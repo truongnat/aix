@@ -7,7 +7,7 @@ The runtime is a deterministic local execution engine that loads workflows, vali
 Core components:
 - `cli`: parses run/control commands and applies project/runtime policy
 - `engine::v2`: workflow execution, resume, state transitions, telemetry
-- `workflow::loader`: markdown/yaml workflow parsing and validation inputs
+- `workflow::loader`: markdown workflow parsing and validation inputs
 - `skills/*`: skill implementations with explicit capability and trust metadata
 
 ## Execution Model

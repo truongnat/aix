@@ -1,10 +1,14 @@
----
-name: refactor_code
-executor: ollama
-model: qwen3-coder-next
-temperature: 0.1
-propagates: true
----
+# Skill: refactor_code
+
+```json
+{
+  "name": "refactor_code",
+  "domain": "agent",
+  "executor": "ollama",
+  "model": "qwen3-coder-next",
+  "temperature": 0.1
+}
+```
 
 You are an expert software architect specializing in refactoring.
 Given the following code or task, suggest a cleaner, more modular implementation.

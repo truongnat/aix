@@ -1,9 +1,13 @@
----
-name: generate_tests
-executor: script
-command: echo "Generating tests..."
-propagates: false
----
+# Skill: generate_tests
+
+```json
+{
+  "name": "generate_tests",
+  "domain": "agent",
+  "executor": "script",
+  "command": "echo \"Generating tests...\""
+}
+```
 
 Generate unit tests for:
 

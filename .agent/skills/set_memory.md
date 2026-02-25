@@ -1,8 +1,15 @@
----
-name: set_memory
-executor: memory
-propagates: false
----
+# Skill: set_memory
+
+```json
+{
+  "name": "set_memory",
+  "domain": "agent",
+  "executor": "ollama",
+  "model": "qwen3:8b",
+  "temperature": 0.0
+}
+```
+
 Store a value in memory using KEY=VALUE format.
 Useful for passing state between steps using {{memory.KEY}}.
 

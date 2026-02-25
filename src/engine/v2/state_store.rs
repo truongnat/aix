@@ -341,7 +341,7 @@ mod tests {
             steps: vec![WorkflowStep::new("s1", "demo.echo", "ok")],
         };
         let mut instance =
-            crate::engine::v2::instance::WorkflowInstance::new(&workflow, Some("wf.yaml".into()));
+            crate::engine::v2::instance::WorkflowInstance::new(&workflow, Some("wf.md".into()));
         store.save(&mut instance).expect("save");
         let loaded = store.load(&instance.instance_id).expect("load");
         assert_eq!(loaded.workflow_name, "state-roundtrip");

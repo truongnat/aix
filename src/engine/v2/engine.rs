@@ -435,7 +435,7 @@ mod tests {
         let first = engine
             .run_new_workflow(
                 &workflow,
-                Some(root.join("w1.yaml").to_string_lossy().to_string()),
+                Some(root.join("w1.md").to_string_lossy().to_string()),
                 budget.clone(),
                 routing.clone(),
                 security.clone(),
@@ -445,7 +445,7 @@ mod tests {
         let second = engine
             .run_new_workflow(
                 &workflow,
-                Some(root.join("w2.yaml").to_string_lossy().to_string()),
+                Some(root.join("w2.md").to_string_lossy().to_string()),
                 budget,
                 routing,
                 security,
@@ -501,7 +501,7 @@ mod tests {
         let instance = engine
             .run_new_workflow(
                 &workflow,
-                Some(root.join("ready-order.yaml").to_string_lossy().to_string()),
+                Some(root.join("ready-order.md").to_string_lossy().to_string()),
                 ExecutionBudget::default(),
                 RoutingPolicy::for_single_domain("demo"),
                 DomainSecurityPolicy::default(),
@@ -523,7 +523,7 @@ mod tests {
     #[tokio::test]
     async fn resume_reuses_idempotent_step_without_double_apply() {
         let root = temp_root("agentic-sdlc-v2-resume-idempotent");
-        let workflow_path = root.join("resume-idempotent.yaml");
+        let workflow_path = root.join("resume-idempotent.md");
         let output_rel_path = format!(
             "local_tmp/idempotent-{}.txt",
             std::time::SystemTime::now()
@@ -536,12 +536,12 @@ mod tests {
             &workflow_path,
             format!(
                 r#"
-id: resume-idempotent
-domain: demo
-steps:
-  - id: write_once
-    skill: demo.write_file
-    input: '{output_input}'
+# Workflow: resume-idempotent
+Domain: demo
+
+## Step: write_once
+Skill: demo.write_file
+Input: {output_input}
 "#
             ),
         )
@@ -675,7 +675,7 @@ steps:
         let instance = engine
             .run_new_workflow(
                 &workflow,
-                Some(root.join("retry.yaml").to_string_lossy().to_string()),
+                Some(root.join("retry.md").to_string_lossy().to_string()),
                 ExecutionBudget::default(),
                 RoutingPolicy::for_single_domain("demo"),
                 DomainSecurityPolicy::default(),

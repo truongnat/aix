@@ -4,6 +4,10 @@ Binary command name is `antigrav` (invoked in this repo via `cargo run -- ...`).
 
 ## Workflow Mode
 
+Workflow definitions under `.agent/workflows` must use Markdown (`.md`) format.
+Project rules under `.agent/rules` are Markdown files with a fenced `json` block.
+Custom skills under `.agent/skills` are Markdown files with a fenced `json` metadata block plus prompt body.
+
 Run a workflow from file path:
 
 ```bash

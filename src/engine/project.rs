@@ -4,6 +4,7 @@ use crate::engine::security::DomainSecurityPolicy;
 use crate::skill::capability::TrustTier;
 use crate::workflow::loader::load_workflow;
 use anyhow::{anyhow, Result};
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::fs;
@@ -75,16 +76,18 @@ pub struct ProjectMergeRules {
 }
 
 impl AgentProjectLayout {
-    fn load_yaml_rule<T>(&self, filename: &str) -> Result<T>
+    fn load_markdown_rule<T>(&self, filename: &str) -> Result<T>
     where
-        T: for<'de> Deserialize<'de> + Default,
+        T: DeserializeOwned + Default,
     {
         let rules_path = self.rules_dir.join(filename);
         if !rules_path.exists() {
             return Ok(T::default());
         }
         let content = fs::read_to_string(rules_path)?;
-        Ok(serde_yaml::from_str(&content)?)
+        let payload = extract_json_code_block(&content)
+            .ok_or_else(|| anyhow!("Rule file '{}' must contain a JSON code block", filename))?;
+        Ok(serde_json::from_str(&payload)?)
     }
 
     pub fn discover(project_root: &str) -> Result<Self> {
@@ -135,7 +138,7 @@ impl AgentProjectLayout {
                     .and_then(|ext| ext.to_str())
                     .unwrap_or_default()
                     .to_ascii_lowercase();
-                if extension != "md" && extension != "yaml" && extension != "yml" {
+                if extension != "md" {
                     continue;
                 }
                 let stem = path
@@ -189,20 +192,52 @@ impl AgentProjectLayout {
     }
 
     pub fn load_runtime_rules(&self) -> Result<ProjectRuntimeRules> {
-        self.load_yaml_rule("runtime.yaml")
+        self.load_markdown_rule("runtime.md")
     }
 
     pub fn load_branching_rules(&self) -> Result<ProjectBranchingRules> {
-        self.load_yaml_rule("branching_rules.yaml")
+        self.load_markdown_rule("branching_rules.md")
     }
 
     pub fn load_coding_rules(&self) -> Result<ProjectCodingRules> {
-        self.load_yaml_rule("coding_rules.yaml")
+        self.load_markdown_rule("coding_rules.md")
     }
 
     pub fn load_merge_rules(&self) -> Result<ProjectMergeRules> {
-        self.load_yaml_rule("merge_rules.yaml")
+        self.load_markdown_rule("merge_rules.md")
     }
+}
+
+fn extract_json_code_block(markdown: &str) -> Option<String> {
+    let mut in_fence = false;
+    let mut fence_lang = String::new();
+    let mut body = String::new();
+
+    for line in markdown.lines() {
+        let trimmed = line.trim();
+        if let Some(rest) = trimmed.strip_prefix("```") {
+            if !in_fence {
+                in_fence = true;
+                fence_lang = rest.trim().to_ascii_lowercase();
+                continue;
+            }
+            if fence_lang.is_empty() || fence_lang == "json" {
+                let payload = body.trim();
+                if !payload.is_empty() {
+                    return Some(payload.to_string());
+                }
+            }
+            in_fence = false;
+            fence_lang.clear();
+            body.clear();
+            continue;
+        }
+        if in_fence {
+            body.push_str(line);
+            body.push('\n');
+        }
+    }
+    None
 }
 
 fn parse_trust_tier(rule: Option<&str>, fallback: TrustTier) -> TrustTier {
@@ -363,18 +398,42 @@ mod tests {
         let rules_dir = root_path.join(".agent").join("rules");
         std::fs::create_dir_all(&rules_dir).expect("rules dir");
         std::fs::write(
-            rules_dir.join("branching_rules.yaml"),
-            "prefix: feat/\nallow_auto_create: false\nallow_auto_checkout: true\n",
+            rules_dir.join("branching_rules.md"),
+            r#"# Branching Rules
+
+```json
+{
+  "prefix": "feat/",
+  "allow_auto_create": false,
+  "allow_auto_checkout": true
+}
+```
+"#,
         )
         .expect("write branching rules");
         std::fs::write(
-            rules_dir.join("coding_rules.yaml"),
-            "require_structured_commit_message: true\n",
+            rules_dir.join("coding_rules.md"),
+            r#"# Coding Rules
+
+```json
+{
+  "require_structured_commit_message": true
+}
+```
+"#,
         )
         .expect("write coding rules");
         std::fs::write(
-            rules_dir.join("merge_rules.yaml"),
-            "require_validation_before_merge: true\ndelete_feature_branch_after_merge: true\n",
+            rules_dir.join("merge_rules.md"),
+            r#"# Merge Rules
+
+```json
+{
+  "require_validation_before_merge": true,
+  "delete_feature_branch_after_merge": true
+}
+```
+"#,
         )
         .expect("write merge rules");
 
