@@ -1,0 +1,303 @@
+Rồi. Mình sẽ mô tả **toàn bộ các bước còn lại** để “completed 1 lượt” theo đúng idea ban đầu — không nói mơ hồ, mà chia thành **execution roadmap hoàn chỉnh** từ hiện tại → v1.0 stable.
+
+Hiện trạng của bạn:
+
+* ✅ Deterministic engine
+* ✅ Crash recovery
+* ✅ Idempotency contract
+* ✅ Concurrency guard
+* 🔄 Phase 25 (Observability) đang mở
+* ⏳ Security, consolidation, polish chưa làm
+
+---
+
+# 🎯 ĐỊNH NGHĨA “COMPLETED 1 LƯỢT”
+
+Completed 1 lượt nghĩa là:
+
+> Engine đủ tin cậy để chạy repo thật, debug được, không crash bất ngờ, có telemetry, có hardening cơ bản, và sẵn sàng tag 1.0.
+
+Không phải enterprise SaaS.
+Không phải distributed system.
+Chỉ là một **production-grade local deterministic engine.**
+
+---
+
+# 🧭 TỔNG SỐ KHỐI CÔNG VIỆC CÒN LẠI
+
+Còn **5 khối lớn**.
+
+---
+
+# 🟢 PHASE 25 — Structured Telemetry & Trace System
+
+## Mục tiêu
+
+Biến engine từ “correct” → “observable”.
+
+## Cần hoàn thành
+
+### 1️⃣ Structured Step Telemetry
+
+* attempt
+* duration_ms
+* retry_count
+* failure_class
+* idempotent_short_circuit
+* started_at / finished_at
+
+Persist trong workflow state.
+
+---
+
+### 2️⃣ Deterministic trace_id
+
+Hash:
+
+* workflow definition
+* sorted inputs
+* engine version
+
+Giúp:
+
+* So sánh run
+* Regression testing
+* Trace replay
+
+---
+
+### 3️⃣ JSON Trace Export CLI
+
+```
+agent workflow trace <id> --json
+agent workflow trace <id> --timeline
+```
+
+---
+
+### 4️⃣ Timeline Renderer
+
+Human readable execution log.
+
+---
+
+### Completion Criteria
+
+* Telemetry persisted
+* JSON export working
+* Timeline working
+* Tests cover retry + idempotency telemetry
+
+---
+
+# 🟡 PHASE 26 — Sandbox & Security Hardening
+
+Hiện tại engine an toàn về logic.
+Chưa an toàn về môi trường thực thi.
+
+## Cần thêm:
+
+### 1️⃣ Environment Isolation
+
+* clear env
+* allowlist variables
+* block secret leak
+
+---
+
+### 2️⃣ Working Directory Isolation
+
+* per workflow working dir
+* prevent accidental overwrite outside repo
+
+---
+
+### 3️⃣ Resource Limits
+
+* CPU limit
+* memory cap
+* timeout enforcement strict
+
+---
+
+### 4️⃣ Command Policy
+
+* optional allowlist
+* deny dangerous commands
+
+---
+
+### Completion Criteria
+
+* run_script không inherit full host env
+* test verify isolation
+* resource exhaustion không crash engine
+
+---
+
+# 🟠 PHASE 27 — Engine Consolidation
+
+Hiện tại:
+
+* v1 + v2 coexist
+
+Để “completed 1 lượt”:
+
+### 1️⃣ v2 become default
+
+Remove need for `AGENT_ENGINE=v2`
+
+---
+
+### 2️⃣ Deprecate v1
+
+* warning message
+* remove dead code
+
+---
+
+### 3️⃣ Remove feature flags that hide core behavior
+
+---
+
+### Completion Criteria
+
+* Single engine path
+* Clean architecture
+* No legacy branching
+
+---
+
+# 🔵 PHASE 28 — Stability & Consistency Sweep
+
+Đây là bước nhiều người bỏ qua.
+
+## 1️⃣ Error Model Cleanup
+
+* unify error types
+* no panic bubbling
+* consistent CLI messages
+
+---
+
+## 2️⃣ CLI UX pass
+
+* consistent flags
+* clear help text
+* predictable exit codes
+
+---
+
+## 3️⃣ Determinism Verification Pass
+
+Test:
+
+* same workflow twice → identical telemetry (except timestamps)
+* crash mid execution → resume deterministic
+
+---
+
+## 4️⃣ Remove TODO / debug logs
+
+---
+
+### Completion Criteria
+
+* cargo clippy clean
+* cargo fmt clean
+* zero panic paths
+* no TODO in production modules
+
+---
+
+# 🟣 PHASE 29 — Documentation & 1.0 Tag
+
+Engine không completed nếu không có:
+
+## 1️⃣ Architecture README
+
+* Execution model
+* Idempotency contract
+* Crash recovery semantics
+* Lock model
+
+---
+
+## 2️⃣ CLI Usage Guide
+
+* Workflow mode
+* Goal mode
+* Trace mode
+
+---
+
+## 3️⃣ Versioning & Changelog
+
+Tag:
+
+```
+v1.0.0
+```
+
+---
+
+# 📊 Tổng Quan Còn Lại
+
+| Phase | Mô tả                | Trọng lượng |
+| ----- | -------------------- | ----------- |
+| 25    | Observability        | Medium      |
+| 26    | Security Hardening   | Medium      |
+| 27    | Engine Consolidation | Light       |
+| 28    | Stability Sweep      | Medium      |
+| 29    | Docs + 1.0           | Light       |
+
+---
+
+# 📌 Tổng Kết Số Bước
+
+Nếu tính theo execution block:
+
+```
+5 phase lớn
+~15–20 task kỹ thuật cụ thể
+```
+
+Nếu làm tập trung:
+
+* 2–3 tuần full focus
+* Hoặc 1 tháng part-time
+
+---
+
+# 🧠 Sau khi xong 5 phase này
+
+Bạn sẽ có:
+
+* Deterministic
+* Resumable
+* Observable
+* Safe
+* Stable
+* Versioned
+
+Tức là:
+
+> Một execution runtime hoàn chỉnh.
+
+---
+
+# 🔥 Quan trọng
+
+Bạn đã vượt qua phần khó nhất (24d).
+Phần còn lại là hardening & polish.
+
+Đây là giai đoạn “từ kỹ sư xây dựng” → “kiến trúc sư hoàn thiện công trình”.
+
+---
+
+Nếu bạn muốn, mình có thể:
+
+* Chuyển toàn bộ roadmap trên thành checklist chi tiết dạng task-level
+* Hoặc phân rã Phase 25 ngay thành implementation plan 1 tuần cụ thể
+
+Bạn đang ở đoạn cuối của vòng 1 rồi 🚀

@@ -1,0 +1,230 @@
+Rất đẹp. 🔥
+Bây giờ engine của bạn đã có **structured execution trace model** — tức là ta đã có đủ nền tảng để làm replay & persistence đúng nghĩa.
+
+Giờ ta bước vào level hệ điều hành runtime:
+
+---
+
+# 🧱 PHASE 10
+
+# Persistent Execution Snapshot + Replay Engine
+
+Hiện tại:
+
+* ExecutionReport chỉ tồn tại in-memory
+* Trace không thể persist
+* Không thể resume workflow giữa chừng
+* Không thể replay deterministically
+
+Ta sẽ thêm:
+
+1. Snapshot model
+2. Serialize execution state
+3. Resume execution từ snapshot
+4. Deterministic replay engine
+
+---
+
+# 🎯 Mục tiêu Phase 10
+
+1. Persist execution snapshot sau mỗi batch
+2. Snapshot chứa đủ state để resume
+3. Có thể replay execution (không re-run skill)
+4. Deterministic restoration
+
+---
+
+# 🔥 STEP 33 — Define ExecutionSnapshot
+
+Tạo:
+
+```
+engine/snapshot.rs
+```
+
+Define:
+
+```rust
+pub struct ExecutionSnapshot {
+    pub workflow_name: String,
+
+    pub completed_steps: Vec<String>,
+    pub failed_steps: Vec<String>,
+
+    pub step_results: HashMap<String, SkillOutput>,
+
+    pub trace: Vec<ExecutionEvent>,
+
+    pub pending_steps: Vec<String>,
+}
+```
+
+Must derive:
+
+```rust
+Serialize, Deserialize
+```
+
+→ cần serde_json support cho SkillOutput + ExecutionEvent.
+
+---
+
+# 🔥 STEP 34 — Make Events + IO Serializable
+
+Add derive:
+
+```rust
+#[derive(Debug, Clone, Serialize, Deserialize)]
+```
+
+For:
+
+* ExecutionEvent
+* SkillInput
+* SkillOutput
+* FailureStrategy
+
+---
+
+# 🔥 STEP 35 — Snapshot Builder
+
+Trong Executor:
+
+Add method:
+
+```rust
+fn build_snapshot(&self) -> ExecutionSnapshot
+```
+
+Snapshot phải capture:
+
+* completed_steps
+* failed_steps
+* step_results
+* trace
+* pending_steps (from graph in_degree > 0 or not executed)
+
+---
+
+# 🔥 STEP 36 — Persist Snapshot to File
+
+Trong Runtime:
+
+Add optional flag:
+
+```bash
+--snapshot-out snapshot.json
+```
+
+Sau mỗi batch execution:
+
+```rust
+save_snapshot(snapshot_path)
+```
+
+Use:
+
+```rust
+serde_json::to_string_pretty
+```
+
+---
+
+# 🔥 STEP 37 — Resume From Snapshot
+
+Add new CLI flag:
+
+```bash
+--resume snapshot.json
+```
+
+Flow:
+
+1. Load snapshot
+2. Load workflow
+3. Reconstruct:
+
+   * completed_steps
+   * failed_steps
+   * step_results
+   * trace
+4. Continue execution only for remaining steps
+
+---
+
+# 🔒 Critical Design Rule
+
+When resuming:
+
+* Do NOT re-execute completed steps
+* Do NOT re-emit old events
+* Only emit events for new steps
+* Preserve determinism
+
+---
+
+# 🔥 STEP 38 — Replay Engine (No Skill Execution)
+
+Add mode:
+
+```bash
+--replay snapshot.json
+```
+
+Replay should:
+
+* Print events from snapshot.trace
+* Not execute any skill
+* Deterministic trace output
+
+---
+
+# 🧠 Example Scenario
+
+Run workflow:
+
+* step1 done
+* step2 done
+* step3 crash (process killed)
+
+Resume:
+
+* Load snapshot
+* Only execute step3 onward
+
+Replay:
+
+* Just show entire trace
+
+---
+
+# 📌 STEP 33–38 TASK
+
+Implement:
+
+1. ExecutionSnapshot struct
+2. Serialization for events + IO
+3. Snapshot builder
+4. CLI snapshot-out flag
+5. Resume flag
+6. Replay flag
+7. Deterministic resume behavior
+
+Test:
+
+* Kill mid-execution
+* Resume works
+* Replay prints exact same trace
+* No duplicate event emission
+
+---
+
+Khi xong reply:
+
+```
+STEP 38 DONE
+```
+
+Sau đó ta sẽ bước vào:
+
+PHASE 11 — Capability-Based Planner Layer (Auto Step Generation) 🚀

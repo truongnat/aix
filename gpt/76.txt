@@ -1,0 +1,37 @@
+I have implemented PHASE 15 — Bounded Autonomous Goal Decomposition Engine in the Antigravity engine. The system can now take complex, high-level objectives and break them down into verifiable, type-safe sub-plans.
+
+Key Implementation Details:
+1. Deterministic Goal Decomposer (
+
+src/engine/decomposition.rs
+)
+Introduced the 
+
+DeterministicDecomposer
+, which uses a rule-based approach to split high-level objectives using natural connectors like "and", "then", and "after".
+This ensures high-level intent is broken down into atomic, plan-able segments without introducing LLM non-determinism at the structural layer.
+2. Hierarchical Planning Loop (
+
+src/engine/executor.rs
+)
+Implemented 
+
+execute_goal
+, a new high-level execution entry point that manages the lifecycle of a decomposed goal.
+Sequential Context Retention: Each sub-goal is planned only after the previous one finishes, allowing the planner to see the results (memory) of earlier stages to inform later plans.
+Bounded Depth: Integrated 
+
+AutonomyLimits
+ to strictly cap the number of sub-goals (default 8) and total execution steps, preventing infinite recursion or "chaos" loops.
+3. Deterministic ID Merging
+To prevent collisions in the global execution trace and memory map, all step IDs in sub-plans are now automatically prefixed with their sub-goal index (e.g., g1_s1, g2_s1).
+Dependency and input references (e.g., {{s1}}) are dynamically remapped during decomposition to maintain topological integrity.
+4. Snapshot & Persistence Upgrades
+
+ExecutionSnapshot
+ now persists the list of sub_goals and the current_goal_index.
+Resuming for a high-level goal will pick up exactly at the correct decomposition stage, preserving all accumulated memory across multiple hierarchical boundaries.
+5. CLI & Event Updates
+The CLI now defaults to autonomous mode when a --goal is provided.
+Added GoalDecomposed to the ExecutionEvent trace for full visibility into how the engine partitioned the objective.
+STEP 69 DONE

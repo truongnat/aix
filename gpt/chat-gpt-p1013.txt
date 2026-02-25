@@ -1,0 +1,173 @@
+Excellent. 🔥
+Bây giờ engine của bạn đã là **deterministic DAG executor** thật sự.
+
+Ta bước vào phần quan trọng nhất về kiến trúc runtime:
+
+---
+
+# 🧱 PHASE 5
+
+# Dataflow Wiring (Output → Input Injection)
+
+Hiện tại:
+
+* Step có input tĩnh (string)
+* Không có data flowing giữa steps
+* Graph chỉ điều khiển order, chưa điều khiển data
+
+Giờ ta sẽ biến DAG thành **dataflow graph**.
+
+---
+
+# 🎯 Mục tiêu Phase 5
+
+1. Step có thể dùng output của step khác
+2. Executor giữ StepResultMap
+3. Input có thể chứa reference
+4. Runtime resolve reference trước khi execute
+5. Không dùng reflection
+6. Vẫn deterministic
+
+---
+
+# 🔥 STEP 10 — Introduce Step Output Store
+
+Trong Executor:
+
+Thêm:
+
+```rust
+HashMap<String, SkillOutput> step_results;
+```
+
+Sau mỗi step:
+
+```rust
+step_results.insert(step_id, output.clone());
+```
+
+---
+
+# 🔥 STEP 11 — Define Reference Syntax
+
+Ta dùng DSL syntax:
+
+```
+{{step_id}}
+```
+
+Ví dụ:
+
+```markdown
+## Step: step2
+DependsOn: step1
+Skill: echo
+Input:
+Result was: {{step1}}
+```
+
+---
+
+# 🔥 STEP 12 — Implement Reference Resolver
+
+Tạo file:
+
+```
+engine/resolver.rs
+```
+
+Function:
+
+```rust
+pub fn resolve_input(
+    raw_input: &str,
+    step_results: &HashMap<String, SkillOutput>
+) -> Result<String>
+```
+
+Logic:
+
+1. Find all `{{...}}`
+2. Extract step_id
+3. Lookup step_results
+4. Replace with output.as_text()
+5. Nếu step chưa execute → error
+
+Không dùng regex phức tạp.
+Simple scan là đủ.
+
+---
+
+# 🔥 STEP 13 — Modify Executor Flow
+
+Trước khi wrap SkillInput:
+
+```rust
+let resolved_input = resolve_input(&step.input, &step_results)?;
+let skill_input = SkillInput::Text(resolved_input);
+```
+
+---
+
+# 🔒 Safety Rule
+
+* Chỉ cho reference đến step đã completed
+* Nếu reference đến future step → error
+* Nếu reference đến unknown step → error
+* Nếu output không phải Text nhưng step input expects Text → error
+
+---
+
+# 🧠 Example Execution
+
+Workflow:
+
+```markdown
+## Step: step1
+Skill: echo
+Input:
+Hello
+
+## Step: step2
+DependsOn: step1
+Skill: echo
+Input:
+Got: {{step1}}
+```
+
+Execution:
+
+```
+step1 → Echo: Hello
+step2 → Echo: Got: Echo: Hello
+```
+
+---
+
+# 📌 STEP 10–13 TASK
+
+Implement:
+
+1. Step result storage
+2. Reference resolver
+3. Input resolution before execute
+4. Error cases
+
+Test:
+
+* Valid reference → OK
+* Missing step → error
+* Future step reference → error
+
+---
+
+Khi xong reply:
+
+```
+STEP 13 DONE
+```
+
+Sau đó ta sẽ vào:
+
+PHASE 6 — Conditional Branching + Boolean Skill Control 🚀
+

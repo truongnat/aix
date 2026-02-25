@@ -1,0 +1,217 @@
+Excellent. 🔥
+Core engine đã sống rồi. Giờ ta “gắn tim vào thân” — Runtime + CLI.
+
+---
+
+# 🧱 PHASE 1 — STEP 4
+
+# Runtime + CLI Integration
+
+🎯 Mục tiêu:
+
+* CLI nhận workflow path
+* Load workflow từ file
+* Build registry
+* Register demo skill
+* Execute workflow
+* Print final output
+
+Không thêm abstraction mới.
+Chỉ wiring.
+
+---
+
+# ✅ STEP 4.1 — Create Runtime (engine/runtime.rs)
+
+Structure:
+
+```rust
+pub struct Runtime {
+    executor: Executor,
+}
+```
+
+Constructor:
+
+```rust
+pub fn new(registry: Arc<SkillRegistry>) -> Self
+```
+
+Method:
+
+```rust
+pub async fn run(&self, workflow: Workflow) -> Result<String>
+```
+
+Implementation chỉ:
+
+```text
+self.executor.execute_workflow(&workflow).await
+```
+
+Không thêm logic.
+
+---
+
+# ✅ STEP 4.2 — Workflow Loader (workflow/loader.rs)
+
+Ta cần parse YAML.
+
+Add dependency nếu chưa có:
+
+```toml
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+```
+
+Workflow structs phải derive:
+
+```rust
+#[derive(Debug, Deserialize)]
+```
+
+Loader:
+
+```rust
+pub fn load_from_file(path: &str) -> Result<Workflow>
+```
+
+Flow:
+
+* Read file
+* Deserialize YAML → Workflow
+* Return
+
+Không validate nâng cao.
+
+---
+
+# ✅ STEP 4.3 — Create Demo Skill (skill/echo.rs)
+
+Ta cần 1 skill thật để test.
+
+```rust
+pub struct EchoSkill;
+```
+
+Implement Skill:
+
+```rust
+fn name(&self) -> &str { "echo" }
+
+fn execute(...) -> Result<String> {
+    Ok(format!("Echo: {}", input))
+}
+```
+
+Chưa cần async nếu trait đang sync.
+Nếu trait async thì dùng async_trait.
+
+---
+
+# ✅ STEP 4.4 — CLI Wiring (main.rs)
+
+Add clap nếu chưa có:
+
+```toml
+clap = { version = "4", features = ["derive"] }
+```
+
+Define CLI:
+
+```rust
+#[derive(Parser)]
+struct Cli {
+    #[arg(short, long)]
+    workflow: String,
+}
+```
+
+Flow trong main:
+
+```text
+parse args
+load workflow
+create registry
+register EchoSkill
+create runtime
+run workflow
+print final result
+```
+
+Không thêm fancy feature.
+
+---
+
+# 🧪 Test Workflow YAML
+
+Tạo file `example.yaml`:
+
+```yaml
+meta:
+  name: test-workflow
+  domain: demo
+  skills:
+    - echo
+
+steps:
+  - id: step1
+    skill: echo
+    input: "Hello AI"
+
+  - id: step2
+    skill: echo
+    input: "Second step"
+```
+
+---
+
+# 🎯 Expected CLI Run
+
+```bash
+cargo run -- --workflow example.yaml
+```
+
+Output:
+
+```
+▶ Step: step1
+   Skill: echo
+   Output: Echo: Hello AI
+
+▶ Step: step2
+   Skill: echo
+   Output: Echo: Second step
+
+Final Memory:
+Echo: Hello AI
+Echo: Second step
+```
+
+---
+
+# 📌 STEP 4 TASK
+
+Implement:
+
+* runtime
+* yaml loader
+* echo skill
+* CLI wiring
+* example.yaml
+
+Compile + run thành công.
+
+---
+
+Khi xong, reply:
+
+```
+STEP 4 DONE
+```
+
+Hoặc paste error.
+
+Sau đó ta sẽ làm:
+
+PHASE 2 — Error Model + Domain Isolation 🔥

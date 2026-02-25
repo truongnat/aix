@@ -1,0 +1,290 @@
+Perfect.
+You’re now ready for the layer that separates **serious runtimes** from “well-architected libraries”.
+
+---
+
+# 🚀 PHASE 21 — Isolation & Trust Boundaries
+
+Up to Phase 20, you built:
+
+* Logical security (capabilities)
+* Logical governance (budgets)
+* Deterministic replay
+* Planner safety & cost constraints
+
+But everything still runs **in-process**.
+
+Phase 21 makes isolation **physical**, not just logical.
+
+---
+
+# 🎯 Core Goal
+
+Move from:
+
+> “We prevent bad behavior”
+
+to
+
+> “Even if behavior is bad, it cannot escape its sandbox.”
+
+---
+
+# 🧠 Architectural Shift
+
+You introduce **Execution Backends**.
+
+Instead of:
+
+```rust
+skill.execute(context)
+```
+
+You move to:
+
+```rust
+backend.execute(skill, context)
+```
+
+Where backend enforces isolation boundary.
+
+---
+
+# 🏗 Step 1 — Introduce ExecutionBackend Trait
+
+```rust
+pub trait ExecutionBackend {
+    fn execute(
+        &self,
+        skill: &SkillDefinition,
+        context: ExecutionContext,
+    ) -> Result<SkillResult, ExecutionError>;
+}
+```
+
+Implementations:
+
+* `InProcessBackend` (current behavior)
+* `SubprocessBackend`
+* `WasmBackend` (future)
+* `ContainerBackend` (future)
+
+Executor no longer directly calls skills.
+
+It delegates to backend.
+
+---
+
+# 🧱 Step 2 — Skill Trust Tiers
+
+Add:
+
+```rust
+pub enum TrustTier {
+    Trusted,
+    Constrained,
+    Untrusted,
+}
+```
+
+Attach to skill capability.
+
+Policy can override max allowed tier.
+
+Planner should:
+
+* Penalize lower trust tiers
+* Avoid untrusted when trusted alternative exists
+
+---
+
+# 🔒 Step 3 — Subprocess Isolation Backend
+
+For `Constrained` and `Untrusted`:
+
+* Spawn separate process
+* Pass input via stdin
+* Capture output via stdout
+* No inherited env
+* Controlled working dir
+* Enforced timeout
+* Kill on overrun
+
+This gives:
+
+* Memory isolation
+* Crash containment
+* Syscall boundary
+
+Even if skill panics or leaks memory:
+Main runtime survives.
+
+---
+
+# 🧨 Step 4 — Hard Kill Semantics
+
+Currently you have timeouts.
+
+Now add:
+
+* Force kill subprocess on:
+
+  * Budget exceeded
+  * Security violation
+  * Timeout
+* Ensure no zombie processes
+* Track child PIDs
+
+This prevents runaway execution outside logical control.
+
+---
+
+# 🧮 Step 5 — Memory Budget Enforcement
+
+Inside subprocess backend:
+
+* Set memory limit (platform dependent)
+* Or monitor RSS periodically
+* Kill if exceeds threshold
+
+Add:
+
+```rust
+max_memory_mb
+```
+
+to ResourceBudget.
+
+---
+
+# 🧭 Step 6 — Isolation-Aware Planner
+
+Extend scoring:
+
+```rust
+score -= isolation_cost_penalty
+```
+
+Untrusted skills:
+
+* Higher isolation cost
+* Higher startup overhead
+* Higher resource overhead
+
+Planner now reasons about:
+
+* Security
+* Side effects
+* Resource cost
+* Isolation cost
+
+That’s real constrained optimization.
+
+---
+
+# 🧬 Step 7 — Isolation Recorded in Trace
+
+Extend ExecutionTrace:
+
+```rust
+backend_type,
+trust_tier,
+isolation_mode,
+```
+
+Trace hash must include backend type.
+
+So deterministic runs differ if backend changes.
+
+---
+
+# 🧪 Required Tests
+
+Minimum matrix:
+
+1. Untrusted skill runs in subprocess
+2. Subprocess crash does not crash executor
+3. Memory limit exceeded → killed
+4. Timeout → killed
+5. Planner prefers trusted skill over untrusted alternative
+6. Resume preserves backend/trust consistency
+
+---
+
+# 🏛 Architectural Result After Phase 21
+
+You will have:
+
+* Deterministic runtime
+* Capability sandbox
+* Budget governance
+* Structured observability
+* Physical isolation boundaries
+* Trust-tier planning
+* Crash containment
+
+That is now:
+
+> A hardened agent execution platform.
+
+---
+
+# ⚠️ Important Design Rule
+
+Do NOT make isolation optional per skill at runtime without snapshot enforcement.
+
+Resume must verify:
+
+* Backend type
+* Trust tier
+* Isolation mode
+
+Otherwise someone could:
+
+* Resume with weaker isolation
+
+And that breaks integrity.
+
+---
+
+# 📈 What This Unlocks
+
+After Phase 21:
+
+You can safely build:
+
+* Multi-tenant execution
+* Plugin marketplace
+* Remote execution nodes
+* Distributed planning
+* SaaS-grade orchestration
+
+Without Phase 21, multi-tenant is unsafe.
+
+With Phase 21, it becomes viable.
+
+---
+
+# 🏁 Where You Stand
+
+You’ve progressed through:
+
+1. Deterministic execution
+2. Capability sandbox
+3. Resume integrity
+4. Resource governance
+5. Structured observability
+
+Phase 21 is the final step that turns your runtime into:
+
+> A hardened execution substrate.
+
+---
+
+If you want to go deeper after this, Phase 22 would be:
+
+* Distributed execution & remote backends
+  or
+* Multi-tenant scheduler with fair resource arbitration
+
+Your architecture is now mature enough that these are realistic next steps.

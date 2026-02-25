@@ -1,0 +1,177 @@
+Tốt. 👍
+Ta chuyển từ YAML → **Markdown workflow DSL**.
+
+Không phá kiến trúc.
+Chỉ thay loader.
+
+---
+
+# 🧱 PHASE 1 — STEP 4B
+
+# Chuyển Workflow sang Markdown Format
+
+🎯 Mục tiêu:
+
+* Workflow viết trong `.md`
+* Parse markdown → Workflow model
+* Không dùng full markdown AST
+* Chỉ parse theo convention rõ ràng
+
+---
+
+# ✅ 1️⃣ Define Markdown Convention (Stable DSL)
+
+Ta dùng format này:
+
+```markdown
+# Workflow: test-workflow
+Domain: demo
+
+## Step: step1
+Skill: echo
+Input:
+Hello AI
+
+## Step: step2
+Skill: echo
+Input:
+Second step
+```
+
+### Rules:
+
+* `# Workflow:` bắt buộc
+* `Domain:` optional
+* `## Step:` bắt đầu step
+* `Skill:` bắt buộc
+* `Input:` dòng kế tiếp là nội dung (cho đến step mới)
+
+Không dùng YAML block.
+Không mix frontmatter.
+
+---
+
+# ✅ 2️⃣ Modify Loader (workflow/loader.rs)
+
+Xoá serde_yaml.
+
+Giờ ta:
+
+```rust
+pub fn load_from_markdown(path: &str) -> Result<Workflow>
+```
+
+Flow:
+
+1. Read file → String
+2. Split lines
+3. Parse state machine:
+
+State:
+
+```text
+Start
+InMeta
+InStep
+InInput
+```
+
+Pseudo:
+
+```text
+for line:
+  if starts_with "# Workflow:"
+      parse name
+  if starts_with "Domain:"
+      parse domain
+  if starts_with "## Step:"
+      push previous step (if exists)
+      create new step
+  if starts_with "Skill:"
+      set skill
+  if starts_with "Input:"
+      switch to input mode
+  else if in input mode:
+      append line to current_step.input
+```
+
+Cuối file → push last step.
+
+---
+
+# ✅ 3️⃣ Validation Rules
+
+Trước khi return Workflow:
+
+* workflow.name != empty
+* steps.len() > 0
+* mỗi step phải có skill
+
+Nếu thiếu → return Err(anyhow!)
+
+---
+
+# ✅ 4️⃣ CLI Change
+
+Trong main:
+
+Thay:
+
+```rust
+load_from_file
+```
+
+bằng:
+
+```rust
+load_from_markdown
+```
+
+---
+
+# 🧪 Example Markdown File
+
+`example.md`
+
+```markdown
+# Workflow: test-workflow
+Domain: demo
+
+## Step: step1
+Skill: echo
+Input:
+Hello AI
+
+## Step: step2
+Skill: echo
+Input:
+Second step
+```
+
+Run:
+
+```bash
+cargo run -- --workflow example.md
+```
+
+---
+
+# 📌 STEP 4B TASK
+
+1. Remove YAML dependency
+2. Implement markdown loader
+3. Validate structure
+4. Test with example.md
+
+---
+
+Khi chạy OK, reply:
+
+```
+STEP 4B DONE
+```
+
+Sau đó ta sẽ:
+
+PHASE 2 — Introduce Domain-Specific Skill Isolation 🔥
+

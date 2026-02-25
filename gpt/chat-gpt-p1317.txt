@@ -1,0 +1,230 @@
+Rất mạnh. 🔥
+Bây giờ engine của bạn đã là:
+
+* DAG executor
+* Deterministic
+* Domain isolated
+* Type aware
+* Dataflow enabled
+
+Giờ ta thêm thứ khiến nó thực sự trở thành runtime orchestration engine:
+
+---
+
+# 🧱 PHASE 6
+
+# Conditional Branching + Boolean Control Flow
+
+Hiện tại DAG chỉ kiểm soát order.
+Tất cả node đều execute.
+
+Ta cần:
+
+* Conditional execution
+* Boolean gate
+* Skip step nếu điều kiện false
+* Không phá deterministic graph
+
+---
+
+# 🎯 Mục tiêu Phase 6
+
+1. Step có thể có điều kiện
+2. Điều kiện dựa trên output step khác
+3. Boolean skill control execution
+4. Nếu condition false → step skipped
+5. Skip vẫn phải propagate correctly trong DAG
+
+---
+
+# 🔥 STEP 14 — Extend WorkflowStep
+
+Thêm field:
+
+```rust
+pub struct WorkflowStep {
+    pub id: String,
+    pub skill: String,
+    pub input: String,
+    pub depends_on: Vec<String>,
+    pub condition: Option<String>,  // NEW
+}
+```
+
+---
+
+# ✅ Markdown DSL Extension
+
+Syntax:
+
+```markdown
+## Step: step2
+DependsOn: step1
+Condition: {{step1}} == true
+Skill: echo
+Input:
+This runs only if step1 true
+```
+
+Simplify for Phase 6:
+
+Condition chỉ support:
+
+```
+{{step_id}} == true
+{{step_id}} == false
+```
+
+Không cần full expression parser.
+
+---
+
+# 🔥 STEP 15 — Boolean Skill
+
+Tạo demo skill:
+
+```rust
+pub struct EqualsSkill;
+```
+
+Capability:
+
+* Input: Text
+* Output: Boolean
+
+Ví dụ:
+
+Input:
+
+```
+5 == 5
+```
+
+Output:
+
+```
+true
+```
+
+Hoặc đơn giản hơn cho phase này:
+
+Tạo skill:
+
+```rust
+pub struct IsPositiveSkill;
+```
+
+Input: Number
+Output: Boolean
+
+Chỉ cần 1 boolean-producing skill để test control flow.
+
+---
+
+# 🔥 STEP 16 — Condition Evaluator
+
+Tạo:
+
+```
+engine/condition.rs
+```
+
+Function:
+
+```rust
+pub fn evaluate_condition(
+    condition: &str,
+    step_results: &HashMap<String, SkillOutput>
+) -> Result<bool>
+```
+
+Logic:
+
+1. Parse `{{step_id}} == true`
+2. Extract step_id
+3. Lookup step_results
+4. Must be Boolean
+5. Compare with literal true/false
+6. Return result
+
+---
+
+# 🔥 STEP 17 — Modify Executor
+
+Trong execution loop:
+
+Before executing step:
+
+```rust
+if let Some(cond) = &step.condition {
+    let should_run = evaluate_condition(cond, &step_results)?;
+    if !should_run {
+        println!("⏭ Skipping step: {}", step.id);
+        continue;
+    }
+}
+```
+
+---
+
+# 🔒 Important Design Rule
+
+Skipped step:
+
+* Không insert result vào step_results
+* Nhưng phải mark completed_steps để không block dependent nodes
+
+Nếu không mark completed → dependent node sẽ fail.
+
+---
+
+# 🧠 Execution Example
+
+```markdown
+## Step: check
+Skill: is_positive
+Input:
+5
+
+## Step: action
+DependsOn: check
+Condition: {{check}} == true
+Skill: echo
+Input:
+It is positive!
+```
+
+Nếu check → true → action runs
+Nếu check → false → action skipped
+
+---
+
+# 📌 STEP 14–17 TASK
+
+Implement:
+
+1. Extend WorkflowStep
+2. Update markdown parser parse Condition
+3. Add boolean-producing demo skill
+4. Implement condition evaluator
+5. Modify executor to support skip
+6. Ensure skipped step doesn't break DAG
+
+Test:
+
+* Condition true → run
+* Condition false → skip
+* Condition referencing non-boolean → error
+
+---
+
+Khi xong reply:
+
+```
+STEP 17 DONE
+```
+
+Sau đó ta sẽ bước vào:
+
+PHASE 7 — Parallel Execution + Async Scheduling 🚀
+

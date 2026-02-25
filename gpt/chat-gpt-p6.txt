@@ -1,0 +1,189 @@
+Rất tốt. 🔥
+Giờ kiến trúc đã có **isolation boundary thật sự**.
+
+Ta lên level tiếp theo.
+
+---
+
+# 🧱 PHASE 3
+
+# Skill Capability Contracts + Type Safety
+
+Hiện tại skill interface là:
+
+```rust
+fn execute(&self, input: &str, ctx: &mut ExecutionContext) -> Result<String>
+```
+
+❌ Vấn đề:
+
+* Input = string mù
+* Output = string mù
+* Không contract
+* Không type safety
+* Không validation
+* Không thể introspect capability
+
+Nếu scale → sẽ vỡ.
+
+---
+
+# 🎯 Mục tiêu Phase 3
+
+1. Skill phải declare capability
+2. Skill phải declare input/output schema
+3. Executor phải validate trước khi chạy
+4. Runtime phải có type-aware execution
+5. Chuẩn bị nền tảng cho:
+
+   * planner
+   * agent reasoning
+   * auto wiring skill
+
+---
+
+# 🔥 STEP 6 — Introduce Skill Contract Model
+
+Ta thêm abstraction:
+
+```text
+Skill
+  ↳ Capability
+  ↳ InputSchema
+  ↳ OutputSchema
+```
+
+---
+
+# ✅ STEP 6.1 — Define SkillCapability
+
+Tạo file: `skill/capability.rs`
+
+```rust
+pub struct SkillCapability {
+    pub name: String,
+    pub description: String,
+    pub input_type: SkillIOType,
+    pub output_type: SkillIOType,
+}
+```
+
+---
+
+# ✅ STEP 6.2 — Define SkillIOType (Simple for now)
+
+```rust
+pub enum SkillIOType {
+    Text,
+    Json,
+    Number,
+    Boolean,
+}
+```
+
+Chưa cần generics.
+Chưa cần serde validation.
+Chỉ metadata trước.
+
+---
+
+# ✅ STEP 6.3 — Modify Skill Trait
+
+Thêm method:
+
+```rust
+fn capability(&self) -> &SkillCapability;
+```
+
+Giờ trait là:
+
+```rust
+pub trait Skill: Send + Sync {
+    fn name(&self) -> &str;
+    fn capability(&self) -> &SkillCapability;
+    fn execute(&self, input: SkillInput, ctx: &mut ExecutionContext) -> Result<SkillOutput>;
+}
+```
+
+---
+
+# ✅ STEP 6.4 — Introduce Typed IO Wrapper
+
+Tạo:
+
+```rust
+pub enum SkillInput {
+    Text(String),
+    Json(serde_json::Value),
+    Number(f64),
+    Boolean(bool),
+}
+
+pub enum SkillOutput {
+    Text(String),
+    Json(serde_json::Value),
+    Number(f64),
+    Boolean(bool),
+}
+```
+
+Hiện tại workflow vẫn parse input dạng text.
+Executor convert Text → SkillInput::Text.
+
+---
+
+# ✅ STEP 6.5 — Executor Validation
+
+Trước khi execute:
+
+```text
+if skill.capability().input_type != actual_input_type:
+    return Err("Input type mismatch")
+```
+
+Output cũng phải match capability.output_type.
+
+---
+
+# 🧠 Quan trọng
+
+Chưa cần:
+
+* JSON schema validation
+* Deep type checking
+* Structured workflow typing
+
+Chỉ enforce capability metadata consistency.
+
+---
+
+# 📌 STEP 6 TASK
+
+1. Add capability struct
+2. Add SkillIOType enum
+3. Modify Skill trait
+4. Add SkillInput / SkillOutput
+5. Update EchoSkill:
+
+   * input_type = Text
+   * output_type = Text
+6. Update Executor:
+
+   * Wrap input
+   * Validate type
+   * Match output
+
+Compile + run workflow cũ phải vẫn chạy OK.
+
+---
+
+Khi xong reply:
+
+```
+STEP 6 DONE
+```
+
+Sau đó ta sẽ:
+
+PHASE 4 — Deterministic Execution Graph (replace linear model) 🚀
+

@@ -1,0 +1,255 @@
+Ok.
+Với vision bạn vừa mô tả (Solo Developer Agent OS), và bạn **đang làm Phase 21 – Isolation & Trust Boundaries**, thì bước tiếp theo **không phải distributed cluster**.
+
+Bạn chưa cần Kubernetes-level infra.
+
+Bạn cần:
+
+# 🚀 PHASE 22 — Agent Session & Project Runtime Layer
+
+Đây là bước biến engine của bạn từ “core runtime” thành “dùng được trong IDE”.
+
+---
+
+# 🎯 Tại sao Phase 22 là bước đúng nhất
+
+Hiện tại bạn có:
+
+* Deterministic executor
+* Capability sandbox
+* Resource governance
+* Isolation backend
+* Planner cost-aware
+
+Nhưng bạn chưa có:
+
+* Project-aware execution
+* Thread-aware execution
+* Git branch orchestration
+* LLM sub-agent integration
+* `.agent/` layout loader
+
+Nếu không có Phase 22, bạn chỉ có kernel.
+
+Phase 22 = user-facing runtime layer.
+
+---
+
+# 🧱 PHASE 22 — Cấu trúc cụ thể
+
+## 1️⃣ Project Agent Layout System
+
+Chuẩn hóa cấu trúc:
+
+```
+.agent/
+  workflows/
+  skills/
+  rules/
+  templates/
+  memory/
+```
+
+Engine phải:
+
+* Auto-load workflows từ project
+* Auto-load skill definitions
+* Merge project rules với runtime policy
+* Validate on startup
+
+Đây là bước để giống Antigravity nhưng deterministic hơn.
+
+---
+
+## 2️⃣ Agent Session Manager
+
+Thêm layer:
+
+```
+AgentSession
+├── project_root
+├── active_thread_id
+├── active_branch
+├── loaded_workflows
+├── vector_index_handle
+└── llm_adapter
+```
+
+Session sẽ:
+
+* Map chat thread → git branch
+* Spawn workflow execution
+* Manage context memory
+* Track thread isolation
+
+---
+
+## 3️⃣ Thread → Git Branch Orchestrator
+
+Đây là phần cực kỳ quan trọng với solo dev.
+
+Cơ chế:
+
+```
+Thread A → feature/login-refactor
+Thread B → feature/new-api
+Thread C → fix/bug-101
+```
+
+Workflow phải:
+
+* Auto create branch
+* Execute skills inside branch
+* Commit changes
+* Merge via merge workflow
+* Conflict resolution skill
+
+Bạn đã có isolation và skill execution.
+Giờ chỉ cần git skill orchestration.
+
+---
+
+## 4️⃣ LLM Sub-Agent Adapter (Ollama Layer)
+
+Bạn cần skill loại:
+
+```
+LLMSubAgentSkill
+```
+
+Có:
+
+* role
+* prompt template
+* tool calling bridge
+* structured output schema
+* temperature
+* model selection (ollama | openai | gemini)
+
+Ollama adapter:
+
+* Local by default
+* Optional public provider
+
+Đừng để LLM gọi trực tiếp từ workflow.
+Phải wrap thành skill → để governance hoạt động.
+
+---
+
+## 5️⃣ Vector + Graph Memory Layer
+
+Thêm 2 skills:
+
+* `embed_document`
+* `semantic_search`
+
+Memory nằm trong:
+
+```
+.agent/memory/
+```
+
+Dùng:
+
+* SQLite + embedding
+  hoặc
+* Qdrant local
+
+Workflow sẽ:
+
+1. Query vector
+2. Inject context vào LLM skill
+3. Generate code
+
+Đây là phần làm cho agent “nhớ project”.
+
+---
+
+## 6️⃣ Script Tooling Layer
+
+Bạn nói đúng:
+
+* validate
+* generate skills
+* generate workflows
+* report
+* analyze conflicts
+
+Tất cả phải là skills.
+
+Không hardcode logic trong engine.
+
+Engine chỉ orchestrate.
+
+---
+
+# 🧠 Tại sao không làm Distributed (22 cũ)?
+
+Vì mục tiêu của bạn là:
+
+> Solo developer augmentation
+
+Không phải:
+
+> Multi-tenant SaaS cluster
+
+Distributed lúc này là premature complexity.
+
+---
+
+# 📊 Sau Phase 22 bạn sẽ có
+
+```
+Solo Dev Agent OS
+│
+├── Core Runtime (Phase 1–21)
+├── Agent Session Layer
+├── Project Layout Loader
+├── Git Branch Orchestrator
+├── Ollama Adapter
+└── Vector Memory Layer
+```
+
+Lúc này:
+
+* Mở IDE
+* Chat
+* Chạy workflow
+* Tạo branch
+* Generate code
+* Validate
+* Merge
+
+=> Work thực tế.
+
+---
+
+# 🏁 Roadmap Tối Ưu Cho Bạn
+
+21 — Isolation (đang làm)
+22 — Agent Session + Project Layout
+23 — Git-aware workflows
+24 — Ollama sub-agent integration
+25 — Vector memory
+26 — Conflict resolution automation
+
+Đó là path đúng với use case bạn nói.
+
+---
+
+# 🎯 Kết luận
+
+Bạn đã xây kernel rất tốt.
+
+Giờ đừng nhảy sang distributed hay enterprise infra.
+
+Hãy xây lớp:
+
+> Project-aware Agent Runtime
+
+Nếu bạn muốn, mình có thể:
+
+* Vẽ sơ đồ kiến trúc Phase 22 chi tiết (struct + module + dependency)
+* Hoặc thiết kế chuẩn `.agent/` spec cho public repo của bạn
+
+Chọn 1 trong 2, mình đi sâu luôn.

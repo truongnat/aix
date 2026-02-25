@@ -1,0 +1,367 @@
+Ok. 👍
+Giờ chúng ta quay lại **đúng hướng ban đầu của bạn** — không phải autonomous agent general-purpose, mà là:
+
+> 🔥 A domain-driven workflow engine for solo developers
+> with pluggable skills, sub-agents (Ollama), vector memory, branching, and project-level config.
+
+Và mục tiêu là:
+
+> Một repo public → clone về là dùng được như “CLI Gemini + IDE Chat + Workflows + Tooling”.
+
+Rất rõ ràng. Rất khả thi. Và thực sự hay. 🚀
+
+---
+
+# 🎯 TÓM TẮT TẦM NHÌN CỦA BẠN
+
+Antigravity =
+
+```
+Project-level AI runtime
+ + Domain workflows
+ + Domain skills
+ + Sub-agents (Ollama)
+ + Vector memory
+ + Branching support
+ + Conflict resolution skills
+ + Scripts / validation / reporting tools
+```
+
+Nó không phải ChatGPT clone.
+Nó là **AI-native solo developer operating system.**
+
+---
+
+# 🏗 KIẾN TRÚC ĐÚNG CHO Ý ĐỊNH CỦA BẠN
+
+Ta sẽ không làm “AI agent tự suy nghĩ vô hạn”.
+Ta làm:
+
+> Structured Workflow Runtime + Skill Graph + Sub-agent Execution.
+
+---
+
+# 1️⃣ CORE ARCHITECTURE
+
+## A. Project Layout (Public Repo Friendly)
+
+```text
+antigravity/
+ ├── src/                ← runtime engine
+ ├── .agent/
+ │    ├── workflows/
+ │    ├── skills/
+ │    ├── rules/
+ │    ├── templates/
+ │    └── config.toml
+ ├── scripts/
+ ├── docs/
+```
+
+Clone về là chạy được.
+
+---
+
+# 2️⃣ WORKFLOW MODEL (Domain-driven)
+
+Workflow không phải chỉ là list steps.
+
+Nó phải là:
+
+```yaml
+meta:
+  domain: backend
+  roles: ["architect", "reviewer"]
+  rules: ["strict-types", "clean-arch"]
+  skills: ["analyze_code", "generate_tests"]
+
+steps:
+  - id: analyze
+    skill: analyze_code
+    template: analyze_backend.tpl
+
+  - id: implement
+    skill: implement_feature
+    depends_on: analyze
+
+  - id: validate
+    skill: run_script
+    script: "cargo test"
+```
+
+👉 Workflow = Declarative execution graph.
+
+---
+
+# 3️⃣ SKILL SYSTEM (Pluggable + Cross-call)
+
+Skill phải có:
+
+```
+SkillMeta:
+ - name
+ - domain
+ - roles
+ - rules
+ - can_call: [other skills]
+```
+
+Skill execution:
+
+```
+Skill.execute(context, memory, config)
+```
+
+Skill có thể:
+
+* gọi skill khác
+* gọi script ngoài
+* gọi Ollama sub-agent
+* query vector DB
+
+---
+
+# 4️⃣ SUB-AGENT MODEL (Ollama Local)
+
+Mỗi skill AI-heavy không gọi trực tiếp model.
+
+Nó gọi:
+
+```
+SubAgent {
+    role: "architect",
+    model: "deepseek-coder",
+    temperature: 0.2,
+    system_template: ...
+}
+```
+
+SubAgent build prompt theo:
+
+```
+role template
++
+workflow rules
++
+step template
++
+context
+```
+
+Ollama local → nhẹ, free.
+
+Option:
+
+```
+model_provider = "ollama" | "openai"
+```
+
+---
+
+# 5️⃣ VECTOR DB LAYER
+
+Bạn cần 3 loại memory:
+
+### A. Project Memory
+
+* Code embeddings
+* Docs
+* ADR
+* Past workflow results
+
+### B. Skill Memory
+
+* Previous reasoning patterns
+
+### C. User Memory
+
+* Preferences
+
+Vector DB use-case:
+
+```
+query: "where email validation logic exists?"
+→ return relevant file embeddings
+→ inject vào skill context
+```
+
+Không inject full history.
+
+---
+
+# 6️⃣ MULTI-THREAD CHAT → BRANCHING MODEL
+
+Bạn đang nghĩ đúng.
+
+Cần:
+
+```
+Workspace
+ ├── branch: feature/email-validation
+ ├── branch: feature/refactor-auth
+```
+
+Mỗi branch có:
+
+```
+AgentContext {
+    workflow_state
+    memory_snapshot
+    branch_id
+}
+```
+
+Conflict resolution skill:
+
+```
+resolve_conflict:
+  - analyze diff
+  - propose merge
+  - run validation script
+```
+
+---
+
+# 7️⃣ IDE CHAT MODE
+
+Bạn hỏi:
+
+> Nếu mở desktop app + IDE chat window thì có work không?
+
+Câu trả lời:
+Có, nếu bạn làm đúng 3 thứ:
+
+### 1️⃣ Runtime độc lập CLI
+
+CLI chỉ là entrypoint.
+
+Engine phải expose:
+
+```
+run_workflow(workflow_name, context)
+chat_thread(thread_id, message)
+```
+
+### 2️⃣ Context per Thread
+
+```
+ThreadState {
+    workflow
+    branch
+    memory
+}
+```
+
+### 3️⃣ Config-driven load
+
+Khi mở project:
+
+```
+load .agent/
+load workflows
+load skills
+load rules
+init vector DB
+```
+
+---
+
+# 8️⃣ So với worktrunk
+
+Worktrunk là task graph + branching model.
+
+Bạn có thể adopt:
+
+```
+WorkflowGraph
+  Node = SkillExecution
+  Edge = dependency
+```
+
+Chứ không chỉ linear steps.
+
+---
+
+# 9️⃣ PUBLIC REPO VISION
+
+Bạn muốn:
+
+> Clone về là thành solo dev OS.
+
+Điều kiện cần:
+
+✔ Default workflows cực xịn
+✔ Backend / Frontend / DevOps domain sets
+✔ CI integration
+✔ Script-based validation
+✔ Conflict resolution workflow
+✔ Smart vector search
+
+---
+
+# 🔟 CLI Experience (Gemini-like)
+
+Bạn muốn kiểu:
+
+```
+antigravity feature add-email-validation
+```
+
+Nó sẽ:
+
+1. Load workflow
+2. Load skills
+3. Load rules
+4. Run validation
+5. Generate patch
+6. Run tests
+7. Commit branch
+
+---
+
+# 🔥 QUAN TRỌNG NHẤT
+
+Antigravity không phải “chat AI”.
+
+Nó là:
+
+> Declarative AI Workflow Runtime for Solo Developers.
+
+---
+
+# 🧠 ĐÚNG TẦM NHÌN CỦA BẠN LÀ:
+
+* Structured
+* Domain-specific
+* Graph-driven
+* Script-integrated
+* Branch-aware
+* Local-first
+* Vector-augmented
+
+---
+
+# 📌 Câu hỏi chiến lược
+
+Bạn muốn:
+
+1️⃣ Tập trung build CLI-first rồi mới làm desktop?
+2️⃣ Hay build desktop-first rồi CLI reuse runtime?
+3️⃣ Hay làm giống Git → CLI core, UI layer sau?
+
+---
+
+Mình đề xuất:
+
+> Build runtime + CLI trước.
+> Desktop chỉ là thin wrapper.
+
+---
+
+Nếu bạn đồng ý, bước tiếp theo mình sẽ:
+
+👉 Thiết kế kiến trúc “Antigravity v1 Stable”
+gồm modules cụ thể, boundaries rõ ràng, dependency graph sạch.
+
+Không lan man nữa.
+Đi thẳng vào kiến trúc có thể implement ngay. 🚀

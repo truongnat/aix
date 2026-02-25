@@ -1,0 +1,109 @@
+Rất tốt. 🔥
+Ta sẽ làm **Runtime + CLI trước**.
+Không lan man. Không nhảy bước.
+Mỗi bước có mục tiêu rõ ràng. Bạn implement → gửi kết quả → ta đi tiếp.
+
+---
+
+# 🧱 PHASE 1 — Foundation Runtime Skeleton
+
+## 🎯 Mục tiêu Phase 1
+
+Có một CLI chạy được:
+
+```bash
+antigravity run <workflow>
+```
+
+Và runtime:
+
+* Load `.agent/workflows`
+* Load `.agent/skills`
+* Build `SkillRegistry`
+* Execute workflow linear (chưa cần graph)
+* Print execution log
+
+Chưa cần:
+
+* Sub-agent
+* Vector DB
+* Branching
+* Conflict resolution
+
+---
+
+# ✅ STEP 1 — Define Core Crate Structure
+
+Bạn tạo structure này trong `src/`:
+
+```text
+engine/
+  mod.rs
+  runtime.rs
+  registry.rs
+  executor.rs
+  context.rs
+
+workflow/
+  mod.rs
+  model.rs
+  loader.rs
+
+skill/
+  mod.rs
+  trait.rs
+
+skills/
+  mod.rs
+  loader.rs
+
+cli.rs
+main.rs
+```
+
+🎯 Yêu cầu:
+
+* Không để circular dependency
+* `engine` không phụ thuộc `cli`
+* `workflow` và `skill` là domain layer
+* `skills` là implementation layer
+
+---
+
+## 🧠 Kiến trúc dependency (quan trọng)
+
+```text
+cli
+ ↓
+engine::runtime
+ ↓
+workflow + registry + executor
+ ↓
+skill::trait
+ ↓
+skills (impl)
+```
+
+Engine không biết skill cụ thể.
+
+---
+
+# 📌 STEP 1 TASK
+
+1. Tạo structure modules như trên
+2. main.rs chỉ gọi cli::run()
+3. Cargo build phải compile được (empty impl cũng được)
+
+---
+
+# ❗ Sau khi làm xong
+
+Chỉ reply:
+
+```
+STEP 1 DONE
+```
+
+Hoặc paste lỗi nếu có.
+
+Ta sẽ sang STEP 2. 🚀

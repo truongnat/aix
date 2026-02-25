@@ -1,0 +1,260 @@
+Alright.
+If Phase 19 was **Security Hardening**, then Phase 20 should elevate the engine from “secure runtime” to **production-grade control plane**.
+
+Given where your architecture stands, the correct next step is:
+
+# 🚀 PHASE 20 — Deterministic Observability & Resource Governance
+
+Security prevents bad behavior.
+Observability + governance let you **prove and control behavior at scale**.
+
+---
+
+# 🎯 Why This Is the Right Move Now
+
+You now have:
+
+* Deterministic execution
+* Capability enforcement
+* Policy merge logic
+* Resume integrity
+* Planner security awareness
+
+But you still lack:
+
+* Resource accounting
+* Execution metrics
+* Cost attribution
+* Deterministic tracing
+* Budget enforcement
+* Multi-run analytics
+
+Without this, you can’t safely scale.
+
+Phase 20 makes the engine enterprise-grade.
+
+---
+
+# 🔥 PHASE 20 Objectives
+
+## 1️⃣ Deterministic Execution Tracing
+
+Add:
+
+```rust
+ExecutionTrace {
+    node_id,
+    skill_name,
+    start_time,
+    end_time,
+    duration_ms,
+    side_effect_class,
+    permissions_used,
+    result_hash,
+}
+```
+
+Persist in:
+
+* Snapshot
+* Final run summary
+
+This gives you:
+
+* Replay verification
+* Audit trail
+* Deterministic diffing
+* Performance debugging
+
+---
+
+## 2️⃣ Resource Budget Model
+
+Introduce:
+
+```rust
+ResourceBudget {
+    max_cpu_ms,
+    max_wall_time_ms,
+    max_fs_reads,
+    max_fs_writes,
+    max_network_calls,
+}
+```
+
+Enforce:
+
+* At executor level
+* During runtime permission checks
+* On timeout boundaries
+
+Fail with:
+
+```
+ExecutionError::ResourceLimitExceeded
+```
+
+This prevents runaway workflows.
+
+---
+
+## 3️⃣ Real Usage Accounting
+
+Track at runtime:
+
+```rust
+ResourceUsage {
+    cpu_ms,
+    wall_time_ms,
+    fs_reads,
+    fs_writes,
+    network_calls,
+}
+```
+
+Attach to:
+
+* Each node
+* Aggregate workflow summary
+* Snapshot
+
+This makes resume aware of budget exhaustion.
+
+---
+
+## 4️⃣ Deterministic Result Hashing
+
+After each node:
+
+* Hash input
+* Hash output
+* Hash permission set
+
+Store hash in snapshot.
+
+This gives you:
+
+* Deterministic replay verification
+* Tamper detection
+* Cross-run diffing
+
+---
+
+## 5️⃣ Structured Observability Events
+
+Extend `ExecutionEvent`:
+
+```rust
+NodeStarted
+NodeCompleted
+ResourceUpdated
+BudgetExceeded
+SecurityViolation
+```
+
+Make them:
+
+* Structured
+* Machine-parseable
+* Stable schema
+
+Now your engine can feed logs into:
+
+* Metrics systems
+* CI enforcement
+* Audit pipelines
+
+---
+
+## 6️⃣ Planner Cost Awareness (Optional but Powerful)
+
+Extend scoring:
+
+```
+score = utility - side_effect_penalty - resource_cost_penalty
+```
+
+Now planner optimizes for:
+
+* Safety
+* Efficiency
+* Determinism
+
+This turns it into constrained optimization.
+
+---
+
+# 🧠 What Phase 20 Changes Architecturally
+
+You move from:
+
+> “Safe deterministic executor”
+
+to
+
+> “Policy-aware, resource-governed execution platform”
+
+That’s the difference between:
+
+* Tool
+* Infrastructure
+
+---
+
+# 📊 What Tests You Should Add
+
+Minimum matrix:
+
+1. CPU budget exceeded → fails deterministically
+2. Network call limit exceeded → blocked
+3. Resume after partial budget → remaining budget enforced
+4. Identical run produces identical execution trace hash
+5. Planner avoids high-cost skill when cheaper alternative exists
+
+---
+
+# 🏗 Expected Code Surface
+
+You’ll touch:
+
+* executor.rs
+* context.rs
+* events.rs
+* snapshot.rs
+* validator.rs
+* planner.rs
+* workflow schema
+* CLI (budget flags)
+
+But this phase is cleaner than 19 — it’s additive, not structural.
+
+---
+
+# ⚖️ Why Not Multi-Tenant Yet?
+
+Because without resource accounting:
+
+Multi-tenant = dangerous.
+
+Observability and governance must come first.
+
+---
+
+# 🏁 After Phase 20…
+
+Your engine will have:
+
+* Determinism
+* Security
+* Resume integrity
+* Planner reasoning
+* Resource governance
+* Structured observability
+
+That’s effectively:
+
+> Agentic SDLC Runtime v1.0 Production Core
+
+---
+
+If you say “21”, I’ll design the next evolution layer (which would likely be multi-tenant isolation or distributed execution).

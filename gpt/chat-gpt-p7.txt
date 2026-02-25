@@ -1,0 +1,202 @@
+Perfect. 🔥
+Bây giờ engine của bạn đã:
+
+* ✅ Domain isolated
+* ✅ Capability aware
+* ✅ Type checked
+* ✅ Deterministic linear execution
+
+Giờ ta nâng cấp kiến trúc thật sự.
+
+---
+
+# 🧱 PHASE 4
+
+# Deterministic Execution Graph
+
+Hiện tại execution là:
+
+```
+step1 → step2 → step3 → ...
+```
+
+❌ Vấn đề:
+
+* Không branching
+* Không conditional
+* Không data dependency
+* Không DAG
+* Không parallelizable
+
+Ta sẽ chuyển sang **Execution Graph Model**
+nhưng vẫn giữ deterministic execution.
+
+---
+
+# 🎯 Mục tiêu Phase 4
+
+1. Workflow trở thành DAG
+2. Step có dependency
+3. Executor resolve dependency order
+4. Không còn linear assumption
+5. Vẫn deterministic
+
+---
+
+# 🔥 STEP 7 — Redesign Workflow Model
+
+## ✅ STEP 7.1 — Extend WorkflowStep
+
+Thêm:
+
+```rust
+pub struct WorkflowStep {
+    pub id: String,
+    pub skill: String,
+    pub input: String,
+    pub depends_on: Vec<String>,
+}
+```
+
+Nếu `depends_on` rỗng → root node.
+
+---
+
+## ✅ STEP 7.2 — Update Markdown DSL
+
+Format mới:
+
+```markdown
+# Workflow: graph-demo
+Domain: demo
+
+## Step: step1
+Skill: echo
+Input:
+Hello
+
+## Step: step2
+DependsOn: step1
+Skill: echo
+Input:
+World
+
+## Step: step3
+DependsOn: step1
+Skill: echo
+Input:
+Parallel branch
+```
+
+Rules:
+
+* DependsOn optional
+* Có thể nhiều id: `DependsOn: step1, step2`
+
+Loader phải parse thành `Vec<String>`.
+
+---
+
+# 🔥 STEP 8 — Build ExecutionGraph
+
+Tạo file:
+
+```
+engine/graph.rs
+```
+
+Struct:
+
+```rust
+pub struct ExecutionGraph {
+    pub adjacency: HashMap<String, Vec<String>>,
+    pub in_degree: HashMap<String, usize>,
+}
+```
+
+Xây graph từ workflow.steps.
+
+---
+
+# ✅ STEP 8.1 — Topological Sort
+
+Implement Kahn’s algorithm:
+
+```text
+queue = nodes with in_degree == 0
+
+while queue not empty:
+    pop node
+    push to execution order
+    reduce in_degree of neighbors
+    if in_degree == 0 → push
+```
+
+Nếu cuối cùng execution_order.len != total_steps
+→ cycle detected → error.
+
+---
+
+# 🔥 STEP 9 — Modify Executor
+
+Thay:
+
+```rust
+for step in workflow.steps
+```
+
+Bằng:
+
+```rust
+let order = graph.topo_sort()?;
+
+for step_id in order:
+    execute(step_id)
+```
+
+Step lookup bằng HashMap.
+
+---
+
+# 🔒 Determinism Rule
+
+Nếu nhiều node có in_degree = 0
+→ phải sort lexicographically trước khi push queue.
+
+Không để random order.
+
+---
+
+# 📌 STEP 7–9 TASK
+
+Implement:
+
+1. Extend WorkflowStep
+2. Update markdown loader parse DependsOn
+3. Create ExecutionGraph
+4. Implement topological sort
+5. Modify Executor to use graph order
+6. Detect cycle → error
+
+---
+
+Test cases:
+
+### Case 1 — Linear → still works
+
+### Case 2 — Branching → executes both
+
+### Case 3 — Cycle → error
+
+---
+
+Khi xong reply:
+
+```
+STEP 9 DONE
+```
+
+Sau đó ta sẽ vào:
+
+PHASE 5 — Dataflow Wiring (output → input injection) 🚀
+

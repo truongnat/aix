@@ -1,0 +1,205 @@
+Rất tốt. 🔥
+Đến đây engine của bạn đã có:
+
+* ✅ Domain isolation
+* ✅ Capability contract
+* ✅ Typed IO
+* ✅ Deterministic DAG
+* ✅ Dataflow injection
+* ✅ Conditional branching
+
+Giờ ta bước vào level runtime thực sự:
+
+---
+
+# 🧱 PHASE 7
+
+# Parallel Execution + Async Scheduling
+
+Hiện tại:
+
+* DAG có thể branch
+* Nhưng executor vẫn chạy tuần tự
+* Không tận dụng parallelism
+
+Ta sẽ:
+
+* Chạy các node cùng “level” song song
+* Vẫn deterministic
+* Không race condition
+* Không phá dataflow
+
+---
+
+# 🎯 Mục tiêu Phase 7
+
+1. Async executor
+2. Execute independent nodes in parallel
+3. Dependency-safe scheduling
+4. Deterministic ordering
+5. Thread-safe step_results
+
+---
+
+# 🔥 STEP 18 — Make Skill Fully Async
+
+Nếu trait hiện tại chưa async → chuyển:
+
+```rust
+#[async_trait]
+pub trait Skill: Send + Sync {
+    async fn execute(
+        &self,
+        input: SkillInput,
+        ctx: &mut ExecutionContext
+    ) -> Result<SkillOutput>;
+}
+```
+
+Dùng `async_trait`.
+
+---
+
+# 🔥 STEP 19 — Redesign Execution Loop
+
+Hiện tại:
+
+```
+for step_id in topo_order:
+    execute step
+```
+
+Giờ ta chuyển sang:
+
+### Level-based execution
+
+1. Compute in_degree map
+2. Find nodes with in_degree == 0
+3. Execute all in that batch concurrently
+4. After batch complete → reduce in_degree
+5. Repeat
+
+---
+
+# 🔥 STEP 20 — Implement Async Batch Execution
+
+Trong executor:
+
+Pseudo:
+
+```rust
+while ready_nodes not empty:
+    sort ready_nodes lexicographically
+
+    let futures = ready_nodes.iter().map(|step_id| async {
+        execute_single_step(step_id)
+    });
+
+    let results = join_all(futures).await;
+
+    for each completed step:
+        update step_results
+        update in_degree
+```
+
+Use:
+
+```rust
+futures::future::join_all
+```
+
+---
+
+# 🔒 Determinism Rule
+
+* Always sort ready_nodes before spawn
+* Never use unordered HashSet iteration
+* Insert results in deterministic order
+
+---
+
+# 🔥 STEP 21 — Make StepResult Thread Safe
+
+Because parallel:
+
+Change:
+
+```rust
+HashMap<String, SkillOutput>
+```
+
+To:
+
+```rust
+Arc<Mutex<HashMap<String, SkillOutput>>>
+```
+
+Or better:
+
+```rust
+DashMap
+```
+
+But for now → Mutex is fine.
+
+---
+
+# 🔥 STEP 22 — ExecutionContext Per Step
+
+⚠️ Critical design point:
+
+Context cannot be shared mutable across parallel tasks.
+
+Solution:
+
+* Clone base context per step
+* Do not share &mut ExecutionContext
+
+---
+
+# 🧠 Example Graph
+
+```
+      step1
+      /   \
+  step2  step3
+      \   /
+      step4
+```
+
+Execution:
+
+Batch 1: step1
+Batch 2: step2 + step3 (parallel)
+Batch 3: step4
+
+---
+
+# 📌 STEP 18–22 TASK
+
+Implement:
+
+1. Async trait
+2. Batch-based DAG execution
+3. join_all execution
+4. Thread-safe result store
+5. Deterministic scheduling
+
+Test:
+
+* Branching workflow
+* Insert artificial delay in skill (sleep 500ms)
+* Verify step2 + step3 run concurrently
+
+---
+
+Khi xong reply:
+
+```
+STEP 22 DONE
+```
+
+Sau đó ta sẽ vào:
+
+PHASE 8 — Failure Semantics + Retry Policy + Step Isolation 🚀
+

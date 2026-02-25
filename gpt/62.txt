@@ -1,0 +1,285 @@
+Excellent. 🔥
+
+This output tells me something very important:
+
+* ✅ Validator executed before runtime
+* ✅ Type flow checked statically
+* ✅ Execution order is now dependency-aware (s2 scheduled only after s1 succeeded)
+* ✅ No premature scheduling like earlier Phase 11
+* ✅ Deterministic trace
+* ✅ No memory corruption
+
+This confirms your Phase 13 validator layer is correctly gating execution.
+
+You now have:
+
+LLM (optional) → Structured Plan → Deterministic Validator → Executor
+
+That is a **verified agent pipeline**.
+
+---
+
+# What Just Happened (Architecturally)
+
+Your log:
+
+```
+✅ Workflow validation passed: Type Flow is Sound.
+```
+
+This means:
+
+1. Skill existence verified
+2. Dependency graph validated
+3. Type compatibility proven
+4. DAG is acyclic
+5. Inputs are structurally valid
+
+Only then:
+
+```
+StepScheduled s1
+StepStarted s1
+StepSucceeded s1
+StepScheduled s2
+```
+
+Notice the ordering difference from Phase 11.
+
+Now scheduling respects topological order.
+
+That is a major maturity milestone.
+
+---
+
+# You Now Have
+
+A constrained program synthesis engine with:
+
+* Static type validation
+* Deterministic DAG execution
+* Optional LLM proposal
+* Formal safety gate
+* Replay engine
+* Snapshot persistence
+* Domain isolation
+
+That is not trivial.
+
+---
+
+# Before Moving to Phase 14
+
+Quick sanity checklist — confirm internally:
+
+* LLM plan rejection path works
+* Hallucinated skill is rejected
+* Wrong type rejected
+* Missing dependency auto-injection works only if deterministic
+* Fallback to deterministic planner works
+
+If all true → you are ready.
+
+---
+
+# 🚀 PHASE 14
+
+# Memory-Aware Adaptive Planning (Contextual Re-Planning)
+
+Up to now:
+
+Planning is static per invocation.
+
+Next step:
+
+> Allow planner to adapt based on execution memory.
+
+This introduces controlled dynamism without losing determinism.
+
+---
+
+# Goal of Phase 14
+
+Allow workflow like:
+
+* Run step
+* Inspect result
+* If condition unmet → dynamically synthesize new sub-plan
+* Resume execution
+
+But in a safe, deterministic way.
+
+---
+
+# Architecture Shift
+
+Current:
+
+```
+Plan → Validate → Execute → Done
+```
+
+Phase 14:
+
+```
+Plan → Validate → Execute
+                     ↓
+               Condition Trigger?
+                     ↓
+               Re-Plan Subgraph
+                     ↓
+               Validate
+                     ↓
+               Continue Execution
+```
+
+Important:
+
+Replanning must be:
+
+* Deterministic
+* Type-safe
+* Snapshot-compatible
+
+---
+
+# Core Concept: Execution Context
+
+Add:
+
+```rust
+pub struct ExecutionContext {
+    pub memory: HashMap<String, SkillOutput>,
+    pub completed_steps: HashSet<String>,
+}
+```
+
+Planner now receives:
+
+```rust
+fn plan_with_context(
+    goal: &PlanningGoal,
+    context: &ExecutionContext,
+    capabilities: &[SkillCapability],
+)
+```
+
+---
+
+# STEP 58 — Conditional Re-Planning Trigger
+
+Define rule:
+
+If a step returns:
+
+```rust
+SkillOutput::Boolean(false)
+```
+
+And goal requires success → trigger replan.
+
+Example:
+
+User goal:
+
+```
+Ensure number is positive
+```
+
+If is_positive returns false:
+
+Planner must synthesize:
+
+```
+absolute_value → is_positive
+```
+
+And inject into graph.
+
+---
+
+# STEP 59 — Subgraph Injection
+
+Implement:
+
+* Freeze completed nodes
+* Attach new DAG after failing node
+* Maintain acyclic structure
+* Update in-degree map
+* Preserve deterministic ordering
+
+---
+
+# STEP 60 — Snapshot Compatibility
+
+When snapshot saved mid-replan:
+
+* Pending subgraph preserved
+* Replay still deterministic
+* No duplicated nodes
+
+---
+
+# STEP 61 — Deterministic Re-Planning Rule
+
+Replanning must:
+
+* Use deterministic planner only
+* No LLM in adaptive mode
+* Use context memory as input source
+* Never override completed steps
+
+---
+
+# STEP 62 — Planning Trace Extension
+
+Trace should include:
+
+```
+AdaptiveTrigger: s2 returned false
+Replan initiated for goal: ensure positivity
+Injected steps: abs_fix → is_positive_retry
+```
+
+This is critical for debugging.
+
+---
+
+# Why This Matters
+
+You are moving from:
+
+Static agent
+
+To:
+
+Self-correcting agent runtime
+
+Without surrendering type safety or determinism.
+
+---
+
+# Where This Ultimately Leads
+
+Phase 14 makes possible:
+
+* Retry strategies
+* Auto remediation
+* Controlled self-healing workflows
+* Deterministic bounded autonomy
+
+Still not chaotic AI.
+
+Still provable.
+
+---
+
+When Phase 14 is complete reply:
+
+```
+STEP 62 DONE
+```
+
+Then we move to:
+
+PHASE 15 — Bounded Autonomous Goal Decomposition Engine 🚀
