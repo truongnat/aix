@@ -1,0 +1,36 @@
+id: bugfix
+description: Apply conservative bugfix flow with retries
+domain: agent
+roles:
+  - debugger
+  - implementer
+  - validator
+steps:
+  - id: ensure_branch
+    skill: agent.ensure_branch
+    input: bugfix-thread
+  - id: detect_failure
+    skill: agent.run_script
+    input: cargo test
+    retry: 1
+    on_failure: Continue
+  - id: retrieve_context
+    skill: agent.semantic_search
+    input: "5:::failing test stack trace and related modules"
+  - id: generate_fix
+    skill: agent.llm_subagent
+    input: "implementer:::Fix only the reported bug. Do not add new features or broad refactors."
+  - id: rerun_tests
+    skill: agent.run_script
+    input: cargo test
+    retry: 2
+  - id: commit_fix
+    skill: agent.git_commit
+    input: |
+      fix(bugfix): resolve failing behavior
+
+      - bug scoped and fixed
+      - tests rerun with retries
+  - id: summarize
+    skill: demo.echo
+    input: Bugfix workflow completed.

@@ -1,0 +1,32 @@
+id: merge
+description: Merge a feature branch with conflict analysis and validation
+domain: agent
+roles:
+  - merger
+  - resolver
+  - validator
+steps:
+  - id: merge_branch
+    skill: agent.git_merge_branch
+    input: main
+    on_failure: Continue
+  - id: analyze_conflicts
+    skill: agent.analyze_conflicts
+    input: scan
+  - id: resolve_conflicts
+    skill: agent.llm_subagent
+    input: "resolver:::If conflicts exist, propose deterministic conflict resolution steps."
+  - id: validate_merge
+    skill: agent.run_script
+    input: cargo test
+  - id: commit_merge
+    skill: agent.git_commit
+    input: |
+      chore(merge): complete merge workflow
+
+      - merge attempted
+      - conflicts analyzed
+      - validation executed
+  - id: summarize
+    skill: demo.echo
+    input: Merge workflow completed.

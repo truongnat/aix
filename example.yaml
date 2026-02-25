@@ -1,0 +1,14 @@
+meta:
+  name: test-workflow
+  domain: demo
+  skills:
+    - echo
+
+steps:
+  - id: step1
+    skill: echo
+    input: "Hello AI"
+
+  - id: step2
+    skill: echo
+    input: "Second step"

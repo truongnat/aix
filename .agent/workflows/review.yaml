@@ -1,0 +1,15 @@
+id: review
+description: Produce structured review without modifying code
+domain: agent
+roles:
+  - reviewer
+steps:
+  - id: load_context
+    skill: agent.semantic_search
+    input: "5:::diff summary coding rule violations review checklist"
+  - id: generate_review
+    skill: agent.llm_subagent
+    input: "reviewer:::Generate JSON review with findings, severity, and concrete remediation."
+  - id: summarize
+    skill: demo.echo
+    input: Review workflow completed.
