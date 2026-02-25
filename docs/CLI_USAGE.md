@@ -28,6 +28,13 @@ cargo run -- workflow status
 cargo run -- workflow status <instance_id>
 ```
 
+Validate project package definitions:
+
+```bash
+cargo run -- workflow check
+cargo run -- workflow check --json
+```
+
 Resume or abort:
 
 ```bash

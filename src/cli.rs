@@ -2,6 +2,7 @@ use std::collections::{HashMap, HashSet};
 use std::future::Future;
 use std::sync::Arc;
 
+use crate::engine::package_check::PackageCheckReport;
 use crate::engine::planner::Planner;
 use crate::engine::project::AgentProjectLayout;
 use crate::engine::registry::DomainRegistry;
@@ -171,6 +172,10 @@ enum WorkflowCommand {
         #[arg(long, default_value_t = false)]
         timeline: bool,
     },
+    Check {
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
     List,
 }
 
@@ -200,7 +205,8 @@ pub async fn run() -> Result<()> {
     let mut resume_instance_id: Option<String> = None;
     if let Some(command) = cli.command.clone() {
         let state_store = WorkflowStateStore::new(&project_root)?;
-        resume_instance_id = handle_workflow_control_command(&state_store, command)?;
+        resume_instance_id =
+            handle_workflow_control_command(&state_store, &project_layout, command)?;
         if resume_instance_id.is_none() {
             return Ok(());
         }
@@ -464,6 +470,7 @@ fn resolve_workflow_selection(
 
 fn handle_workflow_control_command(
     state_store: &WorkflowStateStore,
+    project_layout: &AgentProjectLayout,
     command: Commands,
 ) -> Result<Option<String>> {
     let Commands::Workflow { action } = command;
@@ -532,7 +539,43 @@ fn handle_workflow_control_command(
             }
             Ok(None)
         }
+        WorkflowCommand::Check { json } => {
+            let report = crate::engine::package_check::run_package_check(project_layout)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                print_package_check_report(&report);
+            }
+            if !report.ok() {
+                return Err(anyhow!(
+                    "workflow package check failed with {} error(s)",
+                    report.errors.len()
+                ));
+            }
+            Ok(None)
+        }
         WorkflowCommand::Resume { id } => Ok(Some(id)),
+    }
+}
+
+fn print_package_check_report(report: &PackageCheckReport) {
+    println!(
+        "Package Check: checked={} errors={} warnings={}",
+        report.checked_files,
+        report.errors.len(),
+        report.warnings.len()
+    );
+    if !report.errors.is_empty() {
+        println!("Errors:");
+        for issue in &report.errors {
+            println!("- {}: {}", issue.path, issue.message);
+        }
+    }
+    if !report.warnings.is_empty() {
+        println!("Warnings:");
+        for issue in &report.warnings {
+            println!("- {}: {}", issue.path, issue.message);
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 use crate::engine::registry::DomainRegistry;
 use crate::skills::model::{FileSkill, SkillMeta};
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use std::fs;
 use std::path::Path;
 use std::sync::Arc;
@@ -19,13 +19,9 @@ pub fn load_skills() -> Result<DomainRegistry> {
             continue;
         }
         let content = fs::read_to_string(entry.path())?;
-        let Some((meta_json, body)) = extract_json_code_block_and_body(&content) else {
+        let Ok((meta, body)) = parse_skill_markdown(&content) else {
             // Ignore non-skill markdown files in .agent/skills.
             continue;
-        };
-        let meta: SkillMeta = match serde_json::from_str(&meta_json) {
-            Ok(meta) => meta,
-            Err(_) => continue,
         };
 
         // Register domain if not exists
@@ -39,6 +35,14 @@ pub fn load_skills() -> Result<DomainRegistry> {
     }
 
     Ok(domains)
+}
+
+pub fn parse_skill_markdown(content: &str) -> Result<(SkillMeta, String)> {
+    let (meta_json, body) = extract_json_code_block_and_body(content)
+        .ok_or_else(|| anyhow!("Skill markdown must contain a fenced JSON metadata block"))?;
+    let meta = serde_json::from_str::<SkillMeta>(&meta_json)
+        .map_err(|err| anyhow!("Invalid skill metadata JSON: {}", err))?;
+    Ok((meta, body))
 }
 
 fn extract_json_code_block_and_body(markdown: &str) -> Option<(String, String)> {
