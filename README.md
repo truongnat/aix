@@ -44,4 +44,5 @@ cargo run -- workflow trace <instance_id> --timeline
 
 - Architecture and runtime semantics: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - CLI usage guide: [`docs/CLI_USAGE.md`](docs/CLI_USAGE.md)
+- Dev OS execution blueprint: [`docs/DEV_OS_BLUEPRINT.md`](docs/DEV_OS_BLUEPRINT.md)
 - Release notes: [`CHANGELOG.md`](CHANGELOG.md)
