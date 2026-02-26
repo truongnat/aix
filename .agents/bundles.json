@@ -46,9 +46,25 @@
     ],
     "templates": [
       "bugfix_prompt",
+      "dev_landing_page_prompt",
       "feature_prompt",
       "release_prompt",
       "review_prompt"
+    ]
+  },
+  {
+    "id": "dev",
+    "description": "Domain bundle for 'dev'",
+    "workflows": [
+      "dev/build-landing-page"
+    ],
+    "skills": [
+      "dev/landing_page_architect",
+      "dev/landing_page_implementer"
+    ],
+    "roles": [],
+    "templates": [
+      "dev/build-landing-page_prompt"
     ]
   },
   {

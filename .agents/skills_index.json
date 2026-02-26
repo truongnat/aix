@@ -14,6 +14,36 @@
     ]
   },
   {
+    "id": "dev/landing_page_architect",
+    "path": ".agents/skills/dev/landing_page_architect.md",
+    "name": "landing_page_architect",
+    "domain": "dev",
+    "description": "Design an implementation-ready landing page spec with sections, UX intent, and acceptance criteria.",
+    "risk": "safe",
+    "source": "self",
+    "tags": [
+      "dev",
+      "landing-page",
+      "ux",
+      "planning"
+    ]
+  },
+  {
+    "id": "dev/landing_page_implementer",
+    "path": ".agents/skills/dev/landing_page_implementer.md",
+    "name": "landing_page_implementer",
+    "domain": "dev",
+    "description": "Generate implementation-ready landing page file changes and validation checklist from a spec.",
+    "risk": "safe",
+    "source": "self",
+    "tags": [
+      "dev",
+      "landing-page",
+      "implementation",
+      "frontend"
+    ]
+  },
+  {
     "id": "generate_tests",
     "path": ".agents/skills/generate_tests.md",
     "name": "generate_tests",

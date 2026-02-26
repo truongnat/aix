@@ -1,12 +1,36 @@
 {
   "version": 2,
-  "generated_at_ms": 1772122313235,
+  "generated_at_ms": 1772123287620,
   "skills": [
     {
       "id": "analyze_code",
       "path": ".agents/skills/analyze_code.md",
       "bytes": 1060,
       "fingerprint": "b7e2496d17b9a436",
+      "source": "self",
+      "source_requested": null,
+      "source_commit": null,
+      "source_path": null,
+      "source_license": null,
+      "imported_at_ms": null
+    },
+    {
+      "id": "dev/landing_page_architect",
+      "path": ".agents/skills/dev/landing_page_architect.md",
+      "bytes": 1969,
+      "fingerprint": "34335fe6cf41a4ad",
+      "source": "self",
+      "source_requested": null,
+      "source_commit": null,
+      "source_path": null,
+      "source_license": null,
+      "imported_at_ms": null
+    },
+    {
+      "id": "dev/landing_page_implementer",
+      "path": ".agents/skills/dev/landing_page_implementer.md",
+      "bytes": 1711,
+      "fingerprint": "b3ff7cba320aec2c",
       "source": "self",
       "source_requested": null,
       "source_commit": null,

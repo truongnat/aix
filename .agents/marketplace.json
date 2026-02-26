@@ -30,6 +30,16 @@
       ]
     },
     {
+      "name": "dev",
+      "description": "Domain bundle for 'dev'",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./.agents/skills/dev/landing_page_architect.md",
+        "./.agents/skills/dev/landing_page_implementer.md"
+      ]
+    },
+    {
       "name": "imported",
       "description": "Domain bundle for 'imported'",
       "source": "./",
