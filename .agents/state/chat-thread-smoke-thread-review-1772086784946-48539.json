@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "instance_id": "chat-thread-smoke-thread-review-1772086784946-48539",
+  "trace_id": "v20-70a9da2fbe9b1745",
+  "workflow_id": "chat-thread-smoke-thread-review",
+  "workflow_name": "chat-thread-smoke-thread-review",
+  "workflow_path": "/Users/truongdq/Documents/GitHub/agentic-sdlc/.agent/workflows/review.md",
+  "status": "Completed",
+  "current_step": 3,
+  "step_order": [
+    "load_context",
+    "generate_review",
+    "summarize"
+  ],
+  "completed_steps": [
+    "load_context",
+    "generate_review",
+    "summarize"
+  ],
+  "failed_steps": [],
+  "step_states": {
+    "load_context": {
+      "status": "Succeeded",
+      "attempts": 1,
+      "retry_count": 0,
+      "last_error": null,
+      "started_at_ms": 1772086784974,
+      "finished_at_ms": 1772086784979,
+      "duration_ms": 5,
+      "failure_class": null,
+      "idempotent_short_circuit": false,
+      "context_injected_items": 0,
+      "estimated_cost_units": 1,
+      "actual_cost_usd": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "provider": null,
+      "model": null,
+      "call_attempts": 1
+    },
+    "generate_review": {
+      "status": "Succeeded",
+      "attempts": 1,
+      "retry_count": 0,
+      "last_error": null,
+      "started_at_ms": 1772086784983,
+      "finished_at_ms": 1772086785596,
+      "duration_ms": 613,
+      "failure_class": null,
+      "idempotent_short_circuit": false,
+      "context_injected_items": 0,
+      "estimated_cost_units": 1,
+      "actual_cost_usd": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "call_attempts": 3
+    },
+    "summarize": {
+      "status": "Succeeded",
+      "attempts": 1,
+      "retry_count": 0,
+      "last_error": null,
+      "started_at_ms": 1772086785600,
+      "finished_at_ms": 1772086785605,
+      "duration_ms": 5,
+      "failure_class": null,
+      "idempotent_short_circuit": false,
+      "context_injected_items": 0,
+      "estimated_cost_units": 1,
+      "actual_cost_usd": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "provider": null,
+      "model": null,
+      "call_attempts": 1
+    }
+  },
+  "step_results": {
+    "generate_review": {
+      "Json": {
+        "actions": [
+          "verify provider credentials",
+          "retry with healthy provider"
+        ],
+        "cost": {
+          "currency": "USD",
+          "estimated_usd": 0.0,
+          "input_rate_per_1k": 0.0,
+          "output_rate_per_1k": 0.0,
+          "source": "simulation"
+        },
+        "model": "qwen3:8b",
+        "provider": "ollama",
+        "risks": [
+          "simulation_fallback_used"
+        ],
+        "role": "reviewer",
+        "router": {
+          "attempts": 3,
+          "errors": [
+            "provider=ollama model=qwen3:8b failed after 3 attempt(s): error sending request for url (http://localhost:11434/api/generate): error trying to connect: tcp connect error: Operation not permitted (os error 1)"
+          ],
+          "fallback_used": false,
+          "max_retries": 2,
+          "primary_provider": "ollama",
+          "simulation_fallback": true,
+          "timeout_ms": 30000
+        },
+        "schema": "llm_router.v1",
+        "summary": "Simulated sub-agent response. providers_failed=1 input_len=455",
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "total_tokens": 0
+        }
+      }
+    },
+    "summarize": {
+      "Text": "Echo: Review workflow completed."
+    },
+    "load_context": {
+      "Json": {
+        "query": "diff summary coding rule violations review checklist",
+        "results": []
+      }
+    }
+  },
+  "trace": [
+    "[1772086784968] workflow started",
+    "[1772086784979] step 'load_context' Succeeded context_items=0 cost_units=1 cost_usd=0.000000 tokens=0 provider=- model=-",
+    "[1772086785596] step 'generate_review' Succeeded context_items=0 cost_units=1 cost_usd=0.000000 tokens=0 provider=ollama model=qwen3:8b",
+    "[1772086785605] step 'summarize' Succeeded context_items=0 cost_units=1 cost_usd=0.000000 tokens=0 provider=- model=-",
+    "[1772086785610] workflow completed successfully"
+  ],
+  "created_at_ms": 1772086784946,
+  "updated_at_ms": 1772086785610,
+  "last_error": null
+}

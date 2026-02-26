@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "instance_id": "validflow-1771996836344-76208",
+  "workflow_id": "ValidFlow",
+  "workflow_name": "ValidFlow",
+  "workflow_path": "valid_flow.md",
+  "status": "Completed",
+  "current_step": 2,
+  "step_order": [
+    "s1",
+    "s2"
+  ],
+  "completed_steps": [
+    "s1",
+    "s2"
+  ],
+  "failed_steps": [],
+  "step_states": {
+    "s1": {
+      "status": "Succeeded",
+      "attempts": 1,
+      "last_error": null,
+      "started_at_ms": 1771996836389,
+      "finished_at_ms": 1771996836393
+    },
+    "s2": {
+      "status": "Succeeded",
+      "attempts": 1,
+      "last_error": null,
+      "started_at_ms": 1771996836398,
+      "finished_at_ms": 1771996836403
+    }
+  },
+  "step_results": {
+    "s1": {
+      "Number": 42.0
+    },
+    "s2": {
+      "Boolean": true
+    }
+  },
+  "trace": [
+    "[1771996836379] workflow started",
+    "[1771996836393] step 's1' Succeeded",
+    "[1771996836403] step 's2' Succeeded",
+    "[1771996836408] workflow completed successfully"
+  ],
+  "created_at_ms": 1771996836344,
+  "updated_at_ms": 1771996836409,
+  "last_error": null
+}

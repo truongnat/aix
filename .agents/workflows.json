@@ -1,0 +1,176 @@
+[
+  {
+    "id": "antigravity/antigravity-build-ai-agent-system",
+    "path": ".agents/workflows/antigravity/antigravity-build-ai-agent-system.md",
+    "name": "antigravity-build-ai-agent-system",
+    "domain": "antigravity",
+    "description": "Imported from antigravity-awesome-skills workflow 'build-ai-agent-system'",
+    "steps": 4,
+    "skills": [
+      "antigravity.agent-evaluation",
+      "antigravity.ai-agents-architect",
+      "antigravity.langgraph",
+      "antigravity.llm-app-patterns"
+    ]
+  },
+  {
+    "id": "antigravity/antigravity-design-ddd-core-domain",
+    "path": ".agents/workflows/antigravity/antigravity-design-ddd-core-domain.md",
+    "name": "antigravity-design-ddd-core-domain",
+    "domain": "antigravity",
+    "description": "Imported from antigravity-awesome-skills workflow 'design-ddd-core-domain'",
+    "steps": 5,
+    "skills": [
+      "antigravity.cqrs-implementation",
+      "antigravity.ddd-context-mapping",
+      "antigravity.ddd-strategic-design",
+      "antigravity.ddd-tactical-patterns",
+      "antigravity.domain-driven-design"
+    ]
+  },
+  {
+    "id": "antigravity/antigravity-qa-browser-automation",
+    "path": ".agents/workflows/antigravity/antigravity-qa-browser-automation.md",
+    "name": "antigravity-qa-browser-automation",
+    "domain": "antigravity",
+    "description": "Imported from antigravity-awesome-skills workflow 'qa-browser-automation'",
+    "steps": 3,
+    "skills": [
+      "antigravity.browser-automation",
+      "antigravity.e2e-testing-patterns",
+      "antigravity.systematic-debugging"
+    ]
+  },
+  {
+    "id": "antigravity/antigravity-security-audit-web-app",
+    "path": ".agents/workflows/antigravity/antigravity-security-audit-web-app.md",
+    "name": "antigravity-security-audit-web-app",
+    "domain": "antigravity",
+    "description": "Imported from antigravity-awesome-skills workflow 'security-audit-web-app'",
+    "steps": 4,
+    "skills": [
+      "antigravity.api-security-best-practices",
+      "antigravity.broken-authentication",
+      "antigravity.ethical-hacking-methodology",
+      "antigravity.security-auditor"
+    ]
+  },
+  {
+    "id": "antigravity/antigravity-ship-saas-mvp",
+    "path": ".agents/workflows/antigravity/antigravity-ship-saas-mvp.md",
+    "name": "antigravity-ship-saas-mvp",
+    "domain": "antigravity",
+    "description": "Imported from antigravity-awesome-skills workflow 'ship-saas-mvp'",
+    "steps": 5,
+    "skills": [
+      "antigravity.backend-dev-guidelines",
+      "antigravity.brainstorming",
+      "antigravity.deployment-procedures",
+      "antigravity.frontend-developer",
+      "antigravity.test-driven-development"
+    ]
+  },
+  {
+    "id": "bugfix",
+    "path": ".agents/workflows/bugfix.md",
+    "name": "bugfix",
+    "domain": "agent",
+    "description": "bugfix workflow",
+    "steps": 7,
+    "skills": [
+      "agent.ensure_branch",
+      "agent.git_commit",
+      "agent.llm_subagent",
+      "agent.run_script",
+      "agent.semantic_search",
+      "demo.echo"
+    ]
+  },
+  {
+    "id": "build-feature",
+    "path": ".agents/workflows/build-feature.md",
+    "name": "Build Feature",
+    "domain": "agent",
+    "description": "build feature workflow",
+    "steps": 5,
+    "skills": [
+      "agent.llm_subagent",
+      "agent.run_script"
+    ]
+  },
+  {
+    "id": "feature",
+    "path": ".agents/workflows/feature.md",
+    "name": "feature",
+    "domain": "agent",
+    "description": "feature delivery workflow",
+    "steps": 7,
+    "skills": [
+      "agent.ensure_branch",
+      "agent.git_commit",
+      "agent.llm_subagent",
+      "agent.run_script",
+      "agent.semantic_search",
+      "demo.echo"
+    ]
+  },
+  {
+    "id": "merge",
+    "path": ".agents/workflows/merge.md",
+    "name": "merge",
+    "domain": "agent",
+    "description": "merge workflow",
+    "steps": 6,
+    "skills": [
+      "agent.analyze_conflicts",
+      "agent.git_commit",
+      "agent.git_merge_branch",
+      "agent.llm_subagent",
+      "agent.run_script",
+      "demo.echo"
+    ]
+  },
+  {
+    "id": "refactor",
+    "path": ".agents/workflows/refactor.md",
+    "name": "refactor",
+    "domain": "agent",
+    "description": "refactor workflow",
+    "steps": 7,
+    "skills": [
+      "agent.ensure_branch",
+      "agent.git_commit",
+      "agent.llm_subagent",
+      "agent.run_script",
+      "agent.semantic_search",
+      "demo.echo"
+    ]
+  },
+  {
+    "id": "release",
+    "path": ".agents/workflows/release.md",
+    "name": "release",
+    "domain": "agent",
+    "description": "release workflow",
+    "steps": 6,
+    "skills": [
+      "agent.git_commit",
+      "agent.llm_subagent",
+      "agent.run_script",
+      "demo.echo"
+    ]
+  },
+  {
+    "id": "review",
+    "path": ".agents/workflows/review.md",
+    "name": "review",
+    "domain": "agent",
+    "description": "review workflow",
+    "steps": 3,
+    "skills": [
+      "agent.llm_subagent",
+      "agent.semantic_search",
+      "demo.echo"
+    ]
+  }
+]

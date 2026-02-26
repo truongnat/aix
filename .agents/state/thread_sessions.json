@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "threads": [
+    {
+      "thread_id": "demo-thread",
+      "branch": "thread/demo-thread",
+      "last_workflow_instance_id": "validflow-1772082759060-89934",
+      "last_workflow_name": "ValidFlow",
+      "last_workflow_status": "Completed",
+      "last_trace_id": "v20-99e318ab1dff441b",
+      "run_count": 1,
+      "created_at_ms": 1772082759038,
+      "updated_at_ms": 1772082759115
+    },
+    {
+      "thread_id": "smoke-thread",
+      "branch": "thread/smoke-thread",
+      "last_workflow_instance_id": "chat-thread-smoke-thread-review-1772086784946-48539",
+      "last_workflow_name": "chat-thread-smoke-thread-review",
+      "last_workflow_status": "Completed",
+      "last_trace_id": "v20-70a9da2fbe9b1745",
+      "run_count": 1,
+      "created_at_ms": 1772086279170,
+      "updated_at_ms": 1772086785615
+    }
+  ],
+  "instance_to_thread": {
+    "chat-thread-smoke-thread-review-1772086784946-48539": "smoke-thread",
+    "validflow-1772082759060-89934": "demo-thread"
+  }
+}
