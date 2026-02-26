@@ -93,6 +93,50 @@ cargo run -- workflow check
 cargo run -- workflow check --json
 ```
 
+Run skill quality-bar validation (metadata, trigger sections, examples, limitations, dangling links):
+
+```bash
+cargo run -- workflow quality-skills
+cargo run -- workflow quality-skills --strict
+cargo run -- workflow quality-skills --json
+```
+
+Build curated catalog and marketplace artifacts under `.agents/`:
+
+```bash
+cargo run -- workflow build-catalog
+cargo run -- workflow build-catalog --json
+```
+
+Import external `SKILL.md` repositories and convert to local `.agents/skills/imported/*.md` format:
+
+```bash
+cargo run -- workflow import-skills https://github.com/anthropics/skills --max-skills 20
+cargo run -- workflow import-skills https://github.com/anthropics/skills --allow-missing-license
+cargo run -- workflow import-skills https://github.com/anthropics/skills --mode global --allow-missing-license
+cargo run -- workflow import-skills /absolute/path/to/skills-repo --domain agent --overwrite --json
+cargo run -- workflow import-skills /absolute/path/to/skills-repo --no-catalog-rebuild
+```
+
+Install skillpacks via installer alias:
+
+```bash
+cargo run -- workflow install-skillpack https://github.com/anthropics/skills --mode local --allow-missing-license
+cargo run -- workflow install-skillpack https://github.com/anthropics/skills --mode global --allow-missing-license
+```
+
+Sync already-imported skills from lockfile-pinned provenance/commit:
+
+```bash
+cargo run -- workflow sync-imports --overwrite
+cargo run -- workflow sync-imports --overwrite --allow-missing-license --json
+cargo run -- workflow sync-imports --mode global --overwrite --allow-missing-license
+```
+
+Mode behavior:
+- `--mode local`: install/sync under `.agents/skills/imported` and lockfile `.agents/skills.lock.json`
+- `--mode global`: install/sync under `$CODEX_HOME/skills/imported` (fallback `~/.codex/skills/imported`) and lockfile `$CODEX_HOME/skills/skills.lock.json`
+
 Rebuild graph index for context retrieval (also refreshes sqlite context tables in `.agents/memory/context.db`):
 
 ```bash
@@ -119,10 +163,17 @@ cargo run -- workflow setup --json
 Generate scaffold markdown packages with correct schema headers:
 
 ```bash
-cargo run -- workflow scaffold workflow feature-search
-cargo run -- workflow scaffold skill search_docs
-cargo run -- workflow scaffold role planner
+cargo run -- workflow scaffold workflow feature-search --profile advanced
+cargo run -- workflow scaffold skill search_docs --profile advanced
+cargo run -- workflow scaffold role planner --profile basic
 cargo run -- workflow scaffold rule runtime --overwrite
+```
+
+Generate an advanced domain pack (workflows + skills + roles + templates):
+
+```bash
+cargo run -- workflow scaffold-domain payments
+cargo run -- workflow scaffold-domain growth --json
 ```
 
 Run thread lifecycle flow (thread start -> feature branch validate -> merge target -> auto conflict resolve loop -> conflict gate -> finalize):
@@ -222,6 +273,15 @@ Run the full deterministic gate:
 ```bash
 ./scripts/ci_gate.sh
 ```
+
+`ci_gate.sh` enforces:
+- `cargo fmt --check`
+- `cargo test`
+- `cargo clippy -D warnings`
+- clean-clone smoke
+- `workflow check` with zero warnings
+- `workflow quality-skills --strict`
+- `workflow build-catalog`
 
 `bootstrap.sh` verifies:
 - `git`, `rustc`, `cargo`

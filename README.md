@@ -84,8 +84,14 @@ cargo run -- workflow templates
 Scaffold markdown package files with schema headers:
 
 ```bash
-cargo run -- workflow scaffold workflow feature-search
-cargo run -- workflow scaffold skill search_docs
+cargo run -- workflow scaffold workflow feature-search --profile advanced
+cargo run -- workflow scaffold skill search_docs --profile advanced
+```
+
+Generate an advanced domain pack (workflows + skills + roles + templates):
+
+```bash
+cargo run -- workflow scaffold-domain payments
 ```
 
 Rebuild graph index for context retrieval (also refreshes sqlite context tables in `.agents/memory/context.db`):
@@ -93,6 +99,43 @@ Rebuild graph index for context retrieval (also refreshes sqlite context tables 
 ```bash
 cargo run -- workflow index-graph
 ```
+
+Run skill quality validation and strict gate:
+
+```bash
+cargo run -- workflow quality-skills
+cargo run -- workflow quality-skills --strict
+```
+
+Generate catalog/manifest/lock artifacts for skill bundles:
+
+```bash
+cargo run -- workflow build-catalog
+```
+
+Import third-party `SKILL.md` repos into local `.agents/skills/imported`:
+
+```bash
+cargo run -- workflow import-skills https://github.com/anthropics/skills --max-skills 20
+cargo run -- workflow import-skills https://github.com/anthropics/skills --allow-missing-license
+cargo run -- workflow import-skills https://github.com/anthropics/skills --mode global --allow-missing-license
+```
+
+Install using installer-style alias command:
+
+```bash
+cargo run -- workflow install-skillpack https://github.com/anthropics/skills --mode local --allow-missing-license
+cargo run -- workflow install-skillpack https://github.com/anthropics/skills --mode global --allow-missing-license
+```
+
+Sync existing imported skills using pinned source commit/provenance from `.agents/skills.lock.json`:
+
+```bash
+cargo run -- workflow sync-imports --overwrite
+cargo run -- workflow sync-imports --mode global --overwrite --allow-missing-license
+```
+
+`--mode local` writes to `.agents/skills/imported`; `--mode global` writes to `$CODEX_HOME/skills/imported` (fallback: `~/.codex/skills/imported`).
 
 Resume a run:
 
@@ -138,6 +181,20 @@ ANTIGRAV_CONTEXT_VECTOR_TABLE=vector_entries
 ANTIGRAV_CONTEXT_GRAPH_TABLE=graph_nodes
 ANTIGRAV_CONTEXT_MAX_ITEMS=5
 ANTIGRAV_CONTEXT_MAX_CHARS=300
+```
+
+## Generated Artifacts
+
+These files are generated and ignored by git by default:
+- `.agents/catalog/*`
+- `.agents/marketplace.json`
+- `.agents/skills.lock.json`
+- `.agents/skills/imported/*`
+
+Regenerate them anytime with:
+
+```bash
+cargo run -- workflow build-catalog
 ```
 
 ## Installation

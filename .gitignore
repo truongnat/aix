@@ -36,3 +36,9 @@ dist-ssr
 /.agents/state
 /.agents/sandbox
 /.agents/memory/experiences.json
+
+# Generated catalog / lock artifacts (rebuild via `workflow build-catalog`)
+/.agents/catalog/
+/.agents/marketplace.json
+/.agents/skills.lock.json
+/.agents/skills/imported/

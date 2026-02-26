@@ -42,4 +42,10 @@ if [[ "$warnings_count" != "0" ]]; then
   fail "workflow check reported warnings=$warnings_count"
 fi
 
+log "Running strict skill quality gate..."
+cargo run --quiet -- workflow quality-skills --strict --json >/dev/null
+
+log "Rebuilding catalog + lock artifacts..."
+cargo run --quiet -- workflow build-catalog --json >/dev/null
+
 log "CI gate passed."
