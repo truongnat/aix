@@ -12,7 +12,7 @@ use crate::workflow::loader::load_workflow;
 use crate::workflow::model::{FailureStrategy, Workflow};
 use anyhow::{anyhow, Result};
 use std::collections::{HashMap, HashSet};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::sync::Arc;
 
 pub struct ExecutionEngine {
@@ -335,40 +335,7 @@ fn resolve_resume_workflow_path(raw: &str) -> Result<String> {
         return Ok(raw.to_string());
     }
 
-    let mut candidates = Vec::<PathBuf>::new();
-    if raw.contains(".agent/") {
-        candidates.push(PathBuf::from(raw.replace(".agent/", ".agents/")));
-    }
-    if raw.contains("/.agent/") {
-        candidates.push(PathBuf::from(raw.replace("/.agent/", "/.agents/")));
-    }
-    if raw.starts_with(".agent/") {
-        candidates.push(PathBuf::from(raw.replacen(".agent/", ".agents/", 1)));
-    }
-    if raw.starts_with("./.agent/") {
-        candidates.push(PathBuf::from(raw.replacen("./.agent/", "./.agents/", 1)));
-    }
-
-    let mut seen = HashSet::<PathBuf>::new();
-    for candidate in candidates {
-        if !seen.insert(candidate.clone()) {
-            continue;
-        }
-        if candidate.exists() {
-            return pathbuf_to_string(&candidate);
-        }
-    }
-
-    Err(anyhow!(
-        "Workflow path '{}' does not exist (legacy fallback to .agents not found)",
-        raw
-    ))
-}
-
-fn pathbuf_to_string(path: &Path) -> Result<String> {
-    path.to_str()
-        .map(|v| v.to_string())
-        .ok_or_else(|| anyhow!("Invalid workflow path encoding: {}", path.display()))
+    Err(anyhow!("Workflow path '{}' does not exist", raw))
 }
 
 fn classify_step_failure(err_text: &str) -> String {
@@ -411,7 +378,6 @@ mod tests {
     use anyhow::{anyhow, Result};
     use async_trait::async_trait;
     use serde_json::Value;
-    use std::path::PathBuf;
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::Arc;
 
@@ -780,14 +746,14 @@ Input: {output_input}
     }
 
     #[tokio::test]
-    async fn resume_supports_legacy_agent_workflow_path() {
-        let root = temp_root("agentic-sdlc-v2-resume-legacy-agent-path");
+    async fn resume_fails_when_workflow_path_is_missing() {
+        let root = temp_root("agentic-sdlc-v2-resume-missing-workflow-path");
         let workflows_dir = root.join(".agents").join("workflows");
         std::fs::create_dir_all(&workflows_dir).expect("create workflows");
-        let workflow_path = workflows_dir.join("legacy.md");
+        let workflow_path = workflows_dir.join("existing.md");
         std::fs::write(
             &workflow_path,
-            "# Workflow: legacy\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: demo.echo\nInput: ok\n",
+            "# Workflow: existing\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: demo.echo\nInput: ok\n",
         )
         .expect("write workflow");
 
@@ -801,7 +767,7 @@ Input: {output_input}
 
         let workflow = Workflow {
             meta: WorkflowMeta {
-                name: "legacy-resume".to_string(),
+                name: "missing-resume".to_string(),
                 domain: Some("demo".to_string()),
                 goal: None,
                 target_type: None,
@@ -814,15 +780,10 @@ Input: {output_input}
             },
             steps: vec![WorkflowStep::new("s1", "demo.echo", "ok")],
         };
-        let legacy_path = PathBuf::from(
-            workflow_path
-                .to_string_lossy()
-                .to_string()
-                .replace("/.agents/", "/.agent/"),
-        );
+        let missing_path = root.join(".agents").join("workflows").join("missing.md");
         let mut instance = crate::engine::workflow_engine::instance::WorkflowInstance::new(
             &workflow,
-            Some(legacy_path.to_string_lossy().to_string()),
+            Some(missing_path.to_string_lossy().to_string()),
         );
         instance.status = WorkflowInstanceStatus::Running;
         engine
@@ -830,7 +791,7 @@ Input: {output_input}
             .save(&mut instance)
             .expect("save instance");
 
-        let resumed = engine
+        let err = engine
             .resume_workflow(
                 &instance.instance_id,
                 ExecutionBudget::default(),
@@ -838,11 +799,12 @@ Input: {output_input}
                 DomainSecurityPolicy::default(),
             )
             .await
-            .expect("resume");
-        assert_eq!(resumed.status, WorkflowInstanceStatus::Completed);
-        assert_eq!(
-            resumed.workflow_path.as_deref(),
-            Some(workflow_path.to_string_lossy().as_ref())
+            .expect_err("resume should fail");
+        let msg = err.to_string();
+        assert!(
+            msg.contains("does not exist"),
+            "expected missing path error, got: {}",
+            msg
         );
 
         let _ = std::fs::remove_dir_all(root);

@@ -8,8 +8,8 @@ Schema: antigrav.rule@v1
 
 ```json
 {
-  "allowed_domains": ["demo", "utils", "agent"],
-  "preferred_domains": ["agent", "demo", "utils"],
+  "allowed_domains": ["demo", "utils", "agent", "antigravity", "anthropic", "ai-research"],
+  "preferred_domains": ["agent", "antigravity", "anthropic", "ai-research", "demo", "utils"],
   "cross_domain_penalty": 2,
   "strict_mode": true,
   "disable_network": false,
@@ -24,7 +24,7 @@ Schema: antigrav.rule@v1
   "max_fs_writes": 200,
   "max_network_calls": 100,
   "max_memory_mb": 512,
-  "run_script_timeout_ms": 30000,
+  "run_script_timeout_ms": 180000,
   "run_script_allowed_commands": [
     "cargo",
     "git",

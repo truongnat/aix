@@ -11,8 +11,8 @@ This repository runs a single consolidated workflow engine with:
 
 ## Current Release
 
-- Runtime target: `v1.0.0`
-- Package version: `1.0.0`
+- Runtime target: `v1.0.1`
+- Package version: `1.0.1`
 
 ## Quick Start
 
@@ -32,6 +32,13 @@ Run deterministic CI gate locally:
 
 ```bash
 ./scripts/ci_gate.sh
+```
+
+Optional live provider smoke tests (OpenAI/Gemini):
+
+```bash
+ANTIGRAV_RUN_LIVE_LLM_TESTS=1 OPENAI_API_KEY=... cargo test llm_subagent_live_smoke_openai -- --nocapture
+ANTIGRAV_RUN_LIVE_LLM_TESTS=1 GEMINI_API_KEY=... cargo test llm_subagent_live_smoke_gemini -- --nocapture
 ```
 
 Inspect active/previous runs:

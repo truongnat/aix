@@ -771,10 +771,46 @@ impl Skill for LlmSubAgentSkill {
 mod tests {
     use super::{
         build_provider_chain, estimate_cost_usd, parse_input_payload, parse_provider_list,
-        parse_role_prefixed_input, LlmProvider, ProviderUsage,
+        parse_role_prefixed_input, LlmProvider, LlmSubAgentSkill, ProviderUsage, RouterConfig,
     };
     use crate::skill::io::SkillInput;
     use serde_json::json;
+    use std::path::PathBuf;
+
+    fn live_smoke_enabled() -> bool {
+        std::env::var("ANTIGRAV_RUN_LIVE_LLM_TESTS").ok().as_deref() == Some("1")
+    }
+
+    fn has_env_var(name: &str) -> bool {
+        std::env::var(name)
+            .ok()
+            .map(|v| !v.trim().is_empty())
+            .unwrap_or(false)
+    }
+
+    fn model_for_live_provider(provider: LlmProvider) -> String {
+        std::env::var(super::model_env_for_provider(provider))
+            .ok()
+            .map(|v| v.trim().to_string())
+            .filter(|v| !v.is_empty())
+            .unwrap_or_else(|| super::default_model_for_provider(provider).to_string())
+    }
+
+    fn live_skill(provider: LlmProvider) -> LlmSubAgentSkill {
+        LlmSubAgentSkill {
+            default_role: "software-engineer".to_string(),
+            model: model_for_live_provider(provider),
+            provider,
+            temperature: 0.0,
+            roles_dir: PathBuf::from(".agents/roles"),
+            fallback_providers: Vec::new(),
+            simulation_fallback: false,
+            router_config: RouterConfig {
+                timeout_ms: 30_000,
+                max_retries: 0,
+            },
+        }
+    }
 
     #[test]
     fn parses_role_prefixed_text_payload() {
@@ -831,5 +867,53 @@ mod tests {
         let (openai_cost, _, _) = estimate_cost_usd(LlmProvider::OpenAI, "gpt-4o-mini", usage);
         assert_eq!(ollama_cost, 0.0);
         assert!(openai_cost > 0.0);
+    }
+
+    #[tokio::test]
+    async fn llm_subagent_live_smoke_openai() {
+        if !live_smoke_enabled() {
+            eprintln!("skipped: set ANTIGRAV_RUN_LIVE_LLM_TESTS=1 to run live provider tests");
+            return;
+        }
+        if !has_env_var("OPENAI_API_KEY") {
+            eprintln!("skipped: OPENAI_API_KEY is not set");
+            return;
+        }
+        let skill = live_skill(LlmProvider::OpenAI);
+        let result = skill
+            .call_provider_with_retry(
+                LlmProvider::OpenAI,
+                &skill.model,
+                r#"Return exactly this JSON object and nothing else: {"summary":"smoke","actions":[],"risks":[]}"#,
+                0.0,
+            )
+            .await
+            .expect("openai live smoke call");
+        assert_eq!(result.provider, LlmProvider::OpenAI);
+        assert!(!result.text.trim().is_empty());
+    }
+
+    #[tokio::test]
+    async fn llm_subagent_live_smoke_gemini() {
+        if !live_smoke_enabled() {
+            eprintln!("skipped: set ANTIGRAV_RUN_LIVE_LLM_TESTS=1 to run live provider tests");
+            return;
+        }
+        if !has_env_var("GEMINI_API_KEY") {
+            eprintln!("skipped: GEMINI_API_KEY is not set");
+            return;
+        }
+        let skill = live_skill(LlmProvider::Gemini);
+        let result = skill
+            .call_provider_with_retry(
+                LlmProvider::Gemini,
+                &skill.model,
+                r#"Return exactly this JSON object and nothing else: {"summary":"smoke","actions":[],"risks":[]}"#,
+                0.0,
+            )
+            .await
+            .expect("gemini live smoke call");
+        assert_eq!(result.provider, LlmProvider::Gemini);
+        assert!(!result.text.trim().is_empty());
     }
 }
