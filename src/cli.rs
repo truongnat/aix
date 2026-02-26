@@ -6,7 +6,7 @@ use std::process::Command as ProcessCommand;
 use std::sync::Arc;
 
 use crate::engine::package_check::PackageCheckReport;
-use crate::engine::package_schema::PackageMarkdownKind;
+use crate::engine::package_schema::{validate_schema_header, PackageMarkdownKind};
 use crate::engine::planner::Planner;
 use crate::engine::project::AgentProjectLayout;
 use crate::engine::registry::DomainRegistry;
@@ -27,14 +27,15 @@ use crate::skills::git_ops::{
 };
 use crate::skills::is_positive::IsPositiveSkill;
 use crate::skills::llm_subagent::LlmSubAgentSkill;
-use crate::skills::loader::load_skills;
+use crate::skills::loader::{load_skills, parse_skill_markdown};
 use crate::skills::role_loader::load_role_profile_if_exists;
 use crate::skills::vector_memory::{EmbedDocumentSkill, SemanticSearchSkill};
-use crate::workflow::loader::load_workflow;
+use crate::workflow::loader::{load_workflow, parse_markdown_content};
 use anyhow::{anyhow, Result};
 use clap::{Parser, Subcommand};
+use regex::Regex;
 use rusqlite::params;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Parser)]
 #[command(name = "antigrav")]
@@ -201,6 +202,60 @@ enum WorkflowCommand {
         #[arg(long, default_value_t = false)]
         json: bool,
     },
+    QualitySkills {
+        #[arg(long, default_value_t = false)]
+        strict: bool,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    BuildCatalog {
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    ImportSkills {
+        source: String,
+        #[arg(long)]
+        domain: Option<String>,
+        #[arg(long, default_value_t = 50)]
+        max_skills: usize,
+        #[arg(long, default_value_t = false)]
+        overwrite: bool,
+        #[arg(long, default_value = "local")]
+        mode: String,
+        #[arg(long, default_value_t = false)]
+        allow_missing_license: bool,
+        #[arg(long, default_value_t = false)]
+        no_catalog_rebuild: bool,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    InstallSkillpack {
+        source: String,
+        #[arg(long)]
+        domain: Option<String>,
+        #[arg(long, default_value_t = 50)]
+        max_skills: usize,
+        #[arg(long, default_value_t = false)]
+        overwrite: bool,
+        #[arg(long, default_value = "local")]
+        mode: String,
+        #[arg(long, default_value_t = false)]
+        allow_missing_license: bool,
+        #[arg(long, default_value_t = false)]
+        no_catalog_rebuild: bool,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    SyncImports {
+        #[arg(long, default_value_t = false)]
+        overwrite: bool,
+        #[arg(long, default_value = "local")]
+        mode: String,
+        #[arg(long, default_value_t = false)]
+        allow_missing_license: bool,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
     IndexGraph {
         #[arg(long, default_value_t = 300)]
         max_files: usize,
@@ -282,8 +337,17 @@ enum WorkflowCommand {
     Scaffold {
         kind: String,
         name: String,
+        #[arg(long, default_value = "advanced")]
+        profile: String,
         #[arg(long, default_value_t = false)]
         overwrite: bool,
+    },
+    ScaffoldDomain {
+        domain: String,
+        #[arg(long, default_value_t = false)]
+        overwrite: bool,
+        #[arg(long, default_value_t = false)]
+        json: bool,
     },
     Threads {
         thread_id: Option<String>,
@@ -344,6 +408,200 @@ enum WorkflowLaunchAction {
 struct MarkdownResourceEntry {
     id: String,
     path: String,
+}
+
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "snake_case")]
+enum SkillQualityLevel {
+    Error,
+    Warning,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct SkillQualityFinding {
+    level: SkillQualityLevel,
+    message: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct SkillQualityEntry {
+    id: String,
+    path: String,
+    domain: String,
+    name: String,
+    risk: String,
+    findings: Vec<SkillQualityFinding>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct SkillQualityReport {
+    strict: bool,
+    checked_skills: usize,
+    errors: usize,
+    warnings: usize,
+    entries: Vec<SkillQualityEntry>,
+}
+
+impl SkillQualityReport {
+    fn ok(&self) -> bool {
+        self.errors == 0 && (!self.strict || self.warnings == 0)
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct SkillCatalogEntry {
+    id: String,
+    path: String,
+    name: String,
+    domain: String,
+    description: Option<String>,
+    risk: Option<String>,
+    source: Option<String>,
+    tags: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct WorkflowCatalogEntry {
+    id: String,
+    path: String,
+    name: String,
+    domain: Option<String>,
+    description: Option<String>,
+    steps: usize,
+    skills: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct BundleCatalogEntry {
+    id: String,
+    description: String,
+    workflows: Vec<String>,
+    skills: Vec<String>,
+    roles: Vec<String>,
+    templates: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct MarketplaceOwner {
+    name: String,
+    email: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct MarketplaceMetadata {
+    description: String,
+    version: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct MarketplacePlugin {
+    name: String,
+    description: String,
+    source: String,
+    strict: bool,
+    skills: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct MarketplaceManifest {
+    name: String,
+    owner: MarketplaceOwner,
+    metadata: MarketplaceMetadata,
+    plugins: Vec<MarketplacePlugin>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct SkillLockEntry {
+    id: String,
+    path: String,
+    bytes: usize,
+    fingerprint: String,
+    source: Option<String>,
+    source_requested: Option<String>,
+    source_commit: Option<String>,
+    source_path: Option<String>,
+    source_license: Option<String>,
+    imported_at_ms: Option<u64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct ImportLockSource {
+    source: String,
+    source_requested: Option<String>,
+    source_commit: Option<String>,
+    source_license: Option<String>,
+    skills: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct SkillsLockfile {
+    version: u32,
+    generated_at_ms: u64,
+    #[serde(default)]
+    skills: Vec<SkillLockEntry>,
+    #[serde(default)]
+    imports: Vec<ImportLockSource>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct CatalogBuildReport {
+    catalog_dir: String,
+    outputs: Vec<String>,
+    skills: usize,
+    workflows: usize,
+    bundles: usize,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct ImportSkillsReport {
+    mode: String,
+    source: String,
+    resolved_source: String,
+    commit: Option<String>,
+    license: Option<String>,
+    domain: String,
+    imported: usize,
+    skipped: usize,
+    catalog_rebuilt: bool,
+    files: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct SyncImportsReport {
+    mode: String,
+    lockfile: String,
+    sources: usize,
+    updated: usize,
+    skipped: usize,
+    missing: usize,
+    catalog_rebuilt: bool,
+    files: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
+struct ImportSkillpackOptions {
+    domain_override: Option<String>,
+    max_skills: usize,
+    overwrite: bool,
+    mode: SkillpackInstallMode,
+    allow_missing_license: bool,
+    rebuild_catalog: bool,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+enum SkillpackInstallMode {
+    Local,
+    Global,
+}
+
+impl SkillpackInstallMode {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Local => "local",
+            Self::Global => "global",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -1520,20 +1778,38 @@ fn normalize_auto_conflict_strategy(value: Option<&str>) -> &'static str {
 }
 
 fn infer_workflow_ref_from_template(template_ref: &str) -> String {
-    let stem = Path::new(template_ref)
+    let path = Path::new(template_ref);
+    let stem = path
         .file_stem()
         .and_then(|v| v.to_str())
         .unwrap_or(template_ref)
         .trim()
         .to_string();
+    let mut normalized_stem = stem.clone();
     for suffix in ["_prompt", "-prompt"] {
         if let Some(base) = stem.strip_suffix(suffix) {
             if !base.trim().is_empty() {
-                return base.trim().to_string();
+                normalized_stem = base.trim().to_string();
+                break;
             }
         }
     }
-    stem
+    if path.is_absolute() {
+        return normalized_stem;
+    }
+    let parent = path.parent().and_then(|v| {
+        let value = v.to_string_lossy().replace('\\', "/");
+        let trimmed = value.trim_matches('/').trim().to_string();
+        if trimmed.is_empty() || trimmed == "." {
+            None
+        } else {
+            Some(trimmed)
+        }
+    });
+    match parent {
+        Some(prefix) => format!("{}/{}", prefix, normalized_stem),
+        None => normalized_stem,
+    }
 }
 
 fn inject_template_prompt(
@@ -1729,6 +2005,152 @@ fn handle_workflow_control_command(
             }
             Ok(WorkflowLaunchAction::Noop)
         }
+        WorkflowCommand::QualitySkills { strict, json } => {
+            let report = run_skill_quality_check(project_layout, strict)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                print_skill_quality_report(&report);
+            }
+            if !report.ok() {
+                return Err(anyhow!(
+                    "skill quality check failed with errors={} warnings={} (strict={})",
+                    report.errors,
+                    report.warnings,
+                    report.strict
+                ));
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::BuildCatalog { json } => {
+            let report = build_skill_workflow_catalog(project_layout)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "Catalog built: skills={} workflows={} bundles={} output_dir={}",
+                    report.skills, report.workflows, report.bundles, report.catalog_dir
+                );
+                for output in &report.outputs {
+                    println!("- {}", output);
+                }
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::ImportSkills {
+            source,
+            domain,
+            max_skills,
+            overwrite,
+            mode,
+            allow_missing_license,
+            no_catalog_rebuild,
+            json,
+        } => {
+            let mode = parse_skillpack_install_mode(&mode)?;
+            let options = ImportSkillpackOptions {
+                domain_override: domain,
+                max_skills,
+                overwrite,
+                mode,
+                allow_missing_license,
+                rebuild_catalog: !no_catalog_rebuild,
+            };
+            let report = import_skills_from_source(project_layout, &source, &options)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "Imported skills: mode='{}' source='{}' resolved='{}' commit={:?} license={:?} domain='{}' imported={} skipped={} catalog_rebuilt={}",
+                    report.mode,
+                    report.source,
+                    report.resolved_source,
+                    report.commit,
+                    report.license,
+                    report.domain,
+                    report.imported,
+                    report.skipped,
+                    report.catalog_rebuilt
+                );
+                for path in &report.files {
+                    println!("- {}", path);
+                }
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::InstallSkillpack {
+            source,
+            domain,
+            max_skills,
+            overwrite,
+            mode,
+            allow_missing_license,
+            no_catalog_rebuild,
+            json,
+        } => {
+            let mode = parse_skillpack_install_mode(&mode)?;
+            let options = ImportSkillpackOptions {
+                domain_override: domain,
+                max_skills,
+                overwrite,
+                mode,
+                allow_missing_license,
+                rebuild_catalog: !no_catalog_rebuild,
+            };
+            let report = import_skills_from_source(project_layout, &source, &options)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "Installed skillpack: mode='{}' source='{}' resolved='{}' commit={:?} license={:?} domain='{}' imported={} skipped={} catalog_rebuilt={}",
+                    report.mode,
+                    report.source,
+                    report.resolved_source,
+                    report.commit,
+                    report.license,
+                    report.domain,
+                    report.imported,
+                    report.skipped,
+                    report.catalog_rebuilt
+                );
+                for path in &report.files {
+                    println!("- {}", path);
+                }
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::SyncImports {
+            overwrite,
+            mode,
+            allow_missing_license,
+            json,
+        } => {
+            let mode = parse_skillpack_install_mode(&mode)?;
+            let report = sync_imported_skills_from_lock(
+                project_layout,
+                overwrite,
+                mode,
+                allow_missing_license,
+            )?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "Synced imports: mode='{}' lockfile='{}' sources={} updated={} skipped={} missing={} catalog_rebuilt={}",
+                    report.mode,
+                    report.lockfile,
+                    report.sources,
+                    report.updated,
+                    report.skipped,
+                    report.missing,
+                    report.catalog_rebuilt
+                );
+                for path in &report.files {
+                    println!("- {}", path);
+                }
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
         WorkflowCommand::IndexGraph { max_files, json } => {
             let report = build_graph_index(project_layout, max_files)?;
             if json {
@@ -1874,15 +2296,43 @@ fn handle_workflow_control_command(
         WorkflowCommand::Scaffold {
             kind,
             name,
+            profile,
             overwrite,
         } => {
-            let path = scaffold_markdown_package(project_layout, &kind, &name, overwrite)?;
+            let parsed_profile = parse_scaffold_profile(&profile)?;
+            let path =
+                scaffold_markdown_package(project_layout, &kind, &name, parsed_profile, overwrite)?;
             let parsed_kind = parse_package_scaffold_kind(&kind)?;
             println!(
-                "Scaffold created: {} (schema={})",
+                "Scaffold created: {} (schema={} profile={})",
                 path.display(),
-                parsed_kind.expected_schema()
+                parsed_kind.expected_schema(),
+                parsed_profile.as_str()
             );
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::ScaffoldDomain {
+            domain,
+            overwrite,
+            json,
+        } => {
+            let created = scaffold_domain_pack(project_layout, &domain, overwrite)?;
+            if json {
+                let payload = created
+                    .iter()
+                    .map(|path| path.display().to_string())
+                    .collect::<Vec<_>>();
+                println!("{}", serde_json::to_string_pretty(&payload)?);
+            } else {
+                println!(
+                    "Advanced domain pack generated: domain='{}' files={}",
+                    sanitize_package_name(&domain)?,
+                    created.len()
+                );
+                for path in created {
+                    println!("- {}", path.display());
+                }
+            }
             Ok(WorkflowLaunchAction::Noop)
         }
         WorkflowCommand::Threads { thread_id, json } => {
@@ -1955,6 +2405,1804 @@ fn print_package_check_report(report: &PackageCheckReport) {
             println!("- {}: {}", issue.path, issue.message);
         }
     }
+}
+
+fn print_skill_quality_report(report: &SkillQualityReport) {
+    println!(
+        "Skill Quality: checked={} errors={} warnings={} strict={}",
+        report.checked_skills, report.errors, report.warnings, report.strict
+    );
+    for entry in &report.entries {
+        if entry.findings.is_empty() {
+            continue;
+        }
+        println!(
+            "- {} ({}) domain={} risk={}",
+            entry.id, entry.path, entry.domain, entry.risk
+        );
+        for finding in &entry.findings {
+            let level = match finding.level {
+                SkillQualityLevel::Error => "[error]",
+                SkillQualityLevel::Warning => "[warn]",
+            };
+            println!("  {} {}", level, finding.message);
+        }
+    }
+}
+
+fn push_skill_quality_error(
+    report: &mut SkillQualityReport,
+    findings: &mut Vec<SkillQualityFinding>,
+    message: impl Into<String>,
+) {
+    report.errors = report.errors.saturating_add(1);
+    findings.push(SkillQualityFinding {
+        level: SkillQualityLevel::Error,
+        message: message.into(),
+    });
+}
+
+fn push_skill_quality_warning(
+    report: &mut SkillQualityReport,
+    findings: &mut Vec<SkillQualityFinding>,
+    message: impl Into<String>,
+) {
+    if report.strict {
+        report.errors = report.errors.saturating_add(1);
+        findings.push(SkillQualityFinding {
+            level: SkillQualityLevel::Error,
+            message: format!("[strict] {}", message.into()),
+        });
+        return;
+    }
+    report.warnings = report.warnings.saturating_add(1);
+    findings.push(SkillQualityFinding {
+        level: SkillQualityLevel::Warning,
+        message: message.into(),
+    });
+}
+
+fn run_skill_quality_check(
+    layout: &AgentProjectLayout,
+    strict: bool,
+) -> Result<SkillQualityReport> {
+    let skill_files = collect_markdown_paths_recursive(&layout.skills_dir)?;
+    let mut report = SkillQualityReport {
+        strict,
+        checked_skills: 0,
+        errors: 0,
+        warnings: 0,
+        entries: Vec::new(),
+    };
+    let valid_risks = ["none", "safe", "critical", "offensive", "unknown"];
+
+    for path in skill_files {
+        report.checked_skills = report.checked_skills.saturating_add(1);
+        let id = to_resource_id(&layout.skills_dir, &path).unwrap_or_else(|| {
+            path.file_stem()
+                .and_then(|v| v.to_str())
+                .unwrap_or("unknown")
+                .to_string()
+        });
+        let path_display = path.display().to_string();
+        let mut domain = "unknown".to_string();
+        let mut skill_name = path
+            .file_stem()
+            .and_then(|v| v.to_str())
+            .unwrap_or("unknown")
+            .to_string();
+        let mut risk = "unknown".to_string();
+        let mut findings = Vec::<SkillQualityFinding>::new();
+
+        let content = match fs::read_to_string(&path) {
+            Ok(v) => v,
+            Err(err) => {
+                push_skill_quality_error(
+                    &mut report,
+                    &mut findings,
+                    format!("Failed to read file: {}", err),
+                );
+                report.entries.push(SkillQualityEntry {
+                    id,
+                    path: path_display,
+                    domain,
+                    name: skill_name,
+                    risk,
+                    findings,
+                });
+                continue;
+            }
+        };
+
+        if let Err(err) = validate_schema_header(&content, PackageMarkdownKind::Skill) {
+            push_skill_quality_error(&mut report, &mut findings, err.to_string());
+        }
+
+        let parsed = match parse_skill_markdown(&content) {
+            Ok(v) => Some(v),
+            Err(err) => {
+                push_skill_quality_error(
+                    &mut report,
+                    &mut findings,
+                    format!("Invalid skill metadata: {}", err),
+                );
+                None
+            }
+        };
+
+        if let Some((meta, body)) = parsed {
+            domain = meta.domain.trim().to_string();
+            skill_name = meta.name.trim().to_string();
+            risk = meta
+                .risk
+                .clone()
+                .unwrap_or_else(|| "unknown".to_string())
+                .trim()
+                .to_ascii_lowercase();
+            let expected_name = path
+                .file_stem()
+                .and_then(|v| v.to_str())
+                .unwrap_or_default();
+            if skill_name != expected_name {
+                push_skill_quality_warning(
+                    &mut report,
+                    &mut findings,
+                    format!(
+                        "Skill name '{}' should match file stem '{}'",
+                        skill_name, expected_name
+                    ),
+                );
+            }
+
+            let description = meta.description.clone().unwrap_or_default();
+            if description.trim().is_empty() {
+                push_skill_quality_warning(
+                    &mut report,
+                    &mut findings,
+                    "Missing metadata.description",
+                );
+            } else if description.trim().chars().count() > 200 {
+                push_skill_quality_warning(
+                    &mut report,
+                    &mut findings,
+                    format!(
+                        "metadata.description is oversized ({} chars > 200)",
+                        description.trim().chars().count()
+                    ),
+                );
+            }
+
+            if meta.source.as_deref().unwrap_or("").trim().is_empty() {
+                push_skill_quality_warning(
+                    &mut report,
+                    &mut findings,
+                    "Missing metadata.source (recommend URL or 'self')",
+                );
+            }
+
+            let tags_count = meta.tags.as_ref().map(|v| v.len()).unwrap_or(0);
+            if tags_count == 0 {
+                push_skill_quality_warning(&mut report, &mut findings, "Missing metadata.tags");
+            } else if tags_count < 3 {
+                push_skill_quality_warning(
+                    &mut report,
+                    &mut findings,
+                    "metadata.tags should include at least 3 entries for discoverability",
+                );
+            }
+
+            if !valid_risks.contains(&risk.as_str()) {
+                push_skill_quality_error(
+                    &mut report,
+                    &mut findings,
+                    format!(
+                        "Invalid metadata.risk '{}'; expected one of {:?}",
+                        risk, valid_risks
+                    ),
+                );
+            }
+            let imported_skill =
+                id.starts_with("imported/") || path_display.contains("/skills/imported/");
+            if imported_skill {
+                if meta
+                    .source_commit
+                    .as_deref()
+                    .unwrap_or_default()
+                    .trim()
+                    .is_empty()
+                {
+                    push_skill_quality_warning(
+                        &mut report,
+                        &mut findings,
+                        "Imported skill missing metadata.source_commit pin",
+                    );
+                }
+                if meta
+                    .source_path
+                    .as_deref()
+                    .unwrap_or_default()
+                    .trim()
+                    .is_empty()
+                {
+                    push_skill_quality_warning(
+                        &mut report,
+                        &mut findings,
+                        "Imported skill missing metadata.source_path",
+                    );
+                }
+                if meta
+                    .source_license
+                    .as_deref()
+                    .unwrap_or_default()
+                    .trim()
+                    .is_empty()
+                {
+                    push_skill_quality_warning(
+                        &mut report,
+                        &mut findings,
+                        "Imported skill missing metadata.source_license",
+                    );
+                }
+            }
+
+            if !has_skill_section(
+                &body,
+                &[
+                    "when to use",
+                    "when to use this skill",
+                    "use this skill when",
+                ],
+            ) {
+                push_skill_quality_warning(
+                    &mut report,
+                    &mut findings,
+                    "Missing section heading like '## When to Use'",
+                );
+            }
+            if !has_skill_section(&body, &["examples", "example"]) {
+                push_skill_quality_warning(
+                    &mut report,
+                    &mut findings,
+                    "Missing section heading like '## Examples'",
+                );
+            }
+            if !has_skill_section(
+                &body,
+                &[
+                    "limitations",
+                    "common issues",
+                    "common pitfalls",
+                    "known limitations",
+                ],
+            ) {
+                push_skill_quality_warning(
+                    &mut report,
+                    &mut findings,
+                    "Missing section heading like '## Limitations'",
+                );
+            }
+
+            if risk == "offensive" && !content.to_ascii_uppercase().contains("AUTHORIZED USE ONLY")
+            {
+                push_skill_quality_error(
+                    &mut report,
+                    &mut findings,
+                    "Offensive skill requires explicit 'AUTHORIZED USE ONLY' disclaimer",
+                );
+            }
+
+            let link_errors =
+                find_dangling_markdown_links(&content, path.parent().unwrap_or(Path::new(".")))?;
+            for broken in link_errors {
+                push_skill_quality_error(
+                    &mut report,
+                    &mut findings,
+                    format!("Dangling local markdown link '{}'", broken),
+                );
+            }
+        }
+
+        report.entries.push(SkillQualityEntry {
+            id,
+            path: path_display,
+            domain,
+            name: skill_name,
+            risk,
+            findings,
+        });
+    }
+    report.entries.sort_by(|a, b| a.id.cmp(&b.id));
+    Ok(report)
+}
+
+fn find_dangling_markdown_links(markdown: &str, base_dir: &Path) -> Result<Vec<String>> {
+    let re = Regex::new(r"\[[^\]]*\]\(([^)]+)\)")?;
+    let mut broken = Vec::<String>::new();
+    for capture in re.captures_iter(markdown) {
+        let Some(matched) = capture.get(1) else {
+            continue;
+        };
+        let link = matched.as_str().trim();
+        if link.is_empty()
+            || link.starts_with('#')
+            || link.starts_with('<')
+            || link.starts_with("http://")
+            || link.starts_with("https://")
+            || link.starts_with("mailto:")
+            || link.starts_with("data:")
+        {
+            continue;
+        }
+        let base = link.split('#').next().unwrap_or_default();
+        let base = base.split('?').next().unwrap_or_default().trim();
+        if base.is_empty() || Path::new(base).is_absolute() {
+            continue;
+        }
+        if !base_dir.join(base).exists() {
+            broken.push(base.to_string());
+        }
+    }
+    broken.sort();
+    broken.dedup();
+    Ok(broken)
+}
+
+fn has_skill_section(markdown: &str, candidates: &[&str]) -> bool {
+    markdown.lines().any(|line| {
+        let trimmed = line.trim();
+        if !trimmed.starts_with('#') {
+            return false;
+        }
+        let title = trimmed.trim_start_matches('#').trim().to_ascii_lowercase();
+        candidates
+            .iter()
+            .any(|candidate| title == candidate.to_ascii_lowercase())
+    })
+}
+
+fn build_skill_workflow_catalog(layout: &AgentProjectLayout) -> Result<CatalogBuildReport> {
+    let project_root = Path::new(&layout.project_root);
+    let catalog_dir = layout.agents_root.join("catalog");
+    fs::create_dir_all(&catalog_dir)?;
+
+    let skill_entries = collect_skill_catalog_entries(layout)?;
+    let workflow_entries = collect_workflow_catalog_entries(layout)?;
+    let role_ids = collect_markdown_resource_ids(&layout.roles_dir)?;
+    let template_ids = collect_markdown_resource_ids(&layout.templates_dir)?;
+    let bundles = build_bundle_catalog(&skill_entries, &workflow_entries, &role_ids, &template_ids);
+    let marketplace = build_marketplace_manifest(&bundles, &skill_entries);
+    let lockfile = build_skills_lockfile(layout, &skill_entries)?;
+
+    let skills_index_path = catalog_dir.join("skills_index.json");
+    fs::write(
+        &skills_index_path,
+        serde_json::to_string_pretty(&skill_entries)?,
+    )?;
+    let workflows_path = catalog_dir.join("workflows.json");
+    fs::write(
+        &workflows_path,
+        serde_json::to_string_pretty(&workflow_entries)?,
+    )?;
+    let bundles_path = catalog_dir.join("bundles.json");
+    fs::write(&bundles_path, serde_json::to_string_pretty(&bundles)?)?;
+    let marketplace_path = layout.agents_root.join("marketplace.json");
+    fs::write(
+        &marketplace_path,
+        serde_json::to_string_pretty(&marketplace)?,
+    )?;
+    let lockfile_path = layout.agents_root.join("skills.lock.json");
+    fs::write(&lockfile_path, serde_json::to_string_pretty(&lockfile)?)?;
+
+    let outputs = vec![
+        relative_unix_path(project_root, &skills_index_path)?,
+        relative_unix_path(project_root, &workflows_path)?,
+        relative_unix_path(project_root, &bundles_path)?,
+        relative_unix_path(project_root, &marketplace_path)?,
+        relative_unix_path(project_root, &lockfile_path)?,
+    ];
+
+    Ok(CatalogBuildReport {
+        catalog_dir: relative_unix_path(project_root, &catalog_dir)?,
+        outputs,
+        skills: skill_entries.len(),
+        workflows: workflow_entries.len(),
+        bundles: bundles.len(),
+    })
+}
+
+fn collect_skill_catalog_entries(layout: &AgentProjectLayout) -> Result<Vec<SkillCatalogEntry>> {
+    let project_root = Path::new(&layout.project_root);
+    let mut entries = Vec::<SkillCatalogEntry>::new();
+    for path in collect_markdown_paths_recursive(&layout.skills_dir)? {
+        let content = fs::read_to_string(&path)?;
+        validate_schema_header(&content, PackageMarkdownKind::Skill)?;
+        let (meta, _) = parse_skill_markdown(&content)?;
+        let id = to_resource_id(&layout.skills_dir, &path).unwrap_or_else(|| meta.name.clone());
+        entries.push(SkillCatalogEntry {
+            id,
+            path: relative_unix_path(project_root, &path)?,
+            name: meta.name,
+            domain: meta.domain,
+            description: meta
+                .description
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty()),
+            risk: meta
+                .risk
+                .map(|v| v.trim().to_ascii_lowercase())
+                .filter(|v| !v.is_empty()),
+            source: meta
+                .source
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty()),
+            tags: meta.tags.unwrap_or_default(),
+        });
+    }
+    entries.sort_by(|a, b| a.id.cmp(&b.id));
+    Ok(entries)
+}
+
+fn collect_workflow_catalog_entries(
+    layout: &AgentProjectLayout,
+) -> Result<Vec<WorkflowCatalogEntry>> {
+    let project_root = Path::new(&layout.project_root);
+    let mut entries = Vec::<WorkflowCatalogEntry>::new();
+    for path in collect_markdown_paths_recursive(&layout.workflows_dir)? {
+        let content = fs::read_to_string(&path)?;
+        validate_schema_header(&content, PackageMarkdownKind::Workflow)?;
+        let workflow = parse_markdown_content(&content)?;
+        let id = to_resource_id(&layout.workflows_dir, &path)
+            .unwrap_or_else(|| workflow.meta.name.clone());
+        let mut unique_skills = workflow
+            .steps
+            .iter()
+            .map(|step| step.skill.trim().to_string())
+            .collect::<Vec<_>>();
+        unique_skills.sort();
+        unique_skills.dedup();
+        let frontmatter = extract_frontmatter_map(&content);
+        entries.push(WorkflowCatalogEntry {
+            id,
+            path: relative_unix_path(project_root, &path)?,
+            name: workflow.meta.name,
+            domain: workflow.meta.domain.map(|v| v.trim().to_string()),
+            description: frontmatter
+                .get("description")
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty()),
+            steps: workflow.steps.len(),
+            skills: unique_skills,
+        });
+    }
+    entries.sort_by(|a, b| a.id.cmp(&b.id));
+    Ok(entries)
+}
+
+fn collect_markdown_resource_ids(root: &Path) -> Result<Vec<String>> {
+    let mut ids = collect_markdown_paths_recursive(root)?
+        .into_iter()
+        .filter_map(|path| to_resource_id(root, &path))
+        .collect::<Vec<_>>();
+    ids.sort();
+    ids.dedup();
+    Ok(ids)
+}
+
+fn build_bundle_catalog(
+    skills: &[SkillCatalogEntry],
+    workflows: &[WorkflowCatalogEntry],
+    roles: &[String],
+    templates: &[String],
+) -> Vec<BundleCatalogEntry> {
+    let mut keys = HashSet::<String>::new();
+    for id in skills.iter().map(|v| v.id.as_str()) {
+        keys.insert(bundle_key_from_id(id));
+    }
+    for id in workflows.iter().map(|v| v.id.as_str()) {
+        keys.insert(bundle_key_from_id(id));
+    }
+    for id in roles {
+        keys.insert(bundle_key_from_id(id));
+    }
+    for id in templates {
+        keys.insert(bundle_key_from_id(id));
+    }
+    if keys.is_empty() {
+        keys.insert("core".to_string());
+    }
+
+    let mut sorted_keys = keys.into_iter().collect::<Vec<_>>();
+    sorted_keys.sort();
+    let mut bundles = Vec::<BundleCatalogEntry>::new();
+    for key in sorted_keys {
+        let mut bundle = BundleCatalogEntry {
+            id: key.clone(),
+            description: if key == "core" {
+                "Core workflows and skills".to_string()
+            } else {
+                format!("Domain bundle for '{}'", key)
+            },
+            workflows: workflows
+                .iter()
+                .filter(|entry| bundle_key_from_id(&entry.id) == key)
+                .map(|entry| entry.id.clone())
+                .collect(),
+            skills: skills
+                .iter()
+                .filter(|entry| bundle_key_from_id(&entry.id) == key)
+                .map(|entry| entry.id.clone())
+                .collect(),
+            roles: roles
+                .iter()
+                .filter(|entry| bundle_key_from_id(entry) == key)
+                .cloned()
+                .collect(),
+            templates: templates
+                .iter()
+                .filter(|entry| bundle_key_from_id(entry) == key)
+                .cloned()
+                .collect(),
+        };
+        bundle.workflows.sort();
+        bundle.skills.sort();
+        bundle.roles.sort();
+        bundle.templates.sort();
+        bundles.push(bundle);
+    }
+    bundles
+}
+
+fn build_marketplace_manifest(
+    bundles: &[BundleCatalogEntry],
+    skills: &[SkillCatalogEntry],
+) -> MarketplaceManifest {
+    let mut skill_path_by_id = HashMap::<String, String>::new();
+    for entry in skills {
+        skill_path_by_id.insert(entry.id.clone(), format!("./{}", entry.path));
+    }
+    let plugins = bundles
+        .iter()
+        .map(|bundle| MarketplacePlugin {
+            name: bundle.id.clone(),
+            description: bundle.description.clone(),
+            source: "./".to_string(),
+            strict: false,
+            skills: bundle
+                .skills
+                .iter()
+                .filter_map(|id| skill_path_by_id.get(id).cloned())
+                .collect(),
+        })
+        .collect::<Vec<_>>();
+    MarketplaceManifest {
+        name: "agentic-sdlc-skillpacks".to_string(),
+        owner: MarketplaceOwner {
+            name: "agentic-sdlc".to_string(),
+            email: "n/a".to_string(),
+        },
+        metadata: MarketplaceMetadata {
+            description: "Curated skill bundles for domain-based solo developer workflows"
+                .to_string(),
+            version: "1.0.0".to_string(),
+        },
+        plugins,
+    }
+}
+
+fn build_skills_lockfile(
+    layout: &AgentProjectLayout,
+    skills: &[SkillCatalogEntry],
+) -> Result<SkillsLockfile> {
+    let project_root = Path::new(&layout.project_root);
+    let mut entries = Vec::<SkillLockEntry>::new();
+    for skill in skills {
+        let absolute = project_root.join(&skill.path);
+        let bytes = fs::read(&absolute)?;
+        let mut source = skill
+            .source
+            .clone()
+            .map(|v| v.trim().to_string())
+            .filter(|v| !v.is_empty());
+        let mut source_requested = None::<String>;
+        let mut source_commit = None::<String>;
+        let mut source_path = None::<String>;
+        let mut source_license = None::<String>;
+        let mut imported_at_ms = None::<u64>;
+        if let Ok(content) = fs::read_to_string(&absolute) {
+            if let Ok((meta, _)) = parse_skill_markdown(&content) {
+                source = meta
+                    .source
+                    .map(|v| v.trim().to_string())
+                    .filter(|v| !v.is_empty())
+                    .or(source);
+                source_requested = meta
+                    .source_requested
+                    .map(|v| v.trim().to_string())
+                    .filter(|v| !v.is_empty());
+                source_commit = meta
+                    .source_commit
+                    .map(|v| v.trim().to_string())
+                    .filter(|v| !v.is_empty());
+                source_path = meta
+                    .source_path
+                    .map(|v| v.trim().replace('\\', "/"))
+                    .filter(|v| !v.is_empty());
+                source_license = meta
+                    .source_license
+                    .map(|v| v.trim().to_string())
+                    .filter(|v| !v.is_empty())
+                    .or(meta
+                        .license
+                        .map(|v| v.trim().to_string())
+                        .filter(|v| !v.is_empty()));
+                imported_at_ms = meta.imported_at_ms;
+            }
+        }
+        entries.push(SkillLockEntry {
+            id: skill.id.clone(),
+            path: skill.path.clone(),
+            bytes: bytes.len(),
+            fingerprint: fnv1a64_hex(&bytes),
+            source,
+            source_requested,
+            source_commit,
+            source_path,
+            source_license,
+            imported_at_ms,
+        });
+    }
+    entries.sort_by(|a, b| a.id.cmp(&b.id));
+    let imports = build_import_lock_sources(&entries);
+    Ok(SkillsLockfile {
+        version: 2,
+        generated_at_ms: now_ms_u64(),
+        skills: entries,
+        imports,
+    })
+}
+
+fn build_import_lock_sources(entries: &[SkillLockEntry]) -> Vec<ImportLockSource> {
+    let mut grouped = HashMap::<String, ImportLockSource>::new();
+    for entry in entries {
+        if !is_imported_lock_entry(entry) {
+            continue;
+        }
+        let Some(source) = entry.source.clone().filter(|v| !v.trim().is_empty()) else {
+            continue;
+        };
+        let key = format!(
+            "{}|{}|{}",
+            source,
+            entry.source_commit.as_deref().unwrap_or_default(),
+            entry.source_license.as_deref().unwrap_or_default()
+        );
+        let group = grouped.entry(key).or_insert_with(|| ImportLockSource {
+            source: source.clone(),
+            source_requested: entry.source_requested.clone(),
+            source_commit: entry.source_commit.clone(),
+            source_license: entry.source_license.clone(),
+            skills: Vec::new(),
+        });
+        if !group.skills.iter().any(|id| id == &entry.id) {
+            group.skills.push(entry.id.clone());
+        }
+    }
+    let mut imports = grouped.into_values().collect::<Vec<_>>();
+    for item in &mut imports {
+        item.skills.sort();
+        item.skills.dedup();
+    }
+    imports.sort_by(|a, b| a.source.cmp(&b.source));
+    imports
+}
+
+fn is_imported_lock_entry(entry: &SkillLockEntry) -> bool {
+    entry.id.starts_with("imported/")
+        || entry.path.contains("/skills/imported/")
+        || entry.path.contains("\\skills\\imported\\")
+}
+
+fn read_skills_lockfile(path: &Path) -> Result<SkillsLockfile> {
+    let body = fs::read_to_string(path)?;
+    let mut parsed: SkillsLockfile = serde_json::from_str(&body)?;
+    if parsed.version == 0 {
+        parsed.version = 1;
+    }
+    Ok(parsed)
+}
+
+#[derive(Debug, Clone)]
+struct SkillpackInstallTarget {
+    mode: SkillpackInstallMode,
+    project_root: PathBuf,
+    skills_root: PathBuf,
+    import_dir: PathBuf,
+    lockfile_path: PathBuf,
+    supports_catalog_rebuild: bool,
+}
+
+fn resolve_skillpack_install_target(
+    layout: &AgentProjectLayout,
+    mode: SkillpackInstallMode,
+) -> Result<SkillpackInstallTarget> {
+    let project_root = PathBuf::from(&layout.project_root);
+    match mode {
+        SkillpackInstallMode::Local => Ok(SkillpackInstallTarget {
+            mode,
+            project_root,
+            skills_root: layout.skills_dir.clone(),
+            import_dir: layout.skills_dir.join("imported"),
+            lockfile_path: layout.agents_root.join("skills.lock.json"),
+            supports_catalog_rebuild: true,
+        }),
+        SkillpackInstallMode::Global => {
+            let codex_home = resolve_codex_home_dir()?;
+            let skills_root = codex_home.join("skills");
+            Ok(SkillpackInstallTarget {
+                mode,
+                project_root,
+                skills_root: skills_root.clone(),
+                import_dir: skills_root.join("imported"),
+                lockfile_path: skills_root.join("skills.lock.json"),
+                supports_catalog_rebuild: false,
+            })
+        }
+    }
+}
+
+fn resolve_codex_home_dir() -> Result<PathBuf> {
+    if let Ok(raw) = std::env::var("CODEX_HOME") {
+        let trimmed = raw.trim();
+        if !trimmed.is_empty() {
+            return Ok(PathBuf::from(trimmed));
+        }
+    }
+    let home = std::env::var("HOME")
+        .map(PathBuf::from)
+        .map_err(|_| anyhow!("Cannot resolve global mode: set CODEX_HOME or HOME"))?;
+    Ok(home.join(".codex"))
+}
+
+fn format_skillpack_report_path(target: &SkillpackInstallTarget, path: &Path) -> String {
+    match target.mode {
+        SkillpackInstallMode::Local => relative_unix_path(&target.project_root, path)
+            .unwrap_or_else(|_| path.display().to_string()),
+        SkillpackInstallMode::Global => path.display().to_string(),
+    }
+}
+
+fn resolve_lock_entry_target_path(
+    target: &SkillpackInstallTarget,
+    entry: &SkillLockEntry,
+) -> PathBuf {
+    let raw = PathBuf::from(entry.path.trim());
+    if raw.is_absolute() {
+        return raw;
+    }
+    match target.mode {
+        SkillpackInstallMode::Local => target.project_root.join(&entry.path),
+        SkillpackInstallMode::Global => target.skills_root.join(&entry.path),
+    }
+}
+
+fn write_skills_lockfile_for_target(target: &SkillpackInstallTarget) -> Result<()> {
+    let base = match target.mode {
+        SkillpackInstallMode::Local => target.project_root.as_path(),
+        SkillpackInstallMode::Global => target.skills_root.as_path(),
+    };
+    let lock = build_skills_lockfile_from_skills_root(&target.skills_root, base)?;
+    if let Some(parent) = target.lockfile_path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(&target.lockfile_path, serde_json::to_string_pretty(&lock)?)?;
+    Ok(())
+}
+
+fn build_skills_lockfile_from_skills_root(
+    skills_root: &Path,
+    base_path: &Path,
+) -> Result<SkillsLockfile> {
+    let mut entries = Vec::<SkillLockEntry>::new();
+    for path in collect_markdown_paths_recursive(skills_root)? {
+        let content = match fs::read_to_string(&path) {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+        if validate_schema_header(&content, PackageMarkdownKind::Skill).is_err() {
+            continue;
+        }
+        let (meta, _) = match parse_skill_markdown(&content) {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+        let bytes = fs::read(&path)?;
+        let id = to_resource_id(skills_root, &path).unwrap_or_else(|| meta.name.clone());
+        let path_str =
+            relative_unix_path(base_path, &path).unwrap_or_else(|_| path.display().to_string());
+        entries.push(SkillLockEntry {
+            id,
+            path: path_str,
+            bytes: bytes.len(),
+            fingerprint: fnv1a64_hex(&bytes),
+            source: meta
+                .source
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty()),
+            source_requested: meta
+                .source_requested
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty()),
+            source_commit: meta
+                .source_commit
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty()),
+            source_path: meta
+                .source_path
+                .map(|v| v.trim().replace('\\', "/"))
+                .filter(|v| !v.is_empty()),
+            source_license: meta
+                .source_license
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty())
+                .or(meta
+                    .license
+                    .map(|v| v.trim().to_string())
+                    .filter(|v| !v.is_empty())),
+            imported_at_ms: meta.imported_at_ms,
+        });
+    }
+    entries.sort_by(|a, b| a.id.cmp(&b.id));
+    let imports = build_import_lock_sources(&entries);
+    Ok(SkillsLockfile {
+        version: 2,
+        generated_at_ms: now_ms_u64(),
+        skills: entries,
+        imports,
+    })
+}
+
+fn import_skills_from_source(
+    layout: &AgentProjectLayout,
+    source: &str,
+    options: &ImportSkillpackOptions,
+) -> Result<ImportSkillsReport> {
+    let max_skills = options.max_skills.clamp(1, 500);
+    let target = resolve_skillpack_install_target(layout, options.mode)?;
+    let source_ctx = resolve_import_source_context(source, None)?;
+    if source_ctx.license.is_none() && !options.allow_missing_license {
+        return Err(anyhow!(
+            "Import source '{}' has no detectable license file at repository root. Add --allow-missing-license to override.",
+            source_ctx.requested_source
+        ));
+    }
+    let effective_license = source_ctx
+        .license
+        .clone()
+        .or_else(|| options.allow_missing_license.then(|| "unknown".to_string()));
+
+    let mut skill_files = Vec::<PathBuf>::new();
+    walk_directory_files(&source_ctx.root, &mut |path| {
+        if path
+            .file_name()
+            .and_then(|v| v.to_str())
+            .map(|v| v.eq_ignore_ascii_case("SKILL.md"))
+            .unwrap_or(false)
+        {
+            skill_files.push(path.to_path_buf());
+        }
+    })?;
+    skill_files.sort();
+    if skill_files.is_empty() {
+        return Err(anyhow!("No SKILL.md files found under source '{}'", source));
+    }
+
+    let target_domain =
+        sanitize_package_name(options.domain_override.as_deref().unwrap_or("imported"))?;
+    fs::create_dir_all(&target.import_dir)?;
+    let mut files = Vec::<String>::new();
+    let mut imported = 0usize;
+    let mut skipped = 0usize;
+
+    for skill_path in skill_files.into_iter().take(max_skills) {
+        let content = match fs::read_to_string(&skill_path) {
+            Ok(v) => v,
+            Err(_) => {
+                skipped = skipped.saturating_add(1);
+                continue;
+            }
+        };
+        let imported_skill = parse_external_skill_markdown(&content, &skill_path)?;
+        let skill_name = sanitize_package_name(&imported_skill.name)?;
+        let source_path = relative_unix_path(&source_ctx.root, &skill_path)?;
+        let provenance = ImportProvenance {
+            requested_source: source_ctx.requested_source.clone(),
+            resolved_source: source_ctx.resolved_source.clone(),
+            source_path: source_path.clone(),
+            source_commit: source_ctx.commit.clone(),
+            source_license: effective_license.clone(),
+            imported_at_ms: Some(now_ms_u64()),
+        };
+        let mut target_path = target.import_dir.join(format!("{}.md", skill_name));
+        if target_path.exists() && !options.overwrite {
+            let suffix = fnv1a64_hex(imported_skill.origin.as_bytes());
+            target_path = target
+                .import_dir
+                .join(format!("{}-{}.md", skill_name, &suffix[..8]));
+            if target_path.exists() && !options.overwrite {
+                skipped = skipped.saturating_add(1);
+                continue;
+            }
+        }
+        let body = build_imported_skill_markdown(
+            &target_domain,
+            &skill_name,
+            &imported_skill,
+            &provenance,
+        );
+        fs::write(&target_path, body)?;
+        imported = imported.saturating_add(1);
+        files.push(format_skillpack_report_path(&target, &target_path));
+    }
+    files.sort();
+    let catalog_rebuilt = target.supports_catalog_rebuild && options.rebuild_catalog;
+    if catalog_rebuilt {
+        let _ = build_skill_workflow_catalog(layout)?;
+    } else {
+        write_skills_lockfile_for_target(&target)?;
+    }
+
+    Ok(ImportSkillsReport {
+        mode: options.mode.as_str().to_string(),
+        source: source_ctx.requested_source.clone(),
+        resolved_source: source_ctx.resolved_source.clone(),
+        commit: source_ctx.commit.clone(),
+        license: effective_license,
+        domain: target_domain,
+        imported,
+        skipped,
+        catalog_rebuilt,
+        files,
+    })
+}
+
+fn sync_imported_skills_from_lock(
+    layout: &AgentProjectLayout,
+    overwrite: bool,
+    mode: SkillpackInstallMode,
+    allow_missing_license: bool,
+) -> Result<SyncImportsReport> {
+    let target = resolve_skillpack_install_target(layout, mode)?;
+    let lock_path = target.lockfile_path.clone();
+    if !lock_path.exists() {
+        return Err(anyhow!(
+            "skills lockfile missing at '{}'. Run '{}' first.",
+            lock_path.display(),
+            if mode == SkillpackInstallMode::Local {
+                "workflow build-catalog"
+            } else {
+                "workflow install-skillpack <source> --mode global"
+            }
+        ));
+    }
+    let lockfile = read_skills_lockfile(&lock_path)?;
+    let mut grouped = HashMap::<String, Vec<SkillLockEntry>>::new();
+    let mut missing = 0usize;
+    let mut skipped = 0usize;
+    for entry in lockfile.skills.into_iter().filter(is_imported_lock_entry) {
+        let Some(source) = entry.source.clone().filter(|v| !v.trim().is_empty()) else {
+            missing = missing.saturating_add(1);
+            continue;
+        };
+        let key = format!(
+            "{}|{}",
+            source,
+            entry.source_commit.as_deref().unwrap_or_default()
+        );
+        grouped.entry(key).or_default().push(entry);
+    }
+    let sources = grouped.len();
+    let mut updated = 0usize;
+    let mut files = Vec::<String>::new();
+
+    for entries in grouped.values_mut() {
+        entries.sort_by(|a, b| a.id.cmp(&b.id));
+        let sample = entries
+            .first()
+            .ok_or_else(|| anyhow!("Invalid empty sync group"))?;
+        let source = sample
+            .source
+            .clone()
+            .ok_or_else(|| anyhow!("Imported lock entry '{}' missing source", sample.id))?;
+        let pinned_commit = sample.source_commit.as_deref();
+        let mut source_ctx = resolve_import_source_context(&source, pinned_commit)?;
+        if source_ctx.license.is_none() {
+            source_ctx.license = sample.source_license.clone();
+        }
+        if source_ctx.license.is_none() && !allow_missing_license {
+            return Err(anyhow!(
+                "Sync source '{}' has no detectable license. Add --allow-missing-license to override.",
+                source
+            ));
+        }
+        let effective_license = source_ctx
+            .license
+            .clone()
+            .or_else(|| allow_missing_license.then(|| "unknown".to_string()));
+
+        for entry in entries.iter() {
+            let Some(source_path) = entry.source_path.clone() else {
+                missing = missing.saturating_add(1);
+                continue;
+            };
+            let source_skill_path = source_ctx.root.join(&source_path);
+            if !source_skill_path.exists() {
+                missing = missing.saturating_add(1);
+                continue;
+            }
+            let content = match fs::read_to_string(&source_skill_path) {
+                Ok(v) => v,
+                Err(_) => {
+                    missing = missing.saturating_add(1);
+                    continue;
+                }
+            };
+            let imported_skill = parse_external_skill_markdown(&content, &source_skill_path)?;
+
+            let target_path = resolve_lock_entry_target_path(&target, entry);
+            if target_path.exists() && !overwrite {
+                skipped = skipped.saturating_add(1);
+                continue;
+            }
+            if let Some(parent) = target_path.parent() {
+                fs::create_dir_all(parent)?;
+            }
+
+            let target_domain = infer_skill_domain_for_target(&target_path)
+                .unwrap_or_else(|| "imported".to_string());
+            let skill_name = target_path
+                .file_stem()
+                .and_then(|v| v.to_str())
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty())
+                .unwrap_or_else(|| sanitize_package_name(&imported_skill.name).unwrap_or_default());
+            let provenance = ImportProvenance {
+                requested_source: entry
+                    .source_requested
+                    .clone()
+                    .unwrap_or_else(|| source_ctx.requested_source.clone()),
+                resolved_source: source_ctx.resolved_source.clone(),
+                source_path: source_path.replace('\\', "/"),
+                source_commit: entry.source_commit.clone().or(source_ctx.commit.clone()),
+                source_license: effective_license.clone(),
+                imported_at_ms: Some(now_ms_u64()),
+            };
+            let body = build_imported_skill_markdown(
+                &target_domain,
+                &skill_name,
+                &imported_skill,
+                &provenance,
+            );
+            fs::write(&target_path, body)?;
+            updated = updated.saturating_add(1);
+            files.push(format_skillpack_report_path(&target, &target_path));
+        }
+    }
+    files.sort();
+    let catalog_rebuilt = target.supports_catalog_rebuild;
+    if catalog_rebuilt {
+        let _ = build_skill_workflow_catalog(layout)?;
+    } else {
+        write_skills_lockfile_for_target(&target)?;
+    }
+
+    Ok(SyncImportsReport {
+        mode: mode.as_str().to_string(),
+        lockfile: format_skillpack_report_path(&target, &lock_path),
+        sources,
+        updated,
+        skipped,
+        missing,
+        catalog_rebuilt,
+        files,
+    })
+}
+
+fn infer_skill_domain_for_target(path: &Path) -> Option<String> {
+    if !path.exists() {
+        return None;
+    }
+    let content = fs::read_to_string(path).ok()?;
+    let (meta, _) = parse_skill_markdown(&content).ok()?;
+    sanitize_package_name(&meta.domain).ok()
+}
+
+#[derive(Debug, Clone)]
+struct ImportSourceContext {
+    root: PathBuf,
+    requested_source: String,
+    resolved_source: String,
+    commit: Option<String>,
+    license: Option<String>,
+    cleanup_dir: Option<PathBuf>,
+}
+
+impl Drop for ImportSourceContext {
+    fn drop(&mut self) {
+        if let Some(path) = self.cleanup_dir.take() {
+            let _ = fs::remove_dir_all(path);
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct ImportProvenance {
+    requested_source: String,
+    resolved_source: String,
+    source_path: String,
+    source_commit: Option<String>,
+    source_license: Option<String>,
+    imported_at_ms: Option<u64>,
+}
+
+fn resolve_import_source_context(
+    source: &str,
+    pinned_commit: Option<&str>,
+) -> Result<ImportSourceContext> {
+    let raw = source.trim();
+    if raw.is_empty() {
+        return Err(anyhow!("Import source is required"));
+    }
+    if let Some(commit) = pinned_commit {
+        validate_git_ref_like("source_commit", commit)?;
+    }
+    let source_path = PathBuf::from(raw);
+    if source_path.exists() {
+        if !source_path.is_dir() {
+            return Err(anyhow!(
+                "Import source path '{}' is not a directory",
+                source_path.display()
+            ));
+        }
+        let canonical = fs::canonicalize(&source_path).unwrap_or(source_path.clone());
+        if let Some(commit) = pinned_commit {
+            if !is_command_available("git") {
+                return Err(anyhow!(
+                    "Cannot pin commit '{}' for local import source without git",
+                    commit
+                ));
+            }
+            let temp_dir = create_import_temp_dir("sync-skills");
+            git_clone_source_to(raw, &temp_dir, false)?;
+            git_checkout_commit(&temp_dir, commit)?;
+            let resolved_source = git_remote_origin(&temp_dir)
+                .unwrap_or_else(|| canonical.to_string_lossy().to_string());
+            let detected_commit = git_head_commit(&temp_dir);
+            let license = detect_repo_license(&temp_dir);
+            return Ok(ImportSourceContext {
+                root: temp_dir.clone(),
+                requested_source: raw.to_string(),
+                resolved_source,
+                commit: detected_commit.or_else(|| Some(commit.to_string())),
+                license,
+                cleanup_dir: Some(temp_dir),
+            });
+        }
+
+        let resolved_source = git_remote_origin(&canonical)
+            .unwrap_or_else(|| canonical.to_string_lossy().to_string());
+        let commit = git_head_commit(&canonical);
+        let license = detect_repo_license(&canonical);
+        return Ok(ImportSourceContext {
+            root: canonical,
+            requested_source: raw.to_string(),
+            resolved_source,
+            commit,
+            license,
+            cleanup_dir: None,
+        });
+    }
+
+    let looks_like_git = raw.starts_with("http://")
+        || raw.starts_with("https://")
+        || raw.starts_with("git@")
+        || raw.ends_with(".git");
+    if !looks_like_git {
+        return Err(anyhow!(
+            "Import source '{}' is neither a local directory nor a git URL",
+            raw
+        ));
+    }
+    if !is_command_available("git") {
+        return Err(anyhow!(
+            "Cannot import from git URL because 'git' command is unavailable"
+        ));
+    }
+
+    let use_shallow_clone = pinned_commit.is_none();
+    let temp_dir = create_import_temp_dir("import-skills");
+    git_clone_source_to(raw, &temp_dir, use_shallow_clone)?;
+    if let Some(commit) = pinned_commit {
+        git_checkout_commit(&temp_dir, commit)?;
+    }
+    let resolved_source = git_remote_origin(&temp_dir).unwrap_or_else(|| raw.to_string());
+    let commit = git_head_commit(&temp_dir);
+    let license = detect_repo_license(&temp_dir);
+    Ok(ImportSourceContext {
+        root: temp_dir.clone(),
+        requested_source: raw.to_string(),
+        resolved_source,
+        commit,
+        license,
+        cleanup_dir: Some(temp_dir),
+    })
+}
+
+fn create_import_temp_dir(prefix: &str) -> PathBuf {
+    let temp_dir = std::env::temp_dir().join(format!("agentic-sdlc-{}-{}", prefix, now_ms_u64()));
+    if temp_dir.exists() {
+        let _ = fs::remove_dir_all(&temp_dir);
+    }
+    temp_dir
+}
+
+fn git_clone_source_to(source: &str, target: &Path, shallow: bool) -> Result<()> {
+    let mut cmd = ProcessCommand::new("git");
+    cmd.arg("clone");
+    if shallow {
+        cmd.arg("--depth").arg("1");
+    }
+    let output = cmd.arg(source).arg(target).output()?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(anyhow!(
+            "git clone failed for '{}': {}",
+            source,
+            stderr.trim()
+        ));
+    }
+    Ok(())
+}
+
+fn git_checkout_commit(repo_root: &Path, commit: &str) -> Result<()> {
+    let output = ProcessCommand::new("git")
+        .arg("-C")
+        .arg(repo_root)
+        .arg("checkout")
+        .arg("--detach")
+        .arg(commit)
+        .output()?;
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(anyhow!(
+            "git checkout failed for commit '{}' at '{}': {}",
+            commit,
+            repo_root.display(),
+            stderr.trim()
+        ));
+    }
+    Ok(())
+}
+
+fn git_remote_origin(repo_root: &Path) -> Option<String> {
+    let output = ProcessCommand::new("git")
+        .arg("-C")
+        .arg(repo_root)
+        .arg("config")
+        .arg("--get")
+        .arg("remote.origin.url")
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let value = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    if value.is_empty() {
+        None
+    } else {
+        Some(value)
+    }
+}
+
+fn git_head_commit(repo_root: &Path) -> Option<String> {
+    let output = ProcessCommand::new("git")
+        .arg("-C")
+        .arg(repo_root)
+        .arg("rev-parse")
+        .arg("HEAD")
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let value = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    if value.is_empty() {
+        None
+    } else {
+        Some(value)
+    }
+}
+
+fn detect_repo_license(repo_root: &Path) -> Option<String> {
+    let entries = fs::read_dir(repo_root).ok()?;
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        let Some(name) = path.file_name().and_then(|v| v.to_str()) else {
+            continue;
+        };
+        let upper = name.to_ascii_uppercase();
+        if !(upper.starts_with("LICENSE") || upper.starts_with("COPYING")) {
+            continue;
+        }
+        let body = fs::read_to_string(&path).unwrap_or_default();
+        let inferred = infer_license_identifier(&body).unwrap_or_else(|| name.to_string());
+        return Some(inferred);
+    }
+    None
+}
+
+fn infer_license_identifier(content: &str) -> Option<String> {
+    let lower = content.to_ascii_lowercase();
+    if lower.contains("apache license") && lower.contains("version 2") {
+        return Some("Apache-2.0".to_string());
+    }
+    if lower.contains("mit license") {
+        return Some("MIT".to_string());
+    }
+    if lower.contains("bsd 3-clause") {
+        return Some("BSD-3-Clause".to_string());
+    }
+    if lower.contains("bsd 2-clause") {
+        return Some("BSD-2-Clause".to_string());
+    }
+    if lower.contains("mozilla public license") && lower.contains("2.0") {
+        return Some("MPL-2.0".to_string());
+    }
+    if lower.contains("gnu general public license") && lower.contains("version 3") {
+        return Some("GPL-3.0".to_string());
+    }
+    if lower.contains("gnu general public license") && lower.contains("version 2") {
+        return Some("GPL-2.0".to_string());
+    }
+    if lower.contains("eclipse public license") && lower.contains("2.0") {
+        return Some("EPL-2.0".to_string());
+    }
+    if lower.contains("creative commons zero") || lower.contains("cc0") {
+        return Some("CC0-1.0".to_string());
+    }
+    None
+}
+
+#[derive(Debug, Clone)]
+struct ImportedSkill {
+    name: String,
+    description: String,
+    tags: Vec<String>,
+    risk: String,
+    source: Option<String>,
+    body: String,
+    when_to_use: Vec<String>,
+    examples: Vec<String>,
+    limitations: Vec<String>,
+    origin: String,
+}
+
+fn parse_external_skill_markdown(content: &str, path: &Path) -> Result<ImportedSkill> {
+    let (frontmatter, body) = split_frontmatter(content);
+    let fm = parse_simple_yaml_map(frontmatter.unwrap_or_default());
+    let fallback_name = path
+        .parent()
+        .and_then(|v| v.file_name())
+        .and_then(|v| v.to_str())
+        .unwrap_or("imported-skill");
+    let name = fm
+        .get("name")
+        .cloned()
+        .filter(|v| !v.trim().is_empty())
+        .unwrap_or_else(|| fallback_name.to_string());
+    let description = fm
+        .get("description")
+        .cloned()
+        .filter(|v| !v.trim().is_empty())
+        .unwrap_or_else(|| {
+            extract_first_paragraph(body).unwrap_or_else(|| "Imported skill".to_string())
+        });
+    let tags = parse_frontmatter_list(fm.get("tags").map(String::as_str));
+    let risk = normalize_risk_label(fm.get("risk").map(String::as_str));
+    let source = fm.get("source").cloned().filter(|v| !v.trim().is_empty());
+
+    let body_clean = body.trim();
+    let when_to_use = extract_section_bullets(
+        body_clean,
+        &[
+            "when to use",
+            "when to use this skill",
+            "use this skill when",
+        ],
+    );
+    let examples = extract_fenced_examples(body_clean);
+    let limitations = extract_section_bullets(
+        body_clean,
+        &[
+            "limitations",
+            "known limitations",
+            "common pitfalls",
+            "common issues",
+        ],
+    );
+
+    Ok(ImportedSkill {
+        name,
+        description,
+        tags,
+        risk,
+        source,
+        body: body_clean.to_string(),
+        when_to_use,
+        examples,
+        limitations,
+        origin: path.display().to_string(),
+    })
+}
+
+fn build_imported_skill_markdown(
+    domain: &str,
+    skill_name: &str,
+    imported: &ImportedSkill,
+    provenance: &ImportProvenance,
+) -> String {
+    let source_field = imported
+        .source
+        .clone()
+        .unwrap_or_else(|| provenance.resolved_source.trim().to_string());
+    let description = imported.description.trim();
+    let description_meta = truncate_chars(description, 200);
+    let mut tags = if imported.tags.is_empty() {
+        vec![
+            "imported".to_string(),
+            "external".to_string(),
+            domain.to_string(),
+        ]
+    } else {
+        let mut provided = imported.tags.clone();
+        provided.push(domain.to_string());
+        provided
+    };
+    tags = tags
+        .into_iter()
+        .map(|tag| tag.trim().to_ascii_lowercase())
+        .filter(|tag| !tag.is_empty())
+        .collect::<Vec<_>>();
+    tags.sort();
+    tags.dedup();
+    if tags.len() < 3 {
+        tags.push("skillpack".to_string());
+        tags.sort();
+        tags.dedup();
+    }
+    let when_to_use = if imported.when_to_use.is_empty() {
+        vec!["Use when the task matches this skill domain.".to_string()]
+    } else {
+        imported.when_to_use.clone()
+    };
+    let examples = if imported.examples.is_empty() {
+        vec!["Input: <task context> -> Output: structured guidance".to_string()]
+    } else {
+        imported.examples.clone()
+    };
+    let limitations = if imported.limitations.is_empty() {
+        vec!["Imported guidance may require adaptation to local project conventions.".to_string()]
+    } else {
+        imported.limitations.clone()
+    };
+
+    let json_meta = serde_json::json!({
+        "name": skill_name,
+        "domain": domain,
+        "description": description_meta,
+        "risk": imported.risk,
+        "source": source_field,
+        "source_requested": provenance.requested_source,
+        "source_commit": provenance.source_commit,
+        "source_path": provenance.source_path,
+        "source_license": provenance.source_license,
+        "imported_at_ms": provenance.imported_at_ms,
+        "tags": tags,
+        "executor": "ollama",
+        "model": "qwen3:8b",
+        "temperature": 0.1
+    });
+    let mut out = String::new();
+    out.push_str(&format!(
+        "# Skill: {}\nSchema: antigrav.skill@v1\n\n```json\n{}\n```\n\n",
+        skill_name,
+        serde_json::to_string_pretty(&json_meta).unwrap_or_else(|_| "{}".to_string())
+    ));
+    out.push_str("## Overview\n");
+    out.push_str(description);
+    out.push_str("\n\n## When to Use\n");
+    for item in when_to_use {
+        out.push_str("- ");
+        out.push_str(item.trim());
+        out.push('\n');
+    }
+    out.push_str("\n## Examples\n");
+    for item in examples {
+        out.push_str("- ");
+        out.push_str(item.trim());
+        out.push('\n');
+    }
+    out.push_str("\n## Limitations\n");
+    for item in limitations {
+        out.push_str("- ");
+        out.push_str(item.trim());
+        out.push('\n');
+    }
+    out.push_str("\n## Imported Notes\n");
+    out.push_str(&format!(
+        "Imported from requested source `{}`; resolved source `{}`; path `{}`.\n",
+        provenance.requested_source.trim(),
+        provenance.resolved_source.trim(),
+        provenance.source_path.trim()
+    ));
+    if let Some(commit) = provenance.source_commit.as_deref() {
+        out.push_str(&format!("Pinned source commit: `{}`.\n", commit.trim()));
+    }
+    if let Some(license) = provenance.source_license.as_deref() {
+        out.push_str(&format!("Detected source license: `{}`.\n", license.trim()));
+    }
+    let preview = summarize_text_for_import(&imported.body, 800);
+    if !preview.is_empty() {
+        out.push_str("\nOriginal excerpt:\n\n");
+        out.push_str(preview.trim());
+        out.push('\n');
+    }
+    out.push_str("\n{{input}}\n");
+    out
+}
+
+fn split_frontmatter(markdown: &str) -> (Option<&str>, &str) {
+    let mut lines = markdown.lines();
+    if lines.next().map(str::trim) != Some("---") {
+        return (None, markdown);
+    }
+    let mut cursor = 4usize;
+    for line in markdown.lines().skip(1) {
+        let line_len = line.len().saturating_add(1);
+        if line.trim() == "---" {
+            let fm = &markdown[4..cursor.saturating_sub(1)];
+            let body = &markdown[cursor + line_len..];
+            return (Some(fm), body);
+        }
+        cursor = cursor.saturating_add(line_len);
+    }
+    (None, markdown)
+}
+
+fn parse_simple_yaml_map(frontmatter: &str) -> HashMap<String, String> {
+    let mut map = HashMap::<String, String>::new();
+    for line in frontmatter.lines() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            continue;
+        }
+        let Some((key, value)) = trimmed.split_once(':') else {
+            continue;
+        };
+        let key = key.trim().to_ascii_lowercase();
+        if key.is_empty() {
+            continue;
+        }
+        let value = value
+            .trim()
+            .trim_matches('"')
+            .trim_matches('\'')
+            .to_string();
+        map.insert(key, value);
+    }
+    map
+}
+
+fn parse_frontmatter_list(raw: Option<&str>) -> Vec<String> {
+    let Some(raw) = raw else {
+        return Vec::new();
+    };
+    let trimmed = raw.trim().trim_start_matches('[').trim_end_matches(']');
+    let mut values = trimmed
+        .split(',')
+        .map(|v| v.trim().trim_matches('"').trim_matches('\'').to_string())
+        .filter(|v| !v.is_empty())
+        .collect::<Vec<_>>();
+    values.sort();
+    values.dedup();
+    values
+}
+
+fn normalize_risk_label(raw: Option<&str>) -> String {
+    let normalized = raw.unwrap_or("unknown").trim().to_ascii_lowercase();
+    match normalized.as_str() {
+        "none" | "safe" | "critical" | "offensive" | "unknown" => normalized,
+        _ => "unknown".to_string(),
+    }
+}
+
+fn extract_first_paragraph(markdown: &str) -> Option<String> {
+    let mut paragraph = Vec::<String>::new();
+    for line in markdown.lines() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() {
+            if !paragraph.is_empty() {
+                break;
+            }
+            continue;
+        }
+        if trimmed.starts_with('#') {
+            continue;
+        }
+        paragraph.push(trimmed.to_string());
+    }
+    if paragraph.is_empty() {
+        return None;
+    }
+    Some(paragraph.join(" "))
+}
+
+fn extract_section_bullets(markdown: &str, section_names: &[&str]) -> Vec<String> {
+    let mut in_section = false;
+    let mut items = Vec::<String>::new();
+    for line in markdown.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with('#') {
+            let heading = trimmed.trim_start_matches('#').trim().to_ascii_lowercase();
+            in_section = section_names
+                .iter()
+                .any(|section| heading == section.to_ascii_lowercase());
+            continue;
+        }
+        if !in_section {
+            continue;
+        }
+        if let Some(item) = trimmed
+            .strip_prefix("- ")
+            .or_else(|| trimmed.strip_prefix("* "))
+        {
+            let item = item.trim();
+            if !item.is_empty() {
+                items.push(item.to_string());
+            }
+        }
+    }
+    items
+}
+
+fn extract_fenced_examples(markdown: &str) -> Vec<String> {
+    let mut examples = Vec::<String>::new();
+    let mut in_fence = false;
+    let mut buffer = Vec::<String>::new();
+    for line in markdown.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with("```") {
+            if in_fence {
+                if !buffer.is_empty() {
+                    examples.push(buffer.join("\n"));
+                }
+                buffer.clear();
+                in_fence = false;
+            } else {
+                in_fence = true;
+                buffer.clear();
+            }
+            continue;
+        }
+        if in_fence {
+            buffer.push(line.to_string());
+        }
+    }
+    if examples.is_empty() {
+        if let Some(paragraph) = extract_first_paragraph(markdown) {
+            examples.push(paragraph);
+        }
+    }
+    examples.into_iter().take(3).collect()
+}
+
+fn summarize_text_for_import(markdown: &str, max_chars: usize) -> String {
+    let compact = markdown.split_whitespace().collect::<Vec<_>>().join(" ");
+    if compact.len() <= max_chars {
+        return compact;
+    }
+    compact.chars().take(max_chars).collect::<String>()
+}
+
+fn truncate_chars(value: &str, max_chars: usize) -> String {
+    let compact = value.split_whitespace().collect::<Vec<_>>().join(" ");
+    if compact.chars().count() <= max_chars {
+        return compact;
+    }
+    compact.chars().take(max_chars).collect::<String>()
+}
+
+fn bundle_key_from_id(id: &str) -> String {
+    let trimmed = id.trim().trim_matches('/');
+    if trimmed.is_empty() {
+        return "core".to_string();
+    }
+    if let Some((head, _)) = trimmed.split_once('/') {
+        if !head.trim().is_empty() {
+            return head.trim().to_string();
+        }
+    }
+    "core".to_string()
+}
+
+fn to_resource_id(base_dir: &Path, path: &Path) -> Option<String> {
+    let relative = path.strip_prefix(base_dir).ok()?;
+    let mut id = relative.to_string_lossy().replace('\\', "/");
+    if id.to_ascii_lowercase().ends_with(".md") {
+        id.truncate(id.len().saturating_sub(3));
+    }
+    if id.trim().is_empty() {
+        return None;
+    }
+    Some(id)
+}
+
+fn collect_markdown_paths_recursive(root: &Path) -> Result<Vec<PathBuf>> {
+    let mut files = Vec::<PathBuf>::new();
+    walk_directory_files(root, &mut |path| {
+        let is_markdown = path
+            .extension()
+            .and_then(|ext| ext.to_str())
+            .map(|ext| ext.eq_ignore_ascii_case("md"))
+            .unwrap_or(false);
+        if is_markdown {
+            files.push(path.to_path_buf());
+        }
+    })?;
+    files.sort();
+    Ok(files)
+}
+
+fn extract_frontmatter_map(markdown: &str) -> HashMap<String, String> {
+    let mut map = HashMap::<String, String>::new();
+    let mut lines = markdown.lines();
+    if lines.next().map(str::trim) != Some("---") {
+        return map;
+    }
+    for line in lines {
+        let trimmed = line.trim();
+        if trimmed == "---" {
+            break;
+        }
+        let Some((key, value)) = trimmed.split_once(':') else {
+            continue;
+        };
+        let key = key.trim();
+        let value = value.trim();
+        if key.is_empty() || value.is_empty() {
+            continue;
+        }
+        map.insert(key.to_string(), value.to_string());
+    }
+    map
+}
+
+fn now_ms_u64() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|duration| duration.as_millis() as u64)
+        .unwrap_or(0)
+}
+
+fn fnv1a64_hex(bytes: &[u8]) -> String {
+    let mut hash: u64 = 0xcbf29ce484222325;
+    for byte in bytes {
+        hash ^= u64::from(*byte);
+        hash = hash.wrapping_mul(0x100000001b3);
+    }
+    format!("{:016x}", hash)
 }
 
 fn resolve_bootstrap_strict_ollama(flag: bool) -> bool {
@@ -2641,28 +4889,30 @@ fn relative_unix_path(project_root: &Path, path: &Path) -> Result<String> {
 
 fn collect_markdown_resource_entries(dir: &std::path::Path) -> Result<Vec<MarkdownResourceEntry>> {
     let mut entries = Vec::new();
-    for entry in std::fs::read_dir(dir)? {
-        let entry = entry?;
-        let path = entry.path();
-        if !path.is_file() {
-            continue;
-        }
+    walk_directory_files(dir, &mut |path| {
         let is_markdown = path
             .extension()
             .and_then(|ext| ext.to_str())
             .map(|ext| ext.eq_ignore_ascii_case("md"))
             .unwrap_or(false);
         if !is_markdown {
-            continue;
+            return;
         }
-        let Some(stem) = path.file_stem().and_then(|v| v.to_str()) else {
-            continue;
+        let Ok(relative) = path.strip_prefix(dir) else {
+            return;
         };
+        let mut id = relative.to_string_lossy().replace('\\', "/");
+        if id.to_ascii_lowercase().ends_with(".md") {
+            id.truncate(id.len().saturating_sub(3));
+        }
+        if id.trim().is_empty() {
+            return;
+        }
         entries.push(MarkdownResourceEntry {
-            id: stem.to_string(),
+            id,
             path: path.display().to_string(),
         });
-    }
+    })?;
     entries.sort_by(|a, b| a.id.cmp(&b.id));
     Ok(entries)
 }
@@ -2688,6 +4938,17 @@ fn print_markdown_resource_listing(
     Ok(())
 }
 
+fn parse_skillpack_install_mode(raw: &str) -> Result<SkillpackInstallMode> {
+    match raw.trim().to_ascii_lowercase().as_str() {
+        "" | "local" => Ok(SkillpackInstallMode::Local),
+        "global" => Ok(SkillpackInstallMode::Global),
+        other => Err(anyhow!(
+            "Unsupported install mode '{}'. Use local|global",
+            other
+        )),
+    }
+}
+
 fn parse_package_scaffold_kind(kind: &str) -> Result<PackageMarkdownKind> {
     match kind.trim().to_ascii_lowercase().as_str() {
         "workflow" | "workflows" => Ok(PackageMarkdownKind::Workflow),
@@ -2697,6 +4958,32 @@ fn parse_package_scaffold_kind(kind: &str) -> Result<PackageMarkdownKind> {
         _ => Err(anyhow!(
             "Unsupported scaffold kind '{}'. Use workflow|skill|role|rule",
             kind
+        )),
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ScaffoldProfile {
+    Basic,
+    Advanced,
+}
+
+impl ScaffoldProfile {
+    fn as_str(&self) -> &'static str {
+        match self {
+            ScaffoldProfile::Basic => "basic",
+            ScaffoldProfile::Advanced => "advanced",
+        }
+    }
+}
+
+fn parse_scaffold_profile(raw: &str) -> Result<ScaffoldProfile> {
+    match raw.trim().to_ascii_lowercase().as_str() {
+        "basic" => Ok(ScaffoldProfile::Basic),
+        "advanced" | "pro" => Ok(ScaffoldProfile::Advanced),
+        _ => Err(anyhow!(
+            "Unsupported scaffold profile '{}'. Use basic|advanced",
+            raw
         )),
     }
 }
@@ -2728,11 +5015,11 @@ fn scaffold_markdown_package(
     layout: &AgentProjectLayout,
     kind_raw: &str,
     name_raw: &str,
+    profile: ScaffoldProfile,
     overwrite: bool,
 ) -> Result<std::path::PathBuf> {
     let kind = parse_package_scaffold_kind(kind_raw)?;
     let name = sanitize_package_name(name_raw)?;
-    let schema = kind.expected_schema();
     let target_dir = match kind {
         PackageMarkdownKind::Workflow => &layout.workflows_dir,
         PackageMarkdownKind::Skill => &layout.skills_dir,
@@ -2740,29 +5027,255 @@ fn scaffold_markdown_package(
         PackageMarkdownKind::Rule => &layout.rules_dir,
     };
     let path = target_dir.join(format!("{}.md", name));
+    let content = build_scaffold_markdown(kind, &name, profile);
+    write_scaffold_file(&path, &content, overwrite, &mut Vec::new())?;
+    Ok(path)
+}
+
+fn build_scaffold_markdown(
+    kind: PackageMarkdownKind,
+    name: &str,
+    profile: ScaffoldProfile,
+) -> String {
+    let schema = kind.expected_schema();
+    match (kind, profile) {
+        (PackageMarkdownKind::Workflow, ScaffoldProfile::Basic) => format!(
+            "---\ndescription: {name} workflow description\n---\n# Workflow: {name}\nSchema: {schema}\nDomain: agent\n\n## Step: plan\nSkill: agent.llm_subagent\nInput: Plan implementation for {name}.\n"
+        ),
+        (PackageMarkdownKind::Workflow, ScaffoldProfile::Advanced) => format!(
+            "---\ndescription: {name} advanced workflow (plan, execute, validate, risk)\n---\n# Workflow: {name}\nSchema: {schema}\nDomain: agent\nMaxCpuMs: 180000\nMaxWallTimeMs: 600000\nMaxNetworkCalls: 25\n\n## Step: intent_analysis\nSkill: agent.llm_subagent\nInput: Analyze task scope, constraints, and acceptance criteria for {name}. Return concise JSON decisions.\n\n## Step: execution_plan\nSkill: agent.llm_subagent\nDependsOn: intent_analysis\nInput: Build deterministic implementation plan for {name} with milestones and rollback notes.\n\n## Step: validation_gate\nSkill: agent.run_script\nDependsOn: execution_plan\nRetry: 1\nOnFailure: Continue\nInput: echo \"validate {name}\"\n\n## Step: risk_review\nSkill: agent.llm_subagent\nDependsOn: validation_gate\nInput: Produce risk register for {name}, including severity, blast radius, and mitigations.\n\n## Step: finalize\nSkill: demo.echo\nDependsOn: risk_review\nInput: Advanced scaffold workflow {name} prepared.\n"
+        ),
+        (PackageMarkdownKind::Skill, ScaffoldProfile::Basic) => format!(
+            "# Skill: {name}\nSchema: {schema}\n```json\n{{\"name\":\"{name}\",\"domain\":\"agent\",\"executor\":\"ollama\",\"model\":\"qwen3:8b\"}}\n```\n\nDescribe skill behavior here.\n"
+        ),
+        (PackageMarkdownKind::Skill, ScaffoldProfile::Advanced) => format!(
+            "# Skill: {name}\nSchema: {schema}\n```json\n{{\"name\":\"{name}\",\"domain\":\"agent\",\"executor\":\"ollama\",\"description\":\"Advanced deterministic analysis skill for delivery pipelines\",\"model\":\"qwen3:8b\",\"temperature\":0.1,\"input_type\":\"text\",\"output_type\":\"text\",\"estimated_cost\":8,\"estimated_latency_ms\":2500,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_process_spawn\":false,\"side_effect_class\":\"Idempotent\",\"trust_tier\":\"Constrained\"}}\n```\n\nYou are an advanced delivery copilot. Process `{{input}}` and output strict JSON with fields:\n- `summary` (string)\n- `actions` (array of concrete steps)\n- `risks` (array of explicit risks)\n- `validation` (array of checks)\n\nKeep responses deterministic and implementation-focused.\n"
+        ),
+        (PackageMarkdownKind::Role, ScaffoldProfile::Basic) => format!(
+            "# Role: {name}\nSchema: {schema}\n```json\n{{\"name\":\"{name}\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.1}}\n```\n\nDefine responsibilities and expected output format.\n"
+        ),
+        (PackageMarkdownKind::Role, ScaffoldProfile::Advanced) => format!(
+            "# Role: {name}\nSchema: {schema}\n```json\n{{\"name\":\"{name}\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.1}}\n```\n\nYou are role `{name}` in a deterministic SDLC runtime.\n\nOperating contract:\n- propose minimal-change plans before execution\n- keep outputs machine-readable and risk-aware\n- include validation + rollback guidance\n- avoid speculative edits; prefer explicit assumptions\n"
+        ),
+        (PackageMarkdownKind::Rule, ScaffoldProfile::Basic) => format!(
+            "---\ndescription: {name} rule description\ntrigger: always_on\n---\n# Rule: {name}\nSchema: {schema}\n```json\n{{}}\n```\n"
+        ),
+        (PackageMarkdownKind::Rule, ScaffoldProfile::Advanced) => format!(
+            "---\ndescription: {name} advanced runtime policy\ntrigger: always_on\n---\n# Rule: {name}\nSchema: {schema}\n```json\n{{\n  \"enforce_deterministic_outputs\": true,\n  \"require_validation_steps\": true,\n  \"allow_external_mutation\": true,\n  \"max_parallel_mutation_steps\": 1,\n  \"require_risk_assessment\": true\n}}\n```\n"
+        ),
+    }
+}
+
+fn write_scaffold_file(
+    path: &Path,
+    body: &str,
+    overwrite: bool,
+    created: &mut Vec<std::path::PathBuf>,
+) -> Result<()> {
     if path.exists() && !overwrite {
         return Err(anyhow!(
             "Target file already exists: {} (use --overwrite to replace)",
             path.display()
         ));
     }
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(path, body)?;
+    created.push(path.to_path_buf());
+    Ok(())
+}
 
-    let content = match kind {
-        PackageMarkdownKind::Workflow => format!(
-            "---\ndescription: {name} workflow description\n---\n# Workflow: {name}\nSchema: {schema}\nDomain: agent\n\n## Step: plan\nSkill: agent.llm_subagent\nInput: planner:::Plan implementation for {name}.\n"
+fn scaffold_domain_pack(
+    layout: &AgentProjectLayout,
+    domain_raw: &str,
+    overwrite: bool,
+) -> Result<Vec<std::path::PathBuf>> {
+    let domain = sanitize_package_name(domain_raw)?;
+    let workflow_dir = layout.workflows_dir.join(&domain);
+    let skill_dir = layout.skills_dir.join(&domain);
+    let role_dir = layout.roles_dir.join(&domain);
+    let template_dir = layout.templates_dir.join(&domain);
+
+    let mut created = Vec::<std::path::PathBuf>::new();
+
+    for (name, body) in build_domain_workflow_markdown(&domain) {
+        write_scaffold_file(
+            &workflow_dir.join(format!("{}.md", name)),
+            &body,
+            overwrite,
+            &mut created,
+        )?;
+    }
+
+    for (name, body) in build_domain_skill_markdown(&domain) {
+        write_scaffold_file(
+            &skill_dir.join(format!("{}.md", name)),
+            &body,
+            overwrite,
+            &mut created,
+        )?;
+    }
+
+    for (name, body) in build_domain_role_markdown(&domain) {
+        write_scaffold_file(
+            &role_dir.join(format!("{}.md", name)),
+            &body,
+            overwrite,
+            &mut created,
+        )?;
+    }
+
+    for (name, body) in build_domain_template_markdown(&domain) {
+        write_scaffold_file(
+            &template_dir.join(format!("{}.md", name)),
+            &body,
+            overwrite,
+            &mut created,
+        )?;
+    }
+
+    Ok(created)
+}
+
+fn build_domain_workflow_markdown(domain: &str) -> Vec<(&'static str, String)> {
+    let arch = format!("{}/architect", domain);
+    let impler = format!("{}/implementer", domain);
+    let reviewer = format!("{}/reviewer", domain);
+    let resolver = format!("{}/resolver", domain);
+    let releaser = format!("{}/releaser", domain);
+    vec![
+        (
+            "feature",
+            format!(
+                "---\ndescription: {domain} feature delivery with impact analysis and acceptance gates\n---\n# Workflow: {domain}-feature\nSchema: antigrav.workflow@v1\nDomain: {domain}\nMaxCpuMs: 240000\nMaxWallTimeMs: 900000\nMaxNetworkCalls: 35\n\n## Step: intent_triage\nSkill: agent.llm_subagent\nInput: {arch}:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature.\n\n## Step: impact_analysis\nSkill: {domain}.impact_analyzer\nDependsOn: intent_triage\nRetry: 1\nInput: {{{{intent_triage}}}}\n\n## Step: implementation_plan\nSkill: agent.llm_subagent\nDependsOn: impact_analysis\nInput: {impler}:::Create a deterministic implementation plan from this context:\n{{{{impact_analysis}}}}\n\n## Step: acceptance_gate\nSkill: {domain}.acceptance_guard\nDependsOn: implementation_plan\nRetry: 1\nInput: {{{{implementation_plan}}}}\n\n## Step: risk_register\nSkill: {domain}.risk_register\nDependsOn: acceptance_gate\nOnFailure: Continue\nInput: {{{{acceptance_gate}}}}\n\n## Step: finalize\nSkill: demo.echo\nDependsOn: risk_register\nInput: Feature workflow ready for domain {domain}.\n"
+            ),
         ),
-        PackageMarkdownKind::Skill => format!(
-            "# Skill: {name}\nSchema: {schema}\n```json\n{{\"name\":\"{name}\",\"domain\":\"agent\",\"executor\":\"ollama\",\"model\":\"qwen3:8b\"}}\n```\n\nDescribe skill behavior here.\n"
+        (
+            "bugfix",
+            format!(
+                "---\ndescription: {domain} bugfix workflow with root-cause and regression guard\n---\n# Workflow: {domain}-bugfix\nSchema: antigrav.workflow@v1\nDomain: {domain}\nMaxCpuMs: 180000\nMaxWallTimeMs: 600000\n\n## Step: incident_triage\nSkill: agent.llm_subagent\nInput: {resolver}:::Diagnose failure mode and likely root cause. Prioritize deterministic repro.\n\n## Step: blast_radius\nSkill: {domain}.impact_analyzer\nDependsOn: incident_triage\nInput: {{{{incident_triage}}}}\n\n## Step: patch_plan\nSkill: agent.llm_subagent\nDependsOn: blast_radius\nInput: {impler}:::Propose minimal patch and rollback strategy from:\n{{{{blast_radius}}}}\n\n## Step: regression_guard\nSkill: {domain}.acceptance_guard\nDependsOn: patch_plan\nRetry: 1\nInput: {{{{patch_plan}}}}\n\n## Step: postmortem\nSkill: {domain}.risk_register\nDependsOn: regression_guard\nOnFailure: Continue\nInput: {{{{regression_guard}}}}\n"
+            ),
         ),
-        PackageMarkdownKind::Role => format!(
-            "# Role: {name}\nSchema: {schema}\n```json\n{{\"name\":\"{name}\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.1}}\n```\n\nDefine responsibilities and expected output format.\n"
+        (
+            "review",
+            format!(
+                "---\ndescription: {domain} review workflow focused on correctness, risk, and release readiness\n---\n# Workflow: {domain}-review\nSchema: antigrav.workflow@v1\nDomain: {domain}\n\n## Step: review_context\nSkill: agent.llm_subagent\nInput: {reviewer}:::Summarize current diff intent, architecture impact, and likely weak spots.\n\n## Step: specification_gate\nSkill: {domain}.acceptance_guard\nDependsOn: review_context\nInput: {{{{review_context}}}}\n\n## Step: review_risk_register\nSkill: {domain}.risk_register\nDependsOn: specification_gate\nInput: {{{{specification_gate}}}}\n\n## Step: review_decision\nSkill: agent.llm_subagent\nDependsOn: review_risk_register\nInput: {reviewer}:::Return merge recommendation with blocking issues from:\n{{{{review_risk_register}}}}\n"
+            ),
         ),
-        PackageMarkdownKind::Rule => format!(
-            "---\ndescription: {name} rule description\ntrigger: always_on\n---\n# Rule: {name}\nSchema: {schema}\n```json\n{{}}\n```\n"
+        (
+            "release",
+            format!(
+                "---\ndescription: {domain} release workflow with quality signal and risk approval\n---\n# Workflow: {domain}-release\nSchema: antigrav.workflow@v1\nDomain: {domain}\nMaxCpuMs: 180000\nMaxWallTimeMs: 480000\n\n## Step: release_scope\nSkill: agent.llm_subagent\nInput: {releaser}:::Build release scope summary, included features, and customer impact.\n\n## Step: release_quality_signal\nSkill: {domain}.acceptance_guard\nDependsOn: release_scope\nInput: {{{{release_scope}}}}\n\n## Step: release_risk\nSkill: {domain}.risk_register\nDependsOn: release_quality_signal\nInput: {{{{release_quality_signal}}}}\n\n## Step: finalize_release_note\nSkill: agent.llm_subagent\nDependsOn: release_risk\nInput: {releaser}:::Generate final release note and go/no-go recommendation from:\n{{{{release_risk}}}}\n"
+            ),
         ),
+    ]
+}
+
+fn build_domain_skill_markdown(domain: &str) -> Vec<(&'static str, String)> {
+    vec![
+        (
+            "impact_analyzer",
+            format!(
+                "# Skill: impact_analyzer\nSchema: antigrav.skill@v1\n```json\n{{\"name\":\"impact_analyzer\",\"domain\":\"{domain}\",\"executor\":\"ollama\",\"description\":\"Estimate blast radius and dependency impact\",\"model\":\"qwen3:8b\",\"temperature\":0.1,\"input_type\":\"text\",\"output_type\":\"text\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_process_spawn\":false,\"side_effect_class\":\"Idempotent\",\"trust_tier\":\"Constrained\"}}\n```\n\nAnalyze `{{input}}` and return strict JSON:\n{{\"scope_summary\":\"...\",\"components\":[\"...\"],\"risks\":[\"...\"],\"required_checks\":[\"...\"]}}\n\nFocus on deterministic execution planning.\n"
+            ),
+        ),
+        (
+            "acceptance_guard",
+            format!(
+                "# Skill: acceptance_guard\nSchema: antigrav.skill@v1\n```json\n{{\"name\":\"acceptance_guard\",\"domain\":\"{domain}\",\"executor\":\"ollama\",\"description\":\"Validate acceptance criteria and test completeness\",\"model\":\"qwen3:8b\",\"temperature\":0.1,\"input_type\":\"text\",\"output_type\":\"text\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_process_spawn\":false,\"side_effect_class\":\"Idempotent\",\"trust_tier\":\"Constrained\"}}\n```\n\nReview `{{input}}` against acceptance criteria quality.\nReturn strict JSON with:\n{{\"coverage\":[\"...\"],\"missing_checks\":[\"...\"],\"blocking_issues\":[\"...\"],\"ready\":true}}\n"
+            ),
+        ),
+        (
+            "risk_register",
+            format!(
+                "# Skill: risk_register\nSchema: antigrav.skill@v1\n```json\n{{\"name\":\"risk_register\",\"domain\":\"{domain}\",\"executor\":\"ollama\",\"description\":\"Generate risk register with severity and mitigation\",\"model\":\"qwen3:8b\",\"temperature\":0.1,\"input_type\":\"text\",\"output_type\":\"text\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_process_spawn\":false,\"side_effect_class\":\"Idempotent\",\"trust_tier\":\"Constrained\"}}\n```\n\nFrom `{{input}}`, output strict JSON:\n{{\"risks\":[{{\"title\":\"...\",\"severity\":\"low|medium|high\",\"mitigation\":\"...\"}}],\"rollback\":\"...\",\"owner_actions\":[\"...\"]}}\n"
+            ),
+        ),
+    ]
+}
+
+fn build_domain_role_markdown(domain: &str) -> Vec<(&'static str, String)> {
+    let common_meta = |name: &str| {
+        format!(
+            "# Role: {name}\nSchema: antigrav.role@v1\n```json\n{{\"name\":\"{name}\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.1}}\n```\n"
+        )
     };
-    fs::write(&path, content)?;
-    Ok(path)
+    vec![
+        (
+            "architect",
+            format!(
+                "{}Design bounded solutions for domain `{}`.\n\nRequirements:\n- state assumptions explicitly\n- define acceptance criteria before coding\n- optimize for minimal blast radius\n",
+                common_meta("architect"),
+                domain
+            ),
+        ),
+        (
+            "implementer",
+            format!(
+                "{}Implement deterministic, minimal-change patches in domain `{}`.\n\nRequirements:\n- preserve existing behavior unless explicitly changed\n- include validation and rollback notes\n- avoid speculative refactors\n",
+                common_meta("implementer"),
+                domain
+            ),
+        ),
+        (
+            "reviewer",
+            format!(
+                "{}Act as strict reviewer for domain `{}`.\n\nRequirements:\n- prioritize bugs, regressions, security, and missing tests\n- mark blockers vs non-blockers clearly\n- keep recommendations actionable\n",
+                common_meta("reviewer"),
+                domain
+            ),
+        ),
+        (
+            "resolver",
+            format!(
+                "{}Handle failures and conflict resolution in domain `{}`.\n\nRequirements:\n- isolate root cause\n- propose deterministic fix + verification\n- include fallback plan if fix fails\n",
+                common_meta("resolver"),
+                domain
+            ),
+        ),
+        (
+            "releaser",
+            format!(
+                "{}Prepare safe release decisions in domain `{}`.\n\nRequirements:\n- summarize quality signals\n- highlight top risks and mitigations\n- provide go/no-go recommendation with rationale\n",
+                common_meta("releaser"),
+                domain
+            ),
+        ),
+    ]
+}
+
+fn build_domain_template_markdown(domain: &str) -> Vec<(&'static str, String)> {
+    vec![
+        (
+            "feature_prompt",
+            format!(
+                "You are delivering a feature in domain `{}`.\n\nOutput format:\n1. Scope summary\n2. Implementation plan (ordered)\n3. Acceptance checks\n4. Risks and rollback strategy\n\nConstraints:\n- deterministic steps only\n- smallest safe change set\n- explicit assumptions\n",
+                domain
+            ),
+        ),
+        (
+            "bugfix_prompt",
+            format!(
+                "You are fixing a production bug in domain `{}`.\n\nOutput format:\n1. Root cause hypothesis\n2. Minimal patch plan\n3. Regression checks\n4. Post-fix monitoring notes\n",
+                domain
+            ),
+        ),
+        (
+            "review_prompt",
+            format!(
+                "You are reviewing implementation quality for domain `{}`.\n\nOutput format:\n1. Critical findings\n2. Behavioral regressions\n3. Security/perf concerns\n4. Merge recommendation\n",
+                domain
+            ),
+        ),
+        (
+            "release_prompt",
+            format!(
+                "You are preparing release readiness for domain `{}`.\n\nOutput format:\n1. Release scope\n2. Quality signal summary\n3. Open risks\n4. Go/No-Go with conditions\n",
+                domain
+            ),
+        ),
+    ]
 }
 
 fn print_instance_summary(instance: &WorkflowInstance) {
@@ -3044,12 +5557,16 @@ fn configure_run_script_policy_env(
 mod tests {
     use super::{
         apply_role_override_to_input, bind_role_to_workflow_llm_steps, build_graph_index,
-        build_routing_policy, build_thread_flow_workflow, collect_markdown_resource_entries,
-        ensure_bootstrap_package, infer_workflow_ref_from_template, merge_template_input,
-        normalize_auto_conflict_strategy, parse_package_scaffold_kind, parse_role_override_map,
-        resolve_bootstrap_strict_ollama, resolve_role_workflow_selection, sanitize_package_name,
+        build_routing_policy, build_skill_workflow_catalog, build_thread_flow_workflow,
+        collect_markdown_resource_entries, ensure_bootstrap_package, import_skills_from_source,
+        infer_workflow_ref_from_template, merge_template_input, normalize_auto_conflict_strategy,
+        parse_external_skill_markdown, parse_package_scaffold_kind, parse_role_override_map,
+        parse_scaffold_profile, parse_simple_yaml_map, parse_skillpack_install_mode,
+        read_skills_lockfile, resolve_bootstrap_strict_ollama, resolve_role_workflow_selection,
+        run_skill_quality_check, sanitize_package_name, scaffold_domain_pack,
         scaffold_markdown_package, select_template_and_workflow_for_message, validate_git_ref_like,
-        RoleRunRequest, ThreadFlowRequest,
+        ImportSkillpackOptions, RoleRunRequest, ScaffoldProfile, SkillpackInstallMode,
+        ThreadFlowRequest,
     };
     use crate::engine::budget::ExecutionBudget;
     use crate::engine::context::ExecutionContext;
@@ -3071,6 +5588,8 @@ mod tests {
     use async_trait::async_trait;
     use serde_json::json;
     use std::collections::HashMap;
+    use std::path::Path;
+    use std::process::Command as ProcessCommand;
     use std::sync::{Arc, Mutex};
 
     #[derive(Debug, Default)]
@@ -3404,6 +5923,10 @@ mod tests {
             infer_workflow_ref_from_template("/tmp/custom.md"),
             "custom".to_string()
         );
+        assert_eq!(
+            infer_workflow_ref_from_template("payments/feature_prompt.md"),
+            "payments/feature".to_string()
+        );
     }
 
     #[test]
@@ -3593,6 +6116,19 @@ mod tests {
     }
 
     #[test]
+    fn skillpack_install_mode_parser_supports_local_and_global() {
+        assert_eq!(
+            parse_skillpack_install_mode("local").expect("local"),
+            SkillpackInstallMode::Local
+        );
+        assert_eq!(
+            parse_skillpack_install_mode("global").expect("global"),
+            SkillpackInstallMode::Global
+        );
+        assert!(parse_skillpack_install_mode("invalid").is_err());
+    }
+
+    #[test]
     fn thread_flow_builder_includes_auto_resolve_and_finalize() {
         let unique = format!(
             "agentic-sdlc-cli-thread-flow-{}",
@@ -3669,16 +6205,391 @@ mod tests {
             sanitize_package_name("My Feature").expect("sanitize"),
             "my-feature".to_string()
         );
+        assert_eq!(
+            parse_scaffold_profile("advanced").expect("profile"),
+            ScaffoldProfile::Advanced
+        );
+        assert_eq!(
+            parse_scaffold_profile("basic").expect("profile"),
+            ScaffoldProfile::Basic
+        );
 
-        let path =
-            scaffold_markdown_package(&layout, "workflow", "My Feature", false).expect("scaffold");
+        let path = scaffold_markdown_package(
+            &layout,
+            "workflow",
+            "My Feature",
+            ScaffoldProfile::Advanced,
+            false,
+        )
+        .expect("scaffold");
         let body = std::fs::read_to_string(&path).expect("read scaffolded file");
         assert!(body.contains("Schema: antigrav.workflow@v1"));
+        assert!(body.contains("validation_gate"));
 
-        let duplicate = scaffold_markdown_package(&layout, "workflow", "my-feature", false);
+        let duplicate = scaffold_markdown_package(
+            &layout,
+            "workflow",
+            "my-feature",
+            ScaffoldProfile::Advanced,
+            false,
+        );
         assert!(duplicate.is_err());
 
         let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn scaffold_domain_pack_generates_advanced_assets() {
+        let unique = format!(
+            "agentic-sdlc-cli-domain-pack-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(&root).expect("create temp project");
+        let root_str = root.to_string_lossy().to_string();
+        let layout = AgentProjectLayout::discover(&root_str).expect("discover layout");
+
+        let created = scaffold_domain_pack(&layout, "payments", false).expect("domain pack");
+        assert_eq!(created.len(), 16);
+        assert!(layout
+            .workflows_dir
+            .join("payments")
+            .join("feature.md")
+            .exists());
+        assert!(layout
+            .templates_dir
+            .join("payments")
+            .join("feature_prompt.md")
+            .exists());
+        assert!(layout
+            .roles_dir
+            .join("payments")
+            .join("architect.md")
+            .exists());
+        assert!(layout
+            .skills_dir
+            .join("payments")
+            .join("impact_analyzer.md")
+            .exists());
+
+        let _ = ensure_bootstrap_package(&layout).expect("bootstrap package");
+        let report = run_package_check(&layout).expect("package check");
+        assert!(
+            report.errors.is_empty(),
+            "expected no package errors, got {:?}",
+            report.errors
+        );
+
+        let duplicate = scaffold_domain_pack(&layout, "payments", false);
+        assert!(duplicate.is_err());
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn quality_check_reports_missing_skill_sections() {
+        let unique = format!(
+            "agentic-sdlc-cli-skill-quality-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(root.join(".agents").join("skills")).expect("skills dir");
+        std::fs::write(
+            root.join(".agents").join("skills").join("minimal.md"),
+            "# Skill: minimal\nSchema: antigrav.skill@v1\n```json\n{\"name\":\"minimal\",\"domain\":\"agent\",\"executor\":\"ollama\",\"model\":\"qwen3:8b\"}\n```\nminimal body\n",
+        )
+        .expect("write skill");
+        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+
+        let report = run_skill_quality_check(&layout, false).expect("quality report");
+        assert_eq!(report.checked_skills, 1);
+        assert_eq!(report.errors, 0);
+        assert!(report.warnings >= 3);
+
+        let strict_report = run_skill_quality_check(&layout, true).expect("strict quality report");
+        assert!(strict_report.errors > 0);
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn build_catalog_writes_manifest_and_lockfile() {
+        let unique = format!(
+            "agentic-sdlc-cli-build-catalog-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(&root).expect("create temp project");
+        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+        let _ = ensure_bootstrap_package(&layout).expect("bootstrap");
+        let _ = scaffold_domain_pack(&layout, "catalog-domain", false).expect("domain pack");
+
+        let report = build_skill_workflow_catalog(&layout).expect("build catalog");
+        assert!(report.skills >= 3);
+        assert!(report.workflows >= 4);
+        assert!(
+            layout
+                .agents_root
+                .join("catalog")
+                .join("skills_index.json")
+                .exists(),
+            "skills_index.json missing"
+        );
+        assert!(
+            layout
+                .agents_root
+                .join("catalog")
+                .join("workflows.json")
+                .exists(),
+            "workflows.json missing"
+        );
+        assert!(
+            layout.agents_root.join("marketplace.json").exists(),
+            "marketplace.json missing"
+        );
+        assert!(
+            layout.agents_root.join("skills.lock.json").exists(),
+            "skills.lock.json missing"
+        );
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn lockfile_includes_import_source_provenance() {
+        let unique = format!(
+            "agentic-sdlc-cli-lock-provenance-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(&root).expect("create temp project");
+        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+        let _ = ensure_bootstrap_package(&layout).expect("bootstrap");
+        std::fs::create_dir_all(layout.skills_dir.join("imported")).expect("imported dir");
+        std::fs::write(
+            layout.skills_dir.join("imported").join("sample.md"),
+            r#"# Skill: sample
+Schema: antigrav.skill@v1
+```json
+{
+  "name": "sample",
+  "domain": "imported",
+  "executor": "ollama",
+  "model": "qwen3:8b",
+  "description": "sample import",
+  "risk": "safe",
+  "source": "https://github.com/example/skills",
+  "source_requested": "/tmp/example/skills",
+  "source_commit": "abc1234",
+  "source_path": "skills/sample/SKILL.md",
+  "source_license": "MIT",
+  "imported_at_ms": 1772000000000,
+  "tags": ["imported", "external", "skillpack"]
+}
+```
+
+## When to Use
+- use sample
+
+## Examples
+- ex
+
+## Limitations
+- limits
+
+{{input}}
+"#,
+        )
+        .expect("write imported");
+
+        let _ = build_skill_workflow_catalog(&layout).expect("build catalog");
+        let lock = read_skills_lockfile(&layout.agents_root.join("skills.lock.json"))
+            .expect("read lockfile");
+        let skill = lock
+            .skills
+            .iter()
+            .find(|entry| entry.id == "imported/sample")
+            .expect("imported lock entry");
+        assert_eq!(
+            skill.source.as_deref(),
+            Some("https://github.com/example/skills")
+        );
+        assert_eq!(skill.source_commit.as_deref(), Some("abc1234"));
+        assert_eq!(skill.source_path.as_deref(), Some("skills/sample/SKILL.md"));
+        assert_eq!(skill.source_license.as_deref(), Some("MIT"));
+        assert!(
+            lock.imports
+                .iter()
+                .any(|entry| entry.source == "https://github.com/example/skills"),
+            "expected import source entry in lockfile"
+        );
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn parse_external_skill_markdown_extracts_frontmatter_and_sections() {
+        let body = r#"---
+name: imported-demo
+description: Imported demo skill
+risk: safe
+source: https://example.com/repo
+tags: [demo, imported, workflows]
+---
+# Imported Demo
+
+## When to Use
+- Use when importing third-party skills.
+
+## Examples
+```text
+sample
+```
+
+## Limitations
+- Requires adaptation.
+"#;
+        let parsed = parse_external_skill_markdown(body, Path::new("/tmp/imported-demo/SKILL.md"))
+            .expect("parse external skill");
+        assert_eq!(parsed.name, "imported-demo");
+        assert_eq!(parsed.risk, "safe");
+        assert_eq!(parsed.tags.len(), 3);
+        assert!(!parsed.when_to_use.is_empty());
+        assert!(!parsed.examples.is_empty());
+        assert!(!parsed.limitations.is_empty());
+    }
+
+    #[test]
+    fn import_skills_from_local_repo_generates_imported_markdown() {
+        let unique = format!(
+            "agentic-sdlc-cli-import-skills-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        let source_root = root.join("source-repo");
+        let source = source_root.join("demo-skill");
+        std::fs::create_dir_all(&source).expect("source dir");
+        std::fs::write(
+            source.join("SKILL.md"),
+            r#"---
+name: external-checklist
+description: Build checklists from external skills
+risk: none
+tags: [external, checklist, planning]
+---
+# External Checklist
+
+## When to Use
+- when checklist is needed
+
+## Examples
+```text
+example
+```
+
+## Limitations
+- limited context
+"#,
+        )
+        .expect("write source skill");
+        std::fs::write(
+            source_root.join("LICENSE"),
+            "MIT License\n\nPermission is hereby granted...\n",
+        )
+        .expect("write license");
+        let init = ProcessCommand::new("git")
+            .arg("-C")
+            .arg(&source_root)
+            .arg("init")
+            .output()
+            .expect("git init");
+        assert!(init.status.success(), "git init failed");
+        let add = ProcessCommand::new("git")
+            .arg("-C")
+            .arg(&source_root)
+            .arg("add")
+            .arg(".")
+            .output()
+            .expect("git add");
+        assert!(add.status.success(), "git add failed");
+        let commit = ProcessCommand::new("git")
+            .arg("-C")
+            .arg(&source_root)
+            .arg("-c")
+            .arg("user.name=test")
+            .arg("-c")
+            .arg("user.email=test@example.com")
+            .arg("commit")
+            .arg("-m")
+            .arg("init")
+            .output()
+            .expect("git commit");
+        assert!(commit.status.success(), "git commit failed");
+
+        let project_root = root.join("project");
+        std::fs::create_dir_all(&project_root).expect("project dir");
+        let layout =
+            AgentProjectLayout::discover(project_root.to_string_lossy().as_ref()).expect("layout");
+        let report = import_skills_from_source(
+            &layout,
+            source_root.to_string_lossy().as_ref(),
+            &ImportSkillpackOptions {
+                domain_override: Some("agent".to_string()),
+                max_skills: 10,
+                overwrite: false,
+                mode: SkillpackInstallMode::Local,
+                allow_missing_license: false,
+                rebuild_catalog: false,
+            },
+        )
+        .expect("import");
+        assert_eq!(report.imported, 1);
+        assert!(report.commit.is_some(), "missing pinned source commit");
+        assert_eq!(report.license.as_deref(), Some("MIT"));
+        let imported_path = layout
+            .skills_dir
+            .join("imported")
+            .join("external-checklist.md");
+        assert!(imported_path.exists(), "imported skill not created");
+        let imported_content = std::fs::read_to_string(imported_path).expect("read imported");
+        assert!(imported_content.contains("Schema: antigrav.skill@v1"));
+        assert!(imported_content.contains("\"source_commit\""));
+        assert!(imported_content.contains("\"source_path\""));
+        assert!(imported_content.contains("\"source_license\": \"MIT\""));
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn parse_simple_yaml_map_reads_key_values() {
+        let parsed = parse_simple_yaml_map(
+            r#"
+name: sample
+description: hello world
+tags: [a, b, c]
+"#,
+        );
+        assert_eq!(parsed.get("name").map(String::as_str), Some("sample"));
+        assert_eq!(
+            parsed.get("description").map(String::as_str),
+            Some("hello world")
+        );
+        assert_eq!(parsed.get("tags").map(String::as_str), Some("[a, b, c]"));
     }
 
     #[test]
