@@ -405,6 +405,177 @@ pub(super) fn sync_imported_skills_from_lock(
     })
 }
 
+pub(super) fn install_bundle_from_catalog(
+    layout: &AgentProjectLayout,
+    bundle: &str,
+    mode: SkillpackInstallMode,
+    overwrite: bool,
+) -> Result<BundleInstallReport> {
+    let target = resolve_skillpack_install_target(layout, mode)?;
+    let bundles_path = layout.agents_root.join("catalog").join("bundles.json");
+    let skills_index_path = layout.agents_root.join("catalog").join("skills_index.json");
+    if !bundles_path.exists() || !skills_index_path.exists() {
+        return Err(anyhow!(
+            "Bundle catalog missing. Run 'workflow build-catalog' before install-bundle."
+        ));
+    }
+
+    let bundles_body = fs::read_to_string(&bundles_path)?;
+    let skill_index_body = fs::read_to_string(&skills_index_path)?;
+    let bundles: Vec<BundleCatalogEntry> = serde_json::from_str(&bundles_body)?;
+    let skill_entries: Vec<SkillCatalogEntry> = serde_json::from_str(&skill_index_body)?;
+    let bundle = bundles
+        .into_iter()
+        .find(|entry| entry.id == bundle.trim())
+        .ok_or_else(|| {
+            anyhow!(
+                "Bundle '{}' not found in '{}'",
+                bundle.trim(),
+                bundles_path.display()
+            )
+        })?;
+
+    let mut skill_by_id = HashMap::<String, SkillCatalogEntry>::new();
+    for entry in skill_entries {
+        skill_by_id.insert(entry.id.clone(), entry);
+    }
+
+    let bundle_dir = target.skills_root.join("bundles").join(&bundle.id);
+    fs::create_dir_all(&bundle_dir)?;
+    let mut installed = 0usize;
+    let mut skipped = 0usize;
+    let mut missing = 0usize;
+    let mut files = Vec::<String>::new();
+    let mut missing_skills = Vec::<String>::new();
+    let mut lock_entries = Vec::<serde_json::Value>::new();
+    for skill_id in &bundle.skills {
+        let Some(skill_entry) = skill_by_id.get(skill_id) else {
+            missing = missing.saturating_add(1);
+            missing_skills.push(skill_id.clone());
+            continue;
+        };
+        let source_path = Path::new(&layout.project_root).join(&skill_entry.path);
+        if !source_path.exists() {
+            missing = missing.saturating_add(1);
+            missing_skills.push(skill_id.clone());
+            continue;
+        }
+        let relative_skill = format!("{}.md", skill_id.trim_matches('/').replace('\\', "/"));
+        let target_path = bundle_dir.join(relative_skill);
+        if target_path.exists() && !overwrite {
+            skipped = skipped.saturating_add(1);
+            continue;
+        }
+        if let Some(parent) = target_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        let bytes = fs::read(&source_path)?;
+        fs::write(&target_path, &bytes)?;
+        installed = installed.saturating_add(1);
+        files.push(format_skillpack_report_path(&target, &target_path));
+        lock_entries.push(serde_json::json!({
+            "id": skill_id,
+            "source_path": skill_entry.path,
+            "target_path": format_skillpack_report_path(&target, &target_path),
+            "fingerprint": fnv1a64_hex(&bytes),
+        }));
+    }
+    files.sort();
+    missing_skills.sort();
+    let bundle_lock_dir = match mode {
+        SkillpackInstallMode::Local => layout.agents_root.join("catalog").join("bundle-locks"),
+        SkillpackInstallMode::Global => target.skills_root.join(".bundle-locks"),
+    };
+    fs::create_dir_all(&bundle_lock_dir)?;
+    let bundle_lock_path = bundle_lock_dir.join(format!(
+        "{}.json",
+        sanitize_package_name(&bundle.id).unwrap_or_else(|_| bundle.id.clone())
+    ));
+    fs::write(
+        &bundle_lock_path,
+        serde_json::to_string_pretty(&serde_json::json!({
+            "bundle": bundle.id,
+            "mode": mode.as_str(),
+            "generated_at_ms": now_ms_u64(),
+            "skills": lock_entries,
+        }))?,
+    )?;
+
+    Ok(BundleInstallReport {
+        mode: mode.as_str().to_string(),
+        bundle: bundle.id,
+        target_dir: format_skillpack_report_path(&target, &bundle_dir),
+        installed,
+        skipped,
+        missing,
+        files,
+        missing_skills,
+    })
+}
+
+pub(super) fn verify_skills_lock(
+    layout: &AgentProjectLayout,
+    mode: SkillpackInstallMode,
+    fail_on_extra: bool,
+) -> Result<SkillsLockVerifyReport> {
+    let target = resolve_skillpack_install_target(layout, mode)?;
+    let lock_path = target.lockfile_path.clone();
+    if !lock_path.exists() {
+        return Err(anyhow!(
+            "skills lockfile missing at '{}'. Run 'workflow build-catalog' or 'workflow install-skillpack' first.",
+            lock_path.display()
+        ));
+    }
+
+    let lock = read_skills_lockfile(&lock_path)?;
+    let mut lock_ids = HashSet::<String>::new();
+    let mut missing_entries = Vec::<String>::new();
+    let mut changed_entries = Vec::<String>::new();
+    for entry in &lock.skills {
+        lock_ids.insert(entry.id.clone());
+        let path = resolve_lock_entry_target_path(&target, entry);
+        if !path.exists() {
+            missing_entries.push(entry.id.clone());
+            continue;
+        }
+        let bytes = fs::read(&path)?;
+        let fingerprint = fnv1a64_hex(&bytes);
+        if fingerprint != entry.fingerprint {
+            changed_entries.push(entry.id.clone());
+        }
+    }
+
+    let base = match mode {
+        SkillpackInstallMode::Local => target.project_root.as_path(),
+        SkillpackInstallMode::Global => target.skills_root.as_path(),
+    };
+    let snapshot = build_skills_lockfile_from_skills_root(&target.skills_root, base)?;
+    let mut extra_entries = snapshot
+        .skills
+        .iter()
+        .map(|entry| entry.id.clone())
+        .filter(|id| !lock_ids.contains(id))
+        .collect::<Vec<_>>();
+    missing_entries.sort();
+    changed_entries.sort();
+    extra_entries.sort();
+
+    let ok = missing_entries.is_empty()
+        && changed_entries.is_empty()
+        && (!fail_on_extra || extra_entries.is_empty());
+    Ok(SkillsLockVerifyReport {
+        mode: mode.as_str().to_string(),
+        lockfile: format_skillpack_report_path(&target, &lock_path),
+        ok,
+        missing: missing_entries.len(),
+        changed: changed_entries.len(),
+        extra: extra_entries.len(),
+        missing_entries,
+        changed_entries,
+        extra_entries,
+    })
+}
+
 fn infer_skill_domain_for_target(path: &Path) -> Option<String> {
     if !path.exists() {
         return None;
@@ -881,10 +1052,33 @@ fn split_frontmatter(markdown: &str) -> (Option<&str>, &str) {
 
 pub(super) fn parse_simple_yaml_map(frontmatter: &str) -> HashMap<String, String> {
     let mut map = HashMap::<String, String>::new();
+    let mut pending_list_key = None::<String>;
+    let mut pending_list_values = Vec::<String>::new();
+    let flush_pending =
+        |map: &mut HashMap<String, String>, key: &mut Option<String>, values: &mut Vec<String>| {
+            if let Some(k) = key.take() {
+                if !values.is_empty() {
+                    map.insert(k, format!("[{}]", values.join(", ")));
+                }
+                values.clear();
+            }
+        };
     for line in frontmatter.lines() {
         let trimmed = line.trim();
         if trimmed.is_empty() || trimmed.starts_with('#') {
             continue;
+        }
+        if let Some(item) = trimmed.strip_prefix("- ") {
+            if pending_list_key.is_some() {
+                let value = item.trim().trim_matches('"').trim_matches('\'').to_string();
+                if !value.is_empty() {
+                    pending_list_values.push(value);
+                }
+                continue;
+            }
+        }
+        if pending_list_key.is_some() {
+            flush_pending(&mut map, &mut pending_list_key, &mut pending_list_values);
         }
         let Some((key, value)) = trimmed.split_once(':') else {
             continue;
@@ -893,13 +1087,14 @@ pub(super) fn parse_simple_yaml_map(frontmatter: &str) -> HashMap<String, String
         if key.is_empty() {
             continue;
         }
-        let value = value
-            .trim()
-            .trim_matches('"')
-            .trim_matches('\'')
-            .to_string();
-        map.insert(key, value);
+        let value = value.trim();
+        if value.is_empty() {
+            pending_list_key = Some(key);
+            continue;
+        }
+        map.insert(key, value.trim_matches('"').trim_matches('\'').to_string());
     }
+    flush_pending(&mut map, &mut pending_list_key, &mut pending_list_values);
     map
 }
 

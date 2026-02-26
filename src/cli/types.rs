@@ -40,6 +40,10 @@ pub(crate) enum WorkflowCommand {
         #[arg(long, default_value_t = false)]
         json: bool,
     },
+    Bundles {
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
     ImportSkills {
         source: String,
         #[arg(long)]
@@ -81,6 +85,23 @@ pub(crate) enum WorkflowCommand {
         mode: String,
         #[arg(long, default_value_t = false)]
         allow_missing_license: bool,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    InstallBundle {
+        bundle: String,
+        #[arg(long, default_value = "local")]
+        mode: String,
+        #[arg(long, default_value_t = false)]
+        overwrite: bool,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    VerifyLock {
+        #[arg(long, default_value = "local")]
+        mode: String,
+        #[arg(long, default_value_t = false)]
+        fail_on_extra: bool,
         #[arg(long, default_value_t = false)]
         json: bool,
     },
@@ -276,7 +297,7 @@ impl SkillQualityReport {
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct SkillCatalogEntry {
     pub(crate) id: String,
     pub(crate) path: String,
@@ -288,7 +309,7 @@ pub(crate) struct SkillCatalogEntry {
     pub(crate) tags: Vec<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct WorkflowCatalogEntry {
     pub(crate) id: String,
     pub(crate) path: String,
@@ -299,7 +320,7 @@ pub(crate) struct WorkflowCatalogEntry {
     pub(crate) skills: Vec<String>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub(crate) struct BundleCatalogEntry {
     pub(crate) id: String,
     pub(crate) description: String,
@@ -404,6 +425,31 @@ pub(crate) struct SyncImportsReport {
     pub(crate) missing: usize,
     pub(crate) catalog_rebuilt: bool,
     pub(crate) files: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct BundleInstallReport {
+    pub(crate) mode: String,
+    pub(crate) bundle: String,
+    pub(crate) target_dir: String,
+    pub(crate) installed: usize,
+    pub(crate) skipped: usize,
+    pub(crate) missing: usize,
+    pub(crate) files: Vec<String>,
+    pub(crate) missing_skills: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct SkillsLockVerifyReport {
+    pub(crate) mode: String,
+    pub(crate) lockfile: String,
+    pub(crate) ok: bool,
+    pub(crate) missing: usize,
+    pub(crate) changed: usize,
+    pub(crate) extra: usize,
+    pub(crate) missing_entries: Vec<String>,
+    pub(crate) changed_entries: Vec<String>,
+    pub(crate) extra_entries: Vec<String>,
 }
 
 #[derive(Debug, Clone)]

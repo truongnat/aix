@@ -213,6 +213,10 @@ fn build_skill_workflow_catalog(layout: &AgentProjectLayout) -> Result<CatalogBu
     catalog::build_skill_workflow_catalog(layout)
 }
 
+fn read_bundle_catalog(layout: &AgentProjectLayout) -> Result<Vec<BundleCatalogEntry>> {
+    catalog::read_bundle_catalog(layout)
+}
+
 fn build_import_lock_sources(entries: &[SkillLockEntry]) -> Vec<ImportLockSource> {
     catalog::build_import_lock_sources(entries)
 }
@@ -249,6 +253,23 @@ fn sync_imported_skills_from_lock(
     allow_missing_license: bool,
 ) -> Result<SyncImportsReport> {
     skillpack::sync_imported_skills_from_lock(layout, overwrite, mode, allow_missing_license)
+}
+
+fn install_bundle_from_catalog(
+    layout: &AgentProjectLayout,
+    bundle: &str,
+    mode: SkillpackInstallMode,
+    overwrite: bool,
+) -> Result<BundleInstallReport> {
+    skillpack::install_bundle_from_catalog(layout, bundle, mode, overwrite)
+}
+
+fn verify_skills_lock(
+    layout: &AgentProjectLayout,
+    mode: SkillpackInstallMode,
+    fail_on_extra: bool,
+) -> Result<SkillsLockVerifyReport> {
+    skillpack::verify_skills_lock(layout, mode, fail_on_extra)
 }
 
 #[cfg(test)]

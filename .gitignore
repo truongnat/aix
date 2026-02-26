@@ -39,6 +39,10 @@ dist-ssr
 
 # Generated catalog / lock artifacts (rebuild via `workflow build-catalog`)
 /.agents/catalog/
+/.agents/skills_index.json
+/.agents/workflows.json
+/.agents/bundles.json
 /.agents/marketplace.json
 /.agents/skills.lock.json
 /.agents/skills/imported/
+/.agents/skills/bundles/

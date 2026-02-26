@@ -119,6 +119,27 @@ pub(super) fn handle_workflow_control_command(
             }
             Ok(WorkflowLaunchAction::Noop)
         }
+        WorkflowCommand::Bundles { json } => {
+            let bundles = read_bundle_catalog(project_layout)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&bundles)?);
+            } else if bundles.is_empty() {
+                println!("No bundles found. Run 'workflow build-catalog' first.");
+            } else {
+                println!("Bundle catalog ({}):", bundles.len());
+                for bundle in bundles {
+                    println!(
+                        "- {} workflows={} skills={} roles={} templates={}",
+                        bundle.id,
+                        bundle.workflows.len(),
+                        bundle.skills.len(),
+                        bundle.roles.len(),
+                        bundle.templates.len()
+                    );
+                }
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
         WorkflowCommand::ImportSkills {
             source,
             domain,
@@ -230,6 +251,87 @@ pub(super) fn handle_workflow_control_command(
                 for path in &report.files {
                     println!("- {}", path);
                 }
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::InstallBundle {
+            bundle,
+            mode,
+            overwrite,
+            json,
+        } => {
+            let mode = parse_skillpack_install_mode(&mode)?;
+            let report = install_bundle_from_catalog(project_layout, &bundle, mode, overwrite)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "Installed bundle: mode='{}' bundle='{}' target='{}' installed={} skipped={} missing={}",
+                    report.mode,
+                    report.bundle,
+                    report.target_dir,
+                    report.installed,
+                    report.skipped,
+                    report.missing
+                );
+                for path in &report.files {
+                    println!("- {}", path);
+                }
+                if !report.missing_skills.is_empty() {
+                    println!("Missing skills:");
+                    for skill_id in &report.missing_skills {
+                        println!("- {}", skill_id);
+                    }
+                }
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::VerifyLock {
+            mode,
+            fail_on_extra,
+            json,
+        } => {
+            let mode = parse_skillpack_install_mode(&mode)?;
+            let report = verify_skills_lock(project_layout, mode, fail_on_extra)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "Verify lock: mode='{}' lockfile='{}' ok={} missing={} changed={} extra={} fail_on_extra={}",
+                    report.mode,
+                    report.lockfile,
+                    report.ok,
+                    report.missing,
+                    report.changed,
+                    report.extra,
+                    fail_on_extra
+                );
+                if !report.missing_entries.is_empty() {
+                    println!("Missing entries:");
+                    for id in &report.missing_entries {
+                        println!("- {}", id);
+                    }
+                }
+                if !report.changed_entries.is_empty() {
+                    println!("Changed entries:");
+                    for id in &report.changed_entries {
+                        println!("- {}", id);
+                    }
+                }
+                if !report.extra_entries.is_empty() {
+                    println!("Extra entries:");
+                    for id in &report.extra_entries {
+                        println!("- {}", id);
+                    }
+                }
+            }
+            if !report.ok {
+                return Err(anyhow!(
+                    "skills lock verification failed (missing={}, changed={}, extra={})",
+                    report.missing,
+                    report.changed,
+                    report.extra
+                ));
             }
             Ok(WorkflowLaunchAction::Noop)
         }

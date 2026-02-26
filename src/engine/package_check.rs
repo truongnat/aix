@@ -248,7 +248,7 @@ fn check_skills(layout: &AgentProjectLayout, report: &mut PackageCheckReport) ->
             }
             ExtensionKind::Yaml => report.error(
                 path.display().to_string(),
-                "YAML files are not supported for skills; convert to Markdown with JSON metadata block",
+                "YAML files are not supported for skills; convert to Markdown with frontmatter or JSON metadata block",
             ),
             ExtensionKind::Other => report.error(
                 path.display().to_string(),

@@ -2,12 +2,13 @@ use super::{
     apply_role_override_to_input, bind_role_to_workflow_llm_steps, build_graph_index,
     build_routing_policy, build_skill_workflow_catalog, build_thread_flow_workflow,
     collect_markdown_resource_entries, ensure_bootstrap_package, import_skills_from_source,
-    infer_workflow_ref_from_template, merge_template_input, normalize_auto_conflict_strategy,
-    parse_external_skill_markdown, parse_package_scaffold_kind, parse_role_override_map,
-    parse_scaffold_profile, parse_simple_yaml_map, parse_skillpack_install_mode,
-    read_skills_lockfile, resolve_bootstrap_strict_ollama, resolve_role_workflow_selection,
-    run_skill_quality_check, sanitize_package_name, scaffold_domain_pack,
-    scaffold_markdown_package, select_template_and_workflow_for_message, validate_git_ref_like,
+    infer_workflow_ref_from_template, install_bundle_from_catalog, merge_template_input,
+    normalize_auto_conflict_strategy, parse_external_skill_markdown, parse_package_scaffold_kind,
+    parse_role_override_map, parse_scaffold_profile, parse_simple_yaml_map,
+    parse_skillpack_install_mode, read_bundle_catalog, read_skills_lockfile,
+    resolve_bootstrap_strict_ollama, resolve_role_workflow_selection, run_skill_quality_check,
+    sanitize_package_name, scaffold_domain_pack, scaffold_markdown_package,
+    select_template_and_workflow_for_message, validate_git_ref_like, verify_skills_lock,
     ImportSkillpackOptions, RoleRunRequest, ScaffoldProfile, SkillpackInstallMode,
     ThreadFlowRequest,
 };
@@ -771,12 +772,24 @@ fn build_catalog_writes_manifest_and_lockfile() {
         "skills_index.json missing"
     );
     assert!(
+        layout.agents_root.join("skills_index.json").exists(),
+        "root skills_index.json missing"
+    );
+    assert!(
         layout
             .agents_root
             .join("catalog")
             .join("workflows.json")
             .exists(),
         "workflows.json missing"
+    );
+    assert!(
+        layout.agents_root.join("workflows.json").exists(),
+        "root workflows.json missing"
+    );
+    assert!(
+        layout.agents_root.join("bundles.json").exists(),
+        "root bundles.json missing"
     );
     assert!(
         layout.agents_root.join("marketplace.json").exists(),
@@ -787,6 +800,56 @@ fn build_catalog_writes_manifest_and_lockfile() {
         "skills.lock.json missing"
     );
 
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
+fn quality_check_accepts_skill_md_folder_entry_name() {
+    let unique = format!(
+        "agentic-sdlc-cli-folder-skill-quality-{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("time")
+            .as_nanos()
+    );
+    let root = std::env::temp_dir().join(unique);
+    let entry_dir = root.join(".agents").join("skills").join("folder-skill");
+    std::fs::create_dir_all(entry_dir.join("references")).expect("folder skill dir");
+    std::fs::write(
+        entry_dir.join("SKILL.md"),
+        r#"# Skill: folder-skill
+Schema: antigrav.skill@v1
+```json
+{"name":"folder-skill","domain":"agent","executor":"ollama","description":"folder skill","risk":"safe","source":"self","tags":["folder","skill","agent"]}
+```
+
+## When to Use
+- use for folder layout
+
+## Examples
+- ex
+
+## Limitations
+- limits
+"#,
+    )
+    .expect("write entry");
+    std::fs::write(entry_dir.join("references").join("details.md"), "# details")
+        .expect("write refs");
+    let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+    let report = run_skill_quality_check(&layout, false).expect("quality report");
+    let entry = report
+        .entries
+        .iter()
+        .find(|item| item.id.ends_with("folder-skill"))
+        .expect("folder entry");
+    assert!(
+        !entry
+            .findings
+            .iter()
+            .any(|finding| { finding.message.contains("should match file stem 'SKILL'") }),
+        "folder-skill should not trigger SKILL file-stem mismatch warning"
+    );
     let _ = std::fs::remove_dir_all(root);
 }
 
@@ -1002,12 +1065,78 @@ example
 }
 
 #[test]
+fn install_bundle_from_catalog_installs_bundle_skills() {
+    let unique = format!(
+        "agentic-sdlc-cli-install-bundle-{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("time")
+            .as_nanos()
+    );
+    let root = std::env::temp_dir().join(unique);
+    std::fs::create_dir_all(&root).expect("create temp project");
+    let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+    let _ = ensure_bootstrap_package(&layout).expect("bootstrap");
+    let _ = scaffold_domain_pack(&layout, "payments", false).expect("domain pack");
+    let _ = build_skill_workflow_catalog(&layout).expect("catalog");
+
+    let bundles = read_bundle_catalog(&layout).expect("bundles");
+    assert!(!bundles.is_empty(), "expected at least one bundle");
+    let bundle_id = bundles
+        .iter()
+        .find(|bundle| !bundle.skills.is_empty())
+        .map(|bundle| bundle.id.as_str())
+        .expect("bundle with skills");
+    let report =
+        install_bundle_from_catalog(&layout, bundle_id, SkillpackInstallMode::Local, false)
+            .expect("install bundle");
+    assert!(report.installed > 0, "expected installed files");
+    assert!(layout.skills_dir.join("bundles").join(bundle_id).exists());
+
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
+fn verify_skills_lock_detects_modified_skill() {
+    let unique = format!(
+        "agentic-sdlc-cli-verify-lock-{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("time")
+            .as_nanos()
+    );
+    let root = std::env::temp_dir().join(unique);
+    std::fs::create_dir_all(&root).expect("create temp project");
+    let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+    let _ = ensure_bootstrap_package(&layout).expect("bootstrap");
+    let _ = scaffold_domain_pack(&layout, "payments", false).expect("domain pack");
+    let _ = build_skill_workflow_catalog(&layout).expect("catalog");
+
+    let skill_file = layout
+        .skills_dir
+        .join("payments")
+        .join("impact_analyzer.md");
+    let mut body = std::fs::read_to_string(&skill_file).expect("read skill");
+    body.push_str("\n<!-- drift -->\n");
+    std::fs::write(&skill_file, body).expect("write skill drift");
+
+    let report = verify_skills_lock(&layout, SkillpackInstallMode::Local, false).expect("verify");
+    assert!(!report.ok, "lock verification should fail after drift");
+    assert!(report.changed > 0, "expected changed entries");
+
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
 fn parse_simple_yaml_map_reads_key_values() {
     let parsed = parse_simple_yaml_map(
         r#"
 name: sample
 description: hello world
 tags: [a, b, c]
+owners:
+  - alice
+  - bob
 "#,
     );
     assert_eq!(parsed.get("name").map(String::as_str), Some("sample"));
@@ -1016,6 +1145,10 @@ tags: [a, b, c]
         Some("hello world")
     );
     assert_eq!(parsed.get("tags").map(String::as_str), Some("[a, b, c]"));
+    assert_eq!(
+        parsed.get("owners").map(String::as_str),
+        Some("[alice, bob]")
+    );
 }
 
 #[test]

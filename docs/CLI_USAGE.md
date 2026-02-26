@@ -108,6 +108,13 @@ cargo run -- workflow build-catalog
 cargo run -- workflow build-catalog --json
 ```
 
+List curated bundles from catalog:
+
+```bash
+cargo run -- workflow bundles
+cargo run -- workflow bundles --json
+```
+
 Import external `SKILL.md` repositories and convert to local `.agents/skills/imported/*.md` format:
 
 ```bash
@@ -133,9 +140,32 @@ cargo run -- workflow sync-imports --overwrite --allow-missing-license --json
 cargo run -- workflow sync-imports --mode global --overwrite --allow-missing-license
 ```
 
+Install bundle packs by id:
+
+```bash
+cargo run -- workflow install-bundle core
+cargo run -- workflow install-bundle imported --mode global --overwrite --json
+```
+
+Verify lockfile integrity and detect drift:
+
+```bash
+cargo run -- workflow verify-lock
+cargo run -- workflow verify-lock --fail-on-extra
+cargo run -- workflow verify-lock --mode global --json
+```
+
 Mode behavior:
 - `--mode local`: install/sync under `.agents/skills/imported` and lockfile `.agents/skills.lock.json`
 - `--mode global`: install/sync under `$CODEX_HOME/skills/imported` (fallback `~/.codex/skills/imported`) and lockfile `$CODEX_HOME/skills/skills.lock.json`
+
+Skill markdown format:
+- frontmatter metadata (`---`) with at least `name/domain/executor`, or
+- fenced JSON metadata block (legacy/current format).
+
+Folder-skill structure is supported:
+- `.agents/skills/<skill-name>/SKILL.md`
+- optional `.agents/skills/<skill-name>/references/` and `.agents/skills/<skill-name>/scripts/`
 
 Rebuild graph index for context retrieval (also refreshes sqlite context tables in `.agents/memory/context.db`):
 

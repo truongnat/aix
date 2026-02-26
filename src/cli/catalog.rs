@@ -47,6 +47,9 @@ pub(super) fn run_skill_quality_check(
     let valid_risks = ["none", "safe", "critical", "offensive", "unknown"];
 
     for path in skill_files {
+        if !is_likely_skill_entry_file(&path) {
+            continue;
+        }
         report.checked_skills = report.checked_skills.saturating_add(1);
         let id = to_resource_id(&layout.skills_dir, &path).unwrap_or_else(|| {
             path.file_stem()
@@ -109,10 +112,13 @@ pub(super) fn run_skill_quality_check(
                 .unwrap_or_else(|| "unknown".to_string())
                 .trim()
                 .to_ascii_lowercase();
-            let expected_name = path
-                .file_stem()
-                .and_then(|v| v.to_str())
-                .unwrap_or_default();
+            if skill_name.is_empty() {
+                push_skill_quality_error(&mut report, &mut findings, "metadata.name is empty");
+            }
+            if domain.is_empty() {
+                push_skill_quality_error(&mut report, &mut findings, "metadata.domain is empty");
+            }
+            let expected_name = expected_skill_name_for_path(&path);
             if skill_name != expected_name {
                 push_skill_quality_warning(
                     &mut report,
@@ -147,6 +153,12 @@ pub(super) fn run_skill_quality_check(
                     &mut report,
                     &mut findings,
                     "Missing metadata.source (recommend URL or 'self')",
+                );
+            } else if !is_valid_source_reference(meta.source.as_deref().unwrap_or_default()) {
+                push_skill_quality_warning(
+                    &mut report,
+                    &mut findings,
+                    "metadata.source should be 'self', an absolute URL/git reference, or owner/repo",
                 );
             }
 
@@ -235,6 +247,12 @@ pub(super) fn run_skill_quality_check(
                     &mut findings,
                     "Missing section heading like '## Examples'",
                 );
+            } else if section_bullet_count(&body, &["examples", "example"]) == 0 {
+                push_skill_quality_warning(
+                    &mut report,
+                    &mut findings,
+                    "Section 'Examples' should include at least one bullet item or fenced snippet",
+                );
             }
             if !has_skill_section(
                 &body,
@@ -250,6 +268,39 @@ pub(super) fn run_skill_quality_check(
                     &mut findings,
                     "Missing section heading like '## Limitations'",
                 );
+            } else if section_bullet_count(
+                &body,
+                &[
+                    "limitations",
+                    "known limitations",
+                    "common pitfalls",
+                    "common issues",
+                ],
+            ) == 0
+            {
+                push_skill_quality_warning(
+                    &mut report,
+                    &mut findings,
+                    "Section 'Limitations' should include at least one explicit limitation",
+                );
+            }
+
+            if risk == "critical" {
+                if !has_skill_section(&body, &["safety controls", "guardrails", "constraints"]) {
+                    push_skill_quality_warning(
+                        &mut report,
+                        &mut findings,
+                        "Critical risk skills should define '## Safety Controls' or equivalent guardrails",
+                    );
+                }
+                let trust_tier = meta.trust_tier.as_deref().unwrap_or_default().trim();
+                if trust_tier != "Constrained" && trust_tier != "Untrusted" {
+                    push_skill_quality_warning(
+                        &mut report,
+                        &mut findings,
+                        "Critical risk skills should set metadata.trust_tier to Constrained|Untrusted",
+                    );
+                }
             }
 
             if risk == "offensive" && !content.to_ascii_uppercase().contains("AUTHORIZED USE ONLY")
@@ -330,6 +381,85 @@ fn has_skill_section(markdown: &str, candidates: &[&str]) -> bool {
     })
 }
 
+fn section_bullet_count(markdown: &str, candidates: &[&str]) -> usize {
+    let mut in_section = false;
+    let mut bullets = 0usize;
+    for line in markdown.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with('#') {
+            let title = trimmed.trim_start_matches('#').trim().to_ascii_lowercase();
+            in_section = candidates
+                .iter()
+                .any(|candidate| title == candidate.to_ascii_lowercase());
+            continue;
+        }
+        if !in_section {
+            continue;
+        }
+        if trimmed.starts_with("- ") || trimmed.starts_with("* ") || trimmed.starts_with("```") {
+            bullets = bullets.saturating_add(1);
+        }
+    }
+    bullets
+}
+
+fn is_likely_skill_entry_file(path: &Path) -> bool {
+    let lower_components = path
+        .components()
+        .filter_map(|component| component.as_os_str().to_str())
+        .map(|value| value.to_ascii_lowercase())
+        .collect::<Vec<_>>();
+    if lower_components
+        .iter()
+        .any(|part| matches!(part.as_str(), "references" | "scripts" | "assets"))
+    {
+        return false;
+    }
+    path.extension()
+        .and_then(|ext| ext.to_str())
+        .map(|ext| ext.eq_ignore_ascii_case("md"))
+        .unwrap_or(false)
+}
+
+fn expected_skill_name_for_path(path: &Path) -> String {
+    let is_skill_md = path
+        .file_name()
+        .and_then(|v| v.to_str())
+        .map(|v| v.eq_ignore_ascii_case("SKILL.md"))
+        .unwrap_or(false);
+    if is_skill_md {
+        return path
+            .parent()
+            .and_then(|v| v.file_name())
+            .and_then(|v| v.to_str())
+            .unwrap_or("SKILL")
+            .to_string();
+    }
+    path.file_stem()
+        .and_then(|v| v.to_str())
+        .unwrap_or_default()
+        .to_string()
+}
+
+fn is_valid_source_reference(raw: &str) -> bool {
+    let source = raw.trim();
+    if source.is_empty() {
+        return false;
+    }
+    if source.eq_ignore_ascii_case("self")
+        || source.starts_with("https://")
+        || source.starts_with("http://")
+        || source.starts_with("git@")
+        || source.ends_with(".git")
+    {
+        return true;
+    }
+    Regex::new(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
+        .ok()
+        .map(|re| re.is_match(source))
+        .unwrap_or(false)
+}
+
 pub(super) fn build_skill_workflow_catalog(
     layout: &AgentProjectLayout,
 ) -> Result<CatalogBuildReport> {
@@ -357,6 +487,18 @@ pub(super) fn build_skill_workflow_catalog(
     )?;
     let bundles_path = catalog_dir.join("bundles.json");
     fs::write(&bundles_path, serde_json::to_string_pretty(&bundles)?)?;
+    let root_skills_index_path = layout.agents_root.join("skills_index.json");
+    fs::write(
+        &root_skills_index_path,
+        serde_json::to_string_pretty(&skill_entries)?,
+    )?;
+    let root_workflows_path = layout.agents_root.join("workflows.json");
+    fs::write(
+        &root_workflows_path,
+        serde_json::to_string_pretty(&workflow_entries)?,
+    )?;
+    let root_bundles_path = layout.agents_root.join("bundles.json");
+    fs::write(&root_bundles_path, serde_json::to_string_pretty(&bundles)?)?;
     let marketplace_path = layout.agents_root.join("marketplace.json");
     fs::write(
         &marketplace_path,
@@ -369,6 +511,9 @@ pub(super) fn build_skill_workflow_catalog(
         relative_unix_path(project_root, &skills_index_path)?,
         relative_unix_path(project_root, &workflows_path)?,
         relative_unix_path(project_root, &bundles_path)?,
+        relative_unix_path(project_root, &root_skills_index_path)?,
+        relative_unix_path(project_root, &root_workflows_path)?,
+        relative_unix_path(project_root, &root_bundles_path)?,
         relative_unix_path(project_root, &marketplace_path)?,
         relative_unix_path(project_root, &lockfile_path)?,
     ];
@@ -386,6 +531,9 @@ fn collect_skill_catalog_entries(layout: &AgentProjectLayout) -> Result<Vec<Skil
     let project_root = Path::new(&layout.project_root);
     let mut entries = Vec::<SkillCatalogEntry>::new();
     for path in collect_markdown_paths_recursive(&layout.skills_dir)? {
+        if !is_likely_skill_entry_file(&path) {
+            continue;
+        }
         let content = fs::read_to_string(&path)?;
         validate_schema_header(&content, PackageMarkdownKind::Skill)?;
         let (meta, _) = parse_skill_markdown(&content)?;
@@ -412,6 +560,20 @@ fn collect_skill_catalog_entries(layout: &AgentProjectLayout) -> Result<Vec<Skil
     }
     entries.sort_by(|a, b| a.id.cmp(&b.id));
     Ok(entries)
+}
+
+pub(super) fn read_bundle_catalog(layout: &AgentProjectLayout) -> Result<Vec<BundleCatalogEntry>> {
+    let path = layout.agents_root.join("catalog").join("bundles.json");
+    if !path.exists() {
+        return Err(anyhow!(
+            "Bundle catalog missing at '{}'. Run 'workflow build-catalog' first.",
+            path.display()
+        ));
+    }
+    let body = fs::read_to_string(&path)?;
+    let mut bundles: Vec<BundleCatalogEntry> = serde_json::from_str(&body)?;
+    bundles.sort_by(|a, b| a.id.cmp(&b.id));
+    Ok(bundles)
 }
 
 fn collect_workflow_catalog_entries(
@@ -692,6 +854,11 @@ pub(super) fn to_resource_id(base_dir: &Path, path: &Path) -> Option<String> {
     let mut id = relative.to_string_lossy().replace('\\', "/");
     if id.to_ascii_lowercase().ends_with(".md") {
         id.truncate(id.len().saturating_sub(3));
+    }
+    if id.to_ascii_lowercase().ends_with("/skill") {
+        id.truncate(id.len().saturating_sub("/SKILL".len()));
+    } else if id.eq_ignore_ascii_case("skill") {
+        id.clear();
     }
     if id.trim().is_empty() {
         return None;

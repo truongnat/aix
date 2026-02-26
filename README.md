@@ -107,6 +107,13 @@ cargo run -- workflow quality-skills
 cargo run -- workflow quality-skills --strict
 ```
 
+List available curated bundles:
+
+```bash
+cargo run -- workflow bundles
+cargo run -- workflow bundles --json
+```
+
 Generate catalog/manifest/lock artifacts for skill bundles:
 
 ```bash
@@ -133,6 +140,20 @@ Sync existing imported skills using pinned source commit/provenance from `.agent
 ```bash
 cargo run -- workflow sync-imports --overwrite
 cargo run -- workflow sync-imports --mode global --overwrite --allow-missing-license
+```
+
+Install a curated bundle into local/global skills root:
+
+```bash
+cargo run -- workflow install-bundle core
+cargo run -- workflow install-bundle imported --mode global --overwrite
+```
+
+Verify lock integrity (detect missing/changed/extra skill entries):
+
+```bash
+cargo run -- workflow verify-lock
+cargo run -- workflow verify-lock --mode global --fail-on-extra
 ```
 
 `--mode local` writes to `.agents/skills/imported`; `--mode global` writes to `$CODEX_HOME/skills/imported` (fallback: `~/.codex/skills/imported`).
@@ -187,6 +208,9 @@ ANTIGRAV_CONTEXT_MAX_CHARS=300
 
 These files are generated and ignored by git by default:
 - `.agents/catalog/*`
+- `.agents/skills_index.json`
+- `.agents/workflows.json`
+- `.agents/bundles.json`
 - `.agents/marketplace.json`
 - `.agents/skills.lock.json`
 - `.agents/skills/imported/*`
@@ -196,6 +220,16 @@ Regenerate them anytime with:
 ```bash
 cargo run -- workflow build-catalog
 ```
+
+## Skill Format
+
+Skill markdown supports both formats:
+- frontmatter metadata (`---` block with at least `name/domain/executor`)
+- fenced JSON metadata block (existing format)
+
+Folder-skill layout is supported:
+- `.agents/skills/<skill-name>/SKILL.md`
+- optional `.agents/skills/<skill-name>/references/` and `.agents/skills/<skill-name>/scripts/`
 
 ## Installation
 
