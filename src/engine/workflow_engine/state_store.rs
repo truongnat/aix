@@ -1,4 +1,4 @@
-use crate::engine::v2::instance::{now_ms, WorkflowInstance};
+use crate::engine::workflow_engine::instance::{now_ms, WorkflowInstance};
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use std::fs::OpenOptions;
@@ -340,8 +340,10 @@ mod tests {
             },
             steps: vec![WorkflowStep::new("s1", "demo.echo", "ok")],
         };
-        let mut instance =
-            crate::engine::v2::instance::WorkflowInstance::new(&workflow, Some("wf.md".into()));
+        let mut instance = crate::engine::workflow_engine::instance::WorkflowInstance::new(
+            &workflow,
+            Some("wf.md".into()),
+        );
         store.save(&mut instance).expect("save");
         let loaded = store.load(&instance.instance_id).expect("load");
         assert_eq!(loaded.workflow_name, "state-roundtrip");

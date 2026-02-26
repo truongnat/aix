@@ -1,3 +1,4 @@
+pub mod backend;
 pub mod budget;
 pub mod condition;
 
@@ -16,12 +17,9 @@ pub mod registry;
 pub mod resolver;
 pub mod routing;
 pub mod thread_session_store;
-pub mod v2;
 pub mod validator;
+pub mod workflow_engine;
 
-#[cfg(test)]
-#[allow(dead_code)]
-pub mod backend;
 #[cfg(test)]
 #[allow(dead_code)]
 pub mod decomposition;

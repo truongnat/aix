@@ -6,7 +6,7 @@ use crate::workflow::loader::parse_markdown_content;
 use anyhow::Result;
 use serde::Serialize;
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct PackageCheckIssue {
@@ -47,17 +47,13 @@ pub fn run_package_check(layout: &AgentProjectLayout) -> Result<PackageCheckRepo
     check_rules(layout, &mut report)?;
     check_skills(layout, &mut report)?;
     check_roles(layout, &mut report)?;
+    check_templates(layout, &mut report)?;
     Ok(report)
 }
 
 fn check_workflows(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> Result<()> {
     let mut workflow_count = 0usize;
-    for entry in fs::read_dir(&layout.workflows_dir)? {
-        let entry = entry?;
-        let path = entry.path();
-        if !path.is_file() {
-            continue;
-        }
+    for path in collect_files_recursive(&layout.workflows_dir)? {
         match extension_kind(&path) {
             ExtensionKind::Markdown => {
                 workflow_count = workflow_count.saturating_add(1);
@@ -145,14 +141,10 @@ fn extract_role_reference(input: &str) -> Option<String> {
 }
 
 fn check_rules(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> Result<()> {
-    for entry in fs::read_dir(&layout.rules_dir)? {
-        let entry = entry?;
-        let path = entry.path();
-        if !path.is_file() {
-            continue;
-        }
+    for path in collect_files_recursive(&layout.rules_dir)? {
         match extension_kind(&path) {
             ExtensionKind::Markdown => {
+                report.checked_files = report.checked_files.saturating_add(1);
                 let content = match fs::read_to_string(&path) {
                     Ok(body) => body,
                     Err(err) => {
@@ -183,11 +175,8 @@ fn check_rules(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> 
     let runtime = layout.rules_dir.join("runtime.md");
     if !runtime.exists() {
         report.error(runtime.display().to_string(), "Missing required rule file");
-    } else {
-        report.checked_files = report.checked_files.saturating_add(1);
-        if let Err(err) = layout.load_runtime_rules() {
-            report.error(runtime.display().to_string(), err.to_string());
-        }
+    } else if let Err(err) = layout.load_runtime_rules() {
+        report.error(runtime.display().to_string(), err.to_string());
     }
 
     let branching = layout.rules_dir.join("branching_rules.md");
@@ -196,21 +185,15 @@ fn check_rules(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> 
             branching.display().to_string(),
             "Missing required rule file",
         );
-    } else {
-        report.checked_files = report.checked_files.saturating_add(1);
-        if let Err(err) = layout.load_branching_rules() {
-            report.error(branching.display().to_string(), err.to_string());
-        }
+    } else if let Err(err) = layout.load_branching_rules() {
+        report.error(branching.display().to_string(), err.to_string());
     }
 
     let coding = layout.rules_dir.join("coding_rules.md");
     if !coding.exists() {
         report.error(coding.display().to_string(), "Missing required rule file");
-    } else {
-        report.checked_files = report.checked_files.saturating_add(1);
-        if let Err(err) = layout.load_coding_rules() {
-            report.error(coding.display().to_string(), err.to_string());
-        }
+    } else if let Err(err) = layout.load_coding_rules() {
+        report.error(coding.display().to_string(), err.to_string());
     }
 
     let merge = layout.rules_dir.join("merge_rules.md");
@@ -223,11 +206,8 @@ fn check_rules(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> 
                 .to_string(),
             "Missing required rule file",
         );
-    } else {
-        report.checked_files = report.checked_files.saturating_add(1);
-        if let Err(err) = layout.load_merge_rules() {
-            report.error(merge.display().to_string(), err.to_string());
-        }
+    } else if let Err(err) = layout.load_merge_rules() {
+        report.error(merge.display().to_string(), err.to_string());
     }
 
     Ok(())
@@ -235,12 +215,7 @@ fn check_rules(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> 
 
 fn check_skills(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> Result<()> {
     let mut skill_count = 0usize;
-    for entry in fs::read_dir(&layout.skills_dir)? {
-        let entry = entry?;
-        let path = entry.path();
-        if !path.is_file() {
-            continue;
-        }
+    for path in collect_files_recursive(&layout.skills_dir)? {
         match extension_kind(&path) {
             ExtensionKind::Markdown => {
                 skill_count = skill_count.saturating_add(1);
@@ -256,8 +231,19 @@ fn check_skills(layout: &AgentProjectLayout, report: &mut PackageCheckReport) ->
                     report.error(path.display().to_string(), err.to_string());
                     continue;
                 }
-                if let Err(err) = parse_skill_markdown(&content) {
-                    report.error(path.display().to_string(), err.to_string());
+                match parse_skill_markdown(&content) {
+                    Ok((meta, _body)) => {
+                        if meta.executor.trim().eq_ignore_ascii_case("script") {
+                            report.error(
+                                path.display().to_string(),
+                                "Skill executor 'script' is not allowed in markdown packages; use workflow step 'agent.run_script' with runtime command policy controls"
+                                    .to_string(),
+                            );
+                        }
+                    }
+                    Err(err) => {
+                        report.error(path.display().to_string(), err.to_string());
+                    }
                 }
             }
             ExtensionKind::Yaml => report.error(
@@ -281,12 +267,7 @@ fn check_skills(layout: &AgentProjectLayout, report: &mut PackageCheckReport) ->
 
 fn check_roles(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> Result<()> {
     let mut role_count = 0usize;
-    for entry in fs::read_dir(&layout.roles_dir)? {
-        let entry = entry?;
-        let path = entry.path();
-        if !path.is_file() {
-            continue;
-        }
+    for path in collect_files_recursive(&layout.roles_dir)? {
         match extension_kind(&path) {
             ExtensionKind::Markdown => {
                 role_count = role_count.saturating_add(1);
@@ -321,6 +302,46 @@ fn check_roles(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> 
         report.warning(
             layout.roles_dir.display().to_string(),
             "No role files found under .agents/roles",
+        );
+    }
+    Ok(())
+}
+
+fn check_templates(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> Result<()> {
+    let mut template_count = 0usize;
+    for path in collect_files_recursive(&layout.templates_dir)? {
+        match extension_kind(&path) {
+            ExtensionKind::Markdown => {
+                template_count = template_count.saturating_add(1);
+                report.checked_files = report.checked_files.saturating_add(1);
+                let content = match fs::read_to_string(&path) {
+                    Ok(body) => body,
+                    Err(err) => {
+                        report.error(path.display().to_string(), err.to_string());
+                        continue;
+                    }
+                };
+                if content.trim().is_empty() {
+                    report.error(
+                        path.display().to_string(),
+                        "Template markdown must not be empty".to_string(),
+                    );
+                }
+            }
+            ExtensionKind::Yaml => report.error(
+                path.display().to_string(),
+                "YAML files are not supported for templates; convert to Markdown (.md)",
+            ),
+            ExtensionKind::Other => report.error(
+                path.display().to_string(),
+                "Unsupported template file extension; expected .md",
+            ),
+        }
+    }
+    if template_count == 0 {
+        report.warning(
+            layout.templates_dir.display().to_string(),
+            "No template files found under .agents/templates",
         );
     }
     Ok(())
@@ -378,6 +399,31 @@ fn extension_kind(path: &Path) -> ExtensionKind {
     }
 }
 
+fn collect_files_recursive(root: &Path) -> Result<Vec<PathBuf>> {
+    let mut files = Vec::new();
+    walk_directory_files(root, &mut |path| files.push(path.to_path_buf()))?;
+    files.sort();
+    Ok(files)
+}
+
+fn walk_directory_files(root: &Path, visit: &mut impl FnMut(&Path)) -> Result<()> {
+    if !root.exists() {
+        return Ok(());
+    }
+    for entry in fs::read_dir(root)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_dir() {
+            walk_directory_files(&path, visit)?;
+            continue;
+        }
+        if path.is_file() {
+            visit(&path);
+        }
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::run_package_check;
@@ -402,10 +448,12 @@ mod tests {
         let rules = root.join(".agents").join("rules");
         let skills = root.join(".agents").join("skills");
         let roles = root.join(".agents").join("roles");
+        let templates = root.join(".agents").join("templates");
         std::fs::create_dir_all(&workflows).expect("workflows");
         std::fs::create_dir_all(&rules).expect("rules");
         std::fs::create_dir_all(&skills).expect("skills");
         std::fs::create_dir_all(&roles).expect("roles");
+        std::fs::create_dir_all(&templates).expect("templates");
 
         std::fs::write(
             workflows.join("w.md"),
@@ -457,6 +505,12 @@ Create deterministic and minimal implementation plans.
 "#,
         )
         .expect("role");
+
+        std::fs::write(
+            templates.join("feature_prompt.md"),
+            "Role: Architect + Implementer\nTask:\n{{task}}\n",
+        )
+        .expect("template");
     }
 
     #[test]
@@ -534,6 +588,122 @@ body
         let report = run_package_check(&layout).expect("check");
         assert!(report.errors.iter().any(|issue| {
             issue.path.ends_with("invalid.md") && issue.message.contains("Missing schema header")
+        }));
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn package_check_rejects_script_executor_skill() {
+        let root = temp_root("agentic-sdlc-package-check-script-executor");
+        write_minimal_valid_package(&root);
+        std::fs::write(
+            root.join(".agents").join("skills").join("scripted.md"),
+            r#"# Skill: scripted
+Schema: antigrav.skill@v1
+```json
+{"name":"scripted","domain":"agent","executor":"script","command":"cargo test"}
+```
+Runs shell command.
+"#,
+        )
+        .expect("script skill");
+
+        let layout = AgentProjectLayout::discover(root.to_str().expect("path")).expect("layout");
+        let report = run_package_check(&layout).expect("check");
+        assert!(report.errors.iter().any(|issue| {
+            issue.path.ends_with("scripted.md")
+                && issue.message.contains("executor 'script' is not allowed")
+        }));
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn package_check_scans_nested_workflow_and_skill_files() {
+        let root = temp_root("agentic-sdlc-package-check-recursive");
+        write_minimal_valid_package(&root);
+
+        let nested_workflow_dir = root
+            .join(".agents")
+            .join("workflows")
+            .join("domain")
+            .join("api");
+        std::fs::create_dir_all(&nested_workflow_dir).expect("nested workflow dir");
+        std::fs::write(
+            nested_workflow_dir.join("nested.md"),
+            "---\ndescription: nested valid workflow\n---\n# Workflow: nested\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::nested plan\n",
+        )
+        .expect("nested workflow");
+
+        let nested_skill_dir = root
+            .join(".agents")
+            .join("skills")
+            .join("domain")
+            .join("api");
+        std::fs::create_dir_all(&nested_skill_dir).expect("nested skill dir");
+        std::fs::write(
+            nested_skill_dir.join("nested_skill.md"),
+            r#"# Skill: nested_skill
+Schema: antigrav.skill@v1
+```json
+{"name":"nested_skill","domain":"agent","executor":"ollama","model":"qwen3:8b"}
+```
+Nested skill body.
+"#,
+        )
+        .expect("nested skill");
+
+        let layout = AgentProjectLayout::discover(root.to_str().expect("path")).expect("layout");
+        let report = run_package_check(&layout).expect("check");
+        assert!(
+            report.errors.is_empty(),
+            "expected no errors but got {:?}",
+            report.errors
+        );
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn package_check_rejects_yaml_template_file() {
+        let root = temp_root("agentic-sdlc-package-check-template-yaml");
+        write_minimal_valid_package(&root);
+        std::fs::write(
+            root.join(".agents").join("templates").join("legacy.yaml"),
+            "name: legacy\nprompt: test\n",
+        )
+        .expect("yaml template");
+
+        let layout = AgentProjectLayout::discover(root.to_str().expect("path")).expect("layout");
+        let report = run_package_check(&layout).expect("check");
+        assert!(report.errors.iter().any(|issue| {
+            issue.path.ends_with("legacy.yaml")
+                && issue
+                    .message
+                    .contains("YAML files are not supported for templates")
+        }));
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn package_check_rejects_empty_markdown_template() {
+        let root = temp_root("agentic-sdlc-package-check-template-empty");
+        write_minimal_valid_package(&root);
+        std::fs::write(
+            root.join(".agents").join("templates").join("empty.md"),
+            "   \n",
+        )
+        .expect("empty template");
+
+        let layout = AgentProjectLayout::discover(root.to_str().expect("path")).expect("layout");
+        let report = run_package_check(&layout).expect("check");
+        assert!(report.errors.iter().any(|issue| {
+            issue.path.ends_with("empty.md")
+                && issue
+                    .message
+                    .contains("Template markdown must not be empty")
         }));
 
         let _ = std::fs::remove_dir_all(root);

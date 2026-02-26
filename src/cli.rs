@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::future::Future;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command as ProcessCommand;
 use std::sync::Arc;
 
@@ -14,8 +14,8 @@ use crate::engine::routing::RoutingPolicy;
 use crate::engine::security::DomainSecurityPolicy;
 use crate::engine::session::{AgentSession, LlmAdapter};
 use crate::engine::thread_session_store::ThreadSessionStore;
-use crate::engine::v2::{
-    ExecutionEngineV2, WorkflowInstance, WorkflowInstanceStatus, WorkflowStateStore,
+use crate::engine::workflow_engine::{
+    ExecutionEngine, WorkflowInstance, WorkflowInstanceStatus, WorkflowStateStore,
 };
 use crate::skill::capability::{CapabilityPermissions, TrustTier};
 use crate::skills::dev_workflow::{EnsureBranchSkill, RunScriptSkill, WriteFileSkill};
@@ -33,6 +33,7 @@ use crate::skills::vector_memory::{EmbedDocumentSkill, SemanticSearchSkill};
 use crate::workflow::loader::load_workflow;
 use anyhow::{anyhow, Result};
 use clap::{Parser, Subcommand};
+use rusqlite::params;
 use serde::Serialize;
 
 #[derive(Parser)]
@@ -392,6 +393,20 @@ struct GraphIndexBuildReport {
     index_path: String,
     nodes: usize,
     edges: usize,
+    context_db_path: String,
+    context_vector_table: String,
+    context_graph_table: String,
+    vector_entries: usize,
+    graph_entries: usize,
+}
+
+#[derive(Debug, Clone)]
+struct ContextSqliteWriteReport {
+    db_path: String,
+    vector_table: String,
+    graph_table: String,
+    vector_entries: usize,
+    graph_entries: usize,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -418,18 +433,17 @@ pub async fn run() -> Result<()> {
 
     if cli.replay.is_some() {
         return Err(anyhow!(
-            "Replay mode (--replay) is deprecated after v2 consolidation; use 'workflow trace <id> --timeline|--json'"
+            "Replay mode (--replay) is deprecated after engine consolidation; use 'workflow trace <id> --timeline|--json'"
         ));
     }
     if cli.resume.is_some() {
         return Err(anyhow!(
-            "Snapshot resume (--resume) is deprecated after v2 consolidation; use 'workflow resume <id>'"
+            "Snapshot resume (--resume) is deprecated after engine consolidation; use 'workflow resume <id>'"
         ));
     }
     if cli.snapshot_out.is_some() {
-        eprintln!("Warning: --snapshot-out is ignored; v2 no longer emits v1 snapshots.");
+        eprintln!("Warning: --snapshot-out is ignored; snapshot export is no longer supported.");
     }
-    warn_engine_override_deprecation();
 
     let cwd = std::env::current_dir()?;
     let project_root = cwd.to_string_lossy().to_string();
@@ -473,7 +487,7 @@ pub async fn run() -> Result<()> {
     let domains = build_domain_registry()?;
 
     let domains_arc = Arc::new(domains);
-    let v2_engine = Arc::new(ExecutionEngineV2::new(
+    let runtime_engine = Arc::new(ExecutionEngine::new(
         &project_root,
         Arc::clone(&domains_arc),
     )?);
@@ -536,7 +550,7 @@ pub async fn run() -> Result<()> {
         let resume_instance_id_for_run = instance_id.clone();
         let instance = run_with_panic_guard(
             {
-                let engine = Arc::clone(&v2_engine);
+                let engine = Arc::clone(&runtime_engine);
                 let budget = budget.clone();
                 let routing = routing_policy.clone();
                 let security = security_policy.clone();
@@ -564,7 +578,7 @@ pub async fn run() -> Result<()> {
                 &instance,
             )?;
         }
-        print_v2_instance_summary(&instance);
+        print_instance_summary(&instance);
         return Ok(());
     }
 
@@ -608,8 +622,8 @@ pub async fn run() -> Result<()> {
             )?);
         }
 
-        let instance = execute_v2_workflow(
-            Arc::clone(&v2_engine),
+        let instance = execute_workflow_instance(
+            Arc::clone(&runtime_engine),
             workflow,
             workflow_path,
             budget.clone(),
@@ -638,7 +652,7 @@ pub async fn run() -> Result<()> {
                 "Role launch: role='{}' workflow='{}' template='{}'",
                 selected_role, selected_workflow, selected_template
             );
-            print_v2_instance_summary(&instance);
+            print_instance_summary(&instance);
         }
         return Ok(());
     }
@@ -706,8 +720,8 @@ pub async fn run() -> Result<()> {
             workflow.meta.domain = Some(default_domain_name.clone());
         }
 
-        let implementation_instance = execute_v2_workflow(
-            Arc::clone(&v2_engine),
+        let implementation_instance = execute_workflow_instance(
+            Arc::clone(&runtime_engine),
             workflow,
             workflow_path,
             budget.clone(),
@@ -735,8 +749,8 @@ pub async fn run() -> Result<()> {
             merge_workflow.meta.routing_policy = Some(routing_policy.clone());
             merge_workflow.meta.security_policy = Some(security_policy.clone());
             merge_workflow.meta.resource_budget = Some(budget.resource_budget.clone());
-            let merge = execute_v2_workflow(
-                Arc::clone(&v2_engine),
+            let merge = execute_workflow_instance(
+                Arc::clone(&runtime_engine),
                 merge_workflow,
                 None,
                 budget.clone(),
@@ -807,7 +821,7 @@ pub async fn run() -> Result<()> {
         workflow.meta.resource_budget = Some(budget.resource_budget.clone());
         let instance = run_with_panic_guard(
             {
-                let engine = Arc::clone(&v2_engine);
+                let engine = Arc::clone(&runtime_engine);
                 let budget = budget.clone();
                 let routing = routing_policy.clone();
                 let security = security_policy.clone();
@@ -825,7 +839,7 @@ pub async fn run() -> Result<()> {
         if request.json {
             println!("{}", serde_json::to_string_pretty(&instance)?);
         } else {
-            print_v2_instance_summary(&instance);
+            print_instance_summary(&instance);
         }
         return Ok(());
     }
@@ -845,7 +859,7 @@ pub async fn run() -> Result<()> {
                     planner.plan(&domain, &goal_for_plan).await
                 }
             },
-            "v2 goal planning",
+            "goal planning",
         )
         .await?;
         workflow.meta.routing_policy = Some(routing_policy.clone());
@@ -856,7 +870,7 @@ pub async fn run() -> Result<()> {
         }
         let instance = run_with_panic_guard(
             {
-                let engine = Arc::clone(&v2_engine);
+                let engine = Arc::clone(&runtime_engine);
                 let budget = budget.clone();
                 let routing = routing_policy.clone();
                 let security = security_policy.clone();
@@ -866,7 +880,7 @@ pub async fn run() -> Result<()> {
                         .await
                 }
             },
-            "v2 goal execution",
+            "goal execution",
         )
         .await?;
         if let Some(s) = session.as_ref() {
@@ -876,7 +890,7 @@ pub async fn run() -> Result<()> {
                 &instance,
             )?;
         }
-        print_v2_instance_summary(&instance);
+        print_instance_summary(&instance);
         return Ok(());
     }
 
@@ -921,7 +935,7 @@ pub async fn run() -> Result<()> {
     }
     let instance = run_with_panic_guard(
         {
-            let engine = Arc::clone(&v2_engine);
+            let engine = Arc::clone(&runtime_engine);
             let budget = budget.clone();
             let routing = routing_policy.clone();
             let security = security_policy.clone();
@@ -941,7 +955,7 @@ pub async fn run() -> Result<()> {
             &instance,
         )?;
     }
-    print_v2_instance_summary(&instance);
+    print_instance_summary(&instance);
 
     Ok(())
 }
@@ -1654,7 +1668,7 @@ fn handle_workflow_control_command(
         WorkflowCommand::Status { id } => {
             if let Some(instance_id) = id {
                 let instance = state_store.load(&instance_id)?;
-                print_v2_instance_summary(&instance);
+                print_instance_summary(&instance);
                 return Ok(WorkflowLaunchAction::Noop);
             }
             let instances = state_store.list_instances()?;
@@ -1696,7 +1710,7 @@ fn handle_workflow_control_command(
                 println!("{}", body);
             }
             if timeline {
-                println!("{}", render_v2_timeline(&instance));
+                println!("{}", render_timeline(&instance));
             }
             Ok(WorkflowLaunchAction::Noop)
         }
@@ -1721,8 +1735,15 @@ fn handle_workflow_control_command(
                 println!("{}", serde_json::to_string_pretty(&report)?);
             } else {
                 println!(
-                    "Graph index rebuilt: path={} nodes={} edges={}",
-                    report.index_path, report.nodes, report.edges
+                    "Graph index rebuilt: path={} nodes={} edges={} context_db={} vector_table={} graph_table={} vector_entries={} graph_entries={}",
+                    report.index_path,
+                    report.nodes,
+                    report.edges,
+                    report.context_db_path,
+                    report.context_vector_table,
+                    report.context_graph_table,
+                    report.vector_entries,
+                    report.graph_entries
                 );
             }
             Ok(WorkflowLaunchAction::Noop)
@@ -1871,12 +1892,14 @@ fn handle_workflow_control_command(
                     println!("{}", serde_json::to_string_pretty(&record)?);
                 } else if let Some(record) = record {
                     println!(
-                        "thread='{}' branch='{}' last_instance={:?} last_status={:?} runs={} updated_at={}",
+                        "thread='{}' branch='{}' lifecycle={:?} last_instance={:?} last_status={:?} runs={} events={} updated_at={}",
                         record.thread_id,
                         record.branch,
+                        record.lifecycle_state,
                         record.last_workflow_instance_id,
                         record.last_workflow_status,
                         record.run_count,
+                        record.history.len(),
                         record.updated_at_ms
                     );
                 } else {
@@ -1897,12 +1920,14 @@ fn handle_workflow_control_command(
             println!("Thread Sessions:");
             for record in records {
                 println!(
-                    "- thread='{}' branch='{}' last_instance={:?} last_status={:?} runs={} updated_at={}",
+                    "- thread='{}' branch='{}' lifecycle={:?} last_instance={:?} last_status={:?} runs={} events={} updated_at={}",
                     record.thread_id,
                     record.branch,
+                    record.lifecycle_state,
                     record.last_workflow_instance_id,
                     record.last_workflow_status,
                     record.run_count,
+                    record.history.len(),
                     record.updated_at_ms
                 );
             }
@@ -2149,7 +2174,7 @@ fn run_workflow_doctor(layout: &AgentProjectLayout, strict_ollama: bool) -> Resu
         checks.push(DoctorCheckResult {
             name: "markdown_only_package".to_string(),
             status: DoctorCheckStatus::Ok,
-            message: "no YAML files under workflows/skills/roles/rules".to_string(),
+            message: "no YAML files under workflows/skills/roles/rules/templates".to_string(),
         });
     } else {
         let sample = yaml_files
@@ -2296,6 +2321,7 @@ fn collect_yaml_package_files(layout: &AgentProjectLayout) -> Result<Vec<std::pa
         &layout.skills_dir,
         &layout.roles_dir,
         &layout.rules_dir,
+        &layout.templates_dir,
     ] {
         walk_directory_files(dir, &mut |path| {
             let is_yaml = path
@@ -2329,6 +2355,11 @@ fn walk_directory_files(root: &Path, visit: &mut impl FnMut(&Path)) -> Result<()
     }
     Ok(())
 }
+
+const DEFAULT_CONTEXT_DB_PATH: &str = ".agents/memory/context.db";
+const DEFAULT_CONTEXT_VECTOR_TABLE: &str = "vector_entries";
+const DEFAULT_CONTEXT_GRAPH_TABLE: &str = "graph_nodes";
+const CONTEXT_VECTOR_DIM: usize = 32;
 
 fn build_graph_index(
     layout: &AgentProjectLayout,
@@ -2403,11 +2434,140 @@ fn build_graph_index(
     let index_path = layout.memory_dir.join("graph_index.json");
     std::fs::create_dir_all(&layout.memory_dir)?;
     std::fs::write(&index_path, serde_json::to_string_pretty(&payload)?)?;
+    let sqlite_report = write_context_sqlite(layout, &payload)?;
 
     Ok(GraphIndexBuildReport {
         index_path: index_path.display().to_string(),
         nodes: payload.nodes.len(),
         edges: edge_count,
+        context_db_path: sqlite_report.db_path,
+        context_vector_table: sqlite_report.vector_table,
+        context_graph_table: sqlite_report.graph_table,
+        vector_entries: sqlite_report.vector_entries,
+        graph_entries: sqlite_report.graph_entries,
+    })
+}
+
+fn resolve_context_db_path(layout: &AgentProjectLayout) -> PathBuf {
+    if let Ok(raw) = std::env::var("ANTIGRAV_CONTEXT_DB_PATH") {
+        let trimmed = raw.trim();
+        if !trimmed.is_empty() {
+            let parsed = PathBuf::from(trimmed);
+            if parsed.is_absolute() {
+                return parsed;
+            }
+            return Path::new(&layout.project_root).join(parsed);
+        }
+    }
+    Path::new(&layout.project_root).join(DEFAULT_CONTEXT_DB_PATH)
+}
+
+fn normalize_sqlite_identifier(value: &str) -> Option<String> {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    if trimmed
+        .chars()
+        .all(|ch| ch.is_ascii_alphanumeric() || ch == '_')
+    {
+        return Some(trimmed.to_string());
+    }
+    None
+}
+
+fn tokenize_for_context(text: &str) -> Vec<String> {
+    text.split(|c: char| !c.is_alphanumeric())
+        .filter(|part| !part.is_empty())
+        .map(|part| part.to_ascii_lowercase())
+        .collect()
+}
+
+fn embed_for_context(text: &str) -> Vec<f32> {
+    let mut vec = vec![0.0_f32; CONTEXT_VECTOR_DIM];
+    for token in tokenize_for_context(text) {
+        let mut hash = 1469598103934665603_u64;
+        for byte in token.bytes() {
+            hash ^= u64::from(byte);
+            hash = hash.wrapping_mul(1099511628211_u64);
+        }
+        let idx = (hash as usize) % CONTEXT_VECTOR_DIM;
+        vec[idx] += 1.0;
+    }
+    let norm = vec.iter().map(|v| v * v).sum::<f32>().sqrt();
+    if norm > 0.0 {
+        for v in &mut vec {
+            *v /= norm;
+        }
+    }
+    vec
+}
+
+fn write_context_sqlite(
+    layout: &AgentProjectLayout,
+    payload: &GraphIndexPayloadDoc,
+) -> Result<ContextSqliteWriteReport> {
+    let db_path = resolve_context_db_path(layout);
+    if let Some(parent) = db_path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+
+    let vector_table = normalize_sqlite_identifier(
+        &std::env::var("ANTIGRAV_CONTEXT_VECTOR_TABLE")
+            .ok()
+            .unwrap_or_else(|| DEFAULT_CONTEXT_VECTOR_TABLE.to_string()),
+    )
+    .ok_or_else(|| anyhow!("Invalid sqlite vector table name"))?;
+    let graph_table = normalize_sqlite_identifier(
+        &std::env::var("ANTIGRAV_CONTEXT_GRAPH_TABLE")
+            .ok()
+            .unwrap_or_else(|| DEFAULT_CONTEXT_GRAPH_TABLE.to_string()),
+    )
+    .ok_or_else(|| anyhow!("Invalid sqlite graph table name"))?;
+
+    let conn = rusqlite::Connection::open(&db_path)?;
+    let create_vector_sql = format!(
+        "CREATE TABLE IF NOT EXISTS {vector_table} (id TEXT PRIMARY KEY, text TEXT NOT NULL, embedding_json TEXT NOT NULL)"
+    );
+    conn.execute(&create_vector_sql, [])?;
+    let create_graph_sql = format!(
+        "CREATE TABLE IF NOT EXISTS {graph_table} (id TEXT PRIMARY KEY, text TEXT NOT NULL, tags_json TEXT, links_json TEXT)"
+    );
+    conn.execute(&create_graph_sql, [])?;
+
+    let tx = conn.unchecked_transaction()?;
+    tx.execute(&format!("DELETE FROM {vector_table}"), [])?;
+    tx.execute(&format!("DELETE FROM {graph_table}"), [])?;
+
+    let insert_graph_sql = format!(
+        "INSERT INTO {graph_table} (id, text, tags_json, links_json) VALUES (?1, ?2, ?3, ?4)"
+    );
+    let insert_vector_sql =
+        format!("INSERT INTO {vector_table} (id, text, embedding_json) VALUES (?1, ?2, ?3)");
+
+    for node in &payload.nodes {
+        let tags_json = serde_json::to_string(&node.tags)?;
+        let links_json = serde_json::to_string(&node.links)?;
+        tx.execute(
+            &insert_graph_sql,
+            params![node.id, node.text, tags_json, links_json],
+        )?;
+
+        let embedding_json = serde_json::to_string(&embed_for_context(&node.text))?;
+        tx.execute(
+            &insert_vector_sql,
+            params![node.id, node.text, embedding_json],
+        )?;
+    }
+
+    tx.commit()?;
+
+    Ok(ContextSqliteWriteReport {
+        db_path: db_path.display().to_string(),
+        vector_table,
+        graph_table,
+        vector_entries: payload.nodes.len(),
+        graph_entries: payload.nodes.len(),
     })
 }
 
@@ -2605,7 +2765,7 @@ fn scaffold_markdown_package(
     Ok(path)
 }
 
-fn print_v2_instance_summary(instance: &crate::engine::v2::WorkflowInstance) {
+fn print_instance_summary(instance: &WorkflowInstance) {
     println!(
         "Workflow Instance: {} status={:?} workflow={} trace_id={}",
         instance.instance_id, instance.status, instance.workflow_name, instance.trace_id
@@ -2628,7 +2788,7 @@ fn print_v2_instance_summary(instance: &crate::engine::v2::WorkflowInstance) {
     }
 }
 
-fn render_v2_timeline(instance: &crate::engine::v2::WorkflowInstance) -> String {
+fn render_timeline(instance: &WorkflowInstance) -> String {
     let mut out = Vec::new();
     out.push(format!(
         "Timeline workflow={} instance={} trace_id={} status={:?}",
@@ -2679,8 +2839,8 @@ fn render_v2_timeline(instance: &crate::engine::v2::WorkflowInstance) -> String 
     out.join("\n")
 }
 
-async fn execute_v2_workflow(
-    engine: Arc<ExecutionEngineV2>,
+async fn execute_workflow_instance(
+    engine: Arc<ExecutionEngine>,
     workflow: crate::workflow::model::Workflow,
     workflow_path: Option<String>,
     budget: crate::engine::budget::ExecutionBudget,
@@ -2713,24 +2873,6 @@ where
             Err(anyhow!("{} task cancelled: {}", label, join_err))
         }
     }
-}
-
-fn warn_engine_override_deprecation() {
-    let Ok(raw) = std::env::var("AGENT_ENGINE") else {
-        return;
-    };
-    let normalized = raw.trim().to_ascii_lowercase();
-    if normalized.is_empty() || normalized == "v2" {
-        return;
-    }
-    if normalized == "v1" {
-        eprintln!("Warning: AGENT_ENGINE=v1 is deprecated and ignored; v2 is now the only execution engine.");
-        return;
-    }
-    eprintln!(
-        "Warning: Unknown AGENT_ENGINE='{}'; v2 is now the only execution engine.",
-        raw
-    );
 }
 
 fn parse_csv_list(value: Option<&str>) -> Vec<String> {
@@ -2918,7 +3060,7 @@ mod tests {
     use crate::engine::routing::RoutingPolicy;
     use crate::engine::security::DomainSecurityPolicy;
     use crate::engine::thread_session_store::ThreadSessionStore;
-    use crate::engine::v2::{ExecutionEngineV2, WorkflowInstanceStatus};
+    use crate::engine::workflow_engine::{ExecutionEngine, WorkflowInstanceStatus};
     use crate::skill::capability::{
         CapabilityPermissions, SideEffectClass, SkillCapability, SkillIOType, TrustTier,
     };
@@ -3604,6 +3746,9 @@ mod tests {
         assert!(report.nodes >= 2);
         assert!(report.edges >= 1);
         assert!(layout.memory_dir.join("graph_index.json").exists());
+        assert!(layout.memory_dir.join("context.db").exists());
+        assert_eq!(report.graph_entries, report.nodes);
+        assert_eq!(report.vector_entries, report.nodes);
 
         let _ = std::fs::remove_dir_all(root);
     }
@@ -3711,7 +3856,7 @@ Schema: antigrav.rule@v1
             .register_skill("demo", Arc::new(EchoSkill::new()))
             .expect("register echo");
 
-        let engine = ExecutionEngineV2::new(&root_str, Arc::new(registry)).expect("engine");
+        let engine = ExecutionEngine::new(&root_str, Arc::new(registry)).expect("engine");
         let session_store = ThreadSessionStore::new(&root_str).expect("session store");
 
         for thread_id in ["thread-alpha", "thread-beta"] {
@@ -3744,7 +3889,7 @@ Schema: antigrav.rule@v1
                     .get("resolve_conflicts")
                     .expect("resolve state")
                     .status,
-                crate::engine::v2::instance::StepExecutionStatus::Skipped
+                crate::engine::workflow_engine::instance::StepExecutionStatus::Skipped
             );
             let has_after = instance
                 .step_results

@@ -2,7 +2,7 @@ use crate::engine::context_retrieval::{
     ContextRetrievalService, GraphIndexContextRetrievalService, HybridContextRetrievalService,
     VectorIndexContextRetrievalService,
 };
-use crate::engine::v2::instance::WorkflowInstance;
+use crate::engine::workflow_engine::instance::WorkflowInstance;
 use crate::skill::io::{SkillInput, SkillOutput};
 use crate::workflow::model::{Workflow, WorkflowStep};
 use anyhow::Result;
@@ -346,7 +346,7 @@ fn truncate_chars(text: &str, max_chars: usize) -> String {
 mod tests {
     use super::{ContextService, DeterministicContextService};
     use crate::engine::context_retrieval::{ContextRetrievalService, RetrievedContextItem};
-    use crate::engine::v2::instance::WorkflowInstance;
+    use crate::engine::workflow_engine::instance::WorkflowInstance;
     use crate::skill::io::{SkillInput, SkillOutput};
     use crate::workflow::model::{FailureStrategy, Workflow, WorkflowMeta, WorkflowStep};
     use anyhow::Result;

@@ -209,3 +209,90 @@ impl SkillRegistry {
         self.skills.values().cloned().collect()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::DomainRegistry;
+    use crate::engine::context::ExecutionContext;
+    use crate::skill::capability::{
+        CapabilityPermissions, SideEffectClass, SkillCapability, SkillIOType,
+    };
+    use crate::skill::io::{SkillInput, SkillOutput};
+    use crate::skill::Skill;
+    use anyhow::Result;
+    use async_trait::async_trait;
+    use std::sync::Arc;
+
+    struct EchoSkill;
+
+    #[async_trait]
+    impl Skill for EchoSkill {
+        fn name(&self) -> &str {
+            "echo"
+        }
+
+        fn capability(&self) -> SkillCapability {
+            SkillCapability::new(
+                "echo",
+                "Echo text input",
+                SkillIOType::Text,
+                SkillIOType::Text,
+                CapabilityPermissions::none(),
+                SideEffectClass::Pure,
+            )
+        }
+
+        async fn execute(
+            &self,
+            input: SkillInput,
+            _ctx: &mut ExecutionContext,
+        ) -> Result<SkillOutput> {
+            Ok(SkillOutput::text(input.as_text().unwrap_or_default()))
+        }
+    }
+
+    #[test]
+    fn domain_registry_returns_arc_skill_handle() {
+        let mut registry = DomainRegistry::new();
+        registry.register_domain("demo");
+        registry
+            .register_skill("demo", Arc::new(EchoSkill))
+            .expect("register skill");
+
+        let skill_a = registry.get_skill("demo", "echo").expect("get first");
+        let skill_b = registry.get_skill("demo", "echo").expect("get second");
+
+        assert!(Arc::ptr_eq(&skill_a, &skill_b));
+    }
+
+    #[test]
+    fn domain_registry_rejects_missing_domain_and_skill() {
+        let mut registry = DomainRegistry::new();
+        registry.register_domain("demo");
+
+        let missing_skill = registry.get_skill("demo", "missing");
+        assert!(missing_skill.is_err());
+
+        let missing_domain = registry.get_skill("unknown", "echo");
+        assert!(missing_domain.is_err());
+    }
+
+    #[test]
+    fn resolve_skill_reference_supports_default_and_qualified_forms() {
+        let mut registry = DomainRegistry::new();
+        registry.register_domain("demo");
+        registry
+            .register_skill("demo", Arc::new(EchoSkill))
+            .expect("register");
+
+        let (default_ref, _) = registry
+            .resolve_skill_reference("demo", "echo")
+            .expect("default reference");
+        assert_eq!(default_ref.canonical_id(), "demo.echo");
+
+        let (qualified_ref, _) = registry
+            .resolve_skill_reference("other", "demo.echo")
+            .expect("qualified reference");
+        assert_eq!(qualified_ref.canonical_id(), "demo.echo");
+    }
+}

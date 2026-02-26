@@ -2,11 +2,11 @@
 
 ## Overview
 
-The runtime is a deterministic local execution engine that loads workflows, validates them, and executes steps using a single active engine path (`v2`).
+The runtime is a deterministic local execution engine that loads workflows, validates them, and executes steps using a single active engine path.
 
 Core components:
 - `cli`: parses run/control commands and applies project/runtime policy
-- `engine::v2`: workflow execution, resume, state transitions, telemetry
+- `engine::workflow_engine`: workflow execution, resume, state transitions, telemetry
 - `workflow::loader`: markdown workflow parsing and validation inputs
 - `skills/*`: skill implementations with explicit capability and trust metadata
 

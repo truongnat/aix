@@ -93,7 +93,7 @@ cargo run -- workflow check
 cargo run -- workflow check --json
 ```
 
-Rebuild graph index for context retrieval:
+Rebuild graph index for context retrieval (also refreshes sqlite context tables in `.agents/memory/context.db`):
 
 ```bash
 cargo run -- workflow index-graph
@@ -203,11 +203,10 @@ Routing controls:
 
 ## Deprecated Options
 
-After v2 consolidation:
+After engine consolidation:
 - `--replay` is deprecated and rejected
 - `--resume` snapshot mode is deprecated and rejected
 - `--snapshot-out` is ignored
-- `AGENT_ENGINE=v1` is ignored with deprecation warning
 
 ## Onboarding And CI Gate
 
@@ -227,7 +226,7 @@ Run the full deterministic gate:
 `bootstrap.sh` verifies:
 - `git`, `rustc`, `cargo`
 - Ollama availability/reachability (warn by default, strict mode via `ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA=1`)
-- package layout under `.agents/` (workflows/rules/skills/roles/templates/memory) and markdown-only policy (no YAML under workflows/skills/roles/rules)
+- package layout under `.agents/` (workflows/rules/skills/roles/templates/memory) and markdown-only policy (no YAML under workflows/skills/roles/rules/templates)
 - `workflow check` integrity
 
 `workflow setup` additionally creates missing baseline markdown package files:
@@ -238,10 +237,14 @@ Run the full deterministic gate:
 
 Context retrieval injection controls:
 - `ANTIGRAV_CONTEXT_RETRIEVAL_MODE=vector|graph|hybrid|off`
+- `ANTIGRAV_CONTEXT_BACKEND=json|sqlite`
 - `ANTIGRAV_CONTEXT_INDEX_PATH=.agents/memory/vector_index.json`
 - `ANTIGRAV_CONTEXT_MIN_SCORE=0.1`
 - `ANTIGRAV_CONTEXT_GRAPH_INDEX_PATH=.agents/memory/graph_index.json`
 - `ANTIGRAV_CONTEXT_GRAPH_MIN_SCORE=0.05`
+- `ANTIGRAV_CONTEXT_DB_PATH=.agents/memory/context.db`
+- `ANTIGRAV_CONTEXT_VECTOR_TABLE=vector_entries`
+- `ANTIGRAV_CONTEXT_GRAPH_TABLE=graph_nodes`
 
 `ci_gate.sh` includes clean-clone smoke coverage:
 - clones repo into a temp directory

@@ -1,0 +1,21 @@
+ý tưởng của tôi như sau: sẽ có nhiều skills theo domain sẽ có nhiều workflows theo domain khi workflows thực thi thì bên trong sẽ có nhiều skills được load lên và làm; sử dụng nhiều sub agent cho mỗi skills làm với các skills và workflows thì có các templates; các roles; rules các skills được gọi chéo nhau; nói chung nó sẽ được thiết kế để chồng chéo làm mọi thứ theo đúng công việc sẽ có các script tools để validate; report; generate skills; workflows; nhìn chung ý tưởng của tôi là thế  tôi bổ sung thêm ý tưởng; các sub agent sẽ dùng ollama để làm các sub agent cho nhẹ và free thay vì dùng các AI public; đương nhiên phải có options nếu có tiền
+
+2; phải có cơ chế dùng grapqh vector db để tối ưu và truy vấn
+
+tóm lại là hỗ trợ solo developer
+
+thêm 1 phần nữa là nếu user chat multple thread thì khi coding feature; phải tách nhánh; có cơ chế resolve conflict - skills giải quyết vấn đề đó
+
+tham khảo https://github.com/max-sixty/worktrunk
+
+okay; với mọi kiến thức trên; với use case mà tôi muón làm:
+
+ví dụ tôi mở app desktop antigravity lên và tôi bật cửa sổ chat IDE; tôi sử dụng các workflows trong dự án này; thì nó có work không; tương tự như với CLI gemini
+
+như tôi hay dùng; thì anitgravify hay các công cụ AI khác đều có file cấu hình:
+
+ví dụ như antigravity thì nó sử dụng .agent/workflows và rules để đọc và hiểu
+
+đúng ý tôi rồi; có nghĩa là các workflows sẽ được xây dựng như vậy; và khi cần làm thì nó sẽ load các skills lên; các skills thì có thể external; thực thi scripts; đại loại vậy
+
+tôi muốn nó là 1 dự án; 1 repo để public; có nghĩa là solo developer và ai clone về cũng đều có thể thành solo developer; và bên trong đã có rất nhiều workflows; skills xịn rồi

@@ -56,15 +56,15 @@ for dir in workflows rules skills roles templates memory; do
   [[ -d ".agents/$dir" ]] || fail "Missing required directory: .agents/$dir"
 done
 
-if find .agents/workflows .agents/rules .agents/skills .agents/roles -type f \( -name '*.yml' -o -name '*.yaml' \) | grep -q .; then
-  fail "YAML files detected under workflow/rule/skill/role packages. Convert all package definitions to Markdown."
+if find .agents/workflows .agents/rules .agents/skills .agents/roles .agents/templates -type f \( -name '*.yml' -o -name '*.yaml' \) | grep -q .; then
+  fail "YAML files detected under workflow/rule/skill/role/template packages. Convert all package definitions to Markdown."
 fi
 
 if ! find .agents/workflows -type f -name '*.md' | grep -q .; then
   fail "No workflow markdown files found under .agents/workflows"
 fi
 
-log "Running package integrity check (workflow/skills/rules/roles markdown)..."
+log "Running package integrity check (workflow/skills/rules/roles/templates markdown)..."
 cargo run --quiet -- workflow check
 
 log "Bootstrap checks passed."

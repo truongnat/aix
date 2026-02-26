@@ -139,22 +139,33 @@ impl AgentProjectLayout {
     pub fn reload_workflows(&mut self) -> Result<()> {
         let mut workflows = HashMap::new();
         if self.workflows_dir.exists() {
-            for entry in fs::read_dir(&self.workflows_dir)? {
-                let entry = entry?;
-                let path = entry.path();
-                let extension = path
-                    .extension()
-                    .and_then(|ext| ext.to_str())
-                    .unwrap_or_default()
-                    .to_ascii_lowercase();
-                if extension != "md" {
-                    continue;
-                }
+            let files = collect_markdown_files_recursive(&self.workflows_dir)?;
+            let mut stem_to_ids = HashMap::<String, Vec<String>>::new();
+            for path in files {
+                let relative = path
+                    .strip_prefix(&self.workflows_dir)
+                    .map_err(|_| anyhow!("Workflow path '{}' escaped root", path.display()))?;
+                let workflow_id = workflow_id_from_relative_path(relative)?;
+                workflows.insert(workflow_id.clone(), path.clone());
+
                 let stem = path
                     .file_stem()
                     .and_then(|name| name.to_str())
                     .ok_or_else(|| anyhow!("Invalid workflow filename"))?;
-                workflows.insert(stem.to_string(), path.clone());
+                stem_to_ids
+                    .entry(stem.to_string())
+                    .or_default()
+                    .push(workflow_id);
+            }
+
+            // Backward compatibility: allow bare stem lookup when unique across tree.
+            for (stem, ids) in stem_to_ids {
+                if ids.len() != 1 || workflows.contains_key(&stem) {
+                    continue;
+                }
+                if let Some(path) = workflows.get(&ids[0]).cloned() {
+                    workflows.insert(stem, path);
+                }
             }
         }
         self.loaded_workflows = workflows;
@@ -264,6 +275,61 @@ fn extract_json_code_block(markdown: &str) -> Option<String> {
         }
     }
     None
+}
+
+fn workflow_id_from_relative_path(path: &Path) -> Result<String> {
+    let mut base = path.to_path_buf();
+    if base
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .map(|ext| ext.eq_ignore_ascii_case("md"))
+        .unwrap_or(false)
+    {
+        base.set_extension("");
+    }
+    let id = base
+        .iter()
+        .map(|part| part.to_string_lossy().to_string())
+        .collect::<Vec<_>>()
+        .join("/");
+    if id.trim().is_empty() {
+        return Err(anyhow!("Invalid workflow filename"));
+    }
+    Ok(id)
+}
+
+fn collect_markdown_files_recursive(root: &Path) -> Result<Vec<PathBuf>> {
+    let mut files = Vec::new();
+    walk_directory_files(root, &mut |path| {
+        let is_markdown = path
+            .extension()
+            .and_then(|ext| ext.to_str())
+            .map(|ext| ext.eq_ignore_ascii_case("md"))
+            .unwrap_or(false);
+        if is_markdown {
+            files.push(path.to_path_buf());
+        }
+    })?;
+    files.sort();
+    Ok(files)
+}
+
+fn walk_directory_files(root: &Path, visit: &mut impl FnMut(&Path)) -> Result<()> {
+    if !root.exists() {
+        return Ok(());
+    }
+    for entry in fs::read_dir(root)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_dir() {
+            walk_directory_files(&path, visit)?;
+            continue;
+        }
+        if path.is_file() {
+            visit(&path);
+        }
+    }
+    Ok(())
 }
 
 fn parse_trust_tier(rule: Option<&str>, fallback: TrustTier) -> TrustTier {
@@ -522,6 +588,75 @@ mod tests {
             Some("feature_prompt.md")
         );
         assert!(layout.resolve_template_path("missing_prompt").is_none());
+
+        let _ = std::fs::remove_dir_all(root_path);
+    }
+
+    #[test]
+    fn reload_workflows_supports_recursive_ids_and_unique_stem_alias() {
+        let unique = format!(
+            "agentic-sdlc-workflow-recursive-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root_path = std::env::temp_dir().join(unique);
+        let nested = root_path
+            .join(".agents")
+            .join("workflows")
+            .join("product")
+            .join("signup");
+        std::fs::create_dir_all(&nested).expect("create workflow tree");
+        std::fs::write(
+            nested.join("plan.md"),
+            "# Workflow: plan\n## Step: s\nSkill: demo.echo\n",
+        )
+        .expect("write nested workflow");
+
+        let layout = AgentProjectLayout::discover(root_path.to_str().expect("tmp path"))
+            .expect("discover project");
+        let nested_path = layout
+            .resolve_workflow_path("product/signup/plan")
+            .expect("resolve nested");
+        assert_eq!(
+            nested_path
+                .strip_prefix(root_path.join(".agents").join("workflows"))
+                .expect("relative")
+                .to_string_lossy()
+                .replace('\\', "/"),
+            "product/signup/plan.md"
+        );
+        assert!(layout.resolve_workflow_path("plan").is_some());
+
+        let _ = std::fs::remove_dir_all(root_path);
+    }
+
+    #[test]
+    fn reload_workflows_avoids_ambiguous_stem_aliases() {
+        let unique = format!(
+            "agentic-sdlc-workflow-ambiguous-stem-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root_path = std::env::temp_dir().join(unique);
+        let workflows_dir = root_path.join(".agents").join("workflows");
+        let a_dir = workflows_dir.join("domain_a");
+        let b_dir = workflows_dir.join("domain_b");
+        std::fs::create_dir_all(&a_dir).expect("create a dir");
+        std::fs::create_dir_all(&b_dir).expect("create b dir");
+
+        let body = "# Workflow: plan\n## Step: s\nSkill: demo.echo\n";
+        std::fs::write(a_dir.join("plan.md"), body).expect("write a");
+        std::fs::write(b_dir.join("plan.md"), body).expect("write b");
+
+        let layout = AgentProjectLayout::discover(root_path.to_str().expect("tmp path"))
+            .expect("discover project");
+        assert!(layout.resolve_workflow_path("domain_a/plan").is_some());
+        assert!(layout.resolve_workflow_path("domain_b/plan").is_some());
+        assert!(layout.resolve_workflow_path("plan").is_none());
 
         let _ = std::fs::remove_dir_all(root_path);
     }

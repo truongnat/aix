@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 pub const WORKFLOW_INSTANCE_SCHEMA_VERSION: u32 = 1;
-pub const ENGINE_TRACE_VERSION: &str = "v2.0";
+pub const ENGINE_TRACE_VERSION: &str = "1.0";
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum WorkflowInstanceStatus {

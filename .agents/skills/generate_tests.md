@@ -5,8 +5,8 @@ Schema: antigrav.skill@v1
 {
   "name": "generate_tests",
   "domain": "agent",
-  "executor": "script",
-  "command": "echo \"Generating tests...\""
+  "executor": "ollama",
+  "model": "qwen3:8b"
 }
 ```
 

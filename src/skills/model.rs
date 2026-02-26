@@ -8,7 +8,6 @@ use crate::skill::SubprocessCommand;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use std::process::Command;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -148,15 +147,6 @@ impl SkillTrait for FileSkill {
     }
 
     fn subprocess_command(&self, _input: &SkillInput) -> Option<SubprocessCommand> {
-        if self.meta.executor == "script" {
-            if let Some(cmd) = &self.meta.command {
-                return Some(SubprocessCommand {
-                    program: "/bin/sh".to_string(),
-                    args: vec!["-c".to_string(), cmd.clone()],
-                    stdin: None,
-                });
-            }
-        }
         None
     }
 
@@ -167,30 +157,9 @@ impl SkillTrait for FileSkill {
         match self.meta.executor.as_str() {
             "script" => {
                 ctx.require_process_spawn()?;
-                if let Some(cmd) = &self.meta.command {
-                    println!("🛠  [SCRIPT] Executing: {}", cmd);
-                    let output = Command::new("/bin/sh")
-                        .arg("-c")
-                        .arg(cmd)
-                        .env_clear()
-                        .output()?;
-                    if !output.status.success() {
-                        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
-                        return Err(anyhow!(
-                            "Script command exited with status {}. stderr: {}",
-                            output
-                                .status
-                                .code()
-                                .map(|code| code.to_string())
-                                .unwrap_or_else(|| "terminated".to_string()),
-                            stderr
-                        ));
-                    }
-                    let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
-                    Ok(SkillOutput::text(stdout))
-                } else {
-                    Err(anyhow!("Missing command for script executor"))
-                }
+                Err(anyhow!(
+                    "Custom markdown skills with executor='script' are disabled for safety. Use 'agent.run_script' in workflows so command policy/timeout controls are enforced."
+                ))
             }
             "ollama" => {
                 ctx.require_network()?;

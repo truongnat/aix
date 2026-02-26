@@ -2,24 +2,25 @@ use crate::engine::budget::ExecutionBudget;
 use crate::engine::registry::DomainRegistry;
 use crate::engine::routing::RoutingPolicy;
 use crate::engine::security::DomainSecurityPolicy;
-use crate::engine::v2::instance::{
+use crate::engine::workflow_engine::instance::{
     now_ms, StepExecutionStatus, WorkflowInstance, WorkflowInstanceStatus,
     WORKFLOW_INSTANCE_SCHEMA_VERSION,
 };
-use crate::engine::v2::state_store::WorkflowStateStore;
-use crate::engine::v2::step_executor::StepExecutor;
+use crate::engine::workflow_engine::state_store::WorkflowStateStore;
+use crate::engine::workflow_engine::step_executor::StepExecutor;
 use crate::workflow::loader::load_workflow;
 use crate::workflow::model::{FailureStrategy, Workflow};
 use anyhow::{anyhow, Result};
 use std::collections::{HashMap, HashSet};
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-pub struct ExecutionEngineV2 {
+pub struct ExecutionEngine {
     state_store: WorkflowStateStore,
     step_executor: StepExecutor,
 }
 
-impl ExecutionEngineV2 {
+impl ExecutionEngine {
     pub fn new(project_root: &str, domain_registry: Arc<DomainRegistry>) -> Result<Self> {
         Ok(Self {
             state_store: WorkflowStateStore::new(project_root)?,
@@ -75,7 +76,18 @@ impl ExecutionEngineV2 {
                 instance_id
             )
         })?;
-        let workflow = load_workflow(&workflow_path)?;
+        let resolved_workflow_path = resolve_resume_workflow_path(&workflow_path)?;
+        if resolved_workflow_path != workflow_path {
+            instance.workflow_path = Some(resolved_workflow_path.clone());
+            instance.record_trace(format!(
+                "[{}] migrated workflow path '{}' -> '{}'",
+                now_ms(),
+                workflow_path,
+                resolved_workflow_path
+            ));
+            self.state_store.save(&mut instance)?;
+        }
+        let workflow = load_workflow(&resolved_workflow_path)?;
         instance.ensure_trace_id(&workflow);
         self.step_executor.validate_workflow(&workflow)?;
         self.run_instance(
@@ -286,6 +298,9 @@ impl ExecutionEngineV2 {
                             state.last_error = Some(err_text.clone());
                             state.failure_class = Some(classify_step_failure(&err_text));
                             state.idempotent_short_circuit = false;
+                            state.estimated_cost_units = state
+                                .estimated_cost_units
+                                .max(step.retry.unwrap_or(0).saturating_add(1));
                         }
                         failed.insert(step.id.clone());
                         instance.mark_failed_step(&step.id);
@@ -314,8 +329,53 @@ impl ExecutionEngineV2 {
     }
 }
 
+fn resolve_resume_workflow_path(raw: &str) -> Result<String> {
+    let path = PathBuf::from(raw);
+    if path.exists() {
+        return Ok(raw.to_string());
+    }
+
+    let mut candidates = Vec::<PathBuf>::new();
+    if raw.contains(".agent/") {
+        candidates.push(PathBuf::from(raw.replace(".agent/", ".agents/")));
+    }
+    if raw.contains("/.agent/") {
+        candidates.push(PathBuf::from(raw.replace("/.agent/", "/.agents/")));
+    }
+    if raw.starts_with(".agent/") {
+        candidates.push(PathBuf::from(raw.replacen(".agent/", ".agents/", 1)));
+    }
+    if raw.starts_with("./.agent/") {
+        candidates.push(PathBuf::from(raw.replacen("./.agent/", "./.agents/", 1)));
+    }
+
+    let mut seen = HashSet::<PathBuf>::new();
+    for candidate in candidates {
+        if !seen.insert(candidate.clone()) {
+            continue;
+        }
+        if candidate.exists() {
+            return pathbuf_to_string(&candidate);
+        }
+    }
+
+    Err(anyhow!(
+        "Workflow path '{}' does not exist (legacy fallback to .agents not found)",
+        raw
+    ))
+}
+
+fn pathbuf_to_string(path: &Path) -> Result<String> {
+    path.to_str()
+        .map(|v| v.to_string())
+        .ok_or_else(|| anyhow!("Invalid workflow path encoding: {}", path.display()))
+}
+
 fn classify_step_failure(err_text: &str) -> String {
     let lowered = err_text.to_ascii_lowercase();
+    if lowered.contains("budget") || lowered.contains("exceed") {
+        return "budget".to_string();
+    }
     if lowered.contains("timed out") || lowered.contains("timeout") {
         return "timeout".to_string();
     }
@@ -333,13 +393,13 @@ fn classify_step_failure(err_text: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::ExecutionEngineV2;
+    use super::ExecutionEngine;
     use crate::engine::budget::ExecutionBudget;
     use crate::engine::context::ExecutionContext;
     use crate::engine::registry::DomainRegistry;
     use crate::engine::routing::RoutingPolicy;
     use crate::engine::security::DomainSecurityPolicy;
-    use crate::engine::v2::instance::{StepExecutionStatus, WorkflowInstanceStatus};
+    use crate::engine::workflow_engine::instance::{StepExecutionStatus, WorkflowInstanceStatus};
     use crate::skill::capability::{
         CapabilityPermissions, SideEffectClass, SkillCapability, SkillIOType, TrustTier,
     };
@@ -351,6 +411,7 @@ mod tests {
     use anyhow::{anyhow, Result};
     use async_trait::async_trait;
     use serde_json::Value;
+    use std::path::PathBuf;
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::Arc;
 
@@ -449,8 +510,8 @@ mod tests {
             .register_skill("demo", Arc::new(EchoSkill::new()))
             .expect("register echo");
 
-        let engine = ExecutionEngineV2::new(root.to_str().expect("path"), Arc::new(registry))
-            .expect("engine");
+        let engine =
+            ExecutionEngine::new(root.to_str().expect("path"), Arc::new(registry)).expect("engine");
         let workflow = sample_workflow();
         let budget = ExecutionBudget::default();
         let routing = RoutingPolicy::for_single_domain("demo");
@@ -499,8 +560,8 @@ mod tests {
         registry
             .register_skill("demo", Arc::new(EchoSkill::new()))
             .expect("register echo");
-        let engine = ExecutionEngineV2::new(root.to_str().expect("path"), Arc::new(registry))
-            .expect("engine");
+        let engine =
+            ExecutionEngine::new(root.to_str().expect("path"), Arc::new(registry)).expect("engine");
 
         let workflow = Workflow {
             meta: WorkflowMeta {
@@ -576,8 +637,8 @@ Input: {output_input}
         registry
             .register_skill("demo", Arc::new(WriteFileSkill))
             .expect("register write_file");
-        let engine = ExecutionEngineV2::new(root.to_str().expect("path"), Arc::new(registry))
-            .expect("engine");
+        let engine =
+            ExecutionEngine::new(root.to_str().expect("path"), Arc::new(registry)).expect("engine");
 
         let workflow = Workflow {
             meta: WorkflowMeta {
@@ -605,7 +666,7 @@ Input: {output_input}
         }
         std::fs::write(&output_path, "deterministic").expect("pre-apply side effect");
 
-        let mut instance = crate::engine::v2::instance::WorkflowInstance::new(
+        let mut instance = crate::engine::workflow_engine::instance::WorkflowInstance::new(
             &workflow,
             Some(workflow_path.to_string_lossy().to_string()),
         );
@@ -670,8 +731,8 @@ Input: {output_input}
                 }),
             )
             .expect("register retry_once");
-        let engine = ExecutionEngineV2::new(root.to_str().expect("path"), Arc::new(registry))
-            .expect("engine");
+        let engine =
+            ExecutionEngine::new(root.to_str().expect("path"), Arc::new(registry)).expect("engine");
         let workflow = Workflow {
             meta: WorkflowMeta {
                 name: "retry-telemetry".to_string(),
@@ -714,6 +775,75 @@ Input: {output_input}
         assert!(!state.idempotent_short_circuit);
         assert!(state.duration_ms.is_some());
         assert!(state.failure_class.is_none());
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[tokio::test]
+    async fn resume_supports_legacy_agent_workflow_path() {
+        let root = temp_root("agentic-sdlc-v2-resume-legacy-agent-path");
+        let workflows_dir = root.join(".agents").join("workflows");
+        std::fs::create_dir_all(&workflows_dir).expect("create workflows");
+        let workflow_path = workflows_dir.join("legacy.md");
+        std::fs::write(
+            &workflow_path,
+            "# Workflow: legacy\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: demo.echo\nInput: ok\n",
+        )
+        .expect("write workflow");
+
+        let mut registry = DomainRegistry::new();
+        registry.register_domain("demo");
+        registry
+            .register_skill("demo", Arc::new(EchoSkill::new()))
+            .expect("register echo");
+        let engine =
+            ExecutionEngine::new(root.to_str().expect("path"), Arc::new(registry)).expect("engine");
+
+        let workflow = Workflow {
+            meta: WorkflowMeta {
+                name: "legacy-resume".to_string(),
+                domain: Some("demo".to_string()),
+                goal: None,
+                target_type: None,
+                routing_policy: Some(RoutingPolicy::for_single_domain("demo")),
+                security_policy: Some(DomainSecurityPolicy::default()),
+                resource_budget: None,
+                projected_cost: None,
+                projected_latency_ms: None,
+                projected_steps: None,
+            },
+            steps: vec![WorkflowStep::new("s1", "demo.echo", "ok")],
+        };
+        let legacy_path = PathBuf::from(
+            workflow_path
+                .to_string_lossy()
+                .to_string()
+                .replace("/.agents/", "/.agent/"),
+        );
+        let mut instance = crate::engine::workflow_engine::instance::WorkflowInstance::new(
+            &workflow,
+            Some(legacy_path.to_string_lossy().to_string()),
+        );
+        instance.status = WorkflowInstanceStatus::Running;
+        engine
+            .state_store()
+            .save(&mut instance)
+            .expect("save instance");
+
+        let resumed = engine
+            .resume_workflow(
+                &instance.instance_id,
+                ExecutionBudget::default(),
+                RoutingPolicy::for_single_domain("demo"),
+                DomainSecurityPolicy::default(),
+            )
+            .await
+            .expect("resume");
+        assert_eq!(resumed.status, WorkflowInstanceStatus::Completed);
+        assert_eq!(
+            resumed.workflow_path.as_deref(),
+            Some(workflow_path.to_string_lossy().as_ref())
+        );
 
         let _ = std::fs::remove_dir_all(root);
     }

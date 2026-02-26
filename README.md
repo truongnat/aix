@@ -2,7 +2,7 @@
 
 Deterministic local execution runtime for agentic software workflows.
 
-This repository runs a single consolidated v2 engine with:
+This repository runs a single consolidated workflow engine with:
 - deterministic workflow execution and trace IDs
 - resumable runs with persisted state
 - idempotent step short-circuit support
@@ -88,7 +88,7 @@ cargo run -- workflow scaffold workflow feature-search
 cargo run -- workflow scaffold skill search_docs
 ```
 
-Rebuild graph index for context retrieval:
+Rebuild graph index for context retrieval (also refreshes sqlite context tables in `.agents/memory/context.db`):
 
 ```bash
 cargo run -- workflow index-graph
@@ -128,10 +128,14 @@ Context retrieval service (for deterministic LLM context injection):
 
 ```bash
 ANTIGRAV_CONTEXT_RETRIEVAL_MODE=vector|graph|hybrid|off
+ANTIGRAV_CONTEXT_BACKEND=json|sqlite
 ANTIGRAV_CONTEXT_INDEX_PATH=.agents/memory/vector_index.json
 ANTIGRAV_CONTEXT_MIN_SCORE=0.1
 ANTIGRAV_CONTEXT_GRAPH_INDEX_PATH=.agents/memory/graph_index.json
 ANTIGRAV_CONTEXT_GRAPH_MIN_SCORE=0.05
+ANTIGRAV_CONTEXT_DB_PATH=.agents/memory/context.db
+ANTIGRAV_CONTEXT_VECTOR_TABLE=vector_entries
+ANTIGRAV_CONTEXT_GRAPH_TABLE=graph_nodes
 ANTIGRAV_CONTEXT_MAX_ITEMS=5
 ANTIGRAV_CONTEXT_MAX_CHARS=300
 ```

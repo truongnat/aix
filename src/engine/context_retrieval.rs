@@ -1,10 +1,14 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
+use rusqlite::Connection;
 use serde::Deserialize;
 use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 const VECTOR_DIM: usize = 32;
+const DEFAULT_CONTEXT_DB_PATH: &str = ".agents/memory/context.db";
+const DEFAULT_VECTOR_TABLE: &str = "vector_entries";
+const DEFAULT_GRAPH_TABLE: &str = "graph_nodes";
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct RetrievedContextItem {
@@ -27,28 +31,75 @@ impl ContextRetrievalService for NoopContextRetrievalService {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ContextIndexBackend {
+    Json,
+    Sqlite,
+}
+
+fn parse_context_backend(raw: &str) -> Option<ContextIndexBackend> {
+    match raw.trim().to_ascii_lowercase().as_str() {
+        "json" | "file" => Some(ContextIndexBackend::Json),
+        "sqlite" | "sql" => Some(ContextIndexBackend::Sqlite),
+        _ => None,
+    }
+}
+
+fn select_context_backend(override_var: &str) -> ContextIndexBackend {
+    std::env::var(override_var)
+        .ok()
+        .and_then(|value| parse_context_backend(&value))
+        .or_else(|| {
+            std::env::var("ANTIGRAV_CONTEXT_BACKEND")
+                .ok()
+                .and_then(|value| parse_context_backend(&value))
+        })
+        .unwrap_or(ContextIndexBackend::Json)
+}
+
+#[derive(Debug, Clone)]
+enum VectorIndexSource {
+    Json { index_path: PathBuf },
+    Sqlite { db_path: PathBuf, table: String },
+}
+
 #[derive(Debug, Clone)]
 pub struct VectorIndexContextRetrievalService {
-    index_path: PathBuf,
+    source: VectorIndexSource,
     min_score: f32,
 }
 
 impl VectorIndexContextRetrievalService {
     pub fn from_env() -> Self {
-        let index_path = PathBuf::from(
-            std::env::var("ANTIGRAV_CONTEXT_INDEX_PATH")
-                .ok()
-                .unwrap_or_else(|| ".agents/memory/vector_index.json".to_string()),
-        );
+        let source = match select_context_backend("ANTIGRAV_CONTEXT_VECTOR_BACKEND") {
+            ContextIndexBackend::Json => VectorIndexSource::Json {
+                index_path: PathBuf::from(
+                    std::env::var("ANTIGRAV_CONTEXT_INDEX_PATH")
+                        .ok()
+                        .unwrap_or_else(|| ".agents/memory/vector_index.json".to_string()),
+                ),
+            },
+            ContextIndexBackend::Sqlite => VectorIndexSource::Sqlite {
+                db_path: PathBuf::from(
+                    std::env::var("ANTIGRAV_CONTEXT_DB_PATH")
+                        .ok()
+                        .unwrap_or_else(|| DEFAULT_CONTEXT_DB_PATH.to_string()),
+                ),
+                table: std::env::var("ANTIGRAV_CONTEXT_VECTOR_TABLE")
+                    .ok()
+                    .map(|v| v.trim().to_string())
+                    .filter(|v| !v.is_empty())
+                    .unwrap_or_else(|| DEFAULT_VECTOR_TABLE.to_string()),
+            },
+        };
+
         let min_score = std::env::var("ANTIGRAV_CONTEXT_MIN_SCORE")
             .ok()
             .and_then(|v| v.trim().parse::<f32>().ok())
             .map(|v| v.clamp(0.0, 1.0))
             .unwrap_or(0.1);
-        Self {
-            index_path,
-            min_score,
-        }
+
+        Self { source, min_score }
     }
 }
 
@@ -63,7 +114,7 @@ impl ContextRetrievalService for VectorIndexContextRetrievalService {
         if limit == 0 || query.trim().is_empty() {
             return Ok(Vec::new());
         }
-        let entries = load_vector_index(&self.index_path)?;
+        let entries = load_vector_index(&self.source)?;
         if entries.is_empty() {
             return Ok(Vec::new());
         }
@@ -98,27 +149,48 @@ impl ContextRetrievalService for VectorIndexContextRetrievalService {
 }
 
 #[derive(Debug, Clone)]
+enum GraphIndexSource {
+    Json { index_path: PathBuf },
+    Sqlite { db_path: PathBuf, table: String },
+}
+
+#[derive(Debug, Clone)]
 pub struct GraphIndexContextRetrievalService {
-    index_path: PathBuf,
+    source: GraphIndexSource,
     min_score: f64,
 }
 
 impl GraphIndexContextRetrievalService {
     pub fn from_env() -> Self {
-        let index_path = PathBuf::from(
-            std::env::var("ANTIGRAV_CONTEXT_GRAPH_INDEX_PATH")
-                .ok()
-                .unwrap_or_else(|| ".agents/memory/graph_index.json".to_string()),
-        );
+        let source = match select_context_backend("ANTIGRAV_CONTEXT_GRAPH_BACKEND") {
+            ContextIndexBackend::Json => GraphIndexSource::Json {
+                index_path: PathBuf::from(
+                    std::env::var("ANTIGRAV_CONTEXT_GRAPH_INDEX_PATH")
+                        .ok()
+                        .unwrap_or_else(|| ".agents/memory/graph_index.json".to_string()),
+                ),
+            },
+            ContextIndexBackend::Sqlite => GraphIndexSource::Sqlite {
+                db_path: PathBuf::from(
+                    std::env::var("ANTIGRAV_CONTEXT_DB_PATH")
+                        .ok()
+                        .unwrap_or_else(|| DEFAULT_CONTEXT_DB_PATH.to_string()),
+                ),
+                table: std::env::var("ANTIGRAV_CONTEXT_GRAPH_TABLE")
+                    .ok()
+                    .map(|v| v.trim().to_string())
+                    .filter(|v| !v.is_empty())
+                    .unwrap_or_else(|| DEFAULT_GRAPH_TABLE.to_string()),
+            },
+        };
+
         let min_score = std::env::var("ANTIGRAV_CONTEXT_GRAPH_MIN_SCORE")
             .ok()
             .and_then(|v| v.trim().parse::<f64>().ok())
             .map(|v| v.clamp(0.0, 1.0))
             .unwrap_or(0.05);
-        Self {
-            index_path,
-            min_score,
-        }
+
+        Self { source, min_score }
     }
 }
 
@@ -133,7 +205,7 @@ impl ContextRetrievalService for GraphIndexContextRetrievalService {
         if limit == 0 || query.trim().is_empty() {
             return Ok(Vec::new());
         }
-        let nodes = load_graph_index(&self.index_path)?;
+        let nodes = load_graph_index(&self.source)?;
         if nodes.is_empty() {
             return Ok(Vec::new());
         }
@@ -270,7 +342,14 @@ enum GraphIndexPayload {
     NodesArray(Vec<GraphIndexNode>),
 }
 
-fn load_vector_index(path: &PathBuf) -> Result<Vec<VectorIndexEntry>> {
+fn load_vector_index(source: &VectorIndexSource) -> Result<Vec<VectorIndexEntry>> {
+    match source {
+        VectorIndexSource::Json { index_path } => load_vector_index_json(index_path),
+        VectorIndexSource::Sqlite { db_path, table } => load_vector_index_sqlite(db_path, table),
+    }
+}
+
+fn load_vector_index_json(path: &Path) -> Result<Vec<VectorIndexEntry>> {
     if !path.exists() {
         return Ok(Vec::new());
     }
@@ -279,7 +358,50 @@ fn load_vector_index(path: &PathBuf) -> Result<Vec<VectorIndexEntry>> {
     Ok(entries)
 }
 
-fn load_graph_index(path: &PathBuf) -> Result<Vec<GraphIndexNode>> {
+fn load_vector_index_sqlite(db_path: &Path, table: &str) -> Result<Vec<VectorIndexEntry>> {
+    if !db_path.exists() {
+        return Ok(Vec::new());
+    }
+    let table = normalize_sqlite_identifier(table)
+        .ok_or_else(|| anyhow!("Invalid sqlite vector table name: '{}'", table))?;
+
+    let conn = Connection::open(db_path)?;
+    let sql = format!("SELECT id, text, embedding_json FROM {table}");
+    let mut stmt = match conn.prepare(&sql) {
+        Ok(stmt) => stmt,
+        Err(err) => {
+            if is_missing_table_error(&err) {
+                return Ok(Vec::new());
+            }
+            return Err(err.into());
+        }
+    };
+
+    let mut rows = stmt.query([])?;
+    let mut entries = Vec::new();
+    while let Some(row) = rows.next()? {
+        let id: String = row.get(0)?;
+        let text: String = row.get(1)?;
+        let embedding_json: String = row.get(2)?;
+        let embedding: Vec<f32> = serde_json::from_str(&embedding_json)
+            .map_err(|err| anyhow!("Invalid embedding_json for vector id '{}': {}", id, err))?;
+        entries.push(VectorIndexEntry {
+            id,
+            text,
+            embedding,
+        });
+    }
+    Ok(entries)
+}
+
+fn load_graph_index(source: &GraphIndexSource) -> Result<Vec<GraphIndexNode>> {
+    match source {
+        GraphIndexSource::Json { index_path } => load_graph_index_json(index_path),
+        GraphIndexSource::Sqlite { db_path, table } => load_graph_index_sqlite(db_path, table),
+    }
+}
+
+fn load_graph_index_json(path: &Path) -> Result<Vec<GraphIndexNode>> {
     if !path.exists() {
         return Ok(Vec::new());
     }
@@ -290,6 +412,84 @@ fn load_graph_index(path: &PathBuf) -> Result<Vec<GraphIndexNode>> {
         GraphIndexPayload::NodesArray(nodes) => nodes,
     };
     Ok(nodes)
+}
+
+fn load_graph_index_sqlite(db_path: &Path, table: &str) -> Result<Vec<GraphIndexNode>> {
+    if !db_path.exists() {
+        return Ok(Vec::new());
+    }
+    let table = normalize_sqlite_identifier(table)
+        .ok_or_else(|| anyhow!("Invalid sqlite graph table name: '{}'", table))?;
+
+    let conn = Connection::open(db_path)?;
+    let sql = format!("SELECT id, text, tags_json, links_json FROM {table}");
+    let mut stmt = match conn.prepare(&sql) {
+        Ok(stmt) => stmt,
+        Err(err) => {
+            if is_missing_table_error(&err) {
+                return Ok(Vec::new());
+            }
+            return Err(err.into());
+        }
+    };
+
+    let mut rows = stmt.query([])?;
+    let mut nodes = Vec::new();
+    while let Some(row) = rows.next()? {
+        let id: String = row.get(0)?;
+        let text: String = row.get(1)?;
+        let tags_json: Option<String> = row.get(2)?;
+        let links_json: Option<String> = row.get(3)?;
+
+        let tags = parse_json_string_vec(tags_json.as_deref(), "tags_json", &id)?;
+        let links = parse_json_string_vec(links_json.as_deref(), "links_json", &id)?;
+
+        nodes.push(GraphIndexNode {
+            id,
+            text,
+            tags,
+            links,
+        });
+    }
+    Ok(nodes)
+}
+
+fn parse_json_string_vec(raw: Option<&str>, field: &str, id: &str) -> Result<Vec<String>> {
+    let Some(raw) = raw else {
+        return Ok(Vec::new());
+    };
+    if raw.trim().is_empty() {
+        return Ok(Vec::new());
+    }
+    let values = serde_json::from_str::<Vec<String>>(raw)
+        .map_err(|err| anyhow!("Invalid {field} JSON for graph id '{}': {}", id, err))?;
+    Ok(values)
+}
+
+fn normalize_sqlite_identifier(value: &str) -> Option<String> {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    let mut chars = trimmed.chars();
+    let first = chars.next()?;
+    if !(first.is_ascii_alphabetic() || first == '_') {
+        return None;
+    }
+    if !chars.all(|ch| ch.is_ascii_alphanumeric() || ch == '_') {
+        return None;
+    }
+    Some(trimmed.to_string())
+}
+
+fn is_missing_table_error(err: &rusqlite::Error) -> bool {
+    match err {
+        rusqlite::Error::SqliteFailure(_, message) => message
+            .as_deref()
+            .map(|msg| msg.to_ascii_lowercase().contains("no such table"))
+            .unwrap_or(false),
+        _ => false,
+    }
 }
 
 fn tokenize(text: &str) -> Vec<String> {
@@ -330,9 +530,10 @@ fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::{
-        ContextRetrievalService, GraphIndexContextRetrievalService, HybridContextRetrievalService,
-        VectorIndexContextRetrievalService,
+        embed, ContextRetrievalService, GraphIndexContextRetrievalService, GraphIndexSource,
+        HybridContextRetrievalService, VectorIndexContextRetrievalService, VectorIndexSource,
     };
+    use rusqlite::params;
     use serde_json::json;
 
     #[test]
@@ -350,16 +551,16 @@ mod tests {
         std::fs::write(
             &index_path,
             serde_json::to_string_pretty(&json!([
-                {"id":"a","text":"email validation logic", "embedding":[1.0,0.0]},
-                {"id":"b","text":"signup flow test cases", "embedding":[0.9,0.1]},
-                {"id":"c","text":"database migration notes", "embedding":[0.0,1.0]}
+                {"id":"a","text":"email validation logic", "embedding":embed("email validation logic")},
+                {"id":"b","text":"signup flow test cases", "embedding":embed("signup flow test cases")},
+                {"id":"c","text":"database migration notes", "embedding":embed("database migration notes")}
             ]))
             .expect("json"),
         )
         .expect("write");
 
         let service = VectorIndexContextRetrievalService {
-            index_path,
+            source: VectorIndexSource::Json { index_path },
             min_score: 0.0,
         };
         let out = service.retrieve("email validation", 2).expect("retrieve");
@@ -395,7 +596,7 @@ mod tests {
         .expect("write");
 
         let service = GraphIndexContextRetrievalService {
-            index_path,
+            source: GraphIndexSource::Json { index_path },
             min_score: 0.0,
         };
         let out = service
@@ -425,8 +626,8 @@ mod tests {
         std::fs::write(
             &vector_path,
             serde_json::to_string_pretty(&json!([
-                {"id":"vec-a","text":"email validation logic", "embedding":[1.0,0.0]},
-                {"id":"shared","text":"signup feature branch notes", "embedding":[0.8,0.2]}
+                {"id":"vec-a","text":"email validation logic", "embedding":embed("email validation logic")},
+                {"id":"shared","text":"signup feature branch notes", "embedding":embed("signup feature branch notes")}
             ]))
             .expect("json"),
         )
@@ -445,11 +646,15 @@ mod tests {
 
         let service = HybridContextRetrievalService {
             vector: VectorIndexContextRetrievalService {
-                index_path: vector_path,
+                source: VectorIndexSource::Json {
+                    index_path: vector_path,
+                },
                 min_score: 0.0,
             },
             graph: GraphIndexContextRetrievalService {
-                index_path: graph_path,
+                source: GraphIndexSource::Json {
+                    index_path: graph_path,
+                },
                 min_score: 0.0,
             },
         };
@@ -458,6 +663,114 @@ mod tests {
         assert!(out
             .iter()
             .any(|item| item.id == "vec-a" || item.id == "graph-a"));
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn retrieve_from_vector_sqlite_backend() {
+        let unique = format!(
+            "agentic-sdlc-vector-context-sqlite-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(&root).expect("create root");
+
+        let db_path = root.join("context.db");
+        let conn = rusqlite::Connection::open(&db_path).expect("open sqlite");
+        conn.execute(
+            "CREATE TABLE vector_entries (id TEXT PRIMARY KEY, text TEXT NOT NULL, embedding_json TEXT NOT NULL)",
+            [],
+        )
+        .expect("create table");
+        conn.execute(
+            "INSERT INTO vector_entries (id, text, embedding_json) VALUES (?1, ?2, ?3)",
+            params![
+                "a",
+                "email validation logic",
+                serde_json::to_string(&embed("email validation logic")).expect("embedding")
+            ],
+        )
+        .expect("insert a");
+        conn.execute(
+            "INSERT INTO vector_entries (id, text, embedding_json) VALUES (?1, ?2, ?3)",
+            params![
+                "b",
+                "database migration notes",
+                serde_json::to_string(&embed("database migration notes")).expect("embedding")
+            ],
+        )
+        .expect("insert b");
+
+        let service = VectorIndexContextRetrievalService {
+            source: VectorIndexSource::Sqlite {
+                db_path,
+                table: "vector_entries".to_string(),
+            },
+            min_score: 0.0,
+        };
+        let out = service.retrieve("email validation", 1).expect("retrieve");
+        assert_eq!(out.len(), 1);
+        assert_eq!(out[0].id, "a");
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn retrieve_from_graph_sqlite_backend() {
+        let unique = format!(
+            "agentic-sdlc-graph-context-sqlite-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(&root).expect("create root");
+
+        let db_path = root.join("context.db");
+        let conn = rusqlite::Connection::open(&db_path).expect("open sqlite");
+        conn.execute(
+            "CREATE TABLE graph_nodes (id TEXT PRIMARY KEY, text TEXT NOT NULL, tags_json TEXT, links_json TEXT)",
+            [],
+        )
+        .expect("create table");
+        conn.execute(
+            "INSERT INTO graph_nodes (id, text, tags_json, links_json) VALUES (?1, ?2, ?3, ?4)",
+            params![
+                "src/signup.rs",
+                "signup flow validates email format",
+                serde_json::to_string(&vec!["file", "rust"]).expect("tags"),
+                serde_json::to_string(&vec!["src/email.rs"]).expect("links")
+            ],
+        )
+        .expect("insert signup");
+        conn.execute(
+            "INSERT INTO graph_nodes (id, text, tags_json, links_json) VALUES (?1, ?2, ?3, ?4)",
+            params![
+                "src/email.rs",
+                "email validation helpers",
+                serde_json::to_string(&vec!["file", "utils"]).expect("tags"),
+                serde_json::to_string(Vec::<String>::new().as_slice()).expect("links")
+            ],
+        )
+        .expect("insert email");
+
+        let service = GraphIndexContextRetrievalService {
+            source: GraphIndexSource::Sqlite {
+                db_path,
+                table: "graph_nodes".to_string(),
+            },
+            min_score: 0.0,
+        };
+        let out = service
+            .retrieve("email validation signup", 3)
+            .expect("retrieve");
+        assert_eq!(out.len(), 2);
+        assert_eq!(out[0].id, "src/signup.rs");
 
         let _ = std::fs::remove_dir_all(root);
     }

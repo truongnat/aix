@@ -2026,6 +2026,36 @@ mod tests {
         }
     }
 
+    struct TextEchoSkill;
+
+    #[async_trait]
+    impl Skill for TextEchoSkill {
+        fn name(&self) -> &str {
+            "text_echo"
+        }
+
+        fn capability(&self) -> SkillCapability {
+            SkillCapability::new(
+                "text_echo",
+                "Echo text for deterministic memory accumulation tests",
+                SkillIOType::Text,
+                SkillIOType::Text,
+                CapabilityPermissions::none(),
+                SideEffectClass::Pure,
+            )
+        }
+
+        async fn execute(
+            &self,
+            input: SkillInput,
+            _ctx: &mut ExecutionContext,
+        ) -> Result<SkillOutput> {
+            Ok(SkillOutput::text(
+                input.as_text().unwrap_or_default().to_string(),
+            ))
+        }
+    }
+
     fn one_step_workflow(name: &str, skill: &str) -> Workflow {
         Workflow {
             meta: WorkflowMeta {
@@ -2042,6 +2072,51 @@ mod tests {
             },
             steps: vec![WorkflowStep::new("s1", skill, "input")],
         }
+    }
+
+    #[tokio::test]
+    async fn phase3_linear_execution_accumulates_memory_deterministically() {
+        let mut registry = DomainRegistry::new();
+        registry.register_domain("demo");
+        registry
+            .register_skill("demo", Arc::new(TextEchoSkill))
+            .expect("register skill");
+        let executor = Executor::new(Arc::new(registry));
+
+        // Intentionally place steps in non-lexicographic order to assert deterministic sort.
+        let step_z = WorkflowStep::new("z_step", "demo.text_echo", "z");
+        let step_a = WorkflowStep::new("a_step", "demo.text_echo", "a");
+        let workflow = Workflow {
+            meta: WorkflowMeta {
+                name: "phase3-linear-deterministic".to_string(),
+                domain: Some("demo".to_string()),
+                goal: None,
+                target_type: None,
+                routing_policy: Some(RoutingPolicy::for_single_domain("demo")),
+                security_policy: Some(DomainSecurityPolicy::default()),
+                resource_budget: Some(ResourceBudget::default()),
+                projected_cost: None,
+                projected_latency_ms: None,
+                projected_steps: None,
+            },
+            steps: vec![step_z, step_a],
+        };
+
+        let memory = executor
+            .execute_workflow(
+                &workflow,
+                None,
+                None,
+                vec![],
+                0,
+                ExecutionBudget::default(),
+                RoutingPolicy::for_single_domain("demo"),
+                DomainSecurityPolicy::default(),
+            )
+            .await
+            .expect("execute workflow");
+
+        assert_eq!(memory, "a\nz");
     }
 
     #[tokio::test]
