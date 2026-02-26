@@ -39,6 +39,24 @@ pub struct StepExecutionState {
     pub failure_class: Option<String>,
     #[serde(default)]
     pub idempotent_short_circuit: bool,
+    #[serde(default)]
+    pub context_injected_items: u32,
+    #[serde(default)]
+    pub estimated_cost_units: u32,
+    #[serde(default)]
+    pub actual_cost_usd: f64,
+    #[serde(default)]
+    pub input_tokens: u32,
+    #[serde(default)]
+    pub output_tokens: u32,
+    #[serde(default)]
+    pub total_tokens: u32,
+    #[serde(default)]
+    pub provider: Option<String>,
+    #[serde(default)]
+    pub model: Option<String>,
+    #[serde(default)]
+    pub call_attempts: u32,
 }
 
 impl Default for StepExecutionState {
@@ -53,6 +71,15 @@ impl Default for StepExecutionState {
             duration_ms: None,
             failure_class: None,
             idempotent_short_circuit: false,
+            context_injected_items: 0,
+            estimated_cost_units: 0,
+            actual_cost_usd: 0.0,
+            input_tokens: 0,
+            output_tokens: 0,
+            total_tokens: 0,
+            provider: None,
+            model: None,
+            call_attempts: 0,
         }
     }
 }

@@ -37,7 +37,7 @@ impl ReflectiveScorer {
             client: Client::new(),
             ollama_url: "http://127.0.0.1:11434/api/generate".to_string(),
             model: "qwen2.5-coder:7b".to_string(),
-            experience_path: ".agent/memory/experiences.json".to_string(),
+            experience_path: ".agents/memory/experiences.json".to_string(),
         }
     }
 

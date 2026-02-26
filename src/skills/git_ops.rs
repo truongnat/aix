@@ -21,6 +21,15 @@ pub struct GitMergeBranchSkill;
 #[derive(Debug, Clone)]
 pub struct AnalyzeConflictsSkill;
 
+#[derive(Debug, Clone)]
+pub struct HasConflictsSkill;
+
+#[derive(Debug, Clone)]
+pub struct ConflictGateSkill;
+
+#[derive(Debug, Clone)]
+pub struct AutoResolveConflictsSkill;
+
 const VALIDATION_STATUS_ENV: &str = "ANTIGRAV_LAST_VALIDATION_PASSED";
 
 fn run_git(args: &[&str]) -> Result<std::process::Output> {
@@ -38,6 +47,13 @@ fn load_coding_rules_from_cwd() -> Result<ProjectCodingRules> {
 
 fn load_merge_rules_from_cwd() -> Result<ProjectMergeRules> {
     project_layout_from_cwd()?.load_merge_rules()
+}
+
+fn load_branching_prefix_from_cwd() -> Result<String> {
+    Ok(project_layout_from_cwd()?
+        .load_branching_rules()?
+        .prefix
+        .unwrap_or_else(|| "thread/".to_string()))
 }
 
 fn staged_files() -> Result<Vec<String>> {
@@ -148,10 +164,10 @@ fn enforce_memory_index_rule(rules: &ProjectCodingRules, staged: &[String]) -> R
     });
     let memory_updated = staged
         .iter()
-        .any(|path| path == ".agent/memory/vector_index.json");
+        .any(|path| path == ".agents/memory/vector_index.json");
     if code_changed && !memory_updated {
         return Err(anyhow!(
-            "coding_rules violation: .agent/memory/vector_index.json must be updated for code changes"
+            "coding_rules violation: .agents/memory/vector_index.json must be updated for code changes"
         ));
     }
     Ok(())
@@ -172,6 +188,193 @@ fn enforce_commit_rules(message: &str, rules: &ProjectCodingRules) -> Result<()>
         }
     }
     Ok(())
+}
+
+fn conflict_count_from_input(input: &SkillInput) -> Result<usize> {
+    match input {
+        SkillInput::Boolean(has_conflicts) => Ok(if *has_conflicts { 1 } else { 0 }),
+        SkillInput::Json(value) => {
+            if let Some(count) = value.get("count").and_then(|v| v.as_u64()) {
+                return Ok(usize::try_from(count).unwrap_or(usize::MAX));
+            }
+            if let Some(conflicts) = value.get("conflicts").and_then(|v| v.as_array()) {
+                return Ok(conflicts.len());
+            }
+            Ok(0)
+        }
+        SkillInput::Text(text) => {
+            let normalized = text.trim().to_ascii_lowercase();
+            if normalized.is_empty() || normalized == "false" || normalized == "0" {
+                return Ok(0);
+            }
+            if normalized == "true" {
+                return Ok(1);
+            }
+            let parsed = normalized.parse::<usize>().unwrap_or(0);
+            Ok(parsed)
+        }
+        SkillInput::Number(value) => Ok((*value).max(0.0).round() as usize),
+    }
+}
+
+fn env_enabled(name: &str) -> bool {
+    std::env::var(name)
+        .map(|v| {
+            matches!(
+                v.trim().to_ascii_lowercase().as_str(),
+                "1" | "true" | "yes" | "on"
+            )
+        })
+        .unwrap_or(false)
+}
+
+fn protected_branch_policy_violation(
+    target_branch: &str,
+    source_branch: &str,
+    protected_branches: &[String],
+    branch_prefix: &str,
+    allow_protected_merge: bool,
+) -> Option<String> {
+    if allow_protected_merge {
+        return None;
+    }
+    let is_protected = protected_branches
+        .iter()
+        .any(|branch| branch.trim() == target_branch);
+    if !is_protected {
+        return None;
+    }
+    if source_branch.starts_with(branch_prefix) {
+        return None;
+    }
+    Some(format!(
+        "merge_rules violation: target branch '{}' is protected; source branch '{}' must start with '{}' or set ANTIGRAV_ALLOW_PROTECTED_MERGE=1",
+        target_branch,
+        source_branch,
+        branch_prefix
+    ))
+}
+
+fn enforce_merge_rules_before_merge(
+    source_branch: &str,
+    merge_rules: &ProjectMergeRules,
+) -> Result<String> {
+    let target_branch = current_branch()?;
+    if merge_rules.require_rebase_before_merge.unwrap_or(false) {
+        let status = run_git(&["merge-base", "--is-ancestor", &target_branch, source_branch])?;
+        if !status.status.success() {
+            return Err(anyhow!(
+                "merge_rules violation: source branch '{}' must be rebased onto target branch '{}' before merge",
+                source_branch,
+                target_branch
+            ));
+        }
+    }
+
+    if let Some(protected_branches) = merge_rules.protected_branches.as_ref() {
+        let prefix = load_branching_prefix_from_cwd()?;
+        if let Some(message) = protected_branch_policy_violation(
+            &target_branch,
+            source_branch,
+            protected_branches,
+            prefix.trim(),
+            env_enabled("ANTIGRAV_ALLOW_PROTECTED_MERGE"),
+        ) {
+            return Err(anyhow!(message));
+        }
+    }
+
+    Ok(target_branch)
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum ConflictResolutionStrategy {
+    Ours,
+    Theirs,
+}
+
+impl ConflictResolutionStrategy {
+    fn as_git_flag(&self) -> &'static str {
+        match self {
+            ConflictResolutionStrategy::Ours => "--ours",
+            ConflictResolutionStrategy::Theirs => "--theirs",
+        }
+    }
+
+    fn as_str(&self) -> &'static str {
+        match self {
+            ConflictResolutionStrategy::Ours => "ours",
+            ConflictResolutionStrategy::Theirs => "theirs",
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct AutoResolveConfig {
+    strategy: ConflictResolutionStrategy,
+    max_attempts: u32,
+}
+
+fn parse_resolution_strategy(raw: Option<&str>) -> ConflictResolutionStrategy {
+    match raw.unwrap_or_default().trim().to_ascii_lowercase().as_str() {
+        "theirs" => ConflictResolutionStrategy::Theirs,
+        _ => ConflictResolutionStrategy::Ours,
+    }
+}
+
+fn parse_auto_resolve_config(input: &SkillInput) -> AutoResolveConfig {
+    let mut strategy = ConflictResolutionStrategy::Ours;
+    let mut max_attempts = 2_u32;
+
+    let parse_object = |value: &serde_json::Value| {
+        let strategy = parse_resolution_strategy(value.get("strategy").and_then(|v| v.as_str()));
+        let max_attempts = value
+            .get("max_attempts")
+            .and_then(|v| v.as_u64())
+            .and_then(|v| u32::try_from(v).ok())
+            .unwrap_or(2)
+            .clamp(1, 5);
+        AutoResolveConfig {
+            strategy,
+            max_attempts,
+        }
+    };
+
+    match input {
+        SkillInput::Json(value) => {
+            let cfg = parse_object(value);
+            strategy = cfg.strategy;
+            max_attempts = cfg.max_attempts;
+        }
+        SkillInput::Text(text) => {
+            if let Ok(value) = serde_json::from_str::<serde_json::Value>(text.trim()) {
+                let cfg = parse_object(&value);
+                strategy = cfg.strategy;
+                max_attempts = cfg.max_attempts;
+            }
+        }
+        _ => {}
+    }
+
+    AutoResolveConfig {
+        strategy,
+        max_attempts,
+    }
+}
+
+fn scan_conflict_files() -> Result<Vec<String>> {
+    let output = run_git(&["diff", "--name-only", "--diff-filter=U"])?;
+    if !output.status.success() {
+        return Err(anyhow!(
+            "git diff conflict scan failed: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        ));
+    }
+    Ok(String::from_utf8_lossy(&output.stdout)
+        .lines()
+        .map(|line| line.trim().to_string())
+        .filter(|line| !line.is_empty())
+        .collect::<Vec<_>>())
 }
 
 #[async_trait]
@@ -321,10 +524,13 @@ impl Skill for GitMergeBranchSkill {
             .map(|s| s.trim())
             .filter(|s| !s.is_empty())
             .ok_or_else(|| anyhow!("source branch is required"))?;
+        let target_branch = enforce_merge_rules_before_merge(source_branch, &merge_rules)?;
         let merge = run_git(&["merge", "--no-ff", source_branch])?;
         if !merge.status.success() {
             return Ok(SkillOutput::json(json!({
                 "status": "conflict",
+                "target_branch": target_branch,
+                "source_branch": source_branch,
                 "stdout": String::from_utf8_lossy(&merge.stdout).trim(),
                 "stderr": String::from_utf8_lossy(&merge.stderr).trim(),
                 "requires_conflict_analysis": merge_rules.analyze_conflicts.unwrap_or(true),
@@ -350,6 +556,8 @@ impl Skill for GitMergeBranchSkill {
         }
         let output = SkillOutput::json(json!({
             "status": "merged",
+            "target_branch": target_branch,
+            "source_branch": source_branch,
             "stdout": String::from_utf8_lossy(&merge.stdout).trim(),
             "deleted_source_branch": deleted_source_branch,
             "delete_error": delete_error,
@@ -380,18 +588,7 @@ impl Skill for AnalyzeConflictsSkill {
     async fn execute(&self, _input: SkillInput, ctx: &mut ExecutionContext) -> Result<SkillOutput> {
         ctx.require_process_spawn()?;
         ctx.require_fs_read()?;
-        let output = run_git(&["diff", "--name-only", "--diff-filter=U"])?;
-        if !output.status.success() {
-            return Err(anyhow!(
-                "git diff conflict scan failed: {}",
-                String::from_utf8_lossy(&output.stderr).trim()
-            ));
-        }
-        let files = String::from_utf8_lossy(&output.stdout)
-            .lines()
-            .map(|line| line.trim().to_string())
-            .filter(|line| !line.is_empty())
-            .collect::<Vec<_>>();
+        let files = scan_conflict_files()?;
         Ok(SkillOutput::json(json!({
             "conflicts": files,
             "count": files.len()
@@ -399,9 +596,157 @@ impl Skill for AnalyzeConflictsSkill {
     }
 }
 
+#[async_trait]
+impl Skill for AutoResolveConflictsSkill {
+    fn name(&self) -> &str {
+        "auto_resolve_conflicts"
+    }
+
+    fn capability(&self) -> SkillCapability {
+        SkillCapability::new(
+            self.name(),
+            "Deterministically attempts git conflict auto-resolution (ours/theirs) with bounded retries",
+            SkillIOType::Text,
+            SkillIOType::Json,
+            CapabilityPermissions::new(true, true, false, false, true),
+            SideEffectClass::ExternalMutation,
+        )
+        .with_trust_tier(TrustTier::Constrained)
+    }
+
+    async fn execute(&self, input: SkillInput, ctx: &mut ExecutionContext) -> Result<SkillOutput> {
+        ctx.require_process_spawn()?;
+        ctx.require_fs_read()?;
+        ctx.require_fs_write()?;
+
+        let config = parse_auto_resolve_config(&input);
+        let mut attempts_used = 0_u32;
+        let mut applied_files = Vec::<String>::new();
+        let mut errors = Vec::<String>::new();
+
+        for _ in 0..config.max_attempts {
+            let conflicts = scan_conflict_files()?;
+            if conflicts.is_empty() {
+                break;
+            }
+            attempts_used = attempts_used.saturating_add(1);
+
+            for file in conflicts {
+                let checkout = run_git(&[
+                    "checkout",
+                    config.strategy.as_git_flag(),
+                    "--",
+                    file.as_str(),
+                ])?;
+                if !checkout.status.success() {
+                    errors.push(format!(
+                        "checkout {} failed for '{}': {}",
+                        config.strategy.as_git_flag(),
+                        file,
+                        String::from_utf8_lossy(&checkout.stderr).trim()
+                    ));
+                    continue;
+                }
+
+                let add = run_git(&["add", "--", file.as_str()])?;
+                if !add.status.success() {
+                    errors.push(format!(
+                        "git add failed for '{}': {}",
+                        file,
+                        String::from_utf8_lossy(&add.stderr).trim()
+                    ));
+                    continue;
+                }
+                if !applied_files.iter().any(|existing| existing == &file) {
+                    applied_files.push(file);
+                }
+            }
+        }
+
+        let remaining = scan_conflict_files()?;
+        let status = if remaining.is_empty() {
+            "resolved"
+        } else if attempts_used == 0 {
+            "clean"
+        } else {
+            "unresolved"
+        };
+
+        Ok(SkillOutput::json(json!({
+            "status": status,
+            "strategy": config.strategy.as_str(),
+            "max_attempts": config.max_attempts,
+            "attempts_used": attempts_used,
+            "resolved_files": applied_files,
+            "remaining_conflicts": remaining,
+            "remaining_count": remaining.len(),
+            "errors": errors,
+        })))
+    }
+}
+
+#[async_trait]
+impl Skill for HasConflictsSkill {
+    fn name(&self) -> &str {
+        "has_conflicts"
+    }
+
+    fn capability(&self) -> SkillCapability {
+        SkillCapability::new(
+            self.name(),
+            "Returns true when merge conflict count is greater than zero",
+            SkillIOType::Json,
+            SkillIOType::Boolean,
+            CapabilityPermissions::new(false, false, false, false, false),
+            SideEffectClass::Pure,
+        )
+        .with_trust_tier(TrustTier::Constrained)
+    }
+
+    async fn execute(&self, input: SkillInput, _ctx: &mut ExecutionContext) -> Result<SkillOutput> {
+        let count = conflict_count_from_input(&input)?;
+        Ok(SkillOutput::boolean(count > 0))
+    }
+}
+
+#[async_trait]
+impl Skill for ConflictGateSkill {
+    fn name(&self) -> &str {
+        "conflict_gate"
+    }
+
+    fn capability(&self) -> SkillCapability {
+        SkillCapability::new(
+            self.name(),
+            "Fail-fast gate that aborts workflow when merge conflicts still exist",
+            SkillIOType::Boolean,
+            SkillIOType::Boolean,
+            CapabilityPermissions::new(false, false, false, false, false),
+            SideEffectClass::Pure,
+        )
+        .with_trust_tier(TrustTier::Constrained)
+    }
+
+    async fn execute(&self, input: SkillInput, _ctx: &mut ExecutionContext) -> Result<SkillOutput> {
+        let count = conflict_count_from_input(&input)?;
+        if count > 0 {
+            return Err(anyhow!(
+                "merge conflicts remain unresolved after conflict resolution planning"
+            ));
+        }
+        Ok(SkillOutput::boolean(false))
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{commit_type, validate_structured_commit_message};
+    use super::{
+        commit_type, conflict_count_from_input, parse_auto_resolve_config,
+        protected_branch_policy_violation, validate_structured_commit_message,
+        ConflictResolutionStrategy,
+    };
+    use crate::skill::io::SkillInput;
+    use serde_json::json;
 
     #[test]
     fn commit_type_is_parsed_from_header() {
@@ -416,5 +761,86 @@ mod tests {
 
         let invalid = "invalid header\nno blank line";
         assert!(validate_structured_commit_message(invalid).is_err());
+    }
+
+    #[test]
+    fn conflict_count_extracts_from_json_payload() {
+        let input = SkillInput::Json(json!({
+            "conflicts": ["a.rs", "b.rs"],
+            "count": 2
+        }));
+        assert_eq!(conflict_count_from_input(&input).expect("count"), 2);
+    }
+
+    #[test]
+    fn conflict_count_extracts_from_boolean_payload() {
+        assert_eq!(
+            conflict_count_from_input(&SkillInput::Boolean(true)).expect("count"),
+            1
+        );
+        assert_eq!(
+            conflict_count_from_input(&SkillInput::Boolean(false)).expect("count"),
+            0
+        );
+    }
+
+    #[test]
+    fn auto_resolve_config_parses_json_text() {
+        let input = SkillInput::Text(
+            r#"{"strategy":"theirs","max_attempts":4,"analysis":{"count":2}}"#.to_string(),
+        );
+        let cfg = parse_auto_resolve_config(&input);
+        assert_eq!(cfg.strategy, ConflictResolutionStrategy::Theirs);
+        assert_eq!(cfg.max_attempts, 4);
+    }
+
+    #[test]
+    fn auto_resolve_config_defaults_when_invalid_or_missing() {
+        let cfg = parse_auto_resolve_config(&SkillInput::Text("not-json".to_string()));
+        assert_eq!(cfg.strategy, ConflictResolutionStrategy::Ours);
+        assert_eq!(cfg.max_attempts, 2);
+
+        let cfg = parse_auto_resolve_config(&SkillInput::Json(json!({
+            "strategy": "unknown",
+            "max_attempts": 999
+        })));
+        assert_eq!(cfg.strategy, ConflictResolutionStrategy::Ours);
+        assert_eq!(cfg.max_attempts, 5);
+    }
+
+    #[test]
+    fn protected_branch_policy_blocks_non_thread_source() {
+        let protected = vec!["main".to_string(), "master".to_string()];
+        let err = protected_branch_policy_violation(
+            "main",
+            "feature/login",
+            &protected,
+            "thread/",
+            false,
+        )
+        .expect("violation");
+        assert!(err.contains("target branch 'main' is protected"));
+        assert!(err.contains("feature/login"));
+    }
+
+    #[test]
+    fn protected_branch_policy_allows_thread_source_or_override() {
+        let protected = vec!["main".to_string()];
+        assert!(protected_branch_policy_violation(
+            "main",
+            "thread/abc",
+            &protected,
+            "thread/",
+            false
+        )
+        .is_none());
+        assert!(protected_branch_policy_violation(
+            "main",
+            "feature/abc",
+            &protected,
+            "thread/",
+            true
+        )
+        .is_none());
     }
 }

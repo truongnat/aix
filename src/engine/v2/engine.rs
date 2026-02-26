@@ -194,6 +194,15 @@ impl ExecutionEngineV2 {
                 state.last_error = None;
                 state.failure_class = None;
                 state.idempotent_short_circuit = false;
+                state.context_injected_items = 0;
+                state.estimated_cost_units = 0;
+                state.actual_cost_usd = 0.0;
+                state.input_tokens = 0;
+                state.output_tokens = 0;
+                state.total_tokens = 0;
+                state.provider = None;
+                state.model = None;
+                state.call_attempts = 0;
                 self.state_store.save(&mut instance)?;
 
                 let result = self
@@ -223,6 +232,15 @@ impl ExecutionEngineV2 {
                             state.last_error = None;
                             state.failure_class = None;
                             state.idempotent_short_circuit = outcome.idempotent_short_circuit;
+                            state.context_injected_items = outcome.context_injected_items;
+                            state.estimated_cost_units = outcome.estimated_cost_units;
+                            state.actual_cost_usd = outcome.actual_cost_usd;
+                            state.input_tokens = outcome.input_tokens;
+                            state.output_tokens = outcome.output_tokens;
+                            state.total_tokens = outcome.total_tokens;
+                            state.provider = outcome.provider.clone();
+                            state.model = outcome.model.clone();
+                            state.call_attempts = outcome.call_attempts;
                             state.status.clone()
                         };
                         instance.current_step = instance.current_step.saturating_add(1);
@@ -235,10 +253,16 @@ impl ExecutionEngineV2 {
                                 completed.insert(step.id.clone());
                                 instance.mark_completed_step(&step.id);
                                 instance.record_trace(format!(
-                                    "[{}] step '{}' {:?}",
+                                    "[{}] step '{}' {:?} context_items={} cost_units={} cost_usd={:.6} tokens={} provider={} model={}",
                                     now_ms(),
                                     step.id,
-                                    step_status
+                                    step_status,
+                                    outcome.context_injected_items,
+                                    outcome.estimated_cost_units,
+                                    outcome.actual_cost_usd,
+                                    outcome.total_tokens,
+                                    outcome.provider.as_deref().unwrap_or("-"),
+                                    outcome.model.as_deref().unwrap_or("-")
                                 ));
                             }
                             _ => {}

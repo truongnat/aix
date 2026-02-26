@@ -83,7 +83,7 @@ impl AgentSession {
         }
         if self.vector_index_handle.trim().is_empty() {
             return Err(anyhow!(
-                "Session vector index handle is empty; expected path under .agent/memory"
+                "Session vector index handle is empty; expected path under .agents/memory"
             ));
         }
         let orchestrator = GitBranchOrchestrator::new_with_policy(

@@ -39,7 +39,7 @@ Acceptance criteria:
 ### Layer 3: Domain Package System
 
 Scope:
-- project-local packages under `.agent/` (workflows, skills, rules, templates)
+- project-local packages under `.agents/` (workflows, skills, rules, templates)
 - markdown-only definitions for portability and reviewability
 
 Acceptance criteria:

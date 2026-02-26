@@ -8,7 +8,7 @@ use std::sync::Arc;
 #[allow(dead_code)]
 pub fn load_skills() -> Result<DomainRegistry> {
     let mut domains = DomainRegistry::new();
-    let path = Path::new(".agent/skills");
+    let path = Path::new(".agents/skills");
     if !path.exists() {
         return Ok(domains);
     }
@@ -20,7 +20,7 @@ pub fn load_skills() -> Result<DomainRegistry> {
         }
         let content = fs::read_to_string(entry.path())?;
         let Ok((meta, body)) = parse_skill_markdown(&content) else {
-            // Ignore non-skill markdown files in .agent/skills.
+            // Ignore non-skill markdown files in .agents/skills.
             continue;
         };
 

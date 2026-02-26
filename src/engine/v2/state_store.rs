@@ -64,7 +64,7 @@ pub struct WorkflowStateStore {
 
 impl WorkflowStateStore {
     pub fn new(project_root: &str) -> Result<Self> {
-        let state_dir = Path::new(project_root).join(".agent").join("state");
+        let state_dir = Path::new(project_root).join(".agents").join("state");
         std::fs::create_dir_all(&state_dir)?;
         Ok(Self { state_dir })
     }
@@ -355,7 +355,7 @@ mod tests {
         let root = temp_root("agentic-sdlc-v2-stale-lock");
         let store = WorkflowStateStore::new(root.to_str().expect("path")).expect("store");
 
-        let lock_path = root.join(".agent").join("state").join("repo.lock");
+        let lock_path = root.join(".agents").join("state").join("repo.lock");
         let stale = LockFileMetadata {
             scope: "repo".to_string(),
             pid: 999_999,
@@ -380,7 +380,7 @@ mod tests {
         let root = temp_root("agentic-sdlc-v2-active-lock");
         let store = WorkflowStateStore::new(root.to_str().expect("path")).expect("store");
 
-        let lock_path = root.join(".agent").join("state").join("repo.lock");
+        let lock_path = root.join(".agents").join("state").join("repo.lock");
         let active = LockFileMetadata {
             scope: "repo".to_string(),
             pid: std::process::id(),

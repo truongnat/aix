@@ -38,11 +38,11 @@ Contract:
 
 Examples:
 - `write_file` short-circuits when target file already contains expected content
-- `run_script` short-circuits validation-like commands via idempotency marker files under `.agent/state/idempotency/`
+- `run_script` short-circuits validation-like commands via idempotency marker files under `.agents/state/idempotency/`
 
 ## Crash Recovery Semantics
 
-Workflow state is persisted in `.agent/state/<instance_id>.json` and updated atomically via temp-file rename.
+Workflow state is persisted in `.agents/state/<instance_id>.json` and updated atomically via temp-file rename.
 
 Resume behavior:
 - load persisted instance
@@ -57,8 +57,8 @@ Failure modes:
 ## Lock Model
 
 Two lock scopes protect execution:
-- repo lock: `.agent/state/repo.lock`
-- workflow instance lock: `.agent/state/<instance_id>.lock`
+- repo lock: `.agents/state/repo.lock`
+- workflow instance lock: `.agents/state/<instance_id>.lock`
 
 Lock behavior:
 - lock file is created with metadata (`pid`, host, start time)

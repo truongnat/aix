@@ -13,9 +13,10 @@ use std::path::{Path, PathBuf};
 #[derive(Debug, Clone)]
 pub struct AgentProjectLayout {
     pub project_root: String,
-    pub agent_root: PathBuf,
+    pub agents_root: PathBuf,
     pub workflows_dir: PathBuf,
     pub skills_dir: PathBuf,
+    pub roles_dir: PathBuf,
     pub rules_dir: PathBuf,
     pub templates_dir: PathBuf,
     pub memory_dir: PathBuf,
@@ -72,7 +73,11 @@ pub struct ProjectMergeRules {
     pub require_validation_before_merge: Option<bool>,
     pub analyze_conflicts: Option<bool>,
     pub auto_conflict_resolution_assist: Option<bool>,
+    pub auto_conflict_resolution_strategy: Option<String>,
+    pub auto_conflict_resolution_max_attempts: Option<u32>,
     pub delete_feature_branch_after_merge: Option<bool>,
+    pub protected_branches: Option<Vec<String>>,
+    pub require_rebase_before_merge: Option<bool>,
 }
 
 impl AgentProjectLayout {
@@ -96,18 +101,20 @@ impl AgentProjectLayout {
             return Err(anyhow!("Project root does not exist: {}", project_root));
         }
 
-        let agent_root = root.join(".agent");
-        let workflows_dir = agent_root.join("workflows");
-        let skills_dir = agent_root.join("skills");
-        let rules_dir = agent_root.join("rules");
-        let templates_dir = agent_root.join("templates");
-        let memory_dir = agent_root.join("memory");
+        let agents_root = root.join(".agents");
+        let workflows_dir = agents_root.join("workflows");
+        let skills_dir = agents_root.join("skills");
+        let roles_dir = agents_root.join("roles");
+        let rules_dir = agents_root.join("rules");
+        let templates_dir = agents_root.join("templates");
+        let memory_dir = agents_root.join("memory");
 
         let mut layout = Self {
             project_root: project_root.to_string(),
-            agent_root,
+            agents_root,
             workflows_dir,
             skills_dir,
+            roles_dir,
             rules_dir,
             templates_dir,
             memory_dir,
@@ -119,8 +126,10 @@ impl AgentProjectLayout {
     }
 
     pub fn ensure_layout(&self) -> Result<()> {
+        fs::create_dir_all(&self.agents_root)?;
         fs::create_dir_all(&self.workflows_dir)?;
         fs::create_dir_all(&self.skills_dir)?;
+        fs::create_dir_all(&self.roles_dir)?;
         fs::create_dir_all(&self.rules_dir)?;
         fs::create_dir_all(&self.templates_dir)?;
         fs::create_dir_all(&self.memory_dir)?;
@@ -160,10 +169,10 @@ impl AgentProjectLayout {
                 self.project_root
             ));
         }
-        if !self.agent_root.starts_with(root) {
+        if !self.agents_root.starts_with(root) {
             return Err(anyhow!(
-                "Agent root '{}' escapes project root '{}'",
-                self.agent_root.display(),
+                "Agents root '{}' escapes project root '{}'",
+                self.agents_root.display(),
                 root.display()
             ));
         }
@@ -189,6 +198,23 @@ impl AgentProjectLayout {
             return Some(as_path.to_path_buf());
         }
         self.loaded_workflows.get(workflow_ref).cloned()
+    }
+
+    pub fn resolve_template_path(&self, template_ref: &str) -> Option<PathBuf> {
+        let as_path = Path::new(template_ref);
+        if as_path.exists() {
+            return Some(as_path.to_path_buf());
+        }
+
+        let candidate = if template_ref.to_ascii_lowercase().ends_with(".md") {
+            self.templates_dir.join(template_ref)
+        } else {
+            self.templates_dir.join(format!("{}.md", template_ref))
+        };
+        if candidate.exists() {
+            return Some(candidate);
+        }
+        None
     }
 
     pub fn load_runtime_rules(&self) -> Result<ProjectRuntimeRules> {
@@ -379,6 +405,7 @@ mod tests {
         let layout = AgentProjectLayout::discover(root).expect("discover");
         assert!(layout.workflows_dir.exists());
         assert!(layout.skills_dir.exists());
+        assert!(layout.roles_dir.exists());
         assert!(layout.rules_dir.exists());
         assert!(layout.templates_dir.exists());
         assert!(layout.memory_dir.exists());
@@ -395,7 +422,7 @@ mod tests {
                 .as_nanos()
         );
         let root_path = std::env::temp_dir().join(unique);
-        let rules_dir = root_path.join(".agent").join("rules");
+        let rules_dir = root_path.join(".agents").join("rules");
         std::fs::create_dir_all(&rules_dir).expect("rules dir");
         std::fs::write(
             rules_dir.join("branching_rules.md"),
@@ -430,7 +457,9 @@ mod tests {
 ```json
 {
   "require_validation_before_merge": true,
-  "delete_feature_branch_after_merge": true
+  "delete_feature_branch_after_merge": true,
+  "protected_branches": ["main", "master"],
+  "require_rebase_before_merge": true
 }
 ```
 "#,
@@ -446,6 +475,53 @@ mod tests {
         assert_eq!(branching.prefix.as_deref(), Some("feat/"));
         assert_eq!(coding.require_structured_commit_message, Some(true));
         assert_eq!(merge.require_validation_before_merge, Some(true));
+        assert_eq!(
+            merge.protected_branches,
+            Some(vec!["main".to_string(), "master".to_string()])
+        );
+        assert_eq!(merge.require_rebase_before_merge, Some(true));
+
+        let _ = std::fs::remove_dir_all(root_path);
+    }
+
+    #[test]
+    fn resolves_template_by_id_with_optional_extension() {
+        let unique = format!(
+            "agentic-sdlc-template-path-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root_path = std::env::temp_dir().join(unique);
+        let templates_dir = root_path.join(".agents").join("templates");
+        std::fs::create_dir_all(&templates_dir).expect("templates dir");
+        std::fs::write(
+            templates_dir.join("feature_prompt.md"),
+            "feature prompt body",
+        )
+        .expect("write template");
+
+        let layout = AgentProjectLayout::discover(root_path.to_str().expect("tmp path"))
+            .expect("discover project");
+
+        assert_eq!(
+            layout
+                .resolve_template_path("feature_prompt")
+                .expect("resolve by id")
+                .file_name()
+                .and_then(|v| v.to_str()),
+            Some("feature_prompt.md")
+        );
+        assert_eq!(
+            layout
+                .resolve_template_path("feature_prompt.md")
+                .expect("resolve by filename")
+                .file_name()
+                .and_then(|v| v.to_str()),
+            Some("feature_prompt.md")
+        );
+        assert!(layout.resolve_template_path("missing_prompt").is_none());
 
         let _ = std::fs::remove_dir_all(root_path);
     }

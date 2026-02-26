@@ -33,4 +33,6 @@ dist-ssr
 /local_tmp
 
 # Runtime artifacts
-/.agent/state
+/.agents/state
+/.agents/sandbox
+/.agents/memory/experiences.json

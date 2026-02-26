@@ -1374,7 +1374,7 @@ impl Executor {
 
             // If success is high, learn from it
             if report.score >= 7 {
-                let store = ExperienceStore::new(".agent/memory/experiences.json");
+                let store = ExperienceStore::new(".agents/memory/experiences.json");
                 let entry = ExperienceEntry {
                     objective: goal.to_string(),
                     sub_goals: sub_goals.clone(),

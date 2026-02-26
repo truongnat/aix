@@ -1,6 +1,7 @@
 use crate::engine::budget::ExecutionBudget;
 use crate::engine::condition::evaluate_condition;
 use crate::engine::context::ExecutionContext;
+use crate::engine::context_service::{ContextService, DeterministicContextService};
 use crate::engine::registry::DomainRegistry;
 use crate::engine::routing::RoutingPolicy;
 use crate::engine::security::{DomainSecurityPolicy, SecurityViolationError};
@@ -10,6 +11,7 @@ use crate::skill::capability::CapabilityPermissions;
 use crate::skill::io::SkillOutput;
 use crate::workflow::model::{Workflow, WorkflowStep};
 use anyhow::{anyhow, Result};
+use serde_json::Value;
 use std::collections::HashSet;
 use std::sync::Arc;
 use tokio::time::{sleep, timeout, Duration};
@@ -19,16 +21,40 @@ pub struct StepExecutionOutcome {
     pub attempts: u32,
     pub status: StepExecutionStatus,
     pub idempotent_short_circuit: bool,
+    pub context_injected_items: u32,
+    pub estimated_cost_units: u32,
+    pub actual_cost_usd: f64,
+    pub input_tokens: u32,
+    pub output_tokens: u32,
+    pub total_tokens: u32,
+    pub provider: Option<String>,
+    pub model: Option<String>,
+    pub call_attempts: u32,
 }
 
 #[derive(Clone)]
 pub struct StepExecutor {
     domain_registry: Arc<DomainRegistry>,
+    context_service: Arc<dyn ContextService>,
 }
 
 impl StepExecutor {
     pub fn new(domain_registry: Arc<DomainRegistry>) -> Self {
-        Self { domain_registry }
+        Self {
+            domain_registry,
+            context_service: Arc::new(DeterministicContextService::default()),
+        }
+    }
+
+    #[cfg(test)]
+    pub fn with_context_service(
+        domain_registry: Arc<DomainRegistry>,
+        context_service: Arc<dyn ContextService>,
+    ) -> Self {
+        Self {
+            domain_registry,
+            context_service,
+        }
     }
 
     pub fn validate_workflow(&self, workflow: &Workflow) -> Result<()> {
@@ -60,6 +86,15 @@ impl StepExecutor {
                     attempts: 0,
                     status: StepExecutionStatus::Skipped,
                     idempotent_short_circuit: false,
+                    context_injected_items: 0,
+                    estimated_cost_units: 0,
+                    actual_cost_usd: 0.0,
+                    input_tokens: 0,
+                    output_tokens: 0,
+                    total_tokens: 0,
+                    provider: None,
+                    model: None,
+                    call_attempts: 0,
                 });
             }
         }
@@ -108,6 +143,15 @@ impl StepExecutor {
             &instance.step_results,
             &completed_set,
         )?;
+        let injected = self.context_service.inject(
+            workflow,
+            step,
+            instance,
+            &qualified.canonical_id(),
+            resolved_input,
+        )?;
+        let context_injected_items = injected.injected_items;
+        let resolved_input = injected.input;
         if skill.is_idempotent() {
             let mut probe_ctx = self.build_context(
                 workflow,
@@ -126,6 +170,15 @@ impl StepExecutor {
                     attempts: 0,
                     status: StepExecutionStatus::Succeeded,
                     idempotent_short_circuit: true,
+                    context_injected_items,
+                    estimated_cost_units: 0,
+                    actual_cost_usd: 0.0,
+                    input_tokens: 0,
+                    output_tokens: 0,
+                    total_tokens: 0,
+                    provider: None,
+                    model: None,
+                    call_attempts: 0,
                 });
             }
         }
@@ -154,11 +207,21 @@ impl StepExecutor {
             match result {
                 Ok(Ok(output)) => {
                     let _ = ctx.record_time_usage(now_ms().saturating_sub(started), 0);
+                    let telemetry = extract_output_telemetry(&output);
                     return Ok(StepExecutionOutcome {
                         output,
                         attempts,
                         status: StepExecutionStatus::Succeeded,
                         idempotent_short_circuit: false,
+                        context_injected_items,
+                        estimated_cost_units: capability.estimated_cost.saturating_mul(attempts),
+                        actual_cost_usd: telemetry.actual_cost_usd,
+                        input_tokens: telemetry.input_tokens,
+                        output_tokens: telemetry.output_tokens,
+                        total_tokens: telemetry.total_tokens,
+                        provider: telemetry.provider,
+                        model: telemetry.model,
+                        call_attempts: telemetry.call_attempts.unwrap_or(attempts),
                     });
                 }
                 Ok(Err(err)) => {
@@ -215,11 +278,71 @@ impl StepExecutor {
     }
 }
 
+#[derive(Debug, Default)]
+struct OutputTelemetry {
+    actual_cost_usd: f64,
+    input_tokens: u32,
+    output_tokens: u32,
+    total_tokens: u32,
+    provider: Option<String>,
+    model: Option<String>,
+    call_attempts: Option<u32>,
+}
+
+fn extract_output_telemetry(output: &SkillOutput) -> OutputTelemetry {
+    let SkillOutput::Json(value) = output else {
+        return OutputTelemetry::default();
+    };
+    let mut telemetry = OutputTelemetry::default();
+    telemetry.provider = value
+        .get("provider")
+        .and_then(Value::as_str)
+        .map(|v| v.to_string());
+    telemetry.model = value
+        .get("model")
+        .and_then(Value::as_str)
+        .map(|v| v.to_string());
+    telemetry.call_attempts = value
+        .get("router")
+        .and_then(|v| v.get("attempts"))
+        .and_then(Value::as_u64)
+        .and_then(|v| u32::try_from(v).ok());
+    telemetry.actual_cost_usd = value
+        .get("cost")
+        .and_then(|v| v.get("estimated_usd"))
+        .and_then(Value::as_f64)
+        .unwrap_or(0.0_f64);
+    telemetry.input_tokens = value
+        .get("usage")
+        .and_then(|v| v.get("input_tokens"))
+        .and_then(Value::as_u64)
+        .and_then(|v| u32::try_from(v).ok())
+        .unwrap_or(0);
+    telemetry.output_tokens = value
+        .get("usage")
+        .and_then(|v| v.get("output_tokens"))
+        .and_then(Value::as_u64)
+        .and_then(|v| u32::try_from(v).ok())
+        .unwrap_or(0);
+    telemetry.total_tokens = value
+        .get("usage")
+        .and_then(|v| v.get("total_tokens"))
+        .and_then(Value::as_u64)
+        .and_then(|v| u32::try_from(v).ok())
+        .unwrap_or(
+            telemetry
+                .input_tokens
+                .saturating_add(telemetry.output_tokens),
+        );
+    telemetry
+}
+
 #[cfg(test)]
 mod tests {
     use super::StepExecutor;
     use crate::engine::budget::ExecutionBudget;
     use crate::engine::context::ExecutionContext;
+    use crate::engine::context_service::{ContextInjectionResult, ContextService};
     use crate::engine::registry::DomainRegistry;
     use crate::engine::routing::RoutingPolicy;
     use crate::engine::security::DomainSecurityPolicy;
@@ -232,6 +355,7 @@ mod tests {
     use crate::workflow::model::{FailureStrategy, Workflow, WorkflowMeta, WorkflowStep};
     use anyhow::{anyhow, Result};
     use async_trait::async_trait;
+    use std::collections::HashMap;
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::Arc;
 
@@ -268,6 +392,34 @@ mod tests {
                 return Err(anyhow!("forced failure"));
             }
             Ok(SkillOutput::text("ok"))
+        }
+    }
+
+    #[derive(Default)]
+    struct CountingContextService {
+        calls: AtomicUsize,
+    }
+
+    impl CountingContextService {
+        fn call_count(&self) -> usize {
+            self.calls.load(Ordering::SeqCst)
+        }
+    }
+
+    impl ContextService for CountingContextService {
+        fn inject(
+            &self,
+            _workflow: &Workflow,
+            _step: &WorkflowStep,
+            _instance: &WorkflowInstance,
+            _qualified_skill_name: &str,
+            input: SkillInput,
+        ) -> Result<ContextInjectionResult> {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            Ok(ContextInjectionResult {
+                input,
+                injected_items: 1,
+            })
         }
     }
 
@@ -327,5 +479,66 @@ mod tests {
             crate::engine::v2::instance::StepExecutionStatus::Succeeded
         );
         assert_eq!(out.attempts, 3);
+    }
+
+    #[tokio::test]
+    async fn uses_custom_context_service_when_configured() {
+        let mut registry = DomainRegistry::new();
+        registry.register_domain("demo");
+        registry
+            .register_skill(
+                "demo",
+                Arc::new(RetrySkill {
+                    fail_times: 0,
+                    calls: Arc::new(AtomicUsize::new(0)),
+                }),
+            )
+            .expect("register");
+
+        let context_service = Arc::new(CountingContextService::default());
+        let context_service_dyn: Arc<dyn ContextService> = context_service.clone();
+        let executor = StepExecutor::with_context_service(Arc::new(registry), context_service_dyn);
+
+        let workflow = Workflow {
+            meta: WorkflowMeta {
+                name: "ctx".to_string(),
+                domain: Some("demo".to_string()),
+                goal: None,
+                target_type: None,
+                routing_policy: Some(RoutingPolicy::for_single_domain("demo")),
+                security_policy: Some(DomainSecurityPolicy::default()),
+                resource_budget: None,
+                projected_cost: None,
+                projected_latency_ms: None,
+                projected_steps: None,
+            },
+            steps: vec![WorkflowStep {
+                id: "s1".to_string(),
+                skill: "demo.retry".to_string(),
+                input: "payload".to_string(),
+                depends_on: Vec::new(),
+                condition: None,
+                retry: None,
+                on_failure: FailureStrategy::FailFast,
+            }],
+        };
+
+        let mut instance = WorkflowInstance::new(&workflow, None);
+        instance.step_results = HashMap::new();
+
+        let out = executor
+            .execute_step(
+                &workflow,
+                &workflow.steps[0],
+                &instance,
+                &ExecutionBudget::default(),
+                &RoutingPolicy::for_single_domain("demo"),
+                &DomainSecurityPolicy::default(),
+            )
+            .await
+            .expect("step success");
+
+        assert_eq!(out.context_injected_items, 1);
+        assert_eq!(context_service.call_count(), 1);
     }
 }

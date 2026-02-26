@@ -95,7 +95,7 @@ pub struct SubprocessBackend {
 
 impl Default for SubprocessBackend {
     fn default() -> Self {
-        Self::new(".agent/sandbox/subprocess")
+        Self::new(".agents/sandbox/subprocess")
     }
 }
 

@@ -8,4 +8,5 @@ pub mod llm_subagent;
 pub mod loader;
 pub mod model;
 pub mod parse_number;
+pub mod role_loader;
 pub mod vector_memory;

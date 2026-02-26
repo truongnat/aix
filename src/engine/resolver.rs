@@ -58,12 +58,7 @@ pub fn resolve_input(
             }
 
             let output = step_results.get(*reference).unwrap();
-            let text = output.as_text().ok_or_else(|| {
-                anyhow!(
-                    "Cannot interpolate non-text output from step '{}' into a string",
-                    reference
-                )
-            })?;
+            let text = skill_output_to_interpolated_text(output);
 
             resolved = format!("{}{}{}", &resolved[..start], text, &resolved[end + 2..]);
             start_idx = start;
@@ -73,4 +68,29 @@ pub fn resolve_input(
     }
 
     Ok(SkillInput::Text(resolved))
+}
+
+fn skill_output_to_interpolated_text(output: &SkillOutput) -> String {
+    match output {
+        SkillOutput::Text(value) => value.clone(),
+        SkillOutput::Json(value) => value.to_string(),
+        SkillOutput::Number(value) => value.to_string(),
+        SkillOutput::Boolean(value) => value.to_string(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::resolve_input;
+    use crate::skill::io::SkillOutput;
+    use serde_json::json;
+    use std::collections::{HashMap, HashSet};
+
+    #[test]
+    fn interpolation_supports_json_output_by_stringifying() {
+        let results = HashMap::from([("scan".to_string(), SkillOutput::json(json!({"count": 2})))]);
+        let completed = HashSet::from(["scan".to_string()]);
+        let resolved = resolve_input("conflicts={{scan}}", &results, &completed).expect("resolve");
+        assert_eq!(resolved.as_text(), Some("conflicts={\"count\":2}"));
+    }
 }

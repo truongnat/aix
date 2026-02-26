@@ -1,9 +1,10 @@
+use crate::engine::package_schema::{validate_schema_header, PackageMarkdownKind};
 use crate::engine::project::AgentProjectLayout;
 use crate::skills::loader::parse_skill_markdown;
-use crate::workflow::loader::load_workflow;
+use crate::skills::role_loader::{parse_role_markdown, resolve_role_path};
+use crate::workflow::loader::parse_markdown_content;
 use anyhow::Result;
 use serde::Serialize;
-use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
 
@@ -45,6 +46,7 @@ pub fn run_package_check(layout: &AgentProjectLayout) -> Result<PackageCheckRepo
     check_workflows(layout, &mut report)?;
     check_rules(layout, &mut report)?;
     check_skills(layout, &mut report)?;
+    check_roles(layout, &mut report)?;
     Ok(report)
 }
 
@@ -60,15 +62,28 @@ fn check_workflows(layout: &AgentProjectLayout, report: &mut PackageCheckReport)
             ExtensionKind::Markdown => {
                 workflow_count = workflow_count.saturating_add(1);
                 report.checked_files = report.checked_files.saturating_add(1);
-                let Some(path_str) = path.to_str() else {
-                    report.error(
-                        path.display().to_string(),
-                        "Workflow path contains invalid UTF-8",
-                    );
-                    continue;
+                let content = match fs::read_to_string(&path) {
+                    Ok(body) => body,
+                    Err(err) => {
+                        report.error(path.display().to_string(), err.to_string());
+                        continue;
+                    }
                 };
-                if let Err(err) = load_workflow(path_str) {
+                if let Err(err) = validate_required_description_frontmatter(&content) {
                     report.error(path.display().to_string(), err.to_string());
+                    continue;
+                }
+                if let Err(err) = validate_schema_header(&content, PackageMarkdownKind::Workflow) {
+                    report.error(path.display().to_string(), err.to_string());
+                    continue;
+                }
+                match parse_markdown_content(&content) {
+                    Ok(workflow) => {
+                        check_workflow_role_references(layout, &path, &workflow, report);
+                    }
+                    Err(err) => {
+                        report.error(path.display().to_string(), err.to_string());
+                    }
                 }
             }
             ExtensionKind::Yaml => report.error(
@@ -84,38 +99,74 @@ fn check_workflows(layout: &AgentProjectLayout, report: &mut PackageCheckReport)
     if workflow_count == 0 {
         report.warning(
             layout.workflows_dir.display().to_string(),
-            "No workflow files found under .agent/workflows",
+            "No workflow files found under .agents/workflows",
         );
     }
     Ok(())
 }
 
-fn check_rules(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> Result<()> {
-    let required_files = HashSet::from([
-        "runtime.md",
-        "branching_rules.md",
-        "coding_rules.md",
-        "merge_rules.md",
-    ]);
+fn check_workflow_role_references(
+    layout: &AgentProjectLayout,
+    workflow_path: &Path,
+    workflow: &crate::workflow::model::Workflow,
+    report: &mut PackageCheckReport,
+) {
+    for step in &workflow.steps {
+        if !is_llm_subagent_skill(&step.skill) {
+            continue;
+        }
+        let Some(role_ref) = extract_role_reference(&step.input) else {
+            continue;
+        };
+        if resolve_role_path(&role_ref, &layout.roles_dir).is_none() {
+            report.error(
+                workflow_path.display().to_string(),
+                format!(
+                    "Step '{}' references missing role '{}'. Expected role markdown under .agents/roles",
+                    step.id, role_ref
+                ),
+            );
+        }
+    }
+}
 
+fn is_llm_subagent_skill(skill_ref: &str) -> bool {
+    let normalized = skill_ref.trim().to_ascii_lowercase();
+    normalized == "llm_subagent" || normalized.ends_with(".llm_subagent")
+}
+
+fn extract_role_reference(input: &str) -> Option<String> {
+    let (role_ref, _) = input.split_once(":::")?;
+    let role_ref = role_ref.trim();
+    if role_ref.is_empty() {
+        return None;
+    }
+    Some(role_ref.to_string())
+}
+
+fn check_rules(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> Result<()> {
     for entry in fs::read_dir(&layout.rules_dir)? {
         let entry = entry?;
         let path = entry.path();
         if !path.is_file() {
             continue;
         }
-        let file_name = path
-            .file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or_default()
-            .to_string();
         match extension_kind(&path) {
             ExtensionKind::Markdown => {
-                if !required_files.contains(file_name.as_str()) {
-                    report.warning(
-                        path.display().to_string(),
-                        "Unknown rule markdown file (ignored by runtime)",
-                    );
+                let content = match fs::read_to_string(&path) {
+                    Ok(body) => body,
+                    Err(err) => {
+                        report.error(path.display().to_string(), err.to_string());
+                        continue;
+                    }
+                };
+                if let Err(err) = validate_required_description_frontmatter(&content) {
+                    report.error(path.display().to_string(), err.to_string());
+                    continue;
+                }
+                if let Err(err) = validate_schema_header(&content, PackageMarkdownKind::Rule) {
+                    report.error(path.display().to_string(), err.to_string());
+                    continue;
                 }
             }
             ExtensionKind::Yaml => report.error(
@@ -164,7 +215,14 @@ fn check_rules(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> 
 
     let merge = layout.rules_dir.join("merge_rules.md");
     if !merge.exists() {
-        report.error(merge.display().to_string(), "Missing required rule file");
+        report.error(
+            layout
+                .rules_dir
+                .join("merge_rules.md")
+                .display()
+                .to_string(),
+            "Missing required rule file",
+        );
     } else {
         report.checked_files = report.checked_files.saturating_add(1);
         if let Err(err) = layout.load_merge_rules() {
@@ -194,6 +252,10 @@ fn check_skills(layout: &AgentProjectLayout, report: &mut PackageCheckReport) ->
                         continue;
                     }
                 };
+                if let Err(err) = validate_schema_header(&content, PackageMarkdownKind::Skill) {
+                    report.error(path.display().to_string(), err.to_string());
+                    continue;
+                }
                 if let Err(err) = parse_skill_markdown(&content) {
                     report.error(path.display().to_string(), err.to_string());
                 }
@@ -211,7 +273,54 @@ fn check_skills(layout: &AgentProjectLayout, report: &mut PackageCheckReport) ->
     if skill_count == 0 {
         report.warning(
             layout.skills_dir.display().to_string(),
-            "No custom skills found under .agent/skills",
+            "No custom skills found under .agents/skills",
+        );
+    }
+    Ok(())
+}
+
+fn check_roles(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> Result<()> {
+    let mut role_count = 0usize;
+    for entry in fs::read_dir(&layout.roles_dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        match extension_kind(&path) {
+            ExtensionKind::Markdown => {
+                role_count = role_count.saturating_add(1);
+                report.checked_files = report.checked_files.saturating_add(1);
+                let content = match fs::read_to_string(&path) {
+                    Ok(body) => body,
+                    Err(err) => {
+                        report.error(path.display().to_string(), err.to_string());
+                        continue;
+                    }
+                };
+                if let Err(err) = validate_schema_header(&content, PackageMarkdownKind::Role) {
+                    report.error(path.display().to_string(), err.to_string());
+                    continue;
+                }
+                let fallback_name = path.file_stem().and_then(|v| v.to_str());
+                if let Err(err) = parse_role_markdown(&content, fallback_name) {
+                    report.error(path.display().to_string(), err.to_string());
+                }
+            }
+            ExtensionKind::Yaml => report.error(
+                path.display().to_string(),
+                "YAML files are not supported for roles; convert to Markdown",
+            ),
+            ExtensionKind::Other => report.error(
+                path.display().to_string(),
+                "Unsupported role file extension; expected .md",
+            ),
+        }
+    }
+    if role_count == 0 {
+        report.warning(
+            layout.roles_dir.display().to_string(),
+            "No role files found under .agents/roles",
         );
     }
     Ok(())
@@ -221,6 +330,38 @@ enum ExtensionKind {
     Markdown,
     Yaml,
     Other,
+}
+
+fn validate_required_description_frontmatter(content: &str) -> Result<()> {
+    let mut lines = content.lines();
+    let Some(first) = lines.next() else {
+        return Err(anyhow::anyhow!(
+            "Missing frontmatter: expected leading '---' block with description"
+        ));
+    };
+    if first.trim() != "---" {
+        return Err(anyhow::anyhow!(
+            "Missing frontmatter: expected leading '---' block with description"
+        ));
+    }
+    let mut found_description = false;
+    for line in lines {
+        let trimmed = line.trim();
+        if trimmed == "---" {
+            break;
+        }
+        if let Some(value) = trimmed.strip_prefix("description:") {
+            if !value.trim().is_empty() {
+                found_description = true;
+            }
+        }
+    }
+    if !found_description {
+        return Err(anyhow::anyhow!(
+            "Frontmatter field 'description' is required and must be non-empty"
+        ));
+    }
+    Ok(())
 }
 
 fn extension_kind(path: &Path) -> ExtensionKind {
@@ -257,35 +398,46 @@ mod tests {
     }
 
     fn write_minimal_valid_package(root: &std::path::Path) {
-        let workflows = root.join(".agent").join("workflows");
-        let rules = root.join(".agent").join("rules");
-        let skills = root.join(".agent").join("skills");
+        let workflows = root.join(".agents").join("workflows");
+        let rules = root.join(".agents").join("rules");
+        let skills = root.join(".agents").join("skills");
+        let roles = root.join(".agents").join("roles");
         std::fs::create_dir_all(&workflows).expect("workflows");
         std::fs::create_dir_all(&rules).expect("rules");
         std::fs::create_dir_all(&skills).expect("skills");
+        std::fs::create_dir_all(&roles).expect("roles");
 
         std::fs::write(
             workflows.join("w.md"),
-            "# Workflow: w\nDomain: demo\n\n## Step: s1\nSkill: demo.echo\nInput: hi\n",
+            "---\ndescription: minimal valid workflow\n---\n# Workflow: w\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::draft implementation plan\n",
         )
         .expect("workflow");
 
-        std::fs::write(rules.join("runtime.md"), "# Runtime\n```json\n{}\n```\n").expect("runtime");
+        std::fs::write(
+            rules.join("runtime.md"),
+            "---\ndescription: runtime rules\ntrigger: always_on\n---\n# Runtime\nSchema: antigrav.rule@v1\n```json\n{}\n```\n",
+        )
+        .expect("runtime");
         std::fs::write(
             rules.join("branching_rules.md"),
-            "# Branch\n```json\n{}\n```\n",
+            "---\ndescription: branching rules\ntrigger: always_on\n---\n# Branch\nSchema: antigrav.rule@v1\n```json\n{}\n```\n",
         )
         .expect("branching");
         std::fs::write(
             rules.join("coding_rules.md"),
-            "# Coding\n```json\n{}\n```\n",
+            "---\ndescription: coding rules\ntrigger: always_on\n---\n# Coding\nSchema: antigrav.rule@v1\n```json\n{}\n```\n",
         )
         .expect("coding");
-        std::fs::write(rules.join("merge_rules.md"), "# Merge\n```json\n{}\n```\n").expect("merge");
+        std::fs::write(
+            rules.join("merge_rules.md"),
+            "---\ndescription: merge rules\ntrigger: always_on\n---\n# Merge\nSchema: antigrav.rule@v1\n```json\n{}\n```\n",
+        )
+        .expect("merge");
 
         std::fs::write(
             skills.join("s.md"),
             r#"# Skill: sample
+Schema: antigrav.skill@v1
 ```json
 {"name":"sample","domain":"agent","executor":"ollama","model":"qwen3:8b"}
 ```
@@ -293,6 +445,18 @@ body
 "#,
         )
         .expect("skill");
+
+        std::fs::write(
+            roles.join("architect.md"),
+            r#"# Role: architect
+Schema: antigrav.role@v1
+```json
+{"name":"architect","provider":"ollama","model":"qwen3:8b","temperature":0.1}
+```
+Create deterministic and minimal implementation plans.
+"#,
+        )
+        .expect("role");
     }
 
     #[test]
@@ -312,7 +476,7 @@ body
         let root = temp_root("agentic-sdlc-package-check-yaml");
         write_minimal_valid_package(&root);
         std::fs::write(
-            root.join(".agent").join("workflows").join("legacy.yaml"),
+            root.join(".agents").join("workflows").join("legacy.yaml"),
             "id: legacy\nsteps: []\n",
         )
         .expect("yaml workflow");
@@ -324,6 +488,52 @@ body
                 && issue
                     .message
                     .contains("YAML files are not supported for workflows")
+        }));
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn package_check_rejects_missing_role_reference_in_workflow() {
+        let root = temp_root("agentic-sdlc-package-check-missing-role");
+        write_minimal_valid_package(&root);
+        std::fs::write(
+            root.join(".agents").join("workflows").join("missing_role.md"),
+            "---\ndescription: workflow referencing missing role\n---\n# Workflow: missing-role\nSchema: antigrav.workflow@v1\nDomain: agent\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: missing_role:::investigate bug\n",
+        )
+        .expect("workflow");
+
+        let layout = AgentProjectLayout::discover(root.to_str().expect("path")).expect("layout");
+        let report = run_package_check(&layout).expect("check");
+        assert!(report.errors.iter().any(|issue| {
+            issue.path.ends_with("missing_role.md")
+                && issue
+                    .message
+                    .contains("references missing role 'missing_role'")
+        }));
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn package_check_rejects_missing_schema_header() {
+        let root = temp_root("agentic-sdlc-package-check-missing-schema");
+        write_minimal_valid_package(&root);
+        std::fs::write(
+            root.join(".agents").join("skills").join("invalid.md"),
+            r#"# Skill: invalid
+```json
+{"name":"invalid","domain":"agent","executor":"ollama","model":"qwen3:8b"}
+```
+body
+"#,
+        )
+        .expect("invalid skill");
+
+        let layout = AgentProjectLayout::discover(root.to_str().expect("path")).expect("layout");
+        let report = run_package_check(&layout).expect("check");
+        assert!(report.errors.iter().any(|issue| {
+            issue.path.ends_with("invalid.md") && issue.message.contains("Missing schema header")
         }));
 
         let _ = std::fs::remove_dir_all(root);

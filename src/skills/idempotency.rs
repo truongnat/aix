@@ -40,7 +40,7 @@ pub fn save_marker(skill_name: &str, key: &str, output: &SkillOutput) -> Result<
 
 fn marker_path(skill_name: &str, key: &str) -> Result<PathBuf> {
     let cwd = std::env::current_dir()?;
-    let dir = cwd.join(".agent").join("state").join("idempotency");
+    let dir = cwd.join(".agents").join("state").join("idempotency");
     let skill_safe = skill_name
         .chars()
         .map(|ch| match ch {
