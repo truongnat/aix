@@ -1,0 +1,43 @@
+---
+const steps = [
+  {
+    id: '01',
+    title: 'Author Workflow Intent',
+    body: 'Define goals in markdown workflows, roles, and skills with explicit operating constraints.'
+  },
+  {
+    id: '02',
+    title: 'Run Under Guardrails',
+    body: 'Execute through policy gates for trust tier, command safety, and resource budgets.'
+  },
+  {
+    id: '03',
+    title: 'Observe Every Transition',
+    body: 'Track state, logs, and costs with deterministic trace IDs for each execution step.'
+  },
+  {
+    id: '04',
+    title: 'Resume And Scale',
+    body: 'Recover from interruptions and expand with domain packs as your delivery system matures.'
+  }
+];
+---
+
+<section class="section reveal" id="workflow" aria-labelledby="workflow-title">
+  <div class="section-head">
+    <p class="eyebrow">How it works</p>
+    <h2 id="workflow-title">From prompt to production-grade workflow execution</h2>
+  </div>
+
+  <div class="workflow-grid">
+    {
+      steps.map((step) => (
+        <article>
+          <span>{step.id}</span>
+          <h3>{step.title}</h3>
+          <p>{step.body}</p>
+        </article>
+      ))
+    }
+  </div>
+</section>

@@ -92,7 +92,8 @@
       "skills": [
         "./.agents/skills/dev/landing_page_architect/SKILL.md",
         "./.agents/skills/dev/landing_page_implementer/SKILL.md",
-        "./.agents/skills/dev/project_intelligence_advisor/SKILL.md"
+        "./.agents/skills/dev/project_intelligence_advisor/SKILL.md",
+        "./.agents/skills/dev/remotion_io_visualizer/SKILL.md"
       ]
     },
     {

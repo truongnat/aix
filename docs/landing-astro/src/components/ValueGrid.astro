@@ -1,0 +1,38 @@
+---
+const values = [
+  {
+    title: 'Predictable Outcomes',
+    body: 'Deterministic orchestration removes run-to-run drift so teams can trust execution results.'
+  },
+  {
+    title: 'Operational Safety',
+    body: 'Runtime policy enforces trust tiers, permission boundaries, and safe command behavior by default.'
+  },
+  {
+    title: 'Faster Recovery',
+    body: 'Resumable workflow state lets teams continue from the failure point instead of starting from zero.'
+  },
+  {
+    title: 'Audit Confidence',
+    body: 'Timeline traces make delivery reviews, incident analysis, and release sign-off explicit and verifiable.'
+  }
+];
+---
+
+<section class="section reveal" id="value" aria-labelledby="value-title">
+  <div class="section-head">
+    <p class="eyebrow">Why teams choose it</p>
+    <h2 id="value-title">Clear value for real engineering risk</h2>
+  </div>
+
+  <div class="value-grid">
+    {
+      values.map((item) => (
+        <article class="value-card">
+          <h3>{item.title}</h3>
+          <p>{item.body}</p>
+        </article>
+      ))
+    }
+  </div>
+</section>

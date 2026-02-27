@@ -378,14 +378,12 @@
     "path": ".agents/workflows/dev/build-landing-page.md",
     "name": "dev-build-landing-page",
     "domain": "dev",
-    "description": "Build a landing page feature from brief to implementation-ready handoff",
+    "description": "Build a value-first landing page from brief to implementation-ready handoff",
     "steps": 9,
     "skills": [
       "agent.llm_subagent",
       "agent.semantic_search",
       "antigravity.code-review-checklist",
-      "antigravity.frontend-design",
-      "antigravity.react-patterns",
       "antigravity.test-driven-development",
       "dev.landing_page_architect",
       "dev.landing_page_implementer"

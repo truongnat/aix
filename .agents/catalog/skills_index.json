@@ -209,6 +209,22 @@
     ]
   },
   {
+    "id": "dev/remotion_io_visualizer",
+    "path": ".agents/skills/dev/remotion_io_visualizer/SKILL.md",
+    "name": "remotion_io_visualizer",
+    "domain": "dev",
+    "description": "Turn real workflow input/output traces into a Remotion storyboard and render plan for landing pages.",
+    "risk": "safe",
+    "source": "self",
+    "tags": [
+      "dev",
+      "remotion",
+      "visualization",
+      "workflow-trace",
+      "landing-page"
+    ]
+  },
+  {
     "id": "generate_tests",
     "path": ".agents/skills/generate_tests/SKILL.md",
     "name": "generate_tests",

@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-02-27T02:58:14.714Z",
+  "instance_id": "validflow-1772089636691-93883",
+  "workflow_id": "ValidFlow",
+  "workflow_name": "ValidFlow",
+  "status": "Completed",
+  "trace_id": "v20-99e318ab1dff441b",
+  "created_at_ms": 1772089636691,
+  "updated_at_ms": 1772089636742,
+  "input": {
+    "workflow_path": "valid_flow.md",
+    "current_step": 2,
+    "total_steps": 2
+  },
+  "execution": {
+    "completed_steps": [
+      "s1",
+      "s2"
+    ],
+    "failed_steps": [],
+    "steps": [
+      {
+        "name": "s1",
+        "status": "Succeeded",
+        "duration_ms": 7,
+        "failure_class": null,
+        "provider": null,
+        "model": null
+      },
+      {
+        "name": "s2",
+        "status": "Succeeded",
+        "duration_ms": 4,
+        "failure_class": null,
+        "provider": null,
+        "model": null
+      }
+    ]
+  },
+  "output": {
+    "last_error": null,
+    "trace_events": [
+      "[1772089636713] workflow started",
+      "[1772089636729] step 's1' Succeeded context_items=0 cost_units=3 cost_usd=0.000000 tokens=0 provider=- model=-",
+      "[1772089636738] step 's2' Succeeded context_items=0 cost_units=2 cost_usd=0.000000 tokens=0 provider=- model=-",
+      "[1772089636742] workflow completed successfully"
+    ]
+  },
+  "state": {
+    "status": "Completed",
+    "updated_at_ms": 1772089636742
+  }
+}
