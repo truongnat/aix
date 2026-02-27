@@ -36,7 +36,8 @@
       "strict": false,
       "skills": [
         "./.agents/skills/dev/landing_page_architect.md",
-        "./.agents/skills/dev/landing_page_implementer.md"
+        "./.agents/skills/dev/landing_page_implementer.md",
+        "./.agents/skills/dev/project_intelligence_advisor.md"
       ]
     },
     {

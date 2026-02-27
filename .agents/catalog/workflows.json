@@ -117,6 +117,21 @@
     ]
   },
   {
+    "id": "dev/project-intelligence",
+    "path": ".agents/workflows/dev/project-intelligence.md",
+    "name": "dev-project-intelligence",
+    "domain": "dev",
+    "description": "Index current project and generate workflow/skill upgrade recommendations",
+    "steps": 11,
+    "skills": [
+      "agent.llm_subagent",
+      "agent.run_script",
+      "agent.semantic_search",
+      "antigravity.workflow-automation",
+      "dev.project_intelligence_advisor"
+    ]
+  },
+  {
     "id": "feature",
     "path": ".agents/workflows/feature.md",
     "name": "feature",

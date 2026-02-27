@@ -56,15 +56,18 @@
     "id": "dev",
     "description": "Domain bundle for 'dev'",
     "workflows": [
-      "dev/build-landing-page"
+      "dev/build-landing-page",
+      "dev/project-intelligence"
     ],
     "skills": [
       "dev/landing_page_architect",
-      "dev/landing_page_implementer"
+      "dev/landing_page_implementer",
+      "dev/project_intelligence_advisor"
     ],
     "roles": [],
     "templates": [
-      "dev/build-landing-page_prompt"
+      "dev/build-landing-page_prompt",
+      "dev/project-intelligence_prompt"
     ]
   },
   {

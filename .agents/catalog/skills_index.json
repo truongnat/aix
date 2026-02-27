@@ -44,6 +44,21 @@
     ]
   },
   {
+    "id": "dev/project_intelligence_advisor",
+    "path": ".agents/skills/dev/project_intelligence_advisor.md",
+    "name": "project_intelligence_advisor",
+    "domain": "dev",
+    "description": "Synthesize indexed project context and recommend the best workflows and skills to upgrade delivery quality.",
+    "risk": "safe",
+    "source": "self",
+    "tags": [
+      "dev",
+      "indexing",
+      "project-understanding",
+      "recommendations"
+    ]
+  },
+  {
     "id": "generate_tests",
     "path": ".agents/skills/generate_tests.md",
     "name": "generate_tests",

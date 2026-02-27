@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generated_at_ms": 1772123287620,
+  "generated_at_ms": 1772124564862,
   "skills": [
     {
       "id": "analyze_code",
@@ -31,6 +31,18 @@
       "path": ".agents/skills/dev/landing_page_implementer.md",
       "bytes": 1711,
       "fingerprint": "b3ff7cba320aec2c",
+      "source": "self",
+      "source_requested": null,
+      "source_commit": null,
+      "source_path": null,
+      "source_license": null,
+      "imported_at_ms": null
+    },
+    {
+      "id": "dev/project_intelligence_advisor",
+      "path": ".agents/skills/dev/project_intelligence_advisor.md",
+      "bytes": 2062,
+      "fingerprint": "5a0fcb5cf705b016",
       "source": "self",
       "source_requested": null,
       "source_commit": null,
