@@ -1,0 +1,191 @@
+{
+  "generated_at": "2026-02-27T04:48:32.769Z",
+  "instance_id": "dev-create-showcase-video-1772167469615-59889",
+  "workflow_id": "dev-create-showcase-video",
+  "workflow_name": "dev-create-showcase-video",
+  "status": "Completed",
+  "trace_id": "10-38058dd9ba7ef2c6",
+  "created_at_ms": 1772167469615,
+  "updated_at_ms": 1772167681123,
+  "input": {
+    "workflow_path": "/Users/truongdq/Documents/GitHub/agentic-sdlc/.agents/workflows/dev/create-showcase-video.md",
+    "current_step": 6,
+    "total_steps": 6
+  },
+  "execution": {
+    "completed_steps": [
+      "collect_repo_structure",
+      "collect_cli_surface",
+      "collect_use_case_signals",
+      "synthesize_creator_brief",
+      "remotion_storyboard",
+      "internet_security_check"
+    ],
+    "failed_steps": [],
+    "steps": [
+      {
+        "name": "collect_repo_structure",
+        "status": "Succeeded",
+        "duration_ms": 49,
+        "failure_class": null,
+        "provider": null,
+        "model": null
+      },
+      {
+        "name": "collect_cli_surface",
+        "status": "Succeeded",
+        "duration_ms": 46,
+        "failure_class": null,
+        "provider": null,
+        "model": null
+      },
+      {
+        "name": "collect_use_case_signals",
+        "status": "Succeeded",
+        "duration_ms": 44,
+        "failure_class": null,
+        "provider": null,
+        "model": null
+      },
+      {
+        "name": "synthesize_creator_brief",
+        "status": "Succeeded",
+        "duration_ms": 90650,
+        "failure_class": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      },
+      {
+        "name": "remotion_storyboard",
+        "status": "Succeeded",
+        "duration_ms": 30012,
+        "failure_class": null,
+        "provider": null,
+        "model": null
+      },
+      {
+        "name": "internet_security_check",
+        "status": "Succeeded",
+        "duration_ms": 90627,
+        "failure_class": null,
+        "provider": "ollama",
+        "model": "qwen3:8b"
+      }
+    ]
+  },
+  "output": {
+    "last_error": null,
+    "trace_events": [
+      "[1772167469643] workflow started",
+      "[1772167469699] step 'collect_repo_structure' Succeeded context_items=0 cost_units=26 cost_usd=0.000000 tokens=0 provider=- model=-",
+      "[1772167469750] step 'collect_cli_surface' Succeeded context_items=0 cost_units=26 cost_usd=0.000000 tokens=0 provider=- model=-",
+      "[1772167469799] step 'collect_use_case_signals' Succeeded context_items=0 cost_units=26 cost_usd=0.000000 tokens=0 provider=- model=-",
+      "[1772167560455] step 'synthesize_creator_brief' Succeeded context_items=1 cost_units=6 cost_usd=0.000000 tokens=0 provider=ollama model=qwen3:8b",
+      "[1772167590476] step 'remotion_storyboard' Succeeded context_items=0 cost_units=8 cost_usd=0.000000 tokens=0 provider=- model=-",
+      "[1772167681113] step 'internet_security_check' Succeeded context_items=1 cost_units=8 cost_usd=0.000000 tokens=0 provider=ollama model=qwen3:8b",
+      "[1772167681123] workflow completed successfully"
+    ]
+  },
+  "showcase": {
+    "structure": [
+      {
+        "title": "CLI Layer",
+        "path": "src/cli",
+        "purpose": "command parsing and runtime policy flags"
+      },
+      {
+        "title": "Workflow Engine",
+        "path": "src/engine/workflow_engine",
+        "purpose": "deterministic orchestration and state transitions"
+      },
+      {
+        "title": "Workflow Loader",
+        "path": "src/workflow",
+        "purpose": "markdown workflow parsing and validation"
+      },
+      {
+        "title": "Skill Runtime",
+        "path": "src/skill",
+        "purpose": "skill invocation and execution contracts"
+      },
+      {
+        "title": "Skill Registry",
+        "path": ".agents/skills",
+        "purpose": "domain skills and project capabilities"
+      },
+      {
+        "title": "Workflow Registry",
+        "path": ".agents/workflows",
+        "purpose": "reusable delivery flows by domain"
+      }
+    ],
+    "cli_commands": [
+      "cargo run -- --workflow valid_flow.md",
+      "cargo run -- workflow doctor",
+      "cargo run -- workflow setup",
+      "cargo run -- workflow check",
+      "cargo run -- --workflow-id cybersecurity/security-scan --template cybersecurity/security_scan_prompt --task \"scan internet-surface risk\"",
+      "cargo run -- workflow trace <instance_id> --timeline",
+      "cargo run -- --workflow-id ai-engineering/feature --template ai-engineering/feature_prompt --task \"build eval pipeline\"",
+      "cargo run -- --workflow-id cybersecurity/review --template cybersecurity/review_prompt --task \"review auth middleware\""
+    ],
+    "use_cases": [
+      {
+        "title": "AI Engineering Feature Delivery",
+        "command": "cargo run -- --workflow-id ai-engineering/feature --template ai-engineering/feature_prompt --task \"build eval pipeline\"",
+        "outcome": "impact analysis, acceptance guard, and risk register before implementation"
+      },
+      {
+        "title": "Security Scan Gate",
+        "command": "cargo run -- --workflow-id cybersecurity/security-scan --template cybersecurity/security_scan_prompt --task \"scan internet-surface risk\"",
+        "outcome": "mandatory security check before workflows with internet-capable skills finish"
+      },
+      {
+        "title": "Project Intelligence Upgrade",
+        "command": "cargo run -- --workflow-id dev/project-intelligence --template dev/project-intelligence_prompt --task \"recommend workflows and skills\"",
+        "outcome": "prioritized workflow/skill roadmap with quick wins and risk notes"
+      }
+    ],
+    "success_output": {
+      "title": "Landing page as final production artifact",
+      "artifact_path": "docs/landing-astro/dist/index.html",
+      "screenshot": "media/landing-page-output.png",
+      "note": "Input and runtime evidence are converted to a landing page with visible trust signals."
+    },
+    "voiceover": {
+      "audio": "media/workflow-io-voice-v2.mp3",
+      "source": "local-tts",
+      "captions": [
+        {
+          "start_s": 0.4,
+          "end_s": 4.6,
+          "text": "agentic-sdlc turns software delivery into deterministic, auditable execution."
+        },
+        {
+          "start_s": 4.7,
+          "end_s": 9.8,
+          "text": "First, we show structure: CLI, workflow engine, and skill registry layers."
+        },
+        {
+          "start_s": 9.9,
+          "end_s": 15.4,
+          "text": "Second, we show CLI commands teams run daily across setup, checks, and tracing."
+        },
+        {
+          "start_s": 15.5,
+          "end_s": 21.8,
+          "text": "Third, we show real use cases including feature delivery, security scan gating, and project intelligence."
+        },
+        {
+          "start_s": 21.9,
+          "end_s": 27.6,
+          "text": "Finally, the landing page ships as the production output from real trace evidence."
+        }
+      ]
+    }
+  },
+  "state": {
+    "status": "Completed",
+    "updated_at_ms": 1772167681123
+  }
+}

@@ -77,6 +77,9 @@ For this repository, prefer the following flow:
    - `bash .agents/skills/dev/remotion_io_visualizer/scripts/export_trace_for_remotion.sh <instance_id>`
 2. Render media from exported JSON:
    - `bash .agents/skills/dev/remotion_io_visualizer/scripts/render_remotion_demo.sh <instance_id>`
+   - This step can auto-add narration:
+     - Uses OpenAI script + TTS when `OPENAI_API_KEY` is available
+     - Falls back to local macOS TTS (`say` + `ffmpeg`) when available
 3. Use rendered output under `docs/landing-astro/public/media/`.
 4. Embed MP4/WebM or fallback PNG sequence in landing page sections proving runtime value.
 

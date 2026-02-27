@@ -41,3 +41,9 @@ Input: Build a Remotion-oriented production plan for top 3 concepts from concept
 Skill: agent.llm_subagent
 DependsOn: remotion_production_plan
 Input: planner:::Return prioritized 2-week backlog from concepts={{generate_concept_pack}} remotion={{remotion_production_plan}}. Output only: week plan, daily deliverables, dependencies, and success metrics (watch-through, CTA click, demo request).
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: prioritized_backlog
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+

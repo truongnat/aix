@@ -21,3 +21,9 @@ DependsOn: stage_01_prepare_test_strategy
 Skill: antigravity.systematic-debugging
 Input: Goal: Stabilize flaky tests and establish repeatable CI execution. Notes: Classify failures by root cause: selector drift, timing, environment, data. Companion skills: systematic-debugging, test-fixing, verification-before-completion
 DependsOn: stage_02_implement_browser_tests
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: stage_03_triage_failures_and_harden
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+

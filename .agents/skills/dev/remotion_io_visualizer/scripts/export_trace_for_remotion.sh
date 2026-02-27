@@ -75,6 +75,7 @@ const cliCommands = [
   "cargo run -- workflow doctor",
   "cargo run -- workflow setup",
   "cargo run -- workflow check",
+  "cargo run -- --workflow-id cybersecurity/security-scan --template cybersecurity/security_scan_prompt --task \"scan internet-surface risk\"",
   "cargo run -- workflow trace <instance_id> --timeline",
   "cargo run -- --workflow-id ai-engineering/feature --template ai-engineering/feature_prompt --task \"build eval pipeline\"",
   "cargo run -- --workflow-id cybersecurity/review --template cybersecurity/review_prompt --task \"review auth middleware\""
@@ -87,9 +88,9 @@ const useCases = [
     outcome: "impact analysis, acceptance guard, and risk register before implementation"
   },
   {
-    title: "Cybersecurity Review Gate",
-    command: "cargo run -- --workflow-id cybersecurity/review --template cybersecurity/review_prompt --task \"review auth middleware\"",
-    outcome: "correctness and vulnerability checks before release decisions"
+    title: "Security Scan Gate",
+    command: "cargo run -- --workflow-id cybersecurity/security-scan --template cybersecurity/security_scan_prompt --task \"scan internet-surface risk\"",
+    outcome: "mandatory security check before workflows with internet-capable skills finish"
   },
   {
     title: "Project Intelligence Upgrade",
@@ -103,6 +104,14 @@ const landingScreenshot = pathExists("docs/landing-astro/public/media/landing-pa
   : (pathExists("docs/landing-astro/public/media/workflow-io-still.png")
       ? "media/workflow-io-still.png"
       : null);
+
+const defaultVoiceoverCaptions = [
+  { start_s: 0.4, end_s: 4.6, text: "agentic-sdlc turns software delivery into deterministic, auditable execution." },
+  { start_s: 4.7, end_s: 9.8, text: "First, we show structure: CLI, workflow engine, and skill registry layers." },
+  { start_s: 9.9, end_s: 15.4, text: "Second, we show CLI commands teams run daily across setup, checks, and tracing." },
+  { start_s: 15.5, end_s: 21.8, text: "Third, we show real use cases including feature delivery, security scan gating, and project intelligence." },
+  { start_s: 21.9, end_s: 27.6, text: "Finally, the landing page ships as the production output from real trace evidence." }
+];
 
 const payload = {
   generated_at: new Date().toISOString(),
@@ -136,6 +145,11 @@ const payload = {
       artifact_path: "docs/landing-astro/dist/index.html",
       screenshot: landingScreenshot,
       note: "Input and runtime evidence are converted to a landing page with visible trust signals."
+    },
+    voiceover: {
+      audio: null,
+      source: "none",
+      captions: defaultVoiceoverCaptions
     }
   },
   state: {

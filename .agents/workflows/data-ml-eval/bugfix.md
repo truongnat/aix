@@ -33,3 +33,9 @@ Skill: data-ml-eval.risk_register
 DependsOn: regression_guard
 OnFailure: Continue
 Input: {{regression_guard}}
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: postmortem
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+

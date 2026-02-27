@@ -29,3 +29,9 @@ Input: planner:::Propose the minimal diff implementation plan with ordered steps
 Skill: agent.llm_subagent
 DependsOn: propose_minimal_plan
 Input: implementer:::Implement only the approved minimal diff and avoid unrelated changes.
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: implement_minimal_diff
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+

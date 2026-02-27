@@ -51,3 +51,9 @@ Input: Review completeness and risk from: {{implementation_handoff}} tests={{tes
 Skill: agent.llm_subagent
 DependsOn: review_gate
 Input: reviewer:::Return final execution checklist with ordered file edits, validation sequence, and done criteria from all prior outputs.
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: final_execution_plan
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+

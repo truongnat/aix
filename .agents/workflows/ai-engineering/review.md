@@ -24,3 +24,9 @@ Skill: agent.llm_subagent
 DependsOn: review_risk_register
 Input: ai-engineering/reviewer:::Return merge recommendation with blocking issues from:
 {{review_risk_register}}
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: review_decision
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+

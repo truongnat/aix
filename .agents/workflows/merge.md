@@ -40,3 +40,9 @@ chore(merge): complete merge workflow
 Skill: demo.echo
 DependsOn: commit_merge
 Input: Merge workflow completed.
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: summarize
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+

@@ -5,6 +5,7 @@ use crate::skills::role_loader::{parse_role_markdown, resolve_role_path};
 use crate::workflow::loader::parse_markdown_content;
 use anyhow::Result;
 use serde::Serialize;
+use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -43,7 +44,8 @@ impl PackageCheckReport {
 
 pub fn run_package_check(layout: &AgentProjectLayout) -> Result<PackageCheckReport> {
     let mut report = PackageCheckReport::default();
-    check_workflows(layout, &mut report)?;
+    let network_skills = build_network_skill_index(layout)?;
+    check_workflows(layout, &network_skills, &mut report)?;
     check_rules(layout, &mut report)?;
     check_skills(layout, &mut report)?;
     check_roles(layout, &mut report)?;
@@ -51,7 +53,11 @@ pub fn run_package_check(layout: &AgentProjectLayout) -> Result<PackageCheckRepo
     Ok(report)
 }
 
-fn check_workflows(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> Result<()> {
+fn check_workflows(
+    layout: &AgentProjectLayout,
+    network_skills: &NetworkSkillIndex,
+    report: &mut PackageCheckReport,
+) -> Result<()> {
     let mut workflow_count = 0usize;
     for path in collect_files_recursive(&layout.workflows_dir)? {
         match extension_kind(&path) {
@@ -76,6 +82,12 @@ fn check_workflows(layout: &AgentProjectLayout, report: &mut PackageCheckReport)
                 match parse_markdown_content(&content) {
                     Ok(workflow) => {
                         check_workflow_role_references(layout, &path, &workflow, report);
+                        check_workflow_internet_security_gate(
+                            &path,
+                            &workflow,
+                            network_skills,
+                            report,
+                        );
                     }
                     Err(err) => {
                         report.error(path.display().to_string(), err.to_string());
@@ -99,6 +111,124 @@ fn check_workflows(layout: &AgentProjectLayout, report: &mut PackageCheckReport)
         );
     }
     Ok(())
+}
+
+#[derive(Debug, Default)]
+struct NetworkSkillIndex {
+    qualified: HashSet<String>,
+    unqualified: HashSet<String>,
+}
+
+impl NetworkSkillIndex {
+    fn with_builtins() -> Self {
+        let mut index = Self::default();
+        index.mark_network_skill("agent", "llm_subagent");
+        index
+    }
+
+    fn mark_network_skill(&mut self, domain: &str, name: &str) {
+        let normalized_domain = domain.trim().to_ascii_lowercase();
+        let normalized_name = name.trim().to_ascii_lowercase();
+        if normalized_name.is_empty() {
+            return;
+        }
+        self.unqualified.insert(normalized_name.clone());
+        if !normalized_domain.is_empty() {
+            self.qualified
+                .insert(format!("{}.{}", normalized_domain, normalized_name));
+        }
+    }
+
+    fn is_network_skill(&self, workflow_domain: Option<&str>, skill_ref: &str) -> bool {
+        let normalized = skill_ref.trim().to_ascii_lowercase();
+        if normalized.is_empty() {
+            return false;
+        }
+        if self.qualified.contains(&normalized) || self.unqualified.contains(&normalized) {
+            return true;
+        }
+        if normalized.ends_with(".llm_subagent") {
+            return true;
+        }
+        if normalized.contains('.') {
+            return false;
+        }
+        let inferred_domain = workflow_domain
+            .map(|value| value.trim().to_ascii_lowercase())
+            .filter(|value| !value.is_empty())
+            .unwrap_or_else(|| "agent".to_string());
+        self.qualified
+            .contains(&format!("{}.{}", inferred_domain, normalized))
+    }
+}
+
+fn build_network_skill_index(layout: &AgentProjectLayout) -> Result<NetworkSkillIndex> {
+    let mut index = NetworkSkillIndex::with_builtins();
+    for path in collect_files_recursive(&layout.skills_dir)? {
+        if !matches!(extension_kind(&path), ExtensionKind::Markdown) {
+            continue;
+        }
+        if !is_skill_entry_markdown(&path) {
+            continue;
+        }
+        let Ok(content) = fs::read_to_string(&path) else {
+            continue;
+        };
+        let Ok((meta, _)) = parse_skill_markdown(&content) else {
+            continue;
+        };
+        if skill_declares_network(&meta) {
+            index.mark_network_skill(&meta.domain, &meta.name);
+        }
+    }
+    Ok(index)
+}
+
+fn skill_declares_network(meta: &crate::skills::model::SkillMeta) -> bool {
+    if let Some(explicit) = meta.allow_network {
+        return explicit;
+    }
+    match meta.executor.trim().to_ascii_lowercase().as_str() {
+        "ollama" => true,
+        "script" => false,
+        _ => false,
+    }
+}
+
+fn check_workflow_internet_security_gate(
+    workflow_path: &Path,
+    workflow: &crate::workflow::model::Workflow,
+    network_skills: &NetworkSkillIndex,
+    report: &mut PackageCheckReport,
+) {
+    let uses_internet_skill = workflow
+        .steps
+        .iter()
+        .any(|step| network_skills.is_network_skill(workflow.meta.domain.as_deref(), &step.skill));
+    if !uses_internet_skill {
+        return;
+    }
+    let has_security_check = workflow.steps.iter().any(is_security_check_step);
+    if has_security_check {
+        return;
+    }
+    report.error(
+        workflow_path.display().to_string(),
+        "Workflow uses internet-capable skill(s) but has no explicit security check step. Add a step like 'internet_security_check' (for example using `agent.llm_subagent` with security-review input or a domain security skill).",
+    );
+}
+
+fn is_security_check_step(step: &crate::workflow::model::WorkflowStep) -> bool {
+    let step_id = step.id.trim().to_ascii_lowercase();
+    let skill_ref = step.skill.trim().to_ascii_lowercase();
+    if skill_ref.contains("security") {
+        return true;
+    }
+    step_id.contains("security")
+        && (step_id.contains("check")
+            || step_id.contains("scan")
+            || step_id.contains("audit")
+            || step_id.contains("gate"))
 }
 
 fn check_workflow_role_references(
@@ -495,7 +625,7 @@ mod tests {
 
         std::fs::write(
             workflows.join("w.md"),
-            "---\ndescription: minimal valid workflow\n---\n# Workflow: w\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::draft implementation plan\n",
+            "---\ndescription: minimal valid workflow\n---\n# Workflow: w\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::draft implementation plan\n\n## Step: security_check\nSkill: demo.echo\nDependsOn: s1\nInput: security check complete\n",
         )
         .expect("workflow");
 
@@ -608,6 +738,50 @@ Create deterministic and minimal implementation plans.
     }
 
     #[test]
+    fn package_check_rejects_internet_workflow_without_security_check() {
+        let root = temp_root("agentic-sdlc-package-check-missing-security-check");
+        write_minimal_valid_package(&root);
+        std::fs::write(
+            root.join(".agents").join("workflows").join("missing_security_gate.md"),
+            "---\ndescription: workflow missing security gate\n---\n# Workflow: missing-security-gate\nSchema: antigrav.workflow@v1\nDomain: agent\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::plan rollout\n",
+        )
+        .expect("workflow");
+
+        let layout = AgentProjectLayout::discover(root.to_str().expect("path")).expect("layout");
+        let report = run_package_check(&layout).expect("check");
+        assert!(report.errors.iter().any(|issue| {
+            issue.path.ends_with("missing_security_gate.md")
+                && issue.message.contains("internet-capable skill(s)")
+        }));
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn package_check_accepts_internet_workflow_with_security_check_step() {
+        let root = temp_root("agentic-sdlc-package-check-with-security-check");
+        write_minimal_valid_package(&root);
+        std::fs::write(
+            root.join(".agents").join("workflows").join("with_security_gate.md"),
+            "---\ndescription: workflow with security gate\n---\n# Workflow: with-security-gate\nSchema: antigrav.workflow@v1\nDomain: agent\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::plan rollout\n\n## Step: internet_security_check\nSkill: demo.echo\nDependsOn: s1\nInput: run security checks\n",
+        )
+        .expect("workflow");
+
+        let layout = AgentProjectLayout::discover(root.to_str().expect("path")).expect("layout");
+        let report = run_package_check(&layout).expect("check");
+        assert!(
+            !report.errors.iter().any(|issue| {
+                issue.path.ends_with("with_security_gate.md")
+                    && issue.message.contains("internet-capable skill(s)")
+            }),
+            "{:?}",
+            report.errors
+        );
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
     fn package_check_rejects_missing_schema_header() {
         let root = temp_root("agentic-sdlc-package-check-missing-schema");
         write_minimal_valid_package(&root);
@@ -670,7 +844,7 @@ Runs shell command.
         std::fs::create_dir_all(&nested_workflow_dir).expect("nested workflow dir");
         std::fs::write(
             nested_workflow_dir.join("nested.md"),
-            "---\ndescription: nested valid workflow\n---\n# Workflow: nested\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::nested plan\n",
+            "---\ndescription: nested valid workflow\n---\n# Workflow: nested\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::nested plan\n\n## Step: security_check\nSkill: demo.echo\nDependsOn: s1\nInput: nested security check\n",
         )
         .expect("nested workflow");
 

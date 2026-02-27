@@ -140,6 +140,25 @@ cargo run -- --workflow-id ai-engineering/feature --template ai-engineering/feat
 cargo run -- --workflow-id cybersecurity/review --template cybersecurity/review_prompt --task "review auth middleware diff for vulnerabilities"
 ```
 
+## Security Workflow and Internet Skill Gate
+
+This repository now enforces a package rule:
+- workflows using internet-capable skills must include an explicit security-check step
+- recommended gate step is `internet_security_check` using `cybersecurity.security_scan_guard`
+
+Run the dedicated security workflow:
+
+```bash
+cargo run -- --workflow-id cybersecurity/security-scan --template cybersecurity/security_scan_prompt --task "scan internet-surface risks and policy drift"
+```
+
+Run security/package validation gates:
+
+```bash
+cargo run -- workflow check
+cargo run -- workflow quality-skills --strict
+```
+
 Generate catalog/manifest/lock artifacts for skill bundles:
 
 ```bash
@@ -273,3 +292,5 @@ antigrav workflow doctor
 - CLI usage guide: [`docs/CLI_USAGE.md`](docs/CLI_USAGE.md)
 - Dev OS execution blueprint: [`docs/DEV_OS_BLUEPRINT.md`](docs/DEV_OS_BLUEPRINT.md)
 - Release notes: [`CHANGELOG.md`](CHANGELOG.md)
+- Agent package guide: [`.agents/README.md`](.agents/README.md)
+- Gemini package contract: [`.agents/GEMINI.md`](.agents/GEMINI.md)

@@ -69,3 +69,9 @@ Input: Suggest automation opportunities and sequencing from this recommendation 
 Skill: agent.llm_subagent
 DependsOn: automation_suggestions
 Input: reviewer:::Return final markdown report with sections: 1) Project Summary 2) Top Workflow Suggestions 3) Top Skill Suggestions 4) 7-Day Quick Wins 5) 30-Day Upgrade Plan 6) Risks. Use only available workflows/skills from context.
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: finalize_upgrade_plan
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+

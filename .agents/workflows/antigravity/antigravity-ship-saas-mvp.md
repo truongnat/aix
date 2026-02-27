@@ -31,3 +31,9 @@ DependsOn: stage_03_build_frontend
 Skill: antigravity.deployment-procedures
 Input: Goal: Release with basic observability and rollback readiness. Notes: Define release checklist, minimum telemetry, and rollback triggers. Companion skills: deployment-procedures, observability-engineer, postmortem-writing
 DependsOn: stage_04_test_and_validate
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: stage_05_ship_safely
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+

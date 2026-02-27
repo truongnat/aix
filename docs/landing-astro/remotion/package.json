@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "studio": "remotion studio src/index.ts",
-    "render": "remotion render src/index.ts WorkflowIo ../public/media/workflow-io-demo.mp4",
-    "still": "remotion still src/index.ts WorkflowIo ../public/media/workflow-io-still.png"
+    "render": "remotion render src/index.ts WorkflowIo ../public/media/workflow-io-demo-v2.mp4",
+    "still": "remotion still src/index.ts WorkflowIo ../public/media/workflow-io-still-v2.png"
   },
   "dependencies": {
     "react": "^19.1.0",

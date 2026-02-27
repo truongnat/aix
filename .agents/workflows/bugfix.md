@@ -46,3 +46,9 @@ fix(bugfix): resolve failing behavior
 Skill: demo.echo
 DependsOn: commit_fix
 Input: Bugfix workflow completed.
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: summarize
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+

@@ -31,3 +31,9 @@ Input: architect:::Create a concise creator brief with sections STRUCTURE, CLI, 
 Skill: dev.remotion_io_visualizer
 DependsOn: synthesize_creator_brief
 Input: Build a creator-grade Remotion storyboard and implementation plan using creator_brief={{synthesize_creator_brief}}
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: remotion_storyboard
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+

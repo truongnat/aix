@@ -23,6 +23,26 @@
   ],
   "failed_steps": [],
   "step_states": {
+    "collect_cli_surface": {
+      "status": "Succeeded",
+      "attempts": 1,
+      "retry_count": 0,
+      "last_error": null,
+      "started_at_ms": 1772163004876,
+      "finished_at_ms": 1772163004940,
+      "duration_ms": 64,
+      "failure_class": null,
+      "idempotent_short_circuit": false,
+      "context_injected_items": 0,
+      "estimated_cost_units": 26,
+      "actual_cost_usd": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0,
+      "provider": null,
+      "model": null,
+      "call_attempts": 1
+    },
     "collect_use_case_signals": {
       "status": "Succeeded",
       "attempts": 1,
@@ -63,26 +83,6 @@
       "model": "qwen3:8b",
       "call_attempts": 3
     },
-    "collect_repo_structure": {
-      "status": "Succeeded",
-      "attempts": 1,
-      "retry_count": 0,
-      "last_error": null,
-      "started_at_ms": 1772163004793,
-      "finished_at_ms": 1772163004871,
-      "duration_ms": 78,
-      "failure_class": null,
-      "idempotent_short_circuit": false,
-      "context_injected_items": 0,
-      "estimated_cost_units": 26,
-      "actual_cost_usd": 0.0,
-      "input_tokens": 0,
-      "output_tokens": 0,
-      "total_tokens": 0,
-      "provider": null,
-      "model": null,
-      "call_attempts": 1
-    },
     "remotion_storyboard": {
       "status": "Succeeded",
       "attempts": 1,
@@ -103,14 +103,14 @@
       "model": null,
       "call_attempts": 1
     },
-    "collect_cli_surface": {
+    "collect_repo_structure": {
       "status": "Succeeded",
       "attempts": 1,
       "retry_count": 0,
       "last_error": null,
-      "started_at_ms": 1772163004876,
-      "finished_at_ms": 1772163004940,
-      "duration_ms": 64,
+      "started_at_ms": 1772163004793,
+      "finished_at_ms": 1772163004871,
+      "duration_ms": 78,
       "failure_class": null,
       "idempotent_short_circuit": false,
       "context_injected_items": 0,
@@ -125,14 +125,17 @@
     }
   },
   "step_results": {
-    "collect_repo_structure": {
+    "remotion_storyboard": {
+      "Text": "Simulated response for skill [remotion_io_visualizer]. Ollama API was unreachable."
+    },
+    "collect_use_case_signals": {
       "Json": {
-        "command": "git ls-files src",
+        "command": "git grep -n \"ai-engineering\" README.md .agents/workflows",
         "command_head": "git",
         "exit_code": 0,
         "status": "ok",
         "stderr": "",
-        "stdout": "src/cli.rs\nsrc/cli/catalog.rs\nsrc/cli/entrypoint.rs\nsrc/cli/ops.rs\nsrc/cli/policy.rs\nsrc/cli/runtime.rs\nsrc/cli/scaffold.rs\nsrc/cli/skillpack.rs\nsrc/cli/tests.rs\nsrc/cli/types.rs\nsrc/cli/workflow_control.rs\nsrc/engine/backend.rs\nsrc/engine/budget.rs\nsrc/engine/condition.rs\nsrc/engine/context.rs\nsrc/engine/context_retrieval.rs\nsrc/engine/context_service.rs\nsrc/engine/decomposition.rs\nsrc/engine/events.rs\nsrc/engine/executor.rs\nsrc/engine/git.rs\nsrc/engine/graph.rs\nsrc/engine/mod.rs\nsrc/engine/package_check.rs\nsrc/engine/package_schema.rs\nsrc/engine/planner.rs\nsrc/engine/project.rs\nsrc/engine/reflection.rs\nsrc/engine/registry.rs\nsrc/engine/resolver.rs\nsrc/engine/routing.rs\nsrc/engine/runtime.rs\nsrc/engine/security.rs\nsrc/engine/session.rs\nsrc/engine/snapshot.rs\nsrc/engine/thread_session_store.rs\nsrc/engine/validator.rs\nsrc/engine/workflow_engine/engine.rs\nsrc/engine/workflow_engine/instance.rs\nsrc/engine/workflow_engine/mod.rs\nsrc/engine/workflow_engine/state_store.rs\nsrc/engine/workflow_engine/step_executor.rs\nsrc/main.rs\nsrc/skill/capability.rs\nsrc/skill/io.rs\nsrc/skill/mod.rs\nsrc/skill/trait.rs\nsrc/skills/dev_workflow.rs\nsrc/skills/echo.rs\nsrc/skills/flaky.rs\nsrc/skills/git_ops.rs\nsrc/skills/idempotency.rs\nsrc/skills/is_positive.rs\nsrc/skills/llm_subagent.rs\nsrc/skills/loader.rs\nsrc/skills/mod.rs\nsrc/skills/model.rs\nsrc/skills/parse_number.rs\nsrc/skills/role_loader.rs\nsrc/skills/vector_memory.rs\nsrc/workflow/loader.rs\nsrc/workflow/mod.rs\nsrc/workflow/model.rs",
+        "stdout": ".agents/workflows/ai-engineering/bugfix.md:2:description: ai-engineering bugfix workflow with root-cause and regression guard\n.agents/workflows/ai-engineering/bugfix.md:4:# Workflow: ai-engineering-bugfix\n.agents/workflows/ai-engineering/bugfix.md:6:Domain: ai-engineering\n.agents/workflows/ai-engineering/bugfix.md:12:Input: ai-engineering/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro.\n.agents/workflows/ai-engineering/bugfix.md:15:Skill: ai-engineering.impact_analyzer\n.agents/workflows/ai-engineering/bugfix.md:22:Input: ai-engineering/implementer:::Propose minimal patch and rollback strategy from:\n.agents/workflows/ai-engineering/bugfix.md:26:Skill: ai-engineering.acceptance_guard\n.agents/workflows/ai-engineering/bugfix.md:32:Skill: ai-engineering.risk_register\n.agents/workflows/ai-engineering/feature.md:2:description: ai-engineering feature delivery with impact analysis and acceptance gates\n.agents/workflows/ai-engineering/feature.md:4:# Workflow: ai-engineering-feature\n.agents/workflows/ai-engineering/feature.md:6:Domain: ai-engineering\n.agents/workflows/ai-engineering/feature.md:13:Input: ai-engineering/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature.\n.agents/workflows/ai-engineering/feature.md:16:Skill: ai-engineering.impact_analyzer\n.agents/workflows/ai-engineering/feature.md:24:Input: ai-engineering/implementer:::Create a deterministic implementation plan from this context:\n.agents/workflows/ai-engineering/feature.md:28:Skill: ai-engineering.acceptance_guard\n.agents/workflows/ai-engineering/feature.md:34:Skill: ai-engineering.risk_register\n.agents/workflows/ai-engineering/feature.md:42:Input: Feature workflow ready for domain ai-engineering.\n.agents/workflows/ai-engineering/release.md:2:description: ai-engineering release workflow with quality signal and risk approval\n.agents/workflows/ai-engineering/release.md:4:# Workflow: ai-engineering-release\n.agents/workflows/ai-engineering/release.md:6:Domain: ai-engineering\n.agents/workflows/ai-engineering/release.md:12:Input: ai-engineering/releaser:::Build release scope summary, included features, and customer impact.\n.agents/workflows/ai-engineering/release.md:15:Skill: ai-engineering.acceptance_guard\n.agents/workflows/ai-engineering/release.md:20:Skill: ai-engineering.risk_register\n.agents/workflows/ai-engineering/release.md:27:Input: ai-engineering/releaser:::Generate final release note and go/no-go recommendation from:\n.agents/workflows/ai-engineering/review.md:2:description: ai-engineering review workflow focused on correctness, risk, and release readiness\n.agents/workflows/ai-engineering/review.md:4:# Workflow: ai-engineering-review\n.agents/workflows/ai-engineering/review.md:6:Domain: ai-engineering\n.agents/workflows/ai-engineering/review.md:10:Input: ai-engineering/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots.\n.agents/workflows/ai-engineering/review.md:13:Skill: ai-engineering.acceptance_guard\n.agents/workflows/ai-engineering/review.md:18:Skill: ai-engineering.risk_register\n.agents/workflows/ai-engineering/review.md:25:Input: ai-engineering/reviewer:::Return merge recommendation with blocking issues from:\nREADME.md:129:- `ai-engineering`\nREADME.md:139:cargo run -- --workflow-id ai-engineering/feature --template ai-engineering/feature_prompt --task \"build eval pipeline for support agent\"",
         "timeout_ms": 180000,
         "working_dir": "/Users/truongdq/Documents/GitHub/agentic-sdlc"
       }
@@ -188,20 +191,17 @@
         "working_dir": "/Users/truongdq/Documents/GitHub/agentic-sdlc"
       }
     },
-    "collect_use_case_signals": {
+    "collect_repo_structure": {
       "Json": {
-        "command": "git grep -n \"ai-engineering\" README.md .agents/workflows",
+        "command": "git ls-files src",
         "command_head": "git",
         "exit_code": 0,
         "status": "ok",
         "stderr": "",
-        "stdout": ".agents/workflows/ai-engineering/bugfix.md:2:description: ai-engineering bugfix workflow with root-cause and regression guard\n.agents/workflows/ai-engineering/bugfix.md:4:# Workflow: ai-engineering-bugfix\n.agents/workflows/ai-engineering/bugfix.md:6:Domain: ai-engineering\n.agents/workflows/ai-engineering/bugfix.md:12:Input: ai-engineering/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro.\n.agents/workflows/ai-engineering/bugfix.md:15:Skill: ai-engineering.impact_analyzer\n.agents/workflows/ai-engineering/bugfix.md:22:Input: ai-engineering/implementer:::Propose minimal patch and rollback strategy from:\n.agents/workflows/ai-engineering/bugfix.md:26:Skill: ai-engineering.acceptance_guard\n.agents/workflows/ai-engineering/bugfix.md:32:Skill: ai-engineering.risk_register\n.agents/workflows/ai-engineering/feature.md:2:description: ai-engineering feature delivery with impact analysis and acceptance gates\n.agents/workflows/ai-engineering/feature.md:4:# Workflow: ai-engineering-feature\n.agents/workflows/ai-engineering/feature.md:6:Domain: ai-engineering\n.agents/workflows/ai-engineering/feature.md:13:Input: ai-engineering/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature.\n.agents/workflows/ai-engineering/feature.md:16:Skill: ai-engineering.impact_analyzer\n.agents/workflows/ai-engineering/feature.md:24:Input: ai-engineering/implementer:::Create a deterministic implementation plan from this context:\n.agents/workflows/ai-engineering/feature.md:28:Skill: ai-engineering.acceptance_guard\n.agents/workflows/ai-engineering/feature.md:34:Skill: ai-engineering.risk_register\n.agents/workflows/ai-engineering/feature.md:42:Input: Feature workflow ready for domain ai-engineering.\n.agents/workflows/ai-engineering/release.md:2:description: ai-engineering release workflow with quality signal and risk approval\n.agents/workflows/ai-engineering/release.md:4:# Workflow: ai-engineering-release\n.agents/workflows/ai-engineering/release.md:6:Domain: ai-engineering\n.agents/workflows/ai-engineering/release.md:12:Input: ai-engineering/releaser:::Build release scope summary, included features, and customer impact.\n.agents/workflows/ai-engineering/release.md:15:Skill: ai-engineering.acceptance_guard\n.agents/workflows/ai-engineering/release.md:20:Skill: ai-engineering.risk_register\n.agents/workflows/ai-engineering/release.md:27:Input: ai-engineering/releaser:::Generate final release note and go/no-go recommendation from:\n.agents/workflows/ai-engineering/review.md:2:description: ai-engineering review workflow focused on correctness, risk, and release readiness\n.agents/workflows/ai-engineering/review.md:4:# Workflow: ai-engineering-review\n.agents/workflows/ai-engineering/review.md:6:Domain: ai-engineering\n.agents/workflows/ai-engineering/review.md:10:Input: ai-engineering/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots.\n.agents/workflows/ai-engineering/review.md:13:Skill: ai-engineering.acceptance_guard\n.agents/workflows/ai-engineering/review.md:18:Skill: ai-engineering.risk_register\n.agents/workflows/ai-engineering/review.md:25:Input: ai-engineering/reviewer:::Return merge recommendation with blocking issues from:\nREADME.md:129:- `ai-engineering`\nREADME.md:139:cargo run -- --workflow-id ai-engineering/feature --template ai-engineering/feature_prompt --task \"build eval pipeline for support agent\"",
+        "stdout": "src/cli.rs\nsrc/cli/catalog.rs\nsrc/cli/entrypoint.rs\nsrc/cli/ops.rs\nsrc/cli/policy.rs\nsrc/cli/runtime.rs\nsrc/cli/scaffold.rs\nsrc/cli/skillpack.rs\nsrc/cli/tests.rs\nsrc/cli/types.rs\nsrc/cli/workflow_control.rs\nsrc/engine/backend.rs\nsrc/engine/budget.rs\nsrc/engine/condition.rs\nsrc/engine/context.rs\nsrc/engine/context_retrieval.rs\nsrc/engine/context_service.rs\nsrc/engine/decomposition.rs\nsrc/engine/events.rs\nsrc/engine/executor.rs\nsrc/engine/git.rs\nsrc/engine/graph.rs\nsrc/engine/mod.rs\nsrc/engine/package_check.rs\nsrc/engine/package_schema.rs\nsrc/engine/planner.rs\nsrc/engine/project.rs\nsrc/engine/reflection.rs\nsrc/engine/registry.rs\nsrc/engine/resolver.rs\nsrc/engine/routing.rs\nsrc/engine/runtime.rs\nsrc/engine/security.rs\nsrc/engine/session.rs\nsrc/engine/snapshot.rs\nsrc/engine/thread_session_store.rs\nsrc/engine/validator.rs\nsrc/engine/workflow_engine/engine.rs\nsrc/engine/workflow_engine/instance.rs\nsrc/engine/workflow_engine/mod.rs\nsrc/engine/workflow_engine/state_store.rs\nsrc/engine/workflow_engine/step_executor.rs\nsrc/main.rs\nsrc/skill/capability.rs\nsrc/skill/io.rs\nsrc/skill/mod.rs\nsrc/skill/trait.rs\nsrc/skills/dev_workflow.rs\nsrc/skills/echo.rs\nsrc/skills/flaky.rs\nsrc/skills/git_ops.rs\nsrc/skills/idempotency.rs\nsrc/skills/is_positive.rs\nsrc/skills/llm_subagent.rs\nsrc/skills/loader.rs\nsrc/skills/mod.rs\nsrc/skills/model.rs\nsrc/skills/parse_number.rs\nsrc/skills/role_loader.rs\nsrc/skills/vector_memory.rs\nsrc/workflow/loader.rs\nsrc/workflow/mod.rs\nsrc/workflow/model.rs",
         "timeout_ms": 180000,
         "working_dir": "/Users/truongdq/Documents/GitHub/agentic-sdlc"
       }
-    },
-    "remotion_storyboard": {
-      "Text": "Simulated response for skill [remotion_io_visualizer]. Ollama API was unreachable."
     }
   },
   "trace": [

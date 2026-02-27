@@ -70,6 +70,7 @@ const defaultProps: WorkflowIoProps = {
       'cargo run -- --workflow valid_flow.md',
       'cargo run -- workflow doctor',
       'cargo run -- workflow setup',
+      'cargo run -- --workflow-id cybersecurity/security-scan --template cybersecurity/security_scan_prompt --task \"scan internet-surface risk\"',
       'cargo run -- workflow trace <instance_id> --timeline'
     ],
     use_cases: [
@@ -79,16 +80,32 @@ const defaultProps: WorkflowIoProps = {
         outcome: 'impact + acceptance + risk gates before shipping'
       },
       {
-        title: 'Cybersecurity review gate',
-        command: 'cargo run -- --workflow-id cybersecurity/review --template cybersecurity/review_prompt --task \"review auth middleware\"',
-        outcome: 'security-focused release readiness checks'
+        title: 'Security scan gate',
+        command: 'cargo run -- --workflow-id cybersecurity/security-scan --template cybersecurity/security_scan_prompt --task \"scan internet-surface risk\"',
+        outcome: 'mandatory security checks before internet-capable workflows complete'
+      },
+      {
+        title: 'Project intelligence upgrade',
+        command: 'cargo run -- --workflow-id dev/project-intelligence --template dev/project-intelligence_prompt --task \"recommend workflows and skills\"',
+        outcome: 'prioritized workflow and skill roadmap with quick wins'
       }
     ],
     success_output: {
       title: 'Landing page as final production artifact',
       artifact_path: 'docs/landing-astro/dist/index.html',
-      screenshot: 'media/workflow-io-still.png',
+      screenshot: 'media/landing-page-output.png',
       note: 'workflow evidence is translated into a conversion-focused landing page'
+    },
+    voiceover: {
+      audio: null,
+      source: 'none',
+      captions: [
+        { start_s: 0.4, end_s: 4.6, text: 'agentic-sdlc turns software delivery into deterministic, auditable execution.' },
+        { start_s: 4.7, end_s: 9.8, text: 'First, we show structure: CLI, workflow engine, and skill registry layers.' },
+        { start_s: 9.9, end_s: 15.4, text: 'Second, we show CLI commands teams run daily across setup, checks, and tracing.' },
+        { start_s: 15.5, end_s: 21.8, text: 'Third, we show use cases across AI delivery, security scan gating, and project intelligence.' },
+        { start_s: 21.9, end_s: 27.6, text: 'Finally, the landing page ships as the production output from real trace evidence.' }
+      ]
     }
   },
   state: {
@@ -102,7 +119,7 @@ export const RemotionRoot: React.FC = () => {
     <Composition
       id="WorkflowIo"
       component={WorkflowIoVideo}
-      durationInFrames={720}
+      durationInFrames={840}
       fps={30}
       width={1920}
       height={1080}

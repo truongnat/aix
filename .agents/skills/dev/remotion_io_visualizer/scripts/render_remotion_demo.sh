@@ -12,6 +12,7 @@ PROPS_PATH="${LANDING_ROOT}/public/remotion-data/${INSTANCE_ID}.props.json"
 REMOTION_ROOT="${LANDING_ROOT}/remotion"
 LANDING_MEDIA_ROOT="${LANDING_ROOT}/public/media"
 REMOTION_PUBLIC_MEDIA_ROOT="${REMOTION_ROOT}/public/media"
+VOICEOVER_SCRIPT=".agents/skills/dev/remotion_io_visualizer/scripts/generate_ai_voiceover.mjs"
 
 if [[ ! -f "${PROPS_PATH}" ]]; then
   echo "Props file not found: ${PROPS_PATH}"
@@ -25,6 +26,11 @@ if [[ ! -d "${REMOTION_ROOT}" ]]; then
   exit 1
 fi
 
+# Enrich props with AI narration and try to generate voiceover audio.
+if [[ -f "${VOICEOVER_SCRIPT}" ]]; then
+  node "${VOICEOVER_SCRIPT}" "${PROPS_PATH}" "${LANDING_ROOT}/public/media/workflow-io-voice-v2.mp3" || true
+fi
+
 # Remotion staticFile() serves files from remotion/public, so mirror landing media here.
 mkdir -p "${REMOTION_PUBLIC_MEDIA_ROOT}"
 if [[ -d "${LANDING_MEDIA_ROOT}" ]]; then
@@ -36,5 +42,6 @@ fi
 (cd "${REMOTION_ROOT}" && npm run render -- --props "../public/remotion-data/${INSTANCE_ID}.props.json")
 
 echo "Rendered media:"
-echo "  ${LANDING_ROOT}/public/media/workflow-io-still.png"
-echo "  ${LANDING_ROOT}/public/media/workflow-io-demo.mp4"
+echo "  ${LANDING_ROOT}/public/media/workflow-io-still-v2.png"
+echo "  ${LANDING_ROOT}/public/media/workflow-io-demo-v2.mp4"
+echo "  ${LANDING_ROOT}/public/media/workflow-io-voice-v2.mp3 (if generated)"

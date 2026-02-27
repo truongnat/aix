@@ -28,6 +28,18 @@ export interface ShowcaseSuccessOutput {
   note: string;
 }
 
+export interface ShowcaseCaptionLine {
+  start_s: number;
+  end_s: number;
+  text: string;
+}
+
+export interface ShowcaseVoiceover {
+  audio: string | null;
+  source: string;
+  captions: ShowcaseCaptionLine[];
+}
+
 export interface WorkflowIoProps {
   generated_at: string;
   instance_id: string | null;
@@ -56,6 +68,7 @@ export interface WorkflowIoProps {
     cli_commands: string[];
     use_cases: ShowcaseUseCase[];
     success_output: ShowcaseSuccessOutput;
+    voiceover?: ShowcaseVoiceover;
   };
   state: {
     status: string | null;

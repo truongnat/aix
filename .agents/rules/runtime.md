@@ -8,8 +8,36 @@ Schema: antigrav.rule@v1
 
 ```json
 {
-  "allowed_domains": ["demo", "utils", "agent", "dev", "antigravity", "anthropic", "ai-research"],
-  "preferred_domains": ["agent", "dev", "antigravity", "anthropic", "ai-research", "demo", "utils"],
+  "allowed_domains": [
+    "demo",
+    "utils",
+    "agent",
+    "dev",
+    "antigravity",
+    "anthropic",
+    "ai-research",
+    "ai-engineering",
+    "cloud-platform",
+    "cybersecurity",
+    "data-ml-eval",
+    "healthtech",
+    "climate-tech"
+  ],
+  "preferred_domains": [
+    "agent",
+    "dev",
+    "cybersecurity",
+    "ai-engineering",
+    "cloud-platform",
+    "data-ml-eval",
+    "healthtech",
+    "climate-tech",
+    "antigravity",
+    "anthropic",
+    "ai-research",
+    "demo",
+    "utils"
+  ],
   "cross_domain_penalty": 2,
   "strict_mode": true,
   "disable_network": false,

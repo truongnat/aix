@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-02-27T03:32:15.925Z",
+  "generated_at": "2026-02-27T04:07:29.429Z",
   "instance_id": "dev-create-showcase-video-1772163004771-99431",
   "workflow_id": "dev-create-showcase-video",
   "workflow_name": "dev-create-showcase-video",
@@ -140,6 +140,37 @@
       "artifact_path": "docs/landing-astro/dist/index.html",
       "screenshot": "media/landing-page-output.png",
       "note": "Input and runtime evidence are converted to a landing page with visible trust signals."
+    },
+    "voiceover": {
+      "audio": "media/workflow-io-voice-v2.mp3",
+      "source": "local-tts",
+      "captions": [
+        {
+          "start_s": 0.4,
+          "end_s": 4.6,
+          "text": "agentic-sdlc turns software delivery into deterministic, auditable execution."
+        },
+        {
+          "start_s": 4.7,
+          "end_s": 9.8,
+          "text": "First, we show structure: CLI, workflow engine, and skill registry layers."
+        },
+        {
+          "start_s": 9.9,
+          "end_s": 15.4,
+          "text": "Second, we show CLI commands teams run daily across setup, checks, and tracing."
+        },
+        {
+          "start_s": 15.5,
+          "end_s": 21.8,
+          "text": "Third, we show domain use cases across AI engineering, security review, and project intelligence."
+        },
+        {
+          "start_s": 21.9,
+          "end_s": 27.6,
+          "text": "Finally, the landing page ships as the production output from real trace evidence."
+        }
+      ]
     }
   },
   "state": {

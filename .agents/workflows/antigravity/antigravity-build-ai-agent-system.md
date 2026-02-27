@@ -26,3 +26,9 @@ DependsOn: stage_02_design_architecture_and_retrieval
 Skill: antigravity.agent-evaluation
 Input: Goal: Run benchmark scenarios and improve weak areas systematically. Notes: Use test datasets and failure buckets to guide each iteration cycle. Companion skills: agent-evaluation, langfuse, kaizen
 DependsOn: stage_03_implement_orchestration
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: stage_04_evaluate_and_iterate
+Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+
