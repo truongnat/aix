@@ -1,5 +1,35 @@
 [
   {
+    "id": "ai-engineering/acceptance_guard",
+    "path": ".agents/skills/ai-engineering/acceptance_guard.md",
+    "name": "acceptance_guard",
+    "domain": "ai-engineering",
+    "description": "Validate acceptance criteria and test completeness",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "ai-engineering/impact_analyzer",
+    "path": ".agents/skills/ai-engineering/impact_analyzer.md",
+    "name": "impact_analyzer",
+    "domain": "ai-engineering",
+    "description": "Estimate blast radius and dependency impact",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "ai-engineering/risk_register",
+    "path": ".agents/skills/ai-engineering/risk_register.md",
+    "name": "risk_register",
+    "domain": "ai-engineering",
+    "description": "Generate risk register with severity and mitigation",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
     "id": "analyze_code",
     "path": ".agents/skills/analyze_code.md",
     "name": "analyze_code",
@@ -12,6 +42,126 @@
       "backend",
       "planning"
     ]
+  },
+  {
+    "id": "climate-tech/acceptance_guard",
+    "path": ".agents/skills/climate-tech/acceptance_guard.md",
+    "name": "acceptance_guard",
+    "domain": "climate-tech",
+    "description": "Validate acceptance criteria and test completeness",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "climate-tech/impact_analyzer",
+    "path": ".agents/skills/climate-tech/impact_analyzer.md",
+    "name": "impact_analyzer",
+    "domain": "climate-tech",
+    "description": "Estimate blast radius and dependency impact",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "climate-tech/risk_register",
+    "path": ".agents/skills/climate-tech/risk_register.md",
+    "name": "risk_register",
+    "domain": "climate-tech",
+    "description": "Generate risk register with severity and mitigation",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "cloud-platform/acceptance_guard",
+    "path": ".agents/skills/cloud-platform/acceptance_guard.md",
+    "name": "acceptance_guard",
+    "domain": "cloud-platform",
+    "description": "Validate acceptance criteria and test completeness",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "cloud-platform/impact_analyzer",
+    "path": ".agents/skills/cloud-platform/impact_analyzer.md",
+    "name": "impact_analyzer",
+    "domain": "cloud-platform",
+    "description": "Estimate blast radius and dependency impact",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "cloud-platform/risk_register",
+    "path": ".agents/skills/cloud-platform/risk_register.md",
+    "name": "risk_register",
+    "domain": "cloud-platform",
+    "description": "Generate risk register with severity and mitigation",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "cybersecurity/acceptance_guard",
+    "path": ".agents/skills/cybersecurity/acceptance_guard.md",
+    "name": "acceptance_guard",
+    "domain": "cybersecurity",
+    "description": "Validate acceptance criteria and test completeness",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "cybersecurity/impact_analyzer",
+    "path": ".agents/skills/cybersecurity/impact_analyzer.md",
+    "name": "impact_analyzer",
+    "domain": "cybersecurity",
+    "description": "Estimate blast radius and dependency impact",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "cybersecurity/risk_register",
+    "path": ".agents/skills/cybersecurity/risk_register.md",
+    "name": "risk_register",
+    "domain": "cybersecurity",
+    "description": "Generate risk register with severity and mitigation",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "data-ml-eval/acceptance_guard",
+    "path": ".agents/skills/data-ml-eval/acceptance_guard.md",
+    "name": "acceptance_guard",
+    "domain": "data-ml-eval",
+    "description": "Validate acceptance criteria and test completeness",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "data-ml-eval/impact_analyzer",
+    "path": ".agents/skills/data-ml-eval/impact_analyzer.md",
+    "name": "impact_analyzer",
+    "domain": "data-ml-eval",
+    "description": "Estimate blast radius and dependency impact",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "data-ml-eval/risk_register",
+    "path": ".agents/skills/data-ml-eval/risk_register.md",
+    "name": "risk_register",
+    "domain": "data-ml-eval",
+    "description": "Generate risk register with severity and mitigation",
+    "risk": null,
+    "source": null,
+    "tags": []
   },
   {
     "id": "dev/landing_page_architect",
@@ -73,67 +223,41 @@
     ]
   },
   {
+    "id": "healthtech/acceptance_guard",
+    "path": ".agents/skills/healthtech/acceptance_guard.md",
+    "name": "acceptance_guard",
+    "domain": "healthtech",
+    "description": "Validate acceptance criteria and test completeness",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "healthtech/impact_analyzer",
+    "path": ".agents/skills/healthtech/impact_analyzer.md",
+    "name": "impact_analyzer",
+    "domain": "healthtech",
+    "description": "Estimate blast radius and dependency impact",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
+    "id": "healthtech/risk_register",
+    "path": ".agents/skills/healthtech/risk_register.md",
+    "name": "risk_register",
+    "domain": "healthtech",
+    "description": "Generate risk register with severity and mitigation",
+    "risk": null,
+    "source": null,
+    "tags": []
+  },
+  {
     "id": "imported/agent-evaluation",
     "path": ".agents/skills/imported/agent-evaluation.md",
     "name": "agent-evaluation",
     "domain": "antigravity",
     "description": "Testing and benchmarking LLM agents including behavioral testing, capability assessment, reliability metrics, and production monitoring\\u2014where even top agents achieve less than 50% on re...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/ai-agents-architect",
-    "path": ".agents/skills/imported/ai-agents-architect.md",
-    "name": "ai-agents-architect",
-    "domain": "antigravity",
-    "description": "Expert in designing and building autonomous AI agents. Masters tool use, memory systems, planning strategies, and multi-agent orchestration. Use when: build agent, AI agent, autonomous agent, tool ...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/algorithmic-art",
-    "path": ".agents/skills/imported/algorithmic-art.md",
-    "name": "algorithmic-art",
-    "domain": "anthropic",
-    "description": "Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/api-fuzzing-bug-bounty",
-    "path": ".agents/skills/imported/api-fuzzing-bug-bounty.md",
-    "name": "api-fuzzing-bug-bounty",
-    "domain": "antigravity",
-    "description": "This skill should be used when the user asks to \\\"test API security\\\", \\\"fuzz APIs\\\", \\\"find IDOR vulnerabilities\\\", \\\"test REST API\\\", \\\"test GraphQL\\\", \\\"API penetration testing\\\", \\\"bug b...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/api-patterns",
-    "path": ".agents/skills/imported/api-patterns.md",
-    "name": "api-patterns",
-    "domain": "antigravity",
-    "description": "API design principles and decision-making. REST vs GraphQL vs tRPC selection, response formats, versioning, pagination.",
     "risk": "unknown",
     "source": "sickn33/antigravity-awesome-skills",
     "tags": [
@@ -157,216 +281,17 @@
     ]
   },
   {
-    "id": "imported/architecture-decision-records",
-    "path": ".agents/skills/imported/architecture-decision-records.md",
-    "name": "architecture-decision-records",
-    "domain": "antigravity",
-    "description": "Write and maintain Architecture Decision Records (ADRs) following best practices for technical decision documentation. Use when documenting significant technical decisions, reviewing past architect...",
+    "id": "imported/ask-questions-if-underspecified",
+    "path": ".agents/skills/imported/ask-questions-if-underspecified.md",
+    "name": "ask-questions-if-underspecified",
+    "domain": "imported",
+    "description": "Clarify requirements before implementing. Use when serious doubts arise.",
     "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
+    "source": "https://github.com/trailofbits/skills",
     "tags": [
-      "antigravity",
       "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/attack-tree-construction",
-    "path": ".agents/skills/imported/attack-tree-construction.md",
-    "name": "attack-tree-construction",
-    "domain": "antigravity",
-    "description": "Build comprehensive attack trees to visualize threat paths. Use when mapping attack scenarios, identifying defense gaps, or communicating security risks to stakeholders.",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/audiocraft-audio-generation",
-    "path": ".agents/skills/imported/audiocraft-audio-generation.md",
-    "name": "audiocraft-audio-generation",
-    "domain": "ai-research",
-    "description": "PyTorch library for audio generation including text-to-music (MusicGen) and text-to-sound (AudioGen). Use when you need to generate music from text descriptions, create sound effects, or perform melod",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "audio generation",
-      "multimodal",
-      "musicgen",
-      "text-to-audio",
-      "text-to-music"
-    ]
-  },
-  {
-    "id": "imported/auth-implementation-patterns",
-    "path": ".agents/skills/imported/auth-implementation-patterns.md",
-    "name": "auth-implementation-patterns",
-    "domain": "antigravity",
-    "description": "Master authentication and authorization patterns including JWT, OAuth2, session management, and RBAC to build secure, scalable access control systems. Use when implementing auth systems, securing A...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/autogpt-agents",
-    "path": ".agents/skills/imported/autogpt-agents.md",
-    "name": "autogpt-agents",
-    "domain": "ai-research",
-    "description": "Autonomous AI agent platform for building and deploying continuous agents. Use when creating visual workflow agents, deploying persistent autonomous agents, or building complex multi-step AI automatio",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "agents",
-      "ai platform",
-      "ai-research",
-      "autogpt",
-      "autonomous agents",
-      "visual builder",
-      "workflow automation"
-    ]
-  },
-  {
-    "id": "imported/awq-quantization",
-    "path": ".agents/skills/imported/awq-quantization.md",
-    "name": "awq-quantization",
-    "domain": "ai-research",
-    "description": "Activation-aware weight quantization for 4-bit LLM compression with 3x speedup and minimal accuracy loss. Use when deploying large models (7B-70B) on limited GPU memory, when you need faster inference",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "4-bit",
-      "activation-aware",
-      "ai-research",
-      "awq",
-      "fast inference",
-      "marlin kernels",
-      "memory optimization",
-      "optimization",
-      "quantization",
-      "vllm integration"
-    ]
-  },
-  {
-    "id": "imported/axolotl",
-    "path": ".agents/skills/imported/axolotl.md",
-    "name": "axolotl",
-    "domain": "ai-research",
-    "description": "Expert guidance for fine-tuning LLMs with Axolotl - YAML configs, 100+ models, LoRA/QLoRA, DPO/KTO/ORPO/GRPO, multimodal support",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "axolotl",
-      "deepspeed",
-      "dpo",
-      "fine-tuning",
-      "grpo",
-      "huggingface",
-      "kto",
-      "llm",
-      "lora",
-      "multimodal",
-      "orpo",
-      "qlora",
-      "yaml"
-    ]
-  },
-  {
-    "id": "imported/backend-dev-guidelines",
-    "path": ".agents/skills/imported/backend-dev-guidelines.md",
-    "name": "backend-dev-guidelines",
-    "domain": "antigravity",
-    "description": "Opinionated backend development standards for Node.js + Express + TypeScript microservices. Covers layered architecture, BaseController pattern, dependency injection, Prisma repositories, Zod valid...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/blip-2-vision-language",
-    "path": ".agents/skills/imported/blip-2-vision-language.md",
-    "name": "blip-2-vision-language",
-    "domain": "ai-research",
-    "description": "Vision-language pre-training framework bridging frozen image encoders and LLMs. Use when you need image captioning, visual question answering, image-text retrieval, or multimodal chat with state-of-th",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "image captioning",
-      "multimodal",
-      "vision-language",
-      "vqa",
-      "zero-shot"
-    ]
-  },
-  {
-    "id": "imported/brainstorming",
-    "path": ".agents/skills/imported/brainstorming.md",
-    "name": "brainstorming",
-    "domain": "antigravity",
-    "description": "Use before creative or constructive work (features, architecture, behavior). Transforms vague ideas into validated designs through disciplined reasoning and collaboration.",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/brainstorming-research-ideas",
-    "path": ".agents/skills/imported/brainstorming-research-ideas.md",
-    "name": "brainstorming-research-ideas",
-    "domain": "ai-research",
-    "description": "Guides researchers through structured ideation frameworks to discover high-impact research directions. Use when exploring new problem spaces, pivoting between projects, or seeking novel angles on exis",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "brainstorming",
-      "creative thinking",
-      "problem discovery",
-      "research ideation",
-      "research strategy"
-    ]
-  },
-  {
-    "id": "imported/brand-guidelines",
-    "path": ".agents/skills/imported/brand-guidelines.md",
-    "name": "brand-guidelines",
-    "domain": "anthropic",
-    "description": "Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/broken-authentication",
-    "path": ".agents/skills/imported/broken-authentication.md",
-    "name": "broken-authentication",
-    "domain": "antigravity",
-    "description": "This skill should be used when the user asks to \\\"test for broken authentication vulnerabilities\\\", \\\"assess session management security\\\", \\\"perform credential stuffing tests\\\", \\\"evaluate ...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
+      "imported",
+      "skillpack"
     ]
   },
   {
@@ -384,62 +309,6 @@
     ]
   },
   {
-    "id": "imported/canvas-design",
-    "path": ".agents/skills/imported/canvas-design.md",
-    "name": "canvas-design",
-    "domain": "anthropic",
-    "description": "Create beautiful visual art in .png and .pdf documents using design philosophy. You should use this skill when the user asks to create a poster, piece of art, design, or other static piece. Create ori",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/chroma",
-    "path": ".agents/skills/imported/chroma.md",
-    "name": "chroma",
-    "domain": "ai-research",
-    "description": "Open-source embedding database for AI applications. Store embeddings and metadata, perform vector and full-text search, filter by metadata. Simple 4-function API. Scales from notebooks to production c",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "chroma",
-      "document retrieval",
-      "embeddings",
-      "metadata filtering",
-      "open source",
-      "rag",
-      "self-hosted",
-      "semantic search",
-      "vector database"
-    ]
-  },
-  {
-    "id": "imported/clip",
-    "path": ".agents/skills/imported/clip.md",
-    "name": "clip",
-    "domain": "ai-research",
-    "description": "OpenAI's model connecting vision and language. Enables zero-shot image classification, image-text matching, and cross-modal retrieval. Trained on 400M image-text pairs. Use for image search, content m",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "clip",
-      "content moderation",
-      "cross-modal retrieval",
-      "image classification",
-      "image search",
-      "multimodal",
-      "openai",
-      "vision-language",
-      "zero-shot"
-    ]
-  },
-  {
     "id": "imported/code-review-checklist",
     "path": ".agents/skills/imported/code-review-checklist.md",
     "name": "code-review-checklist",
@@ -451,344 +320,6 @@
       "antigravity",
       "external",
       "imported"
-    ]
-  },
-  {
-    "id": "imported/concise-planning",
-    "path": ".agents/skills/imported/concise-planning.md",
-    "name": "concise-planning",
-    "domain": "antigravity",
-    "description": "Use when a user asks for a plan for a coding task, to generate a clear, actionable, and atomic checklist.",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/constitutional-ai",
-    "path": ".agents/skills/imported/constitutional-ai.md",
-    "name": "constitutional-ai",
-    "domain": "ai-research",
-    "description": "Anthropic's method for training harmless AI through self-improvement. Two-phase approach - supervised learning with self-critique/revision, then RLAIF (RL from AI Feedback). Use for safety alignment,",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai safety",
-      "ai-research",
-      "anthropic",
-      "claude",
-      "constitutional ai",
-      "harmlessness",
-      "rl from ai feedback",
-      "rlaif",
-      "safety alignment",
-      "self-critique"
-    ]
-  },
-  {
-    "id": "imported/cqrs-implementation",
-    "path": ".agents/skills/imported/cqrs-implementation.md",
-    "name": "cqrs-implementation",
-    "domain": "antigravity",
-    "description": "Implement Command Query Responsibility Segregation for scalable architectures. Use when separating read and write models, optimizing query performance, or building event-sourced systems.",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/creative-thinking-for-research",
-    "path": ".agents/skills/imported/creative-thinking-for-research.md",
-    "name": "creative-thinking-for-research",
-    "domain": "ai-research",
-    "description": "Applies cognitive science frameworks for creative thinking to CS and AI research ideation. Use when seeking genuinely novel research directions by leveraging combinatorial creativity, analogical reaso",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "analogical reasoning",
-      "cognitive science",
-      "creative thinking",
-      "problem reformulation",
-      "research ideation"
-    ]
-  },
-  {
-    "id": "imported/crewai-multi-agent",
-    "path": ".agents/skills/imported/crewai-multi-agent.md",
-    "name": "crewai-multi-agent",
-    "domain": "ai-research",
-    "description": "Multi-agent orchestration framework for autonomous AI collaboration. Use when building teams of specialized agents working together on complex tasks, when you need role-based agent collaboration with",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "agents",
-      "ai-research",
-      "autonomous",
-      "collaboration",
-      "crewai",
-      "memory",
-      "multi-agent",
-      "orchestration",
-      "production",
-      "role-based",
-      "workflows"
-    ]
-  },
-  {
-    "id": "imported/database-design",
-    "path": ".agents/skills/imported/database-design.md",
-    "name": "database-design",
-    "domain": "antigravity",
-    "description": "Database design principles and decision-making. Schema design, indexing strategy, ORM selection, serverless databases.",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/ddd-context-mapping",
-    "path": ".agents/skills/imported/ddd-context-mapping.md",
-    "name": "ddd-context-mapping",
-    "domain": "antigravity",
-    "description": "Map relationships between bounded contexts and define integration contracts using DDD context mapping patterns.",
-    "risk": "safe",
-    "source": "self",
-    "tags": [
-      "anti-corruption-layer",
-      "antigravity",
-      "context-map",
-      "ddd",
-      "integration"
-    ]
-  },
-  {
-    "id": "imported/ddd-strategic-design",
-    "path": ".agents/skills/imported/ddd-strategic-design.md",
-    "name": "ddd-strategic-design",
-    "domain": "antigravity",
-    "description": "Design DDD strategic artifacts including subdomains, bounded contexts, and ubiquitous language for complex business domains.",
-    "risk": "safe",
-    "source": "self",
-    "tags": [
-      "antigravity",
-      "bounded-context",
-      "ddd",
-      "strategic-design",
-      "ubiquitous-language"
-    ]
-  },
-  {
-    "id": "imported/ddd-tactical-patterns",
-    "path": ".agents/skills/imported/ddd-tactical-patterns.md",
-    "name": "ddd-tactical-patterns",
-    "domain": "antigravity",
-    "description": "Apply DDD tactical patterns in code using entities, value objects, aggregates, repositories, and domain events with explicit invariants.",
-    "risk": "safe",
-    "source": "self",
-    "tags": [
-      "aggregates",
-      "antigravity",
-      "ddd",
-      "domain-events",
-      "tactical",
-      "value-objects"
-    ]
-  },
-  {
-    "id": "imported/deepspeed",
-    "path": ".agents/skills/imported/deepspeed.md",
-    "name": "deepspeed",
-    "domain": "ai-research",
-    "description": "Expert guidance for distributed training with DeepSpeed - ZeRO optimization stages, pipeline parallelism, FP16/BF16/FP8, 1-bit Adam, sparse attention",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "deepspeed",
-      "distributed training",
-      "fp16",
-      "fp8",
-      "large-scale training",
-      "microsoft",
-      "mixed precision",
-      "optimization",
-      "pipeline parallelism",
-      "zero"
-    ]
-  },
-  {
-    "id": "imported/deployment-procedures",
-    "path": ".agents/skills/imported/deployment-procedures.md",
-    "name": "deployment-procedures",
-    "domain": "antigravity",
-    "description": "Production deployment principles and decision-making. Safe deployment workflows, rollback strategies, and verification. Teaches thinking, not scripts.",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/distributed-llm-pretraining-torchtitan",
-    "path": ".agents/skills/imported/distributed-llm-pretraining-torchtitan.md",
-    "name": "distributed-llm-pretraining-torchtitan",
-    "domain": "ai-research",
-    "description": "Provides PyTorch-native distributed LLM pretraining using torchtitan with 4D parallelism (FSDP2, TP, PP, CP). Use when pretraining Llama 3.1, DeepSeek V3, or custom models at scale from 8 to 512+ GPUs",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "context parallel",
-      "distributed training",
-      "float8",
-      "fsdp2",
-      "llama",
-      "model architecture",
-      "pipeline parallel",
-      "pretraining",
-      "tensor parallel",
-      "torchtitan"
-    ]
-  },
-  {
-    "id": "imported/doc-coauthoring",
-    "path": ".agents/skills/imported/doc-coauthoring.md",
-    "name": "doc-coauthoring",
-    "domain": "anthropic",
-    "description": "Guide users through a structured workflow for co-authoring documentation. Use when user wants to write documentation, proposals, technical specs, decision docs, or similar structured content. This wor",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/docx",
-    "path": ".agents/skills/imported/docx.md",
-    "name": "docx",
-    "domain": "anthropic",
-    "description": "Use this skill whenever the user wants to create, read, edit, or manipulate Word documents (.docx files). Triggers include: any mention of 'Word doc', 'word document', '.docx', or requests to produce",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/domain-driven-design",
-    "path": ".agents/skills/imported/domain-driven-design.md",
-    "name": "domain-driven-design",
-    "domain": "antigravity",
-    "description": "Plan and route Domain-Driven Design work from strategic modeling to tactical implementation and evented architecture patterns.",
-    "risk": "safe",
-    "source": "self",
-    "tags": [
-      "antigravity",
-      "architecture",
-      "bounded-context",
-      "ddd",
-      "domain"
-    ]
-  },
-  {
-    "id": "imported/dspy",
-    "path": ".agents/skills/imported/dspy.md",
-    "name": "dspy",
-    "domain": "ai-research",
-    "description": "Build complex AI systems with declarative programming, optimize prompts automatically, create modular RAG systems and agents with DSPy - Stanford NLP's framework for systematic LM programming",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "agents",
-      "ai-research",
-      "automatic optimization",
-      "declarative programming",
-      "dspy",
-      "lm programming",
-      "modular ai",
-      "prompt engineering",
-      "prompt optimization",
-      "rag",
-      "stanford nlp"
-    ]
-  },
-  {
-    "id": "imported/e2e-testing-patterns",
-    "path": ".agents/skills/imported/e2e-testing-patterns.md",
-    "name": "e2e-testing-patterns",
-    "domain": "antigravity",
-    "description": "Master end-to-end testing with Playwright and Cypress to build reliable test suites that catch bugs, improve confidence, and enable fast deployment. Use when implementing E2E tests, debugging flaky...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/embedding-strategies",
-    "path": ".agents/skills/imported/embedding-strategies.md",
-    "name": "embedding-strategies",
-    "domain": "antigravity",
-    "description": "Select and optimize embedding models for semantic search and RAG applications. Use when choosing embedding models, implementing chunking strategies, or optimizing embedding quality for specific dom...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/ethical-hacking-methodology",
-    "path": ".agents/skills/imported/ethical-hacking-methodology.md",
-    "name": "ethical-hacking-methodology",
-    "domain": "antigravity",
-    "description": "This skill should be used when the user asks to \\\"learn ethical hacking\\\", \\\"understand penetration testing lifecycle\\\", \\\"perform reconnaissance\\\", \\\"conduct security scanning\\\", \\\"exploit ...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/evaluating-code-models",
-    "path": ".agents/skills/imported/evaluating-code-models.md",
-    "name": "evaluating-code-models",
-    "domain": "ai-research",
-    "description": "Evaluates code generation models across HumanEval, MBPP, MultiPL-E, and 15+ benchmarks with pass@k metrics. Use when benchmarking code models, comparing coding abilities, testing multi-language suppor",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "benchmarking",
-      "bigcode",
-      "code generation",
-      "code models",
-      "evaluation",
-      "humaneval",
-      "mbpp",
-      "multipl-e",
-      "pass@k"
     ]
   },
   {
@@ -811,382 +342,6 @@
       "lm evaluation harness",
       "mmlu",
       "model quality"
-    ]
-  },
-  {
-    "id": "imported/event-store-design",
-    "path": ".agents/skills/imported/event-store-design.md",
-    "name": "event-store-design",
-    "domain": "antigravity",
-    "description": "Design and implement event stores for event-sourced systems. Use when building event sourcing infrastructure, choosing event store technologies, or implementing event persistence patterns.",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/faiss",
-    "path": ".agents/skills/imported/faiss.md",
-    "name": "faiss",
-    "domain": "ai-research",
-    "description": "Facebook's library for efficient similarity search and clustering of dense vectors. Supports billions of vectors, GPU acceleration, and various index types (Flat, IVF, HNSW). Use for fast k-NN search,",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "billion-scale",
-      "facebook ai",
-      "faiss",
-      "gpu acceleration",
-      "high performance",
-      "hnsw",
-      "k-nn",
-      "large scale",
-      "rag",
-      "similarity search",
-      "vector search"
-    ]
-  },
-  {
-    "id": "imported/fine-tuning-with-trl",
-    "path": ".agents/skills/imported/fine-tuning-with-trl.md",
-    "name": "fine-tuning-with-trl",
-    "domain": "ai-research",
-    "description": "Fine-tune LLMs using reinforcement learning with TRL - SFT for instruction tuning, DPO for preference alignment, PPO/GRPO for reward optimization, and reward model training. Use when need RLHF, align",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "dpo",
-      "fine-tuning",
-      "grpo",
-      "huggingface",
-      "post-training",
-      "ppo",
-      "preference alignment",
-      "reinforcement learning",
-      "rlhf",
-      "sft",
-      "trl"
-    ]
-  },
-  {
-    "id": "imported/frontend-design",
-    "path": ".agents/skills/imported/frontend-design.md",
-    "name": "frontend-design",
-    "domain": "antigravity",
-    "description": "Create distinctive, production-grade frontend interfaces with intentional aesthetics, high craft, and non-generic visual identity. Use when building or styling web UIs, components, pages, dashboard...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/frontend-developer",
-    "path": ".agents/skills/imported/frontend-developer.md",
-    "name": "frontend-developer",
-    "domain": "antigravity",
-    "description": "Build React components, implement responsive layouts, and handle",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/gguf-quantization",
-    "path": ".agents/skills/imported/gguf-quantization.md",
-    "name": "gguf-quantization",
-    "domain": "ai-research",
-    "description": "GGUF format and llama.cpp quantization for efficient CPU/GPU inference. Use when deploying models on consumer hardware, Apple Silicon, or when needing flexible quantization from 2-8 bit without GPU re",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "apple silicon",
-      "cpu inference",
-      "gguf",
-      "llama.cpp",
-      "model compression",
-      "optimization",
-      "quantization"
-    ]
-  },
-  {
-    "id": "imported/go-playwright",
-    "path": ".agents/skills/imported/go-playwright.md",
-    "name": "go-playwright",
-    "domain": "antigravity",
-    "description": "Expert capability for robust, stealthy, and efficient browser automation using Playwright Go.",
-    "risk": "safe",
-    "source": "https://github.com/playwright-community/playwright-go",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/gptq",
-    "path": ".agents/skills/imported/gptq.md",
-    "name": "gptq",
-    "domain": "ai-research",
-    "description": "Post-training 4-bit quantization for LLMs with minimal accuracy loss. Use for deploying large models (70B, 405B) on consumer GPUs, when you need 4× memory reduction with <2% perplexity degradation, or",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "4-bit",
-      "ai-research",
-      "consumer gpus",
-      "fast inference",
-      "gptq",
-      "group-wise quantization",
-      "memory optimization",
-      "optimization",
-      "post-training",
-      "qlora",
-      "quantization"
-    ]
-  },
-  {
-    "id": "imported/grpo-rl-training",
-    "path": ".agents/skills/imported/grpo-rl-training.md",
-    "name": "grpo-rl-training",
-    "domain": "ai-research",
-    "description": "Expert guidance for GRPO/RL fine-tuning with TRL for reasoning and task-specific model training",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "dpo",
-      "grpo",
-      "post-training",
-      "ppo",
-      "reasoning",
-      "reinforcement learning",
-      "reward modeling",
-      "rlhf",
-      "structured output",
-      "trl"
-    ]
-  },
-  {
-    "id": "imported/guidance",
-    "path": ".agents/skills/imported/guidance.md",
-    "name": "guidance",
-    "domain": "ai-research",
-    "description": "Control LLM output with regex and grammars, guarantee valid JSON/XML/code generation, enforce structured formats, and build multi-step workflows with Guidance - Microsoft Research's constrained genera",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "constrained generation",
-      "format enforcement",
-      "grammar",
-      "guidance",
-      "json validation",
-      "microsoft research",
-      "multi-step workflows",
-      "prompt engineering",
-      "structured output"
-    ]
-  },
-  {
-    "id": "imported/hqq-quantization",
-    "path": ".agents/skills/imported/hqq-quantization.md",
-    "name": "hqq-quantization",
-    "domain": "ai-research",
-    "description": "Half-Quadratic Quantization for LLMs without calibration data. Use when quantizing models to 4/3/2-bit precision without needing calibration datasets, for fast quantization workflows, or when deployin",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "hqq",
-      "inference",
-      "memory efficiency",
-      "model compression",
-      "optimization",
-      "quantization"
-    ]
-  },
-  {
-    "id": "imported/huggingface-accelerate",
-    "path": ".agents/skills/imported/huggingface-accelerate.md",
-    "name": "huggingface-accelerate",
-    "domain": "ai-research",
-    "description": "Simplest distributed training API. 4 lines to add distributed support to any PyTorch script. Unified API for DeepSpeed/FSDP/Megatron/DDP. Automatic device placement, mixed precision (FP16/BF16/FP8). I",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "accelerate",
-      "ai-research",
-      "ddp",
-      "deepspeed",
-      "distributed training",
-      "fsdp",
-      "huggingface",
-      "mixed precision",
-      "pytorch",
-      "simple",
-      "unified api"
-    ]
-  },
-  {
-    "id": "imported/huggingface-tokenizers",
-    "path": ".agents/skills/imported/huggingface-tokenizers.md",
-    "name": "huggingface-tokenizers",
-    "domain": "ai-research",
-    "description": "Fast tokenizers optimized for research and production. Rust-based implementation tokenizes 1GB in <20 seconds. Supports BPE, WordPiece, and Unigram algorithms. Train custom vocabularies, track alignme",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "alignment tracking",
-      "bpe",
-      "custom tokenizer",
-      "fast tokenization",
-      "huggingface",
-      "production",
-      "rust",
-      "tokenization",
-      "unigram",
-      "wordpiece"
-    ]
-  },
-  {
-    "id": "imported/idor-testing",
-    "path": ".agents/skills/imported/idor-testing.md",
-    "name": "idor-testing",
-    "domain": "antigravity",
-    "description": "This skill should be used when the user asks to \\\"test for insecure direct object references,\\\" \\\"find IDOR vulnerabilities,\\\" \\\"exploit broken access control,\\\" \\\"enumerate user IDs or obje...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/implementing-llms-litgpt",
-    "path": ".agents/skills/imported/implementing-llms-litgpt.md",
-    "name": "implementing-llms-litgpt",
-    "domain": "ai-research",
-    "description": "Implements and trains LLMs using Lightning AI's LitGPT with 20+ pretrained architectures (Llama, Gemma, Phi, Qwen, Mistral). Use when need clean model implementations, educational understanding of arc",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "educational",
-      "fine-tuning",
-      "gemma",
-      "lightning ai",
-      "litgpt",
-      "llama",
-      "llm implementation",
-      "lora",
-      "mistral",
-      "model architecture",
-      "phi",
-      "qlora"
-    ]
-  },
-  {
-    "id": "imported/instructor",
-    "path": ".agents/skills/imported/instructor.md",
-    "name": "instructor",
-    "domain": "ai-research",
-    "description": "Extract structured data from LLM responses with Pydantic validation, retry failed extractions automatically, parse complex JSON with type safety, and stream partial results with Instructor - battle-te",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "anthropic",
-      "data extraction",
-      "instructor",
-      "json parsing",
-      "openai",
-      "prompt engineering",
-      "pydantic",
-      "streaming",
-      "structured output",
-      "type safety",
-      "validation"
-    ]
-  },
-  {
-    "id": "imported/internal-comms",
-    "path": ".agents/skills/imported/internal-comms.md",
-    "name": "internal-comms",
-    "domain": "anthropic",
-    "description": "A set of resources to help me write all kinds of internal communications, using the formats that my company likes to use. Claude should use this skill whenever asked to write some sort of internal com",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/kaizen",
-    "path": ".agents/skills/imported/kaizen.md",
-    "name": "kaizen",
-    "domain": "antigravity",
-    "description": "Guide for continuous improvement, error proofing, and standardization. Use this skill when the user wants to improve code quality, refactor, or discuss process improvements.",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/knowledge-distillation",
-    "path": ".agents/skills/imported/knowledge-distillation.md",
-    "name": "knowledge-distillation",
-    "domain": "ai-research",
-    "description": "Compress large language models using knowledge distillation from teacher to student models. Use when deploying smaller models with retained performance, transferring GPT-4 capabilities to open-source",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "emerging techniques",
-      "knowledge distillation",
-      "logit distillation",
-      "minillm",
-      "model compression",
-      "model transfer",
-      "reverse kld",
-      "soft targets",
-      "teacher-student",
-      "temperature scaling"
-    ]
-  },
-  {
-    "id": "imported/lambda-labs-gpu-cloud",
-    "path": ".agents/skills/imported/lambda-labs-gpu-cloud.md",
-    "name": "lambda-labs-gpu-cloud",
-    "domain": "ai-research",
-    "description": "Reserved and on-demand GPU cloud instances for ML training and inference. Use when you need dedicated GPU instances with simple SSH access, persistent filesystems, or high-performance multi-node clust",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "gpu cloud",
-      "inference",
-      "infrastructure",
-      "lambda labs",
-      "training"
     ]
   },
   {
@@ -1240,6 +395,20 @@
     ]
   },
   {
+    "id": "imported/langgraph-docs",
+    "path": ".agents/skills/imported/langgraph-docs.md",
+    "name": "langgraph-docs",
+    "domain": "imported",
+    "description": "Use this skill for requests related to LangGraph in order to fetch relevant documentation to provide accurate, up-to-date guidance.",
+    "risk": "unknown",
+    "source": "https://github.com/langchain-ai/deepagents",
+    "tags": [
+      "external",
+      "imported",
+      "skillpack"
+    ]
+  },
+  {
     "id": "imported/langsmith-observability",
     "path": ".agents/skills/imported/langsmith-observability.md",
     "name": "langsmith-observability",
@@ -1261,119 +430,6 @@
     ]
   },
   {
-    "id": "imported/llama-cpp",
-    "path": ".agents/skills/imported/llama-cpp.md",
-    "name": "llama-cpp",
-    "domain": "ai-research",
-    "description": "Runs LLM inference on CPU, Apple Silicon, and consumer GPUs without NVIDIA hardware. Use for edge deployment, M1/M2/M3 Macs, AMD/Intel GPUs, or when CUDA is unavailable. Supports GGUF quantization (1.",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "amd gpus",
-      "apple silicon",
-      "cpu inference",
-      "edge deployment",
-      "embedded",
-      "gguf",
-      "inference serving",
-      "intel gpus",
-      "llama.cpp",
-      "non-nvidia",
-      "quantization"
-    ]
-  },
-  {
-    "id": "imported/llama-factory",
-    "path": ".agents/skills/imported/llama-factory.md",
-    "name": "llama-factory",
-    "domain": "ai-research",
-    "description": "Expert guidance for fine-tuning LLMs with LLaMA-Factory - WebUI no-code, 100+ models, 2/3/4/5/6/8-bit QLoRA, multimodal support",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "fine-tuning",
-      "gemma",
-      "huggingface",
-      "llama",
-      "llama factory",
-      "llm",
-      "lora",
-      "multimodal",
-      "no-code",
-      "qlora",
-      "qwen",
-      "webui"
-    ]
-  },
-  {
-    "id": "imported/llamaguard",
-    "path": ".agents/skills/imported/llamaguard.md",
-    "name": "llamaguard",
-    "domain": "ai-research",
-    "description": "Meta's 7-8B specialized moderation model for LLM input/output filtering. 6 safety categories - violence/hate, sexual content, weapons, substances, self-harm, criminal planning. 94-95% accuracy. Deploy",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai safety",
-      "ai-research",
-      "content moderation",
-      "guardrails",
-      "input filtering",
-      "llamaguard",
-      "meta",
-      "output filtering",
-      "safety alignment",
-      "safety classification"
-    ]
-  },
-  {
-    "id": "imported/llamaindex",
-    "path": ".agents/skills/imported/llamaindex.md",
-    "name": "llamaindex",
-    "domain": "ai-research",
-    "description": "Data framework for building LLM applications with RAG. Specializes in document ingestion (300+ connectors), indexing, and querying. Features vector indices, query engines, agents, and multi-modal supp",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "agents",
-      "ai-research",
-      "connectors",
-      "data framework",
-      "document ingestion",
-      "knowledge retrieval",
-      "llamaindex",
-      "multimodal",
-      "private data",
-      "query engines",
-      "rag",
-      "vector indices"
-    ]
-  },
-  {
-    "id": "imported/llava",
-    "path": ".agents/skills/imported/llava.md",
-    "name": "llava",
-    "domain": "ai-research",
-    "description": "Large Language and Vision Assistant. Enables visual instruction tuning and image-based conversations. Combines CLIP vision encoder with Vicuna/LLaMA language models. Supports multi-turn image chat, vi",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "clip",
-      "conversational ai",
-      "image chat",
-      "instruction tuning",
-      "llava",
-      "multimodal",
-      "vicuna",
-      "vision-language",
-      "visual question answering",
-      "vqa"
-    ]
-  },
-  {
     "id": "imported/llm-app-patterns",
     "path": ".agents/skills/imported/llm-app-patterns.md",
     "name": "llm-app-patterns",
@@ -1385,50 +441,6 @@
       "antigravity",
       "external",
       "imported"
-    ]
-  },
-  {
-    "id": "imported/long-context",
-    "path": ".agents/skills/imported/long-context.md",
-    "name": "long-context",
-    "domain": "ai-research",
-    "description": "Extend context windows of transformer models using RoPE, YaRN, ALiBi, and position interpolation techniques. Use when processing long documents (32k-128k+ tokens), extending pre-trained models beyond",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "alibi",
-      "attention bias",
-      "context extension",
-      "emerging techniques",
-      "extended context",
-      "long context",
-      "position interpolation",
-      "positional encoding",
-      "rope",
-      "rotary embeddings",
-      "yarn"
-    ]
-  },
-  {
-    "id": "imported/mamba-architecture",
-    "path": ".agents/skills/imported/mamba-architecture.md",
-    "name": "mamba-architecture",
-    "domain": "ai-research",
-    "description": "State-space model with O(n) complexity vs Transformers' O(n²). 5× faster inference, million-token sequences, no KV cache. Selective SSM with hardware-aware design. Mamba-1 (d_state=16) and Mamba-2 (d_",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "alternative to transformers",
-      "efficient inference",
-      "hardware-aware",
-      "linear complexity",
-      "long context",
-      "mamba",
-      "model architecture",
-      "ssm",
-      "state space models"
     ]
   },
   {
@@ -1446,264 +458,6 @@
     ]
   },
   {
-    "id": "imported/miles-rl-training",
-    "path": ".agents/skills/imported/miles-rl-training.md",
-    "name": "miles-rl-training",
-    "domain": "ai-research",
-    "description": "Provides guidance for enterprise-grade RL training using miles, a production-ready fork of slime. Use when training large MoE models with FP8/INT4, needing train-inference alignment, or requiring spec",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "enterprise",
-      "fp8",
-      "int4",
-      "megatron-lm",
-      "moe",
-      "reinforcement learning",
-      "sglang"
-    ]
-  },
-  {
-    "id": "imported/ml-paper-writing",
-    "path": ".agents/skills/imported/ml-paper-writing.md",
-    "name": "ml-paper-writing",
-    "domain": "ai-research",
-    "description": "Write publication-ready ML/AI papers for NeurIPS, ICML, ICLR, ACL, AAAI, COLM. Use when drafting papers from research repos, structuring arguments, verifying citations, or preparing camera-ready submi",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "aaai",
-      "academic writing",
-      "acl",
-      "ai-research",
-      "citations",
-      "colm",
-      "iclr",
-      "icml",
-      "latex",
-      "neurips",
-      "paper writing",
-      "research"
-    ]
-  },
-  {
-    "id": "imported/mlflow",
-    "path": ".agents/skills/imported/mlflow.md",
-    "name": "mlflow",
-    "domain": "ai-research",
-    "description": "Track ML experiments, manage model registry with versioning, deploy models to production, and reproduce experiments with MLflow - framework-agnostic ML lifecycle platform",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "deployment",
-      "experiment tracking",
-      "huggingface",
-      "ml lifecycle",
-      "mlflow",
-      "mlops",
-      "model registry",
-      "model versioning",
-      "pytorch",
-      "scikit-learn",
-      "tensorflow"
-    ]
-  },
-  {
-    "id": "imported/modal-serverless-gpu",
-    "path": ".agents/skills/imported/modal-serverless-gpu.md",
-    "name": "modal-serverless-gpu",
-    "domain": "ai-research",
-    "description": "Serverless GPU cloud platform for running ML workloads. Use when you need on-demand GPU access without infrastructure management, deploying ML models as APIs, or running batch jobs with automatic scal",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "cloud",
-      "deployment",
-      "gpu",
-      "infrastructure",
-      "modal",
-      "serverless"
-    ]
-  },
-  {
-    "id": "imported/model-merging",
-    "path": ".agents/skills/imported/model-merging.md",
-    "name": "model-merging",
-    "domain": "ai-research",
-    "description": "Merge multiple fine-tuned models using mergekit to combine capabilities without retraining. Use when creating specialized models by blending domain-specific expertise (math + coding + chat), improving",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "arcee ai",
-      "dare",
-      "emerging techniques",
-      "mergekit",
-      "model fusion",
-      "model merging",
-      "multi-capability",
-      "no retraining",
-      "slerp",
-      "task arithmetic",
-      "ties"
-    ]
-  },
-  {
-    "id": "imported/model-pruning",
-    "path": ".agents/skills/imported/model-pruning.md",
-    "name": "model-pruning",
-    "domain": "ai-research",
-    "description": "Reduce LLM size and accelerate inference using pruning techniques like Wanda and SparseGPT. Use when compressing models without retraining, achieving 50% sparsity with minimal accuracy loss, or enabli",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "emerging techniques",
-      "fast inference",
-      "model compression",
-      "model pruning",
-      "n:m sparsity",
-      "one-shot pruning",
-      "sparsegpt",
-      "sparsity",
-      "structured pruning",
-      "unstructured pruning",
-      "wanda"
-    ]
-  },
-  {
-    "id": "imported/moe-training",
-    "path": ".agents/skills/imported/moe-training.md",
-    "name": "moe-training",
-    "domain": "ai-research",
-    "description": "Train Mixture of Experts (MoE) models using DeepSpeed or HuggingFace. Use when training large-scale models with limited compute (5× cost reduction vs dense models), implementing sparse architectures l",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "deepseek",
-      "deepspeed",
-      "efficient training",
-      "emerging techniques",
-      "expert parallelism",
-      "load balancing",
-      "mixtral",
-      "mixture of experts",
-      "moe",
-      "routing",
-      "sparse models"
-    ]
-  },
-  {
-    "id": "imported/nanogpt",
-    "path": ".agents/skills/imported/nanogpt.md",
-    "name": "nanogpt",
-    "domain": "ai-research",
-    "description": "Educational GPT implementation in ~300 lines. Reproduces GPT-2 (124M) on OpenWebText. Clean, hackable code for learning transformers. By Andrej Karpathy. Perfect for understanding GPT architecture fro",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "andrej karpathy",
-      "educational",
-      "from scratch",
-      "gpt-2",
-      "minimalist",
-      "model architecture",
-      "nanogpt",
-      "training",
-      "transformer"
-    ]
-  },
-  {
-    "id": "imported/nemo-curator",
-    "path": ".agents/skills/imported/nemo-curator.md",
-    "name": "nemo-curator",
-    "domain": "ai-research",
-    "description": "GPU-accelerated data curation for LLM training. Supports text/image/video/audio. Features fuzzy deduplication (16× faster), quality filtering (30+ heuristics), semantic deduplication, PII redaction, N",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "data curation",
-      "data processing",
-      "deduplication",
-      "gpu acceleration",
-      "llm training data",
-      "multimodal",
-      "nemo curator",
-      "nvidia",
-      "pii redaction",
-      "quality filtering",
-      "rapids"
-    ]
-  },
-  {
-    "id": "imported/nemo-evaluator-sdk",
-    "path": ".agents/skills/imported/nemo-evaluator-sdk.md",
-    "name": "nemo-evaluator-sdk",
-    "domain": "ai-research",
-    "description": "Evaluates LLMs across 100+ benchmarks from 18+ harnesses (MMLU, HumanEval, GSM8K, safety, VLM) with multi-backend execution. Use when needing scalable evaluation on local Docker, Slurm HPC, or cloud p",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "benchmarking",
-      "docker",
-      "enterprise",
-      "evaluation",
-      "humaneval",
-      "mmlu",
-      "multi-backend",
-      "nemo",
-      "nvidia",
-      "reproducible",
-      "slurm"
-    ]
-  },
-  {
-    "id": "imported/nemo-guardrails",
-    "path": ".agents/skills/imported/nemo-guardrails.md",
-    "name": "nemo-guardrails",
-    "domain": "ai-research",
-    "description": "NVIDIA's runtime safety framework for LLM applications. Features jailbreak detection, input/output validation, fact-checking, hallucination detection, PII filtering, toxicity detection. Uses Colang 2.",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "colang",
-      "guardrails",
-      "hallucination detection",
-      "jailbreak detection",
-      "nemo guardrails",
-      "nvidia",
-      "pii filtering",
-      "production",
-      "runtime safety",
-      "safety alignment"
-    ]
-  },
-  {
-    "id": "imported/nnsight-remote-interpretability",
-    "path": ".agents/skills/imported/nnsight-remote-interpretability.md",
-    "name": "nnsight-remote-interpretability",
-    "domain": "ai-research",
-    "description": "Provides guidance for interpreting and manipulating neural network internals using nnsight with optional NDIF remote execution. Use when needing to run interpretability experiments on massive models (",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "mechanistic interpretability",
-      "model internals",
-      "ndif",
-      "nnsight",
-      "remote execution"
-    ]
-  },
-  {
     "id": "imported/observability-engineer",
     "path": ".agents/skills/imported/observability-engineer.md",
     "name": "observability-engineer",
@@ -1715,110 +469,6 @@
       "antigravity",
       "external",
       "imported"
-    ]
-  },
-  {
-    "id": "imported/openrlhf-training",
-    "path": ".agents/skills/imported/openrlhf-training.md",
-    "name": "openrlhf-training",
-    "domain": "ai-research",
-    "description": "High-performance RLHF framework with Ray+vLLM acceleration. Use for PPO, GRPO, RLOO, DPO training of large models (7B-70B+). Built on Ray, vLLM, ZeRO-3. 2× faster than DeepSpeedChat with distributed a",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "distributed training",
-      "dpo",
-      "grpo",
-      "large models",
-      "openrlhf",
-      "post-training",
-      "ppo",
-      "ray",
-      "rlhf",
-      "rloo",
-      "vllm",
-      "zero-3"
-    ]
-  },
-  {
-    "id": "imported/optimizing-attention-flash",
-    "path": ".agents/skills/imported/optimizing-attention-flash.md",
-    "name": "optimizing-attention-flash",
-    "domain": "ai-research",
-    "description": "Optimizes transformer attention with Flash Attention for 2-4x speedup and 10-20x memory reduction. Use when training/running transformers with long sequences (>512 tokens), encountering GPU memory iss",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "attention optimization",
-      "flash attention",
-      "fp8",
-      "h100",
-      "long context",
-      "memory efficiency",
-      "optimization",
-      "pytorch",
-      "sdpa",
-      "speed optimization",
-      "transformers"
-    ]
-  },
-  {
-    "id": "imported/outlines",
-    "path": ".agents/skills/imported/outlines.md",
-    "name": "outlines",
-    "domain": "ai-research",
-    "description": "Guarantee valid JSON/XML/code structure during generation, use Pydantic models for type-safe outputs, support local models (Transformers, vLLM), and maximize inference speed with Outlines - dottxt.ai'",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "grammar-based generation",
-      "json schema",
-      "local models",
-      "outlines",
-      "prompt engineering",
-      "pydantic",
-      "structured generation",
-      "transformers",
-      "type safety",
-      "vllm"
-    ]
-  },
-  {
-    "id": "imported/pdf",
-    "path": ".agents/skills/imported/pdf.md",
-    "name": "pdf",
-    "domain": "anthropic",
-    "description": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rota",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/peft-fine-tuning",
-    "path": ".agents/skills/imported/peft-fine-tuning.md",
-    "name": "peft-fine-tuning",
-    "domain": "ai-research",
-    "description": "Parameter-efficient fine-tuning for LLMs using LoRA, QLoRA, and 25+ methods. Use when fine-tuning large models (7B-70B) with limited GPU memory, when you need to train <1% of parameters with minimal a",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "adapters",
-      "ai-research",
-      "fine-tuning",
-      "lora",
-      "low-rank",
-      "memory optimization",
-      "multi-adapter",
-      "parameter-efficient",
-      "peft",
-      "qlora"
     ]
   },
   {
@@ -1864,143 +514,6 @@
     ]
   },
   {
-    "id": "imported/postmortem-writing",
-    "path": ".agents/skills/imported/postmortem-writing.md",
-    "name": "postmortem-writing",
-    "domain": "antigravity",
-    "description": "Write effective blameless postmortems with root cause analysis, timelines, and action items. Use when conducting incident reviews, writing postmortem documents, or improving incident response proce...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/pptx",
-    "path": ".agents/skills/imported/pptx.md",
-    "name": "pptx",
-    "domain": "anthropic",
-    "description": "Use this skill any time a .pptx file is involved in any way — as input, output, or both. This includes: creating slide decks, pitch decks, or presentations; reading, parsing, or extracting text from a",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/product-manager-toolkit",
-    "path": ".agents/skills/imported/product-manager-toolkit.md",
-    "name": "product-manager-toolkit",
-    "domain": "antigravity",
-    "description": "Comprehensive toolkit for product managers including RICE prioritization, customer interview analysis, PRD templates, discovery frameworks, and go-to-market strategies. Use for feature prioritizati...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/projection-patterns",
-    "path": ".agents/skills/imported/projection-patterns.md",
-    "name": "projection-patterns",
-    "domain": "antigravity",
-    "description": "Build read models and projections from event streams. Use when implementing CQRS read sides, building materialized views, or optimizing query performance in event-sourced systems.",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/prompt-guard",
-    "path": ".agents/skills/imported/prompt-guard.md",
-    "name": "prompt-guard",
-    "domain": "ai-research",
-    "description": "Meta's 86M prompt injection and jailbreak detector. Filters malicious prompts and third-party data for LLM apps. 99%+ TPR, <1% FPR. Fast (<2ms GPU). Multilingual (8 languages). Deploy with HuggingFace",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "content filtering",
-      "input validation",
-      "jailbreak detection",
-      "meta",
-      "multilingual",
-      "prompt injection",
-      "safety alignment",
-      "security"
-    ]
-  },
-  {
-    "id": "imported/pytorch-fsdp2",
-    "path": ".agents/skills/imported/pytorch-fsdp2.md",
-    "name": "pytorch-fsdp2",
-    "domain": "ai-research",
-    "description": "Adds PyTorch FSDP2 (fully_shard) to training scripts with correct init, sharding, mixed precision/offload config, and distributed checkpointing. Use when models exceed single-GPU memory or when you ne",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "device mesh",
-      "distributed training",
-      "dtensor",
-      "fsdp2",
-      "fully sharded data parallel",
-      "mixed precision",
-      "offload",
-      "pytorch",
-      "sharded checkpointing",
-      "torch distributed"
-    ]
-  },
-  {
-    "id": "imported/pytorch-lightning",
-    "path": ".agents/skills/imported/pytorch-lightning.md",
-    "name": "pytorch-lightning",
-    "domain": "ai-research",
-    "description": "High-level PyTorch framework with Trainer class, automatic distributed training (DDP/FSDP/DeepSpeed), callbacks system, and minimal boilerplate. Scales from laptop to supercomputer with same code. Use",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "best practices",
-      "callbacks",
-      "ddp",
-      "deepspeed",
-      "distributed training",
-      "fsdp",
-      "high-level api",
-      "pytorch lightning",
-      "scalable",
-      "training framework"
-    ]
-  },
-  {
-    "id": "imported/pyvene-interventions",
-    "path": ".agents/skills/imported/pyvene-interventions.md",
-    "name": "pyvene-interventions",
-    "domain": "ai-research",
-    "description": "Provides guidance for performing causal interventions on PyTorch models using pyvene's declarative intervention framework. Use when conducting causal tracing, activation patching, interchange interven",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "activation patching",
-      "ai-research",
-      "causal intervention",
-      "causal tracing",
-      "interpretability",
-      "pyvene"
-    ]
-  },
-  {
     "id": "imported/qdrant-vector-search",
     "path": ".agents/skills/imported/qdrant-vector-search.md",
     "name": "qdrant-vector-search",
@@ -2022,128 +535,12 @@
     ]
   },
   {
-    "id": "imported/quantizing-models-bitsandbytes",
-    "path": ".agents/skills/imported/quantizing-models-bitsandbytes.md",
-    "name": "quantizing-models-bitsandbytes",
-    "domain": "ai-research",
-    "description": "Quantizes LLMs to 8-bit or 4-bit for 50-75% memory reduction with minimal accuracy loss. Use when GPU memory is limited, need to fit larger models, or want faster inference. Supports INT8, NF4, FP4 fo",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "4-bit",
-      "8-bit",
-      "ai-research",
-      "bitsandbytes",
-      "efficient inference",
-      "huggingface",
-      "int8",
-      "memory optimization",
-      "nf4",
-      "optimization",
-      "qlora",
-      "quantization"
-    ]
-  },
-  {
     "id": "imported/rag-implementation",
     "path": ".agents/skills/imported/rag-implementation.md",
     "name": "rag-implementation",
     "domain": "antigravity",
     "description": "RAG (Retrieval-Augmented Generation) implementation workflow covering embedding selection, vector database setup, chunking strategies, and retrieval optimization.",
     "risk": "safe",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/ray-data",
-    "path": ".agents/skills/imported/ray-data.md",
-    "name": "ray-data",
-    "domain": "ai-research",
-    "description": "Scalable data processing for ML workloads. Streaming execution across CPU/GPU, supports Parquet/CSV/JSON/images. Integrates with Ray Train, PyTorch, TensorFlow. Scales from single machine to 100s of n",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "batch inference",
-      "data processing",
-      "distributed computing",
-      "etl",
-      "ml pipelines",
-      "pytorch",
-      "ray",
-      "ray data",
-      "scalable",
-      "tensorflow"
-    ]
-  },
-  {
-    "id": "imported/ray-train",
-    "path": ".agents/skills/imported/ray-train.md",
-    "name": "ray-train",
-    "domain": "ai-research",
-    "description": "Distributed training orchestration across clusters. Scales PyTorch/TensorFlow/HuggingFace from laptop to 1000s of nodes. Built-in hyperparameter tuning with Ray Tune, fault tolerance, elastic scaling.",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "distributed training",
-      "elastic scaling",
-      "fault tolerance",
-      "hyperparameter tuning",
-      "multi-node",
-      "orchestration",
-      "pytorch",
-      "ray",
-      "ray train",
-      "tensorflow"
-    ]
-  },
-  {
-    "id": "imported/react-patterns",
-    "path": ".agents/skills/imported/react-patterns.md",
-    "name": "react-patterns",
-    "domain": "antigravity",
-    "description": "Modern React patterns and principles. Hooks, composition, performance, TypeScript best practices.",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/rwkv-architecture",
-    "path": ".agents/skills/imported/rwkv-architecture.md",
-    "name": "rwkv-architecture",
-    "domain": "ai-research",
-    "description": "RNN+Transformer hybrid with O(n) inference. Linear time, infinite context, no KV cache. Train like GPT (parallel), infer like RNN (sequential). Linux Foundation AI project. Production at Windows, Offi",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "alternative architecture",
-      "efficient inference",
-      "infinite context",
-      "linear complexity",
-      "linux foundation",
-      "model architecture",
-      "rnn",
-      "rwkv",
-      "transformer hybrid"
-    ]
-  },
-  {
-    "id": "imported/saga-orchestration",
-    "path": ".agents/skills/imported/saga-orchestration.md",
-    "name": "saga-orchestration",
-    "domain": "antigravity",
-    "description": "Implement saga patterns for distributed transactions and cross-aggregate workflows. Use when coordinating multi-step business processes, handling compensating transactions, or managing long-running...",
-    "risk": "unknown",
     "source": "sickn33/antigravity-awesome-skills",
     "tags": [
       "antigravity",
@@ -2180,144 +577,6 @@
     ]
   },
   {
-    "id": "imported/segment-anything-model",
-    "path": ".agents/skills/imported/segment-anything-model.md",
-    "name": "segment-anything-model",
-    "domain": "ai-research",
-    "description": "Foundation model for image segmentation with zero-shot transfer. Use when you need to segment any object in images using points, boxes, or masks as prompts, or automatically generate all object masks",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "computer vision",
-      "image segmentation",
-      "multimodal",
-      "sam",
-      "zero-shot"
-    ]
-  },
-  {
-    "id": "imported/sentence-transformers",
-    "path": ".agents/skills/imported/sentence-transformers.md",
-    "name": "sentence-transformers",
-    "domain": "ai-research",
-    "description": "Framework for state-of-the-art sentence, text, and image embeddings. Provides 5000+ pre-trained models for semantic similarity, clustering, and retrieval. Supports multilingual, domain-specific, and m",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "clustering",
-      "embeddings",
-      "multilingual",
-      "multimodal",
-      "pre-trained models",
-      "production",
-      "rag",
-      "semantic search",
-      "semantic similarity",
-      "sentence transformers"
-    ]
-  },
-  {
-    "id": "imported/sentencepiece",
-    "path": ".agents/skills/imported/sentencepiece.md",
-    "name": "sentencepiece",
-    "domain": "ai-research",
-    "description": "Language-independent tokenizer treating text as raw Unicode. Supports BPE and Unigram algorithms. Fast (50k sentences/sec), lightweight (6MB memory), deterministic vocabulary. Used by T5, ALBERT, XLNe",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "bpe",
-      "cjk languages",
-      "deterministic",
-      "google",
-      "language-independent",
-      "multilingual",
-      "sentencepiece",
-      "tokenization",
-      "unicode",
-      "unigram"
-    ]
-  },
-  {
-    "id": "imported/serving-llms-vllm",
-    "path": ".agents/skills/imported/serving-llms-vllm.md",
-    "name": "serving-llms-vllm",
-    "domain": "ai-research",
-    "description": "Serves LLMs with high throughput using vLLM's PagedAttention and continuous batching. Use when deploying production LLM APIs, optimizing inference latency/throughput, or serving models with limited GP",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "continuous batching",
-      "high throughput",
-      "inference serving",
-      "openai api",
-      "pagedattention",
-      "production",
-      "quantization",
-      "tensor parallelism",
-      "vllm"
-    ]
-  },
-  {
-    "id": "imported/sglang",
-    "path": ".agents/skills/imported/sglang.md",
-    "name": "sglang",
-    "domain": "ai-research",
-    "description": "Fast structured generation and serving for LLMs with RadixAttention prefix caching. Use for JSON/regex outputs, constrained decoding, agentic workflows with tool calls, or when you need 5× faster infe",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "agents",
-      "ai-research",
-      "constrained decoding",
-      "fast inference",
-      "inference serving",
-      "json output",
-      "prefix caching",
-      "production scale",
-      "radixattention",
-      "sglang",
-      "structured generation"
-    ]
-  },
-  {
-    "id": "imported/simpo-training",
-    "path": ".agents/skills/imported/simpo-training.md",
-    "name": "simpo-training",
-    "domain": "ai-research",
-    "description": "Simple Preference Optimization for LLM alignment. Reference-free alternative to DPO with better performance (+6.4 points on AlpacaEval 2.0). No reference model needed, more efficient than DPO. Use for",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "alignment",
-      "dpo alternative",
-      "efficient training",
-      "llm alignment",
-      "post-training",
-      "preference optimization",
-      "reference-free",
-      "simpo"
-    ]
-  },
-  {
-    "id": "imported/skill-creator",
-    "path": ".agents/skills/imported/skill-creator.md",
-    "name": "skill-creator",
-    "domain": "anthropic",
-    "description": "Create new skills, modify and improve existing skills, and measure skill performance. Use when users want to create a skill from scratch, update or optimize an existing skill, run evals to test a skil",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
-      "external",
-      "imported"
-    ]
-  },
-  {
     "id": "imported/skypilot-multi-cloud-orchestration",
     "path": ".agents/skills/imported/skypilot-multi-cloud-orchestration.md",
     "name": "skypilot-multi-cloud-orchestration",
@@ -2336,95 +595,6 @@
     ]
   },
   {
-    "id": "imported/slack-gif-creator",
-    "path": ".agents/skills/imported/slack-gif-creator.md",
-    "name": "slack-gif-creator",
-    "domain": "anthropic",
-    "description": "Knowledge and utilities for creating animated GIFs optimized for Slack. Provides constraints, validation tools, and animation concepts. Use when users request animated GIFs for Slack like \"make me a G",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/slime-rl-training",
-    "path": ".agents/skills/imported/slime-rl-training.md",
-    "name": "slime-rl-training",
-    "domain": "ai-research",
-    "description": "Provides guidance for LLM post-training with RL using slime, a Megatron+SGLang framework. Use when training GLM models, implementing custom data generation workflows, or needing tight Megatron-LM inte",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "glm",
-      "grpo",
-      "megatron-lm",
-      "post-training",
-      "reinforcement learning",
-      "sglang"
-    ]
-  },
-  {
-    "id": "imported/sparse-autoencoder-training",
-    "path": ".agents/skills/imported/sparse-autoencoder-training.md",
-    "name": "sparse-autoencoder-training",
-    "domain": "ai-research",
-    "description": "Provides guidance for training and analyzing Sparse Autoencoders (SAEs) using SAELens to decompose neural network activations into interpretable features. Use when discovering interpretable features,",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "feature discovery",
-      "mechanistic interpretability",
-      "sae",
-      "sparse autoencoders",
-      "superposition"
-    ]
-  },
-  {
-    "id": "imported/speculative-decoding",
-    "path": ".agents/skills/imported/speculative-decoding.md",
-    "name": "speculative-decoding",
-    "domain": "ai-research",
-    "description": "Accelerate LLM inference using speculative decoding, Medusa multiple heads, and lookahead decoding techniques. Use when optimizing inference speed (1.5-3.6× speedup), reducing latency for real-time ap",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "draft models",
-      "emerging techniques",
-      "fast inference",
-      "inference optimization",
-      "latency reduction",
-      "lookahead decoding",
-      "medusa",
-      "parallel generation",
-      "speculative decoding",
-      "tree attention"
-    ]
-  },
-  {
-    "id": "imported/stable-diffusion-image-generation",
-    "path": ".agents/skills/imported/stable-diffusion-image-generation.md",
-    "name": "stable-diffusion-image-generation",
-    "domain": "ai-research",
-    "description": "State-of-the-art text-to-image generation with Stable Diffusion models via HuggingFace Diffusers. Use when generating images from text prompts, performing image-to-image translation, inpainting, or bu",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "computer vision",
-      "diffusers",
-      "image generation",
-      "multimodal",
-      "stable diffusion",
-      "text-to-image"
-    ]
-  },
-  {
     "id": "imported/systematic-debugging",
     "path": ".agents/skills/imported/systematic-debugging.md",
     "name": "systematic-debugging",
@@ -2439,50 +609,6 @@
     ]
   },
   {
-    "id": "imported/tensorboard",
-    "path": ".agents/skills/imported/tensorboard.md",
-    "name": "tensorboard",
-    "domain": "ai-research",
-    "description": "Visualize training metrics, debug models with histograms, compare experiments, visualize model graphs, and profile performance with TensorBoard - Google's ML visualization toolkit",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "experiment tracking",
-      "mlops",
-      "model debugging",
-      "performance profiling",
-      "pytorch",
-      "tensorboard",
-      "tensorflow",
-      "training metrics",
-      "visualization"
-    ]
-  },
-  {
-    "id": "imported/tensorrt-llm",
-    "path": ".agents/skills/imported/tensorrt-llm.md",
-    "name": "tensorrt-llm",
-    "domain": "ai-research",
-    "description": "Optimizes LLM inference with NVIDIA TensorRT for maximum throughput and lowest latency. Use for production deployment on NVIDIA GPUs (A100/H100), when you need 10-100x faster inference than PyTorch, o",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "fp8",
-      "high throughput",
-      "in-flight batching",
-      "inference optimization",
-      "inference serving",
-      "int4",
-      "low latency",
-      "multi-gpu",
-      "nvidia",
-      "production",
-      "tensorrt-llm"
-    ]
-  },
-  {
     "id": "imported/test-driven-development",
     "path": ".agents/skills/imported/test-driven-development.md",
     "name": "test-driven-development",
@@ -2492,34 +618,6 @@
     "source": "sickn33/antigravity-awesome-skills",
     "tags": [
       "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/test-fixing",
-    "path": ".agents/skills/imported/test-fixing.md",
-    "name": "test-fixing",
-    "domain": "antigravity",
-    "description": "Run tests and systematically fix all failing tests using smart error grouping. Use when user asks to fix failing tests, mentions test failures, runs test suite and failures occur, or requests to ma...",
-    "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
-    "tags": [
-      "antigravity",
-      "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/theme-factory",
-    "path": ".agents/skills/imported/theme-factory.md",
-    "name": "theme-factory",
-    "domain": "anthropic",
-    "description": "Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact t",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
       "external",
       "imported"
     ]
@@ -2553,85 +651,6 @@
     ]
   },
   {
-    "id": "imported/torchforge-rl-training",
-    "path": ".agents/skills/imported/torchforge-rl-training.md",
-    "name": "torchforge-rl-training",
-    "domain": "ai-research",
-    "description": "Provides guidance for PyTorch-native agentic RL using torchforge, Meta's library separating infra from algorithms. Use when you want clean RL abstractions, easy algorithm experimentation, or scalable",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "grpo",
-      "meta",
-      "monarch",
-      "pytorch",
-      "reinforcement learning",
-      "sft",
-      "torchtitan"
-    ]
-  },
-  {
-    "id": "imported/training-llms-megatron",
-    "path": ".agents/skills/imported/training-llms-megatron.md",
-    "name": "training-llms-megatron",
-    "domain": "ai-research",
-    "description": "Trains large language models (2B-462B parameters) using NVIDIA Megatron-Core with advanced parallelism strategies. Use when training models >1B parameters, need maximum GPU efficiency (47% MFU on H100",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "distributed training",
-      "h100",
-      "large-scale training",
-      "megatron-core",
-      "model parallelism",
-      "nvidia",
-      "pipeline parallelism",
-      "production",
-      "tensor parallelism"
-    ]
-  },
-  {
-    "id": "imported/transformer-lens-interpretability",
-    "path": ".agents/skills/imported/transformer-lens-interpretability.md",
-    "name": "transformer-lens-interpretability",
-    "domain": "ai-research",
-    "description": "Provides guidance for mechanistic interpretability research using TransformerLens to inspect and manipulate transformer internals via HookPoints and activation caching. Use when reverse-engineering mo",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "activation patching",
-      "ai-research",
-      "circuit analysis",
-      "mechanistic interpretability",
-      "transformerlens"
-    ]
-  },
-  {
-    "id": "imported/unsloth",
-    "path": ".agents/skills/imported/unsloth.md",
-    "name": "unsloth",
-    "domain": "ai-research",
-    "description": "Expert guidance for fast fine-tuning with Unsloth - 2-5x faster training, 50-80% less memory, LoRA/QLoRA optimization",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "fast training",
-      "fine-tuning",
-      "gemma",
-      "llama",
-      "lora",
-      "memory-efficient",
-      "mistral",
-      "optimization",
-      "qlora",
-      "qwen",
-      "unsloth"
-    ]
-  },
-  {
     "id": "imported/vector-database-engineer",
     "path": ".agents/skills/imported/vector-database-engineer.md",
     "name": "vector-database-engineer",
@@ -2660,35 +679,17 @@
     ]
   },
   {
-    "id": "imported/verl-rl-training",
-    "path": ".agents/skills/imported/verl-rl-training.md",
-    "name": "verl-rl-training",
-    "domain": "ai-research",
-    "description": "Provides guidance for training LLMs with reinforcement learning using verl (Volcano Engine RL). Use when implementing RLHF, GRPO, PPO, or other RL algorithms for LLM post-training at scale with flexib",
+    "id": "imported/web-research",
+    "path": ".agents/skills/imported/web-research.md",
+    "name": "web-research",
+    "domain": "imported",
+    "description": "Use this skill for requests related to web research; it provides a structured approach to conducting comprehensive web research",
     "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
+    "source": "https://github.com/langchain-ai/deepagents",
     "tags": [
-      "ai-research",
-      "distributed training",
-      "grpo",
-      "post-training",
-      "ppo",
-      "reinforcement learning",
-      "rlhf"
-    ]
-  },
-  {
-    "id": "imported/web-artifacts-builder",
-    "path": ".agents/skills/imported/web-artifacts-builder.md",
-    "name": "web-artifacts-builder",
-    "domain": "anthropic",
-    "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state manag",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
       "external",
-      "imported"
+      "imported",
+      "skillpack"
     ]
   },
   {
@@ -2706,51 +707,6 @@
     ]
   },
   {
-    "id": "imported/weights-and-biases",
-    "path": ".agents/skills/imported/weights-and-biases.md",
-    "name": "weights-and-biases",
-    "domain": "ai-research",
-    "description": "Track ML experiments with automatic logging, visualize training in real-time, optimize hyperparameters with sweeps, and manage model registry with W&B - collaborative MLOps platform",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "collaboration",
-      "experiment tracking",
-      "huggingface",
-      "hyperparameter tuning",
-      "mlops",
-      "model registry",
-      "pytorch",
-      "real-time visualization",
-      "tensorflow",
-      "wandb",
-      "weights and biases"
-    ]
-  },
-  {
-    "id": "imported/whisper",
-    "path": ".agents/skills/imported/whisper.md",
-    "name": "whisper",
-    "domain": "ai-research",
-    "description": "OpenAI's general-purpose speech recognition model. Supports 99 languages, transcription, translation to English, and language identification. Six model sizes from tiny (39M params) to large (1550M par",
-    "risk": "unknown",
-    "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
-    "tags": [
-      "ai-research",
-      "asr",
-      "audio processing",
-      "multilingual",
-      "multimodal",
-      "openai",
-      "speech recognition",
-      "speech-to-text",
-      "transcription",
-      "translation",
-      "whisper"
-    ]
-  },
-  {
     "id": "imported/workflow-automation",
     "path": ".agents/skills/imported/workflow-automation.md",
     "name": "workflow-automation",
@@ -2765,31 +721,17 @@
     ]
   },
   {
-    "id": "imported/writing-plans",
-    "path": ".agents/skills/imported/writing-plans.md",
-    "name": "writing-plans",
-    "domain": "antigravity",
-    "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
+    "id": "imported/workflow-orchestration-patterns",
+    "path": ".agents/skills/imported/workflow-orchestration-patterns.md",
+    "name": "workflow-orchestration-patterns",
+    "domain": "imported",
+    "description": "Design durable workflows with Temporal for distributed systems. Covers workflow vs activity separation, saga patterns, state management, and determinism constraints. Use when building long-running pro",
     "risk": "unknown",
-    "source": "sickn33/antigravity-awesome-skills",
+    "source": "https://github.com/wshobson/agents",
     "tags": [
-      "antigravity",
       "external",
-      "imported"
-    ]
-  },
-  {
-    "id": "imported/xlsx",
-    "path": ".agents/skills/imported/xlsx.md",
-    "name": "xlsx",
-    "domain": "anthropic",
-    "description": "Use this skill any time a spreadsheet file is the primary input or output. This means any task where the user wants to: open, read, edit, or fix an existing .xlsx, .xlsm, .csv, or .tsv file (e.g., add",
-    "risk": "unknown",
-    "source": "anthropics/skills",
-    "tags": [
-      "anthropic",
-      "external",
-      "imported"
+      "imported",
+      "skillpack"
     ]
   },
   {

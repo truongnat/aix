@@ -1,5 +1,60 @@
 [
   {
+    "id": "ai-engineering/bugfix",
+    "path": ".agents/workflows/ai-engineering/bugfix.md",
+    "name": "ai-engineering-bugfix",
+    "domain": "ai-engineering",
+    "description": "ai-engineering bugfix workflow with root-cause and regression guard",
+    "steps": 5,
+    "skills": [
+      "agent.llm_subagent",
+      "ai-engineering.acceptance_guard",
+      "ai-engineering.impact_analyzer",
+      "ai-engineering.risk_register"
+    ]
+  },
+  {
+    "id": "ai-engineering/feature",
+    "path": ".agents/workflows/ai-engineering/feature.md",
+    "name": "ai-engineering-feature",
+    "domain": "ai-engineering",
+    "description": "ai-engineering feature delivery with impact analysis and acceptance gates",
+    "steps": 6,
+    "skills": [
+      "agent.llm_subagent",
+      "ai-engineering.acceptance_guard",
+      "ai-engineering.impact_analyzer",
+      "ai-engineering.risk_register",
+      "demo.echo"
+    ]
+  },
+  {
+    "id": "ai-engineering/release",
+    "path": ".agents/workflows/ai-engineering/release.md",
+    "name": "ai-engineering-release",
+    "domain": "ai-engineering",
+    "description": "ai-engineering release workflow with quality signal and risk approval",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "ai-engineering.acceptance_guard",
+      "ai-engineering.risk_register"
+    ]
+  },
+  {
+    "id": "ai-engineering/review",
+    "path": ".agents/workflows/ai-engineering/review.md",
+    "name": "ai-engineering-review",
+    "domain": "ai-engineering",
+    "description": "ai-engineering review workflow focused on correctness, risk, and release readiness",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "ai-engineering.acceptance_guard",
+      "ai-engineering.risk_register"
+    ]
+  },
+  {
     "id": "antigravity/antigravity-build-ai-agent-system",
     "path": ".agents/workflows/antigravity/antigravity-build-ai-agent-system.md",
     "name": "antigravity-build-ai-agent-system",
@@ -99,6 +154,226 @@
     ]
   },
   {
+    "id": "climate-tech/bugfix",
+    "path": ".agents/workflows/climate-tech/bugfix.md",
+    "name": "climate-tech-bugfix",
+    "domain": "climate-tech",
+    "description": "climate-tech bugfix workflow with root-cause and regression guard",
+    "steps": 5,
+    "skills": [
+      "agent.llm_subagent",
+      "climate-tech.acceptance_guard",
+      "climate-tech.impact_analyzer",
+      "climate-tech.risk_register"
+    ]
+  },
+  {
+    "id": "climate-tech/feature",
+    "path": ".agents/workflows/climate-tech/feature.md",
+    "name": "climate-tech-feature",
+    "domain": "climate-tech",
+    "description": "climate-tech feature delivery with impact analysis and acceptance gates",
+    "steps": 6,
+    "skills": [
+      "agent.llm_subagent",
+      "climate-tech.acceptance_guard",
+      "climate-tech.impact_analyzer",
+      "climate-tech.risk_register",
+      "demo.echo"
+    ]
+  },
+  {
+    "id": "climate-tech/release",
+    "path": ".agents/workflows/climate-tech/release.md",
+    "name": "climate-tech-release",
+    "domain": "climate-tech",
+    "description": "climate-tech release workflow with quality signal and risk approval",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "climate-tech.acceptance_guard",
+      "climate-tech.risk_register"
+    ]
+  },
+  {
+    "id": "climate-tech/review",
+    "path": ".agents/workflows/climate-tech/review.md",
+    "name": "climate-tech-review",
+    "domain": "climate-tech",
+    "description": "climate-tech review workflow focused on correctness, risk, and release readiness",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "climate-tech.acceptance_guard",
+      "climate-tech.risk_register"
+    ]
+  },
+  {
+    "id": "cloud-platform/bugfix",
+    "path": ".agents/workflows/cloud-platform/bugfix.md",
+    "name": "cloud-platform-bugfix",
+    "domain": "cloud-platform",
+    "description": "cloud-platform bugfix workflow with root-cause and regression guard",
+    "steps": 5,
+    "skills": [
+      "agent.llm_subagent",
+      "cloud-platform.acceptance_guard",
+      "cloud-platform.impact_analyzer",
+      "cloud-platform.risk_register"
+    ]
+  },
+  {
+    "id": "cloud-platform/feature",
+    "path": ".agents/workflows/cloud-platform/feature.md",
+    "name": "cloud-platform-feature",
+    "domain": "cloud-platform",
+    "description": "cloud-platform feature delivery with impact analysis and acceptance gates",
+    "steps": 6,
+    "skills": [
+      "agent.llm_subagent",
+      "cloud-platform.acceptance_guard",
+      "cloud-platform.impact_analyzer",
+      "cloud-platform.risk_register",
+      "demo.echo"
+    ]
+  },
+  {
+    "id": "cloud-platform/release",
+    "path": ".agents/workflows/cloud-platform/release.md",
+    "name": "cloud-platform-release",
+    "domain": "cloud-platform",
+    "description": "cloud-platform release workflow with quality signal and risk approval",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "cloud-platform.acceptance_guard",
+      "cloud-platform.risk_register"
+    ]
+  },
+  {
+    "id": "cloud-platform/review",
+    "path": ".agents/workflows/cloud-platform/review.md",
+    "name": "cloud-platform-review",
+    "domain": "cloud-platform",
+    "description": "cloud-platform review workflow focused on correctness, risk, and release readiness",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "cloud-platform.acceptance_guard",
+      "cloud-platform.risk_register"
+    ]
+  },
+  {
+    "id": "cybersecurity/bugfix",
+    "path": ".agents/workflows/cybersecurity/bugfix.md",
+    "name": "cybersecurity-bugfix",
+    "domain": "cybersecurity",
+    "description": "cybersecurity bugfix workflow with root-cause and regression guard",
+    "steps": 5,
+    "skills": [
+      "agent.llm_subagent",
+      "cybersecurity.acceptance_guard",
+      "cybersecurity.impact_analyzer",
+      "cybersecurity.risk_register"
+    ]
+  },
+  {
+    "id": "cybersecurity/feature",
+    "path": ".agents/workflows/cybersecurity/feature.md",
+    "name": "cybersecurity-feature",
+    "domain": "cybersecurity",
+    "description": "cybersecurity feature delivery with impact analysis and acceptance gates",
+    "steps": 6,
+    "skills": [
+      "agent.llm_subagent",
+      "cybersecurity.acceptance_guard",
+      "cybersecurity.impact_analyzer",
+      "cybersecurity.risk_register",
+      "demo.echo"
+    ]
+  },
+  {
+    "id": "cybersecurity/release",
+    "path": ".agents/workflows/cybersecurity/release.md",
+    "name": "cybersecurity-release",
+    "domain": "cybersecurity",
+    "description": "cybersecurity release workflow with quality signal and risk approval",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "cybersecurity.acceptance_guard",
+      "cybersecurity.risk_register"
+    ]
+  },
+  {
+    "id": "cybersecurity/review",
+    "path": ".agents/workflows/cybersecurity/review.md",
+    "name": "cybersecurity-review",
+    "domain": "cybersecurity",
+    "description": "cybersecurity review workflow focused on correctness, risk, and release readiness",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "cybersecurity.acceptance_guard",
+      "cybersecurity.risk_register"
+    ]
+  },
+  {
+    "id": "data-ml-eval/bugfix",
+    "path": ".agents/workflows/data-ml-eval/bugfix.md",
+    "name": "data-ml-eval-bugfix",
+    "domain": "data-ml-eval",
+    "description": "data-ml-eval bugfix workflow with root-cause and regression guard",
+    "steps": 5,
+    "skills": [
+      "agent.llm_subagent",
+      "data-ml-eval.acceptance_guard",
+      "data-ml-eval.impact_analyzer",
+      "data-ml-eval.risk_register"
+    ]
+  },
+  {
+    "id": "data-ml-eval/feature",
+    "path": ".agents/workflows/data-ml-eval/feature.md",
+    "name": "data-ml-eval-feature",
+    "domain": "data-ml-eval",
+    "description": "data-ml-eval feature delivery with impact analysis and acceptance gates",
+    "steps": 6,
+    "skills": [
+      "agent.llm_subagent",
+      "data-ml-eval.acceptance_guard",
+      "data-ml-eval.impact_analyzer",
+      "data-ml-eval.risk_register",
+      "demo.echo"
+    ]
+  },
+  {
+    "id": "data-ml-eval/release",
+    "path": ".agents/workflows/data-ml-eval/release.md",
+    "name": "data-ml-eval-release",
+    "domain": "data-ml-eval",
+    "description": "data-ml-eval release workflow with quality signal and risk approval",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "data-ml-eval.acceptance_guard",
+      "data-ml-eval.risk_register"
+    ]
+  },
+  {
+    "id": "data-ml-eval/review",
+    "path": ".agents/workflows/data-ml-eval/review.md",
+    "name": "data-ml-eval-review",
+    "domain": "data-ml-eval",
+    "description": "data-ml-eval review workflow focused on correctness, risk, and release readiness",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "data-ml-eval.acceptance_guard",
+      "data-ml-eval.risk_register"
+    ]
+  },
+  {
     "id": "dev/build-landing-page",
     "path": ".agents/workflows/dev/build-landing-page.md",
     "name": "dev-build-landing-page",
@@ -145,6 +420,61 @@
       "agent.run_script",
       "agent.semantic_search",
       "demo.echo"
+    ]
+  },
+  {
+    "id": "healthtech/bugfix",
+    "path": ".agents/workflows/healthtech/bugfix.md",
+    "name": "healthtech-bugfix",
+    "domain": "healthtech",
+    "description": "healthtech bugfix workflow with root-cause and regression guard",
+    "steps": 5,
+    "skills": [
+      "agent.llm_subagent",
+      "healthtech.acceptance_guard",
+      "healthtech.impact_analyzer",
+      "healthtech.risk_register"
+    ]
+  },
+  {
+    "id": "healthtech/feature",
+    "path": ".agents/workflows/healthtech/feature.md",
+    "name": "healthtech-feature",
+    "domain": "healthtech",
+    "description": "healthtech feature delivery with impact analysis and acceptance gates",
+    "steps": 6,
+    "skills": [
+      "agent.llm_subagent",
+      "demo.echo",
+      "healthtech.acceptance_guard",
+      "healthtech.impact_analyzer",
+      "healthtech.risk_register"
+    ]
+  },
+  {
+    "id": "healthtech/release",
+    "path": ".agents/workflows/healthtech/release.md",
+    "name": "healthtech-release",
+    "domain": "healthtech",
+    "description": "healthtech release workflow with quality signal and risk approval",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "healthtech.acceptance_guard",
+      "healthtech.risk_register"
+    ]
+  },
+  {
+    "id": "healthtech/review",
+    "path": ".agents/workflows/healthtech/review.md",
+    "name": "healthtech-review",
+    "domain": "healthtech",
+    "description": "healthtech review workflow focused on correctness, risk, and release readiness",
+    "steps": 4,
+    "skills": [
+      "agent.llm_subagent",
+      "healthtech.acceptance_guard",
+      "healthtech.risk_register"
     ]
   },
   {

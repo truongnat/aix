@@ -121,6 +121,22 @@ cargo run -- workflow bundles
 cargo run -- workflow bundles --json
 ```
 
+Hot domain bundles currently included:
+
+- `ai-engineering`
+- `cloud-platform`
+- `cybersecurity`
+- `data-ml-eval`
+- `healthtech`
+- `climate-tech`
+
+Quick examples:
+
+```bash
+cargo run -- --workflow-id ai-engineering/feature --template ai-engineering/feature_prompt --task "build eval pipeline for support agent"
+cargo run -- --workflow-id cybersecurity/review --template cybersecurity/review_prompt --task "review auth middleware diff for vulnerabilities"
+```
+
 Generate catalog/manifest/lock artifacts for skill bundles:
 
 ```bash

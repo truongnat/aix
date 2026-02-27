@@ -1,5 +1,33 @@
 [
   {
+    "id": "ai-engineering",
+    "description": "Domain bundle for 'ai-engineering'",
+    "workflows": [
+      "ai-engineering/bugfix",
+      "ai-engineering/feature",
+      "ai-engineering/release",
+      "ai-engineering/review"
+    ],
+    "skills": [
+      "ai-engineering/acceptance_guard",
+      "ai-engineering/impact_analyzer",
+      "ai-engineering/risk_register"
+    ],
+    "roles": [
+      "ai-engineering/architect",
+      "ai-engineering/implementer",
+      "ai-engineering/releaser",
+      "ai-engineering/resolver",
+      "ai-engineering/reviewer"
+    ],
+    "templates": [
+      "ai-engineering/bugfix_prompt",
+      "ai-engineering/feature_prompt",
+      "ai-engineering/release_prompt",
+      "ai-engineering/review_prompt"
+    ]
+  },
+  {
     "id": "antigravity",
     "description": "Domain bundle for 'antigravity'",
     "workflows": [
@@ -12,6 +40,62 @@
     "skills": [],
     "roles": [],
     "templates": []
+  },
+  {
+    "id": "climate-tech",
+    "description": "Domain bundle for 'climate-tech'",
+    "workflows": [
+      "climate-tech/bugfix",
+      "climate-tech/feature",
+      "climate-tech/release",
+      "climate-tech/review"
+    ],
+    "skills": [
+      "climate-tech/acceptance_guard",
+      "climate-tech/impact_analyzer",
+      "climate-tech/risk_register"
+    ],
+    "roles": [
+      "climate-tech/architect",
+      "climate-tech/implementer",
+      "climate-tech/releaser",
+      "climate-tech/resolver",
+      "climate-tech/reviewer"
+    ],
+    "templates": [
+      "climate-tech/bugfix_prompt",
+      "climate-tech/feature_prompt",
+      "climate-tech/release_prompt",
+      "climate-tech/review_prompt"
+    ]
+  },
+  {
+    "id": "cloud-platform",
+    "description": "Domain bundle for 'cloud-platform'",
+    "workflows": [
+      "cloud-platform/bugfix",
+      "cloud-platform/feature",
+      "cloud-platform/release",
+      "cloud-platform/review"
+    ],
+    "skills": [
+      "cloud-platform/acceptance_guard",
+      "cloud-platform/impact_analyzer",
+      "cloud-platform/risk_register"
+    ],
+    "roles": [
+      "cloud-platform/architect",
+      "cloud-platform/implementer",
+      "cloud-platform/releaser",
+      "cloud-platform/resolver",
+      "cloud-platform/reviewer"
+    ],
+    "templates": [
+      "cloud-platform/bugfix_prompt",
+      "cloud-platform/feature_prompt",
+      "cloud-platform/release_prompt",
+      "cloud-platform/review_prompt"
+    ]
   },
   {
     "id": "core",
@@ -53,6 +137,62 @@
     ]
   },
   {
+    "id": "cybersecurity",
+    "description": "Domain bundle for 'cybersecurity'",
+    "workflows": [
+      "cybersecurity/bugfix",
+      "cybersecurity/feature",
+      "cybersecurity/release",
+      "cybersecurity/review"
+    ],
+    "skills": [
+      "cybersecurity/acceptance_guard",
+      "cybersecurity/impact_analyzer",
+      "cybersecurity/risk_register"
+    ],
+    "roles": [
+      "cybersecurity/architect",
+      "cybersecurity/implementer",
+      "cybersecurity/releaser",
+      "cybersecurity/resolver",
+      "cybersecurity/reviewer"
+    ],
+    "templates": [
+      "cybersecurity/bugfix_prompt",
+      "cybersecurity/feature_prompt",
+      "cybersecurity/release_prompt",
+      "cybersecurity/review_prompt"
+    ]
+  },
+  {
+    "id": "data-ml-eval",
+    "description": "Domain bundle for 'data-ml-eval'",
+    "workflows": [
+      "data-ml-eval/bugfix",
+      "data-ml-eval/feature",
+      "data-ml-eval/release",
+      "data-ml-eval/review"
+    ],
+    "skills": [
+      "data-ml-eval/acceptance_guard",
+      "data-ml-eval/impact_analyzer",
+      "data-ml-eval/risk_register"
+    ],
+    "roles": [
+      "data-ml-eval/architect",
+      "data-ml-eval/implementer",
+      "data-ml-eval/releaser",
+      "data-ml-eval/resolver",
+      "data-ml-eval/reviewer"
+    ],
+    "templates": [
+      "data-ml-eval/bugfix_prompt",
+      "data-ml-eval/feature_prompt",
+      "data-ml-eval/release_prompt",
+      "data-ml-eval/review_prompt"
+    ]
+  },
+  {
     "id": "dev",
     "description": "Domain bundle for 'dev'",
     "workflows": [
@@ -71,161 +211,69 @@
     ]
   },
   {
+    "id": "healthtech",
+    "description": "Domain bundle for 'healthtech'",
+    "workflows": [
+      "healthtech/bugfix",
+      "healthtech/feature",
+      "healthtech/release",
+      "healthtech/review"
+    ],
+    "skills": [
+      "healthtech/acceptance_guard",
+      "healthtech/impact_analyzer",
+      "healthtech/risk_register"
+    ],
+    "roles": [
+      "healthtech/architect",
+      "healthtech/implementer",
+      "healthtech/releaser",
+      "healthtech/resolver",
+      "healthtech/reviewer"
+    ],
+    "templates": [
+      "healthtech/bugfix_prompt",
+      "healthtech/feature_prompt",
+      "healthtech/release_prompt",
+      "healthtech/review_prompt"
+    ]
+  },
+  {
     "id": "imported",
     "description": "Domain bundle for 'imported'",
     "workflows": [],
     "skills": [
       "imported/agent-evaluation",
-      "imported/ai-agents-architect",
-      "imported/algorithmic-art",
-      "imported/api-fuzzing-bug-bounty",
-      "imported/api-patterns",
       "imported/api-security-best-practices",
-      "imported/architecture-decision-records",
-      "imported/attack-tree-construction",
-      "imported/audiocraft-audio-generation",
-      "imported/auth-implementation-patterns",
-      "imported/autogpt-agents",
-      "imported/awq-quantization",
-      "imported/axolotl",
-      "imported/backend-dev-guidelines",
-      "imported/blip-2-vision-language",
-      "imported/brainstorming",
-      "imported/brainstorming-research-ideas",
-      "imported/brand-guidelines",
-      "imported/broken-authentication",
+      "imported/ask-questions-if-underspecified",
       "imported/browser-automation",
-      "imported/canvas-design",
-      "imported/chroma",
-      "imported/clip",
       "imported/code-review-checklist",
-      "imported/concise-planning",
-      "imported/constitutional-ai",
-      "imported/cqrs-implementation",
-      "imported/creative-thinking-for-research",
-      "imported/crewai-multi-agent",
-      "imported/database-design",
-      "imported/ddd-context-mapping",
-      "imported/ddd-strategic-design",
-      "imported/ddd-tactical-patterns",
-      "imported/deepspeed",
-      "imported/deployment-procedures",
-      "imported/distributed-llm-pretraining-torchtitan",
-      "imported/doc-coauthoring",
-      "imported/docx",
-      "imported/domain-driven-design",
-      "imported/dspy",
-      "imported/e2e-testing-patterns",
-      "imported/embedding-strategies",
-      "imported/ethical-hacking-methodology",
-      "imported/evaluating-code-models",
       "imported/evaluating-llms-harness",
-      "imported/event-store-design",
-      "imported/faiss",
-      "imported/fine-tuning-with-trl",
-      "imported/frontend-design",
-      "imported/frontend-developer",
-      "imported/gguf-quantization",
-      "imported/go-playwright",
-      "imported/gptq",
-      "imported/grpo-rl-training",
-      "imported/guidance",
-      "imported/hqq-quantization",
-      "imported/huggingface-accelerate",
-      "imported/huggingface-tokenizers",
-      "imported/idor-testing",
-      "imported/implementing-llms-litgpt",
-      "imported/instructor",
-      "imported/internal-comms",
-      "imported/kaizen",
-      "imported/knowledge-distillation",
-      "imported/lambda-labs-gpu-cloud",
       "imported/langchain",
       "imported/langfuse",
       "imported/langgraph",
+      "imported/langgraph-docs",
       "imported/langsmith-observability",
-      "imported/llama-cpp",
-      "imported/llama-factory",
-      "imported/llamaguard",
-      "imported/llamaindex",
-      "imported/llava",
       "imported/llm-app-patterns",
-      "imported/long-context",
-      "imported/mamba-architecture",
       "imported/mcp-builder",
-      "imported/miles-rl-training",
-      "imported/ml-paper-writing",
-      "imported/mlflow",
-      "imported/modal-serverless-gpu",
-      "imported/model-merging",
-      "imported/model-pruning",
-      "imported/moe-training",
-      "imported/nanogpt",
-      "imported/nemo-curator",
-      "imported/nemo-evaluator-sdk",
-      "imported/nemo-guardrails",
-      "imported/nnsight-remote-interpretability",
       "imported/observability-engineer",
-      "imported/openrlhf-training",
-      "imported/optimizing-attention-flash",
-      "imported/outlines",
-      "imported/pdf",
-      "imported/peft-fine-tuning",
       "imported/phoenix-observability",
       "imported/pinecone",
-      "imported/postmortem-writing",
-      "imported/pptx",
-      "imported/product-manager-toolkit",
-      "imported/projection-patterns",
-      "imported/prompt-guard",
-      "imported/pytorch-fsdp2",
-      "imported/pytorch-lightning",
-      "imported/pyvene-interventions",
       "imported/qdrant-vector-search",
-      "imported/quantizing-models-bitsandbytes",
       "imported/rag-implementation",
-      "imported/ray-data",
-      "imported/ray-train",
-      "imported/react-patterns",
-      "imported/rwkv-architecture",
-      "imported/saga-orchestration",
       "imported/sast-configuration",
       "imported/security-auditor",
-      "imported/segment-anything-model",
-      "imported/sentence-transformers",
-      "imported/sentencepiece",
-      "imported/serving-llms-vllm",
-      "imported/sglang",
-      "imported/simpo-training",
-      "imported/skill-creator",
       "imported/skypilot-multi-cloud-orchestration",
-      "imported/slack-gif-creator",
-      "imported/slime-rl-training",
-      "imported/sparse-autoencoder-training",
-      "imported/speculative-decoding",
-      "imported/stable-diffusion-image-generation",
       "imported/systematic-debugging",
-      "imported/tensorboard",
-      "imported/tensorrt-llm",
       "imported/test-driven-development",
-      "imported/test-fixing",
-      "imported/theme-factory",
       "imported/threat-modeling-expert",
       "imported/top-web-vulnerabilities",
-      "imported/torchforge-rl-training",
-      "imported/training-llms-megatron",
-      "imported/transformer-lens-interpretability",
-      "imported/unsloth",
       "imported/vector-database-engineer",
       "imported/verification-before-completion",
-      "imported/verl-rl-training",
-      "imported/web-artifacts-builder",
+      "imported/web-research",
       "imported/webapp-testing",
-      "imported/weights-and-biases",
-      "imported/whisper",
       "imported/workflow-automation",
-      "imported/writing-plans",
-      "imported/xlsx"
+      "imported/workflow-orchestration-patterns"
     ],
     "roles": [],
     "templates": []
