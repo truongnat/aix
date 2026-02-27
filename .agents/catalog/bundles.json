@@ -197,7 +197,9 @@
     "description": "Domain bundle for 'dev'",
     "workflows": [
       "dev/build-landing-page",
-      "dev/project-intelligence"
+      "dev/create-showcase-video",
+      "dev/project-intelligence",
+      "dev/video-idea-lab"
     ],
     "skills": [
       "dev/landing_page_architect",
@@ -208,7 +210,9 @@
     "roles": [],
     "templates": [
       "dev/build-landing-page_prompt",
-      "dev/project-intelligence_prompt"
+      "dev/create-showcase-video_prompt",
+      "dev/project-intelligence_prompt",
+      "dev/video-idea-lab_prompt"
     ]
   },
   {

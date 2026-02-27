@@ -390,6 +390,19 @@
     ]
   },
   {
+    "id": "dev/create-showcase-video",
+    "path": ".agents/workflows/dev/create-showcase-video.md",
+    "name": "dev-create-showcase-video",
+    "domain": "dev",
+    "description": "Build a showcase video plan from real project runtime I/O and artifacts",
+    "steps": 5,
+    "skills": [
+      "agent.llm_subagent",
+      "agent.run_script",
+      "dev.remotion_io_visualizer"
+    ]
+  },
+  {
     "id": "dev/project-intelligence",
     "path": ".agents/workflows/dev/project-intelligence.md",
     "name": "dev-project-intelligence",
@@ -402,6 +415,19 @@
       "agent.semantic_search",
       "antigravity.workflow-automation",
       "dev.project_intelligence_advisor"
+    ]
+  },
+  {
+    "id": "dev/video-idea-lab",
+    "path": ".agents/workflows/dev/video-idea-lab.md",
+    "name": "dev-video-idea-lab",
+    "domain": "dev",
+    "description": "Generate high-conversion video concepts from project evidence and workflow traces",
+    "steps": 7,
+    "skills": [
+      "agent.llm_subagent",
+      "agent.run_script",
+      "dev.remotion_io_visualizer"
     ]
   },
   {

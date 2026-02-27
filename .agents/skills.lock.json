@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "generated_at_ms": 1772161144011,
+  "generated_at_ms": 1772163826480,
   "skills": [
     {
       "id": "ai-engineering/acceptance_guard",
@@ -233,8 +233,8 @@
     {
       "id": "dev/remotion_io_visualizer",
       "path": ".agents/skills/dev/remotion_io_visualizer/SKILL.md",
-      "bytes": 3413,
-      "fingerprint": "35717b16e97f50d2",
+      "bytes": 3548,
+      "fingerprint": "d5cacd3e63f68813",
       "source": "self",
       "source_requested": null,
       "source_commit": null,
