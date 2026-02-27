@@ -8,6 +8,7 @@ use crate::skill::SubprocessCommand;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -130,6 +131,20 @@ struct OllamaResponse {
     response: String,
 }
 
+fn ollama_timeout_ms() -> u64 {
+    std::env::var("ANTIGRAV_OLLAMA_TIMEOUT_MS")
+        .ok()
+        .and_then(|v| v.trim().parse::<u64>().ok())
+        .filter(|v| *v > 0)
+        .or_else(|| {
+            std::env::var("ANTIGRAV_LLM_TIMEOUT_MS")
+                .ok()
+                .and_then(|v| v.trim().parse::<u64>().ok())
+                .filter(|v| *v > 0)
+        })
+        .unwrap_or(30_000)
+}
+
 #[async_trait]
 impl SkillTrait for FileSkill {
     fn name(&self) -> &str {
@@ -180,9 +195,16 @@ impl SkillTrait for FileSkill {
                     .model
                     .clone()
                     .unwrap_or_else(|| "mistral".to_string());
-                println!("🤖 [OLLAMA] Calling model: {}", model);
+                let timeout_ms = ollama_timeout_ms();
+                println!(
+                    "🤖 [OLLAMA] Calling model: {} (timeout={}ms)",
+                    model, timeout_ms
+                );
 
-                let client = reqwest::Client::new();
+                let client = reqwest::Client::builder()
+                    .no_proxy()
+                    .timeout(Duration::from_millis(timeout_ms))
+                    .build()?;
                 let request = OllamaRequest {
                     model,
                     prompt: prompt.clone(),
@@ -201,11 +223,39 @@ impl SkillTrait for FileSkill {
 
                 match res_result {
                     Ok(res) if res.status().is_success() => {
-                        let ollama_res: OllamaResponse = res.json().await?;
-                        Ok(SkillOutput::text(ollama_res.response.trim().to_string()))
+                        match res.json::<OllamaResponse>().await {
+                            Ok(ollama_res) => {
+                                Ok(SkillOutput::text(ollama_res.response.trim().to_string()))
+                            }
+                            Err(err) => {
+                                println!(
+                                    "⚠️ [OLLAMA] Invalid response payload: {}. Falling back to simulation.",
+                                    err
+                                );
+                                Ok(SkillOutput::text(format!(
+                                    "Simulated response for skill [{}]. Ollama response was invalid.",
+                                    self.meta.name
+                                )))
+                            }
+                        }
+                    }
+                    Ok(res) => {
+                        let status = res.status();
+                        let body = res.text().await.unwrap_or_default();
+                        println!(
+                            "⚠️ [OLLAMA] API error status={} body={}. Falling back to simulation.",
+                            status, body
+                        );
+                        Ok(SkillOutput::text(format!(
+                            "Simulated response for skill [{}]. Ollama API returned status {}.",
+                            self.meta.name, status
+                        )))
                     }
                     _ => {
-                        println!("⚠️ [OLLAMA] API unreachable. Falling back to simulation.");
+                        println!(
+                            "⚠️ [OLLAMA] API unreachable/timeout after {}ms. Falling back to simulation.",
+                            timeout_ms
+                        );
                         Ok(SkillOutput::text(format!(
                             "Simulated response for skill [{}]. Ollama API was unreachable.",
                             self.meta.name

@@ -76,39 +76,39 @@ pub struct Cli {
     pub resume: Option<String>,
 
     /// Phase 17: Maximum execution cost
-    #[arg(long, default_value = "100")]
+    #[arg(long, default_value = "300")]
     pub max_cost: u32,
 
     /// Phase 17: Maximum total latency in ms
-    #[arg(long, default_value = "10000")]
+    #[arg(long, default_value = "300000")]
     pub max_latency: u32,
 
     /// Phase 17: Maximum steps
-    #[arg(long, default_value = "20")]
+    #[arg(long, default_value = "60")]
     pub max_steps: usize,
 
     /// Phase 20: Maximum aggregate CPU time in ms
-    #[arg(long, default_value = "10000")]
+    #[arg(long, default_value = "30000")]
     pub max_cpu_ms: u64,
 
     /// Phase 20: Maximum aggregate wall time in ms
-    #[arg(long, default_value = "10000")]
+    #[arg(long, default_value = "300000")]
     pub max_wall_time_ms: u64,
 
     /// Phase 20: Maximum filesystem read calls
-    #[arg(long, default_value = "128")]
+    #[arg(long, default_value = "500")]
     pub max_fs_reads: u32,
 
     /// Phase 20: Maximum filesystem write calls
-    #[arg(long, default_value = "64")]
+    #[arg(long, default_value = "200")]
     pub max_fs_writes: u32,
 
     /// Phase 20: Maximum network calls
-    #[arg(long, default_value = "32")]
+    #[arg(long, default_value = "100")]
     pub max_network_calls: u32,
 
     /// Phase 21: Maximum memory usage for subprocess backends (MB)
-    #[arg(long, default_value = "256")]
+    #[arg(long, default_value = "512")]
     pub max_memory_mb: u32,
 
     #[arg(long)]
@@ -156,7 +156,7 @@ pub struct Cli {
     external_mutation_penalty: u32,
 
     /// Maximum runtime per step in milliseconds
-    #[arg(long, default_value = "30000")]
+    #[arg(long, default_value = "180000")]
     step_timeout_ms: u64,
 
     /// Phase 21: Maximum allowed trust tier (Trusted|Constrained|Untrusted)
