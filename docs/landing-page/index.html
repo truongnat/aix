@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="agentic-sdlc is a deterministic local runtime for agentic software workflows with resumable runs, strict policy controls, and traceable execution."
+    />
+    <title>agentic-sdlc | Deterministic Agentic SDLC Runtime</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="page-noise" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <div class="brand">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span class="brand-name">agentic-sdlc</span>
+      </div>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#value">Value</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#commands">Commands</a>
+      </nav>
+      <a class="button button-ghost" href="../ARCHITECTURE.md">Architecture</a>
+    </header>
+
+    <main id="main">
+      <section class="hero reveal">
+        <p class="eyebrow">Deterministic runtime for agentic engineering</p>
+        <h1>Build faster with AI agents, without losing control of your SDLC.</h1>
+        <p class="hero-copy">
+          <strong>agentic-sdlc</strong> gives engineering teams a local-first runtime where workflows are
+          repeatable, resumable, policy-governed, and fully traceable. You ship with confidence, not
+          guesswork.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button button-solid" href="#commands">Start in 60 seconds</a>
+          <a class="button button-ghost" href="../CLI_USAGE.md">Read CLI guide</a>
+        </div>
+
+        <ul class="hero-highlights">
+          <li>Deterministic trace IDs and execution order</li>
+          <li>Resumable state with crash-safe checkpoints</li>
+          <li>Trust-tier + permission policy enforcement</li>
+          <li>Skill packs and domain workflows out of the box</li>
+        </ul>
+
+        <aside class="hero-panel" aria-label="Core execution loop">
+          <h2>Execution Integrity Loop</h2>
+          <ol>
+            <li>Plan and validate workflow graph</li>
+            <li>Execute under policy and budget constraints</li>
+            <li>Persist state + telemetry at every step</li>
+            <li>Resume, audit, and export deterministic traces</li>
+          </ol>
+        </aside>
+      </section>
+
+      <section id="value" class="section reveal">
+        <div class="section-head">
+          <p class="eyebrow">Why teams adopt it</p>
+          <h2>Value that directly reduces delivery risk</h2>
+        </div>
+
+        <div class="value-grid">
+          <article class="value-card">
+            <h3>Predictable outcomes</h3>
+            <p>
+              Stable step ordering and deterministic state transitions remove "works on one run, fails on
+              another" behavior.
+            </p>
+          </article>
+          <article class="value-card">
+            <h3>Operational safety</h3>
+            <p>
+              Runtime policy gates commands, permissions, trust tier, and unsafe patterns before they damage
+              your repo or environment.
+            </p>
+          </article>
+          <article class="value-card">
+            <h3>Faster incident recovery</h3>
+            <p>
+              Resumable execution with persisted snapshots lets you continue from failure points instead of
+              restarting entire flows.
+            </p>
+          </article>
+          <article class="value-card">
+            <h3>Audit-ready delivery</h3>
+            <p>
+              Structured telemetry + timeline export make debugging, review, and release sign-off explicit and
+              defensible.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="workflow" class="section reveal">
+        <div class="section-head">
+          <p class="eyebrow">How it works</p>
+          <h2>From natural language goal to controlled execution</h2>
+        </div>
+
+        <div class="workflow-grid">
+          <article>
+            <span>01</span>
+            <h3>Define workflow + skills</h3>
+            <p>Use markdown packages for workflows, skills, roles, and runtime rules.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Run with policy constraints</h3>
+            <p>Every step executes under trust, budget, and command safety guardrails.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Observe and recover</h3>
+            <p>Inspect status, threads, and traces; resume safely from persisted state.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Scale with domain bundles</h3>
+            <p>Add curated domain packs to standardize delivery playbooks across teams.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section contrast reveal">
+        <div class="section-head">
+          <p class="eyebrow">Decision support</p>
+          <h2>What you gain versus ad-hoc agent scripts</h2>
+        </div>
+
+        <div class="contrast-grid">
+          <article>
+            <h3>Ad-hoc agent scripts</h3>
+            <ul>
+              <li>Non-deterministic outcomes</li>
+              <li>Weak recovery after interruption</li>
+              <li>Limited policy and auditability</li>
+            </ul>
+          </article>
+          <article>
+            <h3>agentic-sdlc runtime</h3>
+            <ul>
+              <li>Deterministic execution and trace IDs</li>
+              <li>Resumable runs with state persistence</li>
+              <li>Policy-enforced, review-friendly operations</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="commands" class="section reveal">
+        <div class="section-head">
+          <p class="eyebrow">Quick start</p>
+          <h2>Run your first deterministic workflow</h2>
+        </div>
+
+        <div class="command-box">
+          <button class="copy" data-copy-target="#quickstart">Copy</button>
+          <pre id="quickstart"><code>cargo run -- --workflow valid_flow.md
+./scripts/bootstrap.sh
+cargo run -- workflow doctor
+cargo run -- workflow setup
+cargo run -- workflow trace &lt;instance_id&gt; --timeline</code></pre>
+        </div>
+      </section>
+
+      <section class="cta section reveal">
+        <h2>Ship agentic features with reliability, not luck.</h2>
+        <p>
+          Start with one feature workflow, enforce runtime policies, and scale safely through curated domain
+          bundles.
+        </p>
+        <div class="hero-actions">
+          <a class="button button-solid" href="../CLI_USAGE.md">Launch with CLI</a>
+          <a class="button button-ghost" href="../ARCHITECTURE.md">Inspect runtime model</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>agentic-sdlc • deterministic local execution runtime for agentic workflows</p>
+    </footer>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
