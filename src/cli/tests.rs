@@ -699,7 +699,8 @@ fn scaffold_domain_pack_generates_advanced_assets() {
     assert!(layout
         .skills_dir
         .join("payments")
-        .join("impact_analyzer.md")
+        .join("impact_analyzer")
+        .join("SKILL.md")
         .exists());
 
     let _ = ensure_bootstrap_package(&layout).expect("bootstrap package");
@@ -866,9 +867,14 @@ fn lockfile_includes_import_source_provenance() {
     std::fs::create_dir_all(&root).expect("create temp project");
     let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
     let _ = ensure_bootstrap_package(&layout).expect("bootstrap");
-    std::fs::create_dir_all(layout.skills_dir.join("imported")).expect("imported dir");
+    std::fs::create_dir_all(layout.skills_dir.join("imported").join("sample"))
+        .expect("imported dir");
     std::fs::write(
-        layout.skills_dir.join("imported").join("sample.md"),
+        layout
+            .skills_dir
+            .join("imported")
+            .join("sample")
+            .join("SKILL.md"),
         r#"# Skill: sample
 Schema: antigrav.skill@v1
 ```json
@@ -1053,7 +1059,8 @@ example
     let imported_path = layout
         .skills_dir
         .join("imported")
-        .join("external-checklist.md");
+        .join("external-checklist")
+        .join("SKILL.md");
     assert!(imported_path.exists(), "imported skill not created");
     let imported_content = std::fs::read_to_string(imported_path).expect("read imported");
     assert!(imported_content.contains("Schema: antigrav.skill@v1"));
@@ -1115,7 +1122,8 @@ fn verify_skills_lock_detects_modified_skill() {
     let skill_file = layout
         .skills_dir
         .join("payments")
-        .join("impact_analyzer.md");
+        .join("impact_analyzer")
+        .join("SKILL.md");
     let mut body = std::fs::read_to_string(&skill_file).expect("read skill");
     body.push_str("\n<!-- drift -->\n");
     std::fs::write(&skill_file, body).expect("write skill drift");

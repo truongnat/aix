@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "generated_at_ms": 1772155119068,
+  "generated_at_ms": 1772156076393,
   "skills": [
     {
       "id": "ai-engineering/acceptance_guard",
-      "path": ".agents/skills/ai-engineering/acceptance_guard.md",
+      "path": ".agents/skills/ai-engineering/acceptance_guard/SKILL.md",
       "bytes": 668,
       "fingerprint": "7df64c6c1f6c1d59",
       "source": null,
@@ -16,7 +16,7 @@
     },
     {
       "id": "ai-engineering/impact_analyzer",
-      "path": ".agents/skills/ai-engineering/impact_analyzer.md",
+      "path": ".agents/skills/ai-engineering/impact_analyzer/SKILL.md",
       "bytes": 667,
       "fingerprint": "96f6dec7c9d45363",
       "source": null,
@@ -28,7 +28,7 @@
     },
     {
       "id": "ai-engineering/risk_register",
-      "path": ".agents/skills/ai-engineering/risk_register.md",
+      "path": ".agents/skills/ai-engineering/risk_register/SKILL.md",
       "bytes": 651,
       "fingerprint": "076e6d035824b056",
       "source": null,
@@ -40,7 +40,7 @@
     },
     {
       "id": "analyze_code",
-      "path": ".agents/skills/analyze_code.md",
+      "path": ".agents/skills/analyze_code/SKILL.md",
       "bytes": 1060,
       "fingerprint": "b7e2496d17b9a436",
       "source": "self",
@@ -52,7 +52,7 @@
     },
     {
       "id": "climate-tech/acceptance_guard",
-      "path": ".agents/skills/climate-tech/acceptance_guard.md",
+      "path": ".agents/skills/climate-tech/acceptance_guard/SKILL.md",
       "bytes": 666,
       "fingerprint": "a78654a95c89249f",
       "source": null,
@@ -64,7 +64,7 @@
     },
     {
       "id": "climate-tech/impact_analyzer",
-      "path": ".agents/skills/climate-tech/impact_analyzer.md",
+      "path": ".agents/skills/climate-tech/impact_analyzer/SKILL.md",
       "bytes": 665,
       "fingerprint": "495dab9b678565d1",
       "source": null,
@@ -76,7 +76,7 @@
     },
     {
       "id": "climate-tech/risk_register",
-      "path": ".agents/skills/climate-tech/risk_register.md",
+      "path": ".agents/skills/climate-tech/risk_register/SKILL.md",
       "bytes": 649,
       "fingerprint": "06fe8b5d42c8b430",
       "source": null,
@@ -88,7 +88,7 @@
     },
     {
       "id": "cloud-platform/acceptance_guard",
-      "path": ".agents/skills/cloud-platform/acceptance_guard.md",
+      "path": ".agents/skills/cloud-platform/acceptance_guard/SKILL.md",
       "bytes": 668,
       "fingerprint": "c5f8acdbcbd183d8",
       "source": null,
@@ -100,7 +100,7 @@
     },
     {
       "id": "cloud-platform/impact_analyzer",
-      "path": ".agents/skills/cloud-platform/impact_analyzer.md",
+      "path": ".agents/skills/cloud-platform/impact_analyzer/SKILL.md",
       "bytes": 667,
       "fingerprint": "24f1042317782028",
       "source": null,
@@ -112,7 +112,7 @@
     },
     {
       "id": "cloud-platform/risk_register",
-      "path": ".agents/skills/cloud-platform/risk_register.md",
+      "path": ".agents/skills/cloud-platform/risk_register/SKILL.md",
       "bytes": 651,
       "fingerprint": "06d65c7ab6b50f65",
       "source": null,
@@ -124,7 +124,7 @@
     },
     {
       "id": "cybersecurity/acceptance_guard",
-      "path": ".agents/skills/cybersecurity/acceptance_guard.md",
+      "path": ".agents/skills/cybersecurity/acceptance_guard/SKILL.md",
       "bytes": 667,
       "fingerprint": "fe07d1d4d21ba510",
       "source": null,
@@ -136,7 +136,7 @@
     },
     {
       "id": "cybersecurity/impact_analyzer",
-      "path": ".agents/skills/cybersecurity/impact_analyzer.md",
+      "path": ".agents/skills/cybersecurity/impact_analyzer/SKILL.md",
       "bytes": 666,
       "fingerprint": "2b95b6ebadfe1158",
       "source": null,
@@ -148,7 +148,7 @@
     },
     {
       "id": "cybersecurity/risk_register",
-      "path": ".agents/skills/cybersecurity/risk_register.md",
+      "path": ".agents/skills/cybersecurity/risk_register/SKILL.md",
       "bytes": 650,
       "fingerprint": "621468b06b42b00d",
       "source": null,
@@ -160,7 +160,7 @@
     },
     {
       "id": "data-ml-eval/acceptance_guard",
-      "path": ".agents/skills/data-ml-eval/acceptance_guard.md",
+      "path": ".agents/skills/data-ml-eval/acceptance_guard/SKILL.md",
       "bytes": 666,
       "fingerprint": "661f25428ec2eca4",
       "source": null,
@@ -172,7 +172,7 @@
     },
     {
       "id": "data-ml-eval/impact_analyzer",
-      "path": ".agents/skills/data-ml-eval/impact_analyzer.md",
+      "path": ".agents/skills/data-ml-eval/impact_analyzer/SKILL.md",
       "bytes": 665,
       "fingerprint": "c69aba719f1f2014",
       "source": null,
@@ -184,7 +184,7 @@
     },
     {
       "id": "data-ml-eval/risk_register",
-      "path": ".agents/skills/data-ml-eval/risk_register.md",
+      "path": ".agents/skills/data-ml-eval/risk_register/SKILL.md",
       "bytes": 649,
       "fingerprint": "016d1d477a1e6511",
       "source": null,
@@ -196,7 +196,7 @@
     },
     {
       "id": "dev/landing_page_architect",
-      "path": ".agents/skills/dev/landing_page_architect.md",
+      "path": ".agents/skills/dev/landing_page_architect/SKILL.md",
       "bytes": 1969,
       "fingerprint": "34335fe6cf41a4ad",
       "source": "self",
@@ -208,7 +208,7 @@
     },
     {
       "id": "dev/landing_page_implementer",
-      "path": ".agents/skills/dev/landing_page_implementer.md",
+      "path": ".agents/skills/dev/landing_page_implementer/SKILL.md",
       "bytes": 1711,
       "fingerprint": "b3ff7cba320aec2c",
       "source": "self",
@@ -220,7 +220,7 @@
     },
     {
       "id": "dev/project_intelligence_advisor",
-      "path": ".agents/skills/dev/project_intelligence_advisor.md",
+      "path": ".agents/skills/dev/project_intelligence_advisor/SKILL.md",
       "bytes": 2062,
       "fingerprint": "5a0fcb5cf705b016",
       "source": "self",
@@ -232,7 +232,7 @@
     },
     {
       "id": "generate_tests",
-      "path": ".agents/skills/generate_tests.md",
+      "path": ".agents/skills/generate_tests/SKILL.md",
       "bytes": 973,
       "fingerprint": "9126752bd114d022",
       "source": "self",
@@ -244,7 +244,7 @@
     },
     {
       "id": "healthtech/acceptance_guard",
-      "path": ".agents/skills/healthtech/acceptance_guard.md",
+      "path": ".agents/skills/healthtech/acceptance_guard/SKILL.md",
       "bytes": 664,
       "fingerprint": "fd84bb53c6a0373b",
       "source": null,
@@ -256,7 +256,7 @@
     },
     {
       "id": "healthtech/impact_analyzer",
-      "path": ".agents/skills/healthtech/impact_analyzer.md",
+      "path": ".agents/skills/healthtech/impact_analyzer/SKILL.md",
       "bytes": 663,
       "fingerprint": "9b5876994fb021f5",
       "source": null,
@@ -268,7 +268,7 @@
     },
     {
       "id": "healthtech/risk_register",
-      "path": ".agents/skills/healthtech/risk_register.md",
+      "path": ".agents/skills/healthtech/risk_register/SKILL.md",
       "bytes": 647,
       "fingerprint": "d69887c4451e28ac",
       "source": null,
@@ -280,7 +280,7 @@
     },
     {
       "id": "imported/agent-evaluation",
-      "path": ".agents/skills/imported/agent-evaluation.md",
+      "path": ".agents/skills/imported/agent-evaluation/SKILL.md",
       "bytes": 2558,
       "fingerprint": "52f6d428a8cfdb1e",
       "source": "sickn33/antigravity-awesome-skills",
@@ -292,7 +292,7 @@
     },
     {
       "id": "imported/api-security-best-practices",
-      "path": ".agents/skills/imported/api-security-best-practices.md",
+      "path": ".agents/skills/imported/api-security-best-practices/SKILL.md",
       "bytes": 16058,
       "fingerprint": "314caf95b7b7b934",
       "source": "sickn33/antigravity-awesome-skills",
@@ -304,7 +304,7 @@
     },
     {
       "id": "imported/ask-questions-if-underspecified",
-      "path": ".agents/skills/imported/ask-questions-if-underspecified.md",
+      "path": ".agents/skills/imported/ask-questions-if-underspecified/SKILL.md",
       "bytes": 2448,
       "fingerprint": "488ec292a197ddc0",
       "source": "https://github.com/trailofbits/skills",
@@ -316,7 +316,7 @@
     },
     {
       "id": "imported/browser-automation",
-      "path": ".agents/skills/imported/browser-automation.md",
+      "path": ".agents/skills/imported/browser-automation/SKILL.md",
       "bytes": 2528,
       "fingerprint": "002c3d6e4bfe4688",
       "source": "sickn33/antigravity-awesome-skills",
@@ -328,7 +328,7 @@
     },
     {
       "id": "imported/code-review-checklist",
-      "path": ".agents/skills/imported/code-review-checklist.md",
+      "path": ".agents/skills/imported/code-review-checklist/SKILL.md",
       "bytes": 6875,
       "fingerprint": "7a0b8504f659d2cd",
       "source": "sickn33/antigravity-awesome-skills",
@@ -340,7 +340,7 @@
     },
     {
       "id": "imported/evaluating-llms-harness",
-      "path": ".agents/skills/imported/evaluating-llms-harness.md",
+      "path": ".agents/skills/imported/evaluating-llms-harness/SKILL.md",
       "bytes": 2886,
       "fingerprint": "850d53da2bd28e8a",
       "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
@@ -352,7 +352,7 @@
     },
     {
       "id": "imported/langchain",
-      "path": ".agents/skills/imported/langchain.md",
+      "path": ".agents/skills/imported/langchain/SKILL.md",
       "bytes": 3904,
       "fingerprint": "9699714b4d2a239f",
       "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
@@ -364,7 +364,7 @@
     },
     {
       "id": "imported/langfuse",
-      "path": ".agents/skills/imported/langfuse.md",
+      "path": ".agents/skills/imported/langfuse/SKILL.md",
       "bytes": 5702,
       "fingerprint": "577849901a007947",
       "source": "sickn33/antigravity-awesome-skills",
@@ -376,7 +376,7 @@
     },
     {
       "id": "imported/langgraph",
-      "path": ".agents/skills/imported/langgraph.md",
+      "path": ".agents/skills/imported/langgraph/SKILL.md",
       "bytes": 6818,
       "fingerprint": "7882670d73e0c9b5",
       "source": "sickn33/antigravity-awesome-skills",
@@ -388,7 +388,7 @@
     },
     {
       "id": "imported/langgraph-docs",
-      "path": ".agents/skills/imported/langgraph-docs.md",
+      "path": ".agents/skills/imported/langgraph-docs/SKILL.md",
       "bytes": 2318,
       "fingerprint": "906ff9c3056732e3",
       "source": "https://github.com/langchain-ai/deepagents",
@@ -400,7 +400,7 @@
     },
     {
       "id": "imported/langsmith-observability",
-      "path": ".agents/skills/imported/langsmith-observability.md",
+      "path": ".agents/skills/imported/langsmith-observability/SKILL.md",
       "bytes": 3382,
       "fingerprint": "3b1e47f91caba8fd",
       "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
@@ -412,7 +412,7 @@
     },
     {
       "id": "imported/llm-app-patterns",
-      "path": ".agents/skills/imported/llm-app-patterns.md",
+      "path": ".agents/skills/imported/llm-app-patterns/SKILL.md",
       "bytes": 5592,
       "fingerprint": "017d1bb2f2bfeae3",
       "source": "sickn33/antigravity-awesome-skills",
@@ -424,7 +424,7 @@
     },
     {
       "id": "imported/mcp-builder",
-      "path": ".agents/skills/imported/mcp-builder.md",
+      "path": ".agents/skills/imported/mcp-builder/SKILL.md",
       "bytes": 2603,
       "fingerprint": "f657362d90e3720e",
       "source": "sickn33/antigravity-awesome-skills",
@@ -436,7 +436,7 @@
     },
     {
       "id": "imported/observability-engineer",
-      "path": ".agents/skills/imported/observability-engineer.md",
+      "path": ".agents/skills/imported/observability-engineer/SKILL.md",
       "bytes": 2297,
       "fingerprint": "625922cccdb20eb9",
       "source": "sickn33/antigravity-awesome-skills",
@@ -448,7 +448,7 @@
     },
     {
       "id": "imported/phoenix-observability",
-      "path": ".agents/skills/imported/phoenix-observability.md",
+      "path": ".agents/skills/imported/phoenix-observability/SKILL.md",
       "bytes": 3162,
       "fingerprint": "fdc8a22185d8f721",
       "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
@@ -460,7 +460,7 @@
     },
     {
       "id": "imported/pinecone",
-      "path": ".agents/skills/imported/pinecone.md",
+      "path": ".agents/skills/imported/pinecone/SKILL.md",
       "bytes": 3794,
       "fingerprint": "c1b742d454256fc8",
       "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
@@ -472,7 +472,7 @@
     },
     {
       "id": "imported/qdrant-vector-search",
-      "path": ".agents/skills/imported/qdrant-vector-search.md",
+      "path": ".agents/skills/imported/qdrant-vector-search/SKILL.md",
       "bytes": 4465,
       "fingerprint": "6a39ae64348ed104",
       "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
@@ -484,7 +484,7 @@
     },
     {
       "id": "imported/rag-implementation",
-      "path": ".agents/skills/imported/rag-implementation.md",
+      "path": ".agents/skills/imported/rag-implementation/SKILL.md",
       "bytes": 2377,
       "fingerprint": "4cd19a2ce438f1c4",
       "source": "sickn33/antigravity-awesome-skills",
@@ -496,7 +496,7 @@
     },
     {
       "id": "imported/sast-configuration",
-      "path": ".agents/skills/imported/sast-configuration.md",
+      "path": ".agents/skills/imported/sast-configuration/SKILL.md",
       "bytes": 3058,
       "fingerprint": "d1d19f86058a61b1",
       "source": "sickn33/antigravity-awesome-skills",
@@ -508,7 +508,7 @@
     },
     {
       "id": "imported/security-auditor",
-      "path": ".agents/skills/imported/security-auditor.md",
+      "path": ".agents/skills/imported/security-auditor/SKILL.md",
       "bytes": 2321,
       "fingerprint": "a17445bc755903a2",
       "source": "sickn33/antigravity-awesome-skills",
@@ -520,7 +520,7 @@
     },
     {
       "id": "imported/skypilot-multi-cloud-orchestration",
-      "path": ".agents/skills/imported/skypilot-multi-cloud-orchestration.md",
+      "path": ".agents/skills/imported/skypilot-multi-cloud-orchestration/SKILL.md",
       "bytes": 2799,
       "fingerprint": "b9652f94583da5f0",
       "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
@@ -532,7 +532,7 @@
     },
     {
       "id": "imported/systematic-debugging",
-      "path": ".agents/skills/imported/systematic-debugging.md",
+      "path": ".agents/skills/imported/systematic-debugging/SKILL.md",
       "bytes": 3361,
       "fingerprint": "6de9dcfdf41d3100",
       "source": "sickn33/antigravity-awesome-skills",
@@ -544,7 +544,7 @@
     },
     {
       "id": "imported/test-driven-development",
-      "path": ".agents/skills/imported/test-driven-development.md",
+      "path": ".agents/skills/imported/test-driven-development/SKILL.md",
       "bytes": 3291,
       "fingerprint": "353999b1d61c6203",
       "source": "sickn33/antigravity-awesome-skills",
@@ -556,7 +556,7 @@
     },
     {
       "id": "imported/threat-modeling-expert",
-      "path": ".agents/skills/imported/threat-modeling-expert.md",
+      "path": ".agents/skills/imported/threat-modeling-expert/SKILL.md",
       "bytes": 2776,
       "fingerprint": "0e9b55ab63b03010",
       "source": "sickn33/antigravity-awesome-skills",
@@ -568,7 +568,7 @@
     },
     {
       "id": "imported/top-web-vulnerabilities",
-      "path": ".agents/skills/imported/top-web-vulnerabilities.md",
+      "path": ".agents/skills/imported/top-web-vulnerabilities/SKILL.md",
       "bytes": 2612,
       "fingerprint": "bbbfdb03b82ce145",
       "source": "sickn33/antigravity-awesome-skills",
@@ -580,7 +580,7 @@
     },
     {
       "id": "imported/vector-database-engineer",
-      "path": ".agents/skills/imported/vector-database-engineer.md",
+      "path": ".agents/skills/imported/vector-database-engineer/SKILL.md",
       "bytes": 2849,
       "fingerprint": "61977a63d34d7357",
       "source": "sickn33/antigravity-awesome-skills",
@@ -592,7 +592,7 @@
     },
     {
       "id": "imported/verification-before-completion",
-      "path": ".agents/skills/imported/verification-before-completion.md",
+      "path": ".agents/skills/imported/verification-before-completion/SKILL.md",
       "bytes": 2888,
       "fingerprint": "4476fec28f5ab198",
       "source": "sickn33/antigravity-awesome-skills",
@@ -604,7 +604,7 @@
     },
     {
       "id": "imported/web-research",
-      "path": ".agents/skills/imported/web-research.md",
+      "path": ".agents/skills/imported/web-research/SKILL.md",
       "bytes": 2682,
       "fingerprint": "578f75a33d16b21e",
       "source": "https://github.com/langchain-ai/deepagents",
@@ -616,7 +616,7 @@
     },
     {
       "id": "imported/webapp-testing",
-      "path": ".agents/skills/imported/webapp-testing.md",
+      "path": ".agents/skills/imported/webapp-testing/SKILL.md",
       "bytes": 3250,
       "fingerprint": "ae8a22b0f86db405",
       "source": "anthropics/skills",
@@ -628,7 +628,7 @@
     },
     {
       "id": "imported/workflow-automation",
-      "path": ".agents/skills/imported/workflow-automation.md",
+      "path": ".agents/skills/imported/workflow-automation/SKILL.md",
       "bytes": 2500,
       "fingerprint": "ae48f127fe0f5e61",
       "source": "sickn33/antigravity-awesome-skills",
@@ -640,7 +640,7 @@
     },
     {
       "id": "imported/workflow-orchestration-patterns",
-      "path": ".agents/skills/imported/workflow-orchestration-patterns.md",
+      "path": ".agents/skills/imported/workflow-orchestration-patterns/SKILL.md",
       "bytes": 3022,
       "fingerprint": "661def822206c2ec",
       "source": "https://github.com/wshobson/agents",
@@ -652,7 +652,7 @@
     },
     {
       "id": "next_steps",
-      "path": ".agents/skills/next_steps.md",
+      "path": ".agents/skills/next_steps/SKILL.md",
       "bytes": 1086,
       "fingerprint": "1c164640134e84a2",
       "source": "self",
@@ -664,7 +664,7 @@
     },
     {
       "id": "refactor_code",
-      "path": ".agents/skills/refactor_code.md",
+      "path": ".agents/skills/refactor_code/SKILL.md",
       "bytes": 1266,
       "fingerprint": "9ec01936b37c3745",
       "source": "self",
@@ -676,7 +676,7 @@
     },
     {
       "id": "set_memory",
-      "path": ".agents/skills/set_memory.md",
+      "path": ".agents/skills/set_memory/SKILL.md",
       "bytes": 1047,
       "fingerprint": "351ed7d8fc1e207a",
       "source": "self",

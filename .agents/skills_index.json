@@ -1,7 +1,7 @@
 [
   {
     "id": "ai-engineering/acceptance_guard",
-    "path": ".agents/skills/ai-engineering/acceptance_guard.md",
+    "path": ".agents/skills/ai-engineering/acceptance_guard/SKILL.md",
     "name": "acceptance_guard",
     "domain": "ai-engineering",
     "description": "Validate acceptance criteria and test completeness",
@@ -11,7 +11,7 @@
   },
   {
     "id": "ai-engineering/impact_analyzer",
-    "path": ".agents/skills/ai-engineering/impact_analyzer.md",
+    "path": ".agents/skills/ai-engineering/impact_analyzer/SKILL.md",
     "name": "impact_analyzer",
     "domain": "ai-engineering",
     "description": "Estimate blast radius and dependency impact",
@@ -21,7 +21,7 @@
   },
   {
     "id": "ai-engineering/risk_register",
-    "path": ".agents/skills/ai-engineering/risk_register.md",
+    "path": ".agents/skills/ai-engineering/risk_register/SKILL.md",
     "name": "risk_register",
     "domain": "ai-engineering",
     "description": "Generate risk register with severity and mitigation",
@@ -31,7 +31,7 @@
   },
   {
     "id": "analyze_code",
-    "path": ".agents/skills/analyze_code.md",
+    "path": ".agents/skills/analyze_code/SKILL.md",
     "name": "analyze_code",
     "domain": "agent",
     "description": "Analyze a code task and produce a deterministic backend implementation assessment.",
@@ -45,7 +45,7 @@
   },
   {
     "id": "climate-tech/acceptance_guard",
-    "path": ".agents/skills/climate-tech/acceptance_guard.md",
+    "path": ".agents/skills/climate-tech/acceptance_guard/SKILL.md",
     "name": "acceptance_guard",
     "domain": "climate-tech",
     "description": "Validate acceptance criteria and test completeness",
@@ -55,7 +55,7 @@
   },
   {
     "id": "climate-tech/impact_analyzer",
-    "path": ".agents/skills/climate-tech/impact_analyzer.md",
+    "path": ".agents/skills/climate-tech/impact_analyzer/SKILL.md",
     "name": "impact_analyzer",
     "domain": "climate-tech",
     "description": "Estimate blast radius and dependency impact",
@@ -65,7 +65,7 @@
   },
   {
     "id": "climate-tech/risk_register",
-    "path": ".agents/skills/climate-tech/risk_register.md",
+    "path": ".agents/skills/climate-tech/risk_register/SKILL.md",
     "name": "risk_register",
     "domain": "climate-tech",
     "description": "Generate risk register with severity and mitigation",
@@ -75,7 +75,7 @@
   },
   {
     "id": "cloud-platform/acceptance_guard",
-    "path": ".agents/skills/cloud-platform/acceptance_guard.md",
+    "path": ".agents/skills/cloud-platform/acceptance_guard/SKILL.md",
     "name": "acceptance_guard",
     "domain": "cloud-platform",
     "description": "Validate acceptance criteria and test completeness",
@@ -85,7 +85,7 @@
   },
   {
     "id": "cloud-platform/impact_analyzer",
-    "path": ".agents/skills/cloud-platform/impact_analyzer.md",
+    "path": ".agents/skills/cloud-platform/impact_analyzer/SKILL.md",
     "name": "impact_analyzer",
     "domain": "cloud-platform",
     "description": "Estimate blast radius and dependency impact",
@@ -95,7 +95,7 @@
   },
   {
     "id": "cloud-platform/risk_register",
-    "path": ".agents/skills/cloud-platform/risk_register.md",
+    "path": ".agents/skills/cloud-platform/risk_register/SKILL.md",
     "name": "risk_register",
     "domain": "cloud-platform",
     "description": "Generate risk register with severity and mitigation",
@@ -105,7 +105,7 @@
   },
   {
     "id": "cybersecurity/acceptance_guard",
-    "path": ".agents/skills/cybersecurity/acceptance_guard.md",
+    "path": ".agents/skills/cybersecurity/acceptance_guard/SKILL.md",
     "name": "acceptance_guard",
     "domain": "cybersecurity",
     "description": "Validate acceptance criteria and test completeness",
@@ -115,7 +115,7 @@
   },
   {
     "id": "cybersecurity/impact_analyzer",
-    "path": ".agents/skills/cybersecurity/impact_analyzer.md",
+    "path": ".agents/skills/cybersecurity/impact_analyzer/SKILL.md",
     "name": "impact_analyzer",
     "domain": "cybersecurity",
     "description": "Estimate blast radius and dependency impact",
@@ -125,7 +125,7 @@
   },
   {
     "id": "cybersecurity/risk_register",
-    "path": ".agents/skills/cybersecurity/risk_register.md",
+    "path": ".agents/skills/cybersecurity/risk_register/SKILL.md",
     "name": "risk_register",
     "domain": "cybersecurity",
     "description": "Generate risk register with severity and mitigation",
@@ -135,7 +135,7 @@
   },
   {
     "id": "data-ml-eval/acceptance_guard",
-    "path": ".agents/skills/data-ml-eval/acceptance_guard.md",
+    "path": ".agents/skills/data-ml-eval/acceptance_guard/SKILL.md",
     "name": "acceptance_guard",
     "domain": "data-ml-eval",
     "description": "Validate acceptance criteria and test completeness",
@@ -145,7 +145,7 @@
   },
   {
     "id": "data-ml-eval/impact_analyzer",
-    "path": ".agents/skills/data-ml-eval/impact_analyzer.md",
+    "path": ".agents/skills/data-ml-eval/impact_analyzer/SKILL.md",
     "name": "impact_analyzer",
     "domain": "data-ml-eval",
     "description": "Estimate blast radius and dependency impact",
@@ -155,7 +155,7 @@
   },
   {
     "id": "data-ml-eval/risk_register",
-    "path": ".agents/skills/data-ml-eval/risk_register.md",
+    "path": ".agents/skills/data-ml-eval/risk_register/SKILL.md",
     "name": "risk_register",
     "domain": "data-ml-eval",
     "description": "Generate risk register with severity and mitigation",
@@ -165,7 +165,7 @@
   },
   {
     "id": "dev/landing_page_architect",
-    "path": ".agents/skills/dev/landing_page_architect.md",
+    "path": ".agents/skills/dev/landing_page_architect/SKILL.md",
     "name": "landing_page_architect",
     "domain": "dev",
     "description": "Design an implementation-ready landing page spec with sections, UX intent, and acceptance criteria.",
@@ -180,7 +180,7 @@
   },
   {
     "id": "dev/landing_page_implementer",
-    "path": ".agents/skills/dev/landing_page_implementer.md",
+    "path": ".agents/skills/dev/landing_page_implementer/SKILL.md",
     "name": "landing_page_implementer",
     "domain": "dev",
     "description": "Generate implementation-ready landing page file changes and validation checklist from a spec.",
@@ -195,7 +195,7 @@
   },
   {
     "id": "dev/project_intelligence_advisor",
-    "path": ".agents/skills/dev/project_intelligence_advisor.md",
+    "path": ".agents/skills/dev/project_intelligence_advisor/SKILL.md",
     "name": "project_intelligence_advisor",
     "domain": "dev",
     "description": "Synthesize indexed project context and recommend the best workflows and skills to upgrade delivery quality.",
@@ -210,7 +210,7 @@
   },
   {
     "id": "generate_tests",
-    "path": ".agents/skills/generate_tests.md",
+    "path": ".agents/skills/generate_tests/SKILL.md",
     "name": "generate_tests",
     "domain": "agent",
     "description": "Generate deterministic unit tests from feature or bugfix requirements.",
@@ -224,7 +224,7 @@
   },
   {
     "id": "healthtech/acceptance_guard",
-    "path": ".agents/skills/healthtech/acceptance_guard.md",
+    "path": ".agents/skills/healthtech/acceptance_guard/SKILL.md",
     "name": "acceptance_guard",
     "domain": "healthtech",
     "description": "Validate acceptance criteria and test completeness",
@@ -234,7 +234,7 @@
   },
   {
     "id": "healthtech/impact_analyzer",
-    "path": ".agents/skills/healthtech/impact_analyzer.md",
+    "path": ".agents/skills/healthtech/impact_analyzer/SKILL.md",
     "name": "impact_analyzer",
     "domain": "healthtech",
     "description": "Estimate blast radius and dependency impact",
@@ -244,7 +244,7 @@
   },
   {
     "id": "healthtech/risk_register",
-    "path": ".agents/skills/healthtech/risk_register.md",
+    "path": ".agents/skills/healthtech/risk_register/SKILL.md",
     "name": "risk_register",
     "domain": "healthtech",
     "description": "Generate risk register with severity and mitigation",
@@ -254,7 +254,7 @@
   },
   {
     "id": "imported/agent-evaluation",
-    "path": ".agents/skills/imported/agent-evaluation.md",
+    "path": ".agents/skills/imported/agent-evaluation/SKILL.md",
     "name": "agent-evaluation",
     "domain": "antigravity",
     "description": "Testing and benchmarking LLM agents including behavioral testing, capability assessment, reliability metrics, and production monitoring\\u2014where even top agents achieve less than 50% on re...",
@@ -268,7 +268,7 @@
   },
   {
     "id": "imported/api-security-best-practices",
-    "path": ".agents/skills/imported/api-security-best-practices.md",
+    "path": ".agents/skills/imported/api-security-best-practices/SKILL.md",
     "name": "api-security-best-practices",
     "domain": "antigravity",
     "description": "Implement secure API design patterns including authentication, authorization, input validation, rate limiting, and protection against common API vulnerabilities",
@@ -282,7 +282,7 @@
   },
   {
     "id": "imported/ask-questions-if-underspecified",
-    "path": ".agents/skills/imported/ask-questions-if-underspecified.md",
+    "path": ".agents/skills/imported/ask-questions-if-underspecified/SKILL.md",
     "name": "ask-questions-if-underspecified",
     "domain": "imported",
     "description": "Clarify requirements before implementing. Use when serious doubts arise.",
@@ -296,7 +296,7 @@
   },
   {
     "id": "imported/browser-automation",
-    "path": ".agents/skills/imported/browser-automation.md",
+    "path": ".agents/skills/imported/browser-automation/SKILL.md",
     "name": "browser-automation",
     "domain": "antigravity",
     "description": "Browser automation powers web testing, scraping, and AI agent interactions. The difference between a flaky script and a reliable system comes down to understanding selectors, waiting strategies, an...",
@@ -310,7 +310,7 @@
   },
   {
     "id": "imported/code-review-checklist",
-    "path": ".agents/skills/imported/code-review-checklist.md",
+    "path": ".agents/skills/imported/code-review-checklist/SKILL.md",
     "name": "code-review-checklist",
     "domain": "antigravity",
     "description": "Comprehensive checklist for conducting thorough code reviews covering functionality, security, performance, and maintainability",
@@ -324,7 +324,7 @@
   },
   {
     "id": "imported/evaluating-llms-harness",
-    "path": ".agents/skills/imported/evaluating-llms-harness.md",
+    "path": ".agents/skills/imported/evaluating-llms-harness/SKILL.md",
     "name": "evaluating-llms-harness",
     "domain": "ai-research",
     "description": "Evaluates LLMs across 60+ academic benchmarks (MMLU, HumanEval, GSM8K, TruthfulQA, HellaSwag). Use when benchmarking model quality, comparing models, reporting academic results, or tracking training p",
@@ -346,7 +346,7 @@
   },
   {
     "id": "imported/langchain",
-    "path": ".agents/skills/imported/langchain.md",
+    "path": ".agents/skills/imported/langchain/SKILL.md",
     "name": "langchain",
     "domain": "ai-research",
     "description": "Framework for building LLM-powered applications with agents, chains, and RAG. Supports multiple providers (OpenAI, Anthropic, Google), 500+ integrations, ReAct agents, tool calling, memory management,",
@@ -368,7 +368,7 @@
   },
   {
     "id": "imported/langfuse",
-    "path": ".agents/skills/imported/langfuse.md",
+    "path": ".agents/skills/imported/langfuse/SKILL.md",
     "name": "langfuse",
     "domain": "antigravity",
     "description": "Expert in Langfuse - the open-source LLM observability platform. Covers tracing, prompt management, evaluation, datasets, and integration with LangChain, LlamaIndex, and OpenAI. Essential for debug...",
@@ -382,7 +382,7 @@
   },
   {
     "id": "imported/langgraph",
-    "path": ".agents/skills/imported/langgraph.md",
+    "path": ".agents/skills/imported/langgraph/SKILL.md",
     "name": "langgraph",
     "domain": "antigravity",
     "description": "Expert in LangGraph - the production-grade framework for building stateful, multi-actor AI applications. Covers graph construction, state management, cycles and branches, persistence with checkpoin...",
@@ -396,7 +396,7 @@
   },
   {
     "id": "imported/langgraph-docs",
-    "path": ".agents/skills/imported/langgraph-docs.md",
+    "path": ".agents/skills/imported/langgraph-docs/SKILL.md",
     "name": "langgraph-docs",
     "domain": "imported",
     "description": "Use this skill for requests related to LangGraph in order to fetch relevant documentation to provide accurate, up-to-date guidance.",
@@ -410,7 +410,7 @@
   },
   {
     "id": "imported/langsmith-observability",
-    "path": ".agents/skills/imported/langsmith-observability.md",
+    "path": ".agents/skills/imported/langsmith-observability/SKILL.md",
     "name": "langsmith-observability",
     "domain": "ai-research",
     "description": "LLM observability platform for tracing, evaluation, and monitoring. Use when debugging LLM applications, evaluating model outputs against datasets, monitoring production systems, or building systemati",
@@ -431,7 +431,7 @@
   },
   {
     "id": "imported/llm-app-patterns",
-    "path": ".agents/skills/imported/llm-app-patterns.md",
+    "path": ".agents/skills/imported/llm-app-patterns/SKILL.md",
     "name": "llm-app-patterns",
     "domain": "antigravity",
     "description": "Production-ready patterns for building LLM applications. Covers RAG pipelines, agent architectures, prompt IDEs, and LLMOps monitoring. Use when designing AI applications, implementing RAG, buildin...",
@@ -445,7 +445,7 @@
   },
   {
     "id": "imported/mcp-builder",
-    "path": ".agents/skills/imported/mcp-builder.md",
+    "path": ".agents/skills/imported/mcp-builder/SKILL.md",
     "name": "mcp-builder",
     "domain": "antigravity",
     "description": "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate exte...",
@@ -459,7 +459,7 @@
   },
   {
     "id": "imported/observability-engineer",
-    "path": ".agents/skills/imported/observability-engineer.md",
+    "path": ".agents/skills/imported/observability-engineer/SKILL.md",
     "name": "observability-engineer",
     "domain": "antigravity",
     "description": "Build production-ready monitoring, logging, and tracing systems.",
@@ -473,7 +473,7 @@
   },
   {
     "id": "imported/phoenix-observability",
-    "path": ".agents/skills/imported/phoenix-observability.md",
+    "path": ".agents/skills/imported/phoenix-observability/SKILL.md",
     "name": "phoenix-observability",
     "domain": "ai-research",
     "description": "Open-source AI observability platform for LLM tracing, evaluation, and monitoring. Use when debugging LLM applications with detailed traces, running evaluations on datasets, or monitoring production A",
@@ -493,7 +493,7 @@
   },
   {
     "id": "imported/pinecone",
-    "path": ".agents/skills/imported/pinecone.md",
+    "path": ".agents/skills/imported/pinecone/SKILL.md",
     "name": "pinecone",
     "domain": "ai-research",
     "description": "Managed vector database for production AI applications. Fully managed, auto-scaling, with hybrid search (dense + sparse), metadata filtering, and namespaces. Low latency (<100ms p95). Use for producti",
@@ -515,7 +515,7 @@
   },
   {
     "id": "imported/qdrant-vector-search",
-    "path": ".agents/skills/imported/qdrant-vector-search.md",
+    "path": ".agents/skills/imported/qdrant-vector-search/SKILL.md",
     "name": "qdrant-vector-search",
     "domain": "ai-research",
     "description": "High-performance vector similarity search engine for RAG and semantic search. Use when building production RAG systems requiring fast nearest neighbor search, hybrid search with filtering, or scalable",
@@ -536,7 +536,7 @@
   },
   {
     "id": "imported/rag-implementation",
-    "path": ".agents/skills/imported/rag-implementation.md",
+    "path": ".agents/skills/imported/rag-implementation/SKILL.md",
     "name": "rag-implementation",
     "domain": "antigravity",
     "description": "RAG (Retrieval-Augmented Generation) implementation workflow covering embedding selection, vector database setup, chunking strategies, and retrieval optimization.",
@@ -550,7 +550,7 @@
   },
   {
     "id": "imported/sast-configuration",
-    "path": ".agents/skills/imported/sast-configuration.md",
+    "path": ".agents/skills/imported/sast-configuration/SKILL.md",
     "name": "sast-configuration",
     "domain": "antigravity",
     "description": "Configure Static Application Security Testing (SAST) tools for automated vulnerability detection in application code. Use when setting up security scanning, implementing DevSecOps practices, or aut...",
@@ -564,7 +564,7 @@
   },
   {
     "id": "imported/security-auditor",
-    "path": ".agents/skills/imported/security-auditor.md",
+    "path": ".agents/skills/imported/security-auditor/SKILL.md",
     "name": "security-auditor",
     "domain": "antigravity",
     "description": "Expert security auditor specializing in DevSecOps, comprehensive",
@@ -578,7 +578,7 @@
   },
   {
     "id": "imported/skypilot-multi-cloud-orchestration",
-    "path": ".agents/skills/imported/skypilot-multi-cloud-orchestration.md",
+    "path": ".agents/skills/imported/skypilot-multi-cloud-orchestration/SKILL.md",
     "name": "skypilot-multi-cloud-orchestration",
     "domain": "ai-research",
     "description": "Multi-cloud orchestration for ML workloads with automatic cost optimization. Use when you need to run training or batch jobs across multiple clouds, leverage spot instances with auto-recovery, or opti",
@@ -596,7 +596,7 @@
   },
   {
     "id": "imported/systematic-debugging",
-    "path": ".agents/skills/imported/systematic-debugging.md",
+    "path": ".agents/skills/imported/systematic-debugging/SKILL.md",
     "name": "systematic-debugging",
     "domain": "antigravity",
     "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
@@ -610,7 +610,7 @@
   },
   {
     "id": "imported/test-driven-development",
-    "path": ".agents/skills/imported/test-driven-development.md",
+    "path": ".agents/skills/imported/test-driven-development/SKILL.md",
     "name": "test-driven-development",
     "domain": "antigravity",
     "description": "Use when implementing any feature or bugfix, before writing implementation code",
@@ -624,7 +624,7 @@
   },
   {
     "id": "imported/threat-modeling-expert",
-    "path": ".agents/skills/imported/threat-modeling-expert.md",
+    "path": ".agents/skills/imported/threat-modeling-expert/SKILL.md",
     "name": "threat-modeling-expert",
     "domain": "antigravity",
     "description": "Expert in threat modeling methodologies, security architecture review, and risk assessment. Masters STRIDE, PASTA, attack trees, and security requirement extraction. Use for security architecture r...",
@@ -638,7 +638,7 @@
   },
   {
     "id": "imported/top-web-vulnerabilities",
-    "path": ".agents/skills/imported/top-web-vulnerabilities.md",
+    "path": ".agents/skills/imported/top-web-vulnerabilities/SKILL.md",
     "name": "top-web-vulnerabilities",
     "domain": "antigravity",
     "description": "This skill should be used when the user asks to \\\"identify web application vulnerabilities\\\", \\\"explain common security flaws\\\", \\\"understand vulnerability categories\\\", \\\"learn about inject...",
@@ -652,7 +652,7 @@
   },
   {
     "id": "imported/vector-database-engineer",
-    "path": ".agents/skills/imported/vector-database-engineer.md",
+    "path": ".agents/skills/imported/vector-database-engineer/SKILL.md",
     "name": "vector-database-engineer",
     "domain": "antigravity",
     "description": "Expert in vector databases, embedding strategies, and semantic search implementation. Masters Pinecone, Weaviate, Qdrant, Milvus, and pgvector for RAG applications, recommendation systems, and similar",
@@ -666,7 +666,7 @@
   },
   {
     "id": "imported/verification-before-completion",
-    "path": ".agents/skills/imported/verification-before-completion.md",
+    "path": ".agents/skills/imported/verification-before-completion/SKILL.md",
     "name": "verification-before-completion",
     "domain": "antigravity",
     "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evide...",
@@ -680,7 +680,7 @@
   },
   {
     "id": "imported/web-research",
-    "path": ".agents/skills/imported/web-research.md",
+    "path": ".agents/skills/imported/web-research/SKILL.md",
     "name": "web-research",
     "domain": "imported",
     "description": "Use this skill for requests related to web research; it provides a structured approach to conducting comprehensive web research",
@@ -694,7 +694,7 @@
   },
   {
     "id": "imported/webapp-testing",
-    "path": ".agents/skills/imported/webapp-testing.md",
+    "path": ".agents/skills/imported/webapp-testing/SKILL.md",
     "name": "webapp-testing",
     "domain": "anthropic",
     "description": "Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser l",
@@ -708,7 +708,7 @@
   },
   {
     "id": "imported/workflow-automation",
-    "path": ".agents/skills/imported/workflow-automation.md",
+    "path": ".agents/skills/imported/workflow-automation/SKILL.md",
     "name": "workflow-automation",
     "domain": "antigravity",
     "description": "Workflow automation is the infrastructure that makes AI agents reliable. Without durable execution, a network hiccup during a 10-step payment flow means lost money and angry customers. With it, wor...",
@@ -722,7 +722,7 @@
   },
   {
     "id": "imported/workflow-orchestration-patterns",
-    "path": ".agents/skills/imported/workflow-orchestration-patterns.md",
+    "path": ".agents/skills/imported/workflow-orchestration-patterns/SKILL.md",
     "name": "workflow-orchestration-patterns",
     "domain": "imported",
     "description": "Design durable workflows with Temporal for distributed systems. Covers workflow vs activity separation, saga patterns, state management, and determinism constraints. Use when building long-running pro",
@@ -736,7 +736,7 @@
   },
   {
     "id": "next_steps",
-    "path": ".agents/skills/next_steps.md",
+    "path": ".agents/skills/next_steps/SKILL.md",
     "name": "next_steps",
     "domain": "agent",
     "description": "Derive the next actionable workflow tasks from current progress notes.",
@@ -750,7 +750,7 @@
   },
   {
     "id": "refactor_code",
-    "path": ".agents/skills/refactor_code.md",
+    "path": ".agents/skills/refactor_code/SKILL.md",
     "name": "refactor_code",
     "domain": "agent",
     "description": "Propose modular refactoring plans that preserve behavior and reduce complexity.",
@@ -764,7 +764,7 @@
   },
   {
     "id": "set_memory",
-    "path": ".agents/skills/set_memory.md",
+    "path": ".agents/skills/set_memory/SKILL.md",
     "name": "set_memory",
     "domain": "agent",
     "description": "Normalize and structure KEY=VALUE memory updates for downstream workflow steps.",

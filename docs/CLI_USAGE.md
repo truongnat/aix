@@ -115,7 +115,7 @@ cargo run -- workflow bundles
 cargo run -- workflow bundles --json
 ```
 
-Import external `SKILL.md` repositories and convert to local `.agents/skills/imported/*.md` format:
+Import external `SKILL.md` repositories and convert to local folder-skill format:
 
 ```bash
 cargo run -- workflow import-skills https://github.com/anthropics/skills --max-skills 20
@@ -124,6 +124,9 @@ cargo run -- workflow import-skills https://github.com/anthropics/skills --mode 
 cargo run -- workflow import-skills /absolute/path/to/skills-repo --domain agent --overwrite --json
 cargo run -- workflow import-skills /absolute/path/to/skills-repo --no-catalog-rebuild
 ```
+
+Imported entries are written as:
+- `.agents/skills/imported/<skill-name>/SKILL.md`
 
 Install skillpacks via installer alias:
 
@@ -198,6 +201,9 @@ cargo run -- workflow scaffold skill search_docs --profile advanced
 cargo run -- workflow scaffold role planner --profile basic
 cargo run -- workflow scaffold rule runtime --overwrite
 ```
+
+`workflow scaffold skill ...` writes:
+- `.agents/skills/<skill-name>/SKILL.md`
 
 Generate an advanced domain pack (workflows + skills + roles + templates):
 

@@ -15,9 +15,9 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agents/skills/ai-engineering/acceptance_guard.md",
-        "./.agents/skills/ai-engineering/impact_analyzer.md",
-        "./.agents/skills/ai-engineering/risk_register.md"
+        "./.agents/skills/ai-engineering/acceptance_guard/SKILL.md",
+        "./.agents/skills/ai-engineering/impact_analyzer/SKILL.md",
+        "./.agents/skills/ai-engineering/risk_register/SKILL.md"
       ]
     },
     {
@@ -33,9 +33,9 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agents/skills/climate-tech/acceptance_guard.md",
-        "./.agents/skills/climate-tech/impact_analyzer.md",
-        "./.agents/skills/climate-tech/risk_register.md"
+        "./.agents/skills/climate-tech/acceptance_guard/SKILL.md",
+        "./.agents/skills/climate-tech/impact_analyzer/SKILL.md",
+        "./.agents/skills/climate-tech/risk_register/SKILL.md"
       ]
     },
     {
@@ -44,9 +44,9 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agents/skills/cloud-platform/acceptance_guard.md",
-        "./.agents/skills/cloud-platform/impact_analyzer.md",
-        "./.agents/skills/cloud-platform/risk_register.md"
+        "./.agents/skills/cloud-platform/acceptance_guard/SKILL.md",
+        "./.agents/skills/cloud-platform/impact_analyzer/SKILL.md",
+        "./.agents/skills/cloud-platform/risk_register/SKILL.md"
       ]
     },
     {
@@ -55,11 +55,11 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agents/skills/analyze_code.md",
-        "./.agents/skills/generate_tests.md",
-        "./.agents/skills/next_steps.md",
-        "./.agents/skills/refactor_code.md",
-        "./.agents/skills/set_memory.md"
+        "./.agents/skills/analyze_code/SKILL.md",
+        "./.agents/skills/generate_tests/SKILL.md",
+        "./.agents/skills/next_steps/SKILL.md",
+        "./.agents/skills/refactor_code/SKILL.md",
+        "./.agents/skills/set_memory/SKILL.md"
       ]
     },
     {
@@ -68,9 +68,9 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agents/skills/cybersecurity/acceptance_guard.md",
-        "./.agents/skills/cybersecurity/impact_analyzer.md",
-        "./.agents/skills/cybersecurity/risk_register.md"
+        "./.agents/skills/cybersecurity/acceptance_guard/SKILL.md",
+        "./.agents/skills/cybersecurity/impact_analyzer/SKILL.md",
+        "./.agents/skills/cybersecurity/risk_register/SKILL.md"
       ]
     },
     {
@@ -79,9 +79,9 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agents/skills/data-ml-eval/acceptance_guard.md",
-        "./.agents/skills/data-ml-eval/impact_analyzer.md",
-        "./.agents/skills/data-ml-eval/risk_register.md"
+        "./.agents/skills/data-ml-eval/acceptance_guard/SKILL.md",
+        "./.agents/skills/data-ml-eval/impact_analyzer/SKILL.md",
+        "./.agents/skills/data-ml-eval/risk_register/SKILL.md"
       ]
     },
     {
@@ -90,9 +90,9 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agents/skills/dev/landing_page_architect.md",
-        "./.agents/skills/dev/landing_page_implementer.md",
-        "./.agents/skills/dev/project_intelligence_advisor.md"
+        "./.agents/skills/dev/landing_page_architect/SKILL.md",
+        "./.agents/skills/dev/landing_page_implementer/SKILL.md",
+        "./.agents/skills/dev/project_intelligence_advisor/SKILL.md"
       ]
     },
     {
@@ -101,9 +101,9 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agents/skills/healthtech/acceptance_guard.md",
-        "./.agents/skills/healthtech/impact_analyzer.md",
-        "./.agents/skills/healthtech/risk_register.md"
+        "./.agents/skills/healthtech/acceptance_guard/SKILL.md",
+        "./.agents/skills/healthtech/impact_analyzer/SKILL.md",
+        "./.agents/skills/healthtech/risk_register/SKILL.md"
       ]
     },
     {
@@ -112,37 +112,37 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./.agents/skills/imported/agent-evaluation.md",
-        "./.agents/skills/imported/api-security-best-practices.md",
-        "./.agents/skills/imported/ask-questions-if-underspecified.md",
-        "./.agents/skills/imported/browser-automation.md",
-        "./.agents/skills/imported/code-review-checklist.md",
-        "./.agents/skills/imported/evaluating-llms-harness.md",
-        "./.agents/skills/imported/langchain.md",
-        "./.agents/skills/imported/langfuse.md",
-        "./.agents/skills/imported/langgraph.md",
-        "./.agents/skills/imported/langgraph-docs.md",
-        "./.agents/skills/imported/langsmith-observability.md",
-        "./.agents/skills/imported/llm-app-patterns.md",
-        "./.agents/skills/imported/mcp-builder.md",
-        "./.agents/skills/imported/observability-engineer.md",
-        "./.agents/skills/imported/phoenix-observability.md",
-        "./.agents/skills/imported/pinecone.md",
-        "./.agents/skills/imported/qdrant-vector-search.md",
-        "./.agents/skills/imported/rag-implementation.md",
-        "./.agents/skills/imported/sast-configuration.md",
-        "./.agents/skills/imported/security-auditor.md",
-        "./.agents/skills/imported/skypilot-multi-cloud-orchestration.md",
-        "./.agents/skills/imported/systematic-debugging.md",
-        "./.agents/skills/imported/test-driven-development.md",
-        "./.agents/skills/imported/threat-modeling-expert.md",
-        "./.agents/skills/imported/top-web-vulnerabilities.md",
-        "./.agents/skills/imported/vector-database-engineer.md",
-        "./.agents/skills/imported/verification-before-completion.md",
-        "./.agents/skills/imported/web-research.md",
-        "./.agents/skills/imported/webapp-testing.md",
-        "./.agents/skills/imported/workflow-automation.md",
-        "./.agents/skills/imported/workflow-orchestration-patterns.md"
+        "./.agents/skills/imported/agent-evaluation/SKILL.md",
+        "./.agents/skills/imported/api-security-best-practices/SKILL.md",
+        "./.agents/skills/imported/ask-questions-if-underspecified/SKILL.md",
+        "./.agents/skills/imported/browser-automation/SKILL.md",
+        "./.agents/skills/imported/code-review-checklist/SKILL.md",
+        "./.agents/skills/imported/evaluating-llms-harness/SKILL.md",
+        "./.agents/skills/imported/langchain/SKILL.md",
+        "./.agents/skills/imported/langfuse/SKILL.md",
+        "./.agents/skills/imported/langgraph/SKILL.md",
+        "./.agents/skills/imported/langgraph-docs/SKILL.md",
+        "./.agents/skills/imported/langsmith-observability/SKILL.md",
+        "./.agents/skills/imported/llm-app-patterns/SKILL.md",
+        "./.agents/skills/imported/mcp-builder/SKILL.md",
+        "./.agents/skills/imported/observability-engineer/SKILL.md",
+        "./.agents/skills/imported/phoenix-observability/SKILL.md",
+        "./.agents/skills/imported/pinecone/SKILL.md",
+        "./.agents/skills/imported/qdrant-vector-search/SKILL.md",
+        "./.agents/skills/imported/rag-implementation/SKILL.md",
+        "./.agents/skills/imported/sast-configuration/SKILL.md",
+        "./.agents/skills/imported/security-auditor/SKILL.md",
+        "./.agents/skills/imported/skypilot-multi-cloud-orchestration/SKILL.md",
+        "./.agents/skills/imported/systematic-debugging/SKILL.md",
+        "./.agents/skills/imported/test-driven-development/SKILL.md",
+        "./.agents/skills/imported/threat-modeling-expert/SKILL.md",
+        "./.agents/skills/imported/top-web-vulnerabilities/SKILL.md",
+        "./.agents/skills/imported/vector-database-engineer/SKILL.md",
+        "./.agents/skills/imported/verification-before-completion/SKILL.md",
+        "./.agents/skills/imported/web-research/SKILL.md",
+        "./.agents/skills/imported/webapp-testing/SKILL.md",
+        "./.agents/skills/imported/workflow-automation/SKILL.md",
+        "./.agents/skills/imported/workflow-orchestration-patterns/SKILL.md"
       ]
     }
   ]

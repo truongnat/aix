@@ -69,6 +69,38 @@ fn format_skillpack_report_path(target: &SkillpackInstallTarget, path: &Path) ->
     }
 }
 
+fn resolve_imported_skill_target_path(import_dir: &Path, skill_name: &str) -> PathBuf {
+    import_dir.join(skill_name).join("SKILL.md")
+}
+
+fn resolve_bundle_skill_target_path(bundle_dir: &Path, skill_id: &str) -> PathBuf {
+    let relative = skill_id.trim_matches('/').replace('\\', "/");
+    bundle_dir.join(relative).join("SKILL.md")
+}
+
+fn resolve_skill_name_for_target_path(path: &Path, fallback: &str) -> String {
+    if path
+        .file_name()
+        .and_then(|v| v.to_str())
+        .map(|v| v.eq_ignore_ascii_case("SKILL.md"))
+        .unwrap_or(false)
+    {
+        if let Some(parent) = path.parent().and_then(|v| v.file_name()) {
+            if let Some(value) = parent.to_str() {
+                let trimmed = value.trim();
+                if !trimmed.is_empty() {
+                    return trimmed.to_string();
+                }
+            }
+        }
+    }
+    path.file_stem()
+        .and_then(|v| v.to_str())
+        .map(|v| v.trim().to_string())
+        .filter(|v| !v.is_empty())
+        .unwrap_or_else(|| fallback.to_string())
+}
+
 fn resolve_lock_entry_target_path(
     target: &SkillpackInstallTarget,
     entry: &SkillLockEntry,
@@ -220,12 +252,13 @@ pub(super) fn import_skills_from_source(
             source_license: effective_license.clone(),
             imported_at_ms: Some(now_ms_u64()),
         };
-        let mut target_path = target.import_dir.join(format!("{}.md", skill_name));
+        let mut target_path = resolve_imported_skill_target_path(&target.import_dir, &skill_name);
         if target_path.exists() && !options.overwrite {
             let suffix = fnv1a64_hex(imported_skill.origin.as_bytes());
-            target_path = target
-                .import_dir
-                .join(format!("{}-{}.md", skill_name, &suffix[..8]));
+            target_path = resolve_imported_skill_target_path(
+                &target.import_dir,
+                &format!("{}-{}", skill_name, &suffix[..8]),
+            );
             if target_path.exists() && !options.overwrite {
                 skipped = skipped.saturating_add(1);
                 continue;
@@ -237,6 +270,9 @@ pub(super) fn import_skills_from_source(
             &imported_skill,
             &provenance,
         );
+        if let Some(parent) = target_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
         fs::write(&target_path, body)?;
         imported = imported.saturating_add(1);
         files.push(format_skillpack_report_path(&target, &target_path));
@@ -357,12 +393,9 @@ pub(super) fn sync_imported_skills_from_lock(
 
             let target_domain = infer_skill_domain_for_target(&target_path)
                 .unwrap_or_else(|| "imported".to_string());
-            let skill_name = target_path
-                .file_stem()
-                .and_then(|v| v.to_str())
-                .map(|v| v.trim().to_string())
-                .filter(|v| !v.is_empty())
-                .unwrap_or_else(|| sanitize_package_name(&imported_skill.name).unwrap_or_default());
+            let fallback_skill_name = sanitize_package_name(&imported_skill.name)
+                .unwrap_or_else(|_| "imported-skill".to_string());
+            let skill_name = resolve_skill_name_for_target_path(&target_path, &fallback_skill_name);
             let provenance = ImportProvenance {
                 requested_source: entry
                     .source_requested
@@ -380,6 +413,9 @@ pub(super) fn sync_imported_skills_from_lock(
                 &imported_skill,
                 &provenance,
             );
+            if let Some(parent) = target_path.parent() {
+                fs::create_dir_all(parent)?;
+            }
             fs::write(&target_path, body)?;
             updated = updated.saturating_add(1);
             files.push(format_skillpack_report_path(&target, &target_path));
@@ -460,8 +496,7 @@ pub(super) fn install_bundle_from_catalog(
             missing_skills.push(skill_id.clone());
             continue;
         }
-        let relative_skill = format!("{}.md", skill_id.trim_matches('/').replace('\\', "/"));
-        let target_path = bundle_dir.join(relative_skill);
+        let target_path = resolve_bundle_skill_target_path(&bundle_dir, skill_id);
         if target_path.exists() && !overwrite {
             skipped = skipped.saturating_add(1);
             continue;

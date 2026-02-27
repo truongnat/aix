@@ -95,6 +95,9 @@ cargo run -- workflow scaffold workflow feature-search --profile advanced
 cargo run -- workflow scaffold skill search_docs --profile advanced
 ```
 
+Skill scaffold now follows folder layout:
+- `.agents/skills/<skill-name>/SKILL.md`
+
 Generate an advanced domain pack (workflows + skills + roles + templates):
 
 ```bash
@@ -150,6 +153,9 @@ cargo run -- workflow import-skills https://github.com/anthropics/skills --max-s
 cargo run -- workflow import-skills https://github.com/anthropics/skills --allow-missing-license
 cargo run -- workflow import-skills https://github.com/anthropics/skills --mode global --allow-missing-license
 ```
+
+Imported skills are normalized to folder layout:
+- `.agents/skills/imported/<skill-name>/SKILL.md`
 
 Install using installer-style alias command:
 

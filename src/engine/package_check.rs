@@ -218,6 +218,9 @@ fn check_skills(layout: &AgentProjectLayout, report: &mut PackageCheckReport) ->
     for path in collect_files_recursive(&layout.skills_dir)? {
         match extension_kind(&path) {
             ExtensionKind::Markdown => {
+                if !is_skill_entry_markdown(&path) {
+                    continue;
+                }
                 skill_count = skill_count.saturating_add(1);
                 report.checked_files = report.checked_files.saturating_add(1);
                 let content = match fs::read_to_string(&path) {
@@ -246,14 +249,16 @@ fn check_skills(layout: &AgentProjectLayout, report: &mut PackageCheckReport) ->
                     }
                 }
             }
-            ExtensionKind::Yaml => report.error(
-                path.display().to_string(),
-                "YAML files are not supported for skills; convert to Markdown with frontmatter or JSON metadata block",
-            ),
-            ExtensionKind::Other => report.error(
-                path.display().to_string(),
-                "Unsupported skill file extension; expected .md",
-            ),
+            ExtensionKind::Yaml => {
+                if is_skill_auxiliary_path(&path) {
+                    continue;
+                }
+                report.error(
+                    path.display().to_string(),
+                    "YAML files are not supported for skill entries; use SKILL.md with frontmatter or JSON metadata block",
+                );
+            }
+            ExtensionKind::Other => continue,
         }
     }
     if skill_count == 0 {
@@ -399,6 +404,38 @@ fn extension_kind(path: &Path) -> ExtensionKind {
     }
 }
 
+fn is_skill_auxiliary_path(path: &Path) -> bool {
+    path.components()
+        .filter_map(|component| component.as_os_str().to_str())
+        .map(|value| value.to_ascii_lowercase())
+        .any(|value| {
+            matches!(
+                value.as_str(),
+                "references" | "scripts" | "assets" | "agents"
+            )
+        })
+}
+
+fn is_skill_entry_markdown(path: &Path) -> bool {
+    let is_markdown = path
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .map(|ext| ext.eq_ignore_ascii_case("md"))
+        .unwrap_or(false);
+    if !is_markdown {
+        return false;
+    }
+    let is_skill_md = path
+        .file_name()
+        .and_then(|v| v.to_str())
+        .map(|v| v.eq_ignore_ascii_case("SKILL.md"))
+        .unwrap_or(false);
+    if is_skill_md {
+        return true;
+    }
+    !is_skill_auxiliary_path(path)
+}
+
 fn collect_files_recursive(root: &Path) -> Result<Vec<PathBuf>> {
     let mut files = Vec::new();
     walk_directory_files(root, &mut |path| files.push(path.to_path_buf()))?;
@@ -452,6 +489,7 @@ mod tests {
         std::fs::create_dir_all(&workflows).expect("workflows");
         std::fs::create_dir_all(&rules).expect("rules");
         std::fs::create_dir_all(&skills).expect("skills");
+        std::fs::create_dir_all(skills.join("sample")).expect("sample skill dir");
         std::fs::create_dir_all(&roles).expect("roles");
         std::fs::create_dir_all(&templates).expect("templates");
 
@@ -483,7 +521,7 @@ mod tests {
         .expect("merge");
 
         std::fs::write(
-            skills.join("s.md"),
+            skills.join("sample").join("SKILL.md"),
             r#"# Skill: sample
 Schema: antigrav.skill@v1
 ```json
@@ -640,10 +678,11 @@ Runs shell command.
             .join(".agents")
             .join("skills")
             .join("domain")
-            .join("api");
+            .join("api")
+            .join("nested_skill");
         std::fs::create_dir_all(&nested_skill_dir).expect("nested skill dir");
         std::fs::write(
-            nested_skill_dir.join("nested_skill.md"),
+            nested_skill_dir.join("SKILL.md"),
             r#"# Skill: nested_skill
 Schema: antigrav.skill@v1
 ```json
@@ -653,6 +692,35 @@ Nested skill body.
 "#,
         )
         .expect("nested skill");
+
+        let layout = AgentProjectLayout::discover(root.to_str().expect("path")).expect("layout");
+        let report = run_package_check(&layout).expect("check");
+        assert!(
+            report.errors.is_empty(),
+            "expected no errors but got {:?}",
+            report.errors
+        );
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn package_check_ignores_skill_auxiliary_resources() {
+        let root = temp_root("agentic-sdlc-package-check-skill-auxiliary");
+        write_minimal_valid_package(&root);
+        let skill_dir = root.join(".agents").join("skills").join("sample");
+        std::fs::create_dir_all(skill_dir.join("references")).expect("references");
+        std::fs::create_dir_all(skill_dir.join("agents")).expect("agents metadata");
+        std::fs::write(
+            skill_dir.join("references").join("details.md"),
+            "# Details\nextra skill docs",
+        )
+        .expect("write refs");
+        std::fs::write(
+            skill_dir.join("agents").join("openai.yaml"),
+            "display_name: Sample\nshort_description: sample\n",
+        )
+        .expect("write openai metadata");
 
         let layout = AgentProjectLayout::discover(root.to_str().expect("path")).expect("layout");
         let report = run_package_check(&layout).expect("check");

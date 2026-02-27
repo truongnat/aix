@@ -80,7 +80,11 @@ pub(super) fn scaffold_markdown_package(
         PackageMarkdownKind::Role => &layout.roles_dir,
         PackageMarkdownKind::Rule => &layout.rules_dir,
     };
-    let path = target_dir.join(format!("{}.md", name));
+    let path = if kind == PackageMarkdownKind::Skill {
+        target_dir.join(&name).join("SKILL.md")
+    } else {
+        target_dir.join(format!("{}.md", name))
+    };
     let content = build_scaffold_markdown(kind, &name, profile);
     write_scaffold_file(&path, &content, overwrite, &mut Vec::new())?;
     Ok(path)
@@ -164,7 +168,7 @@ pub(super) fn scaffold_domain_pack(
 
     for (name, body) in build_domain_skill_markdown(&domain) {
         write_scaffold_file(
-            &skill_dir.join(format!("{}.md", name)),
+            &skill_dir.join(name).join("SKILL.md"),
             &body,
             overwrite,
             &mut created,
