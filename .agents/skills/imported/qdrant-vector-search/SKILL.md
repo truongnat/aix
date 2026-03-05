@@ -9,7 +9,7 @@ Schema: antigrav.skill@v1
   "imported_at_ms": 1772121155449,
   "model": "qwen3:8b",
   "name": "qdrant-vector-search",
-  "risk": "unknown",
+  "risk": "safe",
   "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
   "source_commit": "8a14d269df6f44ee4ecae2de542a09800e42d829",
   "source_license": "MIT",
@@ -19,13 +19,18 @@ Schema: antigrav.skill@v1
     "ai-research",
     "distributed",
     "embeddings",
+    "external",
     "hnsw",
+    "imported",
     "production",
     "qdrant",
     "rag",
+    "search",
     "semantic search",
     "similarity search",
-    "vector search"
+    "vector",
+    "vector search",
+    "vector-db"
   ],
   "temperature": 0.1,
   "trust_tier": "Constrained"

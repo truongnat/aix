@@ -1,47 +1,66 @@
 ---
-description: release workflow
+description: release advanced workflow with deterministic gates and report quality guard
 ---
-
 # Workflow: release
 Schema: antigrav.workflow@v1
 Domain: agent
+MaxCpuMs: 240000
+MaxWallTimeMs: 900000
+MaxNetworkCalls: 30
 
-## Step: ensure_clean
-Skill: agent.run_script
-Input: git status --porcelain
-
-## Step: full_validation
-Skill: agent.run_script
-DependsOn: ensure_clean
-Input: cargo test
-
-## Step: generate_changelog
+## Step: intent_analysis
 Skill: agent.llm_subagent
-DependsOn: full_validation
-Input: releaser:::Generate concise changelog from recent commits and workflow summaries.
+Input: Analyze task scope, constraints, and acceptance criteria for release. Return strict JSON with summary/actions/risks.
 
-## Step: tag_release
+## Step: execution_plan
+Skill: agent.llm_subagent
+DependsOn: intent_analysis
+Input: Build deterministic implementation plan for release with milestones, validation, and rollback notes.
+
+## Step: validation_gate
 Skill: agent.run_script
-DependsOn: generate_changelog
-Input: git tag v1.0.0
+DependsOn: execution_plan
+Retry: 1
+OnFailure: FailFast
+Input: echo "validate release"
 
-## Step: commit_release_notes
-Skill: agent.git_commit
-DependsOn: tag_release
-Input:
-chore(release): prepare v1.0.0
-
-- full validation executed
-- changelog generated
-- release tag created
-
-## Step: summarize
-Skill: demo.echo
-DependsOn: commit_release_notes
-Input: Release workflow completed.
+## Step: risk_review
+Skill: agent.llm_subagent
+DependsOn: validation_gate
+Input: Produce risk register for release, including severity, blast radius, and mitigations.
 
 ## Step: internet_security_check
 Skill: agent.llm_subagent
-DependsOn: summarize
-Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+DependsOn: risk_review
+Input: Run a focused security check for internet-capable execution paths and return pass/fail with mitigations.
 
+## Step: workflow_report
+Skill: agent.workflow_report
+DependsOn: internet_security_check
+Input: Build detailed workflow report from:
+{{intent_analysis}}
+{{execution_plan}}
+{{validation_gate}}
+{{risk_review}}
+{{internet_security_check}}
+Return strict JSON with summary/actions/risks.
+
+## Step: report_quality_gate
+Skill: agent.report_quality_gate
+DependsOn: workflow_report
+Input: {{workflow_report}}
+
+## Step: simulation_fallback_gate
+Skill: agent.simulation_fallback_gate
+DependsOn: report_quality_gate
+Input: {{workflow_report}}
+
+## Step: next_actions
+Skill: agent.next_steps
+DependsOn: simulation_fallback_gate
+Input: Derive next actions from {{workflow_report}} with explicit critical-path ordering.
+
+## Step: finalize
+Skill: demo.echo
+DependsOn: next_actions
+Input: Advanced scaffold workflow release prepared with report-quality and simulation-fallback gates.

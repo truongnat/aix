@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented here.
 
+## [1.1.0] - 2026-03-06
+
+### Added
+- New command: `workflow normalize-imported-skills` to enrich already-imported `SKILL.md` metadata (`risk`, `source`, `tags`) from lockfile provenance without re-pulling repositories.
+- `normalize-imported-skills` supports `--dry-run`, `--json`, and local/global mode parity for safer rollout in CI and local validation.
+- Advanced scaffold defaults now include richer baseline package files:
+  - non-empty rules (`runtime`, `branching`, `coding`, `merge`)
+  - starter role files with explicit responsibilities
+  - starter skills/workflows/templates with deterministic report gates.
+- Workflow output quality gate skill `agent.report_quality_gate` added and wired into release/review/feature/bugfix/merge/refactor style workflows.
+
+### Changed
+- Package quality checks strengthened to flag sparse/empty rule, role, and skill content and to enforce report-quality conventions for internet-capable workflows.
+- Core and domain workflow packs were upgraded with explicit `workflow_report` + `report_quality_gate` steps to prevent low-detail reporting.
+- Role definitions were expanded across default and domain packs to be more specific and execution-oriented.
+- Imported skill corpus under `.agents/skills/imported` was normalized for more consistent metadata and safer reuse.
+- CLI run summaries for role/chat-thread flows now print per-step details (status, duration, actions, risks, provider/model, summary/error) for better traceability.
+
+### Quality
+- Test suite remains green with `cargo test` (`137 passed`), including new coverage for report quality gating and imported skill normalization paths.
+
 ## [1.0.1] - 2026-02-26
 
 ### Added

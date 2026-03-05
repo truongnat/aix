@@ -8,6 +8,7 @@ use crate::skill::SubprocessCommand;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
 use std::time::Duration;
 
 #[allow(dead_code)]
@@ -142,7 +143,135 @@ fn ollama_timeout_ms() -> u64 {
                 .and_then(|v| v.trim().parse::<u64>().ok())
                 .filter(|v| *v > 0)
         })
-        .unwrap_or(30_000)
+        .unwrap_or(120_000)
+}
+
+fn extract_json_code_fence(raw: &str) -> Option<String> {
+    let mut in_fence = false;
+    let mut allow_fence = false;
+    let mut body = String::new();
+    for line in raw.lines() {
+        let trimmed = line.trim();
+        if let Some(rest) = trimmed.strip_prefix("```") {
+            if !in_fence {
+                in_fence = true;
+                let lang = rest.trim().to_ascii_lowercase();
+                allow_fence = lang.is_empty() || lang == "json";
+                body.clear();
+                continue;
+            }
+            if allow_fence {
+                let payload = body.trim();
+                if !payload.is_empty() {
+                    return Some(payload.to_string());
+                }
+            }
+            in_fence = false;
+            allow_fence = false;
+            body.clear();
+            continue;
+        }
+        if in_fence && allow_fence {
+            body.push_str(line);
+            body.push('\n');
+        }
+    }
+    None
+}
+
+fn parse_json_like_response(raw: &str) -> Result<Value> {
+    let trimmed = raw.trim();
+    if trimmed.is_empty() {
+        return Err(anyhow!("Expected JSON output but got empty response"));
+    }
+    if let Ok(value) = serde_json::from_str::<Value>(trimmed) {
+        return Ok(value);
+    }
+    if let Some(fenced) = extract_json_code_fence(trimmed) {
+        if let Ok(value) = serde_json::from_str::<Value>(&fenced) {
+            return Ok(value);
+        }
+    }
+    if let (Some(start), Some(end)) = (trimmed.find('{'), trimmed.rfind('}')) {
+        if end > start {
+            let candidate = &trimmed[start..=end];
+            if let Ok(value) = serde_json::from_str::<Value>(candidate) {
+                return Ok(value);
+            }
+        }
+    }
+    if let (Some(start), Some(end)) = (trimmed.find('['), trimmed.rfind(']')) {
+        if end > start {
+            let candidate = &trimmed[start..=end];
+            if let Ok(value) = serde_json::from_str::<Value>(candidate) {
+                return Ok(value);
+            }
+        }
+    }
+    let preview = trimmed.chars().take(220).collect::<String>();
+    Err(anyhow!(
+        "Expected JSON output but model returned non-JSON text: '{}'",
+        preview
+    ))
+}
+
+fn coerce_output_from_text(meta: &SkillMeta, raw: &str) -> Result<SkillOutput> {
+    let trimmed = raw.trim();
+    match meta.get_output_type() {
+        SkillIOType::Text => Ok(SkillOutput::text(trimmed.to_string())),
+        SkillIOType::Json => Ok(SkillOutput::json(parse_json_like_response(trimmed)?)),
+        SkillIOType::Number => {
+            if let Ok(value) = trimmed.parse::<f64>() {
+                return Ok(SkillOutput::number(value));
+            }
+            let value = parse_json_like_response(trimmed)?;
+            let number = value
+                .as_f64()
+                .ok_or_else(|| anyhow!("Expected Number output but got non-number JSON"))?;
+            Ok(SkillOutput::number(number))
+        }
+        SkillIOType::Boolean => {
+            let normalized = trimmed.to_ascii_lowercase();
+            if normalized == "true" || normalized == "1" {
+                return Ok(SkillOutput::boolean(true));
+            }
+            if normalized == "false" || normalized == "0" {
+                return Ok(SkillOutput::boolean(false));
+            }
+            let value = parse_json_like_response(trimmed)?;
+            let boolean = value
+                .as_bool()
+                .ok_or_else(|| anyhow!("Expected Boolean output but got non-boolean JSON"))?;
+            Ok(SkillOutput::boolean(boolean))
+        }
+    }
+}
+
+fn simulated_output(meta: &SkillMeta, reason: &str) -> SkillOutput {
+    match meta.get_output_type() {
+        SkillIOType::Json => SkillOutput::json(json!({
+            "summary": format!(
+                "Simulated response for skill [{}]. Live model output unavailable: {}",
+                meta.name, reason
+            ),
+            "actions": [
+                "verify_ollama_health: run `ollama list` and confirm model availability",
+                "retry_workflow_step: rerun after provider recovery to replace simulated output",
+                "review_blockers: treat this step as incomplete for release-critical decisions"
+            ],
+            "risks": [
+                reason,
+                "llm_backend_unavailable",
+                "output_confidence_reduced"
+            ]
+        })),
+        SkillIOType::Number => SkillOutput::number(0.0),
+        SkillIOType::Boolean => SkillOutput::boolean(false),
+        SkillIOType::Text => SkillOutput::text(format!(
+            "Simulated response for skill [{}]. {}",
+            meta.name, reason
+        )),
+    }
 }
 
 #[async_trait]
@@ -207,7 +336,7 @@ impl SkillTrait for FileSkill {
                     .build()?;
                 let request = OllamaRequest {
                     model,
-                    prompt: prompt.clone(),
+                    prompt,
                     stream: false,
                     options: self
                         .meta
@@ -225,17 +354,17 @@ impl SkillTrait for FileSkill {
                     Ok(res) if res.status().is_success() => {
                         match res.json::<OllamaResponse>().await {
                             Ok(ollama_res) => {
-                                Ok(SkillOutput::text(ollama_res.response.trim().to_string()))
+                                coerce_output_from_text(&self.meta, &ollama_res.response)
                             }
                             Err(err) => {
                                 println!(
                                     "⚠️ [OLLAMA] Invalid response payload: {}. Falling back to simulation.",
                                     err
                                 );
-                                Ok(SkillOutput::text(format!(
-                                    "Simulated response for skill [{}]. Ollama response was invalid.",
-                                    self.meta.name
-                                )))
+                                Ok(simulated_output(
+                                    &self.meta,
+                                    "Ollama response payload was invalid.",
+                                ))
                             }
                         }
                     }
@@ -246,24 +375,108 @@ impl SkillTrait for FileSkill {
                             "⚠️ [OLLAMA] API error status={} body={}. Falling back to simulation.",
                             status, body
                         );
-                        Ok(SkillOutput::text(format!(
-                            "Simulated response for skill [{}]. Ollama API returned status {}.",
-                            self.meta.name, status
-                        )))
+                        Ok(simulated_output(
+                            &self.meta,
+                            &format!("Ollama API returned status {}.", status),
+                        ))
                     }
                     _ => {
                         println!(
                             "⚠️ [OLLAMA] API unreachable/timeout after {}ms. Falling back to simulation.",
                             timeout_ms
                         );
-                        Ok(SkillOutput::text(format!(
-                            "Simulated response for skill [{}]. Ollama API was unreachable.",
-                            self.meta.name
-                        )))
+                        Ok(simulated_output(
+                            &self.meta,
+                            "Ollama API was unreachable or timed out.",
+                        ))
                     }
                 }
             }
             _ => Err(anyhow!("Unknown executor: {}", self.meta.executor)),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{coerce_output_from_text, parse_json_like_response, simulated_output, SkillMeta};
+    use crate::skill::io::SkillOutput;
+
+    fn sample_meta(output_type: &str) -> SkillMeta {
+        SkillMeta {
+            name: "sample".to_string(),
+            domain: "agent".to_string(),
+            executor: "ollama".to_string(),
+            description: None,
+            risk: None,
+            source: None,
+            source_requested: None,
+            source_commit: None,
+            source_path: None,
+            source_license: None,
+            imported_at_ms: None,
+            tags: None,
+            version: None,
+            author: None,
+            license: None,
+            dependencies: None,
+            model: None,
+            temperature: None,
+            command: None,
+            input_type: Some("text".to_string()),
+            output_type: Some(output_type.to_string()),
+            estimated_cost: None,
+            estimated_latency_ms: None,
+            allow_fs_read: None,
+            allow_fs_write: None,
+            allow_network: None,
+            allow_env: None,
+            allow_process_spawn: None,
+            side_effect_class: None,
+            trust_tier: None,
+        }
+    }
+
+    #[test]
+    fn parses_json_from_fenced_response() {
+        let raw =
+            "Some explanation\n```json\n{\"summary\":\"ok\",\"actions\":[],\"risks\":[]}\n```";
+        let parsed = parse_json_like_response(raw).expect("parse JSON");
+        assert_eq!(parsed["summary"], "ok");
+    }
+
+    #[test]
+    fn json_output_coercion_returns_json_output() {
+        let meta = sample_meta("json");
+        let output =
+            coerce_output_from_text(&meta, "{\"summary\":\"x\",\"actions\":[],\"risks\":[]}")
+                .expect("coerce");
+        match output {
+            SkillOutput::Json(value) => assert_eq!(value["summary"], "x"),
+            other => panic!("expected json output, got {:?}", other),
+        }
+    }
+
+    #[test]
+    fn json_output_coercion_rejects_non_json_text() {
+        let meta = sample_meta("json");
+        let err = coerce_output_from_text(&meta, "not-json").expect_err("should fail");
+        assert!(err.to_string().contains("Expected JSON output"));
+    }
+
+    #[test]
+    fn simulated_json_output_contains_actionable_fallback() {
+        let meta = sample_meta("json");
+        let output = simulated_output(&meta, "provider timeout");
+        match output {
+            SkillOutput::Json(value) => {
+                assert_eq!(value["actions"].as_array().map(|v| v.len()), Some(3));
+                assert!(value["summary"]
+                    .as_str()
+                    .unwrap_or_default()
+                    .contains("Live model output unavailable"));
+            }
+            other => panic!("expected json output, got {:?}", other),
         }
     }
 }

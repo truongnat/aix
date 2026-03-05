@@ -34,7 +34,29 @@ pub fn resolve_role_path(role_ref: &str, roles_dir: &Path) -> Option<PathBuf> {
     if candidate.exists() {
         return Some(candidate);
     }
-    None
+
+    let lookup = role_ref.trim().trim_end_matches(".md");
+    if lookup.is_empty() {
+        return None;
+    }
+    let files = collect_markdown_files_recursive(roles_dir).ok()?;
+    let mut stem_matches = Vec::new();
+    for path in files {
+        let relative = path.strip_prefix(roles_dir).ok()?;
+        let role_id = resource_id_from_relative_path(relative).ok()?;
+        if role_id == lookup {
+            return Some(path);
+        }
+        let stem = path.file_stem().and_then(|name| name.to_str())?;
+        if stem == lookup {
+            stem_matches.push(path);
+        }
+    }
+    if stem_matches.len() == 1 {
+        stem_matches.into_iter().next()
+    } else {
+        None
+    }
 }
 
 pub fn load_role_profile_if_exists(
@@ -121,6 +143,61 @@ fn extract_json_code_block_and_body(markdown: &str) -> Option<(String, String)> 
     None
 }
 
+fn collect_markdown_files_recursive(root: &Path) -> Result<Vec<PathBuf>> {
+    let mut files = Vec::new();
+    walk_directory_files(root, &mut |path| {
+        let is_markdown = path
+            .extension()
+            .and_then(|ext| ext.to_str())
+            .map(|ext| ext.eq_ignore_ascii_case("md"))
+            .unwrap_or(false);
+        if is_markdown {
+            files.push(path.to_path_buf());
+        }
+    })?;
+    files.sort();
+    Ok(files)
+}
+
+fn walk_directory_files(root: &Path, visit: &mut impl FnMut(&Path)) -> Result<()> {
+    if !root.exists() {
+        return Ok(());
+    }
+    for entry in fs::read_dir(root)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_dir() {
+            walk_directory_files(&path, visit)?;
+            continue;
+        }
+        if path.is_file() {
+            visit(&path);
+        }
+    }
+    Ok(())
+}
+
+fn resource_id_from_relative_path(path: &Path) -> Result<String> {
+    let mut base = path.to_path_buf();
+    if base
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .map(|ext| ext.eq_ignore_ascii_case("md"))
+        .unwrap_or(false)
+    {
+        base.set_extension("");
+    }
+    let id = base
+        .iter()
+        .map(|part| part.to_string_lossy().to_string())
+        .collect::<Vec<_>>()
+        .join("/");
+    if id.trim().is_empty() {
+        return Err(anyhow!("Invalid role filename"));
+    }
+    Ok(id)
+}
+
 #[cfg(test)]
 mod tests {
     use super::{parse_role_markdown, resolve_role_path};
@@ -176,6 +253,36 @@ Design deterministic plans.
                 .and_then(|v| v.to_str().map(|s| s.to_string()))
                 .as_deref(),
             Some("reviewer.md")
+        );
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn resolve_role_supports_nested_unique_stem_alias() {
+        let unique = format!(
+            "agentic-sdlc-role-loader-nested-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        let nested = root.join("payments");
+        std::fs::create_dir_all(&nested).expect("create nested roles");
+        std::fs::write(nested.join("reviewer.md"), "review role").expect("write role");
+
+        assert_eq!(
+            resolve_role_path("payments/reviewer", &root)
+                .and_then(|v| v.strip_prefix(&root).ok().map(|p| p.to_path_buf()))
+                .and_then(|v| v.to_str().map(|s| s.replace('\\', "/"))),
+            Some("payments/reviewer.md".to_string())
+        );
+        assert_eq!(
+            resolve_role_path("reviewer", &root)
+                .and_then(|v| v.strip_prefix(&root).ok().map(|p| p.to_path_buf()))
+                .and_then(|v| v.to_str().map(|s| s.replace('\\', "/"))),
+            Some("payments/reviewer.md".to_string())
         );
 
         let _ = std::fs::remove_dir_all(root);

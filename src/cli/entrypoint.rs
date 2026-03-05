@@ -358,16 +358,64 @@ pub(super) async fn run_impl() -> Result<()> {
                 report.selected_role
             );
             println!(
-                "Implementation run: instance={} status={} trace={}",
+                "Implementation run: instance={} status={} trace={} steps={}/{} failed={}",
                 report.implementation.instance_id,
                 report.implementation.status,
-                report.implementation.trace_id
+                report.implementation.trace_id,
+                report.implementation.completed_steps,
+                report.implementation.total_steps,
+                report.implementation.failed_steps
             );
+            for step in &report.implementation.step_details {
+                println!(
+                    "- [{}] {} duration_ms={} actions={} risks={} provider={} model={}",
+                    step.status,
+                    step.step_id,
+                    step.duration_ms
+                        .map(|v| v.to_string())
+                        .unwrap_or_else(|| "-".to_string()),
+                    step.actions,
+                    step.risks,
+                    step.provider.as_deref().unwrap_or("-"),
+                    step.model.as_deref().unwrap_or("-")
+                );
+                if let Some(summary) = step.summary.as_ref() {
+                    println!("  summary: {}", summary);
+                }
+                if let Some(error) = step.error.as_ref() {
+                    println!("  error: {}", error);
+                }
+            }
             if let Some(merge) = report.merge.as_ref() {
                 println!(
-                    "Merge run: instance={} status={} trace={}",
-                    merge.instance_id, merge.status, merge.trace_id
+                    "Merge run: instance={} status={} trace={} steps={}/{} failed={}",
+                    merge.instance_id,
+                    merge.status,
+                    merge.trace_id,
+                    merge.completed_steps,
+                    merge.total_steps,
+                    merge.failed_steps
                 );
+                for step in &merge.step_details {
+                    println!(
+                        "- [{}] {} duration_ms={} actions={} risks={} provider={} model={}",
+                        step.status,
+                        step.step_id,
+                        step.duration_ms
+                            .map(|v| v.to_string())
+                            .unwrap_or_else(|| "-".to_string()),
+                        step.actions,
+                        step.risks,
+                        step.provider.as_deref().unwrap_or("-"),
+                        step.model.as_deref().unwrap_or("-")
+                    );
+                    if let Some(summary) = step.summary.as_ref() {
+                        println!("  summary: {}", summary);
+                    }
+                    if let Some(error) = step.error.as_ref() {
+                        println!("  error: {}", error);
+                    }
+                }
             } else {
                 println!("Merge run skipped (--no-merge).");
             }

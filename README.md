@@ -28,6 +28,13 @@ cargo run -- workflow doctor
 cargo run -- workflow setup
 ```
 
+`workflow setup` now bootstraps a full core package when missing:
+- rules (`runtime/branching/coding/merge`)
+- workflows (`starter/feature/bugfix/review/release`)
+- templates (`feature/bugfix/review/release_prompt`)
+- roles (`architect/implementer/reviewer/resolver/releaser`)
+- starter skills (`analyze_code/generate_tests/next_steps`)
+
 Run deterministic CI gate locally:
 
 ```bash
@@ -188,6 +195,14 @@ Sync existing imported skills using pinned source commit/provenance from `.agent
 ```bash
 cargo run -- workflow sync-imports --overwrite
 cargo run -- workflow sync-imports --mode global --overwrite --allow-missing-license
+```
+
+Normalize existing imported skill metadata (`risk/source/tags`) without re-pulling upstream repos:
+
+```bash
+cargo run -- workflow normalize-imported-skills
+cargo run -- workflow normalize-imported-skills --dry-run --json
+cargo run -- workflow normalize-imported-skills --mode global --json
 ```
 
 Install a curated bundle into local/global skills root:

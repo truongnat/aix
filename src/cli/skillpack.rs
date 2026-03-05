@@ -441,6 +441,110 @@ pub(super) fn sync_imported_skills_from_lock(
     })
 }
 
+pub(super) fn normalize_imported_skills(
+    layout: &AgentProjectLayout,
+    mode: SkillpackInstallMode,
+    dry_run: bool,
+) -> Result<NormalizeImportedSkillsReport> {
+    let target = resolve_skillpack_install_target(layout, mode)?;
+    fs::create_dir_all(&target.import_dir)?;
+
+    let mut checked = 0usize;
+    let mut normalized = 0usize;
+    let mut skipped = 0usize;
+    let mut skipped_entries = Vec::<NormalizeImportedSkillSkip>::new();
+    let mut changes = Vec::<NormalizeImportedSkillChange>::new();
+    let mut files = Vec::<String>::new();
+
+    for path in collect_markdown_paths_recursive(&target.import_dir)? {
+        if !path
+            .file_name()
+            .and_then(|v| v.to_str())
+            .map(|v| v.eq_ignore_ascii_case("SKILL.md"))
+            .unwrap_or(false)
+        {
+            continue;
+        }
+        checked = checked.saturating_add(1);
+        let content = match fs::read_to_string(&path) {
+            Ok(v) => v,
+            Err(err) => {
+                skipped = skipped.saturating_add(1);
+                skipped_entries.push(NormalizeImportedSkillSkip {
+                    path: format_skillpack_report_path(&target, &path),
+                    reason: format!("read_error: {}", err),
+                });
+                continue;
+            }
+        };
+        if let Err(err) = validate_schema_header(&content, PackageMarkdownKind::Skill) {
+            skipped = skipped.saturating_add(1);
+            skipped_entries.push(NormalizeImportedSkillSkip {
+                path: format_skillpack_report_path(&target, &path),
+                reason: format!("schema_error: {}", err),
+            });
+            continue;
+        }
+        let normalized_markdown = match normalize_imported_skill_markdown(&content, &path) {
+            Ok(Some(v)) => v,
+            Ok(None) => continue,
+            Err(err) => {
+                skipped = skipped.saturating_add(1);
+                skipped_entries.push(NormalizeImportedSkillSkip {
+                    path: format_skillpack_report_path(&target, &path),
+                    reason: format!("normalize_error: {}", err),
+                });
+                continue;
+            }
+        };
+        if !dry_run {
+            if let Err(err) = fs::write(&path, &normalized_markdown.content) {
+                skipped = skipped.saturating_add(1);
+                skipped_entries.push(NormalizeImportedSkillSkip {
+                    path: format_skillpack_report_path(&target, &path),
+                    reason: format!("write_error: {}", err),
+                });
+                continue;
+            }
+        }
+        normalized = normalized.saturating_add(1);
+        let report_path = format_skillpack_report_path(&target, &path);
+        files.push(report_path.clone());
+        changes.push(NormalizeImportedSkillChange {
+            path: report_path,
+            changed_fields: normalized_markdown.changed_fields,
+        });
+    }
+
+    files.sort();
+    skipped_entries.sort_by(|a, b| a.path.cmp(&b.path).then(a.reason.cmp(&b.reason)));
+    skipped_entries.dedup_by(|a, b| a.path == b.path && a.reason == b.reason);
+    changes.sort_by(|a, b| a.path.cmp(&b.path));
+    let mut catalog_rebuilt = false;
+    if normalized > 0 && !dry_run {
+        if target.supports_catalog_rebuild {
+            let _ = build_skill_workflow_catalog(layout)?;
+            catalog_rebuilt = true;
+        } else {
+            write_skills_lockfile_for_target(&target)?;
+        }
+    }
+
+    Ok(NormalizeImportedSkillsReport {
+        mode: mode.as_str().to_string(),
+        import_dir: format_skillpack_report_path(&target, &target.import_dir),
+        lockfile: format_skillpack_report_path(&target, &target.lockfile_path),
+        dry_run,
+        checked,
+        normalized,
+        skipped,
+        skipped_entries,
+        changes,
+        catalog_rebuilt,
+        files,
+    })
+}
+
 pub(super) fn install_bundle_from_catalog(
     layout: &AgentProjectLayout,
     bundle: &str,
@@ -618,6 +722,227 @@ fn infer_skill_domain_for_target(path: &Path) -> Option<String> {
     let content = fs::read_to_string(path).ok()?;
     let (meta, _) = parse_skill_markdown(&content).ok()?;
     sanitize_package_name(&meta.domain).ok()
+}
+
+#[derive(Debug, Clone)]
+struct NormalizedSkillRewrite {
+    content: String,
+    changed_fields: Vec<String>,
+}
+
+fn normalize_imported_skill_markdown(
+    content: &str,
+    path: &Path,
+) -> Result<Option<NormalizedSkillRewrite>> {
+    let (mut meta, body) = parse_skill_markdown(content)?;
+    let before_json = skill_meta_to_json(&meta);
+
+    let fallback_name = meta.name.trim().to_string();
+    let skill_name = resolve_skill_name_for_target_path(path, &fallback_name);
+    let domain = meta.domain.trim().to_ascii_lowercase().trim().to_string();
+    let normalized_domain = if domain.is_empty() {
+        "imported".to_string()
+    } else {
+        domain
+    };
+
+    let description = meta
+        .description
+        .as_deref()
+        .map(str::trim)
+        .filter(|v| !v.is_empty())
+        .map(str::to_string)
+        .or_else(|| extract_first_paragraph(&body))
+        .unwrap_or_else(|| "Imported skill".to_string());
+    let current_tags = meta.tags.clone().unwrap_or_default();
+    let normalized_tags =
+        enrich_imported_tags(&normalized_domain, &skill_name, &description, current_tags);
+    let mut normalized_risk = normalize_risk_label(meta.risk.as_deref());
+    if normalized_risk == "unknown" {
+        normalized_risk =
+            infer_imported_risk(&skill_name, &description, body.trim(), &normalized_tags);
+    }
+    let normalized_source = meta
+        .source
+        .as_deref()
+        .map(str::trim)
+        .filter(|v| !v.is_empty())
+        .map(str::to_string)
+        .unwrap_or_else(|| "external-import".to_string());
+
+    meta.name = skill_name.clone();
+    meta.domain = normalized_domain;
+    meta.description = Some(description);
+    meta.risk = Some(normalized_risk);
+    meta.source = Some(normalized_source);
+    meta.tags = Some(normalized_tags);
+
+    let after_json = skill_meta_to_json(&meta);
+    if before_json == after_json {
+        return Ok(None);
+    }
+
+    let changed_fields = diff_json_object_fields(&before_json, &after_json);
+    let mut out = String::new();
+    out.push_str(&format!(
+        "# Skill: {}\nSchema: antigrav.skill@v1\n\n```json\n{}\n```\n",
+        skill_name,
+        serde_json::to_string_pretty(&after_json)?
+    ));
+    let trimmed_body = body.trim();
+    if !trimmed_body.is_empty() {
+        out.push_str("\n");
+        out.push_str(trimmed_body);
+        out.push('\n');
+    }
+    Ok(Some(NormalizedSkillRewrite {
+        content: out,
+        changed_fields,
+    }))
+}
+
+fn skill_meta_to_json(meta: &crate::skills::model::SkillMeta) -> serde_json::Value {
+    let mut obj = serde_json::Map::<String, serde_json::Value>::new();
+    obj.insert(
+        "name".to_string(),
+        serde_json::Value::String(meta.name.clone()),
+    );
+    obj.insert(
+        "domain".to_string(),
+        serde_json::Value::String(meta.domain.clone()),
+    );
+    obj.insert(
+        "executor".to_string(),
+        serde_json::Value::String(meta.executor.clone()),
+    );
+
+    fn insert_string(
+        obj: &mut serde_json::Map<String, serde_json::Value>,
+        key: &str,
+        value: &Option<String>,
+    ) {
+        if let Some(raw) = value {
+            let trimmed = raw.trim();
+            if !trimmed.is_empty() {
+                obj.insert(
+                    key.to_string(),
+                    serde_json::Value::String(trimmed.to_string()),
+                );
+            }
+        }
+    }
+
+    fn insert_list(
+        obj: &mut serde_json::Map<String, serde_json::Value>,
+        key: &str,
+        value: &Option<Vec<String>>,
+    ) {
+        if let Some(items) = value {
+            let normalized = items
+                .iter()
+                .map(|item| item.trim().to_string())
+                .filter(|item| !item.is_empty())
+                .map(serde_json::Value::String)
+                .collect::<Vec<_>>();
+            if !normalized.is_empty() {
+                obj.insert(key.to_string(), serde_json::Value::Array(normalized));
+            }
+        }
+    }
+
+    fn insert_bool(
+        obj: &mut serde_json::Map<String, serde_json::Value>,
+        key: &str,
+        value: Option<bool>,
+    ) {
+        if let Some(v) = value {
+            obj.insert(key.to_string(), serde_json::Value::Bool(v));
+        }
+    }
+
+    fn insert_u32(
+        obj: &mut serde_json::Map<String, serde_json::Value>,
+        key: &str,
+        value: Option<u32>,
+    ) {
+        if let Some(v) = value {
+            obj.insert(key.to_string(), serde_json::Value::Number(v.into()));
+        }
+    }
+
+    fn insert_u64(
+        obj: &mut serde_json::Map<String, serde_json::Value>,
+        key: &str,
+        value: Option<u64>,
+    ) {
+        if let Some(v) = value {
+            obj.insert(
+                key.to_string(),
+                serde_json::Value::Number(serde_json::Number::from(v)),
+            );
+        }
+    }
+
+    fn insert_f32(
+        obj: &mut serde_json::Map<String, serde_json::Value>,
+        key: &str,
+        value: Option<f32>,
+    ) {
+        if let Some(v) = value {
+            if let Some(number) = serde_json::Number::from_f64(v as f64) {
+                obj.insert(key.to_string(), serde_json::Value::Number(number));
+            }
+        }
+    }
+
+    insert_string(&mut obj, "description", &meta.description);
+    insert_string(&mut obj, "risk", &meta.risk);
+    insert_string(&mut obj, "source", &meta.source);
+    insert_string(&mut obj, "source_requested", &meta.source_requested);
+    insert_string(&mut obj, "source_commit", &meta.source_commit);
+    insert_string(&mut obj, "source_path", &meta.source_path);
+    insert_string(&mut obj, "source_license", &meta.source_license);
+    insert_u64(&mut obj, "imported_at_ms", meta.imported_at_ms);
+    insert_list(&mut obj, "tags", &meta.tags);
+    insert_string(&mut obj, "version", &meta.version);
+    insert_string(&mut obj, "author", &meta.author);
+    insert_string(&mut obj, "license", &meta.license);
+    insert_list(&mut obj, "dependencies", &meta.dependencies);
+    insert_string(&mut obj, "model", &meta.model);
+    insert_f32(&mut obj, "temperature", meta.temperature);
+    insert_string(&mut obj, "command", &meta.command);
+    insert_string(&mut obj, "input_type", &meta.input_type);
+    insert_string(&mut obj, "output_type", &meta.output_type);
+    insert_u32(&mut obj, "estimated_cost", meta.estimated_cost);
+    insert_u32(&mut obj, "estimated_latency_ms", meta.estimated_latency_ms);
+    insert_bool(&mut obj, "allow_fs_read", meta.allow_fs_read);
+    insert_bool(&mut obj, "allow_fs_write", meta.allow_fs_write);
+    insert_bool(&mut obj, "allow_network", meta.allow_network);
+    insert_bool(&mut obj, "allow_env", meta.allow_env);
+    insert_bool(&mut obj, "allow_process_spawn", meta.allow_process_spawn);
+    insert_string(&mut obj, "side_effect_class", &meta.side_effect_class);
+    insert_string(&mut obj, "trust_tier", &meta.trust_tier);
+
+    serde_json::Value::Object(obj)
+}
+
+fn diff_json_object_fields(before: &serde_json::Value, after: &serde_json::Value) -> Vec<String> {
+    let before_obj = before.as_object().cloned().unwrap_or_default();
+    let after_obj = after.as_object().cloned().unwrap_or_default();
+    let mut keys = before_obj
+        .keys()
+        .chain(after_obj.keys())
+        .map(|key| key.to_string())
+        .collect::<Vec<_>>();
+    keys.sort();
+    keys.dedup();
+    let mut changed = Vec::<String>::new();
+    for key in keys {
+        if before_obj.get(&key) != after_obj.get(&key) {
+            changed.push(key);
+        }
+    }
+    changed
 }
 
 #[derive(Debug, Clone)]
@@ -914,10 +1239,13 @@ pub(super) fn parse_external_skill_markdown(content: &str, path: &Path) -> Resul
             extract_first_paragraph(body).unwrap_or_else(|| "Imported skill".to_string())
         });
     let tags = parse_frontmatter_list(fm.get("tags").map(String::as_str));
-    let risk = normalize_risk_label(fm.get("risk").map(String::as_str));
+    let body_clean = body.trim();
+    let mut risk = normalize_risk_label(fm.get("risk").map(String::as_str));
+    if risk == "unknown" {
+        risk = infer_imported_risk(&name, &description, body_clean, &tags);
+    }
     let source = fm.get("source").cloned().filter(|v| !v.trim().is_empty());
 
-    let body_clean = body.trim();
     let when_to_use = extract_section_bullets(
         body_clean,
         &[
@@ -979,6 +1307,7 @@ fn build_imported_skill_markdown(
         .map(|tag| tag.trim().to_ascii_lowercase())
         .filter(|tag| !tag.is_empty())
         .collect::<Vec<_>>();
+    tags = enrich_imported_tags(domain, skill_name, description, tags);
     tags.sort();
     tags.dedup();
     if tags.len() < 3 {
@@ -1065,6 +1394,145 @@ fn build_imported_skill_markdown(
     }
     out.push_str("\n{{input}}\n");
     out
+}
+
+fn infer_imported_risk(name: &str, description: &str, body: &str, tags: &[String]) -> String {
+    let mut merged = String::new();
+    merged.push_str(&name.to_ascii_lowercase());
+    merged.push('\n');
+    merged.push_str(&description.to_ascii_lowercase());
+    merged.push('\n');
+    merged.push_str(&body.to_ascii_lowercase());
+    merged.push('\n');
+    merged.push_str(
+        &tags
+            .iter()
+            .map(|tag| tag.to_ascii_lowercase())
+            .collect::<Vec<_>>()
+            .join(" "),
+    );
+
+    let low_risk_markers = [
+        "ask-questions-if-underspecified",
+        "verification-before-completion",
+        "checklist",
+        "read-only",
+        "documentation",
+        "docs",
+        "guide",
+        "best practices",
+        "web-research",
+        "langgraph-docs",
+    ];
+    if low_risk_markers
+        .iter()
+        .any(|marker| merged.contains(marker))
+    {
+        return "none".to_string();
+    }
+
+    let offensive_markers = [
+        "offensive security",
+        "red team",
+        "payload",
+        "phishing",
+        "malware",
+        "exploit chain",
+        "weaponize",
+        "command and control",
+    ];
+    if offensive_markers
+        .iter()
+        .any(|marker| merged.contains(marker))
+    {
+        return "offensive".to_string();
+    }
+
+    let critical_markers = [
+        "delete production",
+        "destroy data",
+        "privilege escalation",
+        "bypass authentication",
+        "rm -rf",
+        "drop database",
+        "truncate table",
+        "disable security",
+    ];
+    if critical_markers
+        .iter()
+        .any(|marker| merged.contains(marker))
+    {
+        return "critical".to_string();
+    }
+
+    "safe".to_string()
+}
+
+fn enrich_imported_tags(
+    domain: &str,
+    skill_name: &str,
+    description: &str,
+    existing: Vec<String>,
+) -> Vec<String> {
+    let mut tags = existing
+        .into_iter()
+        .map(|tag| tag.trim().to_ascii_lowercase())
+        .filter(|tag| !tag.is_empty())
+        .collect::<Vec<_>>();
+
+    tags.push("imported".to_string());
+    tags.push("external".to_string());
+    tags.push(domain.trim().to_ascii_lowercase());
+
+    let stop_tokens = [
+        "skill",
+        "skills",
+        "agent",
+        "workflow",
+        "tool",
+        "tools",
+        "best",
+        "practices",
+        "expert",
+    ];
+    for token in skill_name
+        .split(|ch: char| ch == '-' || ch == '_' || ch == '/' || ch.is_whitespace())
+        .map(|part| part.trim().to_ascii_lowercase())
+        .filter(|part| part.len() >= 3)
+        .filter(|part| !stop_tokens.contains(&part.as_str()))
+    {
+        tags.push(token);
+    }
+
+    let description_lower = description.to_ascii_lowercase();
+    let keyword_tags = [
+        ("security", "security"),
+        ("observability", "observability"),
+        ("evaluation", "evaluation"),
+        ("benchmark", "benchmarking"),
+        ("debug", "debugging"),
+        ("testing", "testing"),
+        ("automation", "automation"),
+        ("playwright", "playwright"),
+        ("rag", "rag"),
+        ("vector", "vector-db"),
+        ("langchain", "langchain"),
+        ("langgraph", "langgraph"),
+        ("langsmith", "langsmith"),
+        ("langfuse", "langfuse"),
+        ("phoenix", "phoenix"),
+        ("temporal", "temporal"),
+        ("mcp", "mcp"),
+    ];
+    for (needle, tag) in keyword_tags {
+        if description_lower.contains(needle) {
+            tags.push(tag.to_string());
+        }
+    }
+
+    tags.sort();
+    tags.dedup();
+    tags
 }
 
 fn split_frontmatter(markdown: &str) -> (Option<&str>, &str) {
@@ -1250,4 +1718,67 @@ fn truncate_chars(value: &str, max_chars: usize) -> String {
         return compact;
     }
     compact.chars().take(max_chars).collect::<String>()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::normalize_imported_skill_markdown;
+    use std::path::Path;
+
+    #[test]
+    fn normalize_imported_skill_markdown_fixes_unknown_risk_and_enriches_tags() {
+        let content = r#"# Skill: web-research
+Schema: antigrav.skill@v1
+
+```json
+{
+  "name": "web-research",
+  "domain": "imported",
+  "executor": "ollama",
+  "description": "Use this skill for structured web research workflows.",
+  "risk": "unknown",
+  "source": "https://example.com/skills",
+  "tags": ["external", "imported"]
+}
+```
+
+## Overview
+Use this skill for structured web research workflows.
+"#;
+        let updated =
+            normalize_imported_skill_markdown(content, Path::new("/tmp/web-research/SKILL.md"))
+                .expect("normalize")
+                .expect("expected rewrite");
+        assert!(updated.content.contains(r#""risk": "none""#));
+        assert!(updated.content.contains(r#""web""#));
+        assert!(updated.content.contains(r#""research""#));
+        assert!(updated.changed_fields.contains(&"risk".to_string()));
+        assert!(updated.changed_fields.contains(&"tags".to_string()));
+    }
+
+    #[test]
+    fn normalize_imported_skill_markdown_returns_none_when_already_normalized() {
+        let content = r#"# Skill: web-research
+Schema: antigrav.skill@v1
+
+```json
+{
+  "name": "web-research",
+  "domain": "imported",
+  "executor": "ollama",
+  "description": "Use this skill for structured web research workflows.",
+  "risk": "safe",
+  "source": "https://example.com/skills",
+  "tags": ["external", "imported", "research", "web"]
+}
+```
+
+## Overview
+Use this skill for structured web research workflows.
+"#;
+        let updated =
+            normalize_imported_skill_markdown(content, Path::new("/tmp/web-research/SKILL.md"))
+                .expect("normalize");
+        assert!(updated.is_none());
+    }
 }

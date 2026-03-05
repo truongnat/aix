@@ -1,0 +1,38 @@
+---
+const updates = [
+  {
+    title: 'Detailed Workflow Reports By Default',
+    body: 'Core and domain workflow packs now include workflow_report + report_quality_gate to block sparse summaries and enforce actionable outputs.'
+  },
+  {
+    title: 'Stronger Package Quality Gates',
+    body: 'workflow check now catches weak rule/role/skill quality earlier and validates internet-surface security/reporting conventions.'
+  },
+  {
+    title: 'Imported Skill Metadata Normalization',
+    body: 'Use workflow normalize-imported-skills to enrich risk/source/tags from lockfile provenance without re-cloning upstream repos.'
+  },
+  {
+    title: 'Richer Role/Thread Run Visibility',
+    body: 'Role and chat-thread execution summaries now include per-step status, duration, actions, risks, and provider/model for better diagnostics.'
+  }
+];
+---
+
+<section class="section reveal" id="latest-changes" aria-labelledby="latest-changes-title">
+  <div class="section-head">
+    <p class="eyebrow">Latest updates</p>
+    <h2 id="latest-changes-title">March 2026 quality and execution upgrades</h2>
+  </div>
+
+  <div class="value-grid">
+    {
+      updates.map((item) => (
+        <article class="value-card">
+          <h3>{item.title}</h3>
+          <p>{item.body}</p>
+        </article>
+      ))
+    }
+  </div>
+</section>

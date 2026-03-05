@@ -9,7 +9,7 @@ Schema: antigrav.skill@v1
   "imported_at_ms": 1772121153443,
   "model": "qwen3:8b",
   "name": "webapp-testing",
-  "risk": "unknown",
+  "risk": "safe",
   "source": "anthropics/skills",
   "source_commit": "3d5951151859",
   "source_license": "unknown",
@@ -17,8 +17,12 @@ Schema: antigrav.skill@v1
   "source_requested": "/tmp/agentic-sdlc-curated/anthropic-skills",
   "tags": [
     "anthropic",
+    "debugging",
     "external",
-    "imported"
+    "imported",
+    "playwright",
+    "testing",
+    "webapp"
   ],
   "temperature": 0.1,
   "trust_tier": "Constrained"

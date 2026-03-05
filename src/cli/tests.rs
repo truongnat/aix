@@ -1160,7 +1160,7 @@ owners:
 }
 
 #[test]
-fn setup_bootstraps_minimal_markdown_package() {
+fn setup_bootstraps_core_markdown_package() {
     let unique = format!(
         "agentic-sdlc-cli-setup-{}",
         std::time::SystemTime::now()
@@ -1174,12 +1174,45 @@ fn setup_bootstraps_minimal_markdown_package() {
     let layout = AgentProjectLayout::discover(&root_str).expect("discover layout");
 
     let created = ensure_bootstrap_package(&layout).expect("setup package");
-    assert_eq!(created.len(), 7);
+    assert_eq!(created.len(), 24);
     assert!(layout.rules_dir.join("runtime.md").exists());
     assert!(layout.rules_dir.join("branching_rules.md").exists());
     assert!(layout.rules_dir.join("coding_rules.md").exists());
     assert!(layout.rules_dir.join("merge_rules.md").exists());
     assert!(layout.workflows_dir.join("starter.md").exists());
+    assert!(layout.workflows_dir.join("feature.md").exists());
+    assert!(layout.workflows_dir.join("bugfix.md").exists());
+    assert!(layout.workflows_dir.join("review.md").exists());
+    assert!(layout.workflows_dir.join("release.md").exists());
+    assert!(layout.templates_dir.join("feature_prompt.md").exists());
+    assert!(layout.templates_dir.join("bugfix_prompt.md").exists());
+    assert!(layout.templates_dir.join("review_prompt.md").exists());
+    assert!(layout.templates_dir.join("release_prompt.md").exists());
+    assert!(layout.roles_dir.join("architect.md").exists());
+    assert!(layout.roles_dir.join("implementer.md").exists());
+    assert!(layout.roles_dir.join("reviewer.md").exists());
+    assert!(layout.roles_dir.join("resolver.md").exists());
+    assert!(layout.roles_dir.join("releaser.md").exists());
+    assert!(layout
+        .skills_dir
+        .join("analyze_code")
+        .join("SKILL.md")
+        .exists());
+    assert!(layout
+        .skills_dir
+        .join("generate_tests")
+        .join("SKILL.md")
+        .exists());
+    assert!(layout
+        .skills_dir
+        .join("next_steps")
+        .join("SKILL.md")
+        .exists());
+    assert!(layout
+        .skills_dir
+        .join("workflow_report")
+        .join("SKILL.md")
+        .exists());
     assert!(layout.memory_dir.join("vector_index.json").exists());
     assert!(layout.memory_dir.join("graph_index.json").exists());
 

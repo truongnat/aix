@@ -16,3 +16,7 @@ Schema: antigrav.rule@v1
   "commit_format": "type(scope): short summary\n\n- change 1\n- change 2"
 }
 ```
+
+## Policy Intent
+- Keep workflow execution deterministic, auditable, and production-safe.
+- Prefer explicit guardrails over implicit behavior.

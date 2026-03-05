@@ -9,7 +9,7 @@ Schema: antigrav.skill@v1
   "imported_at_ms": 1772121154358,
   "model": "qwen3:8b",
   "name": "api-security-best-practices",
-  "risk": "unknown",
+  "risk": "safe",
   "source": "sickn33/antigravity-awesome-skills",
   "source_commit": "5174a1eae642",
   "source_license": "MIT",
@@ -17,8 +17,10 @@ Schema: antigrav.skill@v1
   "source_requested": "/tmp/agentic-sdlc-curated/antigravity-workflow-skills",
   "tags": [
     "antigravity",
+    "api",
     "external",
-    "imported"
+    "imported",
+    "security"
   ],
   "temperature": 0.1,
   "trust_tier": "Constrained"

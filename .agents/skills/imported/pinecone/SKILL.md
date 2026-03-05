@@ -9,7 +9,7 @@ Schema: antigrav.skill@v1
   "imported_at_ms": 1772121155448,
   "model": "qwen3:8b",
   "name": "pinecone",
-  "risk": "unknown",
+  "risk": "safe",
   "source": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
   "source_commit": "8a14d269df6f44ee4ecae2de542a09800e42d829",
   "source_license": "MIT",
@@ -18,7 +18,9 @@ Schema: antigrav.skill@v1
   "tags": [
     "ai-research",
     "auto-scaling",
+    "external",
     "hybrid search",
+    "imported",
     "low latency",
     "managed service",
     "pinecone",
@@ -26,7 +28,8 @@ Schema: antigrav.skill@v1
     "rag",
     "recommendations",
     "serverless",
-    "vector database"
+    "vector database",
+    "vector-db"
   ],
   "temperature": 0.1,
   "trust_tier": "Constrained"

@@ -30,6 +30,12 @@ pub struct ConflictGateSkill;
 #[derive(Debug, Clone)]
 pub struct AutoResolveConflictsSkill;
 
+#[derive(Debug, Clone)]
+pub struct SimulationFallbackGateSkill;
+
+#[derive(Debug, Clone)]
+pub struct ReportQualityGateSkill;
+
 const VALIDATION_STATUS_ENV: &str = "ANTIGRAV_LAST_VALIDATION_PASSED";
 
 fn run_git(args: &[&str]) -> Result<std::process::Output> {
@@ -215,6 +221,97 @@ fn conflict_count_from_input(input: &SkillInput) -> Result<usize> {
         }
         SkillInput::Number(value) => Ok((*value).max(0.0).round() as usize),
     }
+}
+
+fn simulation_fallback_markers(input: &SkillInput) -> Vec<String> {
+    let mut found = Vec::<String>::new();
+    let marker_set = [
+        "simulation_fallback_used",
+        "llm_backend_unavailable",
+        "output_confidence_reduced",
+    ];
+    let collect = |value: &serde_json::Value, found: &mut Vec<String>| {
+        let Some(risks) = value.get("risks").and_then(|v| v.as_array()) else {
+            return;
+        };
+        for marker in marker_set {
+            if risks
+                .iter()
+                .filter_map(|entry| entry.as_str())
+                .any(|risk| risk.trim().eq_ignore_ascii_case(marker))
+                && !found.iter().any(|existing| existing == marker)
+            {
+                found.push(marker.to_string());
+            }
+        }
+    };
+
+    match input {
+        SkillInput::Json(value) => collect(value, &mut found),
+        SkillInput::Text(text) => {
+            if let Ok(value) = serde_json::from_str::<serde_json::Value>(text.trim()) {
+                collect(&value, &mut found);
+            }
+        }
+        _ => {}
+    }
+    found
+}
+
+fn parse_report_payload(input: &SkillInput) -> Result<serde_json::Value> {
+    match input {
+        SkillInput::Json(value) => Ok(value.clone()),
+        SkillInput::Text(text) => serde_json::from_str(text.trim())
+            .map_err(|err| anyhow!("report_quality_gate expected JSON input: {}", err)),
+        _ => Err(anyhow!(
+            "report_quality_gate expected JSON/Text(JSON) input, got {:?}",
+            input.io_type()
+        )),
+    }
+}
+
+fn report_quality_findings(payload: &serde_json::Value) -> Vec<String> {
+    let mut findings = Vec::<String>::new();
+    let summary = payload
+        .get("summary")
+        .and_then(|v| v.as_str())
+        .map(|v| v.trim())
+        .unwrap_or_default();
+    if summary.len() < 80 {
+        findings.push("summary must be at least 80 characters".to_string());
+    }
+    if summary
+        .to_ascii_lowercase()
+        .contains("simulated response for skill")
+    {
+        findings.push("summary indicates simulated response".to_string());
+    }
+
+    let actions = payload
+        .get("actions")
+        .and_then(|v| v.as_array())
+        .cloned()
+        .unwrap_or_default();
+    if actions.len() < 2 {
+        findings.push("actions must contain at least 2 items".to_string());
+    }
+    for (idx, action) in actions.iter().enumerate() {
+        let text = action.as_str().map(|v| v.trim()).unwrap_or_default();
+        if text.len() < 12 {
+            findings.push(format!("actions[{}] is too short", idx));
+        }
+    }
+
+    let risks = payload
+        .get("risks")
+        .and_then(|v| v.as_array())
+        .cloned()
+        .unwrap_or_default();
+    if risks.is_empty() {
+        findings.push("risks must contain at least 1 item".to_string());
+    }
+
+    findings
 }
 
 fn env_enabled(name: &str) -> bool {
@@ -738,12 +835,73 @@ impl Skill for ConflictGateSkill {
     }
 }
 
+#[async_trait]
+impl Skill for SimulationFallbackGateSkill {
+    fn name(&self) -> &str {
+        "simulation_fallback_gate"
+    }
+
+    fn capability(&self) -> SkillCapability {
+        SkillCapability::new(
+            self.name(),
+            "Fail-fast gate that blocks merge/release when LLM outputs are simulated",
+            SkillIOType::Json,
+            SkillIOType::Boolean,
+            CapabilityPermissions::new(false, false, false, false, false),
+            SideEffectClass::Pure,
+        )
+        .with_trust_tier(TrustTier::Constrained)
+    }
+
+    async fn execute(&self, input: SkillInput, _ctx: &mut ExecutionContext) -> Result<SkillOutput> {
+        let markers = simulation_fallback_markers(&input);
+        if !markers.is_empty() {
+            return Err(anyhow!(
+                "simulation fallback detected in workflow evidence: {}",
+                markers.join(", ")
+            ));
+        }
+        Ok(SkillOutput::boolean(false))
+    }
+}
+
+#[async_trait]
+impl Skill for ReportQualityGateSkill {
+    fn name(&self) -> &str {
+        "report_quality_gate"
+    }
+
+    fn capability(&self) -> SkillCapability {
+        SkillCapability::new(
+            self.name(),
+            "Fail-fast gate that enforces minimum quality for workflow report JSON",
+            SkillIOType::Json,
+            SkillIOType::Boolean,
+            CapabilityPermissions::new(false, false, false, false, false),
+            SideEffectClass::Pure,
+        )
+        .with_trust_tier(TrustTier::Constrained)
+    }
+
+    async fn execute(&self, input: SkillInput, _ctx: &mut ExecutionContext) -> Result<SkillOutput> {
+        let payload = parse_report_payload(&input)?;
+        let findings = report_quality_findings(&payload);
+        if !findings.is_empty() {
+            return Err(anyhow!(
+                "workflow report quality gate failed: {}",
+                findings.join("; ")
+            ));
+        }
+        Ok(SkillOutput::boolean(false))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
         commit_type, conflict_count_from_input, parse_auto_resolve_config,
-        protected_branch_policy_violation, validate_structured_commit_message,
-        ConflictResolutionStrategy,
+        protected_branch_policy_violation, report_quality_findings, simulation_fallback_markers,
+        validate_structured_commit_message, ConflictResolutionStrategy,
     };
     use crate::skill::io::SkillInput;
     use serde_json::json;
@@ -806,6 +964,51 @@ mod tests {
         })));
         assert_eq!(cfg.strategy, ConflictResolutionStrategy::Ours);
         assert_eq!(cfg.max_attempts, 5);
+    }
+
+    #[test]
+    fn detects_simulation_fallback_markers_from_json_input() {
+        let input = SkillInput::Json(json!({
+            "summary": "x",
+            "risks": ["simulation_fallback_used", "other-risk"]
+        }));
+        let markers = simulation_fallback_markers(&input);
+        assert!(markers.iter().any(|m| m == "simulation_fallback_used"));
+    }
+
+    #[test]
+    fn detects_backend_unavailable_marker_from_text_input() {
+        let input =
+            SkillInput::Text(r#"{"summary":"x","risks":["llm_backend_unavailable"]}"#.to_string());
+        let markers = simulation_fallback_markers(&input);
+        assert!(markers.iter().any(|m| m == "llm_backend_unavailable"));
+    }
+
+    #[test]
+    fn report_quality_findings_accepts_detailed_payload() {
+        let payload = json!({
+            "summary": "Detailed release readiness assessment with explicit boundaries, evidence quality, and mitigation posture for tracked risks.",
+            "actions": [
+                "run npm run -s build and attach output evidence",
+                "run cargo check --manifest-path src-tauri/Cargo.toml and confirm zero errors"
+            ],
+            "risks": [
+                "medium: latency regression in query execution path"
+            ]
+        });
+        let findings = report_quality_findings(&payload);
+        assert!(findings.is_empty(), "unexpected findings: {:?}", findings);
+    }
+
+    #[test]
+    fn report_quality_findings_rejects_sparse_payload() {
+        let payload = json!({
+            "summary": "short",
+            "actions": ["fix"],
+            "risks": []
+        });
+        let findings = report_quality_findings(&payload);
+        assert!(!findings.is_empty());
     }
 
     #[test]

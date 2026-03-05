@@ -33,16 +33,32 @@ Input: {{implementation_plan}}
 ## Step: risk_register
 Skill: healthtech.risk_register
 DependsOn: acceptance_gate
-OnFailure: Continue
 Input: {{acceptance_gate}}
-
-## Step: finalize
-Skill: demo.echo
-DependsOn: risk_register
-Input: Feature workflow ready for domain healthtech.
 
 ## Step: internet_security_check
 Skill: agent.llm_subagent
-DependsOn: finalize
-Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+DependsOn: risk_register
+Input: Analyze this workflow output for internet-surface risks and required security mitigations:
+{{risk_register}}
 
+## Step: workflow_report
+Skill: agent.workflow_report
+DependsOn: internet_security_check
+Input: Build detailed feature workflow report from:
+{{intent_triage}}
+{{impact_analysis}}
+{{implementation_plan}}
+{{acceptance_gate}}
+{{risk_register}}
+{{internet_security_check}}
+Return strict JSON with summary/actions/risks.
+
+## Step: report_quality_gate
+Skill: agent.report_quality_gate
+DependsOn: workflow_report
+Input: {{workflow_report}}
+
+## Step: finalize
+Skill: demo.echo
+DependsOn: report_quality_gate
+Input: Feature workflow ready for domain healthtech with report-quality gate.

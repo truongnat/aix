@@ -6,19 +6,21 @@ Schema: antigrav.skill@v1
   "description": "Clarify requirements before implementing. Use when serious doubts arise.",
   "domain": "imported",
   "executor": "ollama",
-  "imported_at_ms": 1772154876576,
+  "imported_at_ms": 1772726746670,
   "model": "qwen3:8b",
   "name": "ask-questions-if-underspecified",
-  "risk": "unknown",
+  "risk": "none",
   "source": "https://github.com/trailofbits/skills",
   "source_commit": "8f92c6dee05a130f7f7840806b1f3a8e58fb48df",
   "source_license": "CC0-1.0",
   "source_path": "plugins/ask-questions-if-underspecified/skills/ask-questions-if-underspecified/SKILL.md",
   "source_requested": "https://github.com/trailofbits/skills",
   "tags": [
+    "ask",
     "external",
     "imported",
-    "skillpack"
+    "questions",
+    "underspecified"
   ],
   "temperature": 0.1
 }

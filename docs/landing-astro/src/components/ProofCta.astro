@@ -73,10 +73,12 @@
 
   <div class="code-shell">
     <button class="copy-btn" type="button" data-copy-target="#quickstart-code">Copy</button>
-    <pre id="quickstart-code"><code>cargo run -- --workflow valid_flow.md
+    <pre id="quickstart-code"><code>cargo run -- workflow setup
 cargo run -- workflow doctor
-cargo run -- workflow setup
 cargo run -- workflow check
+cargo run -- workflow quality-skills --strict
+cargo run -- workflow normalize-imported-skills --dry-run
+cargo run -- --workflow valid_flow.md
 cargo run -- workflow trace &lt;instance_id&gt; --timeline</code></pre>
   </div>
 </section>

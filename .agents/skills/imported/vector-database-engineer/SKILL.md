@@ -9,7 +9,7 @@ Schema: antigrav.skill@v1
   "imported_at_ms": 1772121154407,
   "model": "qwen3:8b",
   "name": "vector-database-engineer",
-  "risk": "unknown",
+  "risk": "safe",
   "source": "sickn33/antigravity-awesome-skills",
   "source_commit": "5174a1eae642",
   "source_license": "MIT",
@@ -17,8 +17,13 @@ Schema: antigrav.skill@v1
   "source_requested": "/tmp/agentic-sdlc-curated/antigravity-workflow-skills",
   "tags": [
     "antigravity",
+    "database",
+    "engineer",
     "external",
-    "imported"
+    "imported",
+    "rag",
+    "vector",
+    "vector-db"
   ],
   "temperature": 0.1,
   "trust_tier": "Constrained"

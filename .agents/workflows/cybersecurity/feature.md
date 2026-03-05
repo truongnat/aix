@@ -33,10 +33,32 @@ Input: {{implementation_plan}}
 ## Step: risk_register
 Skill: cybersecurity.risk_register
 DependsOn: acceptance_gate
-OnFailure: Continue
 Input: {{acceptance_gate}}
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: risk_register
+Input: Analyze this workflow output for internet-surface risks and required security mitigations:
+{{risk_register}}
+
+## Step: workflow_report
+Skill: agent.workflow_report
+DependsOn: internet_security_check
+Input: Build detailed feature workflow report from:
+{{intent_triage}}
+{{impact_analysis}}
+{{implementation_plan}}
+{{acceptance_gate}}
+{{risk_register}}
+{{internet_security_check}}
+Return strict JSON with summary/actions/risks.
+
+## Step: report_quality_gate
+Skill: agent.report_quality_gate
+DependsOn: workflow_report
+Input: {{workflow_report}}
 
 ## Step: finalize
 Skill: demo.echo
-DependsOn: risk_register
-Input: Feature workflow ready for domain cybersecurity.
+DependsOn: report_quality_gate
+Input: Feature workflow ready for domain cybersecurity with report-quality gate.

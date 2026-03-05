@@ -6,10 +6,10 @@ Schema: antigrav.skill@v1
   "description": "Design durable workflows with Temporal for distributed systems. Covers workflow vs activity separation, saga patterns, state management, and determinism constraints. Use when building long-running pro",
   "domain": "imported",
   "executor": "ollama",
-  "imported_at_ms": 1772154876677,
+  "imported_at_ms": 1772726592693,
   "model": "qwen3:8b",
   "name": "workflow-orchestration-patterns",
-  "risk": "unknown",
+  "risk": "safe",
   "source": "https://github.com/wshobson/agents",
   "source_commit": "ade0c7a211d04fa1354d10359737cace5c6fc5b0",
   "source_license": "MIT",
@@ -18,7 +18,9 @@ Schema: antigrav.skill@v1
   "tags": [
     "external",
     "imported",
-    "skillpack"
+    "orchestration",
+    "patterns",
+    "temporal"
   ],
   "temperature": 0.1
 }

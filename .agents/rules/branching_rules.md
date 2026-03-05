@@ -15,3 +15,7 @@ Schema: antigrav.rule@v1
   "cleanup_after_merge": true
 }
 ```
+
+## Policy Intent
+- Keep workflow execution deterministic, auditable, and production-safe.
+- Prefer explicit guardrails over implicit behavior.

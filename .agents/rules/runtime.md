@@ -70,3 +70,7 @@ Schema: antigrav.rule@v1
   ]
 }
 ```
+
+## Policy Intent
+- Keep workflow execution deterministic, auditable, and production-safe.
+- Prefer explicit guardrails over implicit behavior.

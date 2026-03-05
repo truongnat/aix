@@ -254,6 +254,45 @@ pub(super) fn handle_workflow_control_command(
             }
             Ok(WorkflowLaunchAction::Noop)
         }
+        WorkflowCommand::NormalizeImportedSkills {
+            mode,
+            dry_run,
+            json,
+        } => {
+            let mode = parse_skillpack_install_mode(&mode)?;
+            let report = normalize_imported_skills(project_layout, mode, dry_run)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "Normalized imported skills: mode='{}' dry_run={} import_dir='{}' lockfile='{}' checked={} normalized={} skipped={} catalog_rebuilt={}",
+                    report.mode,
+                    report.dry_run,
+                    report.import_dir,
+                    report.lockfile,
+                    report.checked,
+                    report.normalized,
+                    report.skipped,
+                    report.catalog_rebuilt
+                );
+                for path in &report.files {
+                    println!("- {}", path);
+                }
+                if !report.changes.is_empty() {
+                    println!("Planned metadata changes:");
+                    for change in &report.changes {
+                        println!("- {} [{}]", change.path, change.changed_fields.join(", "));
+                    }
+                }
+                if !report.skipped_entries.is_empty() {
+                    println!("Skipped files:");
+                    for entry in &report.skipped_entries {
+                        println!("- {} ({})", entry.path, entry.reason);
+                    }
+                }
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
         WorkflowCommand::InstallBundle {
             bundle,
             mode,
@@ -454,7 +493,7 @@ pub(super) fn handle_workflow_control_command(
             workflow_id,
             template,
             target_branch,
-            validate_command,
+            validate_command: resolve_default_validate_command(project_layout, &validate_command)?,
             no_merge,
             json,
         })),
@@ -474,7 +513,7 @@ pub(super) fn handle_workflow_control_command(
         } => Ok(WorkflowLaunchAction::ThreadFlow(ThreadFlowRequest {
             thread_id,
             target_branch,
-            validate_command,
+            validate_command: resolve_default_validate_command(project_layout, &validate_command)?,
             json,
         })),
         WorkflowCommand::Scaffold {
@@ -567,6 +606,93 @@ pub(super) fn handle_workflow_control_command(
             }
             Ok(WorkflowLaunchAction::Noop)
         }
+    }
+}
+
+fn resolve_default_validate_command(
+    project_layout: &AgentProjectLayout,
+    requested: &str,
+) -> Result<String> {
+    let trimmed = requested.trim();
+    if trimmed.is_empty() {
+        return Err(anyhow!("validate_command must not be empty"));
+    }
+    if trimmed != "cargo test" {
+        return Ok(trimmed.to_string());
+    }
+
+    let package_json = Path::new(&project_layout.project_root).join("package.json");
+    if !package_json.exists() {
+        return Ok(trimmed.to_string());
+    }
+    let Ok(raw) = std::fs::read_to_string(&package_json) else {
+        return Ok(trimmed.to_string());
+    };
+    let Ok(payload) = serde_json::from_str::<serde_json::Value>(&raw) else {
+        return Ok(trimmed.to_string());
+    };
+    let Some(scripts) = payload.get("scripts").and_then(|v| v.as_object()) else {
+        return Ok(trimmed.to_string());
+    };
+    if scripts.contains_key("agent:validate") {
+        return Ok("npm run -s agent:validate".to_string());
+    }
+    if scripts.contains_key("validate:agent") {
+        return Ok("npm run -s validate:agent".to_string());
+    }
+    if scripts.contains_key("build") {
+        return Ok("npm run -s build".to_string());
+    }
+    Ok(trimmed.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::resolve_default_validate_command;
+    use crate::engine::project::AgentProjectLayout;
+
+    #[test]
+    fn keeps_explicit_validate_command() {
+        let unique = format!(
+            "agentic-sdlc-workflow-control-validate-explicit-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(&root).expect("create temp root");
+        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+
+        let resolved =
+            resolve_default_validate_command(&layout, "npm run -s build").expect("resolve");
+        assert_eq!(resolved, "npm run -s build");
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn maps_default_validate_to_agent_validate_script() {
+        let unique = format!(
+            "agentic-sdlc-workflow-control-validate-script-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(&root).expect("create temp root");
+        std::fs::write(
+            root.join("package.json"),
+            r#"{"name":"demo","scripts":{"agent:validate":"npm run -s build && cargo check --manifest-path src-tauri/Cargo.toml"}}"#,
+        )
+        .expect("write package json");
+        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+
+        let resolved = resolve_default_validate_command(&layout, "cargo test").expect("resolve");
+        assert_eq!(resolved, "npm run -s agent:validate");
+
+        let _ = std::fs::remove_dir_all(root);
     }
 }
 

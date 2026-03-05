@@ -6,10 +6,10 @@ Schema: antigrav.skill@v1
   "description": "Use this skill for requests related to web research; it provides a structured approach to conducting comprehensive web research",
   "domain": "imported",
   "executor": "ollama",
-  "imported_at_ms": 1772154877813,
+  "imported_at_ms": 1772726744425,
   "model": "qwen3:8b",
   "name": "web-research",
-  "risk": "unknown",
+  "risk": "safe",
   "source": "https://github.com/langchain-ai/deepagents",
   "source_commit": "47b920b7a5266d60d379bc0ed66d9c6352e20e28",
   "source_license": "MIT",
@@ -18,7 +18,8 @@ Schema: antigrav.skill@v1
   "tags": [
     "external",
     "imported",
-    "skillpack"
+    "research",
+    "web"
   ],
   "temperature": 0.1
 }

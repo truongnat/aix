@@ -9,7 +9,7 @@ Schema: antigrav.skill@v1
   "imported_at_ms": 1772121154388,
   "model": "qwen3:8b",
   "name": "langgraph",
-  "risk": "unknown",
+  "risk": "safe",
   "source": "sickn33/antigravity-awesome-skills",
   "source_commit": "5174a1eae642",
   "source_license": "MIT",
@@ -18,7 +18,8 @@ Schema: antigrav.skill@v1
   "tags": [
     "antigravity",
     "external",
-    "imported"
+    "imported",
+    "langgraph"
   ],
   "temperature": 0.1,
   "trust_tier": "Constrained"

@@ -143,6 +143,14 @@ cargo run -- workflow sync-imports --overwrite --allow-missing-license --json
 cargo run -- workflow sync-imports --mode global --overwrite --allow-missing-license
 ```
 
+Normalize imported skill metadata in-place (`risk/source/tags`) without re-syncing remote sources:
+
+```bash
+cargo run -- workflow normalize-imported-skills
+cargo run -- workflow normalize-imported-skills --dry-run --json
+cargo run -- workflow normalize-imported-skills --mode global --json
+```
+
 Install bundle packs by id:
 
 ```bash
@@ -185,7 +193,7 @@ cargo run -- workflow doctor --strict-ollama
 cargo run -- workflow doctor --json
 ```
 
-Bootstrap missing package skeleton files (rules + starter workflow) and run doctor:
+Bootstrap missing package skeleton files (rules + core workflows/templates/roles/skills + memory indexes) and run doctor:
 
 ```bash
 cargo run -- workflow setup
@@ -327,7 +335,10 @@ Run the full deterministic gate:
 
 `workflow setup` additionally creates missing baseline markdown package files:
 - `.agents/rules/{runtime,branching_rules,coding_rules,merge_rules}.md`
-- `.agents/workflows/starter.md` (only when no workflow markdown exists)
+- `.agents/workflows/{starter,feature,bugfix,review,release}.md` (created when each file is missing)
+- `.agents/templates/{feature_prompt,bugfix_prompt,review_prompt,release_prompt}.md` (created when each file is missing)
+- `.agents/roles/{architect,implementer,reviewer,resolver,releaser}.md` (created when each file is missing)
+- `.agents/skills/{analyze_code,generate_tests,next_steps}/SKILL.md` (created when each file is missing)
 - `.agents/memory/vector_index.json`
 - `.agents/memory/graph_index.json`
 

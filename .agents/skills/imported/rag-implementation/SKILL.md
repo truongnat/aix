@@ -18,7 +18,10 @@ Schema: antigrav.skill@v1
   "tags": [
     "antigravity",
     "external",
-    "imported"
+    "implementation",
+    "imported",
+    "rag",
+    "vector-db"
   ],
   "temperature": 0.1,
   "trust_tier": "Constrained"

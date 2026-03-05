@@ -46,3 +46,30 @@ Skill: agent.llm_subagent
 DependsOn: summarize
 Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
 
+## Step: workflow_report
+Skill: agent.workflow_report
+DependsOn: internet_security_check
+Input: Build detailed workflow report from:
+{{merge_branch}}
+{{analyze_conflicts}}
+{{resolve_conflicts}}
+{{validate_merge}}
+{{commit_merge}}
+{{summarize}}
+{{internet_security_check}}
+Return strict JSON with summary/actions/risks.
+
+## Step: report_quality_gate
+Skill: agent.report_quality_gate
+DependsOn: workflow_report
+Input: {{workflow_report}}
+
+## Step: next_actions
+Skill: agent.next_steps
+DependsOn: report_quality_gate
+Input: Derive next actions from {{workflow_report}} and prioritize merge blockers and conflict follow-ups.
+
+## Step: finalize
+Skill: demo.echo
+DependsOn: next_actions
+Input: Merge workflow completed with report-quality gate.

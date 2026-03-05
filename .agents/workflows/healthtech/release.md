@@ -4,8 +4,9 @@ description: healthtech release workflow with quality signal and risk approval
 # Workflow: healthtech-release
 Schema: antigrav.workflow@v1
 Domain: healthtech
-MaxCpuMs: 180000
-MaxWallTimeMs: 480000
+MaxCpuMs: 220000
+MaxWallTimeMs: 900000
+MaxNetworkCalls: 25
 
 ## Step: release_scope
 Skill: agent.llm_subagent
@@ -21,14 +22,40 @@ Skill: healthtech.risk_register
 DependsOn: release_quality_signal
 Input: {{release_quality_signal}}
 
-## Step: finalize_release_note
-Skill: agent.llm_subagent
-DependsOn: release_risk
-Input: healthtech/releaser:::Generate final release note and go/no-go recommendation from:
-{{release_risk}}
-
 ## Step: internet_security_check
 Skill: agent.llm_subagent
-DependsOn: finalize_release_note
-Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+DependsOn: release_risk
+Input: Run security check on release artifacts for internet-capable workflow behavior:
+{{release_risk}}
 
+## Step: finalize_release_note
+Skill: agent.llm_subagent
+DependsOn: internet_security_check
+Input: healthtech/releaser:::Generate final release note and go/no-go recommendation from:
+{{internet_security_check}}
+
+## Step: workflow_report
+Skill: agent.workflow_report
+DependsOn: finalize_release_note
+Input: Build detailed release workflow report from:
+{{release_scope}}
+{{release_quality_signal}}
+{{release_risk}}
+{{internet_security_check}}
+{{finalize_release_note}}
+Return strict JSON with summary/actions/risks and release posture.
+
+## Step: report_quality_gate
+Skill: agent.report_quality_gate
+DependsOn: workflow_report
+Input: {{workflow_report}}
+
+## Step: simulation_fallback_gate
+Skill: agent.simulation_fallback_gate
+DependsOn: report_quality_gate
+Input: {{workflow_report}}
+
+## Step: finalize
+Skill: demo.echo
+DependsOn: simulation_fallback_gate
+Input: Release workflow ready for domain healthtech with report-quality and simulation-fallback gates.

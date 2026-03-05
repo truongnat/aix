@@ -186,6 +186,20 @@ pub(super) fn run_skill_quality_check(
             let imported_skill =
                 id.starts_with("imported/") || path_display.contains("/skills/imported/");
             if imported_skill {
+                if risk == "unknown" {
+                    push_skill_quality_warning(
+                        &mut report,
+                        &mut findings,
+                        "Imported skill uses metadata.risk='unknown'; prefer explicit none|safe|critical|offensive",
+                    );
+                }
+                if imported_tags_too_generic(meta.tags.as_ref(), &domain) {
+                    push_skill_quality_warning(
+                        &mut report,
+                        &mut findings,
+                        "Imported skill tags look too generic; include at least one domain-specific capability tag",
+                    );
+                }
                 if meta
                     .source_commit
                     .as_deref()
@@ -401,6 +415,29 @@ fn section_bullet_count(markdown: &str, candidates: &[&str]) -> usize {
         }
     }
     bullets
+}
+
+fn imported_tags_too_generic(tags: Option<&Vec<String>>, domain: &str) -> bool {
+    let Some(tags) = tags else {
+        return true;
+    };
+    if tags.is_empty() {
+        return true;
+    }
+    let domain = domain.trim().to_ascii_lowercase();
+    let generic = [
+        "imported".to_string(),
+        "external".to_string(),
+        "skillpack".to_string(),
+        domain,
+    ];
+    let specific = tags
+        .iter()
+        .map(|tag| tag.trim().to_ascii_lowercase())
+        .filter(|tag| !tag.is_empty())
+        .filter(|tag| !generic.contains(tag))
+        .count();
+    specific == 0
 }
 
 fn is_likely_skill_entry_file(path: &Path) -> bool {

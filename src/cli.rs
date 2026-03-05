@@ -23,7 +23,7 @@ use crate::skills::echo::EchoSkill;
 use crate::skills::flaky::FlakySkill;
 use crate::skills::git_ops::{
     AnalyzeConflictsSkill, AutoResolveConflictsSkill, ConflictGateSkill, GitCommitSkill,
-    GitMergeBranchSkill, HasConflictsSkill,
+    GitMergeBranchSkill, HasConflictsSkill, ReportQualityGateSkill, SimulationFallbackGateSkill,
 };
 use crate::skills::is_positive::IsPositiveSkill;
 use crate::skills::llm_subagent::LlmSubAgentSkill;
@@ -76,39 +76,39 @@ pub struct Cli {
     pub resume: Option<String>,
 
     /// Phase 17: Maximum execution cost
-    #[arg(long, default_value = "300")]
+    #[arg(long, default_value = "2500")]
     pub max_cost: u32,
 
     /// Phase 17: Maximum total latency in ms
-    #[arg(long, default_value = "300000")]
+    #[arg(long, default_value = "900000")]
     pub max_latency: u32,
 
     /// Phase 17: Maximum steps
-    #[arg(long, default_value = "60")]
+    #[arg(long, default_value = "30")]
     pub max_steps: usize,
 
     /// Phase 20: Maximum aggregate CPU time in ms
-    #[arg(long, default_value = "30000")]
+    #[arg(long, default_value = "240000")]
     pub max_cpu_ms: u64,
 
     /// Phase 20: Maximum aggregate wall time in ms
-    #[arg(long, default_value = "300000")]
+    #[arg(long, default_value = "1200000")]
     pub max_wall_time_ms: u64,
 
     /// Phase 20: Maximum filesystem read calls
-    #[arg(long, default_value = "500")]
+    #[arg(long, default_value = "3000")]
     pub max_fs_reads: u32,
 
     /// Phase 20: Maximum filesystem write calls
-    #[arg(long, default_value = "200")]
+    #[arg(long, default_value = "450")]
     pub max_fs_writes: u32,
 
     /// Phase 20: Maximum network calls
-    #[arg(long, default_value = "100")]
+    #[arg(long, default_value = "25")]
     pub max_network_calls: u32,
 
     /// Phase 21: Maximum memory usage for subprocess backends (MB)
-    #[arg(long, default_value = "512")]
+    #[arg(long, default_value = "1024")]
     pub max_memory_mb: u32,
 
     #[arg(long)]
@@ -156,7 +156,7 @@ pub struct Cli {
     external_mutation_penalty: u32,
 
     /// Maximum runtime per step in milliseconds
-    #[arg(long, default_value = "180000")]
+    #[arg(long, default_value = "600000")]
     step_timeout_ms: u64,
 
     /// Phase 21: Maximum allowed trust tier (Trusted|Constrained|Untrusted)
@@ -253,6 +253,14 @@ fn sync_imported_skills_from_lock(
     allow_missing_license: bool,
 ) -> Result<SyncImportsReport> {
     skillpack::sync_imported_skills_from_lock(layout, overwrite, mode, allow_missing_license)
+}
+
+fn normalize_imported_skills(
+    layout: &AgentProjectLayout,
+    mode: SkillpackInstallMode,
+    dry_run: bool,
+) -> Result<NormalizeImportedSkillsReport> {
+    skillpack::normalize_imported_skills(layout, mode, dry_run)
 }
 
 fn install_bundle_from_catalog(

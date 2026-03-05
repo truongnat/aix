@@ -88,6 +88,14 @@ pub(crate) enum WorkflowCommand {
         #[arg(long, default_value_t = false)]
         json: bool,
     },
+    NormalizeImportedSkills {
+        #[arg(long, default_value = "local")]
+        mode: String,
+        #[arg(long, default_value_t = false)]
+        dry_run: bool,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
     InstallBundle {
         bundle: String,
         #[arg(long, default_value = "local")]
@@ -428,6 +436,33 @@ pub(crate) struct SyncImportsReport {
 }
 
 #[derive(Debug, Clone, Serialize)]
+pub(crate) struct NormalizeImportedSkillChange {
+    pub(crate) path: String,
+    pub(crate) changed_fields: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct NormalizeImportedSkillSkip {
+    pub(crate) path: String,
+    pub(crate) reason: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct NormalizeImportedSkillsReport {
+    pub(crate) mode: String,
+    pub(crate) import_dir: String,
+    pub(crate) lockfile: String,
+    pub(crate) dry_run: bool,
+    pub(crate) checked: usize,
+    pub(crate) normalized: usize,
+    pub(crate) skipped: usize,
+    pub(crate) skipped_entries: Vec<NormalizeImportedSkillSkip>,
+    pub(crate) changes: Vec<NormalizeImportedSkillChange>,
+    pub(crate) catalog_rebuilt: bool,
+    pub(crate) files: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub(crate) struct BundleInstallReport {
     pub(crate) mode: String,
     pub(crate) bundle: String,
@@ -542,11 +577,28 @@ pub(crate) struct ContextSqliteWriteReport {
 }
 
 #[derive(Debug, Clone, Serialize)]
+pub(crate) struct StepRunSummary {
+    pub(crate) step_id: String,
+    pub(crate) status: String,
+    pub(crate) duration_ms: Option<u64>,
+    pub(crate) provider: Option<String>,
+    pub(crate) model: Option<String>,
+    pub(crate) summary: Option<String>,
+    pub(crate) actions: usize,
+    pub(crate) risks: usize,
+    pub(crate) error: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
 pub(crate) struct ThreadRunSummary {
     pub(crate) instance_id: String,
     pub(crate) workflow_name: String,
     pub(crate) status: String,
     pub(crate) trace_id: String,
+    pub(crate) completed_steps: usize,
+    pub(crate) failed_steps: usize,
+    pub(crate) total_steps: usize,
+    pub(crate) step_details: Vec<StepRunSummary>,
 }
 
 #[derive(Debug, Clone, Serialize)]

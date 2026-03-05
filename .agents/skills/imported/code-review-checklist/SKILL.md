@@ -9,7 +9,7 @@ Schema: antigrav.skill@v1
   "imported_at_ms": 1772121154366,
   "model": "qwen3:8b",
   "name": "code-review-checklist",
-  "risk": "unknown",
+  "risk": "none",
   "source": "sickn33/antigravity-awesome-skills",
   "source_commit": "5174a1eae642",
   "source_license": "MIT",
@@ -17,8 +17,12 @@ Schema: antigrav.skill@v1
   "source_requested": "/tmp/agentic-sdlc-curated/antigravity-workflow-skills",
   "tags": [
     "antigravity",
+    "checklist",
+    "code",
     "external",
-    "imported"
+    "imported",
+    "review",
+    "security"
   ],
   "temperature": 0.1,
   "trust_tier": "Constrained"

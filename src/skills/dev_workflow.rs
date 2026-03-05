@@ -306,6 +306,31 @@ fn resolve_script_workdir() -> Result<PathBuf> {
     Ok(root_path)
 }
 
+fn build_safe_path_env() -> String {
+    let mut entries = vec![
+        "/usr/bin".to_string(),
+        "/bin".to_string(),
+        "/usr/sbin".to_string(),
+        "/sbin".to_string(),
+        "/usr/local/bin".to_string(),
+        "/usr/local/sbin".to_string(),
+        "/opt/homebrew/bin".to_string(),
+        "/opt/homebrew/sbin".to_string(),
+    ];
+    if let Ok(current_path) = std::env::var("PATH") {
+        for entry in current_path
+            .split(':')
+            .map(str::trim)
+            .filter(|v| !v.is_empty())
+        {
+            if !entries.iter().any(|existing| existing == entry) {
+                entries.push(entry.to_string());
+            }
+        }
+    }
+    entries.join(":")
+}
+
 fn truncated(text: &str) -> String {
     if text.len() <= MAX_CAPTURED_OUTPUT_LEN {
         return text.to_string();
@@ -478,7 +503,7 @@ impl Skill for RunScriptSkill {
             .arg("-c")
             .arg(command)
             .env_clear()
-            .env("PATH", "/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin")
+            .env("PATH", build_safe_path_env())
             .env("LC_ALL", "C")
             .env("PWD", &workdir)
             .current_dir(&workdir)

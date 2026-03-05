@@ -88,6 +88,12 @@ fn check_workflows(
                             network_skills,
                             report,
                         );
+                        check_workflow_quality_conventions(
+                            &path,
+                            &workflow,
+                            network_skills,
+                            report,
+                        );
                     }
                     Err(err) => {
                         report.error(path.display().to_string(), err.to_string());
@@ -256,9 +262,132 @@ fn check_workflow_role_references(
     }
 }
 
+fn check_workflow_quality_conventions(
+    workflow_path: &Path,
+    workflow: &crate::workflow::model::Workflow,
+    network_skills: &NetworkSkillIndex,
+    report: &mut PackageCheckReport,
+) {
+    let workflow_name = workflow.meta.name.trim().to_ascii_lowercase();
+    let workflow_domain = workflow
+        .meta
+        .domain
+        .as_deref()
+        .unwrap_or("agent")
+        .trim()
+        .to_ascii_lowercase();
+    if workflow_domain != "agent" {
+        return;
+    }
+
+    if workflow.steps.len() < 4 && workflow_name != "starter" {
+        report.warning(
+            workflow_path.display().to_string(),
+            format!(
+                "Workflow '{}' has only {} step(s); consider adding explicit planning/validation/reporting gates for better execution quality",
+                workflow.meta.name,
+                workflow.steps.len()
+            ),
+        );
+    }
+
+    let uses_internet_skill = workflow
+        .steps
+        .iter()
+        .any(|step| network_skills.is_network_skill(workflow.meta.domain.as_deref(), &step.skill));
+    let has_workflow_report_step = workflow
+        .steps
+        .iter()
+        .any(|step| is_workflow_step_named(step, "workflow_report"));
+    let report_quality_gate_step = workflow
+        .steps
+        .iter()
+        .find(|step| is_workflow_step_named(step, "report_quality_gate"));
+    let has_simulation_fallback_gate = workflow
+        .steps
+        .iter()
+        .any(|step| is_workflow_step_named(step, "simulation_fallback_gate"));
+
+    if uses_internet_skill && !has_workflow_report_step {
+        report.warning(
+            workflow_path.display().to_string(),
+            "Workflow uses internet-capable skills but has no 'workflow_report' step; add a report synthesis gate for detailed traceability".to_string(),
+        );
+    }
+
+    if has_workflow_report_step && report_quality_gate_step.is_none() {
+        report.warning(
+            workflow_path.display().to_string(),
+            "Workflow defines 'workflow_report' but is missing 'report_quality_gate'; add `agent.report_quality_gate` to block sparse reports".to_string(),
+        );
+    }
+
+    if let Some(gate_step) = report_quality_gate_step {
+        let depends_on_report = gate_step
+            .depends_on
+            .iter()
+            .any(|dep| dep.trim().eq_ignore_ascii_case("workflow_report"));
+        let consumes_report = gate_step
+            .input
+            .to_ascii_lowercase()
+            .contains("{{workflow_report}}");
+        if !depends_on_report || !consumes_report {
+            report.warning(
+                workflow_path.display().to_string(),
+                "Step 'report_quality_gate' should depend on and consume '{{workflow_report}}' for deterministic gating".to_string(),
+            );
+        }
+    }
+
+    if (workflow_name.contains("review") || workflow_name.contains("release"))
+        && uses_internet_skill
+        && !has_simulation_fallback_gate
+    {
+        report.warning(
+            workflow_path.display().to_string(),
+            "Review/Release workflow should include 'simulation_fallback_gate' to block LLM fallback outputs before finalization".to_string(),
+        );
+    }
+
+    for step in &workflow.steps {
+        if matches!(
+            step.on_failure,
+            crate::workflow::model::FailureStrategy::Continue
+        ) {
+            if is_allowed_continue_step(step) {
+                continue;
+            }
+            report.warning(
+                workflow_path.display().to_string(),
+                format!(
+                    "Step '{}' uses OnFailure: Continue; prefer FailFast for deterministic and safe gating",
+                    step.id
+                ),
+            );
+        }
+    }
+}
+
 fn is_llm_subagent_skill(skill_ref: &str) -> bool {
     let normalized = skill_ref.trim().to_ascii_lowercase();
     normalized == "llm_subagent" || normalized.ends_with(".llm_subagent")
+}
+
+fn is_workflow_step_named(step: &crate::workflow::model::WorkflowStep, expected: &str) -> bool {
+    let expected = expected.trim().to_ascii_lowercase();
+    let step_id = step.id.trim().to_ascii_lowercase();
+    let skill_ref = step.skill.trim().to_ascii_lowercase();
+    step_id == expected
+        || skill_ref == expected
+        || skill_ref.ends_with(&format!(".{}", expected))
+        || skill_ref.contains(&expected)
+}
+
+fn is_allowed_continue_step(step: &crate::workflow::model::WorkflowStep) -> bool {
+    let step_id = step.id.trim().to_ascii_lowercase();
+    let skill_ref = step.skill.trim().to_ascii_lowercase();
+    (step_id == "merge_branch" || step_id == "git_merge_branch")
+        && (skill_ref == "git_merge_branch" || skill_ref.ends_with(".git_merge_branch"))
 }
 
 fn extract_role_reference(input: &str) -> Option<String> {
@@ -290,6 +419,7 @@ fn check_rules(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> 
                     report.error(path.display().to_string(), err.to_string());
                     continue;
                 }
+                check_rule_quality_conventions(&path, &content, report);
             }
             ExtensionKind::Yaml => report.error(
                 path.display().to_string(),
@@ -421,7 +551,9 @@ fn check_roles(layout: &AgentProjectLayout, report: &mut PackageCheckReport) -> 
                 let fallback_name = path.file_stem().and_then(|v| v.to_str());
                 if let Err(err) = parse_role_markdown(&content, fallback_name) {
                     report.error(path.display().to_string(), err.to_string());
+                    continue;
                 }
+                check_role_quality_conventions(&path, &content, report);
             }
             ExtensionKind::Yaml => report.error(
                 path.display().to_string(),
@@ -518,6 +650,124 @@ fn validate_required_description_frontmatter(content: &str) -> Result<()> {
         ));
     }
     Ok(())
+}
+
+fn check_rule_quality_conventions(path: &Path, content: &str, report: &mut PackageCheckReport) {
+    if !markdown_has_heading(content, &["policy intent"]) {
+        report.warning(
+            path.display().to_string(),
+            "Rule should include a section heading like '## Policy Intent' to document rationale"
+                .to_string(),
+        );
+    }
+    if json_fenced_block_is_empty_object(content) {
+        report.warning(
+            path.display().to_string(),
+            "Rule JSON block is empty (`{}`); consider defining concrete policy fields".to_string(),
+        );
+    }
+}
+
+fn check_role_quality_conventions(path: &Path, content: &str, report: &mut PackageCheckReport) {
+    let role_name = path
+        .file_stem()
+        .and_then(|value| value.to_str())
+        .map(|value| value.to_ascii_lowercase())
+        .unwrap_or_default();
+    let is_core_role = matches!(
+        role_name.as_str(),
+        "architect" | "implementer" | "reviewer" | "resolver" | "releaser"
+    );
+    if !is_core_role {
+        return;
+    }
+
+    if !markdown_contains_label(content, "Mission:") {
+        report.warning(
+            path.display().to_string(),
+            "Role should include a 'Mission:' section for deterministic intent".to_string(),
+        );
+    }
+    if !(markdown_contains_label(content, "Procedure:")
+        || markdown_contains_label(content, "Checklist:"))
+    {
+        report.warning(
+            path.display().to_string(),
+            "Role should include an execution procedure/checklist section".to_string(),
+        );
+    }
+    if !markdown_contains_label(content, "Output Contract:") {
+        report.warning(
+            path.display().to_string(),
+            "Role should include an 'Output Contract:' section with explicit output expectations"
+                .to_string(),
+        );
+    }
+
+    let body_chars = markdown_nonempty_text_len(content);
+    if body_chars < 240 {
+        report.warning(
+            path.display().to_string(),
+            format!(
+                "Role content appears terse ({} chars); expand responsibilities and quality constraints",
+                body_chars
+            ),
+        );
+    }
+}
+
+fn markdown_has_heading(content: &str, candidates: &[&str]) -> bool {
+    content.lines().any(|line| {
+        let trimmed = line.trim();
+        if !trimmed.starts_with('#') {
+            return false;
+        }
+        let title = trimmed.trim_start_matches('#').trim().to_ascii_lowercase();
+        candidates
+            .iter()
+            .any(|candidate| title == candidate.to_ascii_lowercase())
+    })
+}
+
+fn markdown_contains_label(content: &str, label: &str) -> bool {
+    content
+        .to_ascii_lowercase()
+        .contains(&label.to_ascii_lowercase())
+}
+
+fn markdown_nonempty_text_len(content: &str) -> usize {
+    content
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+        .filter(|line| !line.starts_with("```"))
+        .filter(|line| !line.starts_with("Schema:"))
+        .filter(|line| !line.starts_with('{'))
+        .filter(|line| !line.starts_with('}'))
+        .map(str::len)
+        .sum()
+}
+
+fn json_fenced_block_is_empty_object(content: &str) -> bool {
+    let mut lines = content.lines();
+    while let Some(line) = lines.next() {
+        if line.trim().eq_ignore_ascii_case("```json") {
+            let mut payload_lines = Vec::<String>::new();
+            for payload_line in lines.by_ref() {
+                let trimmed = payload_line.trim();
+                if trimmed == "```" {
+                    break;
+                }
+                if !trimmed.is_empty() {
+                    payload_lines.push(trimmed.to_string());
+                }
+            }
+            if payload_lines.len() == 1 && payload_lines[0] == "{}" {
+                return true;
+            }
+        }
+    }
+    false
 }
 
 fn extension_kind(path: &Path) -> ExtensionKind {

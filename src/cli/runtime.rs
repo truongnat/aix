@@ -34,6 +34,8 @@ pub(super) fn build_domain_registry() -> Result<DomainRegistry> {
     domains.register_skill("agent", Arc::new(AutoResolveConflictsSkill))?;
     domains.register_skill("agent", Arc::new(HasConflictsSkill))?;
     domains.register_skill("agent", Arc::new(ConflictGateSkill))?;
+    domains.register_skill("agent", Arc::new(SimulationFallbackGateSkill))?;
+    domains.register_skill("agent", Arc::new(ReportQualityGateSkill))?;
     domains.register_skill(
         "agent",
         Arc::new(EmbedDocumentSkill::new(".agents/memory/vector_index.json")),
@@ -264,12 +266,97 @@ pub(super) fn resolve_role_workflow_selection(
 }
 
 pub(super) fn instance_summary(instance: &WorkflowInstance) -> ThreadRunSummary {
+    let step_details = instance
+        .step_order
+        .iter()
+        .map(|step_id| summarize_step(instance, step_id))
+        .collect::<Vec<_>>();
     ThreadRunSummary {
         instance_id: instance.instance_id.clone(),
         workflow_name: instance.workflow_name.clone(),
         status: format!("{:?}", instance.status),
         trace_id: instance.trace_id.clone(),
+        completed_steps: instance.completed_steps.len(),
+        failed_steps: instance.failed_steps.len(),
+        total_steps: instance.step_order.len(),
+        step_details,
     }
+}
+
+fn summarize_step(instance: &WorkflowInstance, step_id: &str) -> StepRunSummary {
+    let state = instance.step_states.get(step_id);
+    let output = instance.step_results.get(step_id);
+    let (summary, actions, risks) = summarize_skill_output(output);
+    StepRunSummary {
+        step_id: step_id.to_string(),
+        status: state
+            .map(|v| format!("{:?}", v.status))
+            .unwrap_or_else(|| "Pending".to_string()),
+        duration_ms: state.and_then(|v| v.duration_ms),
+        provider: state.and_then(|v| v.provider.clone()),
+        model: state.and_then(|v| v.model.clone()),
+        summary,
+        actions,
+        risks,
+        error: state.and_then(|v| v.last_error.clone()),
+    }
+}
+
+fn summarize_skill_output(
+    output: Option<&crate::skill::io::SkillOutput>,
+) -> (Option<String>, usize, usize) {
+    let Some(output) = output else {
+        return (None, 0, 0);
+    };
+    match output {
+        crate::skill::io::SkillOutput::Json(value) => {
+            let summary = value
+                .get("summary")
+                .and_then(|v| v.as_str())
+                .map(|v| truncate_for_report(v, 240))
+                .or_else(|| {
+                    if value.is_null() {
+                        None
+                    } else {
+                        Some(truncate_for_report(&value.to_string(), 240))
+                    }
+                });
+            let actions = value
+                .get("actions")
+                .and_then(|v| v.as_array())
+                .map(|v| v.len())
+                .unwrap_or(0);
+            let risks = value
+                .get("risks")
+                .and_then(|v| v.as_array())
+                .map(|v| v.len())
+                .unwrap_or(0);
+            (summary, actions, risks)
+        }
+        crate::skill::io::SkillOutput::Text(text) => {
+            let trimmed = text.trim();
+            if trimmed.is_empty() {
+                (None, 0, 0)
+            } else {
+                (Some(truncate_for_report(trimmed, 240)), 0, 0)
+            }
+        }
+        crate::skill::io::SkillOutput::Number(value) => (Some(value.to_string()), 0, 0),
+        crate::skill::io::SkillOutput::Boolean(value) => (Some(value.to_string()), 0, 0),
+    }
+}
+
+fn truncate_for_report(text: &str, max_chars: usize) -> String {
+    let trimmed = text.trim();
+    let count = trimmed.chars().count();
+    if count <= max_chars {
+        return trimmed.to_string();
+    }
+    let mut prefix = String::new();
+    for ch in trimmed.chars().take(max_chars.saturating_sub(3)) {
+        prefix.push(ch);
+    }
+    format!("{}...", prefix)
 }
 
 pub(super) fn load_template_prompt(
@@ -436,7 +523,7 @@ pub(super) fn build_thread_flow_workflow(
             skill: "agent.has_conflicts".to_string(),
             input: "{{recheck_conflicts}}".to_string(),
             depends_on: vec!["recheck_conflicts".to_string()],
-            condition: Some("{{has_conflicts}} == true".to_string()),
+            condition: None,
             retry: None,
             on_failure: crate::workflow::model::FailureStrategy::FailFast,
         });
@@ -446,7 +533,7 @@ pub(super) fn build_thread_flow_workflow(
             skill: "agent.has_conflicts".to_string(),
             input: "{{has_conflicts}}".to_string(),
             depends_on: vec!["has_conflicts".to_string()],
-            condition: Some("{{has_conflicts}} == true".to_string()),
+            condition: None,
             retry: None,
             on_failure: crate::workflow::model::FailureStrategy::FailFast,
         });

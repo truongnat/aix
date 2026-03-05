@@ -212,20 +212,7 @@ impl AgentProjectLayout {
     }
 
     pub fn resolve_template_path(&self, template_ref: &str) -> Option<PathBuf> {
-        let as_path = Path::new(template_ref);
-        if as_path.exists() {
-            return Some(as_path.to_path_buf());
-        }
-
-        let candidate = if template_ref.to_ascii_lowercase().ends_with(".md") {
-            self.templates_dir.join(template_ref)
-        } else {
-            self.templates_dir.join(format!("{}.md", template_ref))
-        };
-        if candidate.exists() {
-            return Some(candidate);
-        }
-        None
+        resolve_markdown_resource_path(&self.templates_dir, template_ref)
     }
 
     pub fn load_runtime_rules(&self) -> Result<ProjectRuntimeRules> {
@@ -312,6 +299,66 @@ fn collect_markdown_files_recursive(root: &Path) -> Result<Vec<PathBuf>> {
     })?;
     files.sort();
     Ok(files)
+}
+
+fn resource_id_from_relative_path(path: &Path) -> Result<String> {
+    let mut base = path.to_path_buf();
+    if base
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .map(|ext| ext.eq_ignore_ascii_case("md"))
+        .unwrap_or(false)
+    {
+        base.set_extension("");
+    }
+    let id = base
+        .iter()
+        .map(|part| part.to_string_lossy().to_string())
+        .collect::<Vec<_>>()
+        .join("/");
+    if id.trim().is_empty() {
+        return Err(anyhow!("Invalid markdown resource filename"));
+    }
+    Ok(id)
+}
+
+fn resolve_markdown_resource_path(root: &Path, resource_ref: &str) -> Option<PathBuf> {
+    let as_path = Path::new(resource_ref);
+    if as_path.exists() {
+        return Some(as_path.to_path_buf());
+    }
+
+    let direct = if resource_ref.to_ascii_lowercase().ends_with(".md") {
+        root.join(resource_ref)
+    } else {
+        root.join(format!("{}.md", resource_ref))
+    };
+    if direct.exists() {
+        return Some(direct);
+    }
+
+    let lookup = resource_ref.trim().trim_end_matches(".md");
+    if lookup.is_empty() {
+        return None;
+    }
+    let files = collect_markdown_files_recursive(root).ok()?;
+    let mut stem_matches = Vec::new();
+    for path in files {
+        let relative = path.strip_prefix(root).ok()?;
+        let resource_id = resource_id_from_relative_path(relative).ok()?;
+        if resource_id == lookup {
+            return Some(path);
+        }
+        let stem = path.file_stem().and_then(|name| name.to_str())?;
+        if stem == lookup {
+            stem_matches.push(path);
+        }
+    }
+    if stem_matches.len() == 1 {
+        stem_matches.into_iter().next()
+    } else {
+        None
+    }
 }
 
 fn walk_directory_files(root: &Path, visit: &mut impl FnMut(&Path)) -> Result<()> {
@@ -588,6 +635,48 @@ mod tests {
             Some("feature_prompt.md")
         );
         assert!(layout.resolve_template_path("missing_prompt").is_none());
+
+        let _ = std::fs::remove_dir_all(root_path);
+    }
+
+    #[test]
+    fn resolves_template_from_nested_directory_with_unique_stem_alias() {
+        let unique = format!(
+            "agentic-sdlc-template-nested-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root_path = std::env::temp_dir().join(unique);
+        let nested_dir = root_path.join(".agents").join("templates").join("payments");
+        std::fs::create_dir_all(&nested_dir).expect("templates dir");
+        std::fs::write(nested_dir.join("feature_prompt.md"), "feature prompt body")
+            .expect("write template");
+
+        let layout = AgentProjectLayout::discover(root_path.to_str().expect("tmp path"))
+            .expect("discover project");
+
+        assert_eq!(
+            layout
+                .resolve_template_path("payments/feature_prompt")
+                .expect("resolve by nested id")
+                .strip_prefix(root_path.join(".agents").join("templates"))
+                .expect("relative")
+                .to_string_lossy()
+                .replace('\\', "/"),
+            "payments/feature_prompt.md"
+        );
+        assert_eq!(
+            layout
+                .resolve_template_path("feature_prompt")
+                .expect("resolve by unique stem")
+                .strip_prefix(root_path.join(".agents").join("templates"))
+                .expect("relative")
+                .to_string_lossy()
+                .replace('\\', "/"),
+            "payments/feature_prompt.md"
+        );
 
         let _ = std::fs::remove_dir_all(root_path);
     }

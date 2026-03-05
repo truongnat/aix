@@ -214,6 +214,14 @@ fn model_env_for_provider(provider: LlmProvider) -> &'static str {
     }
 }
 
+fn resolve_ollama_host() -> String {
+    let host = std::env::var("ANTIGRAV_OLLAMA_HOST")
+        .ok()
+        .or_else(|| std::env::var("OLLAMA_HOST").ok())
+        .unwrap_or_else(|| "http://localhost:11434".to_string());
+    host.trim().trim_end_matches('/').to_string()
+}
+
 fn parse_provider_list(raw: Option<String>) -> Vec<LlmProvider> {
     raw.unwrap_or_default()
         .split(',')
@@ -324,11 +332,11 @@ impl LlmSubAgentSkill {
             .ok()
             .and_then(|v| v.trim().parse::<u64>().ok())
             .filter(|v| *v > 0)
-            .unwrap_or(30_000);
+            .unwrap_or(120_000);
         let max_retries = std::env::var("ANTIGRAV_LLM_MAX_RETRIES")
             .ok()
             .and_then(|v| v.trim().parse::<u32>().ok())
-            .unwrap_or(2);
+            .unwrap_or(1);
         let fallback_providers = parse_provider_list(std::env::var("ANTIGRAV_LLM_FALLBACK").ok());
         Self {
             default_role: "software-engineer".to_string(),
@@ -451,7 +459,7 @@ impl LlmSubAgentSkill {
             options: Some(OllamaOptions { temperature }),
         };
         let response = client
-            .post("http://localhost:11434/api/generate")
+            .post(format!("{}/api/generate", resolve_ollama_host()))
             .json(&request)
             .send()
             .await?;

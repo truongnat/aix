@@ -6,19 +6,20 @@ Schema: antigrav.skill@v1
   "description": "Use this skill for requests related to LangGraph in order to fetch relevant documentation to provide accurate, up-to-date guidance.",
   "domain": "imported",
   "executor": "ollama",
-  "imported_at_ms": 1772154877811,
+  "imported_at_ms": 1772726744424,
   "model": "qwen3:8b",
   "name": "langgraph-docs",
-  "risk": "unknown",
+  "risk": "safe",
   "source": "https://github.com/langchain-ai/deepagents",
   "source_commit": "47b920b7a5266d60d379bc0ed66d9c6352e20e28",
   "source_license": "MIT",
   "source_path": "libs/cli/examples/skills/langgraph-docs/SKILL.md",
   "source_requested": "https://github.com/langchain-ai/deepagents",
   "tags": [
+    "docs",
     "external",
     "imported",
-    "skillpack"
+    "langgraph"
   ],
   "temperature": 0.1
 }

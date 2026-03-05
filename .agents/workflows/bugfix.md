@@ -1,54 +1,66 @@
 ---
-description: bugfix workflow
+description: bugfix advanced workflow with deterministic gates and report quality guard
 ---
-
 # Workflow: bugfix
 Schema: antigrav.workflow@v1
 Domain: agent
+MaxCpuMs: 240000
+MaxWallTimeMs: 900000
+MaxNetworkCalls: 30
 
-## Step: ensure_branch
-Skill: agent.ensure_branch
-Input: bugfix-thread
-
-## Step: detect_failure
-Skill: agent.run_script
-DependsOn: ensure_branch
-Retry: 1
-OnFailure: Continue
-Input: cargo test
-
-## Step: retrieve_context
-Skill: agent.semantic_search
-DependsOn: detect_failure
-Input: 5:::failing test stack trace and related modules
-
-## Step: generate_fix
+## Step: intent_analysis
 Skill: agent.llm_subagent
-DependsOn: retrieve_context
-Input: implementer:::Fix only the reported bug. Do not add new features or broad refactors.
+Input: Analyze task scope, constraints, and acceptance criteria for bugfix. Return strict JSON with summary/actions/risks.
 
-## Step: rerun_tests
+## Step: execution_plan
+Skill: agent.llm_subagent
+DependsOn: intent_analysis
+Input: Build deterministic implementation plan for bugfix with milestones, validation, and rollback notes.
+
+## Step: validation_gate
 Skill: agent.run_script
-DependsOn: generate_fix
-Retry: 2
-Input: cargo test
+DependsOn: execution_plan
+Retry: 1
+OnFailure: FailFast
+Input: echo "validate bugfix"
 
-## Step: commit_fix
-Skill: agent.git_commit
-DependsOn: rerun_tests
-Input:
-fix(bugfix): resolve failing behavior
-
-- bug scoped and fixed
-- tests rerun with retries
-
-## Step: summarize
-Skill: demo.echo
-DependsOn: commit_fix
-Input: Bugfix workflow completed.
+## Step: risk_review
+Skill: agent.llm_subagent
+DependsOn: validation_gate
+Input: Produce risk register for bugfix, including severity, blast radius, and mitigations.
 
 ## Step: internet_security_check
 Skill: agent.llm_subagent
-DependsOn: summarize
-Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+DependsOn: risk_review
+Input: Run a focused security check for internet-capable execution paths and return pass/fail with mitigations.
 
+## Step: workflow_report
+Skill: agent.workflow_report
+DependsOn: internet_security_check
+Input: Build detailed workflow report from:
+{{intent_analysis}}
+{{execution_plan}}
+{{validation_gate}}
+{{risk_review}}
+{{internet_security_check}}
+Return strict JSON with summary/actions/risks.
+
+## Step: report_quality_gate
+Skill: agent.report_quality_gate
+DependsOn: workflow_report
+Input: {{workflow_report}}
+
+## Step: simulation_fallback_gate
+Skill: agent.simulation_fallback_gate
+DependsOn: report_quality_gate
+Input: {{workflow_report}}
+
+## Step: next_actions
+Skill: agent.next_steps
+DependsOn: simulation_fallback_gate
+Input: Derive next actions from {{workflow_report}} with explicit critical-path ordering.
+
+## Step: finalize
+Skill: demo.echo
+DependsOn: next_actions
+Input: Advanced scaffold workflow bugfix prepared with report-quality and simulation-fallback gates.

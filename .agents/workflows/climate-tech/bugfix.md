@@ -4,8 +4,8 @@ description: climate-tech bugfix workflow with root-cause and regression guard
 # Workflow: climate-tech-bugfix
 Schema: antigrav.workflow@v1
 Domain: climate-tech
-MaxCpuMs: 180000
-MaxWallTimeMs: 600000
+MaxCpuMs: 220000
+MaxWallTimeMs: 900000
 
 ## Step: incident_triage
 Skill: agent.llm_subagent
@@ -31,11 +31,32 @@ Input: {{patch_plan}}
 ## Step: postmortem
 Skill: climate-tech.risk_register
 DependsOn: regression_guard
-OnFailure: Continue
 Input: {{regression_guard}}
 
 ## Step: internet_security_check
 Skill: agent.llm_subagent
 DependsOn: postmortem
-Input: reviewer:::Run internet-surface security check for this workflow using outputs from previous steps. Return pass/fail, top risks, and required mitigations before completion.
+Input: Review postmortem output for internet-surface risks and mitigations:
+{{postmortem}}
 
+## Step: workflow_report
+Skill: agent.workflow_report
+DependsOn: internet_security_check
+Input: Build detailed bugfix workflow report from:
+{{incident_triage}}
+{{blast_radius}}
+{{patch_plan}}
+{{regression_guard}}
+{{postmortem}}
+{{internet_security_check}}
+Return strict JSON with summary/actions/risks.
+
+## Step: report_quality_gate
+Skill: agent.report_quality_gate
+DependsOn: workflow_report
+Input: {{workflow_report}}
+
+## Step: finalize
+Skill: demo.echo
+DependsOn: report_quality_gate
+Input: Bugfix workflow ready for domain climate-tech with report-quality gate.

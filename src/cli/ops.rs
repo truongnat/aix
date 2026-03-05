@@ -74,18 +74,42 @@ pub(super) fn run_workflow_doctor(
         });
     }
 
-    let cargo_toml = Path::new(&layout.project_root).join("Cargo.toml");
-    if cargo_toml.exists() {
+    let manifest_candidates = [
+        (
+            "Cargo.toml",
+            Path::new(&layout.project_root).join("Cargo.toml"),
+        ),
+        (
+            "package.json",
+            Path::new(&layout.project_root).join("package.json"),
+        ),
+        (
+            "pyproject.toml",
+            Path::new(&layout.project_root).join("pyproject.toml"),
+        ),
+        ("go.mod", Path::new(&layout.project_root).join("go.mod")),
+    ];
+    let detected_manifests = manifest_candidates
+        .iter()
+        .filter_map(|(name, path)| {
+            if path.exists() {
+                Some(format!("{} ({})", name, path.display()))
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>();
+    if detected_manifests.is_empty() {
         checks.push(DoctorCheckResult {
-            name: "cargo_toml".to_string(),
-            status: DoctorCheckStatus::Ok,
-            message: format!("found at {}", cargo_toml.display()),
+            name: "project_manifest".to_string(),
+            status: DoctorCheckStatus::Error,
+            message: "no project manifest found (expected one of Cargo.toml/package.json/pyproject.toml/go.mod)".to_string(),
         });
     } else {
         checks.push(DoctorCheckResult {
-            name: "cargo_toml".to_string(),
-            status: DoctorCheckStatus::Error,
-            message: format!("missing at {}", cargo_toml.display()),
+            name: "project_manifest".to_string(),
+            status: DoctorCheckStatus::Ok,
+            message: format!("detected {}", detected_manifests.join(", ")),
         });
     }
 
@@ -237,24 +261,25 @@ pub(super) fn ensure_bootstrap_package(
     layout.ensure_layout()?;
     let mut created = Vec::new();
 
-    for (file_name, title) in [
-        ("runtime.md", "Runtime Rules"),
-        ("branching_rules.md", "Branching Rules"),
-        ("coding_rules.md", "Coding Rules"),
-        ("merge_rules.md", "Merge Rules"),
-    ] {
-        let path = layout.rules_dir.join(file_name);
-        let body = format!(
-            "---\ndescription: {} default policy\ntrigger: always_on\n---\n# {}\nSchema: antigrav.rule@v1\n```json\n{{}}\n```\n",
-            title, title
-        );
-        write_file_if_missing(&path, &body, &mut created)?;
+    for (file_name, body) in bootstrap_rule_files() {
+        write_file_if_missing(&layout.rules_dir.join(file_name), body, &mut created)?;
     }
 
-    if count_markdown_files_recursive(&layout.workflows_dir)? == 0 {
-        let starter = layout.workflows_dir.join("starter.md");
-        let body = "---\ndescription: starter workflow\n---\n# Workflow: starter\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: hello\nSkill: demo.echo\nInput: starter workflow ready\n";
-        write_file_if_missing(&starter, body, &mut created)?;
+    for (file_name, body) in bootstrap_workflow_files() {
+        write_file_if_missing(&layout.workflows_dir.join(file_name), body, &mut created)?;
+    }
+
+    for (file_name, body) in bootstrap_template_files() {
+        write_file_if_missing(&layout.templates_dir.join(file_name), body, &mut created)?;
+    }
+
+    for (file_name, body) in bootstrap_role_files() {
+        write_file_if_missing(&layout.roles_dir.join(file_name), body, &mut created)?;
+    }
+
+    for (folder_name, body) in bootstrap_skill_files() {
+        let path = layout.skills_dir.join(folder_name).join("SKILL.md");
+        write_file_if_missing(&path, body, &mut created)?;
     }
 
     let vector_index = layout.memory_dir.join("vector_index.json");
@@ -266,6 +291,762 @@ pub(super) fn ensure_bootstrap_package(
     Ok(created)
 }
 
+fn bootstrap_workflow_files() -> [(&'static str, &'static str); 5] {
+    [
+        (
+            "starter.md",
+            r#"---
+description: starter workflow
+---
+# Workflow: starter
+Schema: antigrav.workflow@v1
+Domain: demo
+
+## Step: hello
+Skill: demo.echo
+Input: starter workflow ready
+"#,
+        ),
+        (
+            "feature.md",
+            r#"---
+description: feature delivery workflow with deterministic planning and report quality gates
+---
+# Workflow: feature
+Schema: antigrav.workflow@v1
+Domain: agent
+MaxCpuMs: 240000
+MaxWallTimeMs: 900000
+MaxNetworkCalls: 30
+
+## Step: intent_analysis
+Skill: agent.llm_subagent
+Input: architect:::Analyze task intent, constraints, acceptance criteria, and impacted components. Return strict JSON with summary/actions/risks.
+
+## Step: execution_plan
+Skill: agent.llm_subagent
+DependsOn: intent_analysis
+Input: implementer:::Produce deterministic implementation plan with ordered edits, test strategy, and rollback notes.
+
+## Step: validation_gate
+Skill: agent.run_script
+DependsOn: execution_plan
+Retry: 1
+OnFailure: FailFast
+Input: npm run -s build
+
+## Step: risk_review
+Skill: agent.llm_subagent
+DependsOn: validation_gate
+Input: reviewer:::Build risk register with severity, blast radius, and mitigations based on implementation and validation outputs.
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: risk_review
+Input: reviewer:::Run a focused security check for internet-capable execution paths and return pass/fail with mitigations.
+
+## Step: workflow_report
+Skill: agent.workflow_report
+DependsOn: internet_security_check
+Input: Build detailed workflow report from:
+{{intent_analysis}}
+{{execution_plan}}
+{{validation_gate}}
+{{risk_review}}
+{{internet_security_check}}
+Return strict JSON with summary/actions/risks.
+
+## Step: report_quality_gate
+Skill: agent.report_quality_gate
+DependsOn: workflow_report
+Input: {{workflow_report}}
+
+## Step: next_actions
+Skill: agent.next_steps
+DependsOn: report_quality_gate
+Input: Derive next actions from {{workflow_report}} with explicit critical-path ordering.
+
+## Step: finalize
+Skill: demo.echo
+DependsOn: next_actions
+Input: Feature workflow completed with report quality and next-action gates.
+"#,
+        ),
+        (
+            "bugfix.md",
+            r#"---
+description: bugfix workflow with root-cause discipline and report quality gates
+---
+# Workflow: bugfix
+Schema: antigrav.workflow@v1
+Domain: agent
+MaxCpuMs: 220000
+MaxWallTimeMs: 900000
+MaxNetworkCalls: 30
+
+## Step: issue_triage
+Skill: agent.llm_subagent
+Input: resolver:::Summarize failure mode, root-cause hypothesis, reproducibility, and affected scope.
+
+## Step: patch_plan
+Skill: agent.llm_subagent
+DependsOn: issue_triage
+Input: implementer:::Provide minimal patch plan with explicit regression checks and rollback.
+
+## Step: validation_gate
+Skill: agent.run_script
+DependsOn: patch_plan
+Retry: 2
+OnFailure: FailFast
+Input: npm run -s build
+
+## Step: post_fix_review
+Skill: agent.llm_subagent
+DependsOn: validation_gate
+Input: reviewer:::Evaluate patch quality, remaining risks, and any follow-up actions.
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: post_fix_review
+Input: reviewer:::Run a focused security check for internet-capable execution paths and return pass/fail with mitigations.
+
+## Step: workflow_report
+Skill: agent.workflow_report
+DependsOn: internet_security_check
+Input: Build detailed workflow report from:
+{{issue_triage}}
+{{patch_plan}}
+{{validation_gate}}
+{{post_fix_review}}
+{{internet_security_check}}
+Return strict JSON with summary/actions/risks.
+
+## Step: report_quality_gate
+Skill: agent.report_quality_gate
+DependsOn: workflow_report
+Input: {{workflow_report}}
+
+## Step: next_actions
+Skill: agent.next_steps
+DependsOn: report_quality_gate
+Input: Derive next actions from {{workflow_report}} and prioritize unresolved blockers.
+
+## Step: finalize
+Skill: demo.echo
+DependsOn: next_actions
+Input: Bugfix workflow completed with report quality and next-action gates.
+"#,
+        ),
+        (
+            "review.md",
+            r#"---
+description: review workflow with detailed findings and simulation-fallback gate
+---
+# Workflow: review
+Schema: antigrav.workflow@v1
+Domain: agent
+MaxCpuMs: 180000
+MaxWallTimeMs: 600000
+MaxNetworkCalls: 20
+
+## Step: review_context
+Skill: agent.llm_subagent
+Input: reviewer:::Summarize implementation intent, code areas, and likely weak spots.
+
+## Step: generate_review
+Skill: agent.llm_subagent
+DependsOn: review_context
+Input: reviewer:::Return strict JSON findings with severity, impact, and remediation guidance.
+
+## Step: merge_recommendation
+Skill: agent.llm_subagent
+DependsOn: generate_review
+Input: reviewer:::Produce merge recommendation with blockers/non-blockers from review findings.
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: merge_recommendation
+Input: reviewer:::Run a focused security check for internet-capable execution paths and return pass/fail with mitigations.
+
+## Step: workflow_report
+Skill: agent.workflow_report
+DependsOn: internet_security_check
+Input: Build detailed review workflow report from:
+{{review_context}}
+{{generate_review}}
+{{merge_recommendation}}
+{{internet_security_check}}
+Return strict JSON with summary/actions/risks and merge posture.
+
+## Step: report_quality_gate
+Skill: agent.report_quality_gate
+DependsOn: workflow_report
+Input: {{workflow_report}}
+
+## Step: simulation_fallback_gate
+Skill: agent.simulation_fallback_gate
+DependsOn: report_quality_gate
+Input: {{workflow_report}}
+
+## Step: next_actions
+Skill: agent.next_steps
+DependsOn: simulation_fallback_gate
+Input: Derive next actions from {{workflow_report}} and keep severity-first ordering.
+
+## Step: finalize
+Skill: demo.echo
+DependsOn: next_actions
+Input: Review workflow completed with detailed report and simulation-fallback gate.
+"#,
+        ),
+        (
+            "release.md",
+            r#"---
+description: release workflow with evidence-backed decision and simulation-fallback gate
+---
+# Workflow: release
+Schema: antigrav.workflow@v1
+Domain: agent
+MaxCpuMs: 220000
+MaxWallTimeMs: 900000
+MaxNetworkCalls: 25
+
+## Step: release_scope
+Skill: agent.llm_subagent
+Input: releaser:::Build release scope summary, included changes, and customer impact.
+
+## Step: validation_gate
+Skill: agent.run_script
+DependsOn: release_scope
+Retry: 1
+OnFailure: FailFast
+Input: npm run -s build
+
+## Step: release_risk
+Skill: agent.llm_subagent
+DependsOn: validation_gate
+Input: releaser:::Produce release risk register with severity, mitigations, and go/no-go conditions.
+
+## Step: internet_security_check
+Skill: agent.llm_subagent
+DependsOn: release_risk
+Input: reviewer:::Run a focused security check for internet-capable execution paths and return pass/fail with mitigations.
+
+## Step: go_no_go_decision
+Skill: agent.llm_subagent
+DependsOn: internet_security_check
+Input: releaser:::Issue final go/no-go decision from release risk and security evidence.
+
+## Step: workflow_report
+Skill: agent.workflow_report
+DependsOn: go_no_go_decision
+Input: Build detailed release workflow report from:
+{{release_scope}}
+{{validation_gate}}
+{{release_risk}}
+{{internet_security_check}}
+{{go_no_go_decision}}
+Return strict JSON with summary/actions/risks and explicit decision posture.
+
+## Step: report_quality_gate
+Skill: agent.report_quality_gate
+DependsOn: workflow_report
+Input: {{workflow_report}}
+
+## Step: simulation_fallback_gate
+Skill: agent.simulation_fallback_gate
+DependsOn: report_quality_gate
+Input: {{workflow_report}}
+
+## Step: next_actions
+Skill: agent.next_steps
+DependsOn: simulation_fallback_gate
+Input: Derive release next actions from {{workflow_report}} with pre-release/release/post-release phases.
+
+## Step: finalize
+Skill: demo.echo
+DependsOn: next_actions
+Input: Release workflow completed with report-quality and simulation-fallback gates.
+"#,
+        ),
+    ]
+}
+
+fn bootstrap_rule_files() -> [(&'static str, &'static str); 4] {
+    [
+        (
+            "runtime.md",
+            "---\ndescription: Runtime execution policy\ntrigger: always_on\n---\n# Runtime Rules\nSchema: antigrav.rule@v1\n```json\n{\n  \"allowed_domains\": [\"agent\", \"demo\", \"utils\"],\n  \"preferred_domains\": [\"agent\"],\n  \"cross_domain_penalty\": 40,\n  \"disable_network\": false,\n  \"read_only\": false,\n  \"strict_mode\": true,\n  \"external_mutation_penalty\": 120,\n  \"step_timeout_ms\": 420000,\n  \"max_trust_tier\": \"Constrained\",\n  \"max_total_cost\": 2500,\n  \"max_total_latency_ms\": 900000,\n  \"max_steps\": 30,\n  \"max_cpu_ms\": 240000,\n  \"max_wall_time_ms\": 1200000,\n  \"max_fs_reads\": 3000,\n  \"max_fs_writes\": 450,\n  \"max_network_calls\": 25,\n  \"max_memory_mb\": 1024,\n  \"run_script_timeout_ms\": 420000,\n  \"run_script_allowed_commands\": [\n    \"npm\",\n    \"npx\",\n    \"cargo\",\n    \"rustc\",\n    \"rustfmt\",\n    \"clippy-driver\",\n    \"git\",\n    \"pnpm\",\n    \"yarn\",\n    \"node\",\n    \"bun\"\n  ],\n  \"run_script_denied_commands\": [\n    \"sudo\",\n    \"rm\",\n    \"dd\",\n    \"mkfs\",\n    \"shutdown\",\n    \"reboot\",\n    \"poweroff\",\n    \"launchctl\"\n  ],\n  \"run_script_allow_shell_operators\": false\n}\n```\n",
+        ),
+        (
+            "branching_rules.md",
+            "---\ndescription: Branching strategy for thread workflows\ntrigger: always_on\n---\n# Branching Rules\nSchema: antigrav.rule@v1\n```json\n{\n  \"strategy\": \"feature-branch-per-thread\",\n  \"prefix\": \"thread/\",\n  \"allow_auto_create\": true,\n  \"allow_auto_checkout\": true,\n  \"cleanup_after_merge\": false\n}\n```\n",
+        ),
+        (
+            "coding_rules.md",
+            "---\ndescription: Coding quality gate\ntrigger: always_on\n---\n# Coding Rules\nSchema: antigrav.rule@v1\n```json\n{\n  \"no_unused_imports\": true,\n  \"require_tests_for_new_feature\": true,\n  \"forbid_unrelated_file_changes\": true,\n  \"require_memory_index_update\": false,\n  \"require_structured_commit_message\": true,\n  \"commit_format\": \"type(scope): summary\"\n}\n```\n",
+        ),
+        (
+            "merge_rules.md",
+            "---\ndescription: Merge safety policy\ntrigger: always_on\n---\n# Merge Rules\nSchema: antigrav.rule@v1\n```json\n{\n  \"require_validation_before_merge\": true,\n  \"analyze_conflicts\": true,\n  \"auto_conflict_resolution_assist\": true,\n  \"auto_conflict_resolution_strategy\": \"ours\",\n  \"auto_conflict_resolution_max_attempts\": 2,\n  \"delete_feature_branch_after_merge\": false,\n  \"protected_branches\": [\"main\", \"master\"],\n  \"require_rebase_before_merge\": true\n}\n```\n",
+        ),
+    ]
+}
+
+fn bootstrap_template_files() -> [(&'static str, &'static str); 4] {
+    [
+        (
+            "feature_prompt.md",
+            "You are implementing a feature with deterministic, production-safe execution.\n\nOutput format:\n1. Scope summary with explicit assumptions\n2. Ordered implementation plan with file-level changes\n3. Validation matrix (command, expected result, fallback)\n4. Risk register (severity, blast radius, mitigation)\n5. Rollback strategy\n\nConstraints:\n- smallest safe change set\n- no unrelated refactors\n- include concrete commands and acceptance checks\n",
+        ),
+        (
+            "bugfix_prompt.md",
+            "You are fixing a bug with strict scope control.\n\nOutput format:\n1. Failure symptom and reproducibility notes\n2. Root cause hypothesis and confidence\n3. Minimal patch plan (ordered)\n4. Regression checks and monitoring follow-up\n5. Residual risks and rollback\n\nConstraints:\n- fix only the reported bug\n- preserve behavior outside bug scope\n- include deterministic validation commands\n",
+        ),
+        (
+            "review_prompt.md",
+            "You are performing a code review focused on defects and release risk.\n\nOutput format:\n1. Critical findings (file, severity, rationale, remediation)\n2. Behavioral regressions and missing tests\n3. Security/performance concerns\n4. Merge recommendation with explicit blockers\n\nConstraints:\n- prioritize high-confidence issues\n- do not include cosmetic-only feedback as blockers\n- keep findings actionable\n",
+        ),
+        (
+            "release_prompt.md",
+            "You are preparing release readiness artifacts.\n\nOutput format:\n1. Release scope and affected components\n2. Validation evidence matrix\n3. Open risks and mitigations\n4. Go/No-Go decision with conditions\n5. Rollback and post-release monitoring plan\n\nConstraints:\n- use factual evidence only\n- flag unknowns explicitly\n- include concrete validation commands\n",
+        ),
+    ]
+}
+
+fn bootstrap_role_files() -> [(&'static str, &'static str); 5] {
+    [
+        (
+            "architect.md",
+            r#"# Role: Architect
+Schema: antigrav.role@v1
+```json
+{
+  "name": "architect",
+  "provider": "ollama",
+  "model": "qwen3:8b",
+  "temperature": 0.05
+}
+```
+You are responsible for architecture-quality execution planning.
+
+Mission:
+- Convert ambiguous requests into deterministic implementation plans.
+- Minimize blast radius while preserving expected behavior.
+
+Operating Procedure:
+1. Clarify objective, scope boundary, and acceptance criteria.
+2. Identify impacted components and dependencies.
+3. Expose technical assumptions and constraints.
+4. Propose phased plan with validation and rollback.
+5. Highlight security, performance, and data-integrity risks.
+
+Output Contract:
+- `summary`: architecture rationale and boundary assumptions.
+- `actions`: ordered, executable plan tied to concrete files or modules.
+- `risks`: explicit failure modes with mitigation direction.
+"#,
+        ),
+        (
+            "implementer.md",
+            r#"# Role: Implementer
+Schema: antigrav.role@v1
+```json
+{
+  "name": "implementer",
+  "provider": "ollama",
+  "model": "qwen3:8b",
+  "temperature": 0.02
+}
+```
+You are responsible for minimal, production-safe code execution.
+
+Mission:
+- Deliver concrete edits with deterministic behavior.
+- Keep scope tight and changes testable.
+
+Execution Checklist:
+1. Restate target behavior and acceptance criteria.
+2. List exact files/functions that must change.
+3. Implement in smallest safe increments.
+4. Preserve APIs unless a breaking change is required.
+5. Provide deterministic validation commands and rollback notes.
+
+Output Contract:
+- `summary`: behavior delta and implementation intent.
+- `actions`: ordered implementation tasks with concrete change points.
+- `risks`: regressions/unknowns and verification strategy.
+"#,
+        ),
+        (
+            "reviewer.md",
+            r#"# Role: Reviewer
+Schema: antigrav.role@v1
+```json
+{
+  "name": "reviewer",
+  "provider": "ollama",
+  "model": "qwen3:8b",
+  "temperature": 0.0
+}
+```
+You are the quality and risk gate before merge/release.
+
+Mission:
+- Identify correctness bugs, regressions, and security risks.
+- Keep findings actionable, evidence-based, and prioritized.
+
+Review Procedure:
+1. Validate requirement-to-implementation alignment.
+2. Check behavioral regressions and edge cases.
+3. Evaluate missing tests and weak validation evidence.
+4. Assess security-sensitive execution paths.
+5. Classify findings by severity and merge impact.
+
+Output Contract:
+- `summary`: top findings and merge posture.
+- `actions`: remediation tasks ordered by severity.
+- `risks`: unresolved risks and confidence gaps.
+"#,
+        ),
+        (
+            "resolver.md",
+            r#"# Role: Resolver
+Schema: antigrav.role@v1
+```json
+{
+  "name": "resolver",
+  "provider": "ollama",
+  "model": "qwen3:8b",
+  "temperature": 0.0
+}
+```
+You are responsible for restoring deterministic progress when failures occur.
+
+Mission:
+- Isolate root cause quickly and safely.
+- Resolve incidents/conflicts with minimal disruption.
+
+Resolution Procedure:
+1. Capture failure symptom with reproducible context.
+2. Determine likely root cause and confidence level.
+3. Propose minimal fix and fallback strategy.
+4. Define post-resolution validation sequence.
+5. Surface residual risk and owner follow-up tasks.
+
+Output Contract:
+- `summary`: root cause + selected strategy + expected result.
+- `actions`: deterministic resolution steps and validation checks.
+- `risks`: unresolved ambiguities and rollback triggers.
+"#,
+        ),
+        (
+            "releaser.md",
+            r#"# Role: Releaser
+Schema: antigrav.role@v1
+```json
+{
+  "name": "releaser",
+  "provider": "ollama",
+  "model": "qwen3:8b",
+  "temperature": 0.0
+}
+```
+You are the release readiness authority.
+
+Mission:
+- Produce evidence-based go/no-go decisions.
+- Ensure release artifacts are complete and low-risk.
+
+Release Procedure:
+1. Summarize release scope and impacted areas.
+2. Verify validation matrix and confidence level.
+3. Evaluate open risks and mitigation status.
+4. Confirm rollback path and operational safeguards.
+5. Produce decision with explicit conditions.
+
+Output Contract:
+- `summary`: readiness narrative and decision rationale.
+- `actions`: pre-release, release, and post-release checklist tasks.
+- `risks`: remaining risks with severity and mitigation owner.
+"#,
+        ),
+    ]
+}
+
+fn bootstrap_skill_files() -> [(&'static str, &'static str); 4] {
+    [
+        (
+            "analyze_code",
+            r#"# Skill: analyze_code
+Schema: antigrav.skill@v1
+
+```json
+{
+  "name": "analyze_code",
+  "domain": "agent",
+  "description": "Perform deep implementation analysis and return deterministic execution guidance.",
+  "risk": "safe",
+  "source": "self",
+  "tags": ["analysis", "architecture", "planning", "workflow"],
+  "executor": "ollama",
+  "model": "qwen3:8b",
+  "temperature": 0.05,
+  "input_type": "text",
+  "output_type": "json",
+  "estimated_cost": 8,
+  "estimated_latency_ms": 2800,
+  "allow_fs_read": false,
+  "allow_fs_write": false,
+  "allow_network": true,
+  "allow_env": false,
+  "allow_process_spawn": false,
+  "side_effect_class": "Idempotent",
+  "trust_tier": "Constrained"
+}
+```
+
+## Overview
+Use this skill when architecture-quality analysis is required before code changes.
+
+## When to Use
+- Planning feature implementation slices.
+- Assessing bug-fix blast radius.
+- Evaluating technical risks before merge/release.
+
+## Examples
+Input:
+```text
+Implement deterministic pagination for query results without breaking existing execution behavior.
+```
+
+Expected output shape:
+```json
+{
+  "summary": "...",
+  "actions": ["...", "..."],
+  "risks": ["...", "..."]
+}
+```
+
+## Limitations
+- Produces analysis only; does not apply code edits.
+- Quality depends on clarity of provided context.
+
+## Output Contract
+Return strict JSON object with:
+- `summary` (string): scope and architecture narrative.
+- `actions` (string[]): ordered, executable implementation actions.
+- `risks` (string[]): explicit failure modes and mitigations.
+
+Task input:
+{{input}}
+"#,
+        ),
+        (
+            "generate_tests",
+            r#"# Skill: generate_tests
+Schema: antigrav.skill@v1
+
+```json
+{
+  "name": "generate_tests",
+  "domain": "agent",
+  "description": "Generate high-value deterministic test plans and cases for changed behavior.",
+  "risk": "safe",
+  "source": "self",
+  "tags": ["testing", "qa", "regression"],
+  "executor": "ollama",
+  "model": "qwen3:8b",
+  "temperature": 0.05,
+  "input_type": "text",
+  "output_type": "json",
+  "estimated_cost": 9,
+  "estimated_latency_ms": 3000,
+  "allow_fs_read": false,
+  "allow_fs_write": false,
+  "allow_network": true,
+  "allow_env": false,
+  "allow_process_spawn": false,
+  "side_effect_class": "Idempotent",
+  "trust_tier": "Constrained"
+}
+```
+
+## Overview
+Use this skill to turn requirements or diffs into concrete, prioritized test suites.
+
+## When to Use
+- New feature verification planning.
+- Regression suite updates after bug fixes.
+- Coverage gap analysis before merge/release.
+
+## Examples
+Input:
+```text
+Connection panel now supports filtering by environment and status.
+```
+
+Expected output shape:
+```json
+{
+  "summary": "...",
+  "actions": ["...", "..."],
+  "risks": ["...", "..."]
+}
+```
+
+## Limitations
+- Produces strategy/cases, not executable test code.
+- Requires accurate change context for best prioritization.
+
+## Output Contract
+Return strict JSON object with:
+- `summary` (string): strategy and coverage intent.
+- `actions` (string[]): ordered test case checklist.
+- `risks` (string[]): uncovered or hard-to-test areas.
+
+Task input:
+{{input}}
+"#,
+        ),
+        (
+            "next_steps",
+            r#"# Skill: next_steps
+Schema: antigrav.skill@v1
+
+```json
+{
+  "name": "next_steps",
+  "domain": "agent",
+  "description": "Derive deterministic next execution tasks from workflow progress and blockers.",
+  "risk": "none",
+  "source": "self",
+  "tags": ["planning", "triage", "workflow"],
+  "executor": "ollama",
+  "model": "qwen3:8b",
+  "temperature": 0.05,
+  "input_type": "text",
+  "output_type": "json",
+  "estimated_cost": 7,
+  "estimated_latency_ms": 2200,
+  "allow_fs_read": false,
+  "allow_fs_write": false,
+  "allow_network": true,
+  "allow_env": false,
+  "allow_process_spawn": false,
+  "side_effect_class": "Idempotent",
+  "trust_tier": "Constrained"
+}
+```
+
+## Overview
+Use this skill to keep workflow momentum by producing execution-ready next tasks.
+
+## When to Use
+- Planning after partial progress.
+- Replanning after blockers or failed validations.
+- Building a short-term roadmap for a thread.
+
+## Examples
+Input:
+```text
+Frontend build passes, backend check fails in query command module, release notes are pending.
+```
+
+Expected output shape:
+```json
+{
+  "summary": "...",
+  "actions": ["...", "..."],
+  "risks": ["...", "..."]
+}
+```
+
+## Limitations
+- Depends on quality of current status context.
+- Does not execute tasks directly.
+
+## Output Contract
+Return strict JSON object with:
+- `summary` (string): current state and planning rationale.
+- `actions` (string[]): ordered next actions.
+- `risks` (string[]): blockers/uncertainties that may derail progress.
+
+Task input:
+{{input}}
+"#,
+        ),
+        (
+            "workflow_report",
+            r#"# Skill: workflow_report
+Schema: antigrav.skill@v1
+
+```json
+{
+  "name": "workflow_report",
+  "domain": "agent",
+  "description": "Generate a detailed, evidence-backed workflow report from planning, validation, and risk outputs.",
+  "risk": "safe",
+  "source": "self",
+  "tags": ["reporting", "evidence", "workflow"],
+  "executor": "ollama",
+  "model": "qwen3:8b",
+  "temperature": 0.03,
+  "input_type": "text",
+  "output_type": "json",
+  "estimated_cost": 10,
+  "estimated_latency_ms": 3200,
+  "allow_fs_read": false,
+  "allow_fs_write": false,
+  "allow_network": true,
+  "allow_env": false,
+  "allow_process_spawn": false,
+  "side_effect_class": "Idempotent",
+  "trust_tier": "Constrained"
+}
+```
+
+## Overview
+Use this skill to turn workflow artifacts into an explicit, production-grade report.
+
+## When to Use
+- Before workflow finalization.
+- When validation evidence exists across multiple steps.
+- When merge/release decisions depend on risk/security posture.
+
+## Examples
+Input:
+```text
+Feature plan completed, frontend build passed, backend check failed, risk review identified high regression risk in export flow.
+```
+
+Expected output shape:
+```json
+{
+  "summary": "...",
+  "actions": ["...", "..."],
+  "risks": ["...", "..."]
+}
+```
+
+## Limitations
+- Depends on completeness of prior step outputs.
+- Synthesizes evidence only; does not execute fixes.
+
+## Output Contract
+Return strict JSON object with:
+- `summary` (string): readiness narrative with decision posture.
+- `actions` (string[]): ordered critical-path actions including validations.
+- `risks` (string[]): unresolved risks with severity and mitigation owner.
+
+Task input:
+{{input}}
+"#,
+        ),
+    ]
+}
+
 fn write_file_if_missing(
     path: &Path,
     body: &str,
@@ -273,6 +1054,9 @@ fn write_file_if_missing(
 ) -> Result<()> {
     if path.exists() {
         return Ok(());
+    }
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
     }
     fs::write(path, body)?;
     created.push(path.to_path_buf());
