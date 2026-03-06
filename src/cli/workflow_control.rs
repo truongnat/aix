@@ -106,8 +106,21 @@ pub(super) fn handle_workflow_control_command(
             );
             Ok(WorkflowLaunchAction::Noop)
         }
-        WorkflowCommand::Trace { id, json, timeline } => {
+        WorkflowCommand::Trace {
+            id,
+            json,
+            timeline,
+            otel,
+        } => {
             let instance = state_store.load(&id)?;
+            if otel {
+                let body = render_otel_trace(&instance);
+                println!("{}", serde_json::to_string_pretty(&body)?);
+                if timeline {
+                    println!("{}", render_timeline(&instance));
+                }
+                return Ok(WorkflowLaunchAction::Noop);
+            }
             if json || !timeline {
                 let body = serde_json::to_string_pretty(&instance)?;
                 println!("{}", body);

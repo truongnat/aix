@@ -74,6 +74,10 @@ The highest-priority work now is to close production-readiness gaps around evalu
   - `workflow approve` / `workflow reject` operator commands
   - persisted approval metadata in `.agents/state`
   - release/review workflows updated with explicit `manual_approval_gate`.
+- OpenTelemetry-compatible trace export MVP:
+  - `workflow trace <instance_id> --otel`
+  - emits OTLP JSON-compatible `resourceSpans -> scopeSpans -> spans` payload
+  - includes workflow root span, per-step spans, and workflow event mapping.
 
 ## Day 61-90: Observability + Supply Chain + Enterprise Integrations
 

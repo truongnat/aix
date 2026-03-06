@@ -494,6 +494,236 @@ fn render_timeline(instance: &WorkflowInstance) -> String {
     out.join("\n")
 }
 
+fn render_otel_trace(instance: &WorkflowInstance) -> serde_json::Value {
+    let trace_id = otel_trace_id(instance);
+    let workflow_span_id = otel_span_id(&format!("{}:workflow", instance.instance_id));
+    let workflow_start_ms = instance.created_at_ms;
+    let workflow_end_ms = instance.updated_at_ms.max(instance.created_at_ms);
+    let workflow_status_code = otel_status_code_for_workflow(instance.status.clone());
+    let workflow_status_message = instance.last_error.clone().unwrap_or_default();
+
+    let mut spans = Vec::<serde_json::Value>::new();
+    spans.push(serde_json::json!({
+        "traceId": trace_id.clone(),
+        "spanId": workflow_span_id.clone(),
+        "name": format!("workflow/{}", instance.workflow_name),
+        "kind": "SPAN_KIND_INTERNAL",
+        "startTimeUnixNano": unix_nano_string_from_ms(workflow_start_ms),
+        "endTimeUnixNano": unix_nano_string_from_ms(workflow_end_ms),
+        "attributes": vec![
+            otel_attr_string("workflow.instance_id", &instance.instance_id),
+            otel_attr_string("workflow.name", &instance.workflow_name),
+            otel_attr_string("workflow.status", &format!("{:?}", instance.status)),
+            otel_attr_int("workflow.current_step", u64::try_from(instance.current_step).unwrap_or(u64::MAX)),
+            otel_attr_int("workflow.total_steps", u64::try_from(instance.step_order.len()).unwrap_or(u64::MAX)),
+            otel_attr_int("workflow.completed_steps", u64::try_from(instance.completed_steps.len()).unwrap_or(u64::MAX)),
+            otel_attr_int("workflow.failed_steps", u64::try_from(instance.failed_steps.len()).unwrap_or(u64::MAX)),
+        ],
+        "events": render_workflow_events_for_otel(instance),
+        "status": {
+            "code": workflow_status_code,
+            "message": workflow_status_message
+        }
+    }));
+
+    for step_id in &instance.step_order {
+        let Some(state) = instance.step_states.get(step_id) else {
+            continue;
+        };
+        let start_ms = state.started_at_ms.unwrap_or(workflow_start_ms);
+        let end_ms = state
+            .finished_at_ms
+            .unwrap_or(start_ms.max(workflow_end_ms));
+        let status_code = otel_status_code_for_step(state.status.clone());
+
+        let mut attributes = vec![
+            otel_attr_string("workflow.instance_id", &instance.instance_id),
+            otel_attr_string("workflow.name", &instance.workflow_name),
+            otel_attr_string("workflow.step_id", step_id),
+            otel_attr_string("workflow.step_status", &format!("{:?}", state.status)),
+            otel_attr_int("workflow.step_attempts", u64::from(state.attempts)),
+            otel_attr_int("workflow.step_retries", u64::from(state.retry_count)),
+            otel_attr_int(
+                "workflow.step_context_items",
+                u64::from(state.context_injected_items),
+            ),
+            otel_attr_int(
+                "workflow.step_cost_units",
+                u64::from(state.estimated_cost_units),
+            ),
+            otel_attr_int("workflow.step_tokens", u64::from(state.total_tokens)),
+            otel_attr_int(
+                "workflow.step_call_attempts",
+                u64::from(state.call_attempts),
+            ),
+            otel_attr_bool(
+                "workflow.step_idempotent_short_circuit",
+                state.idempotent_short_circuit,
+            ),
+            otel_attr_double("workflow.step_cost_usd", state.actual_cost_usd),
+        ];
+        if let Some(duration_ms) = state.duration_ms {
+            attributes.push(otel_attr_int("workflow.step_duration_ms", duration_ms));
+        }
+        if let Some(class) = state.failure_class.as_deref() {
+            attributes.push(otel_attr_string("workflow.step_failure_class", class));
+        }
+        if let Some(provider) = state.provider.as_deref() {
+            attributes.push(otel_attr_string("llm.provider", provider));
+        }
+        if let Some(model) = state.model.as_deref() {
+            attributes.push(otel_attr_string("llm.model", model));
+        }
+
+        spans.push(serde_json::json!({
+            "traceId": trace_id.clone(),
+            "spanId": otel_span_id(&format!("{}:step:{}", instance.instance_id, step_id)),
+            "parentSpanId": workflow_span_id.clone(),
+            "name": format!("step/{}", step_id),
+            "kind": "SPAN_KIND_INTERNAL",
+            "startTimeUnixNano": unix_nano_string_from_ms(start_ms),
+            "endTimeUnixNano": unix_nano_string_from_ms(end_ms),
+            "attributes": attributes,
+            "status": {
+                "code": status_code,
+                "message": state.last_error.clone().unwrap_or_default()
+            }
+        }));
+    }
+
+    serde_json::json!({
+        "resourceSpans": [
+            {
+                "resource": {
+                    "attributes": [
+                        otel_attr_string("service.name", "agentic-sdlc"),
+                        otel_attr_string("service.version", env!("CARGO_PKG_VERSION")),
+                        otel_attr_string("telemetry.sdk.name", "agentic-sdlc"),
+                        otel_attr_string("telemetry.sdk.language", "rust"),
+                    ]
+                },
+                "scopeSpans": [
+                    {
+                        "scope": {
+                            "name": "agentic-sdlc.cli",
+                            "version": env!("CARGO_PKG_VERSION")
+                        },
+                        "spans": spans
+                    }
+                ]
+            }
+        ]
+    })
+}
+
+fn render_workflow_events_for_otel(instance: &WorkflowInstance) -> Vec<serde_json::Value> {
+    if instance.trace.is_empty() {
+        return Vec::new();
+    }
+    instance
+        .trace
+        .iter()
+        .map(|line| {
+            let event_ms = parse_trace_event_ms(line).unwrap_or(instance.updated_at_ms);
+            serde_json::json!({
+                "timeUnixNano": unix_nano_string_from_ms(event_ms),
+                "name": "workflow.event",
+                "attributes": [
+                    otel_attr_string("message", line)
+                ]
+            })
+        })
+        .collect()
+}
+
+fn parse_trace_event_ms(line: &str) -> Option<u64> {
+    let trimmed = line.trim_start();
+    let payload = trimmed.strip_prefix('[')?;
+    let bracket_end = payload.find(']')?;
+    payload[..bracket_end].trim().parse::<u64>().ok()
+}
+
+fn otel_status_code_for_workflow(
+    status: crate::engine::workflow_engine::instance::WorkflowInstanceStatus,
+) -> &'static str {
+    use crate::engine::workflow_engine::instance::WorkflowInstanceStatus;
+    match status {
+        WorkflowInstanceStatus::Completed => "STATUS_CODE_OK",
+        WorkflowInstanceStatus::Failed | WorkflowInstanceStatus::Aborted => "STATUS_CODE_ERROR",
+        WorkflowInstanceStatus::Pending
+        | WorkflowInstanceStatus::Running
+        | WorkflowInstanceStatus::Paused => "STATUS_CODE_UNSET",
+    }
+}
+
+fn otel_status_code_for_step(
+    status: crate::engine::workflow_engine::instance::StepExecutionStatus,
+) -> &'static str {
+    use crate::engine::workflow_engine::instance::StepExecutionStatus;
+    match status {
+        StepExecutionStatus::Succeeded | StepExecutionStatus::Skipped => "STATUS_CODE_OK",
+        StepExecutionStatus::Failed => "STATUS_CODE_ERROR",
+        StepExecutionStatus::Pending
+        | StepExecutionStatus::Running
+        | StepExecutionStatus::Paused => "STATUS_CODE_UNSET",
+    }
+}
+
+fn unix_nano_string_from_ms(ms: u64) -> String {
+    let nanos = u128::from(ms).saturating_mul(1_000_000);
+    nanos.to_string()
+}
+
+fn otel_trace_id(instance: &WorkflowInstance) -> String {
+    let seed = format!(
+        "{}|{}|{}",
+        instance.trace_id, instance.instance_id, instance.workflow_name
+    );
+    let mut reversed = seed.as_bytes().to_vec();
+    reversed.reverse();
+    format!("{}{}", fnv1a64_hex(seed.as_bytes()), fnv1a64_hex(&reversed))
+}
+
+fn otel_span_id(seed: &str) -> String {
+    fnv1a64_hex(seed.as_bytes())
+}
+
+fn otel_attr_string(key: &str, value: &str) -> serde_json::Value {
+    serde_json::json!({
+        "key": key,
+        "value": {
+            "stringValue": value
+        }
+    })
+}
+
+fn otel_attr_int(key: &str, value: u64) -> serde_json::Value {
+    serde_json::json!({
+        "key": key,
+        "value": {
+            "intValue": value.to_string()
+        }
+    })
+}
+
+fn otel_attr_bool(key: &str, value: bool) -> serde_json::Value {
+    serde_json::json!({
+        "key": key,
+        "value": {
+            "boolValue": value
+        }
+    })
+}
+
+fn otel_attr_double(key: &str, value: f64) -> serde_json::Value {
+    serde_json::json!({
+        "key": key,
+        "value": {
+            "doubleValue": value
+        }
+    })
+}
+
 async fn execute_workflow_instance(
     engine: Arc<ExecutionEngine>,
     workflow: crate::workflow::model::Workflow,

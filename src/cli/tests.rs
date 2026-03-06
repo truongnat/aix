@@ -5,7 +5,7 @@ use super::{
     infer_workflow_ref_from_template, install_bundle_from_catalog, merge_template_input,
     normalize_auto_conflict_strategy, parse_external_skill_markdown, parse_package_scaffold_kind,
     parse_role_override_map, parse_scaffold_profile, parse_simple_yaml_map,
-    parse_skillpack_install_mode, read_bundle_catalog, read_skills_lockfile,
+    parse_skillpack_install_mode, read_bundle_catalog, read_skills_lockfile, render_otel_trace,
     resolve_bootstrap_strict_ollama, resolve_role_workflow_selection, run_skill_quality_check,
     sanitize_package_name, scaffold_domain_pack, scaffold_markdown_package,
     select_template_and_workflow_for_message, validate_git_ref_like, verify_skills_lock,
@@ -1429,4 +1429,86 @@ Schema: antigrav.rule@v1
     assert_eq!(state.llm_calls, 0);
 
     let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
+fn otel_trace_export_includes_root_and_step_span_shape() {
+    let workflow = crate::workflow::model::Workflow {
+        meta: crate::workflow::model::WorkflowMeta {
+            name: "otel-check".to_string(),
+            domain: Some("demo".to_string()),
+            goal: None,
+            target_type: None,
+            routing_policy: None,
+            security_policy: None,
+            resource_budget: None,
+            projected_cost: None,
+            projected_latency_ms: None,
+            projected_steps: None,
+        },
+        steps: vec![crate::workflow::model::WorkflowStep::new(
+            "step_a",
+            "demo.echo",
+            "ok",
+        )],
+    };
+    let mut instance =
+        crate::engine::workflow_engine::instance::WorkflowInstance::new(&workflow, None);
+    let start_ms = instance.created_at_ms.saturating_add(10);
+    let end_ms = start_ms.saturating_add(20);
+    instance.status = WorkflowInstanceStatus::Completed;
+    instance.completed_steps.push("step_a".to_string());
+    if let Some(state) = instance.step_states.get_mut("step_a") {
+        state.status = crate::engine::workflow_engine::instance::StepExecutionStatus::Succeeded;
+        state.started_at_ms = Some(start_ms);
+        state.finished_at_ms = Some(end_ms);
+        state.duration_ms = Some(20);
+        state.attempts = 1;
+        state.retry_count = 0;
+    }
+    instance.updated_at_ms = end_ms.saturating_add(5);
+    instance
+        .trace
+        .push(format!("[{}] step 'step_a' completed", end_ms));
+
+    let export = render_otel_trace(&instance);
+    let spans = export
+        .get("resourceSpans")
+        .and_then(|v| v.as_array())
+        .and_then(|v| v.first())
+        .and_then(|v| v.get("scopeSpans"))
+        .and_then(|v| v.as_array())
+        .and_then(|v| v.first())
+        .and_then(|v| v.get("spans"))
+        .and_then(|v| v.as_array())
+        .expect("spans array");
+    assert_eq!(spans.len(), 2, "expected workflow span + one step span");
+
+    let root = spans
+        .iter()
+        .find(|span| span.get("parentSpanId").is_none())
+        .expect("root span");
+    let step = spans
+        .iter()
+        .find(|span| span.get("name").and_then(|v| v.as_str()) == Some("step/step_a"))
+        .expect("step span");
+
+    let trace_id = root
+        .get("traceId")
+        .and_then(|v| v.as_str())
+        .expect("root trace id");
+    assert_eq!(trace_id.len(), 32, "otel traceId must be 16-byte hex");
+    let root_span_id = root
+        .get("spanId")
+        .and_then(|v| v.as_str())
+        .expect("root span id");
+    assert_eq!(root_span_id.len(), 16, "otel spanId must be 8-byte hex");
+    let step_parent = step
+        .get("parentSpanId")
+        .and_then(|v| v.as_str())
+        .expect("step parent");
+    assert_eq!(
+        step_parent, root_span_id,
+        "step should be child of root span"
+    );
 }

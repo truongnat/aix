@@ -43,6 +43,8 @@ pub(crate) enum WorkflowCommand {
         json: bool,
         #[arg(long, default_value_t = false)]
         timeline: bool,
+        #[arg(long, default_value_t = false)]
+        otel: bool,
     },
     Check {
         #[arg(long, default_value_t = false)]

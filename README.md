@@ -265,6 +265,7 @@ Export trace:
 ```bash
 cargo run -- workflow trace <instance_id> --json
 cargo run -- workflow trace <instance_id> --timeline
+cargo run -- workflow trace <instance_id> --otel
 ```
 
 ## LLM Router

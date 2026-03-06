@@ -309,6 +309,13 @@ Render both:
 cargo run -- workflow trace <instance_id> --json --timeline
 ```
 
+Export OpenTelemetry-compatible trace payload (OTLP JSON shape):
+
+```bash
+cargo run -- workflow trace <instance_id> --otel
+cargo run -- workflow trace <instance_id> --otel --timeline
+```
+
 ## Runtime Policy Flags
 
 Common policy controls:
