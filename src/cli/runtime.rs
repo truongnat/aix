@@ -36,6 +36,7 @@ pub(super) fn build_domain_registry() -> Result<DomainRegistry> {
     domains.register_skill("agent", Arc::new(ConflictGateSkill))?;
     domains.register_skill("agent", Arc::new(SimulationFallbackGateSkill))?;
     domains.register_skill("agent", Arc::new(ReportQualityGateSkill))?;
+    domains.register_skill("agent", Arc::new(ManualApprovalSkill))?;
     domains.register_skill(
         "agent",
         Arc::new(EmbedDocumentSkill::new(".agents/memory/vector_index.json")),

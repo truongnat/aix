@@ -43,6 +43,7 @@ pub struct StepBudgetProjection {
 
 #[derive(Clone)]
 pub struct StepExecutor {
+    project_root: String,
     domain_registry: Arc<DomainRegistry>,
     context_service: Arc<dyn ContextService>,
     in_process_backend: Arc<InProcessBackend>,
@@ -50,8 +51,9 @@ pub struct StepExecutor {
 }
 
 impl StepExecutor {
-    pub fn new(domain_registry: Arc<DomainRegistry>) -> Self {
+    pub fn new(project_root: &str, domain_registry: Arc<DomainRegistry>) -> Self {
         Self {
+            project_root: project_root.to_string(),
             domain_registry,
             context_service: Arc::new(DeterministicContextService::default()),
             in_process_backend: Arc::new(InProcessBackend),
@@ -61,10 +63,12 @@ impl StepExecutor {
 
     #[cfg(test)]
     pub fn with_context_service(
+        project_root: &str,
         domain_registry: Arc<DomainRegistry>,
         context_service: Arc<dyn ContextService>,
     ) -> Self {
         Self {
+            project_root: project_root.to_string(),
             domain_registry,
             context_service,
             in_process_backend: Arc::new(InProcessBackend),
@@ -376,10 +380,15 @@ impl StepExecutor {
                     let output = exec_result.output;
                     let _ = ctx.record_time_usage(now_ms().saturating_sub(started), 0);
                     let telemetry = extract_output_telemetry(&output);
+                    let status = if output_requests_pause(&output) {
+                        StepExecutionStatus::Paused
+                    } else {
+                        StepExecutionStatus::Succeeded
+                    };
                     return Ok(StepExecutionOutcome {
                         output,
                         attempts,
-                        status: StepExecutionStatus::Succeeded,
+                        status,
                         idempotent_short_circuit: false,
                         context_injected_items,
                         estimated_cost_units: projection.estimated_cost_units,
@@ -428,6 +437,8 @@ impl StepExecutor {
     ) -> ExecutionContext {
         let mut ctx = ExecutionContext {
             workflow_name: workflow.meta.name.clone(),
+            project_root: self.project_root.clone(),
+            workflow_instance_id: instance.instance_id.clone(),
             step_id: step.id.clone(),
             skill_name: qualified_skill_name.to_string(),
             memory: instance.step_results.clone(),
@@ -500,6 +511,16 @@ fn is_terminal_status(status: &StepExecutionStatus) -> bool {
         status,
         StepExecutionStatus::Succeeded | StepExecutionStatus::Failed | StepExecutionStatus::Skipped
     )
+}
+
+fn output_requests_pause(output: &SkillOutput) -> bool {
+    let SkillOutput::Json(value) = output else {
+        return false;
+    };
+    value
+        .get("pause_workflow")
+        .and_then(Value::as_bool)
+        .unwrap_or(false)
 }
 
 fn infer_domain_from_skill_ref(default_domain: &str, skill_ref: &str) -> String {
@@ -632,6 +653,8 @@ mod tests {
         calls: Arc<AtomicUsize>,
     }
 
+    struct PauseSkill;
+
     #[async_trait]
     impl Skill for RetrySkill {
         fn name(&self) -> &str {
@@ -660,6 +683,36 @@ mod tests {
                 return Err(anyhow!("forced failure"));
             }
             Ok(SkillOutput::text("ok"))
+        }
+    }
+
+    #[async_trait]
+    impl Skill for PauseSkill {
+        fn name(&self) -> &str {
+            "pause"
+        }
+
+        fn capability(&self) -> SkillCapability {
+            SkillCapability::new(
+                self.name(),
+                "returns pause_workflow marker",
+                SkillIOType::Text,
+                SkillIOType::Json,
+                CapabilityPermissions::new(false, false, false, false, false),
+                SideEffectClass::Pure,
+            )
+            .with_trust_tier(TrustTier::Constrained)
+        }
+
+        async fn execute(
+            &self,
+            _input: SkillInput,
+            _ctx: &mut ExecutionContext,
+        ) -> Result<SkillOutput> {
+            Ok(SkillOutput::json(serde_json::json!({
+                "pause_workflow": true,
+                "status": "pending"
+            })))
         }
     }
 
@@ -705,7 +758,7 @@ mod tests {
                 }),
             )
             .expect("register");
-        let executor = StepExecutor::new(Arc::new(registry));
+        let executor = StepExecutor::new(".", Arc::new(registry));
 
         let workflow = Workflow {
             meta: WorkflowMeta {
@@ -765,7 +818,8 @@ mod tests {
 
         let context_service = Arc::new(CountingContextService::default());
         let context_service_dyn: Arc<dyn ContextService> = context_service.clone();
-        let executor = StepExecutor::with_context_service(Arc::new(registry), context_service_dyn);
+        let executor =
+            StepExecutor::with_context_service(".", Arc::new(registry), context_service_dyn);
 
         let workflow = Workflow {
             meta: WorkflowMeta {
@@ -808,5 +862,55 @@ mod tests {
 
         assert_eq!(out.context_injected_items, 1);
         assert_eq!(context_service.call_count(), 1);
+    }
+
+    #[tokio::test]
+    async fn json_pause_marker_sets_paused_step_status() {
+        let mut registry = DomainRegistry::new();
+        registry.register_domain("demo");
+        registry
+            .register_skill("demo", Arc::new(PauseSkill))
+            .expect("register");
+        let executor = StepExecutor::new(".", Arc::new(registry));
+
+        let workflow = Workflow {
+            meta: WorkflowMeta {
+                name: "pause".to_string(),
+                domain: Some("demo".to_string()),
+                goal: None,
+                target_type: None,
+                routing_policy: Some(RoutingPolicy::for_single_domain("demo")),
+                security_policy: Some(DomainSecurityPolicy::default()),
+                resource_budget: None,
+                projected_cost: None,
+                projected_latency_ms: None,
+                projected_steps: None,
+            },
+            steps: vec![WorkflowStep {
+                id: "gate".to_string(),
+                skill: "demo.pause".to_string(),
+                input: "x".to_string(),
+                depends_on: Vec::new(),
+                condition: None,
+                retry: None,
+                on_failure: FailureStrategy::FailFast,
+            }],
+        };
+        let instance = WorkflowInstance::new(&workflow, None);
+        let out = executor
+            .execute_step(
+                &workflow,
+                &workflow.steps[0],
+                &instance,
+                &ExecutionBudget::default(),
+                &RoutingPolicy::for_single_domain("demo"),
+                &DomainSecurityPolicy::default(),
+            )
+            .await
+            .expect("step");
+        assert_eq!(
+            out.status,
+            crate::engine::workflow_engine::instance::StepExecutionStatus::Paused
+        );
     }
 }

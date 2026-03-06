@@ -55,7 +55,12 @@ Skill: agent.simulation_fallback_gate
 DependsOn: report_quality_gate
 Input: {{workflow_report}}
 
+## Step: manual_approval_gate
+Skill: agent.manual_approval
+DependsOn: simulation_fallback_gate
+Input: Require human approval before final go/no-go.
+
 ## Step: finalize
 Skill: demo.echo
-DependsOn: simulation_fallback_gate
-Input: Release workflow ready for domain climate-tech with report-quality and simulation-fallback gates.
+DependsOn: manual_approval_gate
+Input: Release workflow ready for domain climate-tech with report-quality, simulation-fallback, and manual-approval gates.

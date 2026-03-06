@@ -9,6 +9,10 @@ use std::collections::{HashMap, HashSet};
 pub struct ExecutionContext {
     #[allow(dead_code)]
     pub workflow_name: String,
+    #[allow(dead_code)]
+    pub project_root: String,
+    #[allow(dead_code)]
+    pub workflow_instance_id: String,
     pub step_id: String,
     pub skill_name: String,
     pub memory: HashMap<String, SkillOutput>,
@@ -25,6 +29,8 @@ impl Default for ExecutionContext {
     fn default() -> Self {
         Self {
             workflow_name: String::new(),
+            project_root: String::new(),
+            workflow_instance_id: String::new(),
             step_id: String::new(),
             skill_name: String::new(),
             memory: HashMap::new(),

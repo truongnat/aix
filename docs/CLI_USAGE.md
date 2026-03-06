@@ -93,6 +93,46 @@ cargo run -- workflow check
 cargo run -- workflow check --json
 ```
 
+Evaluate workflow report quality from a dataset (pass/fail gate by pass-rate threshold):
+
+```bash
+cargo run -- workflow eval .agents/evals/release_eval.json
+cargo run -- workflow eval .agents/evals/release_eval.json --min-pass-rate 0.9 --json
+```
+
+Approve/reject manual approval gates and resume paused workflows:
+
+```bash
+cargo run -- workflow status <instance_id>
+cargo run -- workflow approve <instance_id> --step manual_approval_gate --by release-manager --note "qa+security passed"
+cargo run -- workflow reject <instance_id> --step manual_approval_gate --by security --note "blocking risk"
+cargo run -- workflow resume <instance_id>
+```
+
+Dataset format example:
+
+```json
+{
+  "name": "release-eval",
+  "cases": [
+    {
+      "id": "release-case-1",
+      "report": {
+        "summary": "Release summary with rollback and risk posture.",
+        "actions": ["run regression tests", "prepare rollback checklist"],
+        "risks": ["latency spike risk"]
+      },
+      "required_summary_keywords": ["rollback", "risk"],
+      "required_action_keywords": ["test", "rollback"],
+      "required_risk_keywords": ["latency"],
+      "min_actions": 2,
+      "min_risks": 1,
+      "min_summary_chars": 80
+    }
+  ]
+}
+```
+
 Run skill quality-bar validation (metadata, trigger sections, examples, limitations, dangling links):
 
 ```bash

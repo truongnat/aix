@@ -178,6 +178,27 @@ cargo run -- workflow check
 cargo run -- workflow quality-skills --strict
 ```
 
+Run workflow report evaluation gate from dataset:
+
+```bash
+cargo run -- workflow eval .agents/evals/release_eval.json
+cargo run -- workflow eval .agents/evals/release_eval.json --min-pass-rate 0.9 --json
+```
+
+Manual approval gate for release/review-sensitive runs:
+
+```bash
+cargo run -- workflow status <instance_id>
+cargo run -- workflow approve <instance_id> --step manual_approval_gate --by release-manager --note "qa+security passed"
+cargo run -- workflow resume <instance_id>
+```
+
+To explicitly block a run at the gate:
+
+```bash
+cargo run -- workflow reject <instance_id> --step manual_approval_gate --by security --note "critical risk unresolved"
+```
+
 Generate catalog/manifest/lock artifacts for skill bundles:
 
 ```bash

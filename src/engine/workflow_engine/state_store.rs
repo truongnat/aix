@@ -62,6 +62,24 @@ pub struct WorkflowStateStore {
     state_dir: PathBuf,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ManualApprovalDecisionKind {
+    Approved,
+    Rejected,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct ManualApprovalDecision {
+    pub instance_id: String,
+    pub step_id: String,
+    pub decision: ManualApprovalDecisionKind,
+    pub approver: String,
+    #[serde(default)]
+    pub note: Option<String>,
+    pub decided_at_ms: u64,
+}
+
 impl WorkflowStateStore {
     pub fn new(project_root: &str) -> Result<Self> {
         let state_dir = Path::new(project_root).join(".agents").join("state");
@@ -83,6 +101,13 @@ impl WorkflowStateStore {
 
     fn abort_file_path(&self, instance_id: &str) -> PathBuf {
         self.state_dir.join(format!("{}.abort", instance_id))
+    }
+
+    fn approval_file_path(&self, instance_id: &str, step_id: &str) -> PathBuf {
+        let safe_instance = sanitize_file_fragment(instance_id);
+        let safe_step = sanitize_file_fragment(step_id);
+        self.state_dir
+            .join(format!("{}.{}.approval.json", safe_instance, safe_step))
     }
 
     pub fn acquire_lock(&self, instance_id: &str) -> Result<WorkflowLockGuard> {
@@ -288,6 +313,81 @@ impl WorkflowStateStore {
     pub fn is_abort_requested(&self, instance_id: &str) -> bool {
         self.abort_file_path(instance_id).exists()
     }
+
+    pub fn record_manual_approval_decision(
+        &self,
+        instance_id: &str,
+        step_id: &str,
+        decision: ManualApprovalDecisionKind,
+        approver: Option<&str>,
+        note: Option<&str>,
+    ) -> Result<ManualApprovalDecision> {
+        let normalized_instance = instance_id.trim();
+        if normalized_instance.is_empty() {
+            return Err(anyhow!("instance_id is required"));
+        }
+        let normalized_step = step_id.trim();
+        if normalized_step.is_empty() {
+            return Err(anyhow!("step_id is required"));
+        }
+        let approver = approver
+            .map(str::trim)
+            .filter(|v| !v.is_empty())
+            .map(ToString::to_string)
+            .or_else(|| {
+                std::env::var("USER")
+                    .ok()
+                    .map(|v| v.trim().to_string())
+                    .filter(|v| !v.is_empty())
+            })
+            .unwrap_or_else(|| "operator".to_string());
+        let note = note
+            .map(str::trim)
+            .filter(|v| !v.is_empty())
+            .map(str::to_string);
+
+        let payload = ManualApprovalDecision {
+            instance_id: normalized_instance.to_string(),
+            step_id: normalized_step.to_string(),
+            decision,
+            approver,
+            note,
+            decided_at_ms: now_ms(),
+        };
+        let path = self.approval_file_path(normalized_instance, normalized_step);
+        let body = serde_json::to_vec_pretty(&payload)?;
+        let mut file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(path)?;
+        file.write_all(&body)?;
+        file.write_all(b"\n")?;
+        file.sync_all()?;
+        Ok(payload)
+    }
+
+    pub fn load_manual_approval_decision(
+        &self,
+        instance_id: &str,
+        step_id: &str,
+    ) -> Result<Option<ManualApprovalDecision>> {
+        let normalized_instance = instance_id.trim();
+        if normalized_instance.is_empty() {
+            return Ok(None);
+        }
+        let normalized_step = step_id.trim();
+        if normalized_step.is_empty() {
+            return Ok(None);
+        }
+        let path = self.approval_file_path(normalized_instance, normalized_step);
+        if !path.exists() {
+            return Ok(None);
+        }
+        let body = std::fs::read_to_string(path)?;
+        let payload: ManualApprovalDecision = serde_json::from_str(&body)?;
+        Ok(Some(payload))
+    }
 }
 
 #[derive(Debug)]
@@ -301,9 +401,30 @@ impl Drop for WorkflowLockGuard {
     }
 }
 
+fn sanitize_file_fragment(value: &str) -> String {
+    let mut out = String::new();
+    for ch in value.trim().chars() {
+        let normalized = match ch {
+            'a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '-' => ch,
+            _ => '-',
+        };
+        out.push(normalized);
+    }
+    let compact = out
+        .split('-')
+        .filter(|part| !part.is_empty())
+        .collect::<Vec<_>>()
+        .join("-");
+    if compact.is_empty() {
+        "unknown".to_string()
+    } else {
+        compact
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{LockFileMetadata, WorkflowStateStore};
+    use super::{LockFileMetadata, ManualApprovalDecisionKind, WorkflowStateStore};
     use crate::workflow::model::{Workflow, WorkflowMeta, WorkflowStep};
 
     fn temp_root(prefix: &str) -> std::path::PathBuf {
@@ -400,6 +521,35 @@ mod tests {
             .expect_err("lock must remain held");
         let msg = err.to_string();
         assert!(msg.contains("already held"));
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn manual_approval_decision_roundtrip() {
+        let root = temp_root("agentic-sdlc-v2-manual-approval");
+        let store = WorkflowStateStore::new(root.to_str().expect("path")).expect("store");
+
+        let saved = store
+            .record_manual_approval_decision(
+                "run-123",
+                "release_gate",
+                ManualApprovalDecisionKind::Approved,
+                Some("qa.lead"),
+                Some("validated release checklist"),
+            )
+            .expect("record approval");
+        assert_eq!(saved.instance_id, "run-123");
+        assert_eq!(saved.step_id, "release_gate");
+        assert_eq!(saved.approver, "qa.lead");
+        assert_eq!(saved.note.as_deref(), Some("validated release checklist"));
+
+        let loaded = store
+            .load_manual_approval_decision("run-123", "release_gate")
+            .expect("load approval")
+            .expect("approval exists");
+        assert_eq!(loaded.decision, ManualApprovalDecisionKind::Approved);
+        assert_eq!(loaded.approver, "qa.lead");
 
         let _ = std::fs::remove_dir_all(root);
     }

@@ -28,6 +28,7 @@ use crate::skills::git_ops::{
 use crate::skills::is_positive::IsPositiveSkill;
 use crate::skills::llm_subagent::LlmSubAgentSkill;
 use crate::skills::loader::{load_skills, parse_skill_markdown};
+use crate::skills::manual_approval::ManualApprovalSkill;
 use crate::skills::role_loader::load_role_profile_if_exists;
 use crate::skills::vector_memory::{EmbedDocumentSkill, SemanticSearchSkill};
 use crate::workflow::loader::{load_workflow, parse_markdown_content};

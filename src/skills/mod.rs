@@ -6,6 +6,7 @@ pub mod idempotency;
 pub mod is_positive;
 pub mod llm_subagent;
 pub mod loader;
+pub mod manual_approval;
 pub mod model;
 pub mod parse_number;
 pub mod role_loader;

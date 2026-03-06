@@ -60,7 +60,12 @@ Skill: agent.next_steps
 DependsOn: simulation_fallback_gate
 Input: Derive next actions from {{workflow_report}} with explicit critical-path ordering.
 
+## Step: manual_approval_gate
+Skill: agent.manual_approval
+DependsOn: next_actions
+Input: Require human approval before final go/no-go.
+
 ## Step: finalize
 Skill: demo.echo
-DependsOn: next_actions
-Input: Advanced scaffold workflow release prepared with report-quality and simulation-fallback gates.
+DependsOn: manual_approval_gate
+Input: Advanced scaffold workflow release prepared with report-quality, simulation-fallback, and manual-approval gates.

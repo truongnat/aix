@@ -10,6 +10,7 @@ pub const ENGINE_TRACE_VERSION: &str = "1.0";
 pub enum WorkflowInstanceStatus {
     Pending,
     Running,
+    Paused,
     Completed,
     Failed,
     Aborted,
@@ -19,6 +20,7 @@ pub enum WorkflowInstanceStatus {
 pub enum StepExecutionStatus {
     Pending,
     Running,
+    Paused,
     Succeeded,
     Failed,
     Skipped,

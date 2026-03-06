@@ -52,6 +52,7 @@ pub(super) fn handle_workflow_control_command(
             if let Ok(mut instance) = state_store.load(&id) {
                 if instance.status == WorkflowInstanceStatus::Pending
                     || instance.status == WorkflowInstanceStatus::Running
+                    || instance.status == WorkflowInstanceStatus::Paused
                 {
                     instance.status = WorkflowInstanceStatus::Aborted;
                     instance.last_error = Some("Abort requested by operator".to_string());
@@ -59,6 +60,50 @@ pub(super) fn handle_workflow_control_command(
                 }
             }
             println!("Abort requested for workflow instance '{}'.", id);
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::Approve { id, step, by, note } => {
+            let instance = state_store.load(&id)?;
+            if !instance.step_order.iter().any(|entry| entry == &step) {
+                return Err(anyhow!(
+                    "step '{}' not found in workflow instance '{}'",
+                    step,
+                    id
+                ));
+            }
+            let decision = state_store.record_manual_approval_decision(
+                &id,
+                &step,
+                crate::engine::workflow_engine::state_store::ManualApprovalDecisionKind::Approved,
+                by.as_deref(),
+                note.as_deref(),
+            )?;
+            println!(
+                "Approval recorded: instance='{}' step='{}' decision='approved' by='{}'",
+                decision.instance_id, decision.step_id, decision.approver
+            );
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::Reject { id, step, by, note } => {
+            let instance = state_store.load(&id)?;
+            if !instance.step_order.iter().any(|entry| entry == &step) {
+                return Err(anyhow!(
+                    "step '{}' not found in workflow instance '{}'",
+                    step,
+                    id
+                ));
+            }
+            let decision = state_store.record_manual_approval_decision(
+                &id,
+                &step,
+                crate::engine::workflow_engine::state_store::ManualApprovalDecisionKind::Rejected,
+                by.as_deref(),
+                note.as_deref(),
+            )?;
+            println!(
+                "Approval recorded: instance='{}' step='{}' decision='rejected' by='{}'",
+                decision.instance_id, decision.step_id, decision.approver
+            );
             Ok(WorkflowLaunchAction::Noop)
         }
         WorkflowCommand::Trace { id, json, timeline } => {
@@ -83,6 +128,26 @@ pub(super) fn handle_workflow_control_command(
                 return Err(anyhow!(
                     "workflow package check failed with {} error(s)",
                     report.errors.len()
+                ));
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::Eval {
+            dataset,
+            min_pass_rate,
+            json,
+        } => {
+            let report = run_workflow_eval(&dataset, min_pass_rate)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                print_workflow_eval_report(&report);
+            }
+            if !report.ok {
+                return Err(anyhow!(
+                    "workflow eval failed: pass_rate={:.2} < min_pass_rate={:.2}",
+                    report.pass_rate,
+                    report.min_pass_rate
                 ));
             }
             Ok(WorkflowLaunchAction::Noop)
@@ -696,9 +761,189 @@ fn print_skill_quality_report(report: &SkillQualityReport) {
     }
 }
 
+fn run_workflow_eval(dataset_path: &str, min_pass_rate: f64) -> Result<WorkflowEvalReport> {
+    if !(0.0..=1.0).contains(&min_pass_rate) {
+        return Err(anyhow!(
+            "min_pass_rate must be within [0.0, 1.0], got {}",
+            min_pass_rate
+        ));
+    }
+    let path = Path::new(dataset_path);
+    let raw = std::fs::read_to_string(path)
+        .map_err(|err| anyhow!("failed to read eval dataset '{}': {}", path.display(), err))?;
+    let dataset: WorkflowEvalDataset = serde_json::from_str(&raw)
+        .map_err(|err| anyhow!("failed to parse eval dataset '{}': {}", path.display(), err))?;
+    if dataset.cases.is_empty() {
+        return Err(anyhow!("eval dataset '{}' has no cases", path.display()));
+    }
+
+    let mut passed = 0usize;
+    let mut results = Vec::with_capacity(dataset.cases.len());
+    for case in dataset.cases {
+        let mut findings = Vec::<String>::new();
+        let summary = case
+            .report
+            .get("summary")
+            .and_then(|v| v.as_str())
+            .unwrap_or_default()
+            .trim()
+            .to_string();
+        let summary_chars = summary.chars().count();
+        let actions = case
+            .report
+            .get("actions")
+            .and_then(|v| v.as_array())
+            .cloned()
+            .unwrap_or_default();
+        let risks = case
+            .report
+            .get("risks")
+            .and_then(|v| v.as_array())
+            .cloned()
+            .unwrap_or_default();
+
+        let min_summary_chars = case.min_summary_chars.unwrap_or(80);
+        let min_actions = case.min_actions.unwrap_or(2);
+        let min_risks = case.min_risks.unwrap_or(1);
+
+        if summary_chars < min_summary_chars {
+            findings.push(format!(
+                "summary too short: {} < {} chars",
+                summary_chars, min_summary_chars
+            ));
+        }
+        if actions.len() < min_actions {
+            findings.push(format!(
+                "actions too few: {} < {}",
+                actions.len(),
+                min_actions
+            ));
+        }
+        if risks.len() < min_risks {
+            findings.push(format!("risks too few: {} < {}", risks.len(), min_risks));
+        }
+
+        let summary_lower = summary.to_ascii_lowercase();
+        for keyword in case
+            .required_summary_keywords
+            .iter()
+            .map(|v| v.trim())
+            .filter(|v| !v.is_empty())
+        {
+            if !summary_lower.contains(&keyword.to_ascii_lowercase()) {
+                findings.push(format!(
+                    "missing summary keyword '{}'",
+                    keyword.to_ascii_lowercase()
+                ));
+            }
+        }
+
+        let actions_text = actions
+            .iter()
+            .filter_map(|v| v.as_str())
+            .collect::<Vec<_>>()
+            .join("\n")
+            .to_ascii_lowercase();
+        for keyword in case
+            .required_action_keywords
+            .iter()
+            .map(|v| v.trim())
+            .filter(|v| !v.is_empty())
+        {
+            if !actions_text.contains(&keyword.to_ascii_lowercase()) {
+                findings.push(format!(
+                    "missing action keyword '{}'",
+                    keyword.to_ascii_lowercase()
+                ));
+            }
+        }
+
+        let risks_text = risks
+            .iter()
+            .filter_map(|v| v.as_str())
+            .collect::<Vec<_>>()
+            .join("\n")
+            .to_ascii_lowercase();
+        for keyword in case
+            .required_risk_keywords
+            .iter()
+            .map(|v| v.trim())
+            .filter(|v| !v.is_empty())
+        {
+            if !risks_text.contains(&keyword.to_ascii_lowercase()) {
+                findings.push(format!(
+                    "missing risk keyword '{}'",
+                    keyword.to_ascii_lowercase()
+                ));
+            }
+        }
+
+        let case_passed = findings.is_empty();
+        if case_passed {
+            passed = passed.saturating_add(1);
+        }
+        results.push(WorkflowEvalCaseResult {
+            id: case.id,
+            passed: case_passed,
+            summary_chars,
+            actions: actions.len(),
+            risks: risks.len(),
+            findings,
+        });
+    }
+
+    let cases = results.len();
+    let failed = cases.saturating_sub(passed);
+    let pass_rate = if cases == 0 {
+        0.0
+    } else {
+        passed as f64 / cases as f64
+    };
+    let dataset_name = dataset
+        .name
+        .unwrap_or_else(|| path.display().to_string())
+        .trim()
+        .to_string();
+    Ok(WorkflowEvalReport {
+        dataset: dataset_name,
+        cases,
+        passed,
+        failed,
+        pass_rate,
+        min_pass_rate,
+        ok: pass_rate >= min_pass_rate,
+        results,
+    })
+}
+
+fn print_workflow_eval_report(report: &WorkflowEvalReport) {
+    println!(
+        "Workflow Eval: dataset='{}' cases={} passed={} failed={} pass_rate={:.2} min_pass_rate={:.2} ok={}",
+        report.dataset,
+        report.cases,
+        report.passed,
+        report.failed,
+        report.pass_rate,
+        report.min_pass_rate,
+        report.ok
+    );
+    for result in &report.results {
+        let label = if result.passed { "pass" } else { "fail" };
+        println!(
+            "- {} [{}] summary_chars={} actions={} risks={}",
+            result.id, label, result.summary_chars, result.actions, result.risks
+        );
+        if !result.findings.is_empty() {
+            for finding in &result.findings {
+                println!("    - {}", finding);
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::resolve_default_validate_command;
+    use super::{resolve_default_validate_command, run_workflow_eval};
     use crate::engine::project::AgentProjectLayout;
 
     #[test]
@@ -742,6 +987,81 @@ mod tests {
         let resolved = resolve_default_validate_command(&layout, "cargo test").expect("resolve");
         assert_eq!(resolved, "npm run -s agent:validate");
 
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn workflow_eval_passes_detailed_case() {
+        let unique = format!(
+            "agentic-sdlc-workflow-eval-pass-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(&root).expect("create temp root");
+        let dataset_path = root.join("dataset.json");
+        std::fs::write(
+            &dataset_path,
+            r#"{
+  "name":"release-eval",
+  "cases":[
+    {
+      "id":"case-1",
+      "report":{
+        "summary":"Release readiness summary includes rollback strategy, risk posture, and validation evidence across critical paths.",
+        "actions":["run regression tests","prepare rollback checklist"],
+        "risks":["latency spike risk"]
+      },
+      "required_summary_keywords":["rollback","risk"],
+      "required_action_keywords":["test","rollback"],
+      "required_risk_keywords":["latency"]
+    }
+  ]
+}"#,
+        )
+        .expect("write dataset");
+
+        let report = run_workflow_eval(dataset_path.to_string_lossy().as_ref(), 0.8).expect("eval");
+        assert!(report.ok);
+        assert_eq!(report.failed, 0);
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn workflow_eval_fails_sparse_case() {
+        let unique = format!(
+            "agentic-sdlc-workflow-eval-fail-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(&root).expect("create temp root");
+        let dataset_path = root.join("dataset.json");
+        std::fs::write(
+            &dataset_path,
+            r#"{
+  "cases":[
+    {
+      "id":"case-1",
+      "report":{
+        "summary":"short",
+        "actions":["fix"],
+        "risks":[]
+      }
+    }
+  ]
+}"#,
+        )
+        .expect("write dataset");
+
+        let report = run_workflow_eval(dataset_path.to_string_lossy().as_ref(), 1.0).expect("eval");
+        assert!(!report.ok);
+        assert_eq!(report.failed, 1);
+        assert!(!report.results[0].findings.is_empty());
         let _ = std::fs::remove_dir_all(root);
     }
 }

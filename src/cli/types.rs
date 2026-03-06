@@ -19,6 +19,24 @@ pub(crate) enum WorkflowCommand {
     Abort {
         id: String,
     },
+    Approve {
+        id: String,
+        #[arg(long)]
+        step: String,
+        #[arg(long)]
+        by: Option<String>,
+        #[arg(long)]
+        note: Option<String>,
+    },
+    Reject {
+        id: String,
+        #[arg(long)]
+        step: String,
+        #[arg(long)]
+        by: Option<String>,
+        #[arg(long)]
+        note: Option<String>,
+    },
     Trace {
         id: String,
         #[arg(long, default_value_t = false)]
@@ -27,6 +45,13 @@ pub(crate) enum WorkflowCommand {
         timeline: bool,
     },
     Check {
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    Eval {
+        dataset: String,
+        #[arg(long, default_value_t = 0.8)]
+        min_pass_rate: f64,
         #[arg(long, default_value_t = false)]
         json: bool,
     },
@@ -610,4 +635,52 @@ pub(crate) struct ChatThreadRunReport {
     pub(crate) selected_role: String,
     pub(crate) implementation: ThreadRunSummary,
     pub(crate) merge: Option<ThreadRunSummary>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub(crate) struct WorkflowEvalDataset {
+    #[serde(default)]
+    pub(crate) name: Option<String>,
+    pub(crate) cases: Vec<WorkflowEvalCase>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub(crate) struct WorkflowEvalCase {
+    pub(crate) id: String,
+    #[serde(default)]
+    pub(crate) report: serde_json::Value,
+    #[serde(default)]
+    pub(crate) min_actions: Option<usize>,
+    #[serde(default)]
+    pub(crate) min_risks: Option<usize>,
+    #[serde(default)]
+    pub(crate) min_summary_chars: Option<usize>,
+    #[serde(default)]
+    pub(crate) required_summary_keywords: Vec<String>,
+    #[serde(default)]
+    pub(crate) required_action_keywords: Vec<String>,
+    #[serde(default)]
+    pub(crate) required_risk_keywords: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct WorkflowEvalCaseResult {
+    pub(crate) id: String,
+    pub(crate) passed: bool,
+    pub(crate) summary_chars: usize,
+    pub(crate) actions: usize,
+    pub(crate) risks: usize,
+    pub(crate) findings: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct WorkflowEvalReport {
+    pub(crate) dataset: String,
+    pub(crate) cases: usize,
+    pub(crate) passed: usize,
+    pub(crate) failed: usize,
+    pub(crate) pass_rate: f64,
+    pub(crate) min_pass_rate: f64,
+    pub(crate) ok: bool,
+    pub(crate) results: Vec<WorkflowEvalCaseResult>,
 }

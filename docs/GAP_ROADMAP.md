@@ -67,6 +67,14 @@ The highest-priority work now is to close production-readiness gaps around evalu
 - PR/CI can fail on evaluation regression.
 - Merge/release-sensitive workflows can be paused and approved explicitly.
 
+### Progress update (current)
+- `workflow eval` command implemented with dataset-based report scoring and pass-rate threshold gate.
+- `manual_approval` runtime primitive implemented:
+  - `WorkflowInstanceStatus::Paused` and `StepExecutionStatus::Paused`
+  - `workflow approve` / `workflow reject` operator commands
+  - persisted approval metadata in `.agents/state`
+  - release/review workflows updated with explicit `manual_approval_gate`.
+
 ## Day 61-90: Observability + Supply Chain + Enterprise Integrations
 
 ### Objectives

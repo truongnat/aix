@@ -308,6 +308,7 @@ fn derive_lifecycle_state(
         WorkflowInstanceStatus::Pending | WorkflowInstanceStatus::Running => {
             ThreadLifecycleState::Active
         }
+        WorkflowInstanceStatus::Paused => ThreadLifecycleState::Blocked,
         WorkflowInstanceStatus::Failed | WorkflowInstanceStatus::Aborted => {
             ThreadLifecycleState::Blocked
         }
@@ -351,6 +352,7 @@ fn migrate_index(index: &mut ThreadSessionIndex) {
                     }
                 }
                 "running" | "pending" => ThreadLifecycleState::Active,
+                "paused" => ThreadLifecycleState::Blocked,
                 _ => ThreadLifecycleState::Open,
             };
             record.lifecycle_state = inferred;

@@ -24,7 +24,7 @@ impl ExecutionEngine {
     pub fn new(project_root: &str, domain_registry: Arc<DomainRegistry>) -> Result<Self> {
         Ok(Self {
             state_store: WorkflowStateStore::new(project_root)?,
-            step_executor: StepExecutor::new(domain_registry),
+            step_executor: StepExecutor::new(project_root, domain_registry),
         })
     }
 
@@ -255,10 +255,10 @@ impl ExecutionEngine {
                             state.call_attempts = outcome.call_attempts;
                             state.status.clone()
                         };
-                        instance.current_step = instance.current_step.saturating_add(1);
 
                         match outcome.status {
                             StepExecutionStatus::Succeeded | StepExecutionStatus::Skipped => {
+                                instance.current_step = instance.current_step.saturating_add(1);
                                 instance
                                     .step_results
                                     .insert(step.id.clone(), outcome.output);
@@ -276,6 +276,24 @@ impl ExecutionEngine {
                                     outcome.provider.as_deref().unwrap_or("-"),
                                     outcome.model.as_deref().unwrap_or("-")
                                 ));
+                            }
+                            StepExecutionStatus::Paused => {
+                                instance
+                                    .step_results
+                                    .insert(step.id.clone(), outcome.output);
+                                instance.status = WorkflowInstanceStatus::Paused;
+                                instance.last_error = Some(format!(
+                                    "Step '{}' paused and requires manual approval before resume",
+                                    step.id
+                                ));
+                                instance.record_trace(format!(
+                                    "[{}] step '{}' {:?} awaiting manual approval",
+                                    now_ms(),
+                                    step.id,
+                                    step_status
+                                ));
+                                self.state_store.save(&mut instance)?;
+                                return Ok(instance);
                             }
                             _ => {}
                         }
@@ -374,6 +392,7 @@ mod tests {
     use crate::skill::Skill;
     use crate::skills::dev_workflow::WriteFileSkill;
     use crate::skills::echo::EchoSkill;
+    use crate::skills::manual_approval::ManualApprovalSkill;
     use crate::workflow::model::{FailureStrategy, Workflow, WorkflowMeta, WorkflowStep};
     use anyhow::{anyhow, Result};
     use async_trait::async_trait;
@@ -741,6 +760,128 @@ Input: {output_input}
         assert!(!state.idempotent_short_circuit);
         assert!(state.duration_ms.is_some());
         assert!(state.failure_class.is_none());
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[tokio::test]
+    async fn manual_approval_pauses_and_resume_completes_after_approval() {
+        let root = temp_root("agentic-sdlc-v2-manual-approval");
+        let workflow_path = root.join("manual-approval.md");
+        std::fs::write(
+            &workflow_path,
+            r#"# Workflow: manual-approval
+Schema: antigrav.workflow@v1
+Domain: agent
+
+## Step: prep
+Skill: agent.echo
+Input: prep
+
+## Step: gate
+Skill: agent.manual_approval
+DependsOn: prep
+Input: Require human approval before finalize.
+
+## Step: done
+Skill: agent.echo
+DependsOn: gate
+Input: done
+"#,
+        )
+        .expect("write workflow");
+
+        let mut registry = DomainRegistry::new();
+        registry.register_domain("agent");
+        registry
+            .register_skill("agent", Arc::new(EchoSkill::new()))
+            .expect("register echo");
+        registry
+            .register_skill("agent", Arc::new(ManualApprovalSkill))
+            .expect("register manual_approval");
+
+        let engine =
+            ExecutionEngine::new(root.to_str().expect("path"), Arc::new(registry)).expect("engine");
+        let workflow = Workflow {
+            meta: WorkflowMeta {
+                name: "manual-approval".to_string(),
+                domain: Some("agent".to_string()),
+                goal: None,
+                target_type: None,
+                routing_policy: Some(RoutingPolicy::for_single_domain("agent")),
+                security_policy: Some(DomainSecurityPolicy::default()),
+                resource_budget: None,
+                projected_cost: None,
+                projected_latency_ms: None,
+                projected_steps: None,
+            },
+            steps: vec![
+                WorkflowStep::new("prep", "agent.echo", "prep"),
+                WorkflowStep {
+                    id: "gate".to_string(),
+                    skill: "agent.manual_approval".to_string(),
+                    input: "Require human approval before finalize.".to_string(),
+                    depends_on: vec!["prep".to_string()],
+                    condition: None,
+                    retry: None,
+                    on_failure: FailureStrategy::FailFast,
+                },
+                WorkflowStep {
+                    id: "done".to_string(),
+                    skill: "agent.echo".to_string(),
+                    input: "done".to_string(),
+                    depends_on: vec!["gate".to_string()],
+                    condition: None,
+                    retry: None,
+                    on_failure: FailureStrategy::FailFast,
+                },
+            ],
+        };
+
+        let paused = engine
+            .run_new_workflow(
+                &workflow,
+                Some(workflow_path.to_string_lossy().to_string()),
+                ExecutionBudget::default(),
+                RoutingPolicy::for_single_domain("agent"),
+                DomainSecurityPolicy::default(),
+            )
+            .await
+            .expect("run");
+        assert_eq!(paused.status, WorkflowInstanceStatus::Paused);
+        assert!(paused.completed_steps.iter().any(|step| step == "prep"));
+        let gate_state = paused.step_states.get("gate").expect("gate state");
+        assert_eq!(gate_state.status, StepExecutionStatus::Paused);
+        assert!(paused
+            .last_error
+            .as_deref()
+            .unwrap_or_default()
+            .contains("requires manual approval"));
+
+        engine
+            .state_store()
+            .record_manual_approval_decision(
+                &paused.instance_id,
+                "gate",
+                crate::engine::workflow_engine::state_store::ManualApprovalDecisionKind::Approved,
+                Some("qa.lead"),
+                Some("gate cleared"),
+            )
+            .expect("record approval");
+
+        let resumed = engine
+            .resume_workflow(
+                &paused.instance_id,
+                ExecutionBudget::default(),
+                RoutingPolicy::for_single_domain("agent"),
+                DomainSecurityPolicy::default(),
+            )
+            .await
+            .expect("resume");
+        assert_eq!(resumed.status, WorkflowInstanceStatus::Completed);
+        assert!(resumed.completed_steps.iter().any(|step| step == "done"));
+        let gate_state = resumed.step_states.get("gate").expect("gate state");
+        assert_eq!(gate_state.status, StepExecutionStatus::Succeeded);
 
         let _ = std::fs::remove_dir_all(root);
     }
