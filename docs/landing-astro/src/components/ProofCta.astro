@@ -1,24 +1,24 @@
 <section class="section contrast reveal" aria-labelledby="compare-title">
   <div class="section-head">
-    <p class="eyebrow">Decision clarity</p>
-    <h2 id="compare-title">What changes when you move beyond ad-hoc agent scripts</h2>
+    <p class="eyebrow">Why this matters</p>
+    <h2 id="compare-title">From AI coding helpers to full lifecycle operations</h2>
   </div>
 
   <div class="compare-grid">
     <article>
-      <h3>Ad-hoc scripts</h3>
+      <h3>Prompt-only execution</h3>
       <ul>
-        <li>Inconsistent behavior across runs</li>
-        <li>Weak failure recovery</li>
-        <li>Low policy and audit visibility</li>
+        <li>Unstable behavior between runs and operators</li>
+        <li>No mandatory evidence quality threshold</li>
+        <li>Hard to review, replay, and recover incidents</li>
       </ul>
     </article>
     <article>
-      <h3>agentic-sdlc runtime</h3>
+      <h3>agentic-sdlc control plane</h3>
       <ul>
-        <li>Deterministic execution and traceability</li>
-        <li>Resumable state and controlled retries</li>
-        <li>Policy-enforced, review-friendly delivery</li>
+        <li>Deterministic, policy-driven workflow execution</li>
+        <li>Structured report + quality gate before finalize</li>
+        <li>Resumable, traceable, audit-friendly delivery loop</li>
       </ul>
     </article>
   </div>
@@ -27,7 +27,7 @@
 <section class="section reveal" id="runtime-proof" aria-labelledby="runtime-proof-title">
   <div class="section-head">
     <p class="eyebrow">Runtime proof</p>
-    <h2 id="runtime-proof-title">Real workflow input/output visualized with Remotion</h2>
+    <h2 id="runtime-proof-title">Observed run output, not static marketing claims</h2>
   </div>
 
   <div class="runtime-demo">
@@ -41,17 +41,16 @@
       Your browser does not support video playback.
     </video>
     <div class="runtime-meta">
-      <h3>Demo Source</h3>
+      <h3>Demo Signal</h3>
       <p>
-        This video is rendered from a real workflow instance export:
+        This capture is rendered from a real workflow trace export:
         <code>dev-create-showcase-video-1772167469615-59889</code>.
       </p>
       <ul>
-        <li>Show structure: architecture layers and capability folders</li>
-        <li>Show CLI: command surface teams run in real delivery</li>
-        <li>Show use cases: AI delivery, security scan gating, and dev workflows</li>
-        <li>Show output success: landing page screenshot as final artifact</li>
-        <li>AI-assisted narration and subtitle timeline generated from trace data</li>
+        <li>Shows role-to-skill execution handoff in sequence</li>
+        <li>Shows deterministic step telemetry and gating moments</li>
+        <li>Shows final output artifact with reproducible trace lineage</li>
+        <li>Shows where quality and security checks block progression</li>
       </ul>
       <p class="runtime-note">
         Regenerate end-to-end with:
@@ -67,8 +66,8 @@
 
 <section class="section reveal" id="quickstart" aria-labelledby="quickstart-title">
   <div class="section-head">
-    <p class="eyebrow">Quick start</p>
-    <h2 id="quickstart-title">Run your first deterministic workflow</h2>
+    <p class="eyebrow">Launch sequence</p>
+    <h2 id="quickstart-title">Boot a lifecycle-grade AI agent runtime locally</h2>
   </div>
 
   <div class="code-shell">
@@ -78,19 +77,19 @@ cargo run -- workflow doctor
 cargo run -- workflow check
 cargo run -- workflow quality-skills --strict
 cargo run -- workflow normalize-imported-skills --dry-run
-cargo run -- --workflow valid_flow.md
+cargo run -- --workflow-id feature --task "implement guarded release pipeline"
 cargo run -- workflow trace &lt;instance_id&gt; --timeline</code></pre>
   </div>
 </section>
 
 <section class="section cta reveal" aria-labelledby="cta-title">
-  <h2 id="cta-title">Build with AI agents and keep your SDLC deterministic.</h2>
+  <h2 id="cta-title">Run agents as a disciplined software lifecycle system.</h2>
   <p>
-    Standardize one workflow, enforce policy guardrails, and scale with skill packs that keep quality high as velocity
-    increases.
+    Design once, execute repeatedly, and keep every decision auditable across planning, coding, review, release, and
+    recovery.
   </p>
   <div class="actions">
-    <a class="btn btn-primary" href="#workflow">Inspect execution model</a>
-    <a class="btn btn-secondary" href="#quickstart">Run from CLI</a>
+    <a class="btn btn-primary" href="#lifecycle">Inspect lifecycle model</a>
+    <a class="btn btn-secondary" href="#quickstart">Start from CLI</a>
   </div>
 </section>

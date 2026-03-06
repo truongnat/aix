@@ -2,42 +2,54 @@
 const steps = [
   {
     id: '01',
-    title: 'Author Workflow Intent',
-    body: 'Define goals in markdown workflows, roles, and skills with explicit operating constraints.'
+    title: 'Plan',
+    body: 'Architect role captures intent, constraints, acceptance criteria, and blast-radius assumptions.'
   },
   {
     id: '02',
-    title: 'Run Under Guardrails',
-    body: 'Execute through policy gates for trust tier, command safety, and resource budgets.'
+    title: 'Build',
+    body: 'Implementer executes deterministic edits with runtime policy, budget, and command safety gates.'
   },
   {
     id: '03',
-    title: 'Observe Every Transition',
-    body: 'Track state, logs, and costs with deterministic trace IDs for each execution step.'
+    title: 'Verify',
+    body: 'Reviewer and validation steps enforce quality checks, security posture, and report completeness.'
   },
   {
     id: '04',
-    title: 'Resume And Scale',
-    body: 'Recover from interruptions and expand with domain packs as your delivery system matures.'
+    title: 'Release',
+    body: 'Releaser applies merge/release policy with protected branch checks and deterministic finalization.'
+  },
+  {
+    id: '05',
+    title: 'Learn',
+    body: 'Next-step synthesis turns run output into explicit follow-up tasks and lifecycle improvements.'
   }
 ];
 ---
 
-<section class="section reveal" id="workflow" aria-labelledby="workflow-title">
+<section class="section reveal" id="lifecycle" aria-labelledby="lifecycle-title">
   <div class="section-head">
-    <p class="eyebrow">How it works</p>
-    <h2 id="workflow-title">From prompt to production-grade workflow execution</h2>
+    <p class="eyebrow">Lifecycle</p>
+    <h2 id="lifecycle-title">One runtime for the entire software lifecycle, not just code generation</h2>
   </div>
 
-  <div class="workflow-grid">
+  <div class="lifecycle-track">
     {
       steps.map((step) => (
-        <article>
-          <span>{step.id}</span>
+        <article class="lifecycle-card">
+          <span class="phase-index">{step.id}</span>
           <h3>{step.title}</h3>
           <p>{step.body}</p>
         </article>
       ))
     }
+  </div>
+
+  <div class="handoff-row" aria-label="Lifecycle handoff points">
+    <span class="handoff-chip">Roles → Skills</span>
+    <span class="handoff-chip">Skills → Evidence</span>
+    <span class="handoff-chip">Evidence → Report Gate</span>
+    <span class="handoff-chip">Report → Next Actions</span>
   </div>
 </section>

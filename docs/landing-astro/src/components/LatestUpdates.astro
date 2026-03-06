@@ -1,38 +1,51 @@
----
-const updates = [
-  {
-    title: 'Detailed Workflow Reports By Default',
-    body: 'Core and domain workflow packs now include workflow_report + report_quality_gate to block sparse summaries and enforce actionable outputs.'
-  },
-  {
-    title: 'Stronger Package Quality Gates',
-    body: 'workflow check now catches weak rule/role/skill quality earlier and validates internet-surface security/reporting conventions.'
-  },
-  {
-    title: 'Imported Skill Metadata Normalization',
-    body: 'Use workflow normalize-imported-skills to enrich risk/source/tags from lockfile provenance without re-cloning upstream repos.'
-  },
-  {
-    title: 'Richer Role/Thread Run Visibility',
-    body: 'Role and chat-thread execution summaries now include per-step status, duration, actions, risks, and provider/model for better diagnostics.'
-  }
-];
----
-
-<section class="section reveal" id="latest-changes" aria-labelledby="latest-changes-title">
+<section class="section reveal" id="ops-console" aria-labelledby="ops-console-title">
   <div class="section-head">
-    <p class="eyebrow">Latest updates</p>
-    <h2 id="latest-changes-title">March 2026 quality and execution upgrades</h2>
+    <p class="eyebrow">Ops Console</p>
+    <h2 id="ops-console-title">Operate agents like an engineering system, not a chat transcript</h2>
   </div>
 
-  <div class="value-grid">
-    {
-      updates.map((item) => (
-        <article class="value-card">
-          <h3>{item.title}</h3>
-          <p>{item.body}</p>
-        </article>
-      ))
-    }
+  <div class="console-grid">
+    <article class="console-card">
+      <h3>Release Gate Deck</h3>
+      <ul class="check-list">
+        <li>Package structure check passed</li>
+        <li>Role/rule/skill quality conventions validated</li>
+        <li>Report-quality gate accepted actionable output</li>
+        <li>Protected branch policy verified before merge</li>
+      </ul>
+    </article>
+
+    <article class="console-card">
+      <h3>Role + Skill Matrix</h3>
+      <div class="tag-cloud">
+        <span>architect</span>
+        <span>implementer</span>
+        <span>reviewer</span>
+        <span>releaser</span>
+        <span>resolver</span>
+        <span>workflow_report</span>
+        <span>report_quality_gate</span>
+        <span>risk_register</span>
+        <span>security_scan_guard</span>
+      </div>
+    </article>
+
+    <article class="console-card code-card">
+      <h3>Thread Run Telemetry</h3>
+      <pre><code>Implementation run: status=completed trace=trc_2f19...
+- [completed] intent_analysis duration_ms=964 actions=4 risks=2
+- [completed] workflow_report duration_ms=801 actions=6 risks=3
+- [completed] report_quality_gate duration_ms=118 actions=0 risks=0
+Merge run: status=completed steps=7/7 failed=0</code></pre>
+    </article>
+
+    <article class="console-card">
+      <h3>Normalization Control</h3>
+      <p>
+        Keep imported skill packs consistent with lockfile provenance before production use.
+      </p>
+      <pre><code>cargo run -- workflow normalize-imported-skills --dry-run
+cargo run -- workflow normalize-imported-skills --json</code></pre>
+    </article>
   </div>
 </section>
