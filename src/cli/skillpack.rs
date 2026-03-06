@@ -791,7 +791,7 @@ fn normalize_imported_skill_markdown(
     ));
     let trimmed_body = body.trim();
     if !trimmed_body.is_empty() {
-        out.push_str("\n");
+        out.push('\n');
         out.push_str(trimmed_body);
         out.push('\n');
     }

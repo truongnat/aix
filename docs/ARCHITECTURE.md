@@ -10,6 +10,30 @@ Core components:
 - `workflow::loader`: markdown workflow parsing and validation inputs
 - `skills/*`: skill implementations with explicit capability and trust metadata
 
+## System Diagram
+
+```mermaid
+flowchart LR
+  A["CLI Commands"] --> B["Workflow Loader"]
+  B --> C["Workflow Engine"]
+  C --> D["Policy And Budget Enforcement"]
+  C --> E["Skill Runtime (Built-in + Markdown Skills)"]
+  E --> F["LLM Providers / Git / Shell / Utilities"]
+  C --> G["State Store (.agents/state)"]
+  C --> H["Trace Export (JSON / Timeline)"]
+  C --> I["Context Retrieval (Vector/Graph/Hybrid)"]
+```
+
+## Determinism Scope
+
+Engine determinism covers orchestration behavior:
+- dependency-ready step ordering
+- persisted state transitions
+- deterministic trace ID generation logic
+
+Model content determinism is not guaranteed by default; LLM outputs may vary across runs.
+Use strict provider settings/policies when content-level reproducibility is required.
+
 ## Execution Model
 
 Workflow execution is stateful and deterministic:

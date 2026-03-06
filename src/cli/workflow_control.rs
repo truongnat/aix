@@ -646,56 +646,6 @@ fn resolve_default_validate_command(
     Ok(trimmed.to_string())
 }
 
-#[cfg(test)]
-mod tests {
-    use super::resolve_default_validate_command;
-    use crate::engine::project::AgentProjectLayout;
-
-    #[test]
-    fn keeps_explicit_validate_command() {
-        let unique = format!(
-            "agentic-sdlc-workflow-control-validate-explicit-{}",
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .expect("time")
-                .as_nanos()
-        );
-        let root = std::env::temp_dir().join(unique);
-        std::fs::create_dir_all(&root).expect("create temp root");
-        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
-
-        let resolved =
-            resolve_default_validate_command(&layout, "npm run -s build").expect("resolve");
-        assert_eq!(resolved, "npm run -s build");
-
-        let _ = std::fs::remove_dir_all(root);
-    }
-
-    #[test]
-    fn maps_default_validate_to_agent_validate_script() {
-        let unique = format!(
-            "agentic-sdlc-workflow-control-validate-script-{}",
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .expect("time")
-                .as_nanos()
-        );
-        let root = std::env::temp_dir().join(unique);
-        std::fs::create_dir_all(&root).expect("create temp root");
-        std::fs::write(
-            root.join("package.json"),
-            r#"{"name":"demo","scripts":{"agent:validate":"npm run -s build && cargo check --manifest-path src-tauri/Cargo.toml"}}"#,
-        )
-        .expect("write package json");
-        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
-
-        let resolved = resolve_default_validate_command(&layout, "cargo test").expect("resolve");
-        assert_eq!(resolved, "npm run -s agent:validate");
-
-        let _ = std::fs::remove_dir_all(root);
-    }
-}
-
 fn print_package_check_report(report: &PackageCheckReport) {
     println!(
         "Package Check: checked={} errors={} warnings={}",
@@ -743,5 +693,55 @@ fn print_skill_quality_report(report: &SkillQualityReport) {
         for finding in &entry.findings {
             println!("    - {:?}: {}", finding.level, finding.message);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::resolve_default_validate_command;
+    use crate::engine::project::AgentProjectLayout;
+
+    #[test]
+    fn keeps_explicit_validate_command() {
+        let unique = format!(
+            "agentic-sdlc-workflow-control-validate-explicit-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(&root).expect("create temp root");
+        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+
+        let resolved =
+            resolve_default_validate_command(&layout, "npm run -s build").expect("resolve");
+        assert_eq!(resolved, "npm run -s build");
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn maps_default_validate_to_agent_validate_script() {
+        let unique = format!(
+            "agentic-sdlc-workflow-control-validate-script-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root = std::env::temp_dir().join(unique);
+        std::fs::create_dir_all(&root).expect("create temp root");
+        std::fs::write(
+            root.join("package.json"),
+            r#"{"name":"demo","scripts":{"agent:validate":"npm run -s build && cargo check --manifest-path src-tauri/Cargo.toml"}}"#,
+        )
+        .expect("write package json");
+        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+
+        let resolved = resolve_default_validate_command(&layout, "cargo test").expect("resolve");
+        assert_eq!(resolved, "npm run -s agent:validate");
+
+        let _ = std::fs::remove_dir_all(root);
     }
 }

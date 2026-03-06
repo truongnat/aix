@@ -143,12 +143,14 @@
       "cybersecurity/bugfix",
       "cybersecurity/feature",
       "cybersecurity/release",
-      "cybersecurity/review"
+      "cybersecurity/review",
+      "cybersecurity/security-scan"
     ],
     "skills": [
       "cybersecurity/acceptance_guard",
       "cybersecurity/impact_analyzer",
-      "cybersecurity/risk_register"
+      "cybersecurity/risk_register",
+      "cybersecurity/security_scan_guard"
     ],
     "roles": [
       "cybersecurity/architect",
@@ -161,7 +163,8 @@
       "cybersecurity/bugfix_prompt",
       "cybersecurity/feature_prompt",
       "cybersecurity/release_prompt",
-      "cybersecurity/review_prompt"
+      "cybersecurity/review_prompt",
+      "cybersecurity/security_scan_prompt"
     ]
   },
   {

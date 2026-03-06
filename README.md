@@ -1,5 +1,7 @@
 # agentic-sdlc
 
+[![CI](https://github.com/truongnat/agentic-sdlc/actions/workflows/ci.yml/badge.svg)](https://github.com/truongnat/agentic-sdlc/actions/workflows/ci.yml)
+
 Deterministic local execution runtime for agentic software workflows.
 
 This repository runs a single consolidated workflow engine with:
@@ -8,6 +10,16 @@ This repository runs a single consolidated workflow engine with:
 - idempotent step short-circuit support
 - runtime policy enforcement for permissions and trust tier
 - structured step telemetry and trace timeline export
+
+## Determinism Scope
+
+Determinism currently applies to orchestration semantics:
+- ready-step ordering
+- state transitions and persistence
+- trace generation and replayability of engine decisions
+
+LLM-generated text/content can still vary across runs unless provider/model/settings enforce deterministic output behavior.
+Treat content reproducibility as a separate concern from workflow engine determinism.
 
 ## Current Release
 
@@ -277,6 +289,11 @@ These files are generated and ignored by git by default:
 - `.agents/marketplace.json`
 - `.agents/skills.lock.json`
 - `.agents/skills/imported/*`
+
+## Roadmap
+
+Current gap closure plan is tracked in:
+- [`docs/GAP_ROADMAP.md`](docs/GAP_ROADMAP.md)
 
 Regenerate them anytime with:
 

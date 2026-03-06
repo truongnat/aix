@@ -70,7 +70,8 @@
       "skills": [
         "./.agents/skills/cybersecurity/acceptance_guard/SKILL.md",
         "./.agents/skills/cybersecurity/impact_analyzer/SKILL.md",
-        "./.agents/skills/cybersecurity/risk_register/SKILL.md"
+        "./.agents/skills/cybersecurity/risk_register/SKILL.md",
+        "./.agents/skills/cybersecurity/security_scan_guard/SKILL.md"
       ]
     },
     {
