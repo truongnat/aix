@@ -17,6 +17,7 @@ pub enum LlmProvider {
     Ollama,
     OpenAI,
     Gemini,
+    Anthropic,
 }
 
 impl LlmProvider {
@@ -25,7 +26,65 @@ impl LlmProvider {
             LlmProvider::Ollama => "ollama",
             LlmProvider::OpenAI => "openai",
             LlmProvider::Gemini => "gemini",
+            LlmProvider::Anthropic => "anthropic",
         }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum FallbackPolicy {
+    Always,
+    TransientOnly,
+    Never,
+}
+
+impl FallbackPolicy {
+    fn as_str(self) -> &'static str {
+        match self {
+            FallbackPolicy::Always => "always",
+            FallbackPolicy::TransientOnly => "transient_only",
+            FallbackPolicy::Never => "never",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum LlmErrorClass {
+    Auth,
+    Validation,
+    RateLimit,
+    Server,
+    Timeout,
+    Network,
+    Configuration,
+    EmptyResponse,
+    Unknown,
+}
+
+impl LlmErrorClass {
+    fn as_str(self) -> &'static str {
+        match self {
+            LlmErrorClass::Auth => "auth",
+            LlmErrorClass::Validation => "validation",
+            LlmErrorClass::RateLimit => "rate_limit",
+            LlmErrorClass::Server => "server",
+            LlmErrorClass::Timeout => "timeout",
+            LlmErrorClass::Network => "network",
+            LlmErrorClass::Configuration => "configuration",
+            LlmErrorClass::EmptyResponse => "empty_response",
+            LlmErrorClass::Unknown => "unknown",
+        }
+    }
+
+    fn is_transient(self) -> bool {
+        matches!(
+            self,
+            LlmErrorClass::RateLimit
+                | LlmErrorClass::Server
+                | LlmErrorClass::Timeout
+                | LlmErrorClass::Network
+                | LlmErrorClass::Unknown
+        )
     }
 }
 
@@ -33,6 +92,7 @@ impl LlmProvider {
 struct RouterConfig {
     timeout_ms: u64,
     max_retries: u32,
+    fallback_policy: FallbackPolicy,
 }
 
 #[derive(Debug, Clone)]
@@ -169,6 +229,44 @@ struct GeminiUsageMetadata {
     total_token_count: u32,
 }
 
+#[derive(Debug, Serialize)]
+struct AnthropicMessageRequest {
+    model: String,
+    max_tokens: u32,
+    temperature: f32,
+    messages: Vec<AnthropicMessage>,
+}
+
+#[derive(Debug, Serialize)]
+struct AnthropicMessage {
+    role: String,
+    content: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct AnthropicMessageResponse {
+    #[serde(default)]
+    content: Vec<AnthropicContentBlock>,
+    #[serde(default)]
+    usage: Option<AnthropicUsage>,
+}
+
+#[derive(Debug, Deserialize)]
+struct AnthropicContentBlock {
+    #[serde(rename = "type")]
+    kind: String,
+    #[serde(default)]
+    text: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct AnthropicUsage {
+    #[serde(default)]
+    input_tokens: u32,
+    #[serde(default)]
+    output_tokens: u32,
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 struct ProviderUsage {
     input_tokens: u32,
@@ -185,6 +283,15 @@ struct ProviderCallResult {
     attempts: u32,
 }
 
+#[derive(Debug, Clone)]
+struct ProviderCallFailure {
+    provider: LlmProvider,
+    model: String,
+    message: String,
+    class: LlmErrorClass,
+    attempts: u32,
+}
+
 fn parse_llm_provider(raw: Option<String>) -> LlmProvider {
     let normalized = raw
         .as_deref()
@@ -194,6 +301,7 @@ fn parse_llm_provider(raw: Option<String>) -> LlmProvider {
     match normalized.as_str() {
         "openai" => LlmProvider::OpenAI,
         "gemini" => LlmProvider::Gemini,
+        "anthropic" | "claude" => LlmProvider::Anthropic,
         _ => LlmProvider::Ollama,
     }
 }
@@ -203,6 +311,7 @@ fn default_model_for_provider(provider: LlmProvider) -> &'static str {
         LlmProvider::Ollama => "qwen3:8b",
         LlmProvider::OpenAI => "gpt-4o-mini",
         LlmProvider::Gemini => "gemini-1.5-flash",
+        LlmProvider::Anthropic => "claude-3-5-haiku-latest",
     }
 }
 
@@ -211,6 +320,7 @@ fn model_env_for_provider(provider: LlmProvider) -> &'static str {
         LlmProvider::Ollama => "ANTIGRAV_LLM_MODEL_OLLAMA",
         LlmProvider::OpenAI => "ANTIGRAV_LLM_MODEL_OPENAI",
         LlmProvider::Gemini => "ANTIGRAV_LLM_MODEL_GEMINI",
+        LlmProvider::Anthropic => "ANTIGRAV_LLM_MODEL_ANTHROPIC",
     }
 }
 
@@ -229,9 +339,32 @@ fn parse_provider_list(raw: Option<String>) -> Vec<LlmProvider> {
             "ollama" => Some(LlmProvider::Ollama),
             "openai" => Some(LlmProvider::OpenAI),
             "gemini" => Some(LlmProvider::Gemini),
+            "anthropic" | "claude" => Some(LlmProvider::Anthropic),
             _ => None,
         })
         .collect()
+}
+
+fn parse_fallback_policy(raw: Option<String>) -> FallbackPolicy {
+    match raw
+        .as_deref()
+        .unwrap_or_default()
+        .trim()
+        .to_ascii_lowercase()
+        .as_str()
+    {
+        "always" => FallbackPolicy::Always,
+        "never" => FallbackPolicy::Never,
+        _ => FallbackPolicy::TransientOnly,
+    }
+}
+
+fn should_attempt_fallback(policy: FallbackPolicy, class: LlmErrorClass) -> bool {
+    match policy {
+        FallbackPolicy::Always => true,
+        FallbackPolicy::Never => false,
+        FallbackPolicy::TransientOnly => class.is_transient(),
+    }
 }
 
 fn parse_simulation_fallback(raw: Option<String>) -> bool {
@@ -258,6 +391,44 @@ fn build_http_client() -> Result<reqwest::Client> {
     Ok(reqwest::Client::builder().no_proxy().build()?)
 }
 
+fn classify_http_status(status_code: u16) -> LlmErrorClass {
+    match status_code {
+        401 | 403 => LlmErrorClass::Auth,
+        429 => LlmErrorClass::RateLimit,
+        500..=599 => LlmErrorClass::Server,
+        400 | 404 | 422 => LlmErrorClass::Validation,
+        _ => LlmErrorClass::Unknown,
+    }
+}
+
+fn provider_failure(
+    provider: LlmProvider,
+    model: &str,
+    class: LlmErrorClass,
+    message: impl Into<String>,
+) -> ProviderCallFailure {
+    ProviderCallFailure {
+        provider,
+        model: model.to_string(),
+        message: message.into(),
+        class,
+        attempts: 1,
+    }
+}
+
+fn map_reqwest_error(
+    provider: LlmProvider,
+    model: &str,
+    err: reqwest::Error,
+) -> ProviderCallFailure {
+    let class = if err.is_timeout() || err.is_connect() {
+        LlmErrorClass::Network
+    } else {
+        LlmErrorClass::Unknown
+    };
+    provider_failure(provider, model, class, err.to_string())
+}
+
 fn estimate_cost_usd(provider: LlmProvider, model: &str, usage: ProviderUsage) -> (f64, f64, f64) {
     let model_lower = model.to_ascii_lowercase();
     let (input_rate_per_1k, output_rate_per_1k) = match provider {
@@ -276,6 +447,15 @@ fn estimate_cost_usd(provider: LlmProvider, model: &str, usage: ProviderUsage) -
                 (0.000075, 0.0003)
             } else {
                 (0.00025, 0.001)
+            }
+        }
+        LlmProvider::Anthropic => {
+            if model_lower.contains("haiku") {
+                (0.00025, 0.00125)
+            } else if model_lower.contains("sonnet") {
+                (0.003, 0.015)
+            } else {
+                (0.001, 0.005)
             }
         }
     };
@@ -338,6 +518,8 @@ impl LlmSubAgentSkill {
             .and_then(|v| v.trim().parse::<u32>().ok())
             .unwrap_or(1);
         let fallback_providers = parse_provider_list(std::env::var("ANTIGRAV_LLM_FALLBACK").ok());
+        let fallback_policy =
+            parse_fallback_policy(std::env::var("ANTIGRAV_LLM_FALLBACK_POLICY").ok());
         Self {
             default_role: "software-engineer".to_string(),
             model,
@@ -355,6 +537,7 @@ impl LlmSubAgentSkill {
             router_config: RouterConfig {
                 timeout_ms,
                 max_retries,
+                fallback_policy,
             },
         }
     }
@@ -389,10 +572,10 @@ impl LlmSubAgentSkill {
         model: &str,
         prompt: &str,
         temperature: f32,
-    ) -> Result<ProviderCallResult> {
+    ) -> Result<ProviderCallResult, ProviderCallFailure> {
         let mut attempts = 0_u32;
         let max_attempts = self.router_config.max_retries.saturating_add(1);
-        let mut last_error = String::new();
+        let mut last_failure: Option<ProviderCallFailure> = None;
 
         for attempt in 0..max_attempts {
             attempts = attempts.saturating_add(1);
@@ -407,28 +590,43 @@ impl LlmSubAgentSkill {
                     result.attempts = attempts;
                     return Ok(result);
                 }
-                Ok(Err(err)) => {
-                    last_error = err.to_string();
+                Ok(Err(mut failure)) => {
+                    failure.attempts = attempts;
+                    last_failure = Some(failure);
                 }
                 Err(_) => {
-                    last_error =
-                        format!("provider timeout after {}ms", self.router_config.timeout_ms);
+                    last_failure = Some(ProviderCallFailure {
+                        provider,
+                        model: model.to_string(),
+                        message: format!(
+                            "provider timeout after {}ms",
+                            self.router_config.timeout_ms
+                        ),
+                        class: LlmErrorClass::Timeout,
+                        attempts,
+                    });
                 }
             }
 
-            if attempt + 1 < max_attempts {
+            let retryable = last_failure
+                .as_ref()
+                .map(|failure| failure.class.is_transient())
+                .unwrap_or(false);
+            if attempt + 1 < max_attempts && retryable {
                 let backoff = 200_u64.saturating_mul(1_u64 << attempt.min(5));
                 sleep(Duration::from_millis(backoff)).await;
+            } else {
+                break;
             }
         }
 
-        Err(anyhow!(
-            "provider={} model={} failed after {} attempt(s): {}",
-            provider.as_str(),
-            model,
+        Err(last_failure.unwrap_or_else(|| ProviderCallFailure {
+            provider,
+            model: model.to_string(),
+            message: "provider failed with unknown error".to_string(),
+            class: LlmErrorClass::Unknown,
             attempts,
-            last_error
-        ))
+        }))
     }
 
     async fn call_provider_once(
@@ -437,11 +635,12 @@ impl LlmSubAgentSkill {
         model: &str,
         prompt: &str,
         temperature: f32,
-    ) -> Result<ProviderCallResult> {
+    ) -> Result<ProviderCallResult, ProviderCallFailure> {
         match provider {
             LlmProvider::Ollama => self.call_ollama(model, prompt, temperature).await,
             LlmProvider::OpenAI => self.call_openai(model, prompt, temperature).await,
             LlmProvider::Gemini => self.call_gemini(model, prompt, temperature).await,
+            LlmProvider::Anthropic => self.call_anthropic(model, prompt, temperature).await,
         }
     }
 
@@ -450,8 +649,15 @@ impl LlmSubAgentSkill {
         model: &str,
         prompt: &str,
         temperature: f32,
-    ) -> Result<ProviderCallResult> {
-        let client = build_http_client()?;
+    ) -> Result<ProviderCallResult, ProviderCallFailure> {
+        let client = build_http_client().map_err(|err| {
+            provider_failure(
+                LlmProvider::Ollama,
+                model,
+                LlmErrorClass::Configuration,
+                err.to_string(),
+            )
+        })?;
         let request = OllamaRequest {
             model: model.to_string(),
             prompt: prompt.to_string(),
@@ -462,18 +668,46 @@ impl LlmSubAgentSkill {
             .post(format!("{}/api/generate", resolve_ollama_host()))
             .json(&request)
             .send()
-            .await?;
+            .await
+            .map_err(|err| map_reqwest_error(LlmProvider::Ollama, model, err))?;
+        let status = response.status();
         if !response.status().is_success() {
             let body = response.text().await.unwrap_or_default();
-            return Err(anyhow!("ollama request failed: {}", body));
+            return Err(provider_failure(
+                LlmProvider::Ollama,
+                model,
+                classify_http_status(status.as_u16()),
+                format!(
+                    "ollama request failed (status={}): {}",
+                    status.as_u16(),
+                    body
+                ),
+            ));
         }
-        let payload: OllamaResponse = response.json().await?;
+        let payload: OllamaResponse = response.json().await.map_err(|err| {
+            provider_failure(
+                LlmProvider::Ollama,
+                model,
+                LlmErrorClass::Validation,
+                format!("ollama response parse failed: {}", err),
+            )
+        })?;
         if let Some(err) = payload.error {
-            return Err(anyhow!("ollama error: {}", err));
+            return Err(provider_failure(
+                LlmProvider::Ollama,
+                model,
+                LlmErrorClass::Validation,
+                format!("ollama error: {}", err),
+            ));
         }
         let text = payload.response.unwrap_or_default().trim().to_string();
         if text.is_empty() {
-            return Err(anyhow!("ollama returned empty response"));
+            return Err(provider_failure(
+                LlmProvider::Ollama,
+                model,
+                LlmErrorClass::EmptyResponse,
+                "ollama returned empty response",
+            ));
         }
         let usage = ProviderUsage {
             input_tokens: payload.prompt_eval_count.unwrap_or(0),
@@ -497,9 +731,15 @@ impl LlmSubAgentSkill {
         model: &str,
         prompt: &str,
         temperature: f32,
-    ) -> Result<ProviderCallResult> {
-        let api_key =
-            std::env::var("OPENAI_API_KEY").map_err(|_| anyhow!("OPENAI_API_KEY is not set"))?;
+    ) -> Result<ProviderCallResult, ProviderCallFailure> {
+        let api_key = std::env::var("OPENAI_API_KEY").map_err(|_| {
+            provider_failure(
+                LlmProvider::OpenAI,
+                model,
+                LlmErrorClass::Configuration,
+                "OPENAI_API_KEY is not set",
+            )
+        })?;
         let request = OpenAiChatRequest {
             model: model.to_string(),
             messages: vec![OpenAiMessage {
@@ -508,24 +748,56 @@ impl LlmSubAgentSkill {
             }],
             temperature,
         };
-        let client = build_http_client()?;
+        let client = build_http_client().map_err(|err| {
+            provider_failure(
+                LlmProvider::OpenAI,
+                model,
+                LlmErrorClass::Configuration,
+                err.to_string(),
+            )
+        })?;
         let response = client
             .post("https://api.openai.com/v1/chat/completions")
             .bearer_auth(api_key)
             .json(&request)
             .send()
-            .await?;
+            .await
+            .map_err(|err| map_reqwest_error(LlmProvider::OpenAI, model, err))?;
+        let status = response.status();
         if !response.status().is_success() {
             let body = response.text().await.unwrap_or_default();
-            return Err(anyhow!("openai request failed: {}", body));
+            return Err(provider_failure(
+                LlmProvider::OpenAI,
+                model,
+                classify_http_status(status.as_u16()),
+                format!(
+                    "openai request failed (status={}): {}",
+                    status.as_u16(),
+                    body
+                ),
+            ));
         }
-        let payload: OpenAiChatResponse = response.json().await?;
+        let payload: OpenAiChatResponse = response.json().await.map_err(|err| {
+            provider_failure(
+                LlmProvider::OpenAI,
+                model,
+                LlmErrorClass::Validation,
+                format!("openai response parse failed: {}", err),
+            )
+        })?;
         let text = payload
             .choices
             .first()
             .map(|choice| choice.message.content.trim().to_string())
             .filter(|v| !v.is_empty())
-            .ok_or_else(|| anyhow!("openai returned empty choices"))?;
+            .ok_or_else(|| {
+                provider_failure(
+                    LlmProvider::OpenAI,
+                    model,
+                    LlmErrorClass::EmptyResponse,
+                    "openai returned empty choices",
+                )
+            })?;
         let usage = payload.usage.unwrap_or(OpenAiUsage {
             prompt_tokens: 0,
             completion_tokens: 0,
@@ -549,9 +821,15 @@ impl LlmSubAgentSkill {
         model: &str,
         prompt: &str,
         temperature: f32,
-    ) -> Result<ProviderCallResult> {
-        let api_key =
-            std::env::var("GEMINI_API_KEY").map_err(|_| anyhow!("GEMINI_API_KEY is not set"))?;
+    ) -> Result<ProviderCallResult, ProviderCallFailure> {
+        let api_key = std::env::var("GEMINI_API_KEY").map_err(|_| {
+            provider_failure(
+                LlmProvider::Gemini,
+                model,
+                LlmErrorClass::Configuration,
+                "GEMINI_API_KEY is not set",
+            )
+        })?;
         let model_path = if model.starts_with("models/") {
             model.to_string()
         } else {
@@ -569,13 +847,42 @@ impl LlmSubAgentSkill {
             }],
             generation_config: GeminiGenerationConfig { temperature },
         };
-        let client = build_http_client()?;
-        let response = client.post(url).json(&request).send().await?;
+        let client = build_http_client().map_err(|err| {
+            provider_failure(
+                LlmProvider::Gemini,
+                model,
+                LlmErrorClass::Configuration,
+                err.to_string(),
+            )
+        })?;
+        let response = client
+            .post(url)
+            .json(&request)
+            .send()
+            .await
+            .map_err(|err| map_reqwest_error(LlmProvider::Gemini, model, err))?;
+        let status = response.status();
         if !response.status().is_success() {
             let body = response.text().await.unwrap_or_default();
-            return Err(anyhow!("gemini request failed: {}", body));
+            return Err(provider_failure(
+                LlmProvider::Gemini,
+                model,
+                classify_http_status(status.as_u16()),
+                format!(
+                    "gemini request failed (status={}): {}",
+                    status.as_u16(),
+                    body
+                ),
+            ));
         }
-        let payload: GeminiGenerateResponse = response.json().await?;
+        let payload: GeminiGenerateResponse = response.json().await.map_err(|err| {
+            provider_failure(
+                LlmProvider::Gemini,
+                model,
+                LlmErrorClass::Validation,
+                format!("gemini response parse failed: {}", err),
+            )
+        })?;
         let text = payload
             .candidates
             .first()
@@ -590,7 +897,14 @@ impl LlmSubAgentSkill {
             })
             .map(|v| v.trim().to_string())
             .filter(|v| !v.is_empty())
-            .ok_or_else(|| anyhow!("gemini returned empty candidates"))?;
+            .ok_or_else(|| {
+                provider_failure(
+                    LlmProvider::Gemini,
+                    model,
+                    LlmErrorClass::EmptyResponse,
+                    "gemini returned empty candidates",
+                )
+            })?;
         let usage = payload.usage_metadata.unwrap_or(GeminiUsageMetadata {
             prompt_token_count: 0,
             candidates_token_count: 0,
@@ -604,6 +918,101 @@ impl LlmSubAgentSkill {
                 input_tokens: usage.prompt_token_count,
                 output_tokens: usage.candidates_token_count,
                 total_tokens: usage.total_token_count,
+            },
+            attempts: 1,
+        })
+    }
+
+    async fn call_anthropic(
+        &self,
+        model: &str,
+        prompt: &str,
+        temperature: f32,
+    ) -> Result<ProviderCallResult, ProviderCallFailure> {
+        let api_key = std::env::var("ANTHROPIC_API_KEY").map_err(|_| {
+            provider_failure(
+                LlmProvider::Anthropic,
+                model,
+                LlmErrorClass::Configuration,
+                "ANTHROPIC_API_KEY is not set",
+            )
+        })?;
+        let request = AnthropicMessageRequest {
+            model: model.to_string(),
+            max_tokens: 1024,
+            temperature,
+            messages: vec![AnthropicMessage {
+                role: "user".to_string(),
+                content: prompt.to_string(),
+            }],
+        };
+        let client = build_http_client().map_err(|err| {
+            provider_failure(
+                LlmProvider::Anthropic,
+                model,
+                LlmErrorClass::Configuration,
+                err.to_string(),
+            )
+        })?;
+        let response = client
+            .post("https://api.anthropic.com/v1/messages")
+            .header("x-api-key", api_key)
+            .header("anthropic-version", "2023-06-01")
+            .json(&request)
+            .send()
+            .await
+            .map_err(|err| map_reqwest_error(LlmProvider::Anthropic, model, err))?;
+        let status = response.status();
+        if !status.is_success() {
+            let body = response.text().await.unwrap_or_default();
+            return Err(provider_failure(
+                LlmProvider::Anthropic,
+                model,
+                classify_http_status(status.as_u16()),
+                format!(
+                    "anthropic request failed (status={}): {}",
+                    status.as_u16(),
+                    body
+                ),
+            ));
+        }
+        let payload: AnthropicMessageResponse = response.json().await.map_err(|err| {
+            provider_failure(
+                LlmProvider::Anthropic,
+                model,
+                LlmErrorClass::Validation,
+                format!("anthropic response parse failed: {}", err),
+            )
+        })?;
+        let text = payload
+            .content
+            .iter()
+            .filter(|block| block.kind == "text")
+            .filter_map(|block| block.text.clone())
+            .collect::<Vec<_>>()
+            .join("\n")
+            .trim()
+            .to_string();
+        if text.is_empty() {
+            return Err(provider_failure(
+                LlmProvider::Anthropic,
+                model,
+                LlmErrorClass::EmptyResponse,
+                "anthropic returned empty content blocks",
+            ));
+        }
+        let usage = payload.usage.unwrap_or(AnthropicUsage {
+            input_tokens: 0,
+            output_tokens: 0,
+        });
+        Ok(ProviderCallResult {
+            provider: LlmProvider::Anthropic,
+            model: model.to_string(),
+            text,
+            usage: ProviderUsage {
+                input_tokens: usage.input_tokens,
+                output_tokens: usage.output_tokens,
+                total_tokens: usage.input_tokens.saturating_add(usage.output_tokens),
             },
             attempts: 1,
         })
@@ -663,6 +1072,7 @@ impl Skill for LlmSubAgentSkill {
         let chain = build_provider_chain(primary_provider, &self.fallback_providers);
         let mut errors = Vec::new();
         let mut fallback_used = false;
+        let mut fallback_blocked_by_policy = false;
         let mut total_attempts = 0_u32;
         let mut success: Option<ProviderCallResult> = None;
 
@@ -682,10 +1092,26 @@ impl Skill for LlmSubAgentSkill {
                     success = Some(result);
                     break;
                 }
-                Err(err) => {
-                    errors.push(err.to_string());
-                    total_attempts = total_attempts
-                        .saturating_add(self.router_config.max_retries.saturating_add(1));
+                Err(failure) => {
+                    errors.push(format!(
+                        "provider={} model={} class={} transient={} message={}",
+                        failure.provider.as_str(),
+                        failure.model,
+                        failure.class.as_str(),
+                        failure.class.is_transient(),
+                        failure.message
+                    ));
+                    total_attempts = total_attempts.saturating_add(failure.attempts);
+                    let has_next_provider = idx + 1 < chain.len();
+                    if has_next_provider
+                        && !should_attempt_fallback(
+                            self.router_config.fallback_policy,
+                            failure.class,
+                        )
+                    {
+                        fallback_blocked_by_policy = true;
+                        break;
+                    }
                 }
             }
         }
@@ -725,7 +1151,9 @@ impl Skill for LlmSubAgentSkill {
                     "attempts": total_attempts,
                     "max_retries": self.router_config.max_retries,
                     "timeout_ms": self.router_config.timeout_ms,
+                    "fallback_policy": self.router_config.fallback_policy.as_str(),
                     "fallback_used": false,
+                    "fallback_blocked_by_policy": fallback_blocked_by_policy,
                     "simulation_fallback": true,
                     "errors": errors,
                 }
@@ -767,7 +1195,9 @@ impl Skill for LlmSubAgentSkill {
                 "attempts": total_attempts.max(result.attempts),
                 "max_retries": self.router_config.max_retries,
                 "timeout_ms": self.router_config.timeout_ms,
+                "fallback_policy": self.router_config.fallback_policy.as_str(),
                 "fallback_used": fallback_used,
+                "fallback_blocked_by_policy": fallback_blocked_by_policy,
                 "simulation_fallback": false,
                 "errors": errors,
             }
@@ -778,8 +1208,9 @@ impl Skill for LlmSubAgentSkill {
 #[cfg(test)]
 mod tests {
     use super::{
-        build_provider_chain, estimate_cost_usd, parse_input_payload, parse_provider_list,
-        parse_role_prefixed_input, LlmProvider, LlmSubAgentSkill, ProviderUsage, RouterConfig,
+        build_provider_chain, estimate_cost_usd, parse_fallback_policy, parse_input_payload,
+        parse_provider_list, parse_role_prefixed_input, should_attempt_fallback, FallbackPolicy,
+        LlmErrorClass, LlmProvider, LlmSubAgentSkill, ProviderUsage, RouterConfig,
     };
     use crate::skill::io::SkillInput;
     use serde_json::json;
@@ -816,6 +1247,7 @@ mod tests {
             router_config: RouterConfig {
                 timeout_ms: 30_000,
                 max_retries: 0,
+                fallback_policy: FallbackPolicy::TransientOnly,
             },
         }
     }
@@ -857,15 +1289,24 @@ mod tests {
 
     #[test]
     fn provider_list_ignores_empty_and_unknown_values() {
-        let parsed = parse_provider_list(Some("openai, ,unknown,gemini".to_string()));
-        assert_eq!(parsed, vec![LlmProvider::OpenAI, LlmProvider::Gemini]);
+        let parsed =
+            parse_provider_list(Some("openai, ,unknown,gemini,anthropic,claude".to_string()));
+        assert_eq!(
+            parsed,
+            vec![
+                LlmProvider::OpenAI,
+                LlmProvider::Gemini,
+                LlmProvider::Anthropic,
+                LlmProvider::Anthropic
+            ]
+        );
 
         let parsed_empty = parse_provider_list(None);
         assert!(parsed_empty.is_empty());
     }
 
     #[test]
-    fn cost_estimation_is_zero_for_ollama_and_positive_for_openai() {
+    fn cost_estimation_is_zero_for_ollama_and_positive_for_hosted_providers() {
         let usage = ProviderUsage {
             input_tokens: 1000,
             output_tokens: 1000,
@@ -873,8 +1314,37 @@ mod tests {
         };
         let (ollama_cost, _, _) = estimate_cost_usd(LlmProvider::Ollama, "qwen3:8b", usage);
         let (openai_cost, _, _) = estimate_cost_usd(LlmProvider::OpenAI, "gpt-4o-mini", usage);
+        let (anthropic_cost, _, _) =
+            estimate_cost_usd(LlmProvider::Anthropic, "claude-3-5-haiku-latest", usage);
         assert_eq!(ollama_cost, 0.0);
         assert!(openai_cost > 0.0);
+        assert!(anthropic_cost > 0.0);
+    }
+
+    #[test]
+    fn fallback_policy_transient_only_blocks_auth_errors() {
+        assert_eq!(
+            parse_fallback_policy(Some("always".to_string())),
+            FallbackPolicy::Always
+        );
+        assert_eq!(
+            parse_fallback_policy(Some("never".to_string())),
+            FallbackPolicy::Never
+        );
+        assert_eq!(
+            parse_fallback_policy(Some("transient_only".to_string())),
+            FallbackPolicy::TransientOnly
+        );
+        assert_eq!(parse_fallback_policy(None), FallbackPolicy::TransientOnly);
+
+        assert!(should_attempt_fallback(
+            FallbackPolicy::TransientOnly,
+            LlmErrorClass::Timeout
+        ));
+        assert!(!should_attempt_fallback(
+            FallbackPolicy::TransientOnly,
+            LlmErrorClass::Auth
+        ));
     }
 
     #[tokio::test]
@@ -922,6 +1392,30 @@ mod tests {
             .await
             .expect("gemini live smoke call");
         assert_eq!(result.provider, LlmProvider::Gemini);
+        assert!(!result.text.trim().is_empty());
+    }
+
+    #[tokio::test]
+    async fn llm_subagent_live_smoke_anthropic() {
+        if !live_smoke_enabled() {
+            eprintln!("skipped: set ANTIGRAV_RUN_LIVE_LLM_TESTS=1 to run live provider tests");
+            return;
+        }
+        if !has_env_var("ANTHROPIC_API_KEY") {
+            eprintln!("skipped: ANTHROPIC_API_KEY is not set");
+            return;
+        }
+        let skill = live_skill(LlmProvider::Anthropic);
+        let result = skill
+            .call_provider_with_retry(
+                LlmProvider::Anthropic,
+                &skill.model,
+                r#"Return exactly this JSON object and nothing else: {"summary":"smoke","actions":[],"risks":[]}"#,
+                0.0,
+            )
+            .await
+            .expect("anthropic live smoke call");
+        assert_eq!(result.provider, LlmProvider::Anthropic);
         assert!(!result.text.trim().is_empty());
     }
 }

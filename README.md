@@ -276,14 +276,16 @@ cargo run -- workflow trace <instance_id> --otel
 Common environment variables:
 
 ```bash
-ANTIGRAV_LLM_PROVIDER=ollama|openai|gemini
+ANTIGRAV_LLM_PROVIDER=ollama|openai|gemini|anthropic
 ANTIGRAV_LLM_MODEL=<primary model>
-ANTIGRAV_LLM_FALLBACK=openai,gemini
+ANTIGRAV_LLM_FALLBACK=openai,gemini,anthropic
+ANTIGRAV_LLM_FALLBACK_POLICY=transient_only|always|never
 ANTIGRAV_LLM_TIMEOUT_MS=30000
 ANTIGRAV_LLM_MAX_RETRIES=2
 ANTIGRAV_LLM_SIMULATION_FALLBACK=true
 OPENAI_API_KEY=...
 GEMINI_API_KEY=...
+ANTHROPIC_API_KEY=...
 ```
 
 Context retrieval service (for deterministic LLM context injection):

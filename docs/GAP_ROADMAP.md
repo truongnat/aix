@@ -82,6 +82,10 @@ The highest-priority work now is to close production-readiness gaps around evalu
   - lock entries include deterministic `attestation` marker for imported skills
   - `workflow verify-lock --require-attestation` enforces attestation presence/validity
   - report includes `attestation_missing` and `attestation_invalid` breakdowns.
+- Provider/fallback reliability upgrade (WS-07 partial):
+  - Anthropic provider support in `llm_subagent` router
+  - fallback policy control: `ANTIGRAV_LLM_FALLBACK_POLICY=transient_only|always|never`
+  - fallback now differentiates transient vs non-transient failures (e.g. auth/config/model errors).
 
 ## Day 61-90: Observability + Supply Chain + Enterprise Integrations
 
