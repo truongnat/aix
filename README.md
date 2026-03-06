@@ -255,6 +255,16 @@ cargo run -- workflow verify-lock --require-attestation
 
 `--mode local` writes to `.agents/skills/imported`; `--mode global` writes to `$CODEX_HOME/skills/imported` (fallback: `~/.codex/skills/imported`).
 
+Register/list/ping MCP runtime servers (stored in `.agents/mcp/servers.json`):
+
+```bash
+cargo run -- workflow mcp-register ollama-cli --transport stdio --command npx --arg -y --arg mcp-client-for-ollama --arg --ollama-host --arg http://127.0.0.1:11434
+cargo run -- workflow mcp-register local-supabase --transport http --url http://127.0.0.1:54321/mcp --allow-tool query --allow-tool list_tables
+cargo run -- workflow mcp-list
+cargo run -- workflow mcp-ping
+cargo run -- workflow mcp-ping ollama-cli --timeout-ms 8000 --json
+```
+
 Resume a run:
 
 ```bash

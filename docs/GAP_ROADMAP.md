@@ -86,6 +86,11 @@ The highest-priority work now is to close production-readiness gaps around evalu
   - Anthropic provider support in `llm_subagent` router
   - fallback policy control: `ANTIGRAV_LLM_FALLBACK_POLICY=transient_only|always|never`
   - fallback now differentiates transient vs non-transient failures (e.g. auth/config/model errors).
+- MCP runtime integration surface (WS-08 partial):
+  - `workflow mcp-register <name>` for stdio/http/sse server registry entries
+  - `workflow mcp-list` for local runtime MCP inventory
+  - `workflow mcp-ping [name] --timeout-ms <ms>` health checks with persisted last ping status
+  - registry persisted at `.agents/mcp/servers.json` with per-server allow/deny tool metadata.
 
 ## Day 61-90: Observability + Supply Chain + Enterprise Integrations
 

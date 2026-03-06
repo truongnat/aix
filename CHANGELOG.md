@@ -7,6 +7,11 @@ All notable changes to this project are documented here.
 ### Added
 - New command: `workflow normalize-imported-skills` to enrich already-imported `SKILL.md` metadata (`risk`, `source`, `tags`) from lockfile provenance without re-pulling repositories.
 - `normalize-imported-skills` supports `--dry-run`, `--json`, and local/global mode parity for safer rollout in CI and local validation.
+- New MCP runtime management commands:
+  - `workflow mcp-register <name>` (stdio/http/sse transport)
+  - `workflow mcp-list`
+  - `workflow mcp-ping [name] --timeout-ms <ms>`
+- MCP registry persistence under `.agents/mcp/servers.json` with per-server allow/deny tool policy metadata and last-ping status tracking.
 - Advanced scaffold defaults now include richer baseline package files:
   - non-empty rules (`runtime`, `branching`, `coding`, `merge`)
   - starter role files with explicit responsibilities
@@ -19,9 +24,10 @@ All notable changes to this project are documented here.
 - Role definitions were expanded across default and domain packs to be more specific and execution-oriented.
 - Imported skill corpus under `.agents/skills/imported` was normalized for more consistent metadata and safer reuse.
 - CLI run summaries for role/chat-thread flows now print per-step details (status, duration, actions, risks, provider/model, summary/error) for better traceability.
+- `llm_subagent` provider routing now supports Anthropic and policy-based fallback behavior via `ANTIGRAV_LLM_FALLBACK_POLICY=transient_only|always|never`.
 
 ### Quality
-- Test suite remains green with `cargo test` (`137 passed`), including new coverage for report quality gating and imported skill normalization paths.
+- Test suite remains green with `cargo test` (`150 passed`), including new coverage for MCP registry/ping behavior and provider fallback policy.
 
 ## [1.0.1] - 2026-02-26
 

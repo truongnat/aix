@@ -211,6 +211,38 @@ Mode behavior:
 - `--mode local`: install/sync under `.agents/skills/imported` and lockfile `.agents/skills.lock.json`
 - `--mode global`: install/sync under `$CODEX_HOME/skills/imported` (fallback `~/.codex/skills/imported`) and lockfile `$CODEX_HOME/skills/skills.lock.json`
 
+Register MCP runtime servers:
+
+```bash
+cargo run -- workflow mcp-register ollama-cli --transport stdio --command npx --arg -y --arg mcp-client-for-ollama --arg --ollama-host --arg http://127.0.0.1:11434
+cargo run -- workflow mcp-register local-supabase --transport http --url http://127.0.0.1:54321/mcp --allow-tool query --allow-tool list_tables
+cargo run -- workflow mcp-register analytics-sse --transport sse --url http://127.0.0.1:8787/sse --env API_TOKEN=dev-token --disabled
+```
+
+List MCP servers:
+
+```bash
+cargo run -- workflow mcp-list
+cargo run -- workflow mcp-list --json
+```
+
+Ping MCP servers (all enabled by default, or one by name):
+
+```bash
+cargo run -- workflow mcp-ping
+cargo run -- workflow mcp-ping ollama-cli --timeout-ms 8000
+cargo run -- workflow mcp-ping local-supabase --json
+```
+
+MCP command notes:
+- registry path: `.agents/mcp/servers.json`
+- supported transports: `stdio|http|sse`
+- `stdio` requires `--command` and optional repeated `--arg`
+- `http|sse` require `--url`
+- `--env` accepts repeated `KEY=VALUE` entries
+- `--allow-tool` / `--deny-tool` define per-server policy metadata
+- by default, `mcp-ping` checks only enabled servers
+
 Skill markdown format:
 - frontmatter metadata (`---`) with at least `name/domain/executor`, or
 - fenced JSON metadata block (legacy/current format).

@@ -164,6 +164,40 @@ pub(crate) enum WorkflowCommand {
         #[arg(long, default_value_t = false)]
         strict_ollama: bool,
     },
+    McpRegister {
+        name: String,
+        #[arg(long, default_value = "stdio")]
+        transport: String,
+        #[arg(long)]
+        command: Option<String>,
+        #[arg(long = "arg")]
+        args: Vec<String>,
+        #[arg(long)]
+        url: Option<String>,
+        #[arg(long)]
+        cwd: Option<String>,
+        #[arg(long = "env")]
+        env: Vec<String>,
+        #[arg(long = "allow-tool")]
+        allow_tools: Vec<String>,
+        #[arg(long = "deny-tool")]
+        deny_tools: Vec<String>,
+        #[arg(long, default_value_t = false)]
+        disabled: bool,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    McpList {
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    McpPing {
+        name: Option<String>,
+        #[arg(long, default_value_t = 5000)]
+        timeout_ms: u64,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
     StartTemplate {
         template: String,
         #[arg(long)]
@@ -576,6 +610,129 @@ pub(crate) struct DoctorReport {
 pub(crate) struct SetupReport {
     pub(crate) created_files: Vec<String>,
     pub(crate) doctor: DoctorReport,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum McpTransport {
+    Stdio,
+    Http,
+    Sse,
+}
+
+impl McpTransport {
+    pub(crate) fn as_str(&self) -> &'static str {
+        match self {
+            Self::Stdio => "stdio",
+            Self::Http => "http",
+            Self::Sse => "sse",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub(crate) struct McpServerConfig {
+    pub(crate) name: String,
+    pub(crate) transport: McpTransport,
+    pub(crate) command: Option<String>,
+    #[serde(default)]
+    pub(crate) args: Vec<String>,
+    pub(crate) url: Option<String>,
+    pub(crate) cwd: Option<String>,
+    #[serde(default)]
+    pub(crate) env: std::collections::BTreeMap<String, String>,
+    #[serde(default)]
+    pub(crate) allow_tools: Vec<String>,
+    #[serde(default)]
+    pub(crate) deny_tools: Vec<String>,
+    pub(crate) enabled: bool,
+    pub(crate) created_at_ms: u64,
+    pub(crate) updated_at_ms: u64,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) last_ping_ok: Option<bool>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) last_ping_at_ms: Option<u64>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) last_ping_latency_ms: Option<u64>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) last_ping_detail: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub(crate) struct McpRegistry {
+    pub(crate) version: u32,
+    pub(crate) generated_at_ms: u64,
+    #[serde(default)]
+    pub(crate) servers: Vec<McpServerConfig>,
+}
+
+impl Default for McpRegistry {
+    fn default() -> Self {
+        Self {
+            version: 1,
+            generated_at_ms: 0,
+            servers: Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct McpServerListEntry {
+    pub(crate) name: String,
+    pub(crate) transport: String,
+    pub(crate) enabled: bool,
+    pub(crate) command: Option<String>,
+    pub(crate) args: Vec<String>,
+    pub(crate) url: Option<String>,
+    pub(crate) cwd: Option<String>,
+    pub(crate) env_keys: Vec<String>,
+    pub(crate) allow_tools: Vec<String>,
+    pub(crate) deny_tools: Vec<String>,
+    pub(crate) created_at_ms: u64,
+    pub(crate) updated_at_ms: u64,
+    pub(crate) last_ping_ok: Option<bool>,
+    pub(crate) last_ping_at_ms: Option<u64>,
+    pub(crate) last_ping_latency_ms: Option<u64>,
+    pub(crate) last_ping_detail: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct McpRegisterReport {
+    pub(crate) action: String,
+    pub(crate) registry_path: String,
+    pub(crate) server: McpServerListEntry,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct McpListReport {
+    pub(crate) registry_path: String,
+    pub(crate) total: usize,
+    pub(crate) enabled: usize,
+    pub(crate) servers: Vec<McpServerListEntry>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct McpPingServerReport {
+    pub(crate) name: String,
+    pub(crate) transport: String,
+    pub(crate) enabled: bool,
+    pub(crate) ok: bool,
+    pub(crate) latency_ms: u64,
+    pub(crate) detail: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct McpPingReport {
+    pub(crate) registry_path: String,
+    pub(crate) checked: usize,
+    pub(crate) passed: usize,
+    pub(crate) failed: usize,
+    pub(crate) timeout_ms: u64,
+    pub(crate) results: Vec<McpPingServerReport>,
 }
 
 #[derive(Debug, Clone, Serialize)]

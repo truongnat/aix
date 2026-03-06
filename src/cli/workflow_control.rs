@@ -548,6 +548,141 @@ pub(super) fn handle_workflow_control_command(
             }
             Ok(WorkflowLaunchAction::Noop)
         }
+        WorkflowCommand::McpRegister {
+            name,
+            transport,
+            command,
+            args,
+            url,
+            cwd,
+            env,
+            allow_tools,
+            deny_tools,
+            disabled,
+            json,
+        } => {
+            let report = register_mcp_server(
+                project_layout,
+                &name,
+                &transport,
+                command.as_deref(),
+                &args,
+                url.as_deref(),
+                cwd.as_deref(),
+                &env,
+                &allow_tools,
+                &deny_tools,
+                !disabled,
+            )?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "MCP server {}: name='{}' transport='{}' enabled={} registry='{}'",
+                    report.action,
+                    report.server.name,
+                    report.server.transport,
+                    report.server.enabled,
+                    report.registry_path
+                );
+                if let Some(command) = report.server.command.as_deref() {
+                    println!(
+                        "- command='{}' args={} cwd={}",
+                        command,
+                        report.server.args.len(),
+                        report.server.cwd.as_deref().unwrap_or("-")
+                    );
+                }
+                if let Some(url) = report.server.url.as_deref() {
+                    println!("- url='{}'", url);
+                }
+                if !report.server.allow_tools.is_empty() {
+                    println!("- allow_tools={}", report.server.allow_tools.join(","));
+                }
+                if !report.server.deny_tools.is_empty() {
+                    println!("- deny_tools={}", report.server.deny_tools.join(","));
+                }
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::McpList { json } => {
+            let report = list_mcp_servers(project_layout)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else if report.servers.is_empty() {
+                println!("No MCP servers registered. Use 'workflow mcp-register <name> ...'.");
+            } else {
+                println!(
+                    "MCP Servers: total={} enabled={} registry='{}'",
+                    report.total, report.enabled, report.registry_path
+                );
+                for server in report.servers {
+                    let target = if let Some(command) = server.command.as_deref() {
+                        format!("command='{}' args={}", command, server.args.len())
+                    } else if let Some(url) = server.url.as_deref() {
+                        format!("url='{}'", url)
+                    } else {
+                        "target='-'".to_string()
+                    };
+                    let last_ping = match (
+                        server.last_ping_ok,
+                        server.last_ping_at_ms,
+                        server.last_ping_latency_ms,
+                    ) {
+                        (Some(ok), Some(at_ms), Some(latency_ms)) => {
+                            format!("ok={} at={} latency_ms={}", ok, at_ms, latency_ms)
+                        }
+                        _ => "none".to_string(),
+                    };
+                    println!(
+                        "- {} transport={} enabled={} {} env_keys={} allow_tools={} deny_tools={} last_ping={}",
+                        server.name,
+                        server.transport,
+                        server.enabled,
+                        target,
+                        server.env_keys.len(),
+                        server.allow_tools.len(),
+                        server.deny_tools.len(),
+                        last_ping
+                    );
+                }
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        WorkflowCommand::McpPing {
+            name,
+            timeout_ms,
+            json,
+        } => {
+            let report = ping_mcp_servers(project_layout, name.as_deref(), timeout_ms)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "MCP ping: checked={} passed={} failed={} timeout_ms={} registry='{}'",
+                    report.checked,
+                    report.passed,
+                    report.failed,
+                    report.timeout_ms,
+                    report.registry_path
+                );
+                for result in report.results {
+                    println!(
+                        "- {} transport={} enabled={} ok={} latency_ms={} detail={}",
+                        result.name,
+                        result.transport,
+                        result.enabled,
+                        result.ok,
+                        result.latency_ms,
+                        result.detail
+                    );
+                }
+            }
+            if report.failed > 0 {
+                return Err(anyhow!("mcp ping failed for {} server(s)", report.failed));
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
         WorkflowCommand::Resume { id } => Ok(WorkflowLaunchAction::Resume { id }),
         WorkflowCommand::StartTemplate {
             template,
@@ -704,6 +839,466 @@ pub(super) fn handle_workflow_control_command(
             Ok(WorkflowLaunchAction::Noop)
         }
     }
+}
+
+fn mcp_registry_path(project_layout: &AgentProjectLayout) -> PathBuf {
+    project_layout.agents_root.join("mcp").join("servers.json")
+}
+
+fn mcp_now_ms() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis() as u64
+}
+
+fn parse_mcp_transport(raw: &str) -> Result<McpTransport> {
+    match raw.trim().to_ascii_lowercase().as_str() {
+        "stdio" => Ok(McpTransport::Stdio),
+        "http" => Ok(McpTransport::Http),
+        "sse" => Ok(McpTransport::Sse),
+        other => Err(anyhow!(
+            "Unsupported MCP transport '{}'. Use stdio|http|sse",
+            other
+        )),
+    }
+}
+
+fn sanitize_mcp_string(raw: Option<&str>) -> Option<String> {
+    raw.map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(ToString::to_string)
+}
+
+fn sanitize_mcp_string_list(values: &[String]) -> Vec<String> {
+    let mut out = values
+        .iter()
+        .map(|value| value.trim())
+        .filter(|value| !value.is_empty())
+        .map(ToString::to_string)
+        .collect::<Vec<_>>();
+    out.sort();
+    out.dedup();
+    out
+}
+
+fn parse_mcp_env(values: &[String]) -> Result<std::collections::BTreeMap<String, String>> {
+    let key_re = Regex::new(r"^[A-Za-z_][A-Za-z0-9_]*$").expect("valid regex");
+    let mut out = std::collections::BTreeMap::<String, String>::new();
+    for item in values {
+        let trimmed = item.trim();
+        if trimmed.is_empty() {
+            continue;
+        }
+        let (key, value) = trimmed
+            .split_once('=')
+            .ok_or_else(|| anyhow!("Invalid --env entry '{}'. Expected KEY=VALUE format", item))?;
+        let key = key.trim();
+        if !key_re.is_match(key) {
+            return Err(anyhow!(
+                "Invalid --env key '{}'. Expected shell variable name format",
+                key
+            ));
+        }
+        out.insert(key.to_string(), value.trim().to_string());
+    }
+    Ok(out)
+}
+
+fn read_mcp_registry(project_layout: &AgentProjectLayout) -> Result<(PathBuf, McpRegistry)> {
+    let path = mcp_registry_path(project_layout);
+    if !path.exists() {
+        return Ok((
+            path,
+            McpRegistry {
+                generated_at_ms: mcp_now_ms(),
+                ..McpRegistry::default()
+            },
+        ));
+    }
+    let raw = std::fs::read_to_string(&path)
+        .map_err(|err| anyhow!("failed to read MCP registry '{}': {}", path.display(), err))?;
+    let mut registry: McpRegistry = serde_json::from_str(&raw)
+        .map_err(|err| anyhow!("failed to parse MCP registry '{}': {}", path.display(), err))?;
+    if registry.version == 0 {
+        registry.version = 1;
+    }
+    registry
+        .servers
+        .sort_by(|left, right| left.name.cmp(&right.name));
+    Ok((path, registry))
+}
+
+fn write_mcp_registry(path: &Path, registry: &mut McpRegistry) -> Result<()> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    registry.generated_at_ms = mcp_now_ms();
+    registry
+        .servers
+        .sort_by(|left, right| left.name.cmp(&right.name));
+    let body = serde_json::to_string_pretty(registry)?;
+    std::fs::write(path, body)?;
+    Ok(())
+}
+
+fn mcp_server_list_entry(server: &McpServerConfig) -> McpServerListEntry {
+    let mut env_keys = server.env.keys().cloned().collect::<Vec<_>>();
+    env_keys.sort();
+    McpServerListEntry {
+        name: server.name.clone(),
+        transport: server.transport.as_str().to_string(),
+        enabled: server.enabled,
+        command: server.command.clone(),
+        args: server.args.clone(),
+        url: server.url.clone(),
+        cwd: server.cwd.clone(),
+        env_keys,
+        allow_tools: server.allow_tools.clone(),
+        deny_tools: server.deny_tools.clone(),
+        created_at_ms: server.created_at_ms,
+        updated_at_ms: server.updated_at_ms,
+        last_ping_ok: server.last_ping_ok,
+        last_ping_at_ms: server.last_ping_at_ms,
+        last_ping_latency_ms: server.last_ping_latency_ms,
+        last_ping_detail: server.last_ping_detail.clone(),
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn register_mcp_server(
+    project_layout: &AgentProjectLayout,
+    name: &str,
+    transport: &str,
+    command: Option<&str>,
+    args: &[String],
+    url: Option<&str>,
+    cwd: Option<&str>,
+    env: &[String],
+    allow_tools: &[String],
+    deny_tools: &[String],
+    enabled: bool,
+) -> Result<McpRegisterReport> {
+    let name = name.trim();
+    if name.is_empty() {
+        return Err(anyhow!("MCP server name must not be empty"));
+    }
+    let name_re = Regex::new(r"^[A-Za-z0-9._-]+$").expect("valid regex");
+    if !name_re.is_match(name) {
+        return Err(anyhow!(
+            "Invalid MCP server name '{}'. Use [A-Za-z0-9._-]",
+            name
+        ));
+    }
+
+    let transport = parse_mcp_transport(transport)?;
+    let command = sanitize_mcp_string(command);
+    let args = args
+        .iter()
+        .map(|value| value.trim())
+        .filter(|value| !value.is_empty())
+        .map(ToString::to_string)
+        .collect::<Vec<_>>();
+    let url = sanitize_mcp_string(url);
+    let cwd = sanitize_mcp_string(cwd);
+    let env = parse_mcp_env(env)?;
+    let allow_tools = sanitize_mcp_string_list(allow_tools);
+    let deny_tools = sanitize_mcp_string_list(deny_tools);
+
+    match &transport {
+        McpTransport::Stdio => {
+            if command.is_none() {
+                return Err(anyhow!("transport=stdio requires --command <executable>"));
+            }
+            if url.is_some() {
+                return Err(anyhow!(
+                    "transport=stdio cannot be combined with --url (use http|sse)"
+                ));
+            }
+        }
+        McpTransport::Http | McpTransport::Sse => {
+            if url.is_none() {
+                return Err(anyhow!(
+                    "transport={} requires --url <endpoint>",
+                    transport.as_str()
+                ));
+            }
+            if command.is_some() || !args.is_empty() {
+                return Err(anyhow!(
+                    "transport={} cannot be combined with --command/--arg (use stdio)",
+                    transport.as_str()
+                ));
+            }
+        }
+    }
+
+    if let Some(url) = url.as_deref() {
+        let parsed = reqwest::Url::parse(url)
+            .map_err(|err| anyhow!("Invalid MCP URL '{}': {}", url, err))?;
+        if parsed.host_str().is_none() {
+            return Err(anyhow!("Invalid MCP URL '{}': missing host", url));
+        }
+    }
+
+    let (registry_path, mut registry) = read_mcp_registry(project_layout)?;
+    let now = mcp_now_ms();
+    let action = if let Some(existing) = registry.servers.iter_mut().find(|s| s.name == name) {
+        existing.transport = transport;
+        existing.command = command.clone();
+        existing.args = args.clone();
+        existing.url = url.clone();
+        existing.cwd = cwd.clone();
+        existing.env = env.clone();
+        existing.allow_tools = allow_tools.clone();
+        existing.deny_tools = deny_tools.clone();
+        existing.enabled = enabled;
+        existing.updated_at_ms = now;
+        "updated".to_string()
+    } else {
+        registry.servers.push(McpServerConfig {
+            name: name.to_string(),
+            transport,
+            command: command.clone(),
+            args: args.clone(),
+            url: url.clone(),
+            cwd: cwd.clone(),
+            env: env.clone(),
+            allow_tools: allow_tools.clone(),
+            deny_tools: deny_tools.clone(),
+            enabled,
+            created_at_ms: now,
+            updated_at_ms: now,
+            last_ping_ok: None,
+            last_ping_at_ms: None,
+            last_ping_latency_ms: None,
+            last_ping_detail: None,
+        });
+        "created".to_string()
+    };
+    write_mcp_registry(&registry_path, &mut registry)?;
+    let server = registry
+        .servers
+        .iter()
+        .find(|entry| entry.name == name)
+        .ok_or_else(|| anyhow!("failed to persist MCP server '{}'", name))?;
+    Ok(McpRegisterReport {
+        action,
+        registry_path: registry_path.display().to_string(),
+        server: mcp_server_list_entry(server),
+    })
+}
+
+fn list_mcp_servers(project_layout: &AgentProjectLayout) -> Result<McpListReport> {
+    let (registry_path, mut registry) = read_mcp_registry(project_layout)?;
+    write_mcp_registry(&registry_path, &mut registry)?;
+    let enabled = registry
+        .servers
+        .iter()
+        .filter(|entry| entry.enabled)
+        .count();
+    Ok(McpListReport {
+        registry_path: registry_path.display().to_string(),
+        total: registry.servers.len(),
+        enabled,
+        servers: registry
+            .servers
+            .iter()
+            .map(mcp_server_list_entry)
+            .collect::<Vec<_>>(),
+    })
+}
+
+fn probe_mcp_http_url(url: &str, timeout_ms: u64) -> Result<String> {
+    use std::net::ToSocketAddrs;
+
+    if is_command_available("curl") {
+        let seconds = (timeout_ms.max(100) as f64) / 1000.0;
+        let output = ProcessCommand::new("curl")
+            .arg("-sS")
+            .arg("-o")
+            .arg("/dev/null")
+            .arg("-w")
+            .arg("%{http_code}")
+            .arg("--max-time")
+            .arg(format!("{seconds:.2}"))
+            .arg(url)
+            .output()
+            .map_err(|err| anyhow!("curl probe failed to start: {}", err))?;
+        if output.status.success() {
+            let code = String::from_utf8_lossy(&output.stdout).trim().to_string();
+            let status = code.parse::<u16>().unwrap_or(0);
+            if (200..500).contains(&status) {
+                return Ok(format!("http status {}", status));
+            }
+            return Err(anyhow!("http status {}", status));
+        }
+        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
+        let detail = if stderr.is_empty() {
+            "curl probe failed".to_string()
+        } else {
+            stderr
+        };
+        return Err(anyhow!(detail));
+    }
+
+    let parsed =
+        reqwest::Url::parse(url).map_err(|err| anyhow!("invalid MCP URL '{}': {}", url, err))?;
+    let host = parsed
+        .host_str()
+        .ok_or_else(|| anyhow!("invalid MCP URL '{}': missing host", url))?;
+    let port = parsed
+        .port_or_known_default()
+        .ok_or_else(|| anyhow!("invalid MCP URL '{}': missing or unknown default port", url))?;
+    let timeout = std::time::Duration::from_millis(timeout_ms.max(100));
+    let mut addrs = (host, port)
+        .to_socket_addrs()
+        .map_err(|err| anyhow!("failed to resolve '{}:{}': {}", host, port, err))?;
+    let addr = addrs
+        .next()
+        .ok_or_else(|| anyhow!("failed to resolve '{}:{}'", host, port))?;
+    std::net::TcpStream::connect_timeout(&addr, timeout)
+        .map_err(|err| anyhow!("tcp connect failed: {}", err))?;
+    Ok(format!("tcp connect {}", addr))
+}
+
+fn probe_mcp_stdio_command(command: &str, args: &[String], timeout_ms: u64) -> Result<String> {
+    let is_explicit_path = command.contains('/') || command.contains(std::path::MAIN_SEPARATOR);
+    if !is_explicit_path && !is_command_available(command) {
+        return Err(anyhow!("command '{}' not found on PATH", command));
+    }
+
+    let mut child = ProcessCommand::new(command)
+        .args(args)
+        .arg("--help")
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .map_err(|err| anyhow!("failed to spawn '{}': {}", command, err))?;
+
+    let started = std::time::Instant::now();
+    let timeout = std::time::Duration::from_millis(timeout_ms.max(100));
+    loop {
+        if let Some(status) = child
+            .try_wait()
+            .map_err(|err| anyhow!("failed to poll '{}': {}", command, err))?
+        {
+            if status.success() {
+                return Ok(format!("exited with status {}", status));
+            }
+            return Err(anyhow!("exited with status {}", status));
+        }
+        if started.elapsed() >= timeout {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(anyhow!("probe timed out after {}ms", timeout.as_millis()));
+        }
+        std::thread::sleep(std::time::Duration::from_millis(25));
+    }
+}
+
+fn ping_mcp_server(server: &McpServerConfig, timeout_ms: u64) -> McpPingServerReport {
+    let started = std::time::Instant::now();
+    let outcome = match server.transport {
+        McpTransport::Stdio => match server.command.as_deref() {
+            Some(command) => probe_mcp_stdio_command(command, &server.args, timeout_ms),
+            None => Err(anyhow!(
+                "transport=stdio but command missing in registry entry"
+            )),
+        },
+        McpTransport::Http | McpTransport::Sse => match server.url.as_deref() {
+            Some(endpoint) => probe_mcp_http_url(endpoint, timeout_ms),
+            None => Err(anyhow!(
+                "transport={} but url missing in registry entry",
+                server.transport.as_str()
+            )),
+        },
+    };
+
+    let latency_ms = started.elapsed().as_millis() as u64;
+    match outcome {
+        Ok(detail) => McpPingServerReport {
+            name: server.name.clone(),
+            transport: server.transport.as_str().to_string(),
+            enabled: server.enabled,
+            ok: true,
+            latency_ms,
+            detail,
+        },
+        Err(err) => McpPingServerReport {
+            name: server.name.clone(),
+            transport: server.transport.as_str().to_string(),
+            enabled: server.enabled,
+            ok: false,
+            latency_ms,
+            detail: err.to_string(),
+        },
+    }
+}
+
+fn ping_mcp_servers(
+    project_layout: &AgentProjectLayout,
+    name: Option<&str>,
+    timeout_ms: u64,
+) -> Result<McpPingReport> {
+    if timeout_ms == 0 {
+        return Err(anyhow!("timeout_ms must be greater than 0"));
+    }
+    let (registry_path, mut registry) = read_mcp_registry(project_layout)?;
+    let target_name = name
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(ToString::to_string);
+
+    let target_indexes = if let Some(target) = target_name {
+        let index = registry
+            .servers
+            .iter()
+            .position(|entry| entry.name == target)
+            .ok_or_else(|| anyhow!("MCP server '{}' not found", target))?;
+        vec![index]
+    } else {
+        registry
+            .servers
+            .iter()
+            .enumerate()
+            .filter_map(|(index, entry)| if entry.enabled { Some(index) } else { None })
+            .collect::<Vec<_>>()
+    };
+
+    if target_indexes.is_empty() {
+        return Ok(McpPingReport {
+            registry_path: registry_path.display().to_string(),
+            checked: 0,
+            passed: 0,
+            failed: 0,
+            timeout_ms,
+            results: Vec::new(),
+        });
+    }
+
+    let mut results = Vec::<McpPingServerReport>::with_capacity(target_indexes.len());
+    let now = mcp_now_ms();
+    for index in target_indexes {
+        let result = ping_mcp_server(&registry.servers[index], timeout_ms);
+        registry.servers[index].last_ping_ok = Some(result.ok);
+        registry.servers[index].last_ping_at_ms = Some(now);
+        registry.servers[index].last_ping_latency_ms = Some(result.latency_ms);
+        registry.servers[index].last_ping_detail = Some(result.detail.clone());
+        results.push(result);
+    }
+    write_mcp_registry(&registry_path, &mut registry)?;
+
+    let passed = results.iter().filter(|entry| entry.ok).count();
+    let failed = results.len().saturating_sub(passed);
+    Ok(McpPingReport {
+        registry_path: registry_path.display().to_string(),
+        checked: results.len(),
+        passed,
+        failed,
+        timeout_ms,
+        results,
+    })
 }
 
 fn resolve_default_validate_command(
@@ -975,19 +1570,27 @@ fn print_workflow_eval_report(report: &WorkflowEvalReport) {
 
 #[cfg(test)]
 mod tests {
-    use super::{resolve_default_validate_command, run_workflow_eval};
+    use super::{
+        list_mcp_servers, parse_mcp_transport, ping_mcp_servers, register_mcp_server,
+        resolve_default_validate_command, run_workflow_eval, McpTransport,
+    };
     use crate::engine::project::AgentProjectLayout;
 
-    #[test]
-    fn keeps_explicit_validate_command() {
+    fn unique_temp_root(label: &str) -> std::path::PathBuf {
         let unique = format!(
-            "agentic-sdlc-workflow-control-validate-explicit-{}",
+            "agentic-sdlc-workflow-control-{}-{}",
+            label,
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .expect("time")
                 .as_nanos()
         );
-        let root = std::env::temp_dir().join(unique);
+        std::env::temp_dir().join(unique)
+    }
+
+    #[test]
+    fn keeps_explicit_validate_command() {
+        let root = unique_temp_root("validate-explicit");
         std::fs::create_dir_all(&root).expect("create temp root");
         let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
 
@@ -1000,14 +1603,7 @@ mod tests {
 
     #[test]
     fn maps_default_validate_to_agent_validate_script() {
-        let unique = format!(
-            "agentic-sdlc-workflow-control-validate-script-{}",
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .expect("time")
-                .as_nanos()
-        );
-        let root = std::env::temp_dir().join(unique);
+        let root = unique_temp_root("validate-script");
         std::fs::create_dir_all(&root).expect("create temp root");
         std::fs::write(
             root.join("package.json"),
@@ -1024,14 +1620,7 @@ mod tests {
 
     #[test]
     fn workflow_eval_passes_detailed_case() {
-        let unique = format!(
-            "agentic-sdlc-workflow-eval-pass-{}",
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .expect("time")
-                .as_nanos()
-        );
-        let root = std::env::temp_dir().join(unique);
+        let root = unique_temp_root("eval-pass");
         std::fs::create_dir_all(&root).expect("create temp root");
         let dataset_path = root.join("dataset.json");
         std::fs::write(
@@ -1063,14 +1652,7 @@ mod tests {
 
     #[test]
     fn workflow_eval_fails_sparse_case() {
-        let unique = format!(
-            "agentic-sdlc-workflow-eval-fail-{}",
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .expect("time")
-                .as_nanos()
-        );
-        let root = std::env::temp_dir().join(unique);
+        let root = unique_temp_root("eval-fail");
         std::fs::create_dir_all(&root).expect("create temp root");
         let dataset_path = root.join("dataset.json");
         std::fs::write(
@@ -1094,6 +1676,117 @@ mod tests {
         assert!(!report.ok);
         assert_eq!(report.failed, 1);
         assert!(!report.results[0].findings.is_empty());
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn parse_mcp_transport_supports_expected_values() {
+        assert!(matches!(
+            parse_mcp_transport("stdio").expect("stdio"),
+            McpTransport::Stdio
+        ));
+        assert!(matches!(
+            parse_mcp_transport("http").expect("http"),
+            McpTransport::Http
+        ));
+        assert!(matches!(
+            parse_mcp_transport("sse").expect("sse"),
+            McpTransport::Sse
+        ));
+        assert!(parse_mcp_transport("invalid").is_err());
+    }
+
+    #[test]
+    fn register_and_list_mcp_server_round_trip() {
+        let root = unique_temp_root("mcp-register-list");
+        std::fs::create_dir_all(&root).expect("create temp root");
+        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+
+        let env = vec!["TEST_TOKEN=dummy".to_string()];
+        let report = register_mcp_server(
+            &layout,
+            "local-cli",
+            "stdio",
+            Some("cargo"),
+            &[],
+            None,
+            None,
+            &env,
+            &["search".to_string()],
+            &[],
+            true,
+        )
+        .expect("register");
+        assert_eq!(report.action, "created");
+        assert_eq!(report.server.name, "local-cli");
+        assert!(report.server.enabled);
+        assert_eq!(report.server.env_keys, vec!["TEST_TOKEN".to_string()]);
+
+        let listed = list_mcp_servers(&layout).expect("list");
+        assert_eq!(listed.total, 1);
+        assert_eq!(listed.enabled, 1);
+        assert_eq!(listed.servers[0].name, "local-cli");
+
+        let update = register_mcp_server(
+            &layout,
+            "local-cli",
+            "stdio",
+            Some("cargo"),
+            &[],
+            None,
+            None,
+            &[],
+            &[],
+            &["unsafe_tool".to_string()],
+            false,
+        )
+        .expect("update");
+        assert_eq!(update.action, "updated");
+        assert!(!update.server.enabled);
+        assert_eq!(update.server.deny_tools, vec!["unsafe_tool".to_string()]);
+
+        let listed = list_mcp_servers(&layout).expect("list after update");
+        assert_eq!(listed.total, 1);
+        assert_eq!(listed.enabled, 0);
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn ping_mcp_server_updates_status_fields() {
+        let root = unique_temp_root("mcp-ping");
+        std::fs::create_dir_all(&root).expect("create temp root");
+        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+
+        register_mcp_server(
+            &layout,
+            "cargo-help",
+            "stdio",
+            Some("cargo"),
+            &[],
+            None,
+            None,
+            &[],
+            &[],
+            &[],
+            true,
+        )
+        .expect("register");
+
+        let report = ping_mcp_servers(&layout, None, 4_000).expect("ping");
+        assert_eq!(report.checked, 1);
+        assert_eq!(report.failed, 0);
+        assert_eq!(report.passed, 1);
+        assert_eq!(report.results[0].name, "cargo-help");
+        assert!(report.results[0].ok);
+
+        let listed = list_mcp_servers(&layout).expect("list after ping");
+        assert_eq!(listed.total, 1);
+        assert_eq!(listed.servers[0].last_ping_ok, Some(true));
+        assert!(listed.servers[0].last_ping_at_ms.is_some());
+        assert!(listed.servers[0].last_ping_latency_ms.is_some());
+        assert!(listed.servers[0].last_ping_detail.is_some());
+
         let _ = std::fs::remove_dir_all(root);
     }
 }
