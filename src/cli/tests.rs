@@ -925,6 +925,14 @@ Schema: antigrav.skill@v1
     assert_eq!(skill.source_path.as_deref(), Some("skills/sample/SKILL.md"));
     assert_eq!(skill.source_license.as_deref(), Some("MIT"));
     assert!(
+        skill
+            .attestation
+            .as_deref()
+            .map(|value| value.starts_with("attest.v1."))
+            .unwrap_or(false),
+        "expected import attestation marker in lock entry"
+    );
+    assert!(
         lock.imports
             .iter()
             .any(|entry| entry.source == "https://github.com/example/skills"),
@@ -1128,9 +1136,105 @@ fn verify_skills_lock_detects_modified_skill() {
     body.push_str("\n<!-- drift -->\n");
     std::fs::write(&skill_file, body).expect("write skill drift");
 
-    let report = verify_skills_lock(&layout, SkillpackInstallMode::Local, false).expect("verify");
+    let report =
+        verify_skills_lock(&layout, SkillpackInstallMode::Local, false, false).expect("verify");
     assert!(!report.ok, "lock verification should fail after drift");
     assert!(report.changed > 0, "expected changed entries");
+
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
+fn verify_skills_lock_can_require_import_attestation() {
+    let unique = format!(
+        "agentic-sdlc-cli-verify-lock-attestation-{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("time")
+            .as_nanos()
+    );
+    let root = std::env::temp_dir().join(unique);
+    std::fs::create_dir_all(&root).expect("create temp project");
+    let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+    let _ = ensure_bootstrap_package(&layout).expect("bootstrap");
+    std::fs::create_dir_all(layout.skills_dir.join("imported").join("sample"))
+        .expect("imported dir");
+    std::fs::write(
+        layout
+            .skills_dir
+            .join("imported")
+            .join("sample")
+            .join("SKILL.md"),
+        r#"# Skill: sample
+Schema: antigrav.skill@v1
+```json
+{
+  "name": "sample",
+  "domain": "imported",
+  "executor": "ollama",
+  "model": "qwen3:8b",
+  "description": "sample import",
+  "risk": "safe",
+  "source": "https://github.com/example/skills",
+  "source_commit": "abc1234",
+  "source_path": "skills/sample/SKILL.md",
+  "source_license": "MIT",
+  "tags": ["imported", "external", "skillpack"]
+}
+```
+
+## When to Use
+- use sample
+
+## Examples
+- ex
+
+## Limitations
+- limits
+
+{{input}}
+"#,
+    )
+    .expect("write imported");
+    let _ = build_skill_workflow_catalog(&layout).expect("build catalog");
+
+    let lock_path = layout.agents_root.join("skills.lock.json");
+    let mut lock_json = serde_json::from_str::<serde_json::Value>(
+        &std::fs::read_to_string(&lock_path).expect("read lock"),
+    )
+    .expect("parse lock");
+    let skills = lock_json
+        .get_mut("skills")
+        .and_then(|value| value.as_array_mut())
+        .expect("skills");
+    let imported = skills
+        .iter_mut()
+        .find(|entry| entry.get("id").and_then(|v| v.as_str()) == Some("imported/sample"))
+        .expect("imported entry");
+    imported
+        .as_object_mut()
+        .expect("entry object")
+        .remove("attestation");
+    std::fs::write(
+        &lock_path,
+        serde_json::to_string_pretty(&lock_json).expect("serialize lock"),
+    )
+    .expect("write lock");
+
+    let report = verify_skills_lock(&layout, SkillpackInstallMode::Local, false, true)
+        .expect("verify lock with attestation");
+    assert!(
+        !report.ok,
+        "expected attestation-required verification to fail"
+    );
+    assert!(
+        report.attestation_missing > 0,
+        "expected missing attestation entries"
+    );
+    assert!(report
+        .attestation_missing_entries
+        .iter()
+        .any(|entry| entry == "imported/sample"));
 
     let _ = std::fs::remove_dir_all(root);
 }

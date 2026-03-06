@@ -78,6 +78,10 @@ The highest-priority work now is to close production-readiness gaps around evalu
   - `workflow trace <instance_id> --otel`
   - emits OTLP JSON-compatible `resourceSpans -> scopeSpans -> spans` payload
   - includes workflow root span, per-step spans, and workflow event mapping.
+- Imported-skill attestation verification MVP:
+  - lock entries include deterministic `attestation` marker for imported skills
+  - `workflow verify-lock --require-attestation` enforces attestation presence/validity
+  - report includes `attestation_missing` and `attestation_invalid` breakdowns.
 
 ## Day 61-90: Observability + Supply Chain + Enterprise Integrations
 

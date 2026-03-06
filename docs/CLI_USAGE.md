@@ -203,6 +203,7 @@ Verify lockfile integrity and detect drift:
 ```bash
 cargo run -- workflow verify-lock
 cargo run -- workflow verify-lock --fail-on-extra
+cargo run -- workflow verify-lock --require-attestation
 cargo run -- workflow verify-lock --mode global --json
 ```
 

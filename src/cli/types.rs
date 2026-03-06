@@ -138,6 +138,8 @@ pub(crate) enum WorkflowCommand {
         #[arg(long, default_value_t = false)]
         fail_on_extra: bool,
         #[arg(long, default_value_t = false)]
+        require_attestation: bool,
+        #[arg(long, default_value_t = false)]
         json: bool,
     },
     IndexGraph {
@@ -400,6 +402,9 @@ pub(crate) struct SkillLockEntry {
     pub(crate) path: String,
     pub(crate) bytes: usize,
     pub(crate) fingerprint: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) attestation: Option<String>,
     pub(crate) source: Option<String>,
     pub(crate) source_requested: Option<String>,
     pub(crate) source_commit: Option<String>,
@@ -509,9 +514,13 @@ pub(crate) struct SkillsLockVerifyReport {
     pub(crate) missing: usize,
     pub(crate) changed: usize,
     pub(crate) extra: usize,
+    pub(crate) attestation_missing: usize,
+    pub(crate) attestation_invalid: usize,
     pub(crate) missing_entries: Vec<String>,
     pub(crate) changed_entries: Vec<String>,
     pub(crate) extra_entries: Vec<String>,
+    pub(crate) attestation_missing_entries: Vec<String>,
+    pub(crate) attestation_invalid_entries: Vec<String>,
 }
 
 #[derive(Debug, Clone)]

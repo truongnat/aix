@@ -809,11 +809,21 @@ fn build_skills_lockfile(
                 imported_at_ms = meta.imported_at_ms;
             }
         }
+        let fingerprint = fnv1a64_hex(&bytes);
+        let attestation = compute_import_skill_attestation(
+            source.as_deref(),
+            source_commit.as_deref(),
+            source_path.as_deref(),
+            source_license.as_deref(),
+            &fingerprint,
+            bytes.len(),
+        );
         entries.push(SkillLockEntry {
             id: skill.id.clone(),
             path: skill.path.clone(),
             bytes: bytes.len(),
-            fingerprint: fnv1a64_hex(&bytes),
+            fingerprint,
+            attestation,
             source,
             source_requested,
             source_commit,

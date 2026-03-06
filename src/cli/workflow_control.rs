@@ -406,22 +406,27 @@ pub(super) fn handle_workflow_control_command(
         WorkflowCommand::VerifyLock {
             mode,
             fail_on_extra,
+            require_attestation,
             json,
         } => {
             let mode = parse_skillpack_install_mode(&mode)?;
-            let report = verify_skills_lock(project_layout, mode, fail_on_extra)?;
+            let report =
+                verify_skills_lock(project_layout, mode, fail_on_extra, require_attestation)?;
             if json {
                 println!("{}", serde_json::to_string_pretty(&report)?);
             } else {
                 println!(
-                    "Verify lock: mode='{}' lockfile='{}' ok={} missing={} changed={} extra={} fail_on_extra={}",
+                    "Verify lock: mode='{}' lockfile='{}' ok={} missing={} changed={} extra={} attestation_missing={} attestation_invalid={} fail_on_extra={} require_attestation={}",
                     report.mode,
                     report.lockfile,
                     report.ok,
                     report.missing,
                     report.changed,
                     report.extra,
-                    fail_on_extra
+                    report.attestation_missing,
+                    report.attestation_invalid,
+                    fail_on_extra,
+                    require_attestation
                 );
                 if !report.missing_entries.is_empty() {
                     println!("Missing entries:");
@@ -441,13 +446,27 @@ pub(super) fn handle_workflow_control_command(
                         println!("- {}", id);
                     }
                 }
+                if !report.attestation_missing_entries.is_empty() {
+                    println!("Attestation missing:");
+                    for id in &report.attestation_missing_entries {
+                        println!("- {}", id);
+                    }
+                }
+                if !report.attestation_invalid_entries.is_empty() {
+                    println!("Attestation invalid:");
+                    for id in &report.attestation_invalid_entries {
+                        println!("- {}", id);
+                    }
+                }
             }
             if !report.ok {
                 return Err(anyhow!(
-                    "skills lock verification failed (missing={}, changed={}, extra={})",
+                    "skills lock verification failed (missing={}, changed={}, extra={}, attestation_missing={}, attestation_invalid={})",
                     report.missing,
                     report.changed,
-                    report.extra
+                    report.extra,
+                    report.attestation_missing,
+                    report.attestation_invalid
                 ));
             }
             Ok(WorkflowLaunchAction::Noop)

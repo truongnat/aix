@@ -277,8 +277,9 @@ fn verify_skills_lock(
     layout: &AgentProjectLayout,
     mode: SkillpackInstallMode,
     fail_on_extra: bool,
+    require_attestation: bool,
 ) -> Result<SkillsLockVerifyReport> {
-    skillpack::verify_skills_lock(layout, mode, fail_on_extra)
+    skillpack::verify_skills_lock(layout, mode, fail_on_extra, require_attestation)
 }
 
 #[cfg(test)]
@@ -305,6 +306,38 @@ fn fnv1a64_hex(bytes: &[u8]) -> String {
         hash = hash.wrapping_mul(0x100000001b3);
     }
     format!("{:016x}", hash)
+}
+
+fn compute_import_skill_attestation(
+    source: Option<&str>,
+    source_commit: Option<&str>,
+    source_path: Option<&str>,
+    source_license: Option<&str>,
+    fingerprint: &str,
+    bytes: usize,
+) -> Option<String> {
+    let normalized_source = source.map(str::trim).filter(|value| !value.is_empty())?;
+    let normalized_path = source_path
+        .map(str::trim)
+        .filter(|value| !value.is_empty())?;
+    let normalized_commit = source_commit.map(str::trim).unwrap_or_default();
+    let normalized_license = source_license.map(str::trim).unwrap_or_default();
+    let payload = format!(
+        "attest.v1|source={}|commit={}|path={}|license={}|fingerprint={}|bytes={}",
+        normalized_source,
+        normalized_commit,
+        normalized_path.replace('\\', "/"),
+        normalized_license,
+        fingerprint.trim(),
+        bytes
+    );
+    let mut reverse = payload.as_bytes().to_vec();
+    reverse.reverse();
+    Some(format!(
+        "attest.v1.{}{}",
+        fnv1a64_hex(payload.as_bytes()),
+        fnv1a64_hex(&reverse)
+    ))
 }
 
 fn resolve_bootstrap_strict_ollama(flag: bool) -> bool {

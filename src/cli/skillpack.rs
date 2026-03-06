@@ -149,35 +149,50 @@ fn build_skills_lockfile_from_skills_root(
         let id = to_resource_id(skills_root, &path).unwrap_or_else(|| meta.name.clone());
         let path_str =
             relative_unix_path(base_path, &path).unwrap_or_else(|_| path.display().to_string());
+        let fingerprint = fnv1a64_hex(&bytes);
+        let source = meta
+            .source
+            .map(|v| v.trim().to_string())
+            .filter(|v| !v.is_empty());
+        let source_requested = meta
+            .source_requested
+            .map(|v| v.trim().to_string())
+            .filter(|v| !v.is_empty());
+        let source_commit = meta
+            .source_commit
+            .map(|v| v.trim().to_string())
+            .filter(|v| !v.is_empty());
+        let source_path = meta
+            .source_path
+            .map(|v| v.trim().replace('\\', "/"))
+            .filter(|v| !v.is_empty());
+        let source_license = meta
+            .source_license
+            .map(|v| v.trim().to_string())
+            .filter(|v| !v.is_empty())
+            .or(meta
+                .license
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty()));
+        let attestation = compute_import_skill_attestation(
+            source.as_deref(),
+            source_commit.as_deref(),
+            source_path.as_deref(),
+            source_license.as_deref(),
+            &fingerprint,
+            bytes.len(),
+        );
         entries.push(SkillLockEntry {
             id,
             path: path_str,
             bytes: bytes.len(),
-            fingerprint: fnv1a64_hex(&bytes),
-            source: meta
-                .source
-                .map(|v| v.trim().to_string())
-                .filter(|v| !v.is_empty()),
-            source_requested: meta
-                .source_requested
-                .map(|v| v.trim().to_string())
-                .filter(|v| !v.is_empty()),
-            source_commit: meta
-                .source_commit
-                .map(|v| v.trim().to_string())
-                .filter(|v| !v.is_empty()),
-            source_path: meta
-                .source_path
-                .map(|v| v.trim().replace('\\', "/"))
-                .filter(|v| !v.is_empty()),
-            source_license: meta
-                .source_license
-                .map(|v| v.trim().to_string())
-                .filter(|v| !v.is_empty())
-                .or(meta
-                    .license
-                    .map(|v| v.trim().to_string())
-                    .filter(|v| !v.is_empty())),
+            fingerprint,
+            attestation,
+            source,
+            source_requested,
+            source_commit,
+            source_path,
+            source_license,
             imported_at_ms: meta.imported_at_ms,
         });
     }
@@ -656,6 +671,7 @@ pub(super) fn verify_skills_lock(
     layout: &AgentProjectLayout,
     mode: SkillpackInstallMode,
     fail_on_extra: bool,
+    require_attestation: bool,
 ) -> Result<SkillsLockVerifyReport> {
     let target = resolve_skillpack_install_target(layout, mode)?;
     let lock_path = target.lockfile_path.clone();
@@ -670,8 +686,42 @@ pub(super) fn verify_skills_lock(
     let mut lock_ids = HashSet::<String>::new();
     let mut missing_entries = Vec::<String>::new();
     let mut changed_entries = Vec::<String>::new();
+    let mut attestation_missing_entries = Vec::<String>::new();
+    let mut attestation_invalid_entries = Vec::<String>::new();
     for entry in &lock.skills {
         lock_ids.insert(entry.id.clone());
+        let expected_attestation = compute_import_skill_attestation(
+            entry.source.as_deref(),
+            entry.source_commit.as_deref(),
+            entry.source_path.as_deref(),
+            entry.source_license.as_deref(),
+            &entry.fingerprint,
+            entry.bytes,
+        );
+        if require_attestation
+            && is_imported_lock_entry(entry)
+            && expected_attestation.is_some()
+            && entry
+                .attestation
+                .as_deref()
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .is_none()
+        {
+            attestation_missing_entries.push(entry.id.clone());
+        }
+        if let (Some(expected), Some(actual)) = (
+            expected_attestation.as_deref(),
+            entry
+                .attestation
+                .as_deref()
+                .map(str::trim)
+                .filter(|value| !value.is_empty()),
+        ) {
+            if actual != expected {
+                attestation_invalid_entries.push(entry.id.clone());
+            }
+        }
         let path = resolve_lock_entry_target_path(&target, entry);
         if !path.exists() {
             missing_entries.push(entry.id.clone());
@@ -698,9 +748,13 @@ pub(super) fn verify_skills_lock(
     missing_entries.sort();
     changed_entries.sort();
     extra_entries.sort();
+    attestation_missing_entries.sort();
+    attestation_invalid_entries.sort();
 
     let ok = missing_entries.is_empty()
         && changed_entries.is_empty()
+        && attestation_invalid_entries.is_empty()
+        && (!require_attestation || attestation_missing_entries.is_empty())
         && (!fail_on_extra || extra_entries.is_empty());
     Ok(SkillsLockVerifyReport {
         mode: mode.as_str().to_string(),
@@ -709,9 +763,13 @@ pub(super) fn verify_skills_lock(
         missing: missing_entries.len(),
         changed: changed_entries.len(),
         extra: extra_entries.len(),
+        attestation_missing: attestation_missing_entries.len(),
+        attestation_invalid: attestation_invalid_entries.len(),
         missing_entries,
         changed_entries,
         extra_entries,
+        attestation_missing_entries,
+        attestation_invalid_entries,
     })
 }
 

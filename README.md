@@ -250,6 +250,7 @@ Verify lock integrity (detect missing/changed/extra skill entries):
 ```bash
 cargo run -- workflow verify-lock
 cargo run -- workflow verify-lock --mode global --fail-on-extra
+cargo run -- workflow verify-lock --require-attestation
 ```
 
 `--mode local` writes to `.agents/skills/imported`; `--mode global` writes to `$CODEX_HOME/skills/imported` (fallback: `~/.codex/skills/imported`).
