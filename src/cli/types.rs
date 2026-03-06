@@ -198,6 +198,13 @@ pub(crate) enum WorkflowCommand {
         #[arg(long, default_value_t = false)]
         json: bool,
     },
+    McpPolicy {
+        name: String,
+        #[arg(long)]
+        tool: String,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
     StartTemplate {
         template: String,
         #[arg(long)]
@@ -733,6 +740,19 @@ pub(crate) struct McpPingReport {
     pub(crate) failed: usize,
     pub(crate) timeout_ms: u64,
     pub(crate) results: Vec<McpPingServerReport>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct McpPolicyReport {
+    pub(crate) registry_path: String,
+    pub(crate) name: String,
+    pub(crate) transport: String,
+    pub(crate) enabled: bool,
+    pub(crate) tool: String,
+    pub(crate) allowed: bool,
+    pub(crate) reason: String,
+    pub(crate) allow_tools: Vec<String>,
+    pub(crate) deny_tools: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]

@@ -234,6 +234,13 @@ cargo run -- workflow mcp-ping ollama-cli --timeout-ms 8000
 cargo run -- workflow mcp-ping local-supabase --json
 ```
 
+Evaluate MCP tool policy for a registered server:
+
+```bash
+cargo run -- workflow mcp-policy local-supabase --tool query
+cargo run -- workflow mcp-policy local-supabase --tool query_secret --json
+```
+
 MCP command notes:
 - registry path: `.agents/mcp/servers.json`
 - supported transports: `stdio|http|sse`
@@ -241,6 +248,7 @@ MCP command notes:
 - `http|sse` require `--url`
 - `--env` accepts repeated `KEY=VALUE` entries
 - `--allow-tool` / `--deny-tool` define per-server policy metadata
+- policy matching supports exact names, `prefix*`, and `*` wildcard
 - by default, `mcp-ping` checks only enabled servers
 
 Skill markdown format:

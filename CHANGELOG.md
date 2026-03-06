@@ -11,7 +11,8 @@ All notable changes to this project are documented here.
   - `workflow mcp-register <name>` (stdio/http/sse transport)
   - `workflow mcp-list`
   - `workflow mcp-ping [name] --timeout-ms <ms>`
-- MCP registry persistence under `.agents/mcp/servers.json` with per-server allow/deny tool policy metadata and last-ping status tracking.
+  - `workflow mcp-policy <name> --tool <tool_name>` for deterministic tool authorization checks
+- MCP registry persistence under `.agents/mcp/servers.json` with per-server allow/deny policy metadata, deterministic policy evaluation, and last-ping status tracking.
 - Advanced scaffold defaults now include richer baseline package files:
   - non-empty rules (`runtime`, `branching`, `coding`, `merge`)
   - starter role files with explicit responsibilities
@@ -27,7 +28,7 @@ All notable changes to this project are documented here.
 - `llm_subagent` provider routing now supports Anthropic and policy-based fallback behavior via `ANTIGRAV_LLM_FALLBACK_POLICY=transient_only|always|never`.
 
 ### Quality
-- Test suite remains green with `cargo test` (`150 passed`), including new coverage for MCP registry/ping behavior and provider fallback policy.
+- Test suite remains green with `cargo test` (`152 passed`), including new coverage for MCP registry/ping/policy behavior and provider fallback policy.
 
 ## [1.0.1] - 2026-02-26
 

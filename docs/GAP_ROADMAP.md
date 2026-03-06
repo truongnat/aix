@@ -90,6 +90,7 @@ The highest-priority work now is to close production-readiness gaps around evalu
   - `workflow mcp-register <name>` for stdio/http/sse server registry entries
   - `workflow mcp-list` for local runtime MCP inventory
   - `workflow mcp-ping [name] --timeout-ms <ms>` health checks with persisted last ping status
+  - `workflow mcp-policy <name> --tool <tool_name>` deterministic allow/deny policy enforcement
   - registry persisted at `.agents/mcp/servers.json` with per-server allow/deny tool metadata.
 
 ## Day 61-90: Observability + Supply Chain + Enterprise Integrations

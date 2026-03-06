@@ -683,6 +683,38 @@ pub(super) fn handle_workflow_control_command(
             }
             Ok(WorkflowLaunchAction::Noop)
         }
+        WorkflowCommand::McpPolicy { name, tool, json } => {
+            let report = evaluate_mcp_policy(project_layout, &name, &tool)?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "MCP policy: server='{}' tool='{}' allowed={} reason='{}' transport='{}' enabled={} registry='{}'",
+                    report.name,
+                    report.tool,
+                    report.allowed,
+                    report.reason,
+                    report.transport,
+                    report.enabled,
+                    report.registry_path
+                );
+                if !report.allow_tools.is_empty() {
+                    println!("- allow_tools={}", report.allow_tools.join(","));
+                }
+                if !report.deny_tools.is_empty() {
+                    println!("- deny_tools={}", report.deny_tools.join(","));
+                }
+            }
+            if !report.allowed {
+                return Err(anyhow!(
+                    "mcp policy denied server='{}' tool='{}' ({})",
+                    report.name,
+                    report.tool,
+                    report.reason
+                ));
+            }
+            Ok(WorkflowLaunchAction::Noop)
+        }
         WorkflowCommand::Resume { id } => Ok(WorkflowLaunchAction::Resume { id }),
         WorkflowCommand::StartTemplate {
             template,
@@ -1301,6 +1333,97 @@ fn ping_mcp_servers(
     })
 }
 
+fn normalize_mcp_tool_name(raw: &str) -> String {
+    raw.trim().to_ascii_lowercase()
+}
+
+fn mcp_tool_pattern_matches(tool: &str, pattern: &str) -> bool {
+    if pattern == "*" {
+        return true;
+    }
+    if let Some(prefix) = pattern.strip_suffix('*') {
+        return !prefix.is_empty() && tool.starts_with(prefix);
+    }
+    tool == pattern
+}
+
+fn find_mcp_policy_match<'a>(tool: &str, patterns: &'a [String]) -> Option<&'a str> {
+    patterns.iter().find_map(|pattern| {
+        let normalized = normalize_mcp_tool_name(pattern);
+        if normalized.is_empty() {
+            return None;
+        }
+        if mcp_tool_pattern_matches(tool, &normalized) {
+            Some(pattern.as_str())
+        } else {
+            None
+        }
+    })
+}
+
+fn evaluate_mcp_policy_decision(server: &McpServerConfig, tool: &str) -> (bool, String) {
+    if !server.enabled {
+        return (false, "server is disabled".to_string());
+    }
+
+    if let Some(matched) = find_mcp_policy_match(tool, &server.deny_tools) {
+        return (
+            false,
+            format!("matched deny_tools pattern '{}'", matched.trim()),
+        );
+    }
+
+    if server.allow_tools.is_empty() {
+        return (true, "allow_tools empty; default-allow mode".to_string());
+    }
+
+    if let Some(matched) = find_mcp_policy_match(tool, &server.allow_tools) {
+        return (
+            true,
+            format!("matched allow_tools pattern '{}'", matched.trim()),
+        );
+    }
+
+    (
+        false,
+        "tool is not included in allow_tools and allowlist mode is active".to_string(),
+    )
+}
+
+fn evaluate_mcp_policy(
+    project_layout: &AgentProjectLayout,
+    name: &str,
+    tool: &str,
+) -> Result<McpPolicyReport> {
+    let server_name = name.trim();
+    if server_name.is_empty() {
+        return Err(anyhow!("MCP server name must not be empty"));
+    }
+    let normalized_tool = normalize_mcp_tool_name(tool);
+    if normalized_tool.is_empty() {
+        return Err(anyhow!("tool name must not be empty"));
+    }
+
+    let (registry_path, registry) = read_mcp_registry(project_layout)?;
+    let server = registry
+        .servers
+        .iter()
+        .find(|entry| entry.name == server_name)
+        .ok_or_else(|| anyhow!("MCP server '{}' not found", server_name))?;
+    let (allowed, reason) = evaluate_mcp_policy_decision(server, &normalized_tool);
+    Ok(McpPolicyReport {
+        registry_path: registry_path.display().to_string(),
+        name: server.name.clone(),
+        transport: server.transport.as_str().to_string(),
+        enabled: server.enabled,
+        tool: normalized_tool,
+        allowed,
+        reason,
+        allow_tools: server.allow_tools.clone(),
+        deny_tools: server.deny_tools.clone(),
+    })
+}
+
 fn resolve_default_validate_command(
     project_layout: &AgentProjectLayout,
     requested: &str,
@@ -1571,8 +1694,8 @@ fn print_workflow_eval_report(report: &WorkflowEvalReport) {
 #[cfg(test)]
 mod tests {
     use super::{
-        list_mcp_servers, parse_mcp_transport, ping_mcp_servers, register_mcp_server,
-        resolve_default_validate_command, run_workflow_eval, McpTransport,
+        evaluate_mcp_policy, list_mcp_servers, parse_mcp_transport, ping_mcp_servers,
+        register_mcp_server, resolve_default_validate_command, run_workflow_eval, McpTransport,
     };
     use crate::engine::project::AgentProjectLayout;
 
@@ -1786,6 +1909,74 @@ mod tests {
         assert!(listed.servers[0].last_ping_at_ms.is_some());
         assert!(listed.servers[0].last_ping_latency_ms.is_some());
         assert!(listed.servers[0].last_ping_detail.is_some());
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn mcp_policy_allow_and_deny_precedence() {
+        let root = unique_temp_root("mcp-policy-precedence");
+        std::fs::create_dir_all(&root).expect("create temp root");
+        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+
+        register_mcp_server(
+            &layout,
+            "policy-server",
+            "stdio",
+            Some("cargo"),
+            &[],
+            None,
+            None,
+            &[],
+            &["query*".to_string(), "list_tables".to_string()],
+            &["query_secret".to_string()],
+            true,
+        )
+        .expect("register");
+
+        let allow =
+            evaluate_mcp_policy(&layout, "policy-server", "query_projects").expect("allow policy");
+        assert!(allow.allowed);
+        assert!(allow.reason.contains("allow_tools"));
+
+        let denied =
+            evaluate_mcp_policy(&layout, "policy-server", "query_secret").expect("deny policy");
+        assert!(!denied.allowed);
+        assert!(denied.reason.contains("deny_tools"));
+
+        let missing =
+            evaluate_mcp_policy(&layout, "policy-server", "drop_schema").expect("missing policy");
+        assert!(!missing.allowed);
+        assert!(missing.reason.contains("allow_tools"));
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn mcp_policy_blocks_disabled_server() {
+        let root = unique_temp_root("mcp-policy-disabled");
+        std::fs::create_dir_all(&root).expect("create temp root");
+        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+
+        register_mcp_server(
+            &layout,
+            "disabled-server",
+            "stdio",
+            Some("cargo"),
+            &[],
+            None,
+            None,
+            &[],
+            &[],
+            &[],
+            false,
+        )
+        .expect("register disabled");
+
+        let report = evaluate_mcp_policy(&layout, "disabled-server", "list_tables")
+            .expect("evaluate disabled");
+        assert!(!report.allowed);
+        assert_eq!(report.reason, "server is disabled");
 
         let _ = std::fs::remove_dir_all(root);
     }

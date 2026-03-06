@@ -263,6 +263,7 @@ cargo run -- workflow mcp-register local-supabase --transport http --url http://
 cargo run -- workflow mcp-list
 cargo run -- workflow mcp-ping
 cargo run -- workflow mcp-ping ollama-cli --timeout-ms 8000 --json
+cargo run -- workflow mcp-policy local-supabase --tool query
 ```
 
 Resume a run:
