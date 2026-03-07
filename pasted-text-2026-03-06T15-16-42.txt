@@ -1,0 +1,125 @@
+Dựa trên README và landing page, mình đã có đủ thông tin để phân tích. Đây là breakdown về các gaps của project này:
+
+---
+
+## Phân tích `agentic-sdlc` — Gaps & Điểm yếu
+
+### 🟢 Những gì project làm tốt
+
+Ý tưởng cốt lõi khá solid: một **deterministic runtime** để orchestrate AI agents qua toàn bộ SDLC (plan → build → review → release → learn), với trace IDs, resumable runs, và policy gates. Đây là hướng đi đúng so với "chat-with-AI" approach phổ biến hiện nay.
+
+---
+
+### 🔴 Gaps theo từng tầng
+
+**1. Kiến trúc — "Deterministic" nhưng không thực sự deterministic với LLM**
+
+Đây là gap lớn nhất và mang tính căn bản. Project claim *"same workflow and input produce the same step order"*, nhưng:
+- LLM outputs vốn dĩ **non-deterministic** (temperature, sampling). Determinism chỉ đúng ở *workflow step order*, không phải ở *output content*.
+- Không có cơ chế snapshot/replay thực sự: nếu replay một run, LLM sẽ cho output khác → trace không reproducible về mặt content.
+- Không thấy mention `seed` hoặc temperature=0 enforcement cho LLM calls.
+
+**2. LLM Integration — Mỏng và thiếu thực tế**
+
+```
+ANTIGRAV_LLM_PROVIDER=ollama|openai|gemini
+ANTIGRAV_LLM_FALLBACK=openai,gemini
+```
+
+- Chỉ support 3 providers. Không có Anthropic Claude, Azure OpenAI, Bedrock — là những provider enterprise thực tế dùng nhiều nhất.
+- Fallback logic: không rõ fallback xảy ra khi nào (timeout? error code? rate limit?). Không có circuit breaker pattern.
+- Context window management: không thấy chunking, summarization, hay token budget enforcement thực sự cho long-running workflows.
+
+**3. "From Spec to Production" — Nhưng thiếu integration thực sự với code**
+
+Project này xử lý **markdown workflows**, không phải code trực tiếp:
+- Không có actual code execution sandbox
+- Không có git integration thực sự (chỉ có "protected branch policy" ở mức check, không push/PR)
+- Không có test runner integration (chỉ có `--validate-command "cargo test"` pass-through)
+- Không thấy integration với CI/CD systems (GitHub Actions, GitLab CI, etc.)
+
+**4. Security Gate — Performative hơn là functional**
+
+```
+cargo run -- --workflow-id cybersecurity/security-scan
+```
+
+- Security check là một *workflow step*, không phải sandboxed execution. Một AI agent tự review security của chính nó là circular reasoning.
+- Không có SAST/DAST integration thực sự (SonarQube, Semgrep, Snyk...).
+- `internet_security_check` skill: không rõ thực sự gọi cái gì, hay chỉ là LLM-generated assessment?
+
+**5. Memory & Context — Vector store rất sơ khai**
+
+```
+ANTIGRAV_CONTEXT_RETRIEVAL_MODE=vector|graph|hybrid|off
+ANTIGRAV_CONTEXT_BACKEND=json|sqlite
+```
+
+- Vector backend là JSON file — không scale được, không concurrent-safe.
+- SQLite là single-writer, không phù hợp multi-agent parallel runs.
+- Không có embedding model configuration — không rõ dùng embedding gì, hoặc có đang dùng không.
+- Graph index: không mention underlying graph DB (Neo4j? in-memory?), có vẻ là custom JSON.
+
+**6. Observability — Telemetry nhưng thiếu actionability**
+
+```
+- [completed] intent_analysis duration_ms=964 actions=4 risks=2
+```
+
+- Trace export có nhưng format không standard (không phải OpenTelemetry).
+- Không integrate với bất kỳ APM tool nào (Datadog, Grafana, etc.).
+- "risks=2" là gì? Không có schema/definition rõ ràng cho `actions` và `risks` fields.
+- Không có alerting hay threshold-based monitoring.
+
+**7. Skill System — Import governance yếu**
+
+```
+cargo run -- workflow import-skills https://github.com/anthropics/skills
+```
+
+- Import từ arbitrary GitHub URL với `--allow-missing-license` flag → supply chain risk.
+- Không có skill sandboxing: một imported skill độc hại có thể execute arbitrary commands.
+- `normalize-imported-skills` chỉ normalize metadata, không validate behavior.
+- Lock file (`.agents/skills.lock.json`) chỉ pin commit, không có cryptographic verification.
+
+**8. Multi-agent Coordination — Còn rất mờ**
+
+Project describe các "roles" (architect, implementer, reviewer...) nhưng:
+- Không có actual parallel execution của multiple agents.
+- Role assignment là static configuration, không có dynamic negotiation.
+- Không handle conflicts khi hai agents modify cùng resource.
+- "Thread" concept trong `workflow chat-thread` không rõ là OS thread hay logical conversation thread.
+
+---
+
+### 🟡 Gaps về Product/DX
+
+**Documentation:**
+- README quá dài và command-heavy, thiếu conceptual explanation.
+- Không có architecture diagram.
+- `valid_flow.md`, `demo.md`, `example.md` — tên file vague, không có naming convention rõ ràng.
+
+**Testing:**
+- "137 Passing tests" được claim trên landing page, nhưng không thấy CI badge hay test report trong repo.
+- Live LLM tests yêu cầu set `ANTIGRAV_RUN_LIVE_LLM_TESTS=1` manually — không có mock layer tốt cho testing.
+
+**Maturity:**
+- v1.0.1 nhưng repo chỉ có 27 commits, 1 star, 0 forks — rất early stage.
+- Không có releases published — `cargo install` từ source, không có binary distribution.
+- Tool name (`antigrav`) không match repo name (`agentic-sdlc`) — branding inconsistency.
+
+---
+
+### 💡 Tóm tắt ưu tiên
+
+| Gap | Impact | Effort fix |
+|---|---|---|
+| LLM non-determinism không được address | 🔴 Critical | Cao |
+| Thiếu real code execution sandbox | 🔴 Critical | Cao |
+| Vector store không scale | 🟠 High | Trung bình |
+| Security gate là circular | 🟠 High | Cao |
+| Skill import không có sandbox | 🟠 High | Trung bình |
+| Không phải OpenTelemetry-compatible | 🟡 Medium | Thấp |
+| Branding/naming inconsistency | 🟡 Medium | Thấp |
+
+Project có **idea tốt** nhưng đang ở giai đoạn proof-of-concept nhiều hơn là production-ready runtime. Phần lớn "automation" thực ra vẫn là LLM generating text theo workflow steps, chứ chưa phải true agentic execution với feedback loops thực sự.

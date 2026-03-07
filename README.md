@@ -21,6 +21,23 @@ Determinism currently applies to orchestration semantics:
 LLM-generated text/content can still vary across runs unless provider/model/settings enforce deterministic output behavior.
 Treat content reproducibility as a separate concern from workflow engine determinism.
 
+### Deterministic Mode
+
+Control LLM temperature for deterministic behavior:
+
+```bash
+# Default: temperature=0.0 (deterministic)
+cargo run -- --workflow feature.md
+
+# Override temperature
+ANTIGRAV_LLM_TEMPERATURE=0.7 cargo run -- --workflow feature.md
+
+# Use specific seed (OpenAI/Azure only)
+ANTIGRAV_LLM_SEED=42 cargo run -- --workflow feature.md
+```
+
+See [Deterministic Mode Guide](docs/DETERMINISTIC_MODE.md) for details.
+
 ## Current Release
 
 - Runtime target: `v1.0.1`

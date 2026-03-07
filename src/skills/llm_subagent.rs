@@ -7,6 +7,7 @@ use crate::skill::Skill;
 use crate::skills::role_loader::load_role_profile_if_exists;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
+use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::path::PathBuf;
@@ -18,6 +19,8 @@ pub enum LlmProvider {
     OpenAI,
     Gemini,
     Anthropic,
+    AzureOpenAI,
+    Bedrock,
 }
 
 impl LlmProvider {
@@ -27,6 +30,8 @@ impl LlmProvider {
             LlmProvider::OpenAI => "openai",
             LlmProvider::Gemini => "gemini",
             LlmProvider::Anthropic => "anthropic",
+            LlmProvider::AzureOpenAI => "azure_openai",
+            LlmProvider::Bedrock => "bedrock",
         }
     }
 }
@@ -136,6 +141,8 @@ struct OpenAiChatRequest {
     model: String,
     messages: Vec<OpenAiMessage>,
     temperature: f32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    seed: Option<i64>,
 }
 
 #[derive(Debug, Serialize)]
@@ -302,6 +309,8 @@ fn parse_llm_provider(raw: Option<String>) -> LlmProvider {
         "openai" => LlmProvider::OpenAI,
         "gemini" => LlmProvider::Gemini,
         "anthropic" | "claude" => LlmProvider::Anthropic,
+        "azure" | "azure_openai" => LlmProvider::AzureOpenAI,
+        "bedrock" | "aws_bedrock" => LlmProvider::Bedrock,
         _ => LlmProvider::Ollama,
     }
 }
@@ -312,6 +321,8 @@ fn default_model_for_provider(provider: LlmProvider) -> &'static str {
         LlmProvider::OpenAI => "gpt-4o-mini",
         LlmProvider::Gemini => "gemini-1.5-flash",
         LlmProvider::Anthropic => "claude-3-5-haiku-latest",
+        LlmProvider::AzureOpenAI => "gpt-4o-mini",
+        LlmProvider::Bedrock => "anthropic.claude-3-haiku-20240307-v1:0",
     }
 }
 
@@ -321,6 +332,8 @@ fn model_env_for_provider(provider: LlmProvider) -> &'static str {
         LlmProvider::OpenAI => "ANTIGRAV_LLM_MODEL_OPENAI",
         LlmProvider::Gemini => "ANTIGRAV_LLM_MODEL_GEMINI",
         LlmProvider::Anthropic => "ANTIGRAV_LLM_MODEL_ANTHROPIC",
+        LlmProvider::AzureOpenAI => "ANTIGRAV_LLM_MODEL_AZURE",
+        LlmProvider::Bedrock => "ANTIGRAV_LLM_MODEL_BEDROCK",
     }
 }
 
@@ -340,6 +353,8 @@ fn parse_provider_list(raw: Option<String>) -> Vec<LlmProvider> {
             "openai" => Some(LlmProvider::OpenAI),
             "gemini" => Some(LlmProvider::Gemini),
             "anthropic" | "claude" => Some(LlmProvider::Anthropic),
+            "azure" | "azure_openai" => Some(LlmProvider::AzureOpenAI),
+            "bedrock" | "aws_bedrock" => Some(LlmProvider::Bedrock),
             _ => None,
         })
         .collect()
@@ -385,6 +400,42 @@ fn build_provider_chain(primary: LlmProvider, fallbacks: &[LlmProvider]) -> Vec<
 fn round6(value: f64) -> f64 {
     (value * 1_000_000.0).round() / 1_000_000.0
 }
+
+/// Resolve temperature from environment or use default
+/// Default is 0.0 for deterministic mode
+fn resolve_temperature() -> f32 {
+    std::env::var("ANTIGRAV_LLM_TEMPERATURE")
+        .ok()
+        .and_then(|v| v.trim().parse::<f32>().ok())
+        .unwrap_or(0.0)
+        .clamp(0.0, 2.0)
+}
+
+/// Generate deterministic seed from trace_id and step_id
+/// This ensures same inputs produce same outputs
+fn generate_seed(trace_id: &str, step_id: &str) -> Option<i64> {
+    // Allow override via environment
+    if let Ok(seed_str) = std::env::var("ANTIGRAV_LLM_SEED") {
+        if let Ok(seed) = seed_str.trim().parse::<i64>() {
+            return Some(seed);
+        }
+    }
+
+    // Generate from trace_id + step_id for determinism
+    let combined = format!("{}:{}", trace_id, step_id);
+    let mut hash: u64 = 0xcbf29ce484222325;
+    for byte in combined.as_bytes() {
+        hash ^= u64::from(*byte);
+        hash = hash.wrapping_mul(0x100000001b3);
+    }
+    Some((hash & 0x7FFFFFFFFFFFFFFF) as i64)
+}
+
+/// Check if deterministic mode is enabled
+fn is_deterministic_mode() -> bool {
+    resolve_temperature() == 0.0
+}
+
 
 fn build_http_client() -> Result<reqwest::Client> {
     // Disable implicit proxy/system lookup to avoid platform-specific panics.
@@ -450,6 +501,26 @@ fn estimate_cost_usd(provider: LlmProvider, model: &str, usage: ProviderUsage) -
             }
         }
         LlmProvider::Anthropic => {
+            if model_lower.contains("haiku") {
+                (0.00025, 0.00125)
+            } else if model_lower.contains("sonnet") {
+                (0.003, 0.015)
+            } else {
+                (0.001, 0.005)
+            }
+        }
+        LlmProvider::AzureOpenAI => {
+            // Same pricing as OpenAI
+            if model_lower.contains("gpt-4o-mini") {
+                (0.00015, 0.00060)
+            } else if model_lower.contains("gpt-4.1-mini") {
+                (0.0004, 0.0016)
+            } else {
+                (0.001, 0.002)
+            }
+        }
+        LlmProvider::Bedrock => {
+            // Claude pricing on Bedrock
             if model_lower.contains("haiku") {
                 (0.00025, 0.00125)
             } else if model_lower.contains("sonnet") {
@@ -524,7 +595,7 @@ impl LlmSubAgentSkill {
             default_role: "software-engineer".to_string(),
             model,
             provider,
-            temperature: 0.1,
+            temperature: resolve_temperature(),
             roles_dir: PathBuf::from(
                 std::env::var("ANTIGRAV_ROLES_DIR")
                     .ok()
@@ -641,6 +712,8 @@ impl LlmSubAgentSkill {
             LlmProvider::OpenAI => self.call_openai(model, prompt, temperature).await,
             LlmProvider::Gemini => self.call_gemini(model, prompt, temperature).await,
             LlmProvider::Anthropic => self.call_anthropic(model, prompt, temperature).await,
+            LlmProvider::AzureOpenAI => self.call_azure_openai(model, prompt, temperature).await,
+            LlmProvider::Bedrock => self.call_bedrock(model, prompt, temperature).await,
         }
     }
 
@@ -747,6 +820,7 @@ impl LlmSubAgentSkill {
                 content: prompt.to_string(),
             }],
             temperature,
+            seed: None, // TODO: Pass seed from context
         };
         let client = build_http_client().map_err(|err| {
             provider_failure(
@@ -1013,6 +1087,336 @@ impl LlmSubAgentSkill {
                 input_tokens: usage.input_tokens,
                 output_tokens: usage.output_tokens,
                 total_tokens: usage.input_tokens.saturating_add(usage.output_tokens),
+            },
+            attempts: 1,
+        })
+    }
+
+    // ============================================================================
+    // Azure OpenAI Implementation
+    // ============================================================================
+
+    async fn call_azure_openai(
+        &self,
+        model: &str,
+        prompt: &str,
+        temperature: f32,
+    ) -> Result<ProviderCallResult, ProviderCallFailure> {
+        let api_key = std::env::var("AZURE_OPENAI_API_KEY").map_err(|_| {
+            provider_failure(
+                LlmProvider::AzureOpenAI,
+                model,
+                LlmErrorClass::Configuration,
+                "AZURE_OPENAI_API_KEY is not set",
+            )
+        })?;
+
+        let endpoint = std::env::var("AZURE_OPENAI_ENDPOINT").map_err(|_| {
+            provider_failure(
+                LlmProvider::AzureOpenAI,
+                model,
+                LlmErrorClass::Configuration,
+                "AZURE_OPENAI_ENDPOINT is not set (format: https://<resource>.openai.azure.com)",
+            )
+        })?;
+
+        let deployment = std::env::var("AZURE_OPENAI_DEPLOYMENT").unwrap_or_else(|_| {
+            // Use model as deployment name if not specified
+            model.to_string()
+        });
+
+        let api_version = std::env::var("AZURE_OPENAI_API_VERSION")
+.unwrap_or_else(|_| "2024-02-15-preview".to_string());
+
+        let request = OpenAiChatRequest {
+            model: deployment.clone(),
+            messages: vec![OpenAiMessage {
+                role: "user".to_string(),
+                content: prompt.to_string(),
+            }],
+            temperature,
+            seed: None, // TODO: Pass seed from context
+        };
+
+        let client = build_http_client().map_err(|err| {
+            provider_failure(
+                LlmProvider::AzureOpenAI,
+                model,
+                LlmErrorClass::Configuration,
+                err.to_string(),
+            )
+        })?;
+
+        let url = format!(
+            "{}/openai/deployments/{}/chat/completions?api-version={}",
+            endpoint.trim_end_matches('/'),
+            deployment,
+            api_version
+        );
+
+        let response = client
+            .post(&url)
+            .header("api-key", api_key)
+            .header("Content-Type", "application/json")
+            .json(&request)
+            .send()
+            .await
+            .map_err(|err| map_reqwest_error(LlmProvider::AzureOpenAI, model, err))?;
+
+        let status = response.status();
+        if !status.is_success() {
+            let body = response.text().await.unwrap_or_default();
+            return Err(provider_failure(
+                LlmProvider::AzureOpenAI,
+                model,
+                classify_http_status(status.as_u16()),
+                format!(
+                    "azure openai request failed (status={}): {}",
+                    status.as_u16(),
+                    body
+                ),
+            ));
+        }
+
+        let payload: OpenAiChatResponse = response.json().await.map_err(|err| {
+            provider_failure(
+                LlmProvider::AzureOpenAI,
+                model,
+                LlmErrorClass::Validation,
+                format!("azure openai response parse failed: {}", err),
+            )
+        })?;
+
+        let text = payload
+            .choices
+            .first()
+            .map(|choice| choice.message.content.trim().to_string())
+            .filter(|v| !v.is_empty())
+            .ok_or_else(|| {
+                provider_failure(
+                    LlmProvider::AzureOpenAI,
+                    model,
+                    LlmErrorClass::EmptyResponse,
+                    "azure openai returned empty choices",
+                )
+            })?;
+
+        let usage = payload.usage.unwrap_or(OpenAiUsage {
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
+        });
+
+        Ok(ProviderCallResult {
+            provider: LlmProvider::AzureOpenAI,
+            model: model.to_string(),
+            text,
+            usage: ProviderUsage {
+                input_tokens: usage.prompt_tokens,
+                output_tokens: usage.completion_tokens,
+                total_tokens: usage.total_tokens,
+            },
+            attempts: 1,
+        })
+    }
+
+    // ============================================================================
+    // AWS Bedrock Implementation
+    // ============================================================================
+
+    async fn call_bedrock(
+        &self,
+        model: &str,
+        prompt: &str,
+        temperature: f32,
+    ) -> Result<ProviderCallResult, ProviderCallFailure> {
+        use aws_config::meta::region::RegionProviderChain;
+        use aws_sdk_bedrockruntime::primitives::Blob;
+        use aws_sdk_bedrockruntime::Client;
+
+        let region_str = std::env::var("AWS_REGION")
+            .or_else(|_| std::env::var("AWS_DEFAULT_REGION"))
+            .unwrap_or_else(|_| "us-east-1".to_string());
+
+        let config = aws_config::defaults(aws_config::BehaviorVersion::latest())
+            .region(aws_config::Region::new(region_str))
+            .load()
+            .await;
+
+        let client = Client::new(&config);
+
+        // Parse model to determine provider format
+        // Format: provider.model (e.g., anthropic.claude-3-haiku-20240307-v1:0)
+        let (provider_name, model_id) = if model.contains('.') {
+            let parts: Vec<&str> = model.splitn(2, '.').collect();
+            if parts.len() == 2 {
+                (parts[0], model)
+            } else {
+                ("anthropic", model)
+            }
+        } else {
+            ("anthropic", model)
+        };
+
+        let request_body = match provider_name {
+            "anthropic" => {
+                serde_json::json!({
+                    "anthropic_version": "bedrock-2023-05-31",
+                    "max_tokens": 1024,
+                    "messages": [{
+                        "role": "user",
+                        "content": prompt
+                    }],
+                    "temperature": temperature
+                })
+            }
+            "ai21" | "cohere" | "meta" | "mistral" => {
+                // Generic format for other Bedrock models
+                serde_json::json!({
+                    "prompt": prompt,
+                    "max_tokens": 1024,
+                    "temperature": temperature
+                })
+            }
+            _ => {
+                // Default to Anthropic format
+                serde_json::json!({
+                    "anthropic_version": "bedrock-2023-05-31",
+                    "max_tokens": 1024,
+                    "messages": [{
+                        "role": "user",
+                        "content": prompt
+                    }],
+                    "temperature": temperature
+                })
+            }
+        };
+
+        let body_bytes = serde_json::to_vec(&request_body).map_err(|err| {
+            provider_failure(
+                LlmProvider::Bedrock,
+                model,
+LlmErrorClass::Validation,
+                format!("failed to serialize bedrock request: {}", err),
+            )
+        })?;
+
+        let result = client
+            .invoke_model()
+            .model_id(model_id)
+            .body(Blob::new(body_bytes))
+            .send()
+            .await
+            .map_err(|err| {
+                // AWS SDK error handling - check error message
+                let err_msg = err.to_string();
+                let class = if err_msg.contains("timeout") || err_msg.contains("Timeout") {
+                    LlmErrorClass::Timeout
+                } else if err_msg.contains("not found") || err_msg.contains("NotFound") {
+                    LlmErrorClass::Validation
+                } else if err_msg.contains("throttl") || err_msg.contains("rate") {
+                    LlmErrorClass::RateLimit
+                } else {
+                    LlmErrorClass::Unknown
+                };
+                provider_failure(
+                    LlmProvider::Bedrock,
+                    model,
+                    class,
+                    format!("bedrock invoke failed: {}", err),
+                )
+            })?;
+
+        let response_body = result.body().as_ref();
+        let response_str = String::from_utf8_lossy(response_body);
+
+        // Parse response based on provider
+        let text = match provider_name {
+            "anthropic" => {
+                #[derive(Deserialize)]
+                struct AnthropicBedrockResponse {
+                    #[serde(default)]
+                    content: Option<Vec<AnthropicBedrockContent>>,
+                    #[serde(default)]
+                    usage: Option<AnthropicBedrockUsage>,
+                }
+                #[derive(Deserialize)]
+                struct AnthropicBedrockContent {
+                    #[serde(rename = "type", default)]
+                    kind: Option<String>,
+                    #[serde(default)]
+                    text: Option<String>,
+                }
+                #[derive(Deserialize)]
+                struct AnthropicBedrockUsage {
+                    #[serde(default, rename = "input_tokens")]
+                    input_tokens: Option<u32>,
+                    #[serde(default, rename = "output_tokens")]
+                    output_tokens: Option<u32>,
+                }
+
+                let parsed: AnthropicBedrockResponse = serde_json::from_str(&response_str)
+                    .map_err(|err| {
+                        provider_failure(
+                            LlmProvider::Bedrock,
+                            model,
+                            LlmErrorClass::Validation,
+                            format!("failed to parse bedrock response: {}", err),
+                        )
+                    })?;
+
+                parsed
+                    .content
+                    .as_ref()
+                    .and_then(|c| c.first())
+                    .and_then(|block| block.text.clone())
+                    .unwrap_or_default()
+            }
+            _ => {
+                // Generic parsing for other providers
+                #[derive(Deserialize)]
+                struct GenericBedrockResponse {
+                    #[serde(default)]
+                    completion: Option<String>,
+                    #[serde(default)]
+                    generated_text: Option<String>,
+                }
+                let parsed: GenericBedrockResponse = serde_json::from_str(&response_str)
+                    .map_err(|err| {
+                        provider_failure(
+                            LlmProvider::Bedrock,
+                            model,
+                            LlmErrorClass::Validation,
+                            format!("failed to parse bedrock response: {}", err),
+                        )
+                    })?;
+
+                parsed.completion.or(parsed.generated_text).unwrap_or_default()
+            }
+        };
+
+        let text = text.trim().to_string();
+        if text.is_empty() {
+            return Err(provider_failure(
+                LlmProvider::Bedrock,
+                model,
+                LlmErrorClass::EmptyResponse,
+                "bedrock returned empty response",
+            ));
+        }
+
+        // Bedrock doesn't always return usage info, estimate from prompt length
+        let estimated_input_tokens = (prompt.len() / 4) as u32;
+        let estimated_output_tokens = (text.len() / 4) as u32;
+
+        Ok(ProviderCallResult {
+            provider: LlmProvider::Bedrock,
+            model: model.to_string(),
+            text,
+            usage: ProviderUsage {
+                input_tokens: estimated_input_tokens,
+                output_tokens: estimated_output_tokens,
+                total_tokens: estimated_input_tokens.saturating_add(estimated_output_tokens),
             },
             attempts: 1,
         })
@@ -1319,6 +1723,65 @@ mod tests {
         assert_eq!(ollama_cost, 0.0);
         assert!(openai_cost > 0.0);
         assert!(anthropic_cost > 0.0);
+    }
+
+    #[test]
+    fn resolve_temperature_defaults_to_zero() {
+        std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
+        let temp = super::resolve_temperature();
+        assert_eq!(temp, 0.0);
+    }
+
+    #[test]
+    fn resolve_temperature_reads_from_env() {
+        std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "0.7");
+        let temp = super::resolve_temperature();
+        assert_eq!(temp, 0.7);
+        std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
+    }
+
+    #[test]
+    fn resolve_temperature_clamps_to_valid_range() {
+        // Test upper bound
+        std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "3.0");
+        let temp = super::resolve_temperature();
+        assert_eq!(temp, 2.0);
+        std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
+        
+        // Test lower bound
+        std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "-1.0");
+        let temp = super::resolve_temperature();
+        assert_eq!(temp, 0.0);
+        std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
+    }
+
+    #[test]
+    fn generate_seed_is_deterministic() {
+        let seed1 = super::generate_seed("trace_123", "step_1");
+        let seed2 = super::generate_seed("trace_123", "step_1");
+        assert_eq!(seed1, seed2);
+        
+        let seed3 = super::generate_seed("trace_123", "step_2");
+        assert_ne!(seed1, seed3);
+    }
+
+    #[test]
+    fn generate_seed_respects_env_override() {
+        std::env::set_var("ANTIGRAV_LLM_SEED", "42");
+        let seed = super::generate_seed("trace_123", "step_1");
+        assert_eq!(seed, Some(42));
+        std::env::remove_var("ANTIGRAV_LLM_SEED");
+    }
+
+    #[test]
+    fn is_deterministic_mode_when_temperature_zero() {
+        std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "0.0");
+        assert!(super::is_deterministic_mode());
+        
+        std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "0.7");
+        assert!(!super::is_deterministic_mode());
+        
+        std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
     }
 
     #[test]

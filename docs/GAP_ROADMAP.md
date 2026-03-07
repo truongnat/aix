@@ -1,140 +1,514 @@
-# Gap Roadmap (Based On Current README + Landing + Runtime)
+# Gap Closure Roadmap
 
-This document translates the current gap analysis into an execution plan for `agentic-sdlc`.
+Kế hoạch khắc phục các gaps quan trọng của `agentic-sdlc` dựa trên phân tích chi tiết.
 
-## Scope And Intent
+## Tổng quan
 
-The project already has a strong deterministic orchestration core (step ordering, persisted state, policy gates, resume semantics).  
-The highest-priority work now is to close production-readiness gaps around evaluation, governance, security hardening, and delivery automation.
+Project hiện tại có ý tưởng tốt về deterministic runtime cho AI agents, nhưng còn nhiều gaps về implementation thực tế. Roadmap này ưu tiên các gaps theo impact và effort.
 
-## Baseline Summary
+---
 
-### Strong today
-- Deterministic workflow engine semantics (ordering/state/trace IDs)
-- Resume and crash recovery
-- Policy gating for trust/budget/permissions
-- Report-quality and simulation-fallback gates
-- Role/workflow/skill scaffolding and package checks
+## Phase 1: Critical Foundations (Weeks 1-4)
 
-### Confirmed gaps to close
-1. Determinism is orchestration-level, not model-output-level.
-2. No remote CI workflow + branch-protection-ready check surface.
-3. No first-class eval command/path for regression gating.
-4. Human-in-the-loop approval primitive is missing in runtime.
-5. Observability export is not OpenTelemetry-compatible.
-6. Imported-skill supply-chain verification is metadata-level (no signature/attestation verification).
-7. Provider coverage and routing reliability are limited for enterprise contexts.
-8. MCP is present as imported skill content, but not runtime-integrated capability.
+### 1.1 LLM Determinism & Reproducibility
+**Priority:** 🔴 Critical | **Effort:** High
 
-## 30 / 60 / 90 Day Plan
+**Problem:**
+- LLM outputs non-deterministic do temperature/sampling
+- Không có snapshot/replay thực sự cho content
+- Claim "deterministic" chỉ đúng với step order, không phải output
 
-## Day 0-30: Reliability And Delivery Baseline
+**Solution:**
+- [ ] Enforce `temperature=0` và `seed` parameter cho tất cả LLM calls
+- [ ] Implement content snapshot system:
+  - Store LLM request/response pairs với trace_id
+  - Replay mode: return cached responses thay vì call LLM
+  - Schema: `{trace_id, step_id, request_hash, response, timestamp}`
+- [ ] Add `--replay-mode` flag để replay từ snapshot
+- [ ] Document determinism scope rõ ràng: orchestration vs content
 
-### Objectives
-- Make project claims precise.
-- Move local quality gate to remote CI.
-- Establish immediate governance artifacts for gaps.
+**Files to modify:**
+- `src/skills/llm_subagent.rs` - Add seed/temperature enforcement
+- `src/engine/workflow_engine/` - Add snapshot storage
+- New: `src/engine/replay_store.rs` - Replay cache implementation
 
-### Deliverables
-- `README` determinism scope clarified (engine determinism vs LLM content nondeterminism).
-- GitHub Actions CI workflow running `./scripts/ci_gate.sh` on push/PR.
-- This roadmap document tracked in repo.
-- Architecture doc update with explicit system diagram.
+**Acceptance:**
+- Same workflow + input → same step order AND same LLM outputs (replay mode)
+- Non-replay mode: document variance expectations
 
-### Success criteria
-- CI check is visible and required in PR flow.
-- No ambiguous “fully deterministic LLM output” wording in docs.
+---
 
-## Day 31-60: Evaluation + Human Control
+### 1.2 Real Code Execution Sandbox
+**Priority:** 🔴 Critical | **Effort:** High
 
-### Objectives
-- Add objective quality regression controls.
-- Add runtime human approval for sensitive transitions.
+**Problem:**
+- Project chỉ xử lý markdown workflows, không execute code thực
+- Không có sandbox cho skill execution
+- Security risk từ imported skills
 
-### Deliverables
-- New `workflow eval` command:
-  - dataset input
-  - scorer interface
-  - pass/fail threshold
-  - JSON report artifact
-- `manual_approval` workflow step primitive:
-  - pause state persisted
-  - approve/reject CLI commands
-  - approver metadata in trace
-- Release/review workflows updated to require approval before final go/no-go.
+**Solution:**
+- [ ] Implement isolated execution environment:
+  - Use Docker containers hoặc gVisor cho sandbox
+  - Resource limits: CPU, memory, network, filesystem
+  - Timeout enforcement per skill execution
+- [ ] Add skill execution modes:
+  - `trusted`: full access (local skills only)
+  - `constrained`: limited filesystem/network
+  - `untrusted`: full sandbox (imported skills)
+- [ ] Integrate với existing `TrustTier` system
+- [ ] Add execution telemetry: resource usage, violations
 
-### Success criteria
-- PR/CI can fail on evaluation regression.
-- Merge/release-sensitive workflows can be paused and approved explicitly.
+**Files to create:**
+- `src/engine/sandbox/` - Sandbox implementation
+- `src/engine/sandbox/docker.rs` - Docker backend
+- `src/engine/sandbox/resource_monitor.rs` - Resource tracking
 
-### Progress update (current)
-- `workflow eval` command implemented with dataset-based report scoring and pass-rate threshold gate.
-- `manual_approval` runtime primitive implemented:
-  - `WorkflowInstanceStatus::Paused` and `StepExecutionStatus::Paused`
-  - `workflow approve` / `workflow reject` operator commands
-  - persisted approval metadata in `.agents/state`
-  - release/review workflows updated with explicit `manual_approval_gate`.
-- OpenTelemetry-compatible trace export MVP:
-  - `workflow trace <instance_id> --otel`
-  - emits OTLP JSON-compatible `resourceSpans -> scopeSpans -> spans` payload
-  - includes workflow root span, per-step spans, and workflow event mapping.
-- Imported-skill attestation verification MVP:
-  - lock entries include deterministic `attestation` marker for imported skills
-  - `workflow verify-lock --require-attestation` enforces attestation presence/validity
-  - report includes `attestation_missing` and `attestation_invalid` breakdowns.
-- Provider/fallback reliability upgrade (WS-07 partial):
-  - Anthropic provider support in `llm_subagent` router
-  - fallback policy control: `ANTIGRAV_LLM_FALLBACK_POLICY=transient_only|always|never`
-  - fallback now differentiates transient vs non-transient failures (e.g. auth/config/model errors).
-- MCP runtime integration surface (WS-08 partial):
-  - `workflow mcp-register <name>` for stdio/http/sse server registry entries
-  - `workflow mcp-list` for local runtime MCP inventory
-  - `workflow mcp-ping [name] --timeout-ms <ms>` health checks with persisted last ping status
-  - `workflow mcp-policy <name> --tool <tool_name>` deterministic allow/deny policy enforcement
-  - registry persisted at `.agents/mcp/servers.json` with per-server allow/deny tool metadata.
+**Files to modify:**
+- `src/skill/capability.rs` - Extend TrustTier enforcement
+- `src/engine/workflow_engine/executor.rs` - Route through sandbox
 
-## Day 61-90: Observability + Supply Chain + Enterprise Integrations
+**Acceptance:**
+- Untrusted skills run in isolated containers
+- Resource violations → skill failure with clear error
+- Telemetry shows actual resource usage
 
-### Objectives
-- Standardize telemetry.
-- Harden imported skill trust.
-- Expand provider/runtime interoperability.
+---
 
-### Deliverables
-- OpenTelemetry export support (trace/span mapping from workflow/step telemetry).
-- Supply-chain security for imported skills:
-  - signed manifests or signature verification
-  - provenance attestation checks
-  - optional SBOM output for imported packs
-- Provider expansion (Anthropic/Azure OpenAI/Bedrock) with explicit routing and fallback policy semantics.
-- MCP runtime management commands (register/list/ping/permission policy).
+## Phase 2: Enterprise Integration (Weeks 5-8)
 
-### Success criteria
-- External observability backend can ingest runtime traces directly.
-- Imported-skill execution can enforce cryptographic trust policy.
-- Enterprise provider adoption path documented and testable.
+### 2.1 Extended LLM Provider Support
+**Priority:** 🟠 High | **Effort:** Medium
 
-## Workstream Backlog
+**Problem:**
+- Chỉ support 3 providers (ollama, openai, gemini)
+- Thiếu Anthropic Claude, Azure OpenAI, AWS Bedrock
+- Fallback logic không rõ ràng
 
-| ID | Workstream | Priority | Effort | Owner |
-|---|---|---:|---:|---|
-| WS-01 | CI on GitHub + required checks | P0 | S | Platform |
-| WS-02 | Determinism claim alignment in docs | P0 | S | Docs |
-| WS-03 | `workflow eval` command and threshold gate | P1 | M | Runtime |
-| WS-04 | `manual_approval` runtime primitive | P1 | M | Runtime |
-| WS-05 | OpenTelemetry exporter | P1 | M | Runtime |
-| WS-06 | Signed imported-skill verification | P1 | L | Security |
-| WS-07 | Provider expansion + robust fallback semantics | P2 | M | LLM Platform |
-| WS-08 | MCP runtime integration surface | P2 | M | Integrations |
+**Solution:**
+- [ ] Add provider implementations:
+  - Anthropic Claude (already in Cargo.toml!)
+  - Azure OpenAI
+  - AWS Bedrock (already have aws-sdk-bedrockruntime!)
+- [ ] Implement smart fallback:
+  - Fallback triggers: timeout, rate limit, 5xx errors
+  - Circuit breaker pattern per provider
+  - Exponential backoff with jitter
+- [ ] Add provider health checks
+- [ ] Document fallback behavior clearly
 
-## Risks
+**Files to modify:**
+- `src/skills/llm_subagent.rs` - Add new providers
+- New: `src/engine/llm/providers/` - Provider implementations
+- New: `src/engine/llm/circuit_breaker.rs` - Circuit breaker
 
-- Adding strict approval/eval gates can slow developer iteration if defaults are too rigid.
-- OTel and supply-chain verification can increase implementation complexity without staged rollout.
-- Multi-provider support may increase maintenance cost unless adapters are standardized.
+**Acceptance:**
+- All 6 providers work with same interface
+- Fallback triggers documented and tested
+- Circuit breaker prevents cascade failures
 
-## Recommended rollout strategy
+---
 
-1. Enable new controls as opt-in first (`--strict-eval`, `--require-approval`).
-2. Collect adoption telemetry.
-3. Graduate to default-on for release-critical workflows.
+### 2.2 Git & CI/CD Integration
+**Priority:** 🟠 High | **Effort:** Medium
+
+**Problem:**
+- Không có git integration thực sự (chỉ có policy checks)
+- Không push/create PR
+- Không integrate với CI/CD systems
+
+**Solution:**
+- [ ] Implement git operations:
+  - Create branch, commit, push
+  - Create PR/MR (GitHub, GitLab, Bitbucket APIs)
+  - Handle merge conflicts programmatically
+- [ ] CI/CD integration:
+  - GitHub Actions workflow templates
+  - GitLab CI templates
+  - Webhook listeners for CI status
+- [ ] Add workflow steps:
+  - `git_create_pr` skill
+  - `ci_wait_for_status` skill
+  - `git_auto_merge` skill (with policies)
+
+**Files to create:**
+- `src/skills/git_integration.rs` - Full git operations
+- `src/skills/ci_integration.rs` - CI/CD integrations
+- `templates/github_actions/` - Workflow templates
+
+**Files to modify:**
+- `src/skills/git_ops.rs` - Extend existing git skills
+
+**Acceptance:**
+- Workflow can create branch → commit → push → PR
+- CI status integrated into workflow decisions
+- Auto-merge with policy enforcement
+
+---
+
+## Phase 3: Security & Observability (Weeks 9-12)
+
+### 3.1 Real Security Integration
+**Priority:** 🟠 High | **Effort:** High
+
+**Problem:**
+- Security check là workflow step, không phải real scan
+- AI agent tự review security = circular reasoning
+- Không có SAST/DAST integration
+
+**Solution:**
+- [ ] Integrate real security tools:
+  - Semgrep for SAST
+  - Trivy for dependency scanning
+  - OWASP ZAP for DAST (optional)
+- [ ] Implement security gate:
+  - Run scans in sandbox
+  - Parse tool outputs
+  - Block workflow on critical findings
+  - Allow manual override with approval
+- [ ] Add security policies:
+  - Severity thresholds
+  - Allowed CVE exceptions
+  - Required approvers for overrides
+
+**Files to create:**
+- `src/engine/security/scanners/` - Scanner integrations
+- `src/engine/security/policy_engine.rs` - Policy enforcement
+- `src/skills/security_scan.rs` - Security scan skills
+
+**Acceptance:**
+- Real SAST/DAST scans run before deployment
+- Critical findings block workflow
+- Security reports in trace timeline
+
+---
+
+### 3.2 OpenTelemetry Integration
+**Priority:** 🟡 Medium | **Effort:** Low
+
+**Problem:**
+- Custom trace format, không phải OpenTelemetry
+- Không integrate với APM tools
+- Thiếu alerting/monitoring
+
+**Solution:**
+- [ ] Migrate to OpenTelemetry:
+  - Use `opentelemetry` and `opentelemetry-otlp` crates
+  - Export spans to OTLP endpoint
+  - Keep existing timeline format as fallback
+- [ ] Add structured logging:
+  - Use `tracing` crate
+  - Correlate logs with traces
+- [ ] Document integration với:
+  - Jaeger
+  - Grafana Tempo
+  - Datadog
+  - Honeycomb
+
+**Files to modify:**
+- `Cargo.toml` - Add opentelemetry deps
+- `src/cli.rs` - Replace custom otel_* functions
+- New: `src/engine/telemetry/` - OTel setup
+
+**Acceptance:**
+- Traces visible in Jaeger/Grafana
+- Logs correlated with trace_id
+- Integration guide for popular APM tools
+
+---
+
+## Phase 4: Scalability & Performance (Weeks 13-16)
+
+### 4.1 Scalable Vector Store
+**Priority:** 🟠 High | **Effort:** Medium
+
+**Problem:**
+- Vector backend là JSON file - không scale
+- SQLite single-writer - không concurrent-safe
+- Không rõ embedding model
+
+**Solution:**
+- [ ] Implement proper vector store:
+  - Qdrant (self-hosted) hoặc Pinecone (cloud)
+  - PostgreSQL + pgvector (simpler option)
+  - Keep JSON as fallback for dev
+- [ ] Add embedding configuration:
+  - Support multiple embedding models
+  - OpenAI embeddings, Sentence Transformers, etc.
+  - Cache embeddings to avoid recomputation
+- [ ] Concurrent-safe operations:
+  - Connection pooling
+  - Read replicas for queries
+  - Write batching
+
+**Files to create:**
+- `src/engine/vector_store/` - Vector store abstraction
+- `src/engine/vector_store/qdrant.rs` - Qdrant backend
+- `src/engine/vector_store/pgvector.rs` - PostgreSQL backend
+
+**Files to modify:**
+- `src/skills/vector_memory.rs` - Use new abstraction
+
+**Acceptance:**
+- Support 10k+ documents without performance degradation
+- Concurrent reads/writes work correctly
+- Embedding model configurable
+
+---
+
+### 4.2 True Multi-Agent Coordination
+**Priority:** 🟡 Medium | **Effort:** High
+
+**Problem:**
+- Roles là static configuration
+- Không có parallel execution
+- Không handle conflicts giữa agents
+
+**Solution:**
+- [ ] Implement agent coordination:
+  - Parallel step execution với dependencies
+  - Shared state với optimistic locking
+  - Conflict resolution strategies
+- [ ] Dynamic role assignment:
+  - Agent capabilities registry
+  - Task-to-agent matching
+  - Load balancing across agents
+- [ ] Communication protocol:
+  - Message passing between agents
+  - Shared blackboard for coordination
+  - Event-driven triggers
+
+**Files to create:**
+- `src/engine/coordination/` - Multi-agent coordination
+- `src/engine/coordination/scheduler.rs` - Parallel scheduler
+- `src/engine/coordination/conflict_resolver.rs` - Conflict handling
+
+**Acceptance:**
+- Multiple agents execute steps in parallel
+- Conflicts detected and resolved
+- Coordination overhead < 10% of total time
+
+---
+
+## Phase 5: Developer Experience (Weeks 17-20)
+
+### 5.1 Documentation & Architecture
+**Priority:** 🟡 Medium | **Effort:** Low
+
+**Problem:**
+- README quá dài, thiếu conceptual explanation
+- Không có architecture diagram
+- File naming vague
+
+**Solution:**
+- [ ] Restructure documentation:
+  - Separate: Getting Started, Concepts, Reference, Guides
+  - Add architecture diagrams (use Mermaid)
+  - Add sequence diagrams for key flows
+- [ ] Improve file organization:
+  - Rename `valid_flow.md` → `examples/basic_workflow.md`
+  - Rename `demo.md` → `examples/demo_scenario.md`
+  - Add `docs/concepts/` folder
+- [ ] Add interactive tutorials:
+  - Step-by-step workflow creation
+  - Skill development guide
+  - Troubleshooting guide
+
+**Files to create:**
+- `docs/concepts/ARCHITECTURE.md` - System architecture
+- `docs/concepts/DETERMINISM.md` - Determinism explained
+- `docs/guides/WORKFLOW_CREATION.md` - Tutorial
+- `docs/guides/SKILL_DEVELOPMENT.md` - Tutorial
+
+**Acceptance:**
+- New users can understand concepts in < 30 minutes
+- Architecture clear from diagrams
+- Common issues have documented solutions
+
+---
+
+### 5.2 Testing & CI Improvements
+**Priority:** 🟡 Medium | **Effort:** Low
+
+**Problem:**
+- "137 tests" claimed nhưng không có CI badge
+- Live LLM tests require manual flag
+- Không có mock layer tốt
+
+**Solution:**
+- [ ] Improve test infrastructure:
+  - Mock LLM responses for unit tests
+  - Contract tests for provider integrations
+  - Integration tests với Docker Compose
+- [ ] CI/CD pipeline:
+  - GitHub Actions workflow (already exists!)
+  - Add test coverage reporting
+  - Add performance benchmarks
+  - Publish binary releases
+- [ ] Add test documentation:
+  - How to run tests locally
+  - How to add new tests
+  - Test architecture explanation
+
+**Files to create:**
+- `tests/mocks/` - Mock LLM responses
+- `.github/workflows/release.yml` - Release automation
+- `docs/TESTING.md` - Test guide
+
+**Files to modify:**
+- `.github/workflows/ci.yml` - Add coverage, benchmarks
+
+**Acceptance:**
+- CI badge shows passing tests
+- Test coverage > 70%
+- Binary releases published automatically
+
+---
+
+### 5.3 Branding & Maturity
+**Priority:** 🟡 Medium | **Effort:** Low
+
+**Problem:**
+- Tool name (`antigrav`) ≠ repo name (`agentic-sdlc`)
+- v1.0.1 nhưng chỉ 27 commits, 1 star
+- Không có binary distribution
+
+**Solution:**
+- [ ] Unify branding:
+  - Decide: keep `antigrav` or rename to `agentic-sdlc`
+  - Update all references consistently
+  - Create logo/visual identity
+- [ ] Improve project maturity signals:
+  - Add CONTRIBUTING.md
+  - Add CODE_OF_CONDUCT.md
+  - Add SECURITY.md with vulnerability reporting
+  - Add project roadmap to README
+- [ ] Distribution:
+  - Publish to crates.io
+  - Binary releases for major platforms
+  - Docker image
+  - Homebrew formula (macOS)
+
+**Files to create:**
+- `CONTRIBUTING.md` - Contribution guide
+- `CODE_OF_CONDUCT.md` - Community guidelines
+- `SECURITY.md` - Security policy
+- `Dockerfile` - Container image
+- `homebrew/antigrav.rb` - Homebrew formula
+
+**Acceptance:**
+- Consistent naming everywhere
+- Published on crates.io
+- Easy installation on all platforms
+
+---
+
+## Implementation Priority Matrix
+
+| Phase | Gap | Impact | Effort | Priority | Weeks |
+|-------|-----|--------|--------|----------|-------|
+| 1 | LLM Determinism | 🔴 Critical | High | P0 | 1-2 |
+| 1 | Code Sandbox | 🔴 Critical | High | P0 | 3-4 |
+| 2 | LLM Providers | 🟠 High | Medium | P1 | 5-6 |
+| 2 | Git/CI Integration | 🟠 High | Medium | P1 | 7-8 |
+| 3 | Security Integration | 🟠 High | High | P1 | 9-11 |
+| 3 | OpenTelemetry | 🟡 Medium | Low | P2 | 12 |
+| 4 | Vector Store | 🟠 High | Medium | P1 | 13-14 |
+| 4 | Multi-Agent | 🟡 Medium | High | P2 | 15-16 |
+| 5 | Documentation | 🟡 Medium | Low | P2 | 17-18 |
+| 5 | Testing/CI | 🟡 Medium | Low | P2 | 19 |
+| 5 | Branding | 🟡 Medium | Low | P3 | 20 |
+
+---
+
+## Success Metrics
+
+### Technical Metrics
+- [ ] Deterministic replay: 100% reproducibility in replay mode
+- [ ] Security: 0 critical vulnerabilities in production
+- [ ] Performance: Vector search < 100ms for 10k docs
+- [ ] Reliability: 99.9% workflow completion rate
+- [ ] Test coverage: > 70%
+
+### Product Metrics
+- [ ] Time to first workflow: < 15 minutes
+- [ ] Documentation completeness: All features documented
+- [ ] Community: > 100 stars, > 10 contributors
+- [ ] Adoption: > 50 production deployments
+
+### Developer Experience
+- [ ] Setup time: < 5 minutes
+- [ ] Build time: < 2 minutes
+- [ ] Test time: < 5 minutes
+- [ ] Binary size: < 50MB
+
+---
+
+## Risk Mitigation
+
+### Technical Risks
+1. **Sandbox performance overhead**
+   - Mitigation: Benchmark early, optimize hot paths
+   - Fallback: Make sandbox optional for trusted environments
+
+2. **LLM provider API changes**
+   - Mitigation: Abstract provider interface, version pinning
+   - Fallback: Maintain multiple provider versions
+
+3. **Vector store migration complexity**
+   - Mitigation: Phased rollout, keep JSON fallback
+   - Fallback: Document manual migration path
+
+### Project Risks
+1. **Scope creep**
+   - Mitigation: Strict phase boundaries, MVP per phase
+   - Fallback: Cut P3 features if needed
+
+2. **Breaking changes**
+   - Mitigation: Semantic versioning, deprecation warnings
+   - Fallback: Maintain v1.x branch for stability
+
+---
+
+## Next Steps
+
+1. **Week 1:** Start Phase 1.1 (LLM Determinism)
+   - Design snapshot schema
+   - Implement replay store
+   - Add temperature/seed enforcement
+
+2. **Week 2:** Continue Phase 1.1 + Start Phase 1.2
+   - Complete replay mode
+   - Design sandbox architecture
+   - Prototype Docker backend
+
+3. **Week 3-4:** Complete Phase 1
+   - Finish sandbox implementation
+   - Integration testing
+   - Documentation
+
+4. **Week 5+:** Follow phase sequence
+   - Review progress weekly
+   - Adjust priorities based on feedback
+   - Release incremental versions
+
+---
+
+## Version Milestones
+
+- **v1.1.0** (Week 4): Determinism + Sandbox
+- **v1.2.0** (Week 8): Enterprise LLM + Git/CI
+- **v1.3.0** (Week 12): Security + Observability
+- **v1.4.0** (Week 16): Scalability + Multi-Agent
+- **v2.0.0** (Week 20): Production-Ready Release
+
+---
+
+## Contributing
+
+Roadmap này là living document. Contributions welcome:
+- Open issues cho specific gaps
+- Submit PRs theo phase priority
+- Discuss trong GitHub Discussions
+
+**Last Updated:** 2026-03-06
+**Status:** Draft → Review → Implementation
