@@ -56,6 +56,59 @@ Benefits:
 
 See [Deterministic Mode Guide](docs/DETERMINISTIC_MODE.md) for details.
 
+## LLM Providers (Week 3 Feature)
+
+Support for 6 LLM providers with automatic fallback:
+
+```bash
+# Choose your provider
+export ANTIGRAV_LLM_PROVIDER=openai    # or ollama, gemini, anthropic, azure, bedrock
+export OPENAI_API_KEY=sk-proj-...
+
+# Optional: Configure fallback
+export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
+
+# Run workflow
+cargo run -- --workflow feature.md
+```
+
+### Supported Providers
+
+| Provider | Best For | Cost | Setup |
+|----------|----------|------|-------|
+| **Ollama** | Development, offline | Free | [Guide](docs/providers/OLLAMA.md) |
+| **OpenAI** | Production, determinism | $$ | [Guide](docs/providers/OPENAI.md) |
+| **Gemini** | Cost optimization | $ | [Guide](docs/providers/GEMINI.md) |
+| **Anthropic** | Quality, safety | $$$ | [Guide](docs/providers/ANTHROPIC.md) |
+| **Azure OpenAI** | Enterprise | $$ | [Guide](docs/providers/AZURE_OPENAI.md) |
+| **AWS Bedrock** | AWS ecosystem | $$$ | [Guide](docs/providers/BEDROCK.md) |
+
+See [LLM Providers Guide](docs/LLM_PROVIDERS.md) for complete documentation.
+
+### Quick Examples
+
+**Development (Free):**
+```bash
+export ANTIGRAV_LLM_PROVIDER=ollama
+cargo run -- --workflow feature.md
+```
+
+**Production (Reliable):**
+```bash
+export ANTIGRAV_LLM_PROVIDER=openai
+export OPENAI_API_KEY=sk-proj-...
+cargo run -- --workflow feature.md
+```
+
+**Cost-Optimized:**
+```bash
+export ANTIGRAV_LLM_PROVIDER=gemini
+export GEMINI_API_KEY=AIza...
+cargo run -- --workflow feature.md
+```
+
+See [Deterministic Mode Guide](docs/DETERMINISTIC_MODE.md) for details.
+
 ## Current Release
 
 - Runtime target: `v1.0.1`
