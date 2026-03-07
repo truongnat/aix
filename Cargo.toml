@@ -17,5 +17,10 @@ aws-config = "1"
 aws-sdk-bedrockruntime = "1"
 base64 = "0.22"
 
+# Git integration
+git2 = "0.18"
+octocrab = "0.49"  # Upgraded for better API compatibility
+gitlab = "0.1610"
+
 [dev-dependencies]
 tempfile = "3"
