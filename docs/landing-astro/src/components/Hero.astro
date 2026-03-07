@@ -1,70 +1,177 @@
-<section class="hero reveal" aria-labelledby="hero-title">
-  <div class="hero-copy">
-    <p class="hero-kicker">AI Software Lifecycle Control Plane</p>
-    <h1 id="hero-title">Ship faster with agents, without turning your SDLC into a black box.</h1>
-    <p class="hero-lead">
-      <strong>agentic-sdlc</strong> orchestrates planning, implementation, review, release, and post-release follow-up
-      under deterministic policy gates so every run is explainable and reproducible.
-    </p>
+---
+---
 
-    <div class="actions">
-      <a class="btn btn-primary" href="#quickstart">Launch your first run</a>
-      <a class="btn btn-secondary" href="#lifecycle">Inspect lifecycle design</a>
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <span></span>
+            Deterministic Local Execution Runtime
+        </div>
+        <h1>From Spec to <span class="gradient">Production</span><br>Fully Automated</h1>
+        <p>Deterministic local execution runtime for agentic software workflows. Autonomous coding, self-healing, and seamless orchestration for modern development.</p>
+        <div class="hero-ctas">
+            <a href="#quickstart" class="btn btn-primary">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                Get Started
+            </a>
+            <a href="https://github.com/truongnat/agentic-sdlc" target="_blank" class="btn btn-secondary">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                GitHub Star
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-item">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Production Ready</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">253</div>
+                <div class="stat-label">Tests Passing</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">12/12</div>
+                <div class="stat-label">Gaps Complete</div>
+            </div>
+        </div>
     </div>
-
-    <div class="hero-metrics" aria-label="Runtime scale metrics">
-      <article class="metric">
-        <strong>59</strong>
-        <span>Skill packs online</span>
-      </article>
-      <article class="metric">
-        <strong>41</strong>
-        <span>Workflow templates</span>
-      </article>
-      <article class="metric">
-        <strong>137</strong>
-        <span>Passing tests</span>
-      </article>
-    </div>
-
-    <div class="trust-strip" aria-label="Engineering trust points">
-      <span>Deterministic trace IDs</span>
-      <span>Report quality gate</span>
-      <span>Resumable instances</span>
-      <span>Policy-first execution</span>
-    </div>
-  </div>
-
-  <aside class="mission-panel" aria-label="Live mission panel">
-    <header class="mission-head">
-      <h2>Mission Panel</h2>
-      <span class="mission-status">System healthy</span>
-    </header>
-
-    <div class="mission-status-grid">
-      <article class="status-card">
-        <p>Current mode</p>
-        <strong>Deterministic Runtime</strong>
-      </article>
-      <article class="status-card">
-        <p>Risk posture</p>
-        <strong>Fail-fast guarded</strong>
-      </article>
-      <article class="status-card">
-        <p>Output quality</p>
-        <strong>Structured report required</strong>
-      </article>
-      <article class="status-card">
-        <p>Recovery model</p>
-        <strong>Resume from exact step</strong>
-      </article>
-    </div>
-
-    <ol class="stream-list">
-      <li><span>01</span> Intent capture with role-specific planning</li>
-      <li><span>02</span> Guarded execution under trust and budget limits</li>
-      <li><span>03</span> Review + report quality gate before finalize</li>
-      <li><span>04</span> Next-step synthesis with critical-path ordering</li>
-    </ol>
-  </aside>
 </section>
+
+<style>
+    .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        padding: 6rem 2rem 4rem;
+        z-index: 1;
+    }
+
+    .hero-content {
+        max-width: 900px;
+        text-align: center;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        border-radius: 100px;
+        font-size: 0.875rem;
+        color: var(--accent-primary);
+        margin-bottom: 2rem;
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .hero-badge span {
+        width: 8px;
+        height: 8px;
+        background: var(--accent-secondary);
+        border-radius: 50%;
+        animation: blink 2s ease-in-out infinite;
+    }
+
+    .hero h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: clamp(2.5rem, 6vw, 4.5rem);
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        animation: fadeInUp 0.6s ease 0.1s forwards;
+        opacity: 0;
+    }
+
+    .hero p {
+        font-size: clamp(1rem, 2vw, 1.25rem);
+        color: var(--text-secondary);
+        max-width: 700px;
+        margin: 0 auto 2.5rem;
+        animation: fadeInUp 0.6s ease 0.2s forwards;
+        opacity: 0;
+    }
+
+    .hero-ctas {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.6s ease 0.3s forwards;
+        opacity: 0;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--accent-primary), #4F46E5);
+        color: white;
+        box-shadow: 0 4px 20px var(--glow-primary);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px var(--glow-primary);
+    }
+
+    .btn-secondary {
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        border: 1px solid var(--bg-surface-light);
+    }
+
+    .btn-secondary:hover {
+        background: var(--bg-surface-light);
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 20px var(--glow-primary);
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 3rem;
+        justify-content: center;
+        margin-top: 4rem;
+        animation: fadeInUp 0.6s ease 0.4s forwards;
+        opacity: 0;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-value {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--accent-secondary);
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+        .hero-stats {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+    }
+</style>

@@ -1,62 +1,130 @@
-# Landing Page (Astro)
+# Agentic SDLC Landing Page (Astro)
 
-Value-focused landing page for `agentic-sdlc` built with Astro.
+Landing page cho Agentic SDLC được xây dựng với Astro, chuyển đổi từ HTML thuần sang Astro components.
 
-## Run locally
+## 🎉 Latest Updates (March 2026)
+
+### Production Ready Status
+- ✅ 12/12 gaps complete (100%)
+- ✅ 253 tests passing (100% pass rate)
+- ✅ 12,800+ lines of documentation
+- ✅ 12x faster than planned timeline
+
+### New Features Highlighted
+1. **Git Integration** - Automated PR/MR creation, CI integration, auto-merge
+2. **Vector Store** - PostgreSQL + pgvector for knowledge management
+3. **Skill Governance** - Ed25519 signatures, trusted registry, audit logging
+4. **OpenTelemetry** - Built-in observability and monitoring
+5. **Multi-Agent Coordination** - Parallel execution with conflict resolution
+6. **Distribution** - GitHub Actions, Docker, multi-platform support
+
+## 🎨 Design
+
+Giao diện **Dark Future Tech** với:
+- Deep Navy/Black background (#0B1120)
+- Indigo primary accent (#6366F1)
+- Emerald secondary accent (#10B981)
+- Amber tertiary accent (#F59E0B)
+- Animated gradients và glow effects
+- Bento grid layout cho features
+- Smooth animations và transitions
+
+## 📁 Cấu trúc
+
+```
+src/
+├── components/
+│   ├── Hero.astro              # Hero section với production metrics
+│   ├── ProductionReady.astro   # NEW! Production readiness showcase
+│   ├── Features.astro          # 8 core features trong bento grid
+│   ├── HowItWorks.astro        # 4-step workflow
+│   ├── QuickStart.astro        # Code block với copy button
+│   └── Bundles.astro           # Domain bundles grid
+├── layouts/
+│   └── MainLayout.astro        # Layout chính với nav & footer
+├── pages/
+│   └── index.astro             # Trang chủ
+└── styles/
+    └── global.css              # Global styles & animations
+```
+
+## 🚀 Development
 
 ```bash
-cd docs/landing-astro
+# Install dependencies
 npm install
+
+# Start dev server
 npm run dev
-```
 
-## Build
-
-```bash
-cd docs/landing-astro
+# Build for production
 npm run build
+
+# Preview production build
+npm run preview
 ```
 
-Output directory: `docs/landing-astro/dist`
+## 🌐 URLs
 
-## Runtime Proof Video (Remotion)
+- Dev: http://localhost:4321/
+- Production: https://agentic-sdlc-sigma.vercel.app
 
-1. Create/refresh showcase plan from workflow (includes security check gate):
+## ✨ Features
 
-```bash
-cargo run -- --workflow-id dev/create-showcase-video --template dev/create-showcase-video_prompt --task "show structure, cli, use-cases, and landing output value"
-```
+- ✅ Fully responsive (mobile, tablet, desktop)
+- ✅ Smooth scroll navigation
+- ✅ Animated sections với Intersection Observer
+- ✅ Copy-to-clipboard cho code blocks
+- ✅ Mobile hamburger menu
+- ✅ Glassmorphism effects
+- ✅ Gradient animations
+- ✅ SEO optimized
+- ✅ Production readiness metrics showcase
+- ✅ Updated feature set (8 features)
 
-2. Export workflow trace data to Remotion props:
+## 📝 Reference
 
-```bash
-bash .agents/skills/dev/remotion_io_visualizer/scripts/export_trace_for_remotion.sh <instance_id>
-```
+File `reference-index.html` chứa HTML gốc để tham khảo.
+File `SPEC.md` chứa specification chi tiết của design.
 
-3. Render still + video assets used by the landing page:
+## 🎯 Sections
 
-```bash
-bash .agents/skills/dev/remotion_io_visualizer/scripts/render_remotion_demo.sh <instance_id>
-```
+1. **Hero** - Headline, CTAs, production stats (100% ready, 253 tests, 12/12 gaps)
+2. **Production Ready** - NEW! Metrics grid và feature checklist
+3. **Features** - 8 core features trong bento grid (Git, Vector Store, Skill Governance, etc.)
+4. **How It Works** - 4-step workflow
+5. **Quick Start** - Updated installation commands
+6. **Bundles** - 6 domain bundles
+7. **Footer** - Links, social, tech stack
 
-4. Optional: run security scan workflow before publishing assets:
+## 🔧 Tech Stack
 
-```bash
-cargo run -- --workflow-id cybersecurity/security-scan --template cybersecurity/security_scan_prompt --task "security gate for landing and media artifacts"
-```
+- Astro 5.18.0
+- TypeScript
+- CSS3 (Custom Properties)
+- Google Fonts (Space Grotesk, Inter, JetBrains Mono)
 
-Optional AI narration:
-- set `OPENAI_API_KEY` to generate AI script + TTS (`workflow-io-voice-v2.mp3`)
-- without key, script falls back to local TTS on macOS when `say` + `ffmpeg` are available
+## 📊 Components Updates
 
-Generated files:
-- `docs/landing-astro/public/media/workflow-io-still-v2.png`
-- `docs/landing-astro/public/media/workflow-io-demo-v2.mp4`
-- `docs/landing-astro/public/media/workflow-io-voice-v2.mp3` (optional)
+### Hero.astro
+- Updated stats: 100% Production Ready, 253 Tests, 12/12 Gaps
 
-## Package Landing Artifacts
+### ProductionReady.astro (NEW!)
+- Metrics grid with 4 key metrics
+- Feature checklist with 8 production features
+- Animated cards with hover effects
 
-```bash
-npm run build --prefix docs/landing-astro
-tar -czf docs/landing-astro-package.tgz -C docs/landing-astro dist public/media public/remotion-data
-```
+### Features.astro
+- Updated to 8 features (from 7)
+- New features: Git Integration, Vector Store, Skill Governance, OpenTelemetry, Multi-Agent Coordination
+- Updated descriptions to reflect production capabilities
+
+### QuickStart.astro
+- Updated installation commands
+- Added global install option
+- Simplified workflow commands
+
+### MainLayout.astro
+- Added "Production" link to navigation
+- Updated mobile menu
+- Updated footer links
