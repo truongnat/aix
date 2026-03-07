@@ -4,7 +4,9 @@ use std::sync::Arc;
 
 use super::*;
 
-pub(super) fn build_domain_registry() -> Result<DomainRegistry> {
+pub(super) fn build_domain_registry(
+    replay_cache: Option<Arc<crate::engine::replay_cache::ReplayCache>>,
+) -> Result<DomainRegistry> {
     let mut domains = DomainRegistry::new();
     domains.register_domain("demo");
     domains.register_skill("demo", Arc::new(EchoSkill::new()))?;
@@ -24,7 +26,14 @@ pub(super) fn build_domain_registry() -> Result<DomainRegistry> {
     )?;
 
     domains.register_domain("agent");
-    domains.register_skill("agent", Arc::new(LlmSubAgentSkill::new()))?;
+    
+    // Week 2: Inject replay cache into LlmSubAgentSkill if provided
+    let llm_skill = if let Some(cache) = replay_cache {
+        Arc::new(LlmSubAgentSkill::new().with_replay_cache(cache))
+    } else {
+        Arc::new(LlmSubAgentSkill::new())
+    };
+    domains.register_skill("agent", llm_skill)?;
     domains.register_skill("agent", Arc::new(EnsureBranchSkill))?;
     domains.register_skill("agent", Arc::new(RunScriptSkill))?;
     domains.register_skill("agent", Arc::new(WriteFileSkill))?;

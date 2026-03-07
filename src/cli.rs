@@ -148,6 +148,14 @@ pub struct Cli {
     #[arg(long, default_value_t = false)]
     read_only: bool,
 
+    /// Week 2: Save LLM responses to replay store for deterministic replay
+    #[arg(long)]
+    save_replay: Option<String>,
+
+    /// Week 2: Load and replay LLM responses from replay store
+    #[arg(long)]
+    replay_mode: Option<String>,
+
     /// Phase 19: Prefer pure/idempotent skills by penalizing external mutations
     #[arg(long, default_value_t = false)]
     strict_mode: bool,

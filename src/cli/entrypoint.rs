@@ -56,7 +56,26 @@ pub(super) async fn run_impl() -> Result<()> {
     }
     let role_overrides = parse_role_override_map(cli.role_override.as_deref())?;
 
-    let domains = build_domain_registry()?;
+    // Week 2: Initialize replay cache if flags are provided
+    let replay_cache = if let Some(save_path) = cli.save_replay.as_ref() {
+        // Record mode - save LLM responses
+        let cache = crate::engine::replay_cache::ReplayCache::new(
+            crate::engine::replay_cache::ReplayMode::Record,
+            Some(std::path::PathBuf::from(save_path)),
+        )?;
+        Some(Arc::new(cache))
+    } else if let Some(replay_path) = cli.replay_mode.as_ref() {
+        // Replay mode - use cached responses
+        let cache = crate::engine::replay_cache::ReplayCache::new(
+            crate::engine::replay_cache::ReplayMode::Replay,
+            Some(std::path::PathBuf::from(replay_path)),
+        )?;
+        Some(Arc::new(cache))
+    } else {
+        None
+    };
+
+    let domains = build_domain_registry(replay_cache.clone())?;
 
     let domains_arc = Arc::new(domains);
     let runtime_engine = Arc::new(ExecutionEngine::new(

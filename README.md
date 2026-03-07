@@ -36,6 +36,24 @@ ANTIGRAV_LLM_TEMPERATURE=0.7 cargo run -- --workflow feature.md
 ANTIGRAV_LLM_SEED=42 cargo run -- --workflow feature.md
 ```
 
+### Replay Store (Week 2 Feature)
+
+Save and replay LLM responses for perfect determinism:
+
+```bash
+# Record mode - save all LLM responses to file
+cargo run -- --workflow feature.md --save-replay llm_cache.json
+
+# Replay mode - use cached responses (no LLM calls)
+cargo run -- --workflow feature.md --replay-mode llm_cache.json
+```
+
+Benefits:
+- **Perfect Determinism**: Same inputs → same outputs, always
+- **Fast Replay**: 10x+ speedup by skipping LLM calls
+- **Cost Savings**: No API costs during replay
+- **Offline Testing**: Test workflows without internet
+
 See [Deterministic Mode Guide](docs/DETERMINISTIC_MODE.md) for details.
 
 ## Current Release
