@@ -5,6 +5,7 @@ pub mod condition;
 pub mod context;
 pub mod context_retrieval;
 pub mod context_service;
+pub mod coordination;
 pub mod git;
 pub mod project;
 pub mod replay_cache;
@@ -12,6 +13,8 @@ pub mod replay_store;
 pub mod sandbox;
 pub mod security;
 pub mod session;
+pub mod skill_governance;
+pub mod telemetry;
 pub mod vector;
 
 pub mod package_check;
