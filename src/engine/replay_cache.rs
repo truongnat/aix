@@ -16,6 +16,7 @@ pub enum ReplayMode {
 }
 
 /// In-memory cache for replay store with thread-safe access
+#[derive(Debug)]
 pub struct ReplayCache {
     cache: Arc<RwLock<HashMap<String, LlmSnapshot>>>,
     store_path: Option<PathBuf>,

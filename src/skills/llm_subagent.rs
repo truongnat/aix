@@ -110,6 +110,7 @@ pub struct LlmSubAgentSkill {
     fallback_providers: Vec<LlmProvider>,
     simulation_fallback: bool,
     router_config: RouterConfig,
+    replay_cache: Option<std::sync::Arc<crate::engine::replay_cache::ReplayCache>>,
 }
 
 #[derive(Debug, Serialize)]
@@ -610,7 +611,17 @@ impl LlmSubAgentSkill {
                 max_retries,
                 fallback_policy,
             },
+            replay_cache: None, // Will be set by CLI if replay mode enabled
         }
+    }
+    
+    /// Set replay cache (called by CLI)
+    pub fn with_replay_cache(
+        mut self,
+        cache: std::sync::Arc<crate::engine::replay_cache::ReplayCache>,
+    ) -> Self {
+        self.replay_cache = Some(cache);
+        self
     }
 
     fn resolve_model_for_provider(
@@ -1473,6 +1484,67 @@ impl Skill for LlmSubAgentSkill {
         }
 
         let prompt = build_prompt(&role_name, &role_prompt, &instruction_input);
+        
+        // Check replay cache before calling providers
+        if let Some(cache) = &self.replay_cache {
+            let seed = generate_seed(&ctx.workflow_instance_id, &ctx.step_id);
+            let request_hash = crate::engine::replay_store::compute_request_hash(
+                primary_provider.as_str(),
+                &self.resolve_model_for_provider(
+                    primary_provider,
+                    primary_provider,
+                    role_model_override.as_deref(),
+                ),
+                &prompt,
+                temperature,
+                seed,
+            );
+            
+            // Try to get from cache
+            if let Some(snapshot) = cache.check_cache(&request_hash) {
+                // Return cached response
+                let usage = ProviderUsage {
+                    input_tokens: snapshot.tokens / 2, // Rough estimate
+                    output_tokens: snapshot.tokens / 2,
+                    total_tokens: snapshot.tokens,
+                };
+                
+                return Ok(SkillOutput::json(json!({
+                    "schema": "llm_router.v1",
+                    "provider": snapshot.provider,
+                    "model": snapshot.model,
+                    "role": role_name,
+                    "summary": snapshot.response,
+                    "actions": [],
+                    "risks": [],
+                    "usage": {
+                        "input_tokens": usage.input_tokens,
+                        "output_tokens": usage.output_tokens,
+                        "total_tokens": usage.total_tokens
+                    },
+                    "cost": {
+                        "estimated_usd": snapshot.cost_usd,
+                        "input_rate_per_1k": 0.0,
+                        "output_rate_per_1k": 0.0,
+                        "currency": "USD",
+                        "source": "replay_cache"
+                    },
+                    "router": {
+                        "primary_provider": primary_provider.as_str(),
+                        "attempts": 0,
+                        "max_retries": 0,
+                        "timeout_ms": 0,
+                        "fallback_policy": "none",
+                        "fallback_used": false,
+                        "fallback_blocked_by_policy": false,
+                        "simulation_fallback": false,
+                        "replay_cache_hit": true,
+                        "errors": [],
+                    }
+                })));
+            }
+        }
+        
         let chain = build_provider_chain(primary_provider, &self.fallback_providers);
         let mut errors = Vec::new();
         let mut fallback_used = false;
@@ -1574,6 +1646,36 @@ impl Skill for LlmSubAgentSkill {
         let (estimated_usd, input_rate_per_1k, output_rate_per_1k) =
             estimate_cost_usd(result.provider, &result.model, result.usage);
 
+        // Save to replay cache if in record mode
+        if let Some(cache) = &self.replay_cache {
+            let seed = generate_seed(&ctx.workflow_instance_id, &ctx.step_id);
+            let request_hash = crate::engine::replay_store::compute_request_hash(
+                result.provider.as_str(),
+                &result.model,
+                &prompt,
+                temperature,
+                seed,
+            );
+            
+            let snapshot = crate::engine::replay_store::LlmSnapshot {
+                trace_id: ctx.workflow_instance_id.clone(),
+                step_id: ctx.step_id.clone(),
+                request_hash,
+                provider: result.provider.as_str().to_string(),
+                model: result.model.clone(),
+                prompt: prompt.clone(),
+                response: result.text.clone(),
+                timestamp_ms: std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_millis() as u64)
+                    .unwrap_or(0),
+                tokens: result.usage.total_tokens,
+                cost_usd: estimated_usd,
+            };
+            
+            let _ = cache.add_to_cache(snapshot.request_hash.clone(), snapshot);
+        }
+
         Ok(SkillOutput::json(json!({
             "schema": "llm_router.v1",
             "provider": result.provider.as_str(),
@@ -1653,6 +1755,7 @@ mod tests {
                 max_retries: 0,
                 fallback_policy: FallbackPolicy::TransientOnly,
             },
+            replay_cache: None,
         }
     }
 
