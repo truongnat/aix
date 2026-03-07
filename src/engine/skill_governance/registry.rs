@@ -57,20 +57,28 @@ impl SkillRegistry {
     /// Check if a skill is local (not from external source)
     pub fn is_local_skill(&self, skill_id: &str) -> bool {
         // Check if it starts with local paths
-        if skill_id.starts_with(".agents/") || skill_id.starts_with("./") || skill_id.starts_with("/") {
+        if skill_id.starts_with(".agents/")
+            || skill_id.starts_with("./")
+            || skill_id.starts_with("/")
+        {
             return true;
         }
-        
+
         // Check if it contains URL scheme (http://, https://, git://, etc.)
         if skill_id.contains("://") {
             return false;
         }
-        
+
         // Check if it looks like a domain (contains dots and slashes like github.com/user/repo)
-        if skill_id.contains('/') && skill_id.split('/').next().map_or(false, |first| first.contains('.')) {
+        if skill_id.contains('/')
+            && skill_id
+                .split('/')
+                .next()
+                .is_some_and(|first| first.contains('.'))
+        {
             return false;
         }
-        
+
         // Default to local
         true
     }
@@ -113,9 +121,7 @@ impl SkillRegistry {
     /// Remove trusted source from registry
     pub fn remove_trusted_source(&mut self, pattern: &str) -> bool {
         let initial_len = self.config.trusted_sources.len();
-        self.config
-            .trusted_sources
-            .retain(|s| s.pattern != pattern);
+        self.config.trusted_sources.retain(|s| s.pattern != pattern);
         self.config.trusted_sources.len() < initial_len
     }
 
@@ -152,10 +158,10 @@ mod tests {
     #[test]
     fn test_is_trusted_source() {
         let registry = SkillRegistry::default();
-        
+
         // Local skills should be trusted by default
         assert!(registry.is_trusted_source(".agents/skills/test.md"));
-        
+
         // External skills should not be trusted
         assert!(!registry.is_trusted_source("github.com/user/repo/skill.md"));
     }
@@ -163,7 +169,7 @@ mod tests {
     #[test]
     fn test_is_local_skill() {
         let registry = SkillRegistry::default();
-        
+
         assert!(registry.is_local_skill(".agents/skills/test.md"));
         assert!(registry.is_local_skill("./skills/test.md"));
         assert!(!registry.is_local_skill("github.com/user/repo/skill.md"));
@@ -173,7 +179,7 @@ mod tests {
     #[test]
     fn test_requires_signature_local() {
         let registry = SkillRegistry::default();
-        
+
         // Local skills should not require signature by default
         assert!(!registry.requires_signature(".agents/skills/test.md"));
     }
@@ -181,7 +187,7 @@ mod tests {
     #[test]
     fn test_requires_signature_external() {
         let registry = SkillRegistry::default();
-        
+
         // External skills should require signature
         assert!(registry.requires_signature("github.com/user/repo/skill.md"));
     }
@@ -189,7 +195,7 @@ mod tests {
     #[test]
     fn test_validate_source_trusted() {
         let registry = SkillRegistry::default();
-        
+
         let result = registry.validate_source(".agents/skills/test.md", false);
         assert_eq!(result, VerificationResult::TrustedSource);
     }
@@ -197,7 +203,7 @@ mod tests {
     #[test]
     fn test_validate_source_requires_signature() {
         let registry = SkillRegistry::default();
-        
+
         let result = registry.validate_source("github.com/user/repo/skill.md", false);
         assert!(result.is_invalid());
     }
@@ -206,12 +212,12 @@ mod tests {
     fn test_add_remove_trusted_source() {
         let mut registry = SkillRegistry::default();
         let initial_count = registry.trusted_sources().len();
-        
+
         // Add source
         let source = TrustedSource::new("github.com/trusted/*".to_string(), false);
         registry.add_trusted_source(source);
         assert_eq!(registry.trusted_sources().len(), initial_count + 1);
-        
+
         // Remove source
         let removed = registry.remove_trusted_source("github.com/trusted/*");
         assert!(removed);
@@ -220,10 +226,12 @@ mod tests {
 
     #[test]
     fn test_global_signature_requirement() {
-        let mut config = GovernanceConfig::default();
-        config.require_signatures = true;
+        let config = GovernanceConfig {
+            require_signatures: true,
+            ..Default::default()
+        };
         let registry = SkillRegistry::new(config);
-        
+
         // Even local skills should require signature
         assert!(registry.requires_signature(".agents/skills/test.md"));
     }

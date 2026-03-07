@@ -10,11 +10,12 @@
 // - Metrics collection
 // - APM tool integration
 
+#![allow(unexpected_cfgs)]
+#![allow(dead_code)]
+
 pub mod types;
 
-pub use types::{
-    LlmMetrics, ProviderMetrics, SpanAttributes, StepMetrics, TelemetryConfig, WorkflowMetrics,
-};
+pub use types::{SpanAttributes, TelemetryConfig, WorkflowMetrics};
 
 // Note: Full OpenTelemetry integration requires additional dependencies:
 // - opentelemetry = "0.21"
@@ -37,7 +38,7 @@ pub fn init_telemetry(_config: &TelemetryConfig) -> anyhow::Result<()> {
         // Full OpenTelemetry initialization would go here
         unimplemented!("Full OpenTelemetry support requires 'telemetry' feature");
     }
-    
+
     #[cfg(not(feature = "telemetry"))]
     {
         // Telemetry disabled, no-op

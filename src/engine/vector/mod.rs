@@ -2,12 +2,13 @@
 //
 // Provides scalable vector storage with PostgreSQL + pgvector backend.
 
-pub mod types;
-pub mod error;
-pub mod backend;
-pub mod postgres;
+#![allow(dead_code)]
 
-pub use types::*;
-pub use error::*;
+pub mod backend;
+pub mod error;
+pub mod postgres;
+pub mod types;
+
 pub use backend::VectorBackend;
-pub use postgres::PostgresVectorBackend;
+pub use error::*;
+pub use types::*;

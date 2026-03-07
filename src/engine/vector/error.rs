@@ -6,28 +6,28 @@ use std::fmt;
 pub enum VectorError {
     /// Database error
     DatabaseError(String),
-    
+
     /// Connection error
     ConnectionError(String),
-    
+
     /// Document not found
     DocumentNotFound(String),
-    
+
     /// Invalid embedding dimension
     InvalidDimension(String),
-    
+
     /// Query error
     QueryError(String),
-    
+
     /// Migration error
     MigrationError(String),
-    
+
     /// Configuration error
     ConfigError(String),
-    
+
     /// Serialization error
     SerializationError(String),
-    
+
     /// Other error
     Other(String),
 }

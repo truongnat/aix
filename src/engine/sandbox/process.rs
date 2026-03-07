@@ -2,7 +2,10 @@
 //
 // Executes skills in isolated subprocess with resource monitoring and enforcement.
 
-use super::{LimitViolation, ResourceLimits, ResourceMonitor, ResourceUsage, Sandbox, SandboxResult, SandboxType};
+use super::{
+    LimitViolation, ResourceLimits, ResourceMonitor, ResourceUsage, Sandbox, SandboxResult,
+    SandboxType,
+};
 use crate::engine::budget::ExecutionError;
 use crate::engine::context::ExecutionContext;
 use crate::engine::security::SecurityViolationError;
@@ -91,15 +94,20 @@ impl ProcessSandbox {
     fn parse_output(&self, output_type: SkillIOType, raw: &str) -> Result<SkillOutput> {
         match output_type {
             SkillIOType::Text => Ok(SkillOutput::text(raw.to_string())),
-            SkillIOType::Number => Ok(SkillOutput::Number(raw.parse::<f64>().map_err(|_| {
-                anyhow!("Failed to parse subprocess output as Number: '{}'", raw)
-            })?)),
-            SkillIOType::Boolean => Ok(SkillOutput::Boolean(raw.parse::<bool>().map_err(
-                |_| anyhow!("Failed to parse subprocess output as Boolean: '{}'", raw),
-            )?)),
-            SkillIOType::Json => Ok(SkillOutput::Json(serde_json::from_str(raw).map_err(
-                |_| anyhow!("Failed to parse subprocess output as JSON: '{}'", raw),
-            )?)),
+            SkillIOType::Number => {
+                Ok(SkillOutput::Number(raw.parse::<f64>().map_err(|_| {
+                    anyhow!("Failed to parse subprocess output as Number: '{}'", raw)
+                })?))
+            }
+            SkillIOType::Boolean => {
+                Ok(SkillOutput::Boolean(raw.parse::<bool>().map_err(|_| {
+                    anyhow!("Failed to parse subprocess output as Boolean: '{}'", raw)
+                })?))
+            }
+            SkillIOType::Json => Ok(SkillOutput::Json(
+                serde_json::from_str(raw)
+                    .map_err(|_| anyhow!("Failed to parse subprocess output as JSON: '{}'", raw))?,
+            )),
         }
     }
 }
@@ -113,7 +121,7 @@ impl Sandbox for ProcessSandbox {
         skill: Arc<dyn Skill>,
         input: SkillInput,
         context: ExecutionContext,
-        timeout: Duration,
+        _timeout: Duration,
         limits: ResourceLimits,
     ) -> Result<SandboxResult> {
         // Get subprocess command from skill
@@ -328,10 +336,7 @@ mod tests {
             actual: 75.5,
             limit: 50,
         };
-        assert_eq!(
-            violation.to_string(),
-            "CPU limit exceeded: 75.5% > 50%"
-        );
+        assert_eq!(violation.to_string(), "CPU limit exceeded: 75.5% > 50%");
 
         let violation = LimitViolation::MemoryExceeded {
             actual: 150,
@@ -346,9 +351,6 @@ mod tests {
             actual: 6000,
             limit: 5000,
         };
-        assert_eq!(
-            violation.to_string(),
-            "Timeout exceeded: 6000ms > 5000ms"
-        );
+        assert_eq!(violation.to_string(), "Timeout exceeded: 6000ms > 5000ms");
     }
 }

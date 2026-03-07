@@ -6,37 +6,37 @@ use std::fmt;
 pub enum GitError {
     /// Git operation failed
     GitOperationFailed(String),
-    
+
     /// Repository not found
     RepositoryNotFound(String),
-    
+
     /// Branch not found
     BranchNotFound(String),
-    
+
     /// Commit failed
     CommitFailed(String),
-    
+
     /// Push failed
     PushFailed(String),
-    
+
     /// PR/MR operation failed
     PrOperationFailed(String),
-    
+
     /// CI operation failed
     CiOperationFailed(String),
-    
+
     /// Merge failed
     MergeFailed(String),
-    
+
     /// Authentication failed
     AuthenticationFailed(String),
-    
+
     /// API error
     ApiError(String),
-    
+
     /// Configuration error
     ConfigError(String),
-    
+
     /// Other error
     Other(String),
 }

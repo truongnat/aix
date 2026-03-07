@@ -26,7 +26,7 @@ pub(super) fn build_domain_registry(
     )?;
 
     domains.register_domain("agent");
-    
+
     // Week 2: Inject replay cache into LlmSubAgentSkill if provided
     let llm_skill = if let Some(cache) = replay_cache {
         Arc::new(LlmSubAgentSkill::new().with_replay_cache(cache))

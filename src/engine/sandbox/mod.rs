@@ -3,6 +3,7 @@
 // This module provides abstractions for executing skills in isolated environments
 // with resource monitoring and enforcement.
 
+#![allow(dead_code)]
 use crate::engine::context::ExecutionContext;
 use crate::skill::io::{SkillInput, SkillOutput};
 use crate::skill::Skill;
@@ -12,11 +13,11 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use std::time::Duration;
 
-pub mod process;
 pub mod monitor;
+pub mod process;
 
-pub use process::ProcessSandbox;
 pub use monitor::ResourceMonitor;
+pub use process::ProcessSandbox;
 
 /// Type of sandbox implementation
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -75,6 +76,7 @@ pub struct ResourceUsage {
 
 /// Type of resource limit violation
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(clippy::enum_variant_names)]
 pub enum LimitViolation {
     CpuExceeded { actual: f32, limit: u32 },
     MemoryExceeded { actual: u32, limit: u32 },
@@ -116,6 +118,7 @@ pub struct SandboxResult {
 
 /// Trait for sandbox implementations
 #[async_trait]
+#[allow(clippy::too_many_arguments)]
 pub trait Sandbox: Send + Sync {
     /// Execute skill in isolated environment
     async fn execute(

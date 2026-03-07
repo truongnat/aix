@@ -10,12 +10,11 @@
 // - Shared state management
 // - Agent capability registry
 
+#![allow(dead_code)]
+
 pub mod types;
 
-pub use types::{
-    AgentCapability, AgentStatus, Conflict, ConflictType, CoordinationConfig, ExecutionPlan,
-    ParallelGroup, ResolutionStrategy, StateEntry, TaskRequirement,
-};
+pub use types::ConflictType;
 
 // Note: Full multi-agent coordination requires additional implementation:
 // - Dependency graph analysis (petgraph)
@@ -27,6 +26,7 @@ pub use types::{
 // Core types are provided here. Full implementation can be added
 // when parallel execution is needed.
 
+#[allow(dead_code)]
 /// Check if parallel execution is beneficial
 ///
 /// Returns true if workflow has independent steps that can run in parallel.
@@ -36,6 +36,7 @@ pub fn is_parallelizable(_workflow: &str) -> bool {
     false
 }
 
+#[allow(dead_code)]
 /// Estimate speedup from parallel execution
 ///
 /// Returns estimated speedup factor (e.g., 2.0 = 2x faster).
@@ -46,6 +47,7 @@ pub fn estimate_speedup(_workflow: &str, _max_agents: usize) -> f32 {
     1.0
 }
 
+#[allow(dead_code)]
 /// Detect potential conflicts in workflow
 ///
 /// Returns list of potential conflicts between steps.

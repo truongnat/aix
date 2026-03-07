@@ -1,7 +1,6 @@
 // Common types for Git integration
 
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 
 /// Git provider type
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

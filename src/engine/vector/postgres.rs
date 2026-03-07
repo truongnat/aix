@@ -46,7 +46,7 @@ impl PostgresVectorBackend {
     /// Initialize database schema
     pub async fn init_schema(&self) -> Result<()> {
         let client = self.client.lock().await;
-        
+
         // Enable pgvector extension
         client
             .execute("CREATE EXTENSION IF NOT EXISTS vector", &[])
@@ -184,7 +184,7 @@ impl VectorBackend for PostgresVectorBackend {
 
     async fn get(&self, id: Uuid) -> Result<Option<VectorDocument>> {
         let client = self.client.lock().await;
-        
+
         let row = client
             .query_opt(
                 r#"
@@ -244,7 +244,7 @@ impl VectorBackend for PostgresVectorBackend {
 
     async fn delete(&self, id: Uuid) -> Result<()> {
         let client = self.client.lock().await;
-        
+
         let rows_affected = client
             .execute(
                 r#"
@@ -332,7 +332,7 @@ impl VectorBackend for PostgresVectorBackend {
 
     async fn stats(&self) -> Result<VectorStats> {
         let client = self.client.lock().await;
-        
+
         let row = client
             .query_one(
                 r#"
@@ -356,7 +356,7 @@ impl VectorBackend for PostgresVectorBackend {
 
     async fn clear(&self) -> Result<()> {
         let client = self.client.lock().await;
-        
+
         client
             .execute("DELETE FROM vector_documents", &[])
             .await

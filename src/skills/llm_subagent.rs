@@ -7,7 +7,6 @@ use crate::skill::Skill;
 use crate::skills::role_loader::load_role_profile_if_exists;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use base64::{engine::general_purpose::STANDARD as BASE64, Engine};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::path::PathBuf;
@@ -433,10 +432,10 @@ fn generate_seed(trace_id: &str, step_id: &str) -> Option<i64> {
 }
 
 /// Check if deterministic mode is enabled
+#[allow(dead_code)]
 fn is_deterministic_mode() -> bool {
     resolve_temperature() == 0.0
 }
-
 
 fn build_http_client() -> Result<reqwest::Client> {
     // Disable implicit proxy/system lookup to avoid platform-specific panics.
@@ -614,7 +613,7 @@ impl LlmSubAgentSkill {
             replay_cache: None, // Will be set by CLI if replay mode enabled
         }
     }
-    
+
     /// Set replay cache (called by CLI)
     pub fn with_replay_cache(
         mut self,
@@ -1137,7 +1136,7 @@ impl LlmSubAgentSkill {
         });
 
         let api_version = std::env::var("AZURE_OPENAI_API_VERSION")
-.unwrap_or_else(|_| "2024-02-15-preview".to_string());
+            .unwrap_or_else(|_| "2024-02-15-preview".to_string());
 
         let request = OpenAiChatRequest {
             model: deployment.clone(),
@@ -1241,7 +1240,6 @@ impl LlmSubAgentSkill {
         prompt: &str,
         temperature: f32,
     ) -> Result<ProviderCallResult, ProviderCallFailure> {
-        use aws_config::meta::region::RegionProviderChain;
         use aws_sdk_bedrockruntime::primitives::Blob;
         use aws_sdk_bedrockruntime::Client;
 
@@ -1307,7 +1305,7 @@ impl LlmSubAgentSkill {
             provider_failure(
                 LlmProvider::Bedrock,
                 model,
-LlmErrorClass::Validation,
+                LlmErrorClass::Validation,
                 format!("failed to serialize bedrock request: {}", err),
             )
         })?;
@@ -1344,6 +1342,7 @@ LlmErrorClass::Validation,
         // Parse response based on provider
         let text = match provider_name {
             "anthropic" => {
+                #[allow(dead_code)]
                 #[derive(Deserialize)]
                 struct AnthropicBedrockResponse {
                     #[serde(default)]
@@ -1351,6 +1350,7 @@ LlmErrorClass::Validation,
                     #[serde(default)]
                     usage: Option<AnthropicBedrockUsage>,
                 }
+                #[allow(dead_code)]
                 #[derive(Deserialize)]
                 struct AnthropicBedrockContent {
                     #[serde(rename = "type", default)]
@@ -1358,6 +1358,7 @@ LlmErrorClass::Validation,
                     #[serde(default)]
                     text: Option<String>,
                 }
+                #[allow(dead_code)]
                 #[derive(Deserialize)]
                 struct AnthropicBedrockUsage {
                     #[serde(default, rename = "input_tokens")]
@@ -1392,8 +1393,8 @@ LlmErrorClass::Validation,
                     #[serde(default)]
                     generated_text: Option<String>,
                 }
-                let parsed: GenericBedrockResponse = serde_json::from_str(&response_str)
-                    .map_err(|err| {
+                let parsed: GenericBedrockResponse =
+                    serde_json::from_str(&response_str).map_err(|err| {
                         provider_failure(
                             LlmProvider::Bedrock,
                             model,
@@ -1402,7 +1403,10 @@ LlmErrorClass::Validation,
                         )
                     })?;
 
-                parsed.completion.or(parsed.generated_text).unwrap_or_default()
+                parsed
+                    .completion
+                    .or(parsed.generated_text)
+                    .unwrap_or_default()
             }
         };
 
@@ -1484,7 +1488,7 @@ impl Skill for LlmSubAgentSkill {
         }
 
         let prompt = build_prompt(&role_name, &role_prompt, &instruction_input);
-        
+
         // Check replay cache before calling providers
         if let Some(cache) = &self.replay_cache {
             let seed = generate_seed(&ctx.workflow_instance_id, &ctx.step_id);
@@ -1499,7 +1503,7 @@ impl Skill for LlmSubAgentSkill {
                 temperature,
                 seed,
             );
-            
+
             // Try to get from cache
             if let Some(snapshot) = cache.check_cache(&request_hash) {
                 // Return cached response
@@ -1508,7 +1512,7 @@ impl Skill for LlmSubAgentSkill {
                     output_tokens: snapshot.tokens / 2,
                     total_tokens: snapshot.tokens,
                 };
-                
+
                 return Ok(SkillOutput::json(json!({
                     "schema": "llm_router.v1",
                     "provider": snapshot.provider,
@@ -1544,7 +1548,7 @@ impl Skill for LlmSubAgentSkill {
                 })));
             }
         }
-        
+
         let chain = build_provider_chain(primary_provider, &self.fallback_providers);
         let mut errors = Vec::new();
         let mut fallback_used = false;
@@ -1656,7 +1660,7 @@ impl Skill for LlmSubAgentSkill {
                 temperature,
                 seed,
             );
-            
+
             let snapshot = crate::engine::replay_store::LlmSnapshot {
                 trace_id: ctx.workflow_instance_id.clone(),
                 step_id: ctx.step_id.clone(),
@@ -1672,7 +1676,7 @@ impl Skill for LlmSubAgentSkill {
                 tokens: result.usage.total_tokens,
                 cost_usd: estimated_usd,
             };
-            
+
             let _ = cache.add_to_cache(snapshot.request_hash.clone(), snapshot);
         }
 
@@ -1850,7 +1854,7 @@ mod tests {
         let temp = super::resolve_temperature();
         assert_eq!(temp, 2.0);
         std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
-        
+
         // Test lower bound
         std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "-1.0");
         let temp = super::resolve_temperature();
@@ -1863,7 +1867,7 @@ mod tests {
         let seed1 = super::generate_seed("trace_123", "step_1");
         let seed2 = super::generate_seed("trace_123", "step_1");
         assert_eq!(seed1, seed2);
-        
+
         let seed3 = super::generate_seed("trace_123", "step_2");
         assert_ne!(seed1, seed3);
     }
@@ -1880,10 +1884,10 @@ mod tests {
     fn is_deterministic_mode_when_temperature_zero() {
         std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "0.0");
         assert!(super::is_deterministic_mode());
-        
+
         std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "0.7");
         assert!(!super::is_deterministic_mode());
-        
+
         std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
     }
 

@@ -4,7 +4,7 @@
 // conflict resolution, and agent coordination.
 
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 /// Agent capability definition
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -93,9 +93,10 @@ impl std::fmt::Display for ConflictType {
 }
 
 /// Strategy for resolving conflicts
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum ResolutionStrategy {
     /// Last write wins
+    #[default]
     LastWriteWins,
     /// Attempt to merge changes
     Merge,
@@ -103,12 +104,6 @@ pub enum ResolutionStrategy {
     Abort,
     /// Require manual resolution
     Manual,
-}
-
-impl Default for ResolutionStrategy {
-    fn default() -> Self {
-        ResolutionStrategy::LastWriteWins
-    }
 }
 
 /// Conflict detected during parallel execution

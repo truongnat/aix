@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::engine::replay_store::{LlmSnapshot, ReplayStore};
 use anyhow::Result;
 use std::collections::HashMap;
@@ -28,7 +30,7 @@ impl ReplayCache {
     /// Create a new replay cache
     pub fn new(mode: ReplayMode, store_path: Option<PathBuf>) -> Result<Self> {
         let mut cache = HashMap::new();
-        
+
         // Load existing store if in replay mode
         if mode == ReplayMode::Replay {
             if let Some(path) = &store_path {
@@ -36,7 +38,7 @@ impl ReplayCache {
                 cache = store.snapshots;
             }
         }
-        
+
         Ok(Self {
             cache: Arc::new(RwLock::new(cache)),
             store_path,
@@ -54,10 +56,12 @@ impl ReplayCache {
     /// Add a snapshot to cache
     pub fn add_to_cache(&self, hash: String, snapshot: LlmSnapshot) -> Result<()> {
         if self.mode == ReplayMode::Record {
-            let mut cache = self.cache.write()
+            let mut cache = self
+                .cache
+                .write()
                 .map_err(|e| anyhow::anyhow!("Failed to acquire write lock: {}", e))?;
             cache.insert(hash, snapshot);
-            
+
             // Mark as dirty
             if let Ok(mut dirty) = self.dirty.write() {
                 *dirty = true;
@@ -73,31 +77,31 @@ impl ReplayCache {
         }
 
         // Check if dirty
-        let is_dirty = self.dirty.read()
-            .map(|d| *d)
-            .unwrap_or(false);
-        
+        let is_dirty = self.dirty.read().map(|d| *d).unwrap_or(false);
+
         if !is_dirty {
             return Ok(());
         }
 
         if let Some(path) = &self.store_path {
-            let cache = self.cache.read()
+            let cache = self
+                .cache
+                .read()
                 .map_err(|e| anyhow::anyhow!("Failed to acquire read lock: {}", e))?;
-            
+
             let mut store = ReplayStore::new();
             for (_, snapshot) in cache.iter() {
                 store.add_snapshot(snapshot.clone());
             }
-            
+
             store.save(path)?;
-            
+
             // Clear dirty flag
             if let Ok(mut dirty) = self.dirty.write() {
                 *dirty = false;
             }
         }
-        
+
         Ok(())
     }
 
@@ -108,9 +112,7 @@ impl ReplayCache {
 
     /// Get cache size
     pub fn len(&self) -> usize {
-        self.cache.read()
-            .map(|c| c.len())
-            .unwrap_or(0)
+        self.cache.read().map(|c| c.len()).unwrap_or(0)
     }
 
     /// Check if cache is empty
@@ -122,10 +124,8 @@ impl ReplayCache {
     pub fn stats(&self) -> CacheStats {
         let size = self.len();
         let mode = self.mode;
-        let dirty = self.dirty.read()
-            .map(|d| *d)
-            .unwrap_or(false);
-        
+        let dirty = self.dirty.read().map(|d| *d).unwrap_or(false);
+
         CacheStats {
             size,
             mode,
@@ -184,7 +184,7 @@ mod tests {
     fn test_create_cache_record_mode() {
         let temp_dir = TempDir::new().unwrap();
         let path = temp_dir.path().join("replay.json");
-        
+
         let cache = ReplayCache::new(ReplayMode::Record, Some(path)).unwrap();
         assert_eq!(cache.mode(), ReplayMode::Record);
         assert_eq!(cache.len(), 0);
@@ -194,13 +194,15 @@ mod tests {
     fn test_add_to_cache() {
         let temp_dir = TempDir::new().unwrap();
         let path = temp_dir.path().join("replay.json");
-        
+
         let cache = ReplayCache::new(ReplayMode::Record, Some(path)).unwrap();
         let snapshot = create_test_snapshot("hash_abc");
-        
-        cache.add_to_cache("hash_abc".to_string(), snapshot).unwrap();
+
+        cache
+            .add_to_cache("hash_abc".to_string(), snapshot)
+            .unwrap();
         assert_eq!(cache.len(), 1);
-        
+
         let retrieved = cache.check_cache("hash_abc").unwrap();
         assert_eq!(retrieved.response, "test response");
     }
@@ -215,16 +217,18 @@ mod tests {
     fn test_flush_to_disk() {
         let temp_dir = TempDir::new().unwrap();
         let path = temp_dir.path().join("replay.json");
-        
+
         let cache = ReplayCache::new(ReplayMode::Record, Some(path.clone())).unwrap();
         let snapshot = create_test_snapshot("hash_abc");
-        
-        cache.add_to_cache("hash_abc".to_string(), snapshot).unwrap();
+
+        cache
+            .add_to_cache("hash_abc".to_string(), snapshot)
+            .unwrap();
         cache.flush().unwrap();
-        
+
         // Verify file was created
         assert!(path.exists());
-        
+
         // Load and verify
         let store = ReplayStore::load(&path).unwrap();
         assert_eq!(store.len(), 1);
@@ -235,16 +239,16 @@ mod tests {
     fn test_load_existing_store_in_replay_mode() {
         let temp_dir = TempDir::new().unwrap();
         let path = temp_dir.path().join("replay.json");
-        
+
         // Create and save a store
         let mut store = ReplayStore::new();
         store.add_snapshot(create_test_snapshot("hash_abc"));
         store.save(&path).unwrap();
-        
+
         // Load in replay mode
         let cache = ReplayCache::new(ReplayMode::Replay, Some(path)).unwrap();
         assert_eq!(cache.len(), 1);
-        
+
         let snapshot = cache.check_cache("hash_abc").unwrap();
         assert_eq!(snapshot.response, "test response");
     }
@@ -253,11 +257,13 @@ mod tests {
     fn test_cache_stats() {
         let temp_dir = TempDir::new().unwrap();
         let path = temp_dir.path().join("replay.json");
-        
+
         let cache = ReplayCache::new(ReplayMode::Record, Some(path.clone())).unwrap();
         let snapshot = create_test_snapshot("hash_abc");
-        cache.add_to_cache("hash_abc".to_string(), snapshot).unwrap();
-        
+        cache
+            .add_to_cache("hash_abc".to_string(), snapshot)
+            .unwrap();
+
         let stats = cache.stats();
         assert_eq!(stats.size, 1);
         assert_eq!(stats.mode, ReplayMode::Record);
@@ -269,14 +275,16 @@ mod tests {
     fn test_auto_flush_on_drop() {
         let temp_dir = TempDir::new().unwrap();
         let path = temp_dir.path().join("replay.json");
-        
+
         {
             let cache = ReplayCache::new(ReplayMode::Record, Some(path.clone())).unwrap();
             let snapshot = create_test_snapshot("hash_abc");
-            cache.add_to_cache("hash_abc".to_string(), snapshot).unwrap();
+            cache
+                .add_to_cache("hash_abc".to_string(), snapshot)
+                .unwrap();
             // Cache drops here, should auto-flush
         }
-        
+
         // Verify file was created
         assert!(path.exists());
         let store = ReplayStore::load(&path).unwrap();
@@ -287,9 +295,11 @@ mod tests {
     fn test_off_mode_does_not_cache() {
         let cache = ReplayCache::new(ReplayMode::Off, None).unwrap();
         let snapshot = create_test_snapshot("hash_abc");
-        
+
         // Should not error, but should not cache
-        cache.add_to_cache("hash_abc".to_string(), snapshot).unwrap();
+        cache
+            .add_to_cache("hash_abc".to_string(), snapshot)
+            .unwrap();
         assert_eq!(cache.len(), 0);
     }
 }

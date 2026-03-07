@@ -2,6 +2,8 @@
 //
 // Provides CPU, memory, and time tracking with limit enforcement.
 
+#![allow(dead_code)]
+
 use super::{LimitViolation, ResourceLimits, ResourceUsage};
 use anyhow::Result;
 use std::time::{Duration, Instant};

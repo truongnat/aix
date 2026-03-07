@@ -62,17 +62,17 @@ impl VectorQuery {
             filter: None,
         }
     }
-    
+
     pub fn with_limit(mut self, limit: usize) -> Self {
         self.limit = limit;
         self
     }
-    
+
     pub fn with_threshold(mut self, threshold: f32) -> Self {
         self.threshold = Some(threshold);
         self
     }
-    
+
     pub fn with_filter(mut self, filter: serde_json::Value) -> Self {
         self.filter = Some(filter);
         self

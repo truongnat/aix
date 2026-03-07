@@ -1,8 +1,10 @@
-use anyhow::{anyhow, Result};
+#![allow(dead_code)]
+
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 /// Snapshot entry for LLM request/response pair
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -64,12 +66,12 @@ impl ReplayStore {
     pub fn save(&mut self, path: &Path) -> Result<()> {
         self.metadata.updated_at_ms = now_ms();
         self.metadata.total_snapshots = self.snapshots.len();
-        
+
         // Create parent directory if needed
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)?;
         }
-        
+
         let content = serde_json::to_string_pretty(self)?;
         fs::write(path, content)?;
         Ok(())
@@ -77,7 +79,8 @@ impl ReplayStore {
 
     /// Add a snapshot to the store
     pub fn add_snapshot(&mut self, snapshot: LlmSnapshot) {
-        self.snapshots.insert(snapshot.request_hash.clone(), snapshot);
+        self.snapshots
+            .insert(snapshot.request_hash.clone(), snapshot);
     }
 
     /// Get a snapshot by request hash
@@ -147,7 +150,6 @@ fn fnv1a64_hex(bytes: &[u8]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs;
     use tempfile::TempDir;
 
     #[test]
@@ -226,7 +228,7 @@ mod tests {
     fn test_load_nonexistent_file() {
         let temp_dir = TempDir::new().unwrap();
         let file_path = temp_dir.path().join("nonexistent.json");
-        
+
         let store = ReplayStore::load(&file_path).unwrap();
         assert_eq!(store.len(), 0);
         assert!(store.is_empty());

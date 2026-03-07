@@ -126,7 +126,15 @@ impl ExecutionBackend for SubprocessBackend {
 
         let result = self
             .sandbox
-            .execute(domain, qualified_skill, skill, input, context, timeout, limits)
+            .execute(
+                domain,
+                qualified_skill,
+                skill,
+                input,
+                context,
+                timeout,
+                limits,
+            )
             .await?;
 
         Ok(BackendExecutionResult {

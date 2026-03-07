@@ -21,19 +21,19 @@ impl AuditLogger {
     /// Create new audit logger
     pub fn new(log_path: impl Into<PathBuf>, enabled: bool) -> Result<Self> {
         let log_path = log_path.into();
-        
+
         let log_file = if enabled {
             // Create parent directory if needed
             if let Some(parent) = log_path.parent() {
                 std::fs::create_dir_all(parent)?;
             }
-            
+
             // Open log file in append mode
             let file = OpenOptions::new()
                 .create(true)
                 .append(true)
                 .open(&log_path)?;
-            
+
             Some(file)
         } else {
             None
@@ -159,7 +159,7 @@ impl AuditLogger {
             if line.trim().is_empty() {
                 continue;
             }
-            
+
             match serde_json::from_str::<AuditEvent>(line) {
                 Ok(event) => events.push(event),
                 Err(e) => {
@@ -191,7 +191,7 @@ mod tests {
     fn test_audit_logger_creation() {
         let temp_dir = TempDir::new().unwrap();
         let log_path = temp_dir.path().join("audit.log");
-        
+
         let logger = AuditLogger::new(&log_path, true).unwrap();
         assert!(logger.is_enabled());
         assert_eq!(logger.log_path(), log_path);
@@ -207,9 +207,9 @@ mod tests {
     fn test_log_event() {
         let temp_dir = TempDir::new().unwrap();
         let log_path = temp_dir.path().join("audit.log");
-        
+
         let logger = AuditLogger::new(&log_path, true).unwrap();
-        
+
         let event = AuditEvent::new(
             "test_event".to_string(),
             "test/skill.md".to_string(),
@@ -218,9 +218,9 @@ mod tests {
             "Trusted".to_string(),
             "allowed".to_string(),
         );
-        
+
         logger.log_event(&event).unwrap();
-        
+
         // Verify log file exists and contains event
         assert!(log_path.exists());
         let content = std::fs::read_to_string(&log_path).unwrap();
@@ -232,9 +232,9 @@ mod tests {
     fn test_log_import() {
         let temp_dir = TempDir::new().unwrap();
         let log_path = temp_dir.path().join("audit.log");
-        
+
         let logger = AuditLogger::new(&log_path, true).unwrap();
-        
+
         logger
             .log_import(
                 "test/skill.md",
@@ -245,7 +245,7 @@ mod tests {
                 Some("Test reason".to_string()),
             )
             .unwrap();
-        
+
         let content = std::fs::read_to_string(&log_path).unwrap();
         assert!(content.contains("skill_import"));
         assert!(content.contains("Test reason"));
@@ -255,9 +255,9 @@ mod tests {
     fn test_log_verification() {
         let temp_dir = TempDir::new().unwrap();
         let log_path = temp_dir.path().join("audit.log");
-        
+
         let logger = AuditLogger::new(&log_path, true).unwrap();
-        
+
         logger
             .log_verification(
                 "test/skill.md",
@@ -266,7 +266,7 @@ mod tests {
                 Some("Valid signature".to_string()),
             )
             .unwrap();
-        
+
         let content = std::fs::read_to_string(&log_path).unwrap();
         assert!(content.contains("signature_verification"));
         assert!(content.contains("Valid signature"));
@@ -276,9 +276,9 @@ mod tests {
     fn test_read_events() {
         let temp_dir = TempDir::new().unwrap();
         let log_path = temp_dir.path().join("audit.log");
-        
+
         let logger = AuditLogger::new(&log_path, true).unwrap();
-        
+
         // Log multiple events
         logger
             .log_import("skill1.md", "local", true, "Trusted", "allowed", None)
@@ -286,7 +286,7 @@ mod tests {
         logger
             .log_import("skill2.md", "remote", false, "Untrusted", "rejected", None)
             .unwrap();
-        
+
         // Read events
         let events = logger.read_events().unwrap();
         assert_eq!(events.len(), 2);
@@ -297,7 +297,7 @@ mod tests {
     #[test]
     fn test_disabled_logger_no_file() {
         let logger = AuditLogger::disabled();
-        
+
         let event = AuditEvent::new(
             "test_event".to_string(),
             "test/skill.md".to_string(),
@@ -306,7 +306,7 @@ mod tests {
             "Trusted".to_string(),
             "allowed".to_string(),
         );
-        
+
         // Should not error even though disabled
         logger.log_event(&event).unwrap();
     }

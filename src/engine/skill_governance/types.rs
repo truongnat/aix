@@ -119,7 +119,7 @@ impl TrustedSource {
     pub fn matches(&self, skill_id: &str) -> bool {
         // Simple glob matching: * matches any characters
         let pattern_parts: Vec<&str> = self.pattern.split('*').collect();
-        
+
         if pattern_parts.len() == 1 {
             // No wildcard, exact match
             return skill_id == self.pattern;
@@ -149,10 +149,8 @@ pub struct GovernanceConfig {
 impl Default for GovernanceConfig {
     fn default() -> Self {
         Self {
-            trusted_sources: vec![
-                TrustedSource::new(".agents/skills/*".to_string(), false)
-                    .with_description("Local skills directory".to_string()),
-            ],
+            trusted_sources: vec![TrustedSource::new(".agents/skills/*".to_string(), false)
+                .with_description("Local skills directory".to_string())],
             require_signatures: false,
             allow_unsigned_local: true,
             enable_audit_log: true,
@@ -175,7 +173,10 @@ pub enum VerificationResult {
 
 impl VerificationResult {
     pub fn is_valid(&self) -> bool {
-        matches!(self, VerificationResult::Valid | VerificationResult::TrustedSource)
+        matches!(
+            self,
+            VerificationResult::Valid | VerificationResult::TrustedSource
+        )
     }
 
     pub fn is_invalid(&self) -> bool {
@@ -189,7 +190,9 @@ impl fmt::Display for VerificationResult {
             VerificationResult::Valid => write!(f, "Valid signature"),
             VerificationResult::Invalid(reason) => write!(f, "Invalid signature: {}", reason),
             VerificationResult::NoSignature => write!(f, "No signature provided"),
-            VerificationResult::TrustedSource => write!(f, "Trusted source (signature not required)"),
+            VerificationResult::TrustedSource => {
+                write!(f, "Trusted source (signature not required)")
+            }
         }
     }
 }

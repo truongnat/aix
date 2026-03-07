@@ -49,21 +49,21 @@ impl TelemetryConfig {
     /// Create config from environment variables
     pub fn from_env() -> Self {
         let mut config = Self::default();
-        
+
         if let Ok(endpoint) = std::env::var("OTEL_EXPORTER_OTLP_ENDPOINT") {
             config.endpoint = endpoint;
         }
-        
+
         if let Ok(service_name) = std::env::var("OTEL_SERVICE_NAME") {
             config.service_name = service_name;
         }
-        
+
         if let Ok(sample_rate) = std::env::var("OTEL_TRACES_SAMPLER_ARG") {
             if let Ok(rate) = sample_rate.parse::<f64>() {
                 config.sample_rate = rate.clamp(0.0, 1.0);
             }
         }
-        
+
         config
     }
 }
@@ -101,46 +101,46 @@ impl SpanAttributes {
     pub fn new() -> Self {
         Self::default()
     }
-    
+
     pub fn with_workflow(mut self, id: String, name: String) -> Self {
         self.workflow_id = Some(id);
         self.workflow_name = Some(name);
         self
     }
-    
+
     pub fn with_step(mut self, id: String, skill_id: String) -> Self {
         self.step_id = Some(id);
         self.skill_id = Some(skill_id);
         self
     }
-    
+
     pub fn with_status(mut self, status: String) -> Self {
         self.step_status = Some(status);
         self
     }
-    
+
     pub fn with_duration(mut self, duration_ms: u64) -> Self {
         self.duration_ms = Some(duration_ms);
         self
     }
-    
+
     pub fn with_cost(mut self, cost: u32) -> Self {
         self.cost = Some(cost);
         self
     }
-    
+
     pub fn with_llm(mut self, provider: String, model: String, tokens: u32) -> Self {
         self.llm_provider = Some(provider);
         self.llm_model = Some(model);
         self.llm_tokens = Some(tokens);
         self
     }
-    
+
     pub fn with_error(mut self, error: String) -> Self {
         self.error_message = Some(error);
         self
     }
-    
+
     pub fn with_custom(mut self, key: String, value: String) -> Self {
         self.custom.insert(key, value);
         self
@@ -218,11 +218,11 @@ mod tests {
     fn test_telemetry_config_from_env() {
         std::env::set_var("OTEL_EXPORTER_OTLP_ENDPOINT", "http://custom:4317");
         std::env::set_var("OTEL_SERVICE_NAME", "test-service");
-        
+
         let config = TelemetryConfig::from_env();
         assert_eq!(config.endpoint, "http://custom:4317");
         assert_eq!(config.service_name, "test-service");
-        
+
         std::env::remove_var("OTEL_EXPORTER_OTLP_ENDPOINT");
         std::env::remove_var("OTEL_SERVICE_NAME");
     }
@@ -235,7 +235,7 @@ mod tests {
             .with_status("completed".to_string())
             .with_duration(1000)
             .with_cost(10);
-        
+
         assert_eq!(attrs.workflow_id, Some("wf-1".to_string()));
         assert_eq!(attrs.workflow_name, Some("test-workflow".to_string()));
         assert_eq!(attrs.step_id, Some("step-1".to_string()));
@@ -245,9 +245,8 @@ mod tests {
 
     #[test]
     fn test_span_attributes_with_llm() {
-        let attrs = SpanAttributes::new()
-            .with_llm("openai".to_string(), "gpt-4".to_string(), 1000);
-        
+        let attrs = SpanAttributes::new().with_llm("openai".to_string(), "gpt-4".to_string(), 1000);
+
         assert_eq!(attrs.llm_provider, Some("openai".to_string()));
         assert_eq!(attrs.llm_model, Some("gpt-4".to_string()));
         assert_eq!(attrs.llm_tokens, Some(1000));
@@ -258,7 +257,7 @@ mod tests {
         let attrs = SpanAttributes::new()
             .with_custom("key1".to_string(), "value1".to_string())
             .with_custom("key2".to_string(), "value2".to_string());
-        
+
         assert_eq!(attrs.custom.len(), 2);
         assert_eq!(attrs.custom.get("key1"), Some(&"value1".to_string()));
     }

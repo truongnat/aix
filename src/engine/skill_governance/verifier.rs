@@ -46,7 +46,7 @@ impl SkillVerifier {
         for entry in std::fs::read_dir(dir)? {
             let entry = entry?;
             let path = entry.path();
-            
+
             if path.extension().and_then(|s| s.to_str()) == Some("json") {
                 let content = std::fs::read_to_string(&path)?;
                 let key: PublicKey = serde_json::from_str(&content)?;
@@ -148,12 +148,12 @@ mod tests {
     fn test_add_public_key() {
         let mut verifier = SkillVerifier::default();
         let (_, verifying_key) = generate_keypair();
-        
+
         let key = PublicKey::new(
             "test@example.com".to_string(),
             encode_public_key(&verifying_key),
         );
-        
+
         verifier.add_public_key(key);
         assert_eq!(verifier.public_keys().len(), 1);
     }
@@ -163,7 +163,7 @@ mod tests {
         let verifier = SkillVerifier::default();
         let skill_id = ".agents/skills/test.md";
         let content = "# Test Skill";
-        
+
         let result = verifier.verify_skill(skill_id, content, None);
         assert_eq!(result, VerificationResult::TrustedSource);
     }
@@ -173,7 +173,7 @@ mod tests {
         let verifier = SkillVerifier::default();
         let skill_id = "github.com/user/repo/skill.md";
         let content = "# Test Skill";
-        
+
         let result = verifier.verify_skill(skill_id, content, None);
         assert!(result.is_invalid());
     }
@@ -182,20 +182,17 @@ mod tests {
     fn test_verify_with_valid_signature() {
         let mut verifier = SkillVerifier::default();
         let (signing_key, verifying_key) = generate_keypair();
-        
+
         // Add public key
         let signer_id = "test@example.com";
-        let key = PublicKey::new(
-            signer_id.to_string(),
-            encode_public_key(&verifying_key),
-        );
+        let key = PublicKey::new(signer_id.to_string(), encode_public_key(&verifying_key));
         verifier.add_public_key(key);
-        
+
         // Sign skill
         let skill_id = "github.com/user/repo/skill.md";
         let content = "# Test Skill\n\nThis is a test.";
         let signature = sign_skill(skill_id, content, signer_id, &signing_key).unwrap();
-        
+
         // Verify
         let result = verifier.verify_skill(skill_id, content, Some(&signature));
         assert_eq!(result, VerificationResult::Valid);
@@ -205,20 +202,17 @@ mod tests {
     fn test_verify_with_invalid_signature() {
         let mut verifier = SkillVerifier::default();
         let (signing_key, verifying_key) = generate_keypair();
-        
+
         // Add public key
         let signer_id = "test@example.com";
-        let key = PublicKey::new(
-            signer_id.to_string(),
-            encode_public_key(&verifying_key),
-        );
+        let key = PublicKey::new(signer_id.to_string(), encode_public_key(&verifying_key));
         verifier.add_public_key(key);
-        
+
         // Sign skill
         let skill_id = "github.com/user/repo/skill.md";
         let content = "# Test Skill";
         let signature = sign_skill(skill_id, content, signer_id, &signing_key).unwrap();
-        
+
         // Verify with different content
         let tampered_content = "# Tampered Skill";
         let result = verifier.verify_skill(skill_id, tampered_content, Some(&signature));
@@ -229,13 +223,13 @@ mod tests {
     fn test_verify_with_unknown_signer() {
         let verifier = SkillVerifier::default();
         let (signing_key, _) = generate_keypair();
-        
+
         // Sign skill (but don't add public key to verifier)
         let skill_id = "github.com/user/repo/skill.md";
         let content = "# Test Skill";
         let signer_id = "unknown@example.com";
         let signature = sign_skill(skill_id, content, signer_id, &signing_key).unwrap();
-        
+
         // Verify should fail (unknown signer)
         let result = verifier.verify_skill(skill_id, content, Some(&signature));
         assert!(result.is_invalid());
@@ -243,15 +237,17 @@ mod tests {
 
     #[test]
     fn test_verify_with_global_signature_requirement() {
-        let mut config = GovernanceConfig::default();
-        config.require_signatures = true;
+        let config = GovernanceConfig {
+            require_signatures: true,
+            ..Default::default()
+        };
         let registry = SkillRegistry::new(config);
         let verifier = SkillVerifier::new(registry);
-        
+
         // Even local skills should require signature
         let skill_id = ".agents/skills/test.md";
         let content = "# Test Skill";
-        
+
         let result = verifier.verify_skill(skill_id, content, None);
         assert!(result.is_invalid());
     }
