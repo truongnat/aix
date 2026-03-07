@@ -9,6 +9,7 @@ pub mod git;
 pub mod project;
 pub mod replay_cache;
 pub mod replay_store;
+pub mod sandbox;
 pub mod security;
 pub mod session;
 

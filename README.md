@@ -107,6 +107,56 @@ export GEMINI_API_KEY=AIza...
 cargo run -- --workflow feature.md
 ```
 
+## Sandbox Execution (Week 4 Feature)
+
+Automatic process isolation for untrusted skills with resource monitoring:
+
+### Trust Tiers
+
+| Tier | Execution | Isolation | Use Case |
+|------|-----------|-----------|----------|
+| **Trusted** | In-process | None | Local, verified skills |
+| **Constrained** | In-process | Permissions | Limited access skills |
+| **Untrusted** | Subprocess | Full isolation | Imported, unverified skills |
+
+### Features
+
+✅ **Process Isolation** - Untrusted skills run in separate processes  
+✅ **Resource Monitoring** - Track CPU, memory, execution time  
+✅ **Automatic Enforcement** - Kill processes exceeding limits  
+✅ **Zero Overhead** - Trusted skills run in-process (no performance impact)  
+
+### Resource Limits
+
+```rust
+// Configure resource limits
+let budget = ExecutionBudget {
+    resource_budget: ResourceBudget {
+        max_cpu_ms: 10_000,      // 10 seconds CPU
+        max_wall_time_ms: 30_000, // 30 seconds wall time
+        max_memory_mb: 512,       // 512 MB memory
+        ..Default::default()
+    },
+    ..Default::default()
+};
+```
+
+### Example: Untrusted Skill
+
+```rust
+SkillCapability::new(
+    "imported_skill",
+    "Skill from external source",
+    SkillIOType::Text,
+    SkillIOType::Text,
+    CapabilityPermissions::none(),
+    SideEffectClass::ExternalMutation,
+)
+.with_trust_tier(TrustTier::Untrusted)  // Runs in sandbox
+```
+
+See [Sandbox Guide](docs/SANDBOX.md) for complete documentation.
+
 See [Deterministic Mode Guide](docs/DETERMINISTIC_MODE.md) for details.
 
 ## Current Release
