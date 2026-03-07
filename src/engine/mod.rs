@@ -7,6 +7,8 @@ pub mod context_retrieval;
 pub mod context_service;
 pub mod git;
 pub mod project;
+pub mod replay_cache;
+pub mod replay_store;
 pub mod security;
 pub mod session;
 
