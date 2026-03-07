@@ -12,6 +12,7 @@ pub mod replay_store;
 pub mod sandbox;
 pub mod security;
 pub mod session;
+pub mod vector;
 
 pub mod package_check;
 pub mod package_schema;
