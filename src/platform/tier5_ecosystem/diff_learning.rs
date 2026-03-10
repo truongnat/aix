@@ -1,7 +1,7 @@
 // Diff Learning Service - capture human edits for improvement
 
-use crate::platform::{PlatformError, Result};
 use crate::platform::types::StepId;
+use crate::platform::{PlatformError, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -23,6 +23,7 @@ pub struct HumanEdit {
 }
 
 impl HumanEdit {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         edit_id: String,
         workflow_id: String,
@@ -350,7 +351,7 @@ impl DiffLearningService for InMemoryDiffLearningService {
         for edit in &workflow_edits {
             type_groups
                 .entry(edit.edit_type.clone())
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(edit);
         }
 
@@ -376,10 +377,7 @@ impl DiffLearningService for InMemoryDiffLearningService {
                 }
             };
 
-            let mut pattern = Pattern::new(
-                format!("{}_{:?}", workflow_id, edit_type),
-                description,
-            );
+            let mut pattern = Pattern::new(format!("{}_{:?}", workflow_id, edit_type), description);
             pattern.frequency = frequency;
 
             // Add examples (up to 5)
@@ -494,10 +492,7 @@ impl DiffLearningService for InMemoryDiffLearningService {
                     )
                 }
                 desc if desc.contains("Content removed") => {
-                    format!(
-                        "Reduce verbosity: {} removals detected",
-                        pattern.frequency
-                    )
+                    format!("Reduce verbosity: {} removals detected", pattern.frequency)
                 }
                 desc if desc.contains("Structure changed") => {
                     format!(
@@ -584,12 +579,8 @@ mod tests {
 
         // Add multiple edits of same type
         for i in 0..5 {
-            let edit = create_test_edit(
-                &format!("edit{}", i),
-                "wf1",
-                EditType::Correction,
-                1000 + i,
-            );
+            let edit =
+                create_test_edit(&format!("edit{}", i), "wf1", EditType::Correction, 1000 + i);
             service.capture_edit(edit).unwrap();
         }
 
@@ -629,7 +620,12 @@ mod tests {
             .capture_edit(create_test_edit("e2", "wf1", EditType::Correction, 2000))
             .unwrap();
         service
-            .capture_edit(create_test_edit("e3", "wf2", EditType::StyleImprovement, 3000))
+            .capture_edit(create_test_edit(
+                "e3",
+                "wf2",
+                EditType::StyleImprovement,
+                3000,
+            ))
             .unwrap();
 
         // Filter by workflow
@@ -670,15 +666,20 @@ mod tests {
             .capture_edit(create_test_edit("e1", "wf1", EditType::Correction, 1000))
             .unwrap();
         service
-            .capture_edit(create_test_edit("e2", "wf1", EditType::StyleImprovement, 2000))
+            .capture_edit(create_test_edit(
+                "e2",
+                "wf1",
+                EditType::StyleImprovement,
+                2000,
+            ))
             .unwrap();
         service
             .capture_edit(create_test_edit("e3", "wf1", EditType::AddedDetail, 3000))
             .unwrap();
 
         // Filter by edit types
-        let filters =
-            TrainingFilters::new().with_edit_types(vec![EditType::Correction, EditType::AddedDetail]);
+        let filters = TrainingFilters::new()
+            .with_edit_types(vec![EditType::Correction, EditType::AddedDetail]);
         let dataset = service.generate_training_data(filters).unwrap();
 
         assert_eq!(dataset.examples.len(), 2);
@@ -762,7 +763,12 @@ mod tests {
 
         // Add edits for workflow 2
         service
-            .capture_edit(create_test_edit("e2", "wf2", EditType::StyleImprovement, 2000))
+            .capture_edit(create_test_edit(
+                "e2",
+                "wf2",
+                EditType::StyleImprovement,
+                2000,
+            ))
             .unwrap();
 
         // Generate training data for each workflow

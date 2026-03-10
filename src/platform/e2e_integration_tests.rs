@@ -23,8 +23,10 @@ mod tests {
             shared_memory::{CRDTMetadata, MemoryValue, SharedMemory, SharedMemoryTrait},
         },
         tier3_trust_verification::{
+            adversarial_tester::{
+                AdversarialTester, AttackIntensity, AttackProfile, DefaultAdversarialTester,
+            },
             attack_vectors::{HardcodedSecretsAttackVector, SQLInjectionAttackVector},
-            adversarial_tester::{AdversarialTester, AttackIntensity, AttackProfile, DefaultAdversarialTester},
             commitment::{CommitmentService, DefaultCommitmentService},
             formal_verifier::{Artifact, Claim, ClaimType, DefaultFormalVerifier, FormalVerifier},
             verifiers::{NoSQLInjectionVerifier, NoSecretsVerifier},
@@ -120,7 +122,8 @@ mod tests {
     fn test_adaptive_workflow_execution() {
         // Create workflow and context
         let workflow = create_test_workflow();
-        let mut context = ExecutionContext::new("test_workflow".to_string(), "instance_001".to_string());
+        let mut context =
+            ExecutionContext::new("test_workflow".to_string(), "instance_001".to_string());
         context.completed_steps.insert("step1".to_string());
 
         // Create adaptive planner and causal tracer
@@ -158,7 +161,10 @@ mod tests {
         // Verify replanning results (Requirements 1.5, 1.6)
         assert_eq!(new_plan.plan_version, 2, "Plan version should increment");
         assert!(
-            new_plan.steps.iter().any(|s| s.name.contains("debug") || s.name.contains("fix")),
+            new_plan
+                .steps
+                .iter()
+                .any(|s| s.name.contains("debug") || s.name.contains("fix")),
             "New plan should include debugging/fix steps"
         );
 
@@ -169,7 +175,7 @@ mod tests {
                 timestamp_ms: current_timestamp(),
                 decision_type: DecisionType::Replan,
                 inputs: vec![],
-                rationale: format!("Replanned due to test failure"),
+                rationale: "Replanned due to test failure".to_string(),
                 confidence: new_plan.confidence_score,
             })
             .unwrap();
@@ -213,7 +219,10 @@ mod tests {
         shared_memory
             .write(
                 "implementation_notes",
-                lww_value(serde_json::json!({"concerns": "Performance overhead"}), &implementer_id),
+                lww_value(
+                    serde_json::json!({"concerns": "Performance overhead"}),
+                    &implementer_id,
+                ),
                 &implementer_id,
             )
             .unwrap();
@@ -228,7 +237,7 @@ mod tests {
             topic_id: "api_approach".to_string(),
             subject: "REST vs GraphQL for user API".to_string(),
             participants: vec![architect_id.clone(), implementer_id.clone()],
-            deadline_ms: current_timestamp() + 3600_000, // 1 hour
+            deadline_ms: current_timestamp() + 3_600_000, // 1 hour
         };
 
         let session = negotiation.initiate_negotiation(topic).unwrap();
@@ -281,10 +290,13 @@ mod tests {
         shared_memory
             .write(
                 "api_decision",
-                lww_value(serde_json::json!({
-                    "approach": "GraphQL",
-                    "conditions": ["caching", "rest_fallback"]
-                }), "system"),
+                lww_value(
+                    serde_json::json!({
+                        "approach": "GraphQL",
+                        "conditions": ["caching", "rest_fallback"]
+                    }),
+                    "system",
+                ),
                 "system",
             )
             .unwrap();
@@ -405,9 +417,7 @@ mod tests {
         assert!(is_valid, "Signature should be valid");
 
         // Get audit trail
-        let audit_trail = commitment_service
-            .get_audit_trail("test_workflow")
-            .unwrap();
+        let audit_trail = commitment_service.get_audit_trail("test_workflow").unwrap();
         assert!(
             !audit_trail.is_empty(),
             "Audit trail should contain signed decisions"
@@ -440,10 +450,7 @@ mod tests {
 
         // Get isolated context
         let context = tenant_isolation.get_isolated_context(&tenant_id).unwrap();
-        assert!(context
-            .state_path
-            .to_string_lossy()
-            .contains("team_alpha"));
+        assert!(context.state_path.to_string_lossy().contains("team_alpha"));
         assert_eq!(context.memory_namespace, "team_alpha");
 
         // Step 2: Track resource usage (Requirements 10.1, 10.2)
@@ -499,9 +506,7 @@ mod tests {
         );
 
         // Calculate ROI (Requirement 10.6)
-        let roi = cost_tracker
-            .calculate_roi("test_workflow", 400.0)
-            .unwrap();
+        let roi = cost_tracker.calculate_roi("test_workflow", 400.0).unwrap();
         assert!(roi.automation_cost > 0.0);
         assert_eq!(roi.manual_cost, 400.0);
         assert!(roi.roi_percentage != 0.0);
@@ -518,7 +523,7 @@ mod tests {
                 ("issue".to_string(), "Potential data exposure".to_string()),
                 ("impact".to_string(), "Customer PII at risk".to_string()),
             ]),
-            sla_deadline_ms: current_timestamp() + 1800_000, // 30 minutes
+            sla_deadline_ms: current_timestamp() + 1_800_000, // 30 minutes
             timeout_policy: TimeoutPolicy::Block,
         };
 
@@ -590,7 +595,9 @@ mod tests {
         workflow_package2_with_tags.add_tag("security".to_string());
         workflow_package2_with_tags.add_tag("scanning".to_string());
 
-        marketplace.publish_workflow(workflow_package2_with_tags).unwrap();
+        marketplace
+            .publish_workflow(workflow_package2_with_tags)
+            .unwrap();
 
         // Step 2: Search workflows (Requirement 15.2)
         let search_query = SearchQuery {
@@ -631,9 +638,7 @@ mod tests {
             .unwrap();
 
         // Step 4: Install workflow (Requirement 15.3)
-        marketplace
-            .install_workflow(&package_id, "1.0.0")
-            .unwrap();
+        marketplace.install_workflow(&package_id, "1.0.0").unwrap();
 
         // Verify installation
         let installed = marketplace
@@ -673,7 +678,8 @@ mod tests {
         let mut tracer = CausalTracer::new();
 
         let workflow = create_test_workflow();
-        let context = ExecutionContext::new("complete_workflow".to_string(), "complete_001".to_string());
+        let context =
+            ExecutionContext::new("complete_workflow".to_string(), "complete_001".to_string());
 
         let plan = planner.generate_plan(&workflow, &context).unwrap();
         assert!(plan.steps.len() >= 2);

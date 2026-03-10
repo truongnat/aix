@@ -5,12 +5,12 @@
 
 #[cfg(test)]
 mod tests {
-    use crate::platform::tier3_trust_verification::{
-        Artifact, Claim, DefaultFormalVerifier, FormalVerifier,
-    };
     use crate::platform::tier3_trust_verification::formal_verifier::ClaimType;
     use crate::platform::tier3_trust_verification::verifiers::{
         AllTestsPassVerifier, CodeCoverageVerifier, NoSQLInjectionVerifier, NoSecretsVerifier,
+    };
+    use crate::platform::tier3_trust_verification::{
+        Artifact, Claim, DefaultFormalVerifier, FormalVerifier,
     };
 
     #[test]
@@ -19,18 +19,22 @@ mod tests {
         let mut verifier = DefaultFormalVerifier::new();
 
         // Register all built-in verifiers
-        verifier.register_verifier(Box::new(NoSQLInjectionVerifier::new())).unwrap();
-        verifier.register_verifier(Box::new(AllTestsPassVerifier::new())).unwrap();
-        verifier.register_verifier(Box::new(CodeCoverageVerifier::new())).unwrap();
-        verifier.register_verifier(Box::new(NoSecretsVerifier::new())).unwrap();
+        verifier
+            .register_verifier(Box::new(NoSQLInjectionVerifier::new()))
+            .unwrap();
+        verifier
+            .register_verifier(Box::new(AllTestsPassVerifier::new()))
+            .unwrap();
+        verifier
+            .register_verifier(Box::new(CodeCoverageVerifier::new()))
+            .unwrap();
+        verifier
+            .register_verifier(Box::new(NoSecretsVerifier::new()))
+            .unwrap();
 
         // Test SQL injection verification
-        let sql_claim = Claim::new(
-            "sql_check",
-            ClaimType::NoSQLInjection,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let sql_claim =
+            Claim::new("sql_check", ClaimType::NoSQLInjection, "test_agent", 0.95).unwrap();
 
         let safe_sql = Artifact::from_inline(
             "source_code",
@@ -42,12 +46,8 @@ mod tests {
         assert_eq!(result.verifier_tool, "NoSQLInjectionVerifier");
 
         // Test all tests pass verification
-        let test_claim = Claim::new(
-            "test_check",
-            ClaimType::AllTestsPass,
-            "test_agent",
-            0.90,
-        ).unwrap();
+        let test_claim =
+            Claim::new("test_check", ClaimType::AllTestsPass, "test_agent", 0.90).unwrap();
 
         let test_code = Artifact::from_inline(
             "source_code",
@@ -64,24 +64,23 @@ mod tests {
             ClaimType::CodeCoverage { threshold: 50.0 },
             "test_agent",
             0.85,
-        ).unwrap();
+        )
+        .unwrap();
 
         let coverage_code = Artifact::from_inline(
             "source_code",
             "fn add(a: i32, b: i32) -> i32 { a + b }\n#[test]\nfn test() { assert_eq!(add(1,1), 2); }",
         );
 
-        let result = verifier.verify_claim(coverage_claim, &coverage_code).unwrap();
+        let result = verifier
+            .verify_claim(coverage_claim, &coverage_code)
+            .unwrap();
         assert!(result.verified);
         assert_eq!(result.verifier_tool, "CodeCoverageVerifier");
 
         // Test secrets verification
-        let secrets_claim = Claim::new(
-            "secrets_check",
-            ClaimType::NoSecrets,
-            "test_agent",
-            0.99,
-        ).unwrap();
+        let secrets_claim =
+            Claim::new("secrets_check", ClaimType::NoSecrets, "test_agent", 0.99).unwrap();
 
         let secure_code = Artifact::from_inline(
             "source_code",
@@ -97,8 +96,12 @@ mod tests {
     fn test_security_pipeline_scenario() {
         // Simulate a complete security verification pipeline
         let mut verifier = DefaultFormalVerifier::new();
-        verifier.register_verifier(Box::new(NoSQLInjectionVerifier::new())).unwrap();
-        verifier.register_verifier(Box::new(NoSecretsVerifier::new())).unwrap();
+        verifier
+            .register_verifier(Box::new(NoSQLInjectionVerifier::new()))
+            .unwrap();
+        verifier
+            .register_verifier(Box::new(NoSecretsVerifier::new()))
+            .unwrap();
 
         let code = r#"
             fn authenticate_user(username: String) -> Result<User> {
@@ -116,7 +119,8 @@ mod tests {
             ClaimType::NoSQLInjection,
             "security_agent",
             0.95,
-        ).unwrap();
+        )
+        .unwrap();
 
         let result = verifier.verify_claim(sql_claim, &artifact).unwrap();
         assert!(result.verified, "SQL injection check should pass");
@@ -127,7 +131,8 @@ mod tests {
             ClaimType::NoSecrets,
             "security_agent",
             0.99,
-        ).unwrap();
+        )
+        .unwrap();
 
         let result = verifier.verify_claim(secrets_claim, &artifact).unwrap();
         assert!(result.verified, "Secrets check should pass");
@@ -137,8 +142,12 @@ mod tests {
     fn test_quality_pipeline_scenario() {
         // Simulate a complete quality verification pipeline
         let mut verifier = DefaultFormalVerifier::new();
-        verifier.register_verifier(Box::new(AllTestsPassVerifier::new())).unwrap();
-        verifier.register_verifier(Box::new(CodeCoverageVerifier::new())).unwrap();
+        verifier
+            .register_verifier(Box::new(AllTestsPassVerifier::new()))
+            .unwrap();
+        verifier
+            .register_verifier(Box::new(CodeCoverageVerifier::new()))
+            .unwrap();
 
         let code = r#"
             fn calculate_total(items: &[i32]) -> i32 {
@@ -164,7 +173,8 @@ mod tests {
             ClaimType::AllTestsPass,
             "quality_agent",
             0.90,
-        ).unwrap();
+        )
+        .unwrap();
 
         let result = verifier.verify_claim(test_claim, &artifact).unwrap();
         assert!(result.verified, "All tests should pass");
@@ -175,7 +185,8 @@ mod tests {
             ClaimType::CodeCoverage { threshold: 60.0 },
             "quality_agent",
             0.85,
-        ).unwrap();
+        )
+        .unwrap();
 
         let result = verifier.verify_claim(coverage_claim, &artifact).unwrap();
         assert!(result.verified, "Coverage should meet threshold");
@@ -184,8 +195,12 @@ mod tests {
     #[test]
     fn test_verification_failure_scenarios() {
         let mut verifier = DefaultFormalVerifier::new();
-        verifier.register_verifier(Box::new(NoSQLInjectionVerifier::new())).unwrap();
-        verifier.register_verifier(Box::new(NoSecretsVerifier::new())).unwrap();
+        verifier
+            .register_verifier(Box::new(NoSQLInjectionVerifier::new()))
+            .unwrap();
+        verifier
+            .register_verifier(Box::new(NoSecretsVerifier::new()))
+            .unwrap();
 
         // Test SQL injection vulnerability detection
         let vulnerable_code = Artifact::from_inline(
@@ -193,30 +208,25 @@ mod tests {
             r#"execute("SELECT * FROM users WHERE id = " + user_id)"#,
         );
 
-        let sql_claim = Claim::new(
-            "sql_vuln",
-            ClaimType::NoSQLInjection,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let sql_claim =
+            Claim::new("sql_vuln", ClaimType::NoSQLInjection, "test_agent", 0.95).unwrap();
 
         let result = verifier.verify_claim(sql_claim, &vulnerable_code).unwrap();
-        assert!(!result.verified, "Should detect SQL injection vulnerability");
-
-        // Test hardcoded secret detection
-        let insecure_code = Artifact::from_inline(
-            "source_code",
-            r#"let api_key = "sk-1234567890abcdef";"#,
+        assert!(
+            !result.verified,
+            "Should detect SQL injection vulnerability"
         );
 
-        let secrets_claim = Claim::new(
-            "secrets_vuln",
-            ClaimType::NoSecrets,
-            "test_agent",
-            0.99,
-        ).unwrap();
+        // Test hardcoded secret detection
+        let insecure_code =
+            Artifact::from_inline("source_code", r#"let api_key = "sk-1234567890abcdef";"#);
 
-        let result = verifier.verify_claim(secrets_claim, &insecure_code).unwrap();
+        let secrets_claim =
+            Claim::new("secrets_vuln", ClaimType::NoSecrets, "test_agent", 0.99).unwrap();
+
+        let result = verifier
+            .verify_claim(secrets_claim, &insecure_code)
+            .unwrap();
         assert!(!result.verified, "Should detect hardcoded secret");
     }
 
@@ -224,33 +234,32 @@ mod tests {
     fn test_verifier_not_registered() {
         let verifier = DefaultFormalVerifier::new();
 
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSQLInjection,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let claim =
+            Claim::new("test_claim", ClaimType::NoSQLInjection, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline("source_code", "fn main() {}");
 
         let result = verifier.verify_claim(claim, &artifact);
-        assert!(result.is_err(), "Should fail when no verifier is registered");
+        assert!(
+            result.is_err(),
+            "Should fail when no verifier is registered"
+        );
     }
 
     #[test]
     fn test_multiple_verifiers_same_type() {
         // Test that the first matching verifier is used
         let mut verifier = DefaultFormalVerifier::new();
-        
-        verifier.register_verifier(Box::new(NoSQLInjectionVerifier::new())).unwrap();
-        verifier.register_verifier(Box::new(NoSQLInjectionVerifier::new())).unwrap();
 
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSQLInjection,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        verifier
+            .register_verifier(Box::new(NoSQLInjectionVerifier::new()))
+            .unwrap();
+        verifier
+            .register_verifier(Box::new(NoSQLInjectionVerifier::new()))
+            .unwrap();
+
+        let claim =
+            Claim::new("test_claim", ClaimType::NoSQLInjection, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline(
             "source_code",
@@ -258,25 +267,25 @@ mod tests {
         );
 
         let result = verifier.verify_claim(claim, &artifact);
-        assert!(result.is_ok(), "Should work with multiple verifiers of same type");
+        assert!(
+            result.is_ok(),
+            "Should work with multiple verifiers of same type"
+        );
     }
 
     #[test]
     fn test_artifact_with_metadata() {
         let mut verifier = DefaultFormalVerifier::new();
-        verifier.register_verifier(Box::new(NoSecretsVerifier::new())).unwrap();
+        verifier
+            .register_verifier(Box::new(NoSecretsVerifier::new()))
+            .unwrap();
 
         let artifact = Artifact::from_inline("source_code", "let x = 42;")
             .with_metadata("language", "rust")
             .with_metadata("version", "1.0")
             .with_metadata("author", "test_agent");
 
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSecrets,
-            "test_agent",
-            0.99,
-        ).unwrap();
+        let claim = Claim::new("test_claim", ClaimType::NoSecrets, "test_agent", 0.99).unwrap();
 
         let result = verifier.verify_claim(claim, &artifact).unwrap();
         assert!(result.verified);
@@ -285,19 +294,16 @@ mod tests {
     #[test]
     fn test_verification_result_timestamps() {
         let mut verifier = DefaultFormalVerifier::new();
-        verifier.register_verifier(Box::new(NoSecretsVerifier::new())).unwrap();
+        verifier
+            .register_verifier(Box::new(NoSecretsVerifier::new()))
+            .unwrap();
 
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSecrets,
-            "test_agent",
-            0.99,
-        ).unwrap();
+        let claim = Claim::new("test_claim", ClaimType::NoSecrets, "test_agent", 0.99).unwrap();
 
         let artifact = Artifact::from_inline("source_code", "let x = 42;");
 
         let result = verifier.verify_claim(claim, &artifact).unwrap();
-        
+
         // Timestamp should be set
         assert!(result.timestamp_ms > 0);
     }

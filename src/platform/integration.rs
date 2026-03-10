@@ -9,12 +9,10 @@ use crate::platform::error::Result;
 use crate::platform::tier1_execution_intelligence::{
     AdaptivePlanner, CausalTracer, FeedbackCollector,
 };
-use crate::platform::tier2_multi_agent::{
-    AgentMarketplace, NegotiationProtocol, SharedMemory,
-};
+use crate::platform::tier2_multi_agent::{AgentMarketplace, NegotiationProtocol, SharedMemory};
 use crate::platform::tier3_trust_verification::{
-    Claim, CommitmentService, DefaultCommitmentService, DefaultFormalVerifier, FormalVerifier,
-    DefaultAdversarialTester,
+    Claim, CommitmentService, DefaultAdversarialTester, DefaultCommitmentService,
+    DefaultFormalVerifier, FormalVerifier,
 };
 use crate::platform::tier4_organizational::{CostTracker, HumanReviewService, TenantIsolation};
 use crate::platform::tier5_ecosystem::{
@@ -95,7 +93,7 @@ impl PlatformServices {
             feedback_collector: Arc::new(RwLock::new(FeedbackCollector::new(
                 crate::platform::tier1_execution_intelligence::feedback_collector::FeedbackConfig {
                     aggregation_window_secs: 3600, // 1 hour default
-                }
+                },
             ))),
 
             // Tier 2
@@ -111,7 +109,9 @@ impl PlatformServices {
             // Tier 4
             cost_tracker: Arc::new(RwLock::new(CostTracker::new())),
             human_review_service: Arc::new(RwLock::new(HumanReviewService::new())),
-            tenant_isolation: Arc::new(RwLock::new(TenantIsolation::new(std::path::PathBuf::from(".agents/tenants")))),
+            tenant_isolation: Arc::new(RwLock::new(TenantIsolation::new(
+                std::path::PathBuf::from(".agents/tenants"),
+            ))),
 
             // Tier 5
             benchmark_service: Arc::new(RwLock::new(DefaultBenchmarkService::new())),
@@ -121,11 +121,11 @@ impl PlatformServices {
             enabled_tiers,
         })
     }
-    
+
     /// Create platform services from a PlatformConfig
     pub fn from_platform_config(config: &crate::platform::config::PlatformConfig) -> Result<Self> {
         let enabled_tiers = config.to_enabled_tiers();
-        
+
         // Create services with configuration-specific settings
         Ok(Self {
             // Tier 1
@@ -133,8 +133,10 @@ impl PlatformServices {
             causal_tracer: Arc::new(RwLock::new(CausalTracer::new())),
             feedback_collector: Arc::new(RwLock::new(FeedbackCollector::new(
                 crate::platform::tier1_execution_intelligence::feedback_collector::FeedbackConfig {
-                    aggregation_window_secs: config.tier1_execution_intelligence.feedback_window_secs,
-                }
+                    aggregation_window_secs: config
+                        .tier1_execution_intelligence
+                        .feedback_window_secs,
+                },
             ))),
 
             // Tier 2
@@ -150,7 +152,9 @@ impl PlatformServices {
             // Tier 4
             cost_tracker: Arc::new(RwLock::new(CostTracker::new())),
             human_review_service: Arc::new(RwLock::new(HumanReviewService::new())),
-            tenant_isolation: Arc::new(RwLock::new(TenantIsolation::new(std::path::PathBuf::from(".agents/tenants")))),
+            tenant_isolation: Arc::new(RwLock::new(TenantIsolation::new(
+                std::path::PathBuf::from(".agents/tenants"),
+            ))),
 
             // Tier 5
             benchmark_service: Arc::new(RwLock::new(DefaultBenchmarkService::new())),
@@ -223,12 +227,12 @@ impl WorkflowExecutionHooks {
         if self.services.is_execution_intelligence_enabled() {
             // Convert engine ExecutionContext to platform ExecutionContext
             let platform_context = convert_to_platform_context(context);
-            
+
             let plan = self
                 .services
                 .adaptive_planner
                 .generate_plan(workflow, &platform_context)?;
-            
+
             // Log plan generation decision
             let mut tracer = self.services.causal_tracer.write().unwrap();
             let decision = crate::platform::tier1_execution_intelligence::causal_tracer::Decision {
@@ -281,7 +285,11 @@ impl WorkflowExecutionHooks {
 
             // Check if replanning is needed
             let platform_context = convert_to_platform_context(context);
-            if let Some(_trigger) = self.services.adaptive_planner.should_replan(&platform_context) {
+            if let Some(_trigger) = self
+                .services
+                .adaptive_planner
+                .should_replan(&platform_context)
+            {
                 // Replan needed - this would be handled by the engine
                 // Using println instead of tracing since tracing is not available
                 println!("Replan trigger detected for step: {}", step_id);
@@ -325,7 +333,11 @@ impl WorkflowExecutionHooks {
                     model: "default".to_string(),
                 },
                 quantity: llm_tokens as f64,
-                unit_cost: if llm_tokens > 0 { cost_usd / llm_tokens as f64 } else { 0.0 },
+                unit_cost: if llm_tokens > 0 {
+                    cost_usd / llm_tokens as f64
+                } else {
+                    0.0
+                },
                 timestamp_ms: now_ms(),
                 step_id: step_id.clone(),
             };
@@ -436,13 +448,18 @@ impl WorkflowExecutionHooks {
             metadata: std::collections::HashMap::new(),
         };
 
-        let result = self.services.formal_verifier.verify_claim(claim, &artifact)?;
+        let result = self
+            .services
+            .formal_verifier
+            .verify_claim(claim, &artifact)?;
         Ok(result.verified)
     }
 }
 
 /// Helper function to convert engine ExecutionContext to platform ExecutionContext
-fn convert_to_platform_context(engine_ctx: &ExecutionContext) -> crate::platform::types::ExecutionContext {
+fn convert_to_platform_context(
+    engine_ctx: &ExecutionContext,
+) -> crate::platform::types::ExecutionContext {
     crate::platform::types::ExecutionContext {
         workflow_id: engine_ctx.workflow_name.clone(),
         instance_id: engine_ctx.workflow_instance_id.clone(),
@@ -502,13 +519,13 @@ mod tests {
         assert!(!services.is_organizational_scale_enabled());
         assert!(!services.is_ecosystem_enabled());
     }
-    
+
     #[test]
     fn test_platform_services_from_config_all_disabled() {
         let config = crate::platform::config::PlatformConfig::default_disabled();
         let services = PlatformServices::from_platform_config(&config);
         assert!(services.is_ok());
-        
+
         let services = services.unwrap();
         assert!(!services.is_execution_intelligence_enabled());
         assert!(!services.is_multi_agent_coordination_enabled());
@@ -516,13 +533,13 @@ mod tests {
         assert!(!services.is_organizational_scale_enabled());
         assert!(!services.is_ecosystem_enabled());
     }
-    
+
     #[test]
     fn test_platform_services_from_config_all_enabled() {
         let config = crate::platform::config::PlatformConfig::all_enabled();
         let services = PlatformServices::from_platform_config(&config);
         assert!(services.is_ok());
-        
+
         let services = services.unwrap();
         assert!(services.is_execution_intelligence_enabled());
         assert!(services.is_multi_agent_coordination_enabled());
@@ -530,16 +547,16 @@ mod tests {
         assert!(services.is_organizational_scale_enabled());
         assert!(services.is_ecosystem_enabled());
     }
-    
+
     #[test]
     fn test_platform_services_from_config_partial() {
         let mut config = crate::platform::config::PlatformConfig::default_disabled();
         config.features.adaptive_planning = true;
         config.features.cost_tracking = true;
-        
+
         let services = PlatformServices::from_platform_config(&config);
         assert!(services.is_ok());
-        
+
         let services = services.unwrap();
         assert!(services.is_execution_intelligence_enabled());
         assert!(!services.is_multi_agent_coordination_enabled());
@@ -547,15 +564,15 @@ mod tests {
         assert!(services.is_organizational_scale_enabled());
         assert!(!services.is_ecosystem_enabled());
     }
-    
+
     #[test]
     fn test_platform_services_respects_feedback_window_config() {
         let mut config = crate::platform::config::PlatformConfig::default_disabled();
         config.tier1_execution_intelligence.feedback_window_secs = 7200;
-        
+
         let services = PlatformServices::from_platform_config(&config);
         assert!(services.is_ok());
-        
+
         // Services should be created with the configured feedback window
         // This is verified by the fact that the service creation succeeds
     }

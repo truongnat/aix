@@ -197,7 +197,11 @@ pub trait AttackVector: Send + Sync {
     fn description(&self) -> &str;
 
     /// Execute the attack against an artifact
-    fn execute(&self, artifact: &Artifact, intensity: AttackIntensity) -> Result<Vec<Vulnerability>>;
+    fn execute(
+        &self,
+        artifact: &Artifact,
+        intensity: AttackIntensity,
+    ) -> Result<Vec<Vulnerability>>;
 
     /// Check if this vector applies to the given artifact type
     fn applies_to(&self, artifact_type: &str) -> bool;
@@ -294,7 +298,9 @@ impl DefaultAdversarialTester {
         // Group by vulnerability type
         let mut type_counts: HashMap<String, usize> = HashMap::new();
         for vuln in vulnerabilities {
-            *type_counts.entry(vuln.vulnerability_type.clone()).or_insert(0) += 1;
+            *type_counts
+                .entry(vuln.vulnerability_type.clone())
+                .or_insert(0) += 1;
         }
 
         for (vuln_type, count) in type_counts.iter() {
@@ -308,11 +314,9 @@ impl DefaultAdversarialTester {
 
         // Add general recommendations if vulnerabilities found
         if !vulnerabilities.is_empty() {
+            recommendations.push("Run formal verification tools to validate fixes.".to_string());
             recommendations.push(
-                "Run formal verification tools to validate fixes.".to_string()
-            );
-            recommendations.push(
-                "Consider adding automated security tests to prevent regression.".to_string()
+                "Consider adding automated security tests to prevent regression.".to_string(),
             );
         }
 
@@ -337,22 +341,25 @@ impl AdversarialTester for DefaultAdversarialTester {
         })?;
 
         // Determine which vectors to use
-        let vectors_to_use: Vec<&Box<dyn AttackVector>> = if attack_profile.attack_vectors.is_empty() {
-            // Use all applicable vectors
-            vectors
-                .iter()
-                .filter(|v| v.applies_to(&target.artifact_type))
-                .collect()
-        } else {
-            // Use only specified vectors
-            vectors
-                .iter()
-                .filter(|v| {
-                    attack_profile.attack_vectors.contains(&v.name().to_string())
-                        && v.applies_to(&target.artifact_type)
-                })
-                .collect()
-        };
+        let vectors_to_use: Vec<&Box<dyn AttackVector>> =
+            if attack_profile.attack_vectors.is_empty() {
+                // Use all applicable vectors
+                vectors
+                    .iter()
+                    .filter(|v| v.applies_to(&target.artifact_type))
+                    .collect()
+            } else {
+                // Use only specified vectors
+                vectors
+                    .iter()
+                    .filter(|v| {
+                        attack_profile
+                            .attack_vectors
+                            .contains(&v.name().to_string())
+                            && v.applies_to(&target.artifact_type)
+                    })
+                    .collect()
+            };
 
         if vectors_to_use.is_empty() {
             return Err(PlatformError::AdversarialTestFailed(format!(
@@ -363,10 +370,10 @@ impl AdversarialTester for DefaultAdversarialTester {
 
         // Execute attacks with time budget
         let time_per_vector = attack_profile.time_budget_ms / vectors_to_use.len() as u64;
-        
+
         for vector in vectors_to_use {
             let vector_start = current_timestamp_ms();
-            
+
             // Check if we've exceeded time budget
             if current_timestamp_ms() - start_time >= attack_profile.time_budget_ms {
                 break;
@@ -398,8 +405,10 @@ impl AdversarialTester for DefaultAdversarialTester {
         // Generate recommendations
         let recommendations = self.generate_recommendations(&vulnerabilities);
 
-        Ok(AttackReport::new(vulnerabilities, attack_attempts, duration_ms)
-            .with_recommendations(recommendations))
+        Ok(
+            AttackReport::new(vulnerabilities, attack_attempts, duration_ms)
+                .with_recommendations(recommendations),
+        )
     }
 
     fn register_attack_vector(&mut self, vector: Box<dyn AttackVector>) -> Result<()> {
@@ -429,7 +438,10 @@ impl AdversarialTester for DefaultAdversarialTester {
             let strategy = AttackStrategy::new(
                 format!("{}_comprehensive", artifact_type),
                 vec![artifact_type.to_string()],
-                format!("Comprehensive security testing for {} artifacts", artifact_type),
+                format!(
+                    "Comprehensive security testing for {} artifacts",
+                    artifact_type
+                ),
             );
 
             let strategy = applicable_vectors
@@ -489,7 +501,9 @@ mod tests {
             .with_vector("xss");
 
         assert_eq!(profile.attack_vectors.len(), 2);
-        assert!(profile.attack_vectors.contains(&"sql_injection".to_string()));
+        assert!(profile
+            .attack_vectors
+            .contains(&"sql_injection".to_string()));
     }
 
     #[test]
@@ -509,15 +523,13 @@ mod tests {
 
     #[test]
     fn test_attack_report_creation() {
-        let vulns = vec![
-            Vulnerability::new(
-                Severity::High,
-                "SQL Injection",
-                "line 42",
-                "exploit",
-                "fix",
-            ),
-        ];
+        let vulns = vec![Vulnerability::new(
+            Severity::High,
+            "SQL Injection",
+            "line 42",
+            "exploit",
+            "fix",
+        )];
 
         let report = AttackReport::new(vulns, 10, 5000);
         assert_eq!(report.vulnerabilities_found.len(), 1);
@@ -727,29 +739,19 @@ mod tests {
                 "exploit",
                 "fix",
             ),
-            Vulnerability::new(
-                Severity::High,
-                "XSS",
-                "line 100",
-                "exploit",
-                "fix",
-            ),
-            Vulnerability::new(
-                Severity::High,
-                "XSS",
-                "line 200",
-                "exploit",
-                "fix",
-            ),
+            Vulnerability::new(Severity::High, "XSS", "line 100", "exploit", "fix"),
+            Vulnerability::new(Severity::High, "XSS", "line 200", "exploit", "fix"),
         ];
 
         let recommendations = tester.generate_recommendations(&vulns);
         assert!(!recommendations.is_empty());
-        
+
         // Should have critical warning
         assert!(recommendations.iter().any(|r| r.contains("CRITICAL")));
-        
+
         // Should have pattern detection for XSS
-        assert!(recommendations.iter().any(|r| r.contains("Pattern detected") && r.contains("XSS")));
+        assert!(recommendations
+            .iter()
+            .any(|r| r.contains("Pattern detected") && r.contains("XSS")));
     }
 }

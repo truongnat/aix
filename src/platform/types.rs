@@ -22,7 +22,7 @@ impl TenantId {
         }
         Ok(TenantId(id))
     }
-    
+
     pub fn as_str(&self) -> &str {
         &self.0
     }
@@ -70,7 +70,7 @@ impl ExecutionContext {
             plan_version: 1,
         }
     }
-    
+
     /// Validate that completed and failed steps are disjoint
     pub fn validate(&self) -> crate::platform::Result<()> {
         if self.workflow_id.is_empty() {
@@ -78,24 +78,26 @@ impl ExecutionContext {
                 "workflow_id cannot be empty".to_string(),
             ));
         }
-        
+
         if self.instance_id.is_empty() {
             return Err(crate::platform::PlatformError::InvalidInput(
                 "instance_id cannot be empty".to_string(),
             ));
         }
-        
+
         // Check that completed and failed steps are disjoint
-        let intersection: HashSet<_> = self.completed_steps
+        let intersection: HashSet<_> = self
+            .completed_steps
             .intersection(&self.failed_steps)
             .collect();
-        
+
         if !intersection.is_empty() {
-            return Err(crate::platform::PlatformError::InvalidInput(
-                format!("Steps cannot be both completed and failed: {:?}", intersection),
-            ));
+            return Err(crate::platform::PlatformError::InvalidInput(format!(
+                "Steps cannot be both completed and failed: {:?}",
+                intersection
+            )));
         }
-        
+
         Ok(())
     }
 }
@@ -219,7 +221,7 @@ mod tests {
     fn test_execution_context_validation() {
         let mut ctx = ExecutionContext::new("wf1".to_string(), "inst1".to_string());
         assert!(ctx.validate().is_ok());
-        
+
         // Add overlapping step
         ctx.completed_steps.insert("step1".to_string());
         ctx.failed_steps.insert("step1".to_string());

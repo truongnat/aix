@@ -102,7 +102,9 @@ impl SkillOutput {
         let output = match self {
             SkillOutput::Text(s) => Value::String(s),
             SkillOutput::Json(v) => v,
-            SkillOutput::Number(n) => Value::Number(serde_json::Number::from_f64(n).unwrap_or(serde_json::Number::from(0))),
+            SkillOutput::Number(n) => Value::Number(
+                serde_json::Number::from_f64(n).unwrap_or(serde_json::Number::from(0)),
+            ),
             SkillOutput::Boolean(b) => Value::Bool(b),
         };
         super::capability::SkillResult {

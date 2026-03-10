@@ -9,9 +9,9 @@
 use serde::{Deserialize, Serialize};
 
 pub mod agents;
-pub mod workflows;
 pub mod party_mode;
 pub mod planning;
+pub mod workflows;
 
 /// BMAD agent types matching BMAD-METHOD
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]

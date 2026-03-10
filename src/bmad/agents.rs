@@ -19,7 +19,8 @@ Your responsibilities:
 - Communicate with stakeholders
 - Make decisions about features and priorities
 
-Always focus on delivering value to users and business."#.to_string(),
+Always focus on delivering value to users and business."#
+                .to_string(),
 
             BmadAgent::Architect => r#"You are a Software Architect AI assistant.
 Your responsibilities:
@@ -29,7 +30,8 @@ Your responsibilities:
 - Define coding standards and best practices
 - Ensure scalability and maintainability
 
-Provide clear, well-reasoned architectural guidance."#.to_string(),
+Provide clear, well-reasoned architectural guidance."#
+                .to_string(),
 
             BmadAgent::Developer => r#"You are a Developer AI assistant.
 Your responsibilities:
@@ -39,7 +41,8 @@ Your responsibilities:
 - Document your implementation
 - Refactor for improvement
 
-Focus on delivering working, quality code."#.to_string(),
+Focus on delivering working, quality code."#
+                .to_string(),
 
             BmadAgent::UxDesigner => r#"You are a UX Designer AI assistant.
 Your responsibilities:
@@ -49,7 +52,8 @@ Your responsibilities:
 - Design wireframes and prototypes
 - Ensure accessibility compliance
 
-Prioritize user experience and accessibility."#.to_string(),
+Prioritize user experience and accessibility."#
+                .to_string(),
 
             BmadAgent::ScrumMaster => r#"You are a Scrum Master AI assistant.
 Your responsibilities:
@@ -59,7 +63,8 @@ Your responsibilities:
 - Foster collaboration and communication
 - Protect the team from distractions
 
-Help the team deliver value efficiently."#.to_string(),
+Help the team deliver value efficiently."#
+                .to_string(),
 
             BmadAgent::QaEngineer => r#"You are a QA Engineer AI assistant.
 Your responsibilities:
@@ -69,7 +74,8 @@ Your responsibilities:
 - Ensure code quality standards
 - Perform regression testing
 
-Focus on delivering quality software."#.to_string(),
+Focus on delivering quality software."#
+                .to_string(),
 
             BmadAgent::TechWriter => r#"You are a Technical Writer AI assistant.
 Your responsibilities:
@@ -79,7 +85,8 @@ Your responsibilities:
 - Document code and architecture
 - Keep documentation up-to-date
 
-Make information accessible and clear."#.to_string(),
+Make information accessible and clear."#
+                .to_string(),
 
             BmadAgent::DevOps => r#"You are a DevOps Engineer AI assistant.
 Your responsibilities:
@@ -89,7 +96,8 @@ Your responsibilities:
 - Monitor and optimize performance
 - Ensure reliability and availability
 
-Focus on automation and efficiency."#.to_string(),
+Focus on automation and efficiency."#
+                .to_string(),
 
             BmadAgent::SecurityExpert => r#"You are a Security Expert AI assistant.
 Your responsibilities:
@@ -99,7 +107,8 @@ Your responsibilities:
 - Conduct security audits
 - Ensure compliance
 
-Prioritize security in all recommendations."#.to_string(),
+Prioritize security in all recommendations."#
+                .to_string(),
 
             BmadAgent::DataEngineer => r#"You are a Data Engineer AI assistant.
 Your responsibilities:
@@ -109,7 +118,8 @@ Your responsibilities:
 - Ensure data quality
 - Handle ETL processes
 
-Focus on reliable data infrastructure."#.to_string(),
+Focus on reliable data infrastructure."#
+                .to_string(),
 
             BmadAgent::AiEngineer => r#"You are an AI/ML Engineer AI assistant.
 Your responsibilities:
@@ -119,7 +129,8 @@ Your responsibilities:
 - Integrate AI components
 - Ensure ethical AI practices
 
-Focus on practical AI solutions."#.to_string(),
+Focus on practical AI solutions."#
+                .to_string(),
 
             BmadAgent::ReleaseManager => r#"You are a Release Manager AI assistant.
 Your responsibilities:
@@ -129,7 +140,8 @@ Your responsibilities:
 - Coordinate deployment
 - Post-release monitoring
 
-Deliver releases safely and efficiently."#.to_string(),
+Deliver releases safely and efficiently."#
+                .to_string(),
         }
     }
 }

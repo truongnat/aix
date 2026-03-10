@@ -4,7 +4,7 @@
 // It provides a plugin architecture for registering custom verification tools and
 // supports various claim types for security, testing, and compliance verification.
 
-use crate::platform::{types::*, Result, PlatformError};
+use crate::platform::{types::*, PlatformError, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
@@ -77,7 +77,7 @@ impl Claim {
         asserted_by: impl Into<String>,
         confidence: f64,
     ) -> Result<Self> {
-        if confidence < 0.0 || confidence > 1.0 {
+        if !(0.0..=1.0).contains(&confidence) {
             return Err(PlatformError::InvalidInput(
                 "Confidence must be between 0.0 and 1.0".to_string(),
             ));
@@ -299,12 +299,12 @@ impl FormalVerifier for DefaultFormalVerifier {
             PlatformError::InternalError(format!("Failed to acquire policies lock: {}", e))
         })?;
 
-        policies
-            .get(step_type)
-            .cloned()
-            .ok_or_else(|| {
-                PlatformError::NotFound(format!("No verification policy for step type: {}", step_type))
-            })
+        policies.get(step_type).cloned().ok_or_else(|| {
+            PlatformError::NotFound(format!(
+                "No verification policy for step type: {}",
+                step_type
+            ))
+        })
     }
 
     fn set_verification_policy(&mut self, policy: VerificationPolicy) -> Result<()> {
@@ -323,12 +323,7 @@ mod tests {
 
     #[test]
     fn test_claim_creation() {
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSQLInjection,
-            "test_agent",
-            0.95,
-        );
+        let claim = Claim::new("test_claim", ClaimType::NoSQLInjection, "test_agent", 0.95);
         assert!(claim.is_ok());
 
         let claim = claim.unwrap();
@@ -339,20 +334,10 @@ mod tests {
 
     #[test]
     fn test_claim_invalid_confidence() {
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSQLInjection,
-            "test_agent",
-            1.5,
-        );
+        let claim = Claim::new("test_claim", ClaimType::NoSQLInjection, "test_agent", 1.5);
         assert!(claim.is_err());
 
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSQLInjection,
-            "test_agent",
-            -0.1,
-        );
+        let claim = Claim::new("test_claim", ClaimType::NoSQLInjection, "test_agent", -0.1);
         assert!(claim.is_err());
     }
 
@@ -411,8 +396,7 @@ mod tests {
     fn test_formal_verifier_policy_management() {
         let mut verifier = DefaultFormalVerifier::new();
 
-        let policy = VerificationPolicy::new("test_step")
-            .require_claim(ClaimType::AllTestsPass);
+        let policy = VerificationPolicy::new("test_step").require_claim(ClaimType::AllTestsPass);
 
         assert!(verifier.set_verification_policy(policy).is_ok());
 
@@ -468,12 +452,8 @@ mod tests {
 
         verifier.register_verifier(mock).unwrap();
 
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSQLInjection,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let claim =
+            Claim::new("test_claim", ClaimType::NoSQLInjection, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline("source_code", "SELECT * FROM users");
 
@@ -486,12 +466,8 @@ mod tests {
     fn test_verify_claim_without_verifier() {
         let verifier = DefaultFormalVerifier::new();
 
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSQLInjection,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let claim =
+            Claim::new("test_claim", ClaimType::NoSQLInjection, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline("source_code", "SELECT * FROM users");
 

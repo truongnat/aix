@@ -91,9 +91,7 @@ impl DefaultCommitmentService {
     /// Create a new commitment service with custom rotation policy
     pub fn with_rotation_policy(rotation_days: u64) -> Self {
         Self {
-            certificate_authority: Arc::new(RwLock::new(CertificateAuthority::new(
-                rotation_days,
-            ))),
+            certificate_authority: Arc::new(RwLock::new(CertificateAuthority::new(rotation_days))),
             audit_trail: Arc::new(RwLock::new(HashMap::new())),
         }
     }
@@ -170,7 +168,9 @@ impl CommitmentService for DefaultCommitmentService {
         let certificate = ca
             .certificates
             .get(agent_id)
-            .ok_or_else(|| PlatformError::NotFound(format!("Certificate for agent {} not found", agent_id)))?
+            .ok_or_else(|| {
+                PlatformError::NotFound(format!("Certificate for agent {} not found", agent_id))
+            })?
             .clone();
 
         // Check certificate validity
@@ -183,8 +183,9 @@ impl CommitmentService for DefaultCommitmentService {
         }
 
         // Serialize decision for signing
-        let decision_bytes = serde_json::to_vec(decision)
-            .map_err(|e| PlatformError::SerializationError(format!("Failed to serialize decision: {}", e)))?;
+        let decision_bytes = serde_json::to_vec(decision).map_err(|e| {
+            PlatformError::SerializationError(format!("Failed to serialize decision: {}", e))
+        })?;
 
         // Create signature with timestamp
         let timestamp_ms = current_timestamp_ms();
@@ -226,8 +227,9 @@ impl CommitmentService for DefaultCommitmentService {
         }
 
         // Reconstruct the signed message
-        let decision_bytes = serde_json::to_vec(&signed.decision)
-            .map_err(|e| PlatformError::SerializationError(format!("Failed to serialize decision: {}", e)))?;
+        let decision_bytes = serde_json::to_vec(&signed.decision).map_err(|e| {
+            PlatformError::SerializationError(format!("Failed to serialize decision: {}", e))
+        })?;
 
         let mut message = decision_bytes;
         message.extend_from_slice(&signed.signature.timestamp_ms.to_le_bytes());
@@ -261,10 +263,9 @@ impl CommitmentService for DefaultCommitmentService {
     }
 
     fn get_audit_trail(&self, workflow_id: &str) -> Result<Vec<SignedDecision>> {
-        let trail = self
-            .audit_trail
-            .read()
-            .map_err(|_| PlatformError::LockError("Failed to acquire audit trail read lock".to_string()))?;
+        let trail = self.audit_trail.read().map_err(|_| {
+            PlatformError::LockError("Failed to acquire audit trail read lock".to_string())
+        })?;
 
         Ok(trail.get(workflow_id).cloned().unwrap_or_default())
     }
@@ -298,7 +299,8 @@ impl CertificateAuthority {
 
         // Store key and certificate
         self.signing_keys.insert(agent_id.clone(), signing_key);
-        self.certificates.insert(agent_id.clone(), certificate.clone());
+        self.certificates
+            .insert(agent_id.clone(), certificate.clone());
 
         Ok(certificate)
     }
@@ -313,10 +315,9 @@ impl CertificateAuthority {
     }
 
     fn get_certificate(&self, agent_id: &AgentId) -> Result<Certificate> {
-        self.certificates
-            .get(agent_id)
-            .cloned()
-            .ok_or_else(|| PlatformError::NotFound(format!("Certificate for agent {} not found", agent_id)))
+        self.certificates.get(agent_id).cloned().ok_or_else(|| {
+            PlatformError::NotFound(format!("Certificate for agent {} not found", agent_id))
+        })
     }
 
     fn needs_rotation(&self, agent_id: &AgentId) -> Result<bool> {
@@ -344,13 +345,13 @@ impl SignedDecision {
         audit_trail: &Arc<RwLock<HashMap<String, Vec<SignedDecision>>>>,
     ) -> Result<()> {
         if let Some(workflow_id) = &self.workflow_id {
-            let mut trail = audit_trail
-                .write()
-                .map_err(|_| PlatformError::LockError("Failed to acquire audit trail write lock".to_string()))?;
+            let mut trail = audit_trail.write().map_err(|_| {
+                PlatformError::LockError("Failed to acquire audit trail write lock".to_string())
+            })?;
 
             trail
                 .entry(workflow_id.clone())
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(self.clone());
         }
         Ok(())
@@ -364,7 +365,6 @@ fn current_timestamp_ms() -> u64 {
         .expect("Time went backwards")
         .as_millis() as u64
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -616,7 +616,10 @@ mod tests {
 
         // Signatures should be different
         assert_ne!(signed1.signature.value, signed2.signature.value);
-        assert_ne!(signed1.certificate.public_key, signed2.certificate.public_key);
+        assert_ne!(
+            signed1.certificate.public_key,
+            signed2.certificate.public_key
+        );
 
         // Both should verify
         assert!(service.verify_signature(&signed1).unwrap());

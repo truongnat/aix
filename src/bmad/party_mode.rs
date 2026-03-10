@@ -145,9 +145,7 @@ impl PartyManager {
 /// Simple UUID generation
 fn uuid_simple() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
-    let duration = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap();
+    let duration = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     format!("{:x}-{:x}", duration.as_secs(), duration.subsec_nanos())
 }
 

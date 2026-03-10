@@ -3,11 +3,11 @@
 // This tier provides formal verification, adversarial testing,
 // and cryptographic commitment for trust and security.
 
-pub mod formal_verifier;
-pub mod verifiers;
 pub mod adversarial_tester;
 pub mod attack_vectors;
 pub mod commitment;
+pub mod formal_verifier;
+pub mod verifiers;
 
 #[cfg(test)]
 mod integration_tests;
@@ -25,6 +25,4 @@ pub use adversarial_tester::DefaultAdversarialTester;
 // Re-exports for built-in attack vectors
 
 // Re-exports for commitment service
-pub use commitment::{
-    CommitmentService, DefaultCommitmentService,
-};
+pub use commitment::{CommitmentService, DefaultCommitmentService};

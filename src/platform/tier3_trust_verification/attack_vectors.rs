@@ -6,7 +6,7 @@
 
 use super::adversarial_tester::{AttackIntensity, AttackVector, Vulnerability};
 use super::formal_verifier::{Artifact, ArtifactContent};
-use crate::platform::{types::Severity, Result, PlatformError};
+use crate::platform::{types::Severity, PlatformError, Result};
 
 /// SQL Injection attack vector
 ///
@@ -30,20 +30,35 @@ impl SQLInjectionAttackVector {
         // Patterns that indicate potential SQL injection
         let dangerous_patterns = match intensity {
             AttackIntensity::Light => vec![
-                ("execute(\"SELECT", "Direct string concatenation in SQL query"),
+                (
+                    "execute(\"SELECT",
+                    "Direct string concatenation in SQL query",
+                ),
                 ("query(\"SELECT", "Direct string concatenation in SQL query"),
             ],
             AttackIntensity::Moderate => vec![
-                ("execute(\"SELECT", "Direct string concatenation in SQL query"),
-                ("execute('SELECT", "Direct string concatenation in SQL query"),
+                (
+                    "execute(\"SELECT",
+                    "Direct string concatenation in SQL query",
+                ),
+                (
+                    "execute('SELECT",
+                    "Direct string concatenation in SQL query",
+                ),
                 ("query(\"SELECT", "Direct string concatenation in SQL query"),
                 ("query('SELECT", "Direct string concatenation in SQL query"),
                 (".raw(\"", "Raw SQL query without parameterization"),
                 (".raw('", "Raw SQL query without parameterization"),
             ],
             AttackIntensity::Aggressive => vec![
-                ("execute(\"SELECT", "Direct string concatenation in SQL query"),
-                ("execute('SELECT", "Direct string concatenation in SQL query"),
+                (
+                    "execute(\"SELECT",
+                    "Direct string concatenation in SQL query",
+                ),
+                (
+                    "execute('SELECT",
+                    "Direct string concatenation in SQL query",
+                ),
                 ("query(\"SELECT", "Direct string concatenation in SQL query"),
                 ("query('SELECT", "Direct string concatenation in SQL query"),
                 (".raw(\"", "Raw SQL query without parameterization"),
@@ -60,7 +75,7 @@ impl SQLInjectionAttackVector {
                 if line.contains(pattern) {
                     // Check if parameterization is used
                     let has_params = line.contains('?') || line.contains('$');
-                    
+
                     if !has_params {
                         let severity = if line.contains("user") || line.contains("input") {
                             Severity::Critical
@@ -299,16 +314,19 @@ impl HardcodedSecretsAttackVector {
 
         for (line_num, line) in content.lines().enumerate() {
             let line_lower = line.to_lowercase();
-            
+
             for (pattern, description) in &secret_patterns {
                 if line_lower.contains(pattern) {
                     // Check if it's an assignment with a string value
-                    let has_assignment = line.contains('=') && (line.contains('"') || line.contains('\''));
-                    
+                    let has_assignment =
+                        line.contains('=') && (line.contains('"') || line.contains('\''));
+
                     // Skip if it's a comment or environment variable reference
                     let is_comment = line.trim().starts_with("//") || line.trim().starts_with('#');
-                    let is_env_var = line.contains("env::var") || line.contains("getenv") || line.contains("process.env");
-                    
+                    let is_env_var = line.contains("env::var")
+                        || line.contains("getenv")
+                        || line.contains("process.env");
+
                     if has_assignment && !is_comment && !is_env_var {
                         vulnerabilities.push(Vulnerability::new(
                             Severity::Critical,
@@ -386,7 +404,7 @@ mod tests {
 
         let artifact = Artifact::from_inline("source_code", code);
         let vulns = vector.execute(&artifact, AttackIntensity::Light).unwrap();
-        
+
         // Should not find vulnerability with Light intensity (format! not in Light patterns)
         assert_eq!(vulns.len(), 0);
     }
@@ -402,10 +420,12 @@ mod tests {
         "#;
 
         let artifact = Artifact::from_inline("source_code", code);
-        let vulns = vector.execute(&artifact, AttackIntensity::Aggressive).unwrap();
-        
+        let vulns = vector
+            .execute(&artifact, AttackIntensity::Aggressive)
+            .unwrap();
+
         // Should find vulnerability with Aggressive intensity
-        assert!(vulns.len() > 0);
+        assert!(!vulns.is_empty());
         assert_eq!(vulns[0].vulnerability_type, "SQL Injection");
     }
 
@@ -419,8 +439,10 @@ mod tests {
         "#;
 
         let artifact = Artifact::from_inline("source_code", code);
-        let vulns = vector.execute(&artifact, AttackIntensity::Aggressive).unwrap();
-        
+        let vulns = vector
+            .execute(&artifact, AttackIntensity::Aggressive)
+            .unwrap();
+
         // Should not find vulnerability when parameterization is used
         assert_eq!(vulns.len(), 0);
     }
@@ -435,9 +457,11 @@ mod tests {
         "#;
 
         let artifact = Artifact::from_inline("javascript_code", code);
-        let vulns = vector.execute(&artifact, AttackIntensity::Moderate).unwrap();
-        
-        assert!(vulns.len() > 0);
+        let vulns = vector
+            .execute(&artifact, AttackIntensity::Moderate)
+            .unwrap();
+
+        assert!(!vulns.is_empty());
         assert_eq!(vulns[0].vulnerability_type, "Cross-Site Scripting (XSS)");
     }
 
@@ -451,8 +475,10 @@ mod tests {
         "#;
 
         let artifact = Artifact::from_inline("javascript_code", code);
-        let vulns = vector.execute(&artifact, AttackIntensity::Moderate).unwrap();
-        
+        let vulns = vector
+            .execute(&artifact, AttackIntensity::Moderate)
+            .unwrap();
+
         // Should not find vulnerability when sanitization is used
         assert_eq!(vulns.len(), 0);
     }
@@ -466,10 +492,14 @@ mod tests {
         "#;
 
         let artifact = Artifact::from_inline("source_code", code);
-        let vulns = vector.execute(&artifact, AttackIntensity::Moderate).unwrap();
-        
+        let vulns = vector
+            .execute(&artifact, AttackIntensity::Moderate)
+            .unwrap();
+
         assert!(vulns.len() >= 2);
-        assert!(vulns.iter().any(|v| v.vulnerability_type == "Hardcoded Secret"));
+        assert!(vulns
+            .iter()
+            .any(|v| v.vulnerability_type == "Hardcoded Secret"));
     }
 
     #[test]
@@ -481,8 +511,10 @@ mod tests {
         "#;
 
         let artifact = Artifact::from_inline("source_code", code);
-        let vulns = vector.execute(&artifact, AttackIntensity::Moderate).unwrap();
-        
+        let vulns = vector
+            .execute(&artifact, AttackIntensity::Moderate)
+            .unwrap();
+
         // Should not find vulnerability when using environment variables
         assert_eq!(vulns.len(), 0);
     }

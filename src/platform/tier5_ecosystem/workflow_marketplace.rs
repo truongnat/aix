@@ -187,7 +187,7 @@ pub struct AggregateRating {
     pub average_score: f64,
     pub total_ratings: usize,
     pub rating_distribution: HashMap<u8, usize>, // 1-5 stars -> count
-    scores: Vec<f64>, // Store actual scores for accurate average
+    scores: Vec<f64>,                            // Store actual scores for accurate average
 }
 
 impl AggregateRating {
@@ -278,7 +278,7 @@ impl InMemoryWorkflowMarketplace {
         for word in package.name.to_lowercase().split_whitespace() {
             self.search_index
                 .entry(word.to_string())
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(package.package_id.clone());
         }
 
@@ -286,7 +286,7 @@ impl InMemoryWorkflowMarketplace {
         for word in package.description.to_lowercase().split_whitespace() {
             self.search_index
                 .entry(word.to_string())
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(package.package_id.clone());
         }
 
@@ -294,14 +294,14 @@ impl InMemoryWorkflowMarketplace {
         for tag in &package.tags {
             self.search_index
                 .entry(tag.to_lowercase())
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(package.package_id.clone());
         }
 
         // Index by author
         self.search_index
             .entry(package.author.to_lowercase())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(package.package_id.clone());
     }
 
@@ -312,15 +312,13 @@ impl InMemoryWorkflowMarketplace {
             return true;
         }
 
-        if constraint.starts_with("^") {
+        if let Some(constraint_version) = constraint.strip_prefix("^") {
             // Caret: compatible with version
-            let constraint_version = &constraint[1..];
             return version.starts_with(constraint_version);
         }
 
-        if constraint.starts_with("~") {
+        if let Some(constraint_version) = constraint.strip_prefix("~") {
             // Tilde: approximately equivalent
-            let constraint_version = &constraint[1..];
             return version.starts_with(constraint_version);
         }
 
@@ -354,10 +352,7 @@ impl InMemoryWorkflowMarketplace {
 
             // Find matching version
             let versions = self.packages.get(&dep.package_id).ok_or_else(|| {
-                PlatformError::DependencyError(format!(
-                    "Dependency not found: {}",
-                    dep.package_id
-                ))
+                PlatformError::DependencyError(format!("Dependency not found: {}", dep.package_id))
             })?;
 
             let matching_version = versions
@@ -403,10 +398,7 @@ impl InMemoryWorkflowMarketplace {
 
         // Check tags
         if !query.tags.is_empty() {
-            let has_tag = query
-                .tags
-                .iter()
-                .any(|tag| package.tags.contains(tag));
+            let has_tag = query.tags.iter().any(|tag| package.tags.contains(tag));
 
             if !has_tag {
                 return false;
@@ -485,7 +477,7 @@ impl WorkflowMarketplace for InMemoryWorkflowMarketplace {
         let package_id = workflow.package_id.clone();
         self.packages
             .entry(package_id.clone())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(workflow);
 
         Ok(package_id)
@@ -538,7 +530,9 @@ impl WorkflowMarketplace for InMemoryWorkflowMarketplace {
                 })
                 .unwrap_or(0.0);
 
-            rating_b.partial_cmp(&rating_a).unwrap_or(std::cmp::Ordering::Equal)
+            rating_b
+                .partial_cmp(&rating_a)
+                .unwrap_or(std::cmp::Ordering::Equal)
         });
 
         Ok(results)
@@ -547,9 +541,10 @@ impl WorkflowMarketplace for InMemoryWorkflowMarketplace {
     /// Subtask 20.4: Implement workflow installation with dependency resolution
     fn install_workflow(&mut self, package_id: &PackageId, version: &str) -> Result<()> {
         // Find the package
-        let versions = self.packages.get(package_id).ok_or_else(|| {
-            PlatformError::NotFound(format!("Package not found: {}", package_id))
-        })?;
+        let versions = self
+            .packages
+            .get(package_id)
+            .ok_or_else(|| PlatformError::NotFound(format!("Package not found: {}", package_id)))?;
 
         let package = versions
             .iter()
@@ -574,7 +569,8 @@ impl WorkflowMarketplace for InMemoryWorkflowMarketplace {
         }
 
         // Install the package itself
-        self.installed.insert(package_id.clone(), version.to_string());
+        self.installed
+            .insert(package_id.clone(), version.to_string());
 
         Ok(())
     }
@@ -615,9 +611,10 @@ impl WorkflowMarketplace for InMemoryWorkflowMarketplace {
     }
 
     fn get_workflow(&self, package_id: &PackageId, version: &str) -> Result<WorkflowPackage> {
-        let versions = self.packages.get(package_id).ok_or_else(|| {
-            PlatformError::NotFound(format!("Package not found: {}", package_id))
-        })?;
+        let versions = self
+            .packages
+            .get(package_id)
+            .ok_or_else(|| PlatformError::NotFound(format!("Package not found: {}", package_id)))?;
 
         versions
             .iter()
@@ -697,9 +694,9 @@ impl WorkflowPackageBuilder {
     }
 
     pub fn build(self) -> Result<WorkflowPackage> {
-        let package_id = self.package_id.unwrap_or_else(|| {
-            PackageId::new(format!("{}_{}", self.name, self.version)).unwrap()
-        });
+        let package_id = self
+            .package_id
+            .unwrap_or_else(|| PackageId::new(format!("{}_{}", self.name, self.version)).unwrap());
 
         let mut package = WorkflowPackage::new(
             package_id,
@@ -1155,8 +1152,8 @@ mod tests {
 
 #[cfg(test)]
 mod integration_tests {
-    use super::*;
     use super::tests::create_test_package;
+    use super::*;
 
     #[test]
     fn test_complete_marketplace_workflow() {

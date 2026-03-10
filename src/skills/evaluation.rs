@@ -34,8 +34,8 @@ pub struct DimensionScores {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Score {
-    pub value: f32,    // 0.0 - 1.0
-    pub weight: f32,   // Default 1.0
+    pub value: f32,  // 0.0 - 1.0
+    pub weight: f32, // Default 1.0
     pub notes: String,
 }
 
@@ -97,7 +97,7 @@ impl SkillEvaluator {
 
         let num_cases = test_cases.len() as f32;
 
-        for (_i, (test_case, actual)) in test_cases.iter().zip(actual_outputs.iter()).enumerate() {
+        for (test_case, actual) in test_cases.iter().zip(actual_outputs.iter()) {
             // Correctness: Does output match expected?
             let correctness = Self::evaluate_correctness(test_case, actual);
             correctness_total += correctness.value;
@@ -171,13 +171,41 @@ impl SkillEvaluator {
         }
 
         let dimensions = DimensionScores {
-            correctness: Score { value: correctness_total / num_cases, weight: 1.0, notes: "".to_string() },
-            completeness: Score { value: completeness_total / num_cases, weight: 1.0, notes: "".to_string() },
-            format: Score { value: format_total / num_cases, weight: 1.0, notes: "".to_string() },
-            adherence: Score { value: adherence_total / num_cases, weight: 1.0, notes: "".to_string() },
-            safety: Score { value: safety_total / num_cases, weight: 1.5, notes: "".to_string() }, // Safety weighted higher
-            efficiency: Score { value: efficiency_total / num_cases, weight: 0.8, notes: "".to_string() },
-            robustness: Score { value: robustness_total / num_cases, weight: 1.0, notes: "".to_string() },
+            correctness: Score {
+                value: correctness_total / num_cases,
+                weight: 1.0,
+                notes: "".to_string(),
+            },
+            completeness: Score {
+                value: completeness_total / num_cases,
+                weight: 1.0,
+                notes: "".to_string(),
+            },
+            format: Score {
+                value: format_total / num_cases,
+                weight: 1.0,
+                notes: "".to_string(),
+            },
+            adherence: Score {
+                value: adherence_total / num_cases,
+                weight: 1.0,
+                notes: "".to_string(),
+            },
+            safety: Score {
+                value: safety_total / num_cases,
+                weight: 1.5,
+                notes: "".to_string(),
+            }, // Safety weighted higher
+            efficiency: Score {
+                value: efficiency_total / num_cases,
+                weight: 0.8,
+                notes: "".to_string(),
+            },
+            robustness: Score {
+                value: robustness_total / num_cases,
+                weight: 1.0,
+                notes: "".to_string(),
+            },
         };
 
         let weighted_sum = dimensions.correctness.weighted()
@@ -215,12 +243,24 @@ impl SkillEvaluator {
         if let Some(expected) = &test_case.expected_output {
             // Simple string match (can be enhanced with fuzzy matching)
             if actual.contains(expected) || expected.contains(actual) {
-                Score { value: 1.0, weight: 1.0, notes: "Output matches expected".to_string() }
+                Score {
+                    value: 1.0,
+                    weight: 1.0,
+                    notes: "Output matches expected".to_string(),
+                }
             } else {
-                Score { value: 0.3, weight: 1.0, notes: "Output does not match expected".to_string() }
+                Score {
+                    value: 0.3,
+                    weight: 1.0,
+                    notes: "Output does not match expected".to_string(),
+                }
             }
         } else {
-            Score { value: 0.5, weight: 1.0, notes: "No expected output for comparison".to_string() }
+            Score {
+                value: 0.5,
+                weight: 1.0,
+                notes: "No expected output for comparison".to_string(),
+            }
         }
     }
 
@@ -228,7 +268,11 @@ impl SkillEvaluator {
     fn evaluate_completeness(test_case: &TestCase, actual: &str) -> Score {
         let required_elements = &test_case.required_elements;
         if required_elements.is_empty() {
-            return Score { value: 1.0, weight: 1.0, notes: "No required elements specified".to_string() };
+            return Score {
+                value: 1.0,
+                weight: 1.0,
+                notes: "No required elements specified".to_string(),
+            };
         }
 
         let mut found = 0;
@@ -242,7 +286,11 @@ impl SkillEvaluator {
         Score {
             value: completeness,
             weight: 1.0,
-            notes: format!("Found {}/{} required elements", found, required_elements.len()),
+            notes: format!(
+                "Found {}/{} required elements",
+                found,
+                required_elements.len()
+            ),
         }
     }
 
@@ -273,7 +321,11 @@ impl SkillEvaluator {
                 notes: format!("Format requirements: {}/{}", matches, total),
             }
         } else {
-            Score { value: 1.0, weight: 1.0, notes: "No format requirements".to_string() }
+            Score {
+                value: 1.0,
+                weight: 1.0,
+                notes: "No format requirements".to_string(),
+            }
         }
     }
 
@@ -289,7 +341,9 @@ impl SkillEvaluator {
                         adherence_score -= 0.3;
                     }
                 }
-                if constraint.must_contain.is_some() && !constraint.must_contain.clone().unwrap().is_empty() {
+                if constraint.must_contain.is_some()
+                    && !constraint.must_contain.clone().unwrap().is_empty()
+                {
                     // Check if required content is present
                     adherence_score -= 0.0; // Placeholder
                 }
@@ -324,9 +378,17 @@ impl SkillEvaluator {
         }
 
         if has_harmful {
-            Score { value: 0.0, weight: 1.5, notes: "Potentially harmful content detected".to_string() }
+            Score {
+                value: 0.0,
+                weight: 1.5,
+                notes: "Potentially harmful content detected".to_string(),
+            }
         } else {
-            Score { value: 1.0, weight: 1.5, notes: "No harmful content detected".to_string() }
+            Score {
+                value: 1.0,
+                weight: 1.5,
+                notes: "No harmful content detected".to_string(),
+            }
         }
     }
 
@@ -337,7 +399,11 @@ impl SkillEvaluator {
         let actual_length = actual.len();
 
         if actual_length == 0 {
-            return Score { value: 0.0, weight: 0.8, notes: "Empty output".to_string() };
+            return Score {
+                value: 0.0,
+                weight: 0.8,
+                notes: "Empty output".to_string(),
+            };
         }
 
         let efficiency: f32 = if actual_length <= optimal_length {
@@ -349,7 +415,10 @@ impl SkillEvaluator {
         Score {
             value: efficiency,
             weight: 0.8,
-            notes: format!("Output length: {} (optimal: {})", actual_length, optimal_length),
+            notes: format!(
+                "Output length: {} (optimal: {})",
+                actual_length, optimal_length
+            ),
         }
     }
 
@@ -378,7 +447,11 @@ impl SkillEvaluator {
         Score {
             value: robustness,
             weight: 1.0,
-            notes: if test_case.is_edge_case { "Edge case handling evaluated".to_string() } else { "Normal case".to_string() },
+            notes: if test_case.is_edge_case {
+                "Edge case handling evaluated".to_string()
+            } else {
+                "Normal case".to_string()
+            },
         }
     }
 
@@ -386,22 +459,27 @@ impl SkillEvaluator {
         let mut recommendations = Vec::new();
 
         if dimensions.correctness.value < 0.7 {
-            recommendations.push("Review logic and ensure output matches expected results".to_string());
+            recommendations
+                .push("Review logic and ensure output matches expected results".to_string());
         }
         if dimensions.completeness.value < 0.7 {
-            recommendations.push("Add missing elements or steps to make output complete".to_string());
+            recommendations
+                .push("Add missing elements or steps to make output complete".to_string());
         }
         if dimensions.format.value < 0.7 {
             recommendations.push("Follow output format specification more strictly".to_string());
         }
         if dimensions.adherence.value < 0.7 {
-            recommendations.push("Ensure all constraints and instructions are followed".to_string());
+            recommendations
+                .push("Ensure all constraints and instructions are followed".to_string());
         }
         if dimensions.safety.value < 0.7 {
-            recommendations.push("CRITICAL: Review output for safety issues before returning".to_string());
+            recommendations
+                .push("CRITICAL: Review output for safety issues before returning".to_string());
         }
         if dimensions.efficiency.value < 0.7 {
-            recommendations.push("Optimize output to be more concise while maintaining quality".to_string());
+            recommendations
+                .push("Optimize output to be more concise while maintaining quality".to_string());
         }
         if dimensions.robustness.value < 0.7 {
             recommendations.push("Add error handling and edge case support".to_string());
@@ -449,18 +527,16 @@ mod tests {
 
     #[test]
     fn test_evaluation() {
-        let test_cases = vec![
-            TestCase {
-                name: "Basic test".to_string(),
-                input: "test".to_string(),
-                expected_output: Some("result".to_string()),
-                required_elements: vec![],
-                format_requirements: None,
-                constraints: None,
-                is_edge_case: false,
-                optimal_length: Some(100),
-            }
-        ];
+        let test_cases = vec![TestCase {
+            name: "Basic test".to_string(),
+            input: "test".to_string(),
+            expected_output: Some("result".to_string()),
+            required_elements: vec![],
+            format_requirements: None,
+            constraints: None,
+            is_edge_case: false,
+            optimal_length: Some(100),
+        }];
 
         let actual_outputs = vec!["result".to_string()];
 

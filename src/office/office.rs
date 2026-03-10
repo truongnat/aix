@@ -24,14 +24,40 @@ pub enum ExecutionMode {
 /// Office event for monitoring
 #[derive(Debug, Clone)]
 pub enum OfficeEvent {
-    TaskAssigned { task_id: String, role: Role },
-    TaskStarted { task_id: String, role: Role },
-    TaskCompleted { task_id: String, role: Role },
-    TaskFailed { task_id: String, role: Role, error: String },
-    TaskPaused { task_id: String, role: Role },
-    TaskResumed { task_id: String, role: Role },
-    AgentMessage { from: Role, to: Role, content: String },
-    AgentStateChanged { role: Role, state: AgentState },
+    TaskAssigned {
+        task_id: String,
+        role: Role,
+    },
+    TaskStarted {
+        task_id: String,
+        role: Role,
+    },
+    TaskCompleted {
+        task_id: String,
+        role: Role,
+    },
+    TaskFailed {
+        task_id: String,
+        role: Role,
+        error: String,
+    },
+    TaskPaused {
+        task_id: String,
+        role: Role,
+    },
+    TaskResumed {
+        task_id: String,
+        role: Role,
+    },
+    AgentMessage {
+        from: Role,
+        to: Role,
+        content: String,
+    },
+    AgentStateChanged {
+        role: Role,
+        state: AgentState,
+    },
 }
 
 /// Office statistics
@@ -294,7 +320,8 @@ impl Office {
             if let Some(target) = self.agents.get_mut(&to) {
                 target.receive_message(msg);
             }
-            self.events.push(OfficeEvent::AgentMessage { from, to, content });
+            self.events
+                .push(OfficeEvent::AgentMessage { from, to, content });
         }
     }
 
@@ -346,14 +373,18 @@ impl Office {
             stats.pending_tasks,
             stats.in_progress_tasks
         );
-        println!("Mode: {:?} | Running: {} | Paused: {}", self.mode, self.running, self.paused);
+        println!(
+            "Mode: {:?} | Running: {} | Paused: {}",
+            self.mode, self.running, self.paused
+        );
         println!();
 
         // Print each agent
         for (role, agent) in &self.agents {
             let color = role.color();
             println!("{}{}: {}", color, role.description(), Role::reset_color());
-            println!("   State: {:?} | Pending: {} | Completed: {} | Failed: {}",
+            println!(
+                "   State: {:?} | Pending: {} | Completed: {} | Failed: {}",
                 agent.state,
                 agent.pending_tasks(),
                 agent.total_completed(),

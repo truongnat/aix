@@ -3,7 +3,9 @@
 //! This skill extracts main content from web pages by removing clutter.
 
 use crate::engine::context::ExecutionContext;
-use crate::skill::capability::{SkillCapability, SkillIOType, CapabilityPermissions, SideEffectClass};
+use crate::skill::capability::{
+    CapabilityPermissions, SideEffectClass, SkillCapability, SkillIOType,
+};
 use crate::skill::io::{SkillInput, SkillOutput};
 use crate::skill::Skill;
 use anyhow::{anyhow, Result};
@@ -57,7 +59,9 @@ impl DefuddleSkill {
             cmd.arg("--debug");
         }
 
-        let output = cmd.output().map_err(|e| anyhow!("Failed to execute: {}", e))?;
+        let output = cmd
+            .output()
+            .map_err(|e| anyhow!("Failed to execute: {}", e))?;
 
         if output.status.success() {
             Ok(String::from_utf8_lossy(&output.stdout).to_string())
@@ -67,7 +71,7 @@ impl DefuddleSkill {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct DefuddleInput {
     pub source: Option<String>,
     pub url: Option<String>,
@@ -76,20 +80,6 @@ pub struct DefuddleInput {
     pub property: Option<String>,
     pub output: Option<String>,
     pub debug: bool,
-}
-
-impl Default for DefuddleInput {
-    fn default() -> Self {
-        Self {
-            source: None,
-            url: None,
-            markdown: false,
-            json: false,
-            property: None,
-            output: None,
-            debug: false,
-        }
-    }
 }
 
 #[async_trait]
@@ -104,13 +94,7 @@ impl Skill for DefuddleSkill {
             "Extract main content from web pages using Defuddle",
             SkillIOType::Json,
             SkillIOType::Text,
-            CapabilityPermissions::new(
-                false,
-                false,
-                true,
-                false,
-                true,
-            ),
+            CapabilityPermissions::new(false, false, true, false, true),
             SideEffectClass::ExternalMutation,
         )
     }

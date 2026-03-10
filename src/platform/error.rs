@@ -13,32 +13,32 @@ pub enum PlatformError {
     ReplanFailed(String),
     CausalTracingError(String),
     FeedbackCollectionError(String),
-    
+
     // Tier 2: Multi-Agent Coordination errors
     NegotiationError(String),
     SharedMemoryError(String),
     CRDTMergeConflict(String),
     MarketplaceError(String),
-    
+
     // Tier 3: Trust & Verification errors
     VerificationFailed(String),
     AdversarialTestFailed(String),
     SignatureError(String),
     CertificateError(String),
-    
+
     // Tier 4: Organizational Scale errors
     CostTrackingError(String),
     BudgetExceeded { current: f64, threshold: f64 },
     HumanReviewTimeout(String),
     TenantIsolationViolation(String),
     ResourceLimitExceeded(String),
-    
+
     // Tier 5: Ecosystem errors
     BenchmarkError(String),
     DiffLearningError(String),
     MarketplacePublishError(String),
     DependencyError(String),
-    
+
     // Common errors
     ConfigurationError(String),
     InvalidInput(String),
@@ -57,35 +57,49 @@ impl fmt::Display for PlatformError {
             PlatformError::PlanningError(msg) => write!(f, "Planning error: {}", msg),
             PlatformError::ReplanFailed(msg) => write!(f, "Replan failed: {}", msg),
             PlatformError::CausalTracingError(msg) => write!(f, "Causal tracing error: {}", msg),
-            PlatformError::FeedbackCollectionError(msg) => write!(f, "Feedback collection error: {}", msg),
-            
+            PlatformError::FeedbackCollectionError(msg) => {
+                write!(f, "Feedback collection error: {}", msg)
+            }
+
             // Tier 2
             PlatformError::NegotiationError(msg) => write!(f, "Negotiation error: {}", msg),
             PlatformError::SharedMemoryError(msg) => write!(f, "Shared memory error: {}", msg),
             PlatformError::CRDTMergeConflict(msg) => write!(f, "CRDT merge conflict: {}", msg),
             PlatformError::MarketplaceError(msg) => write!(f, "Marketplace error: {}", msg),
-            
+
             // Tier 3
             PlatformError::VerificationFailed(msg) => write!(f, "Verification failed: {}", msg),
-            PlatformError::AdversarialTestFailed(msg) => write!(f, "Adversarial test failed: {}", msg),
+            PlatformError::AdversarialTestFailed(msg) => {
+                write!(f, "Adversarial test failed: {}", msg)
+            }
             PlatformError::SignatureError(msg) => write!(f, "Signature error: {}", msg),
             PlatformError::CertificateError(msg) => write!(f, "Certificate error: {}", msg),
-            
+
             // Tier 4
             PlatformError::CostTrackingError(msg) => write!(f, "Cost tracking error: {}", msg),
             PlatformError::BudgetExceeded { current, threshold } => {
-                write!(f, "Budget exceeded: current cost ${:.2} exceeds threshold ${:.2}", current, threshold)
+                write!(
+                    f,
+                    "Budget exceeded: current cost ${:.2} exceeds threshold ${:.2}",
+                    current, threshold
+                )
             }
             PlatformError::HumanReviewTimeout(msg) => write!(f, "Human review timeout: {}", msg),
-            PlatformError::TenantIsolationViolation(msg) => write!(f, "Tenant isolation violation: {}", msg),
-            PlatformError::ResourceLimitExceeded(msg) => write!(f, "Resource limit exceeded: {}", msg),
-            
+            PlatformError::TenantIsolationViolation(msg) => {
+                write!(f, "Tenant isolation violation: {}", msg)
+            }
+            PlatformError::ResourceLimitExceeded(msg) => {
+                write!(f, "Resource limit exceeded: {}", msg)
+            }
+
             // Tier 5
             PlatformError::BenchmarkError(msg) => write!(f, "Benchmark error: {}", msg),
             PlatformError::DiffLearningError(msg) => write!(f, "Diff learning error: {}", msg),
-            PlatformError::MarketplacePublishError(msg) => write!(f, "Marketplace publish error: {}", msg),
+            PlatformError::MarketplacePublishError(msg) => {
+                write!(f, "Marketplace publish error: {}", msg)
+            }
             PlatformError::DependencyError(msg) => write!(f, "Dependency error: {}", msg),
-            
+
             // Common
             PlatformError::ConfigurationError(msg) => write!(f, "Configuration error: {}", msg),
             PlatformError::InvalidInput(msg) => write!(f, "Invalid input: {}", msg),

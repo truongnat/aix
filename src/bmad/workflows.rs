@@ -83,7 +83,11 @@ fn sprint_planning_workflow() -> WorkflowDefinition {
         id: "sprint-planning".to_string(),
         name: "Sprint Planning".to_string(),
         description: "Plan the upcoming sprint with backlog refinement and commitment".to_string(),
-        agents: vec![BmadAgent::ProductManager, BmadAgent::ScrumMaster, BmadAgent::Developer],
+        agents: vec![
+            BmadAgent::ProductManager,
+            BmadAgent::ScrumMaster,
+            BmadAgent::Developer,
+        ],
         steps: vec![
             WorkflowStep {
                 name: "backlog_review".to_string(),
@@ -126,7 +130,11 @@ fn standup_workflow() -> WorkflowDefinition {
         id: "standup".to_string(),
         name: "Daily Standup".to_string(),
         description: "Daily sync meeting for sprint progress".to_string(),
-        agents: vec![BmadAgent::ScrumMaster, BmadAgent::Developer, BmadAgent::QaEngineer],
+        agents: vec![
+            BmadAgent::ScrumMaster,
+            BmadAgent::Developer,
+            BmadAgent::QaEngineer,
+        ],
         steps: vec![
             WorkflowStep {
                 name: "yesterday".to_string(),
@@ -157,7 +165,11 @@ fn retrospective_workflow() -> WorkflowDefinition {
         id: "retrospective".to_string(),
         name: "Sprint Retrospective".to_string(),
         description: "Reflect on the sprint and identify improvements".to_string(),
-        agents: vec![BmadAgent::ScrumMaster, BmadAgent::Developer, BmadAgent::QaEngineer],
+        agents: vec![
+            BmadAgent::ScrumMaster,
+            BmadAgent::Developer,
+            BmadAgent::QaEngineer,
+        ],
         steps: vec![
             WorkflowStep {
                 name: "what_went_well".to_string(),

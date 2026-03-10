@@ -161,7 +161,11 @@ impl From<&Office> for OfficeState {
                     content: None,
                     error: None,
                 },
-                OfficeEvent::TaskFailed { task_id, role, error } => OfficeEventData {
+                OfficeEvent::TaskFailed {
+                    task_id,
+                    role,
+                    error,
+                } => OfficeEventData {
                     variant: "TaskFailed".to_string(),
                     task_id: Some(task_id.clone()),
                     role: Some(format!("{:?}", role)),
@@ -309,7 +313,7 @@ impl OfficeStateStore {
         }
 
         // Load tasks
-        for (_id, task_data) in &state.tasks {
+        for task_data in state.tasks.values() {
             let status = match task_data.status.as_str() {
                 "Pending" => TaskStatus::Pending,
                 "InProgress" => TaskStatus::InProgress,

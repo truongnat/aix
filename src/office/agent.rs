@@ -58,7 +58,11 @@ impl OfficeAgent {
             completed_tasks: Vec::new(),
             failed_tasks: Vec::new(),
             messages: Vec::new(),
-            skills: role.typical_skills().iter().map(|s| s.to_string()).collect(),
+            skills: role
+                .typical_skills()
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
         }
     }
 
@@ -126,7 +130,7 @@ impl OfficeAgent {
 
     /// Send a message to another agent
     pub fn send_message(&mut self, to: Role, content: String) -> AgentMessage {
-        let msg = AgentMessage {
+        AgentMessage {
             from: self.role,
             to,
             content,
@@ -134,8 +138,7 @@ impl OfficeAgent {
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_millis() as u64,
-        };
-        msg
+        }
     }
 
     /// Receive a message
@@ -166,9 +169,9 @@ impl OfficeAgent {
     /// Get status summary
     pub fn status_summary(&self) -> String {
         format!(
-            "{}: {} ({} pending, {} completed, {} failed)",
+            "{}: {:?} ({} pending, {} completed, {} failed)",
             self.name,
-            format!("{:?}", self.state),
+            self.state,
             self.pending_tasks(),
             self.total_completed(),
             self.total_failed()

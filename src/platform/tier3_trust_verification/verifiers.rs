@@ -4,8 +4,10 @@
 // security and quality checks. These verifiers can be used to validate agent claims
 // about code security, test coverage, and credential scanning.
 
-use super::formal_verifier::{Artifact, ArtifactContent, Claim, ClaimType, ToolVerifier, VerificationResult};
-use crate::platform::{types::Evidence, Result, PlatformError};
+use super::formal_verifier::{
+    Artifact, ArtifactContent, Claim, ClaimType, ToolVerifier, VerificationResult,
+};
+use crate::platform::{types::Evidence, PlatformError, Result};
 
 /// NoSQLInjection verifier using SAST integration
 ///
@@ -128,17 +130,17 @@ impl AllTestsPassVerifier {
     fn run_tests(&self, content: &str) -> Result<TestResults> {
         // Simple simulation for demonstration
         // In production, this would execute actual test commands
-        
+
         let test_count = content.matches("#[test]").count();
-        
+
         // Simulate test execution
         // Check for obvious test failures in comments or assertions
         let failed_tests = content
             .lines()
             .filter(|line| {
-                line.contains("// FAIL") || 
-                line.contains("assert!(false") ||
-                line.contains("panic!")
+                line.contains("// FAIL")
+                    || line.contains("assert!(false")
+                    || line.contains("panic!")
             })
             .count();
 
@@ -238,14 +240,17 @@ impl CodeCoverageVerifier {
     fn measure_coverage(&self, content: &str) -> Result<CoverageMetrics> {
         // Simple simulation for demonstration
         // In production, this would use actual coverage tools
-        
-        let total_lines = content.lines().filter(|line| {
-            let trimmed = line.trim();
-            !trimmed.is_empty() && 
-            !trimmed.starts_with("//") && 
-            !trimmed.starts_with("/*") &&
-            !trimmed.starts_with('*')
-        }).count();
+
+        let total_lines = content
+            .lines()
+            .filter(|line| {
+                let trimmed = line.trim();
+                !trimmed.is_empty()
+                    && !trimmed.starts_with("//")
+                    && !trimmed.starts_with("/*")
+                    && !trimmed.starts_with('*')
+            })
+            .count();
 
         // Simulate coverage by checking for test markers
         let test_markers = content.matches("#[test]").count();
@@ -291,7 +296,7 @@ impl ToolVerifier for CodeCoverageVerifier {
             }
         };
 
-        if threshold < 0.0 || threshold > 100.0 {
+        if !(0.0..=100.0).contains(&threshold) {
             return Err(PlatformError::InvalidInput(
                 "Coverage threshold must be between 0.0 and 100.0".to_string(),
             ));
@@ -376,17 +381,18 @@ impl NoSecretsVerifier {
 
         for (line_num, line) in content.lines().enumerate() {
             let line_lower = line.to_lowercase();
-            
+
             for (pattern, secret_type) in &patterns {
                 // Simple substring matching for demonstration
                 // In production, use regex or dedicated secret scanning tools
                 if line_lower.contains(pattern) && line.contains('=') && line.contains('"') {
                     // Skip if it's a comment or example
-                    if !line.trim().starts_with("//") && 
-                       !line.trim().starts_with('#') &&
-                       !line.contains("example") &&
-                       !line.contains("placeholder") &&
-                       !line.contains("env::var") {
+                    if !line.trim().starts_with("//")
+                        && !line.trim().starts_with('#')
+                        && !line.contains("example")
+                        && !line.contains("placeholder")
+                        && !line.contains("env::var")
+                    {
                         findings.push(SecretFinding {
                             line_number: line_num + 1,
                             secret_type: secret_type.to_string(),
@@ -448,10 +454,7 @@ impl ToolVerifier for NoSecretsVerifier {
                 "Secrets detected:\n{}",
                 findings
                     .iter()
-                    .map(|f| format!(
-                        "Line {}: {} - {}",
-                        f.line_number, f.secret_type, f.context
-                    ))
+                    .map(|f| format!("Line {}: {} - {}", f.line_number, f.secret_type, f.context))
                     .collect::<Vec<_>>()
                     .join("\n")
             );
@@ -481,12 +484,8 @@ mod tests {
     #[test]
     fn test_no_sql_injection_verifier_clean_code() {
         let verifier = NoSQLInjectionVerifier::new();
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSQLInjection,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let claim =
+            Claim::new("test_claim", ClaimType::NoSQLInjection, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline(
             "source_code",
@@ -504,12 +503,8 @@ mod tests {
     #[test]
     fn test_no_sql_injection_verifier_vulnerable_code() {
         let verifier = NoSQLInjectionVerifier::new();
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSQLInjection,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let claim =
+            Claim::new("test_claim", ClaimType::NoSQLInjection, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline(
             "source_code",
@@ -527,12 +522,7 @@ mod tests {
     #[test]
     fn test_all_tests_pass_verifier_passing_tests() {
         let verifier = AllTestsPassVerifier::new();
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::AllTestsPass,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let claim = Claim::new("test_claim", ClaimType::AllTestsPass, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline(
             "source_code",
@@ -556,12 +546,7 @@ mod tests {
     #[test]
     fn test_all_tests_pass_verifier_failing_tests() {
         let verifier = AllTestsPassVerifier::new();
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::AllTestsPass,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let claim = Claim::new("test_claim", ClaimType::AllTestsPass, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline(
             "source_code",
@@ -586,12 +571,7 @@ mod tests {
     #[test]
     fn test_all_tests_pass_verifier_no_tests() {
         let verifier = AllTestsPassVerifier::new();
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::AllTestsPass,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let claim = Claim::new("test_claim", ClaimType::AllTestsPass, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline(
             "source_code",
@@ -614,7 +594,8 @@ mod tests {
             ClaimType::CodeCoverage { threshold: 50.0 },
             "test_agent",
             0.95,
-        ).unwrap();
+        )
+        .unwrap();
 
         let artifact = Artifact::from_inline(
             "source_code",
@@ -642,7 +623,8 @@ mod tests {
             ClaimType::CodeCoverage { threshold: 90.0 },
             "test_agent",
             0.95,
-        ).unwrap();
+        )
+        .unwrap();
 
         let artifact = Artifact::from_inline(
             "source_code",
@@ -673,12 +655,7 @@ mod tests {
     #[test]
     fn test_no_secrets_verifier_clean_code() {
         let verifier = NoSecretsVerifier::new();
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSecrets,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let claim = Claim::new("test_claim", ClaimType::NoSecrets, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline(
             "source_code",
@@ -697,12 +674,7 @@ mod tests {
     #[test]
     fn test_no_secrets_verifier_with_secrets() {
         let verifier = NoSecretsVerifier::new();
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::NoSecrets,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let claim = Claim::new("test_claim", ClaimType::NoSecrets, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline(
             "source_code",
@@ -721,12 +693,7 @@ mod tests {
     #[test]
     fn test_verifier_wrong_claim_type() {
         let verifier = NoSQLInjectionVerifier::new();
-        let claim = Claim::new(
-            "test_claim",
-            ClaimType::AllTestsPass,
-            "test_agent",
-            0.95,
-        ).unwrap();
+        let claim = Claim::new("test_claim", ClaimType::AllTestsPass, "test_agent", 0.95).unwrap();
 
         let artifact = Artifact::from_inline("source_code", "fn main() {}");
 

@@ -45,7 +45,9 @@ pub(super) async fn run_impl() -> Result<()> {
             WorkflowLaunchAction::StartOffice(request) => {
                 use crate::office::runtime::OfficeRuntime;
 
-                let project_root = project_layout.agents_root.parent()
+                let project_root = project_layout
+                    .agents_root
+                    .parent()
                     .map(|p| p.to_string_lossy().to_string())
                     .unwrap_or_else(|| ".".to_string());
 

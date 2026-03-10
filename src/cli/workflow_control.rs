@@ -8,240 +8,240 @@ pub(super) fn handle_workflow_control_command(
 ) -> Result<WorkflowLaunchAction> {
     match command {
         Commands::Workflow { action } => match action {
-        WorkflowCommand::List => {
-            let instances = state_store.list_instances()?;
-            if instances.is_empty() {
-                println!("No workflow instances found.");
-                return Ok(WorkflowLaunchAction::Noop);
-            }
-            println!("Workflow Instances:");
-            for item in instances {
-                println!(
-                    "- {} status={:?} workflow={} updated_at={}",
-                    item.instance_id, item.status, item.workflow_name, item.updated_at_ms
-                );
-            }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Status { id } => {
-            if let Some(instance_id) = id {
-                let instance = state_store.load(&instance_id)?;
-                print_instance_summary(&instance);
-                return Ok(WorkflowLaunchAction::Noop);
-            }
-            let instances = state_store.list_instances()?;
-            if instances.is_empty() {
-                println!("No workflow instances found.");
-                return Ok(WorkflowLaunchAction::Noop);
-            }
-            println!("Workflow Instances:");
-            for item in instances {
-                println!(
-                    "- {} status={:?} workflow={} current_step={} updated_at={}",
-                    item.instance_id,
-                    item.status,
-                    item.workflow_name,
-                    item.current_step,
-                    item.updated_at_ms
-                );
-            }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Abort { id } => {
-            state_store.request_abort(&id)?;
-            if let Ok(mut instance) = state_store.load(&id) {
-                if instance.status == WorkflowInstanceStatus::Pending
-                    || instance.status == WorkflowInstanceStatus::Running
-                    || instance.status == WorkflowInstanceStatus::Paused
-                {
-                    instance.status = WorkflowInstanceStatus::Aborted;
-                    instance.last_error = Some("Abort requested by operator".to_string());
-                    state_store.save(&mut instance)?;
+            WorkflowCommand::List => {
+                let instances = state_store.list_instances()?;
+                if instances.is_empty() {
+                    println!("No workflow instances found.");
+                    return Ok(WorkflowLaunchAction::Noop);
                 }
+                println!("Workflow Instances:");
+                for item in instances {
+                    println!(
+                        "- {} status={:?} workflow={} updated_at={}",
+                        item.instance_id, item.status, item.workflow_name, item.updated_at_ms
+                    );
+                }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            println!("Abort requested for workflow instance '{}'.", id);
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Approve { id, step, by, note } => {
-            let instance = state_store.load(&id)?;
-            if !instance.step_order.iter().any(|entry| entry == &step) {
-                return Err(anyhow!(
-                    "step '{}' not found in workflow instance '{}'",
-                    step,
-                    id
-                ));
+            WorkflowCommand::Status { id } => {
+                if let Some(instance_id) = id {
+                    let instance = state_store.load(&instance_id)?;
+                    print_instance_summary(&instance);
+                    return Ok(WorkflowLaunchAction::Noop);
+                }
+                let instances = state_store.list_instances()?;
+                if instances.is_empty() {
+                    println!("No workflow instances found.");
+                    return Ok(WorkflowLaunchAction::Noop);
+                }
+                println!("Workflow Instances:");
+                for item in instances {
+                    println!(
+                        "- {} status={:?} workflow={} current_step={} updated_at={}",
+                        item.instance_id,
+                        item.status,
+                        item.workflow_name,
+                        item.current_step,
+                        item.updated_at_ms
+                    );
+                }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            let decision = state_store.record_manual_approval_decision(
+            WorkflowCommand::Abort { id } => {
+                state_store.request_abort(&id)?;
+                if let Ok(mut instance) = state_store.load(&id) {
+                    if instance.status == WorkflowInstanceStatus::Pending
+                        || instance.status == WorkflowInstanceStatus::Running
+                        || instance.status == WorkflowInstanceStatus::Paused
+                    {
+                        instance.status = WorkflowInstanceStatus::Aborted;
+                        instance.last_error = Some("Abort requested by operator".to_string());
+                        state_store.save(&mut instance)?;
+                    }
+                }
+                println!("Abort requested for workflow instance '{}'.", id);
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::Approve { id, step, by, note } => {
+                let instance = state_store.load(&id)?;
+                if !instance.step_order.iter().any(|entry| entry == &step) {
+                    return Err(anyhow!(
+                        "step '{}' not found in workflow instance '{}'",
+                        step,
+                        id
+                    ));
+                }
+                let decision = state_store.record_manual_approval_decision(
                 &id,
                 &step,
                 crate::engine::workflow_engine::state_store::ManualApprovalDecisionKind::Approved,
                 by.as_deref(),
                 note.as_deref(),
             )?;
-            println!(
-                "Approval recorded: instance='{}' step='{}' decision='approved' by='{}'",
-                decision.instance_id, decision.step_id, decision.approver
-            );
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Reject { id, step, by, note } => {
-            let instance = state_store.load(&id)?;
-            if !instance.step_order.iter().any(|entry| entry == &step) {
-                return Err(anyhow!(
-                    "step '{}' not found in workflow instance '{}'",
-                    step,
-                    id
-                ));
+                println!(
+                    "Approval recorded: instance='{}' step='{}' decision='approved' by='{}'",
+                    decision.instance_id, decision.step_id, decision.approver
+                );
+                Ok(WorkflowLaunchAction::Noop)
             }
-            let decision = state_store.record_manual_approval_decision(
+            WorkflowCommand::Reject { id, step, by, note } => {
+                let instance = state_store.load(&id)?;
+                if !instance.step_order.iter().any(|entry| entry == &step) {
+                    return Err(anyhow!(
+                        "step '{}' not found in workflow instance '{}'",
+                        step,
+                        id
+                    ));
+                }
+                let decision = state_store.record_manual_approval_decision(
                 &id,
                 &step,
                 crate::engine::workflow_engine::state_store::ManualApprovalDecisionKind::Rejected,
                 by.as_deref(),
                 note.as_deref(),
             )?;
-            println!(
-                "Approval recorded: instance='{}' step='{}' decision='rejected' by='{}'",
-                decision.instance_id, decision.step_id, decision.approver
-            );
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Trace {
-            id,
-            json,
-            timeline,
-            otel,
-        } => {
-            let instance = state_store.load(&id)?;
-            if otel {
-                let body = render_otel_trace(&instance);
-                println!("{}", serde_json::to_string_pretty(&body)?);
+                println!(
+                    "Approval recorded: instance='{}' step='{}' decision='rejected' by='{}'",
+                    decision.instance_id, decision.step_id, decision.approver
+                );
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::Trace {
+                id,
+                json,
+                timeline,
+                otel,
+            } => {
+                let instance = state_store.load(&id)?;
+                if otel {
+                    let body = render_otel_trace(&instance);
+                    println!("{}", serde_json::to_string_pretty(&body)?);
+                    if timeline {
+                        println!("{}", render_timeline(&instance));
+                    }
+                    return Ok(WorkflowLaunchAction::Noop);
+                }
+                if json || !timeline {
+                    let body = serde_json::to_string_pretty(&instance)?;
+                    println!("{}", body);
+                }
                 if timeline {
                     println!("{}", render_timeline(&instance));
                 }
-                return Ok(WorkflowLaunchAction::Noop);
+                Ok(WorkflowLaunchAction::Noop)
             }
-            if json || !timeline {
-                let body = serde_json::to_string_pretty(&instance)?;
-                println!("{}", body);
-            }
-            if timeline {
-                println!("{}", render_timeline(&instance));
-            }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Check { json } => {
-            let report = crate::engine::package_check::run_package_check(project_layout)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                print_package_check_report(&report);
-            }
-            if !report.ok() {
-                return Err(anyhow!(
-                    "workflow package check failed with {} error(s)",
-                    report.errors.len()
-                ));
-            }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Eval {
-            dataset,
-            min_pass_rate,
-            json,
-        } => {
-            let report = run_workflow_eval(&dataset, min_pass_rate)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                print_workflow_eval_report(&report);
-            }
-            if !report.ok {
-                return Err(anyhow!(
-                    "workflow eval failed: pass_rate={:.2} < min_pass_rate={:.2}",
-                    report.pass_rate,
-                    report.min_pass_rate
-                ));
-            }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::QualitySkills { strict, json } => {
-            let report = run_skill_quality_check(project_layout, strict)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                print_skill_quality_report(&report);
-            }
-            if !report.ok() {
-                return Err(anyhow!(
-                    "skill quality check failed with errors={} warnings={} (strict={})",
-                    report.errors,
-                    report.warnings,
-                    report.strict
-                ));
-            }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::BuildCatalog { json } => {
-            let report = build_skill_workflow_catalog(project_layout)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                println!(
-                    "Catalog built: skills={} workflows={} bundles={} output_dir= {}",
-                    report.skills, report.workflows, report.bundles, report.catalog_dir
-                );
-                for output in &report.outputs {
-                    println!("- {}", output);
+            WorkflowCommand::Check { json } => {
+                let report = crate::engine::package_check::run_package_check(project_layout)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    print_package_check_report(&report);
                 }
+                if !report.ok() {
+                    return Err(anyhow!(
+                        "workflow package check failed with {} error(s)",
+                        report.errors.len()
+                    ));
+                }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Bundles { json } => {
-            let bundles = read_bundle_catalog(project_layout)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&bundles)?);
-            } else if bundles.is_empty() {
-                println!("No bundles found. Run 'workflow build-catalog' first.");
-            } else {
-                println!("Bundle catalog ({}):", bundles.len());
-                for bundle in bundles {
+            WorkflowCommand::Eval {
+                dataset,
+                min_pass_rate,
+                json,
+            } => {
+                let report = run_workflow_eval(&dataset, min_pass_rate)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    print_workflow_eval_report(&report);
+                }
+                if !report.ok {
+                    return Err(anyhow!(
+                        "workflow eval failed: pass_rate={:.2} < min_pass_rate={:.2}",
+                        report.pass_rate,
+                        report.min_pass_rate
+                    ));
+                }
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::QualitySkills { strict, json } => {
+                let report = run_skill_quality_check(project_layout, strict)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    print_skill_quality_report(&report);
+                }
+                if !report.ok() {
+                    return Err(anyhow!(
+                        "skill quality check failed with errors={} warnings={} (strict={})",
+                        report.errors,
+                        report.warnings,
+                        report.strict
+                    ));
+                }
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::BuildCatalog { json } => {
+                let report = build_skill_workflow_catalog(project_layout)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
                     println!(
-                        "- {} workflows={} skills={} roles={} templates={}",
-                        bundle.id,
-                        bundle.workflows.len(),
-                        bundle.skills.len(),
-                        bundle.roles.len(),
-                        bundle.templates.len()
+                        "Catalog built: skills={} workflows={} bundles={} output_dir= {}",
+                        report.skills, report.workflows, report.bundles, report.catalog_dir
                     );
+                    for output in &report.outputs {
+                        println!("- {}", output);
+                    }
                 }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::ImportSkills {
-            source,
-            domain,
-            max_skills,
-            overwrite,
-            mode,
-            allow_missing_license,
-            no_catalog_rebuild,
-            json,
-        } => {
-            let mode = parse_skillpack_install_mode(&mode)?;
-            let options = ImportSkillpackOptions {
-                domain_override: domain,
+            WorkflowCommand::Bundles { json } => {
+                let bundles = read_bundle_catalog(project_layout)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&bundles)?);
+                } else if bundles.is_empty() {
+                    println!("No bundles found. Run 'workflow build-catalog' first.");
+                } else {
+                    println!("Bundle catalog ({}):", bundles.len());
+                    for bundle in bundles {
+                        println!(
+                            "- {} workflows={} skills={} roles={} templates={}",
+                            bundle.id,
+                            bundle.workflows.len(),
+                            bundle.skills.len(),
+                            bundle.roles.len(),
+                            bundle.templates.len()
+                        );
+                    }
+                }
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::ImportSkills {
+                source,
+                domain,
                 max_skills,
                 overwrite,
                 mode,
                 allow_missing_license,
-                rebuild_catalog: !no_catalog_rebuild,
-            };
-            let report = import_skills_from_source(project_layout, &source, &options)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                println!(
+                no_catalog_rebuild,
+                json,
+            } => {
+                let mode = parse_skillpack_install_mode(&mode)?;
+                let options = ImportSkillpackOptions {
+                    domain_override: domain,
+                    max_skills,
+                    overwrite,
+                    mode,
+                    allow_missing_license,
+                    rebuild_catalog: !no_catalog_rebuild,
+                };
+                let report = import_skills_from_source(project_layout, &source, &options)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    println!(
                     "Imported skills: mode='{}' source='{}' resolved='{}' commit={:?} license={:?} domain='{}' imported={} skipped={} catalog_rebuilt={}",
                     report.mode,
                     report.source,
@@ -253,36 +253,36 @@ pub(super) fn handle_workflow_control_command(
                     report.skipped,
                     report.catalog_rebuilt
                 );
-                for path in &report.files {
-                    println!("- {}", path);
+                    for path in &report.files {
+                        println!("- {}", path);
+                    }
                 }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::InstallSkillpack {
-            source,
-            domain,
-            max_skills,
-            overwrite,
-            mode,
-            allow_missing_license,
-            no_catalog_rebuild,
-            json,
-        } => {
-            let mode = parse_skillpack_install_mode(&mode)?;
-            let options = ImportSkillpackOptions {
-                domain_override: domain,
+            WorkflowCommand::InstallSkillpack {
+                source,
+                domain,
                 max_skills,
                 overwrite,
                 mode,
                 allow_missing_license,
-                rebuild_catalog: !no_catalog_rebuild,
-            };
-            let report = import_skills_from_source(project_layout, &source, &options)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                println!(
+                no_catalog_rebuild,
+                json,
+            } => {
+                let mode = parse_skillpack_install_mode(&mode)?;
+                let options = ImportSkillpackOptions {
+                    domain_override: domain,
+                    max_skills,
+                    overwrite,
+                    mode,
+                    allow_missing_license,
+                    rebuild_catalog: !no_catalog_rebuild,
+                };
+                let report = import_skills_from_source(project_layout, &source, &options)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    println!(
                     "Installed skillpack: mode='{}' source='{}' resolved='{}' commit={:?} license={:?} domain='{}' imported={} skipped={} catalog_rebuilt={}",
                     report.mode,
                     report.source,
@@ -294,29 +294,29 @@ pub(super) fn handle_workflow_control_command(
                     report.skipped,
                     report.catalog_rebuilt
                 );
-                for path in &report.files {
-                    println!("- {}", path);
+                    for path in &report.files {
+                        println!("- {}", path);
+                    }
                 }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::SyncImports {
-            overwrite,
-            mode,
-            allow_missing_license,
-            json,
-        } => {
-            let mode = parse_skillpack_install_mode(&mode)?;
-            let report = sync_imported_skills_from_lock(
-                project_layout,
+            WorkflowCommand::SyncImports {
                 overwrite,
                 mode,
                 allow_missing_license,
-            )?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                println!(
+                json,
+            } => {
+                let mode = parse_skillpack_install_mode(&mode)?;
+                let report = sync_imported_skills_from_lock(
+                    project_layout,
+                    overwrite,
+                    mode,
+                    allow_missing_license,
+                )?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    println!(
                     "Synced imports: mode='{}' lockfile='{}' sources={} updated={} skipped={} missing={} catalog_rebuilt={}",
                     report.mode,
                     report.lockfile,
@@ -326,23 +326,23 @@ pub(super) fn handle_workflow_control_command(
                     report.missing,
                     report.catalog_rebuilt
                 );
-                for path in &report.files {
-                    println!("- {}", path);
+                    for path in &report.files {
+                        println!("- {}", path);
+                    }
                 }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::NormalizeImportedSkills {
-            mode,
-            dry_run,
-            json,
-        } => {
-            let mode = parse_skillpack_install_mode(&mode)?;
-            let report = normalize_imported_skills(project_layout, mode, dry_run)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                println!(
+            WorkflowCommand::NormalizeImportedSkills {
+                mode,
+                dry_run,
+                json,
+            } => {
+                let mode = parse_skillpack_install_mode(&mode)?;
+                let report = normalize_imported_skills(project_layout, mode, dry_run)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    println!(
                     "Normalized imported skills: mode='{}' dry_run={} import_dir='{}' lockfile='{}' checked={} normalized={} skipped={} catalog_rebuilt={}",
                     report.mode,
                     report.dry_run,
@@ -353,36 +353,36 @@ pub(super) fn handle_workflow_control_command(
                     report.skipped,
                     report.catalog_rebuilt
                 );
-                for path in &report.files {
-                    println!("- {}", path);
-                }
-                if !report.changes.is_empty() {
-                    println!("Planned metadata changes:");
-                    for change in &report.changes {
-                        println!("- {} [{}]", change.path, change.changed_fields.join(", "));
+                    for path in &report.files {
+                        println!("- {}", path);
+                    }
+                    if !report.changes.is_empty() {
+                        println!("Planned metadata changes:");
+                        for change in &report.changes {
+                            println!("- {} [{}]", change.path, change.changed_fields.join(", "));
+                        }
+                    }
+                    if !report.skipped_entries.is_empty() {
+                        println!("Skipped files:");
+                        for entry in &report.skipped_entries {
+                            println!("- {} ({})", entry.path, entry.reason);
+                        }
                     }
                 }
-                if !report.skipped_entries.is_empty() {
-                    println!("Skipped files:");
-                    for entry in &report.skipped_entries {
-                        println!("- {} ({})", entry.path, entry.reason);
-                    }
-                }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::InstallBundle {
-            bundle,
-            mode,
-            overwrite,
-            json,
-        } => {
-            let mode = parse_skillpack_install_mode(&mode)?;
-            let report = install_bundle_from_catalog(project_layout, &bundle, mode, overwrite)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                println!(
+            WorkflowCommand::InstallBundle {
+                bundle,
+                mode,
+                overwrite,
+                json,
+            } => {
+                let mode = parse_skillpack_install_mode(&mode)?;
+                let report = install_bundle_from_catalog(project_layout, &bundle, mode, overwrite)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    println!(
                     "Installed bundle: mode='{}' bundle='{}' target='{}' installed={} skipped={} missing={}",
                     report.mode,
                     report.bundle,
@@ -391,31 +391,31 @@ pub(super) fn handle_workflow_control_command(
                     report.skipped,
                     report.missing
                 );
-                for path in &report.files {
-                    println!("- {}", path);
-                }
-                if !report.missing_skills.is_empty() {
-                    println!("Missing skills:");
-                    for skill_id in &report.missing_skills {
-                        println!("- {}", skill_id);
+                    for path in &report.files {
+                        println!("- {}", path);
+                    }
+                    if !report.missing_skills.is_empty() {
+                        println!("Missing skills:");
+                        for skill_id in &report.missing_skills {
+                            println!("- {}", skill_id);
+                        }
                     }
                 }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::VerifyLock {
-            mode,
-            fail_on_extra,
-            require_attestation,
-            json,
-        } => {
-            let mode = parse_skillpack_install_mode(&mode)?;
-            let report =
-                verify_skills_lock(project_layout, mode, fail_on_extra, require_attestation)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                println!(
+            WorkflowCommand::VerifyLock {
+                mode,
+                fail_on_extra,
+                require_attestation,
+                json,
+            } => {
+                let mode = parse_skillpack_install_mode(&mode)?;
+                let report =
+                    verify_skills_lock(project_layout, mode, fail_on_extra, require_attestation)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    println!(
                     "Verify lock: mode='{}' lockfile='{}' ok={} missing={} changed={} extra={} attestation_missing={} attestation_invalid={} fail_on_extra={} require_attestation={}",
                     report.mode,
                     report.lockfile,
@@ -428,39 +428,39 @@ pub(super) fn handle_workflow_control_command(
                     fail_on_extra,
                     require_attestation
                 );
-                if !report.missing_entries.is_empty() {
-                    println!("Missing entries:");
-                    for id in &report.missing_entries {
-                        println!("- {}", id);
+                    if !report.missing_entries.is_empty() {
+                        println!("Missing entries:");
+                        for id in &report.missing_entries {
+                            println!("- {}", id);
+                        }
+                    }
+                    if !report.changed_entries.is_empty() {
+                        println!("Changed entries:");
+                        for id in &report.changed_entries {
+                            println!("- {}", id);
+                        }
+                    }
+                    if !report.extra_entries.is_empty() {
+                        println!("Extra entries:");
+                        for id in &report.extra_entries {
+                            println!("- {}", id);
+                        }
+                    }
+                    if !report.attestation_missing_entries.is_empty() {
+                        println!("Attestation missing:");
+                        for id in &report.attestation_missing_entries {
+                            println!("- {}", id);
+                        }
+                    }
+                    if !report.attestation_invalid_entries.is_empty() {
+                        println!("Attestation invalid:");
+                        for id in &report.attestation_invalid_entries {
+                            println!("- {}", id);
+                        }
                     }
                 }
-                if !report.changed_entries.is_empty() {
-                    println!("Changed entries:");
-                    for id in &report.changed_entries {
-                        println!("- {}", id);
-                    }
-                }
-                if !report.extra_entries.is_empty() {
-                    println!("Extra entries:");
-                    for id in &report.extra_entries {
-                        println!("- {}", id);
-                    }
-                }
-                if !report.attestation_missing_entries.is_empty() {
-                    println!("Attestation missing:");
-                    for id in &report.attestation_missing_entries {
-                        println!("- {}", id);
-                    }
-                }
-                if !report.attestation_invalid_entries.is_empty() {
-                    println!("Attestation invalid:");
-                    for id in &report.attestation_invalid_entries {
-                        println!("- {}", id);
-                    }
-                }
-            }
-            if !report.ok {
-                return Err(anyhow!(
+                if !report.ok {
+                    return Err(anyhow!(
                     "skills lock verification failed (missing={}, changed={}, extra={}, attestation_missing={}, attestation_invalid={})",
                     report.missing,
                     report.changed,
@@ -468,15 +468,15 @@ pub(super) fn handle_workflow_control_command(
                     report.attestation_missing,
                     report.attestation_invalid
                 ));
+                }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::IndexGraph { max_files, json } => {
-            let report = build_graph_index(project_layout, max_files)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                println!(
+            WorkflowCommand::IndexGraph { max_files, json } => {
+                let report = build_graph_index(project_layout, max_files)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    println!(
                     "Graph index rebuilt: path={} nodes={} edges={} context_db={} vector_table={} graph_table={} vector_entries={} graph_entries={}",
                     report.index_path,
                     report.nodes,
@@ -487,154 +487,154 @@ pub(super) fn handle_workflow_control_command(
                     report.vector_entries,
                     report.graph_entries
                 );
+                }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Doctor {
-            json,
-            strict_ollama,
-        } => {
-            let report = run_workflow_doctor(
-                project_layout,
-                resolve_bootstrap_strict_ollama(strict_ollama),
-            )?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                print_doctor_report(&report);
-            }
-            if !report.ok {
-                return Err(anyhow!(
-                    "workflow doctor failed with {} error check(s)",
-                    doctor_error_count(&report)
-                ));
-            }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Setup {
-            json,
-            strict_ollama,
-        } => {
-            let created = ensure_bootstrap_package(project_layout)?;
-            let report = run_workflow_doctor(
-                project_layout,
-                resolve_bootstrap_strict_ollama(strict_ollama),
-            )?;
-            if json {
-                let payload = SetupReport {
-                    created_files: created
-                        .iter()
-                        .map(|path| path.display().to_string())
-                        .collect(),
-                    doctor: report.clone(),
-                };
-                println!("{}", serde_json::to_string_pretty(&payload)?);
-            } else {
-                if created.is_empty() {
-                    println!("Setup: package skeleton already present (no files created).");
+            WorkflowCommand::Doctor {
+                json,
+                strict_ollama,
+            } => {
+                let report = run_workflow_doctor(
+                    project_layout,
+                    resolve_bootstrap_strict_ollama(strict_ollama),
+                )?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
                 } else {
-                    println!("Setup: created {} file(s):", created.len());
-                    for path in &created {
-                        println!("- {}", path.display());
+                    print_doctor_report(&report);
+                }
+                if !report.ok {
+                    return Err(anyhow!(
+                        "workflow doctor failed with {} error check(s)",
+                        doctor_error_count(&report)
+                    ));
+                }
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::Setup {
+                json,
+                strict_ollama,
+            } => {
+                let created = ensure_bootstrap_package(project_layout)?;
+                let report = run_workflow_doctor(
+                    project_layout,
+                    resolve_bootstrap_strict_ollama(strict_ollama),
+                )?;
+                if json {
+                    let payload = SetupReport {
+                        created_files: created
+                            .iter()
+                            .map(|path| path.display().to_string())
+                            .collect(),
+                        doctor: report.clone(),
+                    };
+                    println!("{}", serde_json::to_string_pretty(&payload)?);
+                } else {
+                    if created.is_empty() {
+                        println!("Setup: package skeleton already present (no files created).");
+                    } else {
+                        println!("Setup: created {} file(s):", created.len());
+                        for path in &created {
+                            println!("- {}", path.display());
+                        }
+                    }
+                    print_doctor_report(&report);
+                }
+                if !report.ok {
+                    return Err(anyhow!(
+                        "workflow setup failed with {} error check(s)",
+                        doctor_error_count(&report)
+                    ));
+                }
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::McpRegister {
+                name,
+                transport,
+                command,
+                args,
+                url,
+                cwd,
+                env,
+                allow_tools,
+                deny_tools,
+                disabled,
+                json,
+            } => {
+                let report = register_mcp_server(
+                    project_layout,
+                    &name,
+                    &transport,
+                    command.as_deref(),
+                    &args,
+                    url.as_deref(),
+                    cwd.as_deref(),
+                    &env,
+                    &allow_tools,
+                    &deny_tools,
+                    !disabled,
+                )?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    println!(
+                        "MCP server {}: name='{}' transport='{}' enabled={} registry='{}'",
+                        report.action,
+                        report.server.name,
+                        report.server.transport,
+                        report.server.enabled,
+                        report.registry_path
+                    );
+                    if let Some(command) = report.server.command.as_deref() {
+                        println!(
+                            "- command='{}' args={} cwd={}",
+                            command,
+                            report.server.args.len(),
+                            report.server.cwd.as_deref().unwrap_or("-")
+                        );
+                    }
+                    if let Some(url) = report.server.url.as_deref() {
+                        println!("- url='{}'", url);
+                    }
+                    if !report.server.allow_tools.is_empty() {
+                        println!("- allow_tools={}", report.server.allow_tools.join(","));
+                    }
+                    if !report.server.deny_tools.is_empty() {
+                        println!("- deny_tools={}", report.server.deny_tools.join(","));
                     }
                 }
-                print_doctor_report(&report);
+                Ok(WorkflowLaunchAction::Noop)
             }
-            if !report.ok {
-                return Err(anyhow!(
-                    "workflow setup failed with {} error check(s)",
-                    doctor_error_count(&report)
-                ));
-            }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::McpRegister {
-            name,
-            transport,
-            command,
-            args,
-            url,
-            cwd,
-            env,
-            allow_tools,
-            deny_tools,
-            disabled,
-            json,
-        } => {
-            let report = register_mcp_server(
-                project_layout,
-                &name,
-                &transport,
-                command.as_deref(),
-                &args,
-                url.as_deref(),
-                cwd.as_deref(),
-                &env,
-                &allow_tools,
-                &deny_tools,
-                !disabled,
-            )?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                println!(
-                    "MCP server {}: name='{}' transport='{}' enabled={} registry='{}'",
-                    report.action,
-                    report.server.name,
-                    report.server.transport,
-                    report.server.enabled,
-                    report.registry_path
-                );
-                if let Some(command) = report.server.command.as_deref() {
+            WorkflowCommand::McpList { json } => {
+                let report = list_mcp_servers(project_layout)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else if report.servers.is_empty() {
+                    println!("No MCP servers registered. Use 'workflow mcp-register <name> ...'.");
+                } else {
                     println!(
-                        "- command='{}' args={} cwd={}",
-                        command,
-                        report.server.args.len(),
-                        report.server.cwd.as_deref().unwrap_or("-")
+                        "MCP Servers: total={} enabled={} registry='{}'",
+                        report.total, report.enabled, report.registry_path
                     );
-                }
-                if let Some(url) = report.server.url.as_deref() {
-                    println!("- url='{}'", url);
-                }
-                if !report.server.allow_tools.is_empty() {
-                    println!("- allow_tools={}", report.server.allow_tools.join(","));
-                }
-                if !report.server.deny_tools.is_empty() {
-                    println!("- deny_tools={}", report.server.deny_tools.join(","));
-                }
-            }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::McpList { json } => {
-            let report = list_mcp_servers(project_layout)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else if report.servers.is_empty() {
-                println!("No MCP servers registered. Use 'workflow mcp-register <name> ...'.");
-            } else {
-                println!(
-                    "MCP Servers: total={} enabled={} registry='{}'",
-                    report.total, report.enabled, report.registry_path
-                );
-                for server in report.servers {
-                    let target = if let Some(command) = server.command.as_deref() {
-                        format!("command='{}' args={}", command, server.args.len())
-                    } else if let Some(url) = server.url.as_deref() {
-                        format!("url='{}'", url)
-                    } else {
-                        "target='-'".to_string()
-                    };
-                    let last_ping = match (
-                        server.last_ping_ok,
-                        server.last_ping_at_ms,
-                        server.last_ping_latency_ms,
-                    ) {
-                        (Some(ok), Some(at_ms), Some(latency_ms)) => {
-                            format!("ok={} at={} latency_ms={}", ok, at_ms, latency_ms)
-                        }
-                        _ => "none".to_string(),
-                    };
-                    println!(
+                    for server in report.servers {
+                        let target = if let Some(command) = server.command.as_deref() {
+                            format!("command='{}' args={}", command, server.args.len())
+                        } else if let Some(url) = server.url.as_deref() {
+                            format!("url='{}'", url)
+                        } else {
+                            "target='-'".to_string()
+                        };
+                        let last_ping = match (
+                            server.last_ping_ok,
+                            server.last_ping_at_ms,
+                            server.last_ping_latency_ms,
+                        ) {
+                            (Some(ok), Some(at_ms), Some(latency_ms)) => {
+                                format!("ok={} at={} latency_ms={}", ok, at_ms, latency_ms)
+                            }
+                            _ => "none".to_string(),
+                        };
+                        println!(
                         "- {} transport={} enabled={} {} env_keys={} allow_tools={} deny_tools={} last_ping={}",
                         server.name,
                         server.transport,
@@ -645,50 +645,50 @@ pub(super) fn handle_workflow_control_command(
                         server.deny_tools.len(),
                         last_ping
                     );
+                    }
                 }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::McpPing {
-            name,
-            timeout_ms,
-            json,
-        } => {
-            let report = ping_mcp_servers(project_layout, name.as_deref(), timeout_ms)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                println!(
-                    "MCP ping: checked={} passed={} failed={} timeout_ms={} registry='{}'",
-                    report.checked,
-                    report.passed,
-                    report.failed,
-                    report.timeout_ms,
-                    report.registry_path
-                );
-                for result in report.results {
+            WorkflowCommand::McpPing {
+                name,
+                timeout_ms,
+                json,
+            } => {
+                let report = ping_mcp_servers(project_layout, name.as_deref(), timeout_ms)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
                     println!(
-                        "- {} transport={} enabled={} ok={} latency_ms={} detail={}",
-                        result.name,
-                        result.transport,
-                        result.enabled,
-                        result.ok,
-                        result.latency_ms,
-                        result.detail
+                        "MCP ping: checked={} passed={} failed={} timeout_ms={} registry='{}'",
+                        report.checked,
+                        report.passed,
+                        report.failed,
+                        report.timeout_ms,
+                        report.registry_path
                     );
+                    for result in report.results {
+                        println!(
+                            "- {} transport={} enabled={} ok={} latency_ms={} detail={}",
+                            result.name,
+                            result.transport,
+                            result.enabled,
+                            result.ok,
+                            result.latency_ms,
+                            result.detail
+                        );
+                    }
                 }
+                if report.failed > 0 {
+                    return Err(anyhow!("mcp ping failed for {} server(s)", report.failed));
+                }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            if report.failed > 0 {
-                return Err(anyhow!("mcp ping failed for {} server(s)", report.failed));
-            }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::McpPolicy { name, tool, json } => {
-            let report = evaluate_mcp_policy(project_layout, &name, &tool)?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&report)?);
-            } else {
-                println!(
+            WorkflowCommand::McpPolicy { name, tool, json } => {
+                let report = evaluate_mcp_policy(project_layout, &name, &tool)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    println!(
                     "MCP policy: server='{}' tool='{}' allowed={} reason='{}' transport='{}' enabled={} registry='{}'",
                     report.name,
                     report.tool,
@@ -698,137 +698,148 @@ pub(super) fn handle_workflow_control_command(
                     report.enabled,
                     report.registry_path
                 );
-                if !report.allow_tools.is_empty() {
-                    println!("- allow_tools={}", report.allow_tools.join(","));
+                    if !report.allow_tools.is_empty() {
+                        println!("- allow_tools={}", report.allow_tools.join(","));
+                    }
+                    if !report.deny_tools.is_empty() {
+                        println!("- deny_tools={}", report.deny_tools.join(","));
+                    }
                 }
-                if !report.deny_tools.is_empty() {
-                    println!("- deny_tools={}", report.deny_tools.join(","));
+                if !report.allowed {
+                    return Err(anyhow!(
+                        "mcp policy denied server='{}' tool='{}' ({})",
+                        report.name,
+                        report.tool,
+                        report.reason
+                    ));
                 }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            if !report.allowed {
-                return Err(anyhow!(
-                    "mcp policy denied server='{}' tool='{}' ({})",
-                    report.name,
-                    report.tool,
-                    report.reason
-                ));
+            WorkflowCommand::Resume { id } => Ok(WorkflowLaunchAction::Resume { id }),
+            WorkflowCommand::StartTemplate {
+                template,
+                workflow_id,
+                task,
+            } => Ok(WorkflowLaunchAction::StartTemplate(TemplateRunRequest {
+                template,
+                workflow_id,
+                task,
+            })),
+            WorkflowCommand::StartRole {
+                role,
+                task,
+                workflow_id,
+                template,
+                thread_id,
+                json,
+            } => Ok(WorkflowLaunchAction::StartRole(RoleRunRequest {
+                role,
+                task,
+                workflow_id,
+                template,
+                thread_id,
+                json,
+            })),
+            WorkflowCommand::ChatThread {
+                thread_id,
+                message,
+                role,
+                workflow_id,
+                template,
+                target_branch,
+                validate_command,
+                no_merge,
+                json,
+            } => Ok(WorkflowLaunchAction::ChatThread(ChatThreadRequest {
+                thread_id,
+                message,
+                role,
+                workflow_id,
+                template,
+                target_branch,
+                validate_command: resolve_default_validate_command(
+                    project_layout,
+                    &validate_command,
+                )?,
+                no_merge,
+                json,
+            })),
+            WorkflowCommand::Roles { json } => {
+                print_markdown_resource_listing("Role Profiles", &project_layout.roles_dir, json)?;
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Resume { id } => Ok(WorkflowLaunchAction::Resume { id }),
-        WorkflowCommand::StartTemplate {
-            template,
-            workflow_id,
-            task,
-        } => Ok(WorkflowLaunchAction::StartTemplate(TemplateRunRequest {
-            template,
-            workflow_id,
-            task,
-        })),
-        WorkflowCommand::StartRole {
-            role,
-            task,
-            workflow_id,
-            template,
-            thread_id,
-            json,
-        } => Ok(WorkflowLaunchAction::StartRole(RoleRunRequest {
-            role,
-            task,
-            workflow_id,
-            template,
-            thread_id,
-            json,
-        })),
-        WorkflowCommand::ChatThread {
-            thread_id,
-            message,
-            role,
-            workflow_id,
-            template,
-            target_branch,
-            validate_command,
-            no_merge,
-            json,
-        } => Ok(WorkflowLaunchAction::ChatThread(ChatThreadRequest {
-            thread_id,
-            message,
-            role,
-            workflow_id,
-            template,
-            target_branch,
-            validate_command: resolve_default_validate_command(project_layout, &validate_command)?,
-            no_merge,
-            json,
-        })),
-        WorkflowCommand::Roles { json } => {
-            print_markdown_resource_listing("Role Profiles", &project_layout.roles_dir, json)?;
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Templates { json } => {
-            print_markdown_resource_listing("Templates", &project_layout.templates_dir, json)?;
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::ThreadFlow {
-            thread_id,
-            target_branch,
-            validate_command,
-            json,
-        } => Ok(WorkflowLaunchAction::ThreadFlow(ThreadFlowRequest {
-            thread_id,
-            target_branch,
-            validate_command: resolve_default_validate_command(project_layout, &validate_command)?,
-            json,
-        })),
-        WorkflowCommand::Scaffold {
-            kind,
-            name,
-            profile,
-            overwrite,
-        } => {
-            let parsed_profile = parse_scaffold_profile(&profile)?;
-            let path =
-                scaffold_markdown_package(project_layout, &kind, &name, parsed_profile, overwrite)?;
-            let parsed_kind = parse_package_scaffold_kind(&kind)?;
-            println!(
-                "Scaffold created: {} (schema={} profile={})",
-                path.display(),
-                parsed_kind.expected_schema(),
-                parsed_profile.as_str()
-            );
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::ScaffoldDomain {
-            domain,
-            overwrite,
-            json,
-        } => {
-            let created = scaffold_domain_pack(project_layout, &domain, overwrite)?;
-            if json {
-                let payload = created
-                    .iter()
-                    .map(|path| path.display().to_string())
-                    .collect::<Vec<_>>();
-                println!("{}", serde_json::to_string_pretty(&payload)?);
-            } else {
+            WorkflowCommand::Templates { json } => {
+                print_markdown_resource_listing("Templates", &project_layout.templates_dir, json)?;
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::ThreadFlow {
+                thread_id,
+                target_branch,
+                validate_command,
+                json,
+            } => Ok(WorkflowLaunchAction::ThreadFlow(ThreadFlowRequest {
+                thread_id,
+                target_branch,
+                validate_command: resolve_default_validate_command(
+                    project_layout,
+                    &validate_command,
+                )?,
+                json,
+            })),
+            WorkflowCommand::Scaffold {
+                kind,
+                name,
+                profile,
+                overwrite,
+            } => {
+                let parsed_profile = parse_scaffold_profile(&profile)?;
+                let path = scaffold_markdown_package(
+                    project_layout,
+                    &kind,
+                    &name,
+                    parsed_profile,
+                    overwrite,
+                )?;
+                let parsed_kind = parse_package_scaffold_kind(&kind)?;
                 println!(
-                    "Advanced domain pack generated: domain='{}' files={}",
-                    sanitize_package_name(&domain)?,
-                    created.len()
+                    "Scaffold created: {} (schema={} profile={})",
+                    path.display(),
+                    parsed_kind.expected_schema(),
+                    parsed_profile.as_str()
                 );
-                for path in created {
-                    println!("- {}", path.display());
-                }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
-        WorkflowCommand::Threads { thread_id, json } => {
-            if let Some(thread_id) = thread_id {
-                let record = thread_session_store.get_thread(&thread_id)?;
+            WorkflowCommand::ScaffoldDomain {
+                domain,
+                overwrite,
+                json,
+            } => {
+                let created = scaffold_domain_pack(project_layout, &domain, overwrite)?;
                 if json {
-                    println!("{}", serde_json::to_string_pretty(&record)?);
-                } else if let Some(record) = record {
+                    let payload = created
+                        .iter()
+                        .map(|path| path.display().to_string())
+                        .collect::<Vec<_>>();
+                    println!("{}", serde_json::to_string_pretty(&payload)?);
+                } else {
                     println!(
+                        "Advanced domain pack generated: domain='{}' files={}",
+                        sanitize_package_name(&domain)?,
+                        created.len()
+                    );
+                    for path in created {
+                        println!("- {}", path.display());
+                    }
+                }
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::Threads { thread_id, json } => {
+                if let Some(thread_id) = thread_id {
+                    let record = thread_session_store.get_thread(&thread_id)?;
+                    if json {
+                        println!("{}", serde_json::to_string_pretty(&record)?);
+                    } else if let Some(record) = record {
+                        println!(
                         "thread='{}' branch='{}' lifecycle={:?} last_instance={:?} last_status={:?} runs={} events={} updated_at={}",
                         record.thread_id,
                         record.branch,
@@ -839,24 +850,24 @@ pub(super) fn handle_workflow_control_command(
                         record.history.len(),
                         record.updated_at_ms
                     );
-                } else {
-                    println!("No thread session found for '{}'.", thread_id);
+                    } else {
+                        println!("No thread session found for '{}'.", thread_id);
+                    }
+                    return Ok(WorkflowLaunchAction::Noop);
                 }
-                return Ok(WorkflowLaunchAction::Noop);
-            }
 
-            let records = thread_session_store.list_threads()?;
-            if json {
-                println!("{}", serde_json::to_string_pretty(&records)?);
-                return Ok(WorkflowLaunchAction::Noop);
-            }
-            if records.is_empty() {
-                println!("No thread sessions found.");
-                return Ok(WorkflowLaunchAction::Noop);
-            }
-            println!("Thread Sessions:");
-            for record in records {
-                println!(
+                let records = thread_session_store.list_threads()?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&records)?);
+                    return Ok(WorkflowLaunchAction::Noop);
+                }
+                if records.is_empty() {
+                    println!("No thread sessions found.");
+                    return Ok(WorkflowLaunchAction::Noop);
+                }
+                println!("Thread Sessions:");
+                for record in records {
+                    println!(
                     "- thread='{}' branch='{}' lifecycle={:?} last_instance={:?} last_status={:?} runs={} events={} updated_at={}",
                     record.thread_id,
                     record.branch,
@@ -867,22 +878,28 @@ pub(super) fn handle_workflow_control_command(
                     record.history.len(),
                     record.updated_at_ms
                 );
+                }
+                Ok(WorkflowLaunchAction::Noop)
             }
-            Ok(WorkflowLaunchAction::Noop)
-        }
         },
         Commands::Office { action } => {
-            use crate::office::runtime::OfficeRuntime;
             use crate::office::roles::Role;
+            use crate::office::runtime::OfficeRuntime;
 
-            let project_root = project_layout.agents_root.parent()
+            let project_root = project_layout
+                .agents_root
+                .parent()
                 .map(|p| p.to_string_lossy().to_string())
                 .unwrap_or_else(|| ".".to_string());
 
             let mut runtime = OfficeRuntime::new(&project_root)?;
 
             match action {
-                OfficeCommand::Start { task, parallel, roles } => {
+                OfficeCommand::Start {
+                    task,
+                    parallel,
+                    roles,
+                } => {
                     runtime.start(task, parallel, roles)?;
                     println!("Office started successfully.");
                     runtime.office.print_status();
@@ -896,7 +913,12 @@ pub(super) fn handle_workflow_control_command(
                         runtime.office.print_status();
                     }
                 }
-                OfficeCommand::AddTask { title, description, input, role } => {
+                OfficeCommand::AddTask {
+                    title,
+                    description,
+                    input,
+                    role,
+                } => {
                     let task_id = runtime.add_task(title, description, input, role)?;
                     println!("Task added: {}", task_id);
                 }

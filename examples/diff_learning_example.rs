@@ -26,7 +26,9 @@ fn main() {
     println!("       \"code_generation_workflow\".to_string(),");
     println!("       \"generate_function\".to_string(),");
     println!("       \"fn calculate(x: i32) -> i32 {{ x * 2 }}\".to_string(),");
-    println!("       \"fn calculate(x: i32) -> i32 {{ x.checked_mul(2).unwrap_or(0) }}\".to_string(),");
+    println!(
+        "       \"fn calculate(x: i32) -> i32 {{ x.checked_mul(2).unwrap_or(0) }}\".to_string(),"
+    );
     println!("       EditType::Correction,");
     println!("       \"developer_alice\".to_string(),");
     println!("       current_timestamp_ms(),");
@@ -115,7 +117,9 @@ fn main() {
     println!("=== Example Complete ===");
     println!();
     println!("Key Features:");
-    println!("• Edit Capture: Records original output, edited output, edit type, editor, timestamp");
+    println!(
+        "• Edit Capture: Records original output, edited output, edit type, editor, timestamp"
+    );
     println!("• Pattern Analysis: Identifies frequent edit types and common themes");
     println!("• Training Data: Generates datasets filtered by workflow, time, edit type");
     println!("• Learning Application: Applies patterns to improve future executions");
@@ -135,4 +139,3 @@ fn main() {
     println!("• Continuous improvement through feedback loops");
     println!("• Compliance and audit trail for human oversight");
 }
-

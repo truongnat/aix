@@ -5,6 +5,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Company roles for office simulation
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Role {
     /// Chief Executive Officer - Strategic decisions, final approval
@@ -62,8 +63,8 @@ impl Role {
     /// Get role color for terminal output
     pub fn color(&self) -> &'static str {
         match self {
-            Role::CEO => "\x1b[35m",    // Magenta
-            Role::CTO => "\x1b[34m",    // Blue
+            Role::CEO => "\x1b[35m",      // Magenta
+            Role::CTO => "\x1b[34m",      // Blue
             Role::PM => "\x1b[33m",       // Yellow
             Role::Engineer => "\x1b[32m", // Green
             Role::Designer => "\x1b[36m", // Cyan

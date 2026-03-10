@@ -1,8 +1,8 @@
 // Human Review Service - escalate ambiguity with SLA enforcement
 
-use crate::platform::Result;
 use crate::platform::types::{Severity, StepId};
 use crate::platform::PlatformError;
+use crate::platform::Result;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -155,11 +155,7 @@ impl HumanReviewService {
     }
 
     /// Submit human decision for a review (Requirement 11.3)
-    pub fn submit_decision(
-        &mut self,
-        review_id: &ReviewId,
-        decision: HumanDecision,
-    ) -> Result<()> {
+    pub fn submit_decision(&mut self, review_id: &ReviewId, decision: HumanDecision) -> Result<()> {
         // Find review
         let state = self
             .reviews
@@ -168,16 +164,12 @@ impl HumanReviewService {
 
         // Check if already completed or timed out
         match &state.status {
-            ReviewStatus::Completed { .. } => {
-                return Err(PlatformError::InvalidInput(
-                    "Review already completed".to_string(),
-                ));
-            }
-            ReviewStatus::TimedOut { .. } => {
-                return Err(PlatformError::InvalidInput(
-                    "Review already timed out".to_string(),
-                ));
-            }
+            ReviewStatus::Completed { .. } => Err(PlatformError::InvalidInput(
+                "Review already completed".to_string(),
+            )),
+            ReviewStatus::TimedOut { .. } => Err(PlatformError::InvalidInput(
+                "Review already timed out".to_string(),
+            )),
             ReviewStatus::Pending => {
                 // Update status
                 state.status = ReviewStatus::Completed { decision };
@@ -200,10 +192,9 @@ impl HumanReviewService {
     pub fn handle_timeout(&mut self, review_id: &ReviewId) -> Result<TimeoutAction> {
         // First, get the request and status without holding a mutable borrow
         let (request, status, current_time) = {
-            let state = self
-                .reviews
-                .get(review_id)
-                .ok_or_else(|| PlatformError::NotFound(format!("Review not found: {}", review_id)))?;
+            let state = self.reviews.get(review_id).ok_or_else(|| {
+                PlatformError::NotFound(format!("Review not found: {}", review_id))
+            })?;
 
             let current_time = current_timestamp();
 
@@ -219,14 +210,10 @@ impl HumanReviewService {
 
         // Check if already handled
         match &status {
-            ReviewStatus::Completed { .. } => {
-                return Err(PlatformError::InvalidInput(
-                    "Review already completed".to_string(),
-                ));
-            }
-            ReviewStatus::TimedOut { action } => {
-                return Ok(action.clone());
-            }
+            ReviewStatus::Completed { .. } => Err(PlatformError::InvalidInput(
+                "Review already completed".to_string(),
+            )),
+            ReviewStatus::TimedOut { action } => Ok(action.clone()),
             ReviewStatus::Pending => {
                 // Apply timeout policy
                 let action = self.apply_timeout_policy(&request, current_time)?;
@@ -252,8 +239,7 @@ impl HumanReviewService {
 
         for (review_id, state) in &self.reviews {
             if matches!(state.status, ReviewStatus::Pending) {
-                let time_remaining_ms =
-                    state.request.sla_deadline_ms as i64 - current_time as i64;
+                let time_remaining_ms = state.request.sla_deadline_ms as i64 - current_time as i64;
 
                 pending.push(PendingReview {
                     review_id: review_id.clone(),
@@ -398,7 +384,6 @@ fn current_timestamp() -> u64 {
         .as_millis() as u64
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -446,7 +431,8 @@ mod tests {
         let mut service = HumanReviewService::new();
 
         // Empty request_id should fail
-        let mut request = create_test_request("", current_timestamp() + 60000, TimeoutPolicy::Block);
+        let mut request =
+            create_test_request("", current_timestamp() + 60000, TimeoutPolicy::Block);
         let result = service.request_review(request.clone());
         assert!(result.is_err());
 
@@ -476,7 +462,9 @@ mod tests {
             timestamp_ms: current_timestamp(),
         };
 
-        service.submit_decision(&review_id, decision.clone()).unwrap();
+        service
+            .submit_decision(&review_id, decision.clone())
+            .unwrap();
 
         // Verify status is completed
         let status = service.check_status(&review_id).unwrap();
@@ -507,7 +495,9 @@ mod tests {
             timestamp_ms: current_timestamp(),
         };
 
-        service.submit_decision(&review_id, decision.clone()).unwrap();
+        service
+            .submit_decision(&review_id, decision.clone())
+            .unwrap();
 
         // Try to submit again - should fail
         let result = service.submit_decision(&review_id, decision);
@@ -862,10 +852,7 @@ mod tests {
 
         // Both actions should be the same
         match (&action1, &action2) {
-            (
-                TimeoutAction::Proceed { decision: d1 },
-                TimeoutAction::Proceed { decision: d2 },
-            ) => {
+            (TimeoutAction::Proceed { decision: d1 }, TimeoutAction::Proceed { decision: d2 }) => {
                 assert_eq!(d1.decision, d2.decision);
                 assert_eq!(d1.reviewer_id, d2.reviewer_id);
             }

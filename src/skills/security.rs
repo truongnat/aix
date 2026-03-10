@@ -66,7 +66,9 @@ impl SkillSecurityScanner {
         let score = Self::calculate_score(&issues);
 
         SecurityScanResult {
-            passed: issues.iter().all(|i| i.severity != SecuritySeverity::Critical),
+            passed: issues
+                .iter()
+                .all(|i| i.severity != SecuritySeverity::Critical),
             issues,
             warnings,
             score,
@@ -80,11 +82,26 @@ impl SkillSecurityScanner {
 
         // Common prompt injection patterns
         let injection_patterns = [
-            (r"(?i)ignore\s+(all\s+)?(previous|prior|above)\s+(instructions?|rules?|commands?)", "Attempt to ignore instructions"),
-            (r"(?i)(system|assistant|ai)\s*:\s*", "Potential system prompt override"),
-            (r"(?i)forget\s+(everything|all|what)\s+(I\s+)?(said|told|asked)", "Memory manipulation attempt"),
-            (r"(?i)new\s+(instructions?|rules?|system)", "New instructions injection"),
-            (r"(?i)you\s+(are|are now|have become)\s+(a|an)\s+", "Role manipulation attempt"),
+            (
+                r"(?i)ignore\s+(all\s+)?(previous|prior|above)\s+(instructions?|rules?|commands?)",
+                "Attempt to ignore instructions",
+            ),
+            (
+                r"(?i)(system|assistant|ai)\s*:\s*",
+                "Potential system prompt override",
+            ),
+            (
+                r"(?i)forget\s+(everything|all|what)\s+(I\s+)?(said|told|asked)",
+                "Memory manipulation attempt",
+            ),
+            (
+                r"(?i)new\s+(instructions?|rules?|system)",
+                "New instructions injection",
+            ),
+            (
+                r"(?i)you\s+(are|are now|have become)\s+(a|an)\s+",
+                "Role manipulation attempt",
+            ),
             (r"(?i)<\|.*\|>", "Potential prompt injection token"),
             (r"(?i)\[INST\]\s*", "Instruction injection pattern"),
             (r"(?i)\[SYSTEM\]", "System prompt injection"),
@@ -98,7 +115,9 @@ impl SkillSecurityScanner {
                         category: SecurityCategory::PromptInjection,
                         message: msg.to_string(),
                         location: None,
-                        suggestion: "Review and sanitize user input that could contain prompt injections".to_string(),
+                        suggestion:
+                            "Review and sanitize user input that could contain prompt injections"
+                                .to_string(),
                     });
                 }
             }
@@ -118,7 +137,10 @@ impl SkillSecurityScanner {
             (r"\b\d{9}\b", "Potential SSN or ID number"),
             (r"(?i)password\s*[:=]\s*\S+", "Hardcoded password"),
             (r"(?i)(credit|debit)\s+card", "Credit card reference"),
-            (r"\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b", "Credit card number pattern"),
+            (
+                r"\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b",
+                "Credit card number pattern",
+            ),
             (r"(?i)api[_-]?key\s*[:=]\s*\S+", "API key reference"),
             (r"(?i)bearer\s+\S+", "Bearer token reference"),
         ];
@@ -148,10 +170,19 @@ impl SkillSecurityScanner {
         // Secret patterns
         let secret_patterns = [
             (r"(?i)secret\s*[:=]\s*\S+", "Hardcoded secret"),
-            (r"(?i)token\s*[:=]\s*[A-Za-z0-9_\-]{20,}", "Potential API token"),
+            (
+                r"(?i)token\s*[:=]\s*[A-Za-z0-9_\-]{20,}",
+                "Potential API token",
+            ),
             (r"(?i)private[_-]?key\s*[:=]", "Private key reference"),
-            (r"-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----", "Private key detected"),
-            (r"(?i)(aws|azure|gcp|google)[_-]?(access|secret)?[_-]?key", "Cloud provider key"),
+            (
+                r"-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----",
+                "Private key detected",
+            ),
+            (
+                r"(?i)(aws|azure|gcp|google)[_-]?(access|secret)?[_-]?key",
+                "Cloud provider key",
+            ),
             (r"(?i)sk-[A-Za-z0-9]{20,}", "OpenAI API key pattern"),
             (r"(?i)ghp_[A-Za-z0-9]{36}", "GitHub token pattern"),
             (r"(?i)glpat-[A-Za-z0-9\-]{20,}", "GitLab token pattern"),
@@ -165,7 +196,8 @@ impl SkillSecurityScanner {
                         category: SecurityCategory::Secrets,
                         message: msg.to_string(),
                         location: None,
-                        suggestion: "Use environment variables instead of hardcoding secrets".to_string(),
+                        suggestion: "Use environment variables instead of hardcoding secrets"
+                            .to_string(),
                     });
                 }
             }
@@ -181,9 +213,18 @@ impl SkillSecurityScanner {
 
         // Check for scope creep indicators
         let scope_checks = [
-            (r"(?i)(execute|run)\s+(shell|terminal|command)\s+(anything|everything|any)", "Skill may execute arbitrary commands"),
-            (r"(?i)access\s+(all|every|any)\s+(file|directory|folder)", "Skill may access all files"),
-            (r"(?i)send\s+(email|message)\s+(to\s+)?anyone", "Skill may send to any recipient"),
+            (
+                r"(?i)(execute|run)\s+(shell|terminal|command)\s+(anything|everything|any)",
+                "Skill may execute arbitrary commands",
+            ),
+            (
+                r"(?i)access\s+(all|every|any)\s+(file|directory|folder)",
+                "Skill may access all files",
+            ),
+            (
+                r"(?i)send\s+(email|message)\s+(to\s+)?anyone",
+                "Skill may send to any recipient",
+            ),
         ];
 
         for (pattern, msg) in scope_checks {
@@ -209,7 +250,10 @@ impl SkillSecurityScanner {
             (r"(?i)drop\s+table\b", "Database table deletion"),
             (r"(?i)drop\s+database\b", "Database deletion"),
             (r"(?i)truncate\s+table\b", "Table truncation"),
-            (r"(?i)delete\s+from\s+\w+\s*(where|\;)", "Direct deletion query"),
+            (
+                r"(?i)delete\s+from\s+\w+\s*(where|\;)",
+                "Direct deletion query",
+            ),
             (r"(?i)format\s+(disk|drive|volume)", "Disk formatting"),
             (r"(?i)mkfs\b", "Filesystem creation (destructive)"),
             (r"(?i)shutdown|reboot\b", "System shutdown/reboot"),
@@ -227,7 +271,8 @@ impl SkillSecurityScanner {
                         category: SecurityCategory::DestructiveCommand,
                         message: msg.to_string(),
                         location: None,
-                        suggestion: "Add confirmation step before executing destructive commands".to_string(),
+                        suggestion: "Add confirmation step before executing destructive commands"
+                            .to_string(),
                     });
                 }
             }

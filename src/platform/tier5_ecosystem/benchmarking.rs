@@ -318,12 +318,7 @@ impl DefaultBenchmarkService {
     }
 
     /// Normalize a metric value to 0-1 scale
-    fn normalize_metric(
-        &self,
-        value: f64,
-        metric_type: &MetricType,
-        all_values: &[f64],
-    ) -> f64 {
+    fn normalize_metric(&self, value: f64, metric_type: &MetricType, all_values: &[f64]) -> f64 {
         if all_values.is_empty() {
             return 0.0;
         }
@@ -372,7 +367,7 @@ impl BenchmarkService for DefaultBenchmarkService {
         // Calculate metrics
         let mut result = BenchmarkResult::new(
             benchmark.benchmark_id.clone(),
-            "1.0.0".to_string(), // Default version
+            "1.0.0".to_string(),   // Default version
             "default".to_string(), // Default provider
             timestamp_ms,
         );
@@ -432,11 +427,18 @@ impl BenchmarkService for DefaultBenchmarkService {
                     name if name.contains("cost") || name.contains("Cost") => {
                         (MetricType::CostEfficiency, true)
                     }
-                    _ => (MetricType::Custom { unit: "".to_string() }, true),
+                    _ => (
+                        MetricType::Custom {
+                            unit: "".to_string(),
+                        },
+                        true,
+                    ),
                 };
 
-                let normalized_baseline = self.normalize_metric(*baseline_value, &metric_type, &all_values);
-                let normalized_comparison = self.normalize_metric(*comparison_value, &metric_type, &all_values);
+                let normalized_baseline =
+                    self.normalize_metric(*baseline_value, &metric_type, &all_values);
+                let normalized_comparison =
+                    self.normalize_metric(*comparison_value, &metric_type, &all_values);
 
                 // Calculate improvement percentage
                 let improvement = if higher_is_better {
@@ -445,12 +447,10 @@ impl BenchmarkService for DefaultBenchmarkService {
                     } else {
                         0.0
                     }
+                } else if *baseline_value > 0.0 {
+                    ((*baseline_value - *comparison_value) / *baseline_value) * 100.0
                 } else {
-                    if *baseline_value > 0.0 {
-                        ((*baseline_value - *comparison_value) / *baseline_value) * 100.0
-                    } else {
-                        0.0
-                    }
+                    0.0
                 };
 
                 metric_comparisons.insert(
@@ -511,7 +511,7 @@ impl BenchmarkService for DefaultBenchmarkService {
                 for (metric_name, value) in &r.metrics {
                     all_metric_values
                         .entry(metric_name.clone())
-                        .or_insert_with(Vec::new)
+                        .or_default()
                         .push(*value);
                 }
             }
@@ -535,7 +535,9 @@ impl BenchmarkService for DefaultBenchmarkService {
                         name if name.contains("cost") || name.contains("Cost") => {
                             MetricType::CostEfficiency
                         }
-                        _ => MetricType::Custom { unit: "".to_string() },
+                        _ => MetricType::Custom {
+                            unit: "".to_string(),
+                        },
                     };
 
                     let normalized = self.normalize_metric(*value, &metric_type, all_values);
@@ -773,27 +775,21 @@ mod tests {
     #[test]
     fn test_benchmark_builder_validation() {
         // No test cases
-        let result = BenchmarkBuilder::new(
-            "test".to_string(),
-            "Test".to_string(),
-            "cat".to_string(),
-        )
-        .add_metric(MetricDefinition::quality("Quality".to_string(), 100.0))
-        .build();
+        let result =
+            BenchmarkBuilder::new("test".to_string(), "Test".to_string(), "cat".to_string())
+                .add_metric(MetricDefinition::quality("Quality".to_string(), 100.0))
+                .build();
         assert!(result.is_err());
 
         // No metrics
-        let result = BenchmarkBuilder::new(
-            "test".to_string(),
-            "Test".to_string(),
-            "cat".to_string(),
-        )
-        .add_test_case(TestCase::new(
-            "test1".to_string(),
-            "Test".to_string(),
-            serde_json::json!({}),
-        ))
-        .build();
+        let result =
+            BenchmarkBuilder::new("test".to_string(), "Test".to_string(), "cat".to_string())
+                .add_test_case(TestCase::new(
+                    "test1".to_string(),
+                    "Test".to_string(),
+                    serde_json::json!({}),
+                ))
+                .build();
         assert!(result.is_err());
     }
 
@@ -885,7 +881,8 @@ mod tests {
         let values = vec![10.0, 20.0, 30.0];
 
         // Quality metric (higher is better)
-        let normalized = service.normalize_metric(20.0, &MetricType::Quality { scale: 100.0 }, &values);
+        let normalized =
+            service.normalize_metric(20.0, &MetricType::Quality { scale: 100.0 }, &values);
         assert!((normalized - 0.5).abs() < 0.01);
 
         // Time metric (lower is better)
@@ -923,83 +920,81 @@ mod integration_tests {
             "Workflow Performance Benchmark".to_string(),
             "code_generation".to_string(),
         )
-        .add_test_case(
-            TestCase::new(
-                "simple_function".to_string(),
-                "Generate simple function".to_string(),
-                serde_json::json!({
-                    "task": "create a function that adds two numbers"
-                }),
-            )
-        )
-        .add_test_case(
-            TestCase::new(
-                "complex_class".to_string(),
-                "Generate complex class".to_string(),
-                serde_json::json!({
-                    "task": "create a class with multiple methods"
-                }),
-            )
-        )
-        .add_test_case(
-            TestCase::new(
-                "error_handling".to_string(),
-                "Generate error handling".to_string(),
-                serde_json::json!({
-                    "task": "add error handling to existing code"
-                }),
-            )
-        )
+        .add_test_case(TestCase::new(
+            "simple_function".to_string(),
+            "Generate simple function".to_string(),
+            serde_json::json!({
+                "task": "create a function that adds two numbers"
+            }),
+        ))
+        .add_test_case(TestCase::new(
+            "complex_class".to_string(),
+            "Generate complex class".to_string(),
+            serde_json::json!({
+                "task": "create a class with multiple methods"
+            }),
+        ))
+        .add_test_case(TestCase::new(
+            "error_handling".to_string(),
+            "Generate error handling".to_string(),
+            serde_json::json!({
+                "task": "add error handling to existing code"
+            }),
+        ))
         .add_metric(MetricDefinition::quality("Code Quality".to_string(), 100.0))
-        .add_metric(MetricDefinition::time_to_completion("Execution Time".to_string()))
+        .add_metric(MetricDefinition::time_to_completion(
+            "Execution Time".to_string(),
+        ))
         .add_metric(MetricDefinition::defect_rate("Defect Rate".to_string()))
-        .add_metric(MetricDefinition::cost_efficiency("Cost Efficiency".to_string()))
+        .add_metric(MetricDefinition::cost_efficiency(
+            "Cost Efficiency".to_string(),
+        ))
         .build()
         .unwrap();
 
         // Create service and run benchmark
         let mut service = DefaultBenchmarkService::new();
-        
+
         // Run benchmark for version 1.0
         let mut result_v1 = service.run_benchmark(&benchmark).unwrap();
         result_v1.workflow_version = "1.0.0".to_string();
         result_v1.provider = "provider_a".to_string();
-        
+
         // Verify results
         assert_eq!(result_v1.test_case_results.len(), 3);
         assert!(result_v1.metrics.contains_key("Code Quality"));
         assert!(result_v1.metrics.contains_key("Execution Time"));
         assert!(result_v1.metrics.contains_key("Defect Rate"));
         assert!(result_v1.metrics.contains_key("Cost Efficiency"));
-        
+
         // Store result
         service.store_result(result_v1.clone()).unwrap();
-        
+
         // Run benchmark for version 2.0
         let mut result_v2 = service.run_benchmark(&benchmark).unwrap();
         result_v2.workflow_version = "2.0.0".to_string();
         result_v2.provider = "provider_b".to_string();
-        
+
         // Store result
         service.store_result(result_v2.clone()).unwrap();
-        
+
         // Compare results
         let comparison = service.compare_results(&result_v1, &result_v2).unwrap();
         assert_eq!(comparison.metric_comparisons.len(), 4);
-        
+
         // Verify each metric comparison has required fields
         for (metric_name, comp) in &comparison.metric_comparisons {
             assert!(!metric_name.is_empty());
             assert!(comp.normalized_baseline >= 0.0 && comp.normalized_baseline <= 1.0);
             assert!(comp.normalized_comparison >= 0.0 && comp.normalized_comparison <= 1.0);
         }
-        
+
         // Get leaderboard
         let leaderboard = service.get_leaderboard("code_generation").unwrap();
         assert_eq!(leaderboard.len(), 2);
         assert_eq!(leaderboard[0].rank, 1);
         assert_eq!(leaderboard[1].rank, 2);
-        
+
         // Verify leaderboard entries have all required data
         for entry in &leaderboard {
             assert!(!entry.workflow_version.is_empty());
@@ -1022,13 +1017,11 @@ mod integration_tests {
             "Custom Metrics Benchmark".to_string(),
             "performance".to_string(),
         )
-        .add_test_case(
-            TestCase::new(
-                "load_test".to_string(),
-                "Load Test".to_string(),
-                serde_json::json!({"load": 1000}),
-            )
-        )
+        .add_test_case(TestCase::new(
+            "load_test".to_string(),
+            "Load Test".to_string(),
+            serde_json::json!({"load": 1000}),
+        ))
         .add_metric(custom_metric)
         .add_metric(MetricDefinition::quality("Quality".to_string(), 100.0))
         .build()
@@ -1036,7 +1029,7 @@ mod integration_tests {
 
         let service = DefaultBenchmarkService::new();
         let result = service.run_benchmark(&benchmark).unwrap();
-        
+
         assert!(result.metrics.contains_key("Throughput"));
         assert!(result.metrics.contains_key("Quality"));
     }
@@ -1065,13 +1058,11 @@ mod integration_tests {
             "Tracking Test".to_string(),
             "test".to_string(),
         )
-        .add_test_case(
-            TestCase::new(
-                "test1".to_string(),
-                "Test 1".to_string(),
-                serde_json::json!({}),
-            )
-        )
+        .add_test_case(TestCase::new(
+            "test1".to_string(),
+            "Test 1".to_string(),
+            serde_json::json!({}),
+        ))
         .add_metric(MetricDefinition::quality("Quality".to_string(), 100.0))
         .build()
         .unwrap();

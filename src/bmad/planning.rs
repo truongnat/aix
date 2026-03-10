@@ -54,6 +54,7 @@ pub enum Priority {
 }
 
 /// Story point estimate
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum Estimate {
@@ -184,8 +185,9 @@ pub struct SprintPlanner;
 impl SprintPlanner {
     /// Create a sprint from backlog based on capacity
     pub fn plan_sprint(backlog: &ProductBacklog, capacity: u32, goal: &str) -> Sprint {
+        let sprint_id = simple_id();
         let mut sprint = Sprint::new(
-            format!("Sprint {}", simple_id()[..8].to_string()),
+            format!("Sprint {}", &sprint_id[..8]),
             goal.to_string(),
             capacity,
         );
@@ -230,9 +232,7 @@ impl SprintPlanner {
 /// Simple ID generation
 fn simple_id() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
-    let duration = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap();
+    let duration = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
     format!("{:x}{:x}", duration.as_secs(), duration.subsec_nanos())
 }
 

@@ -105,7 +105,11 @@ impl PinchTabManager {
     }
 
     /// Launch a new browser instance
-    pub fn launch_instance(&self, profile: Option<&str>, headless: Option<bool>) -> Result<Instance, String> {
+    pub fn launch_instance(
+        &self,
+        profile: Option<&str>,
+        headless: Option<bool>,
+    ) -> Result<Instance, String> {
         let mut args = vec!["instance".to_string(), "launch".to_string()];
 
         if headless.unwrap_or(self.config.headless) {
@@ -142,7 +146,7 @@ impl PinchTabManager {
     /// Navigate to URL
     pub fn navigate(&self, instance_id: &str, url: &str) -> Result<Tab, String> {
         let output = Command::new("pinchtab")
-            .args(&["nav", "-i", instance_id, url])
+            .args(["nav", "-i", instance_id, url])
             .output()
             .map_err(|e| format!("Failed to navigate: {}", e))?;
 
@@ -162,7 +166,7 @@ impl PinchTabManager {
     /// Get page snapshot with interactive elements
     pub fn snapshot(&self, tab_id: &str) -> Result<Snapshot, String> {
         let output = Command::new("pinchtab")
-            .args(&["snap", "-i", tab_id])
+            .args(["snap", "-i", tab_id])
             .output()
             .map_err(|e| format!("Failed to get snapshot: {}", e))?;
 
@@ -184,7 +188,7 @@ impl PinchTabManager {
     /// Click element by ID
     pub fn click(&self, tab_id: &str, element_id: &str) -> Result<ActionResult, String> {
         let output = Command::new("pinchtab")
-            .args(&["click", "-i", tab_id, element_id])
+            .args(["click", "-i", tab_id, element_id])
             .output()
             .map_err(|e| format!("Failed to click: {}", e))?;
 
@@ -196,9 +200,14 @@ impl PinchTabManager {
     }
 
     /// Fill input field
-    pub fn fill(&self, tab_id: &str, element_id: &str, value: &str) -> Result<ActionResult, String> {
+    pub fn fill(
+        &self,
+        tab_id: &str,
+        element_id: &str,
+        value: &str,
+    ) -> Result<ActionResult, String> {
         let output = Command::new("pinchtab")
-            .args(&["fill", "-i", tab_id, element_id, value])
+            .args(["fill", "-i", tab_id, element_id, value])
             .output()
             .map_err(|e| format!("Failed to fill: {}", e))?;
 
@@ -212,7 +221,7 @@ impl PinchTabManager {
     /// Extract page text
     pub fn extract_text(&self, tab_id: &str) -> Result<String, String> {
         let output = Command::new("pinchtab")
-            .args(&["text", "-i", tab_id])
+            .args(["text", "-i", tab_id])
             .output()
             .map_err(|e| format!("Failed to extract text: {}", e))?;
 
@@ -226,7 +235,7 @@ impl PinchTabManager {
     /// Take screenshot
     pub fn screenshot(&self, tab_id: &str, path: &str) -> Result<ActionResult, String> {
         let output = Command::new("pinchtab")
-            .args(&["screenshot", "-i", tab_id, "-o", path])
+            .args(["screenshot", "-i", tab_id, "-o", path])
             .output()
             .map_err(|e| format!("Failed to take screenshot: {}", e))?;
 

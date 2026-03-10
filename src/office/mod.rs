@@ -5,6 +5,7 @@
 //! in parallel on tasks.
 
 pub mod agent;
+#[allow(clippy::module_inception)]
 pub mod office;
 pub mod roles;
 pub mod runtime;

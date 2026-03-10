@@ -6,10 +6,10 @@ use tokio::sync::RwLock;
 use anyhow::anyhow;
 
 use crate::office::office::ExecutionMode;
-use crate::office::Office;
-use crate::office::OfficeStateStore;
 use crate::office::roles::Role;
 use crate::office::tasks::OfficeTask;
+use crate::office::Office;
+use crate::office::OfficeStateStore;
 
 /// Global office state
 pub struct OfficeRuntime {
@@ -29,7 +29,10 @@ impl OfficeRuntime {
             Office::new()
         };
 
-        Ok(Self { office, state_store })
+        Ok(Self {
+            office,
+            state_store,
+        })
     }
 
     /// Save current state
@@ -38,7 +41,12 @@ impl OfficeRuntime {
     }
 
     /// Start office with task
-    pub fn start(&mut self, task: String, parallel: bool, roles: Option<String>) -> Result<(), anyhow::Error> {
+    pub fn start(
+        &mut self,
+        task: String,
+        parallel: bool,
+        roles: Option<String>,
+    ) -> Result<(), anyhow::Error> {
         let mode = if parallel {
             ExecutionMode::Parallel
         } else {
@@ -61,11 +69,19 @@ impl OfficeRuntime {
         self.office.set_mode(mode);
 
         // Add initial task
-        let task_id = format!("task-{}", std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_millis());
-        let task = OfficeTask::new(task_id.clone(), "Initial Task".to_string(), task.clone(), task);
+        let task_id = format!(
+            "task-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_millis()
+        );
+        let task = OfficeTask::new(
+            task_id.clone(),
+            "Initial Task".to_string(),
+            task.clone(),
+            task,
+        );
         self.office.add_task(task);
 
         self.office.start();
@@ -74,18 +90,22 @@ impl OfficeRuntime {
     }
 
     /// Add a task
-    pub fn add_task(&mut self, title: String, description: String, input: String, role: Option<String>) -> Result<String, anyhow::Error> {
-        let task_id = format!("task-{}", std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_millis());
-
-        let task = OfficeTask::new(
-            task_id.clone(),
-            title,
-            description,
-            input,
+    pub fn add_task(
+        &mut self,
+        title: String,
+        description: String,
+        input: String,
+        role: Option<String>,
+    ) -> Result<String, anyhow::Error> {
+        let task_id = format!(
+            "task-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_millis()
         );
+
+        let task = OfficeTask::new(task_id.clone(), title, description, input);
 
         if let Some(role_str) = role {
             if let Some(r) = Role::from_str(&role_str) {
@@ -136,7 +156,12 @@ impl OfficeRuntime {
     }
 
     /// Send message
-    pub fn send_message(&mut self, from: String, to: String, content: String) -> Result<(), anyhow::Error> {
+    pub fn send_message(
+        &mut self,
+        from: String,
+        to: String,
+        content: String,
+    ) -> Result<(), anyhow::Error> {
         if let (Some(f), Some(t)) = (Role::from_str(&from), Role::from_str(&to)) {
             self.office.send_message(f, t, content);
             self.save()?;
@@ -149,6 +174,8 @@ impl OfficeRuntime {
 pub type SharedOfficeRuntime = Arc<RwLock<OfficeRuntime>>;
 
 /// Get or create the global office runtime
-pub fn get_or_create_office_runtime(project_root: &str) -> Result<SharedOfficeRuntime, anyhow::Error> {
+pub fn get_or_create_office_runtime(
+    project_root: &str,
+) -> Result<SharedOfficeRuntime, anyhow::Error> {
     Ok(Arc::new(RwLock::new(OfficeRuntime::new(project_root)?)))
 }

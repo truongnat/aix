@@ -3,7 +3,9 @@
 //! This skill provides browser automation capabilities using PinchTab.
 
 use crate::engine::context::ExecutionContext;
-use crate::skill::capability::{SkillCapability, SkillIOType, CapabilityPermissions, SideEffectClass};
+use crate::skill::capability::{
+    CapabilityPermissions, SideEffectClass, SkillCapability, SkillIOType,
+};
 use crate::skill::io::{SkillInput, SkillOutput};
 use crate::skill::Skill;
 use anyhow::{anyhow, Result};
@@ -89,7 +91,9 @@ impl PinchTabSkill {
             }
         }
 
-        let output = cmd.output().map_err(|e| anyhow!("Failed to execute: {}", e))?;
+        let output = cmd
+            .output()
+            .map_err(|e| anyhow!("Failed to execute: {}", e))?;
 
         if output.status.success() {
             Ok(String::from_utf8_lossy(&output.stdout).to_string())
@@ -151,13 +155,7 @@ impl Skill for PinchTabSkill {
             "Browser automation using PinchTab for web scraping, testing, and interaction",
             SkillIOType::Json,
             SkillIOType::Text,
-            CapabilityPermissions::new(
-                false,
-                false,
-                true,
-                false,
-                true,
-            ),
+            CapabilityPermissions::new(false, false, true, false, true),
             SideEffectClass::ExternalMutation,
         )
     }

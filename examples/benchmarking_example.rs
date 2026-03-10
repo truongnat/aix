@@ -32,7 +32,7 @@ fn main() {
 
 fn example_create_benchmark() {
     println!("Creating a code generation benchmark with multiple test cases...");
-    
+
     // In actual usage:
     // let benchmark = BenchmarkBuilder::new(
     //     "code_gen_v1".to_string(),
@@ -50,17 +50,17 @@ fn example_create_benchmark() {
     // .add_metric(MetricDefinition::time_to_completion("Execution Time".to_string()))
     // .build()
     // .unwrap();
-    
+
     println!("  ✓ Benchmark created with 3 test cases and 4 metrics");
 }
 
 fn example_run_benchmark() {
     println!("Running benchmark for version 1.0.0...");
-    
+
     // In actual usage:
     // let service = DefaultBenchmarkService::new();
     // let result = service.run_benchmark(&benchmark).unwrap();
-    
+
     println!("  ✓ Benchmark completed");
     println!("    - Test cases executed: 3");
     println!("    - Metrics collected: 4");
@@ -72,10 +72,10 @@ fn example_run_benchmark() {
 
 fn example_compare_results() {
     println!("Comparing version 1.0.0 vs 2.0.0...");
-    
+
     // In actual usage:
     // let comparison = service.compare_results(&result_v1, &result_v2).unwrap();
-    
+
     println!("  ✓ Comparison completed");
     println!("    Overall improvement: +12.5%");
     println!("    Metric improvements:");
@@ -87,10 +87,10 @@ fn example_compare_results() {
 
 fn example_leaderboard() {
     println!("Generating leaderboard for 'code_generation' category...");
-    
+
     // In actual usage:
     // let leaderboard = service.get_leaderboard("code_generation").unwrap();
-    
+
     println!("  ✓ Leaderboard generated");
     println!("\n  Rank | Version | Provider   | Score");
     println!("  -----|---------|------------|-------");
@@ -101,13 +101,13 @@ fn example_leaderboard() {
 
 fn example_custom_metrics() {
     println!("Creating benchmark with custom metrics...");
-    
+
     // In actual usage:
     // let custom_metric = CustomMetricBuilder::new("Throughput".to_string())
     //     .with_unit("requests/sec".to_string())
     //     .higher_is_better(true)
     //     .build();
-    
+
     println!("  ✓ Custom metric created: Throughput (requests/sec)");
     println!("  ✓ Optimization direction: higher is better");
     println!("  ✓ Benchmark executed with custom metric");
