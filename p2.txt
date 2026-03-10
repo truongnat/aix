@@ -1,0 +1,76 @@
+Câu hỏi hay — giả sử tất cả gaps trên đã được fix, đây là tầng **next-level** cần improve để đi từ "good tool" → "serious platform":
+
+---
+
+## Tầng 1 — Execution Intelligence
+
+**Adaptive workflow planning**
+Hiện tại workflow là static markdown. Cần nâng lên: agent tự *re-plan* mid-execution khi context thay đổi (test fail, scope drift, blocked dependency). Đây là sự khác biệt giữa scripted automation và true agentic behavior.
+
+**Causal trace, không chỉ sequential trace**
+Hiện tại trace ghi lại *cái gì đã xảy ra*. Cần nâng lên ghi lại *tại sao step này được trigger*, *decision nào dẫn đến output này*. Đây là foundation cho audit và compliance thực sự.
+
+**Feedback loop từ production**
+Vòng "Learn" trong lifecycle hiện là next-step synthesis từ run output. Cần extend để ingest signals từ production thực: error rates, user feedback, incident reports → feed ngược lại vào planning phase của workflow tiếp theo.
+
+---
+
+## Tầng 2 — Multi-agent Coordination thực sự
+
+**Agent negotiation protocol**
+Khi architect và implementer disagree (spec vs feasibility), cần có structured negotiation, không phải chỉ role assignment. Gần với RLHF debate setup hơn là sequential handoff.
+
+**Shared working memory với conflict resolution**
+Nhiều agents cùng đọc/ghi context → cần CRDT-style merging hoặc optimistic locking, không phải last-write-wins.
+
+**Agent specialization marketplace**
+Thay vì bundled roles cố định, cho phép community contribute specialized agents (security expert, performance specialist, domain-specific reviewer) và runtime tự compose team phù hợp với task.
+
+---
+
+## Tầng 3 — Trust & Verification
+
+**Formal verification của workflow outputs**
+Với critical paths (release, security scan), LLM output cần được cross-checked bởi deterministic tools, không phải chỉ "report quality gate." Ví dụ: nếu agent claim "no SQL injection", phải chạy actual SAST để verify claim đó.
+
+**Adversarial testing của chính agents**
+Có một "red team agent" chủ động tìm cách break output của implementer agent trước khi reviewer agent chạy. Hiện tại review chỉ là cooperative.
+
+**Cryptographic commitment của decisions**
+Mỗi significant decision (approve merge, pass security gate) cần được sign bởi agent identity + timestamp, không thể retroactively modify. Đây là yêu cầu của SOC2/ISO27001 environments.
+
+---
+
+## Tầng 4 — Organizational Scale
+
+**Cost accounting per workflow run**
+Mỗi run tốn bao nhiêu token, bao nhiêu $, ROI so với manual effort là bao nhiêu. Không có cái này thì enterprise không adopt được.
+
+**Human-in-the-loop với SLA**
+Khi workflow gặp ambiguity vượt threshold, escalate đến human reviewer với deadline. Nếu human không respond trong SLA window, workflow có policy rõ ràng: block, assume yes, hay assume no.
+
+**Multi-tenant isolation**
+Nếu nhiều teams dùng cùng runtime, cần hard isolation giữa workflow runs: không share context, không cross-contaminate memory, separate audit logs.
+
+---
+
+## Tầng 5 — Ecosystem & Network Effects
+
+**Workflow performance benchmarking**
+Như benchmark model trên MMLU nhưng cho SDLC workflows: đo quality of output, time-to-completion, defect rate của code được generate — so sánh được giữa versions và providers.
+
+**Diff-based learning**
+Khi human sửa lại output của agent (code review, edit release notes), capture diff đó và dùng để fine-tune agent behavior cho project đó. Project-specific memory, không phải generic.
+
+**Composable workflow marketplace**
+Giống npm nhưng cho workflows. Teams share và reuse workflow fragments, với versioning, ratings, và dependency resolution. Hiện tại skill import là primitive version của ý tưởng này nhưng thiếu discovery và governance.
+
+---
+
+## Thứ tự ưu tiên nếu phải chọn
+
+Nếu goal là **enterprise adoption**: làm tầng 3 (Trust & Verification) và tầng 4 (cost accounting + human-in-the-loop) trước — đây là những blocker thực tế mà procurement team hỏi đến đầu tiên.
+
+Nếu goal là **developer adoption**: làm tầng 1 (adaptive planning + causal trace) và tầng 5 (marketplace) trước — đây là những thứ tạo "wow moment" và word-of-mouth.
+
+Nếu goal là **research/differentiation**: tầng 2 (multi-agent negotiation) là frontier thực sự, chưa ai làm tốt và đây là moat dài hạn.

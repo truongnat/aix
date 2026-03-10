@@ -6,6 +6,10 @@ pub(crate) enum Commands {
         #[command(subcommand)]
         action: WorkflowCommand,
     },
+    Office {
+        #[command(subcommand)]
+        action: OfficeCommand,
+    },
 }
 
 #[derive(Subcommand, Debug, Clone)]
@@ -284,6 +288,62 @@ pub(crate) enum WorkflowCommand {
     List,
 }
 
+#[derive(Subcommand, Debug, Clone)]
+pub(crate) enum OfficeCommand {
+    /// Start the office with a task
+    Start {
+        /// Task description
+        task: String,
+        /// Run in parallel mode (default)
+        #[arg(long, default_value_t = true)]
+        parallel: bool,
+        /// Roles to include (comma-separated)
+        #[arg(long)]
+        roles: Option<String>,
+    },
+    /// Show office status
+    Status {
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    /// Add a task to the office
+    AddTask {
+        /// Task title
+        title: String,
+        /// Task description
+        description: String,
+        /// Task input
+        input: String,
+        /// Assign to role
+        #[arg(long)]
+        role: Option<String>,
+    },
+    /// Assign task to a role
+    Assign {
+        /// Task ID
+        task_id: String,
+        /// Role to assign to
+        role: String,
+    },
+    /// Pause office execution
+    Pause,
+    /// Resume office execution
+    Resume,
+    /// Stop office execution
+    Stop,
+    /// List all roles
+    Roles,
+    /// Send message between roles
+    Message {
+        /// From role
+        from: String,
+        /// To role
+        to: String,
+        /// Message content
+        message: String,
+    },
+}
+
 #[derive(Debug, Clone)]
 pub(crate) struct TemplateRunRequest {
     pub(crate) template: String,
@@ -329,6 +389,22 @@ pub(crate) enum WorkflowLaunchAction {
     StartRole(RoleRunRequest),
     ChatThread(ChatThreadRequest),
     ThreadFlow(ThreadFlowRequest),
+    StartOffice(OfficeRunRequest),
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct OfficeRunRequest {
+    pub task: String,
+    pub parallel: bool,
+    pub roles: Option<String>,
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct OfficeAddTaskRequest {
+    pub title: String,
+    pub description: String,
+    pub input: String,
+    pub role: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]

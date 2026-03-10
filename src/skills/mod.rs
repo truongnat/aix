@@ -1,5 +1,7 @@
+pub mod defuddle;
 pub mod dev_workflow;
 pub mod echo;
+pub mod evaluation;
 pub mod flaky;
 pub mod git_ops;
 pub mod idempotency;
@@ -9,5 +11,7 @@ pub mod loader;
 pub mod manual_approval;
 pub mod model;
 pub mod parse_number;
+pub mod pinchtab;
 pub mod role_loader;
+pub mod security;
 pub mod vector_memory;

@@ -44,6 +44,28 @@
 <span class="command">antigrav</span> <span class="command">workflow</span> <span class="command">doctor</span></pre>
             </div>
         </div>
+        <div class="code-block bmad-section">
+            <div class="code-header">
+                <div class="code-title">
+                    <div class="code-dots">
+                        <span class="code-dot red"></span>
+                        <span class="code-dot yellow"></span>
+                        <span class="code-dot green"></span>
+                    </div>
+                    terminal - Native BMAD Commands
+                </div>
+            </div>
+            <div class="code-content">
+                <pre><span class="comment"># Run with BMAD feature workflow</span>
+<span class="command">cargo</span> run <span class="flag">--</span> <span class="flag">--workflow</span> <span class="string">feature</span> <span class="flag">--task</span> <span class="string">"Build user auth"</span>
+
+<span class="comment"># Run sprint planning workflow</span>
+<span class="command">cargo</span> run <span class="flag">--</span> <span class="flag">--workflow</span> <span class="string">sprint-planning</span> <span class="flag">--task</span> <span class="string">"Plan sprint 12"</span>
+
+<span class="comment"># Use Party Mode for multi-agent</span>
+<span class="command">cargo</span> run <span class="flag">--</span> <span class="flag">--party-mode</span> <span class="string">feature-team</span></pre>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -202,5 +224,20 @@ antigrav workflow doctor`;
 
     .code-content .string {
         color: var(--accent-primary);
+    }
+
+    .bmad-section {
+        margin-top: 2rem;
+        border-color: rgba(139, 92, 246, 0.3);
+    }
+
+    .bmad-section .code-header {
+        background: rgba(139, 92, 246, 0.1);
+    }
+
+    .bmad-section .code-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
     }
 </style>

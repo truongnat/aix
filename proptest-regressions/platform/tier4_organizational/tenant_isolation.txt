@@ -1,0 +1,10 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc e2f2e8933a93c1100a8cb86fc951da09d16d985cc31d6fe4eb5ad48344b765ca # shrinks to tenant1_id = "a000_aa0aa_000_000a00a_0aaa000aaa__aaaa_a___0_0_a0_a0aa000", tenant2_suffix = "00a000", limits = ResourceLimits { max_concurrent_workflows: 1, max_storage_mb: 1, max_cost_per_month: 1.0 }, isolation_level = Soft
+cc 462de5bab92533e1554773d6365b3f0aa27e67c070d24195a2f9ca7e2b0a98e8 # shrinks to tenant1_id = "aa0_a0aa_0aa0aa_a__0aa0a0aaa00aa0aa00_aaaa0aa0__a00a0_a_a00", tenant2_suffix = "a0a00", limits = ResourceLimits { max_concurrent_workflows: 1, max_storage_mb: 1, max_cost_per_month: 1.0 }, isolation_level = Soft
+cc 8a4425b129710252cd5dd51b008cad5c949fe4d3da6c4a0ed7e82fb19c1b1d70 # shrinks to tenant1_id = "a0aa___aa_a_a0_aa_0a00000_a0a0_a__a0_a0_0_a0_aa_00_aa_0_00_", tenant2_suffix = "0aa0a", limits = ResourceLimits { max_concurrent_workflows: 1, max_storage_mb: 1, max_cost_per_month: 1.0 }, isolation_level = Soft
+cc a93f6217c65061f8c0a83e490b786fa1b2941a87a505dc02ffcf2d90e6ed9ade # shrinks to tenant1_id = "a_a___aa__00_0___a0_0aa_a__0aaa__a0a_aa_a0_0_0a0aa_00_a0__a", tenant2_suffix = "aa0aa", limits = ResourceLimits { max_concurrent_workflows: 1, max_storage_mb: 1, max_cost_per_month: 1.0 }, isolation_level = Soft

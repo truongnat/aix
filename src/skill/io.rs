@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::skill::capability::ConfidenceLevel;
+
 /// Typed input wrapper for skill execution
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SkillInput {
@@ -87,6 +89,29 @@ impl SkillOutput {
             SkillOutput::Json(_) => super::capability::SkillIOType::Json,
             SkillOutput::Number(_) => super::capability::SkillIOType::Number,
             SkillOutput::Boolean(_) => super::capability::SkillIOType::Boolean,
+        }
+    }
+
+    /// Wrap output with confidence scoring (The Dial pattern)
+    pub fn with_confidence(
+        self,
+        confidence: f32,
+        reasoning: Option<String>,
+    ) -> super::capability::SkillResult {
+        use serde_json::Value;
+        let output = match self {
+            SkillOutput::Text(s) => Value::String(s),
+            SkillOutput::Json(v) => v,
+            SkillOutput::Number(n) => Value::Number(serde_json::Number::from_f64(n).unwrap_or(serde_json::Number::from(0))),
+            SkillOutput::Boolean(b) => Value::Bool(b),
+        };
+        super::capability::SkillResult {
+            output,
+            confidence,
+            confidence_level: ConfidenceLevel::from_score(confidence),
+            reasoning,
+            warnings: Vec::new(),
+            metadata: None,
         }
     }
 }

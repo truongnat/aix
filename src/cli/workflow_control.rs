@@ -6,8 +6,8 @@ pub(super) fn handle_workflow_control_command(
     project_layout: &AgentProjectLayout,
     command: Commands,
 ) -> Result<WorkflowLaunchAction> {
-    let Commands::Workflow { action } = command;
-    match action {
+    match command {
+        Commands::Workflow { action } => match action {
         WorkflowCommand::List => {
             let instances = state_store.list_instances()?;
             if instances.is_empty() {
@@ -868,6 +868,68 @@ pub(super) fn handle_workflow_control_command(
                     record.updated_at_ms
                 );
             }
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        },
+        Commands::Office { action } => {
+            use crate::office::runtime::OfficeRuntime;
+            use crate::office::roles::Role;
+
+            let project_root = project_layout.agents_root.parent()
+                .map(|p| p.to_string_lossy().to_string())
+                .unwrap_or_else(|| ".".to_string());
+
+            let mut runtime = OfficeRuntime::new(&project_root)?;
+
+            match action {
+                OfficeCommand::Start { task, parallel, roles } => {
+                    runtime.start(task, parallel, roles)?;
+                    println!("Office started successfully.");
+                    runtime.office.print_status();
+                }
+                OfficeCommand::Status { json } => {
+                    if json {
+                        use serde_json::to_string_pretty;
+                        let stats = runtime.office.stats();
+                        println!("{}", to_string_pretty(&stats)?);
+                    } else {
+                        runtime.office.print_status();
+                    }
+                }
+                OfficeCommand::AddTask { title, description, input, role } => {
+                    let task_id = runtime.add_task(title, description, input, role)?;
+                    println!("Task added: {}", task_id);
+                }
+                OfficeCommand::Assign { task_id, role } => {
+                    runtime.assign_task(task_id, role.clone())?;
+                    println!("Task assigned to role: {}", role);
+                }
+                OfficeCommand::Pause => {
+                    runtime.pause()?;
+                    println!("Office paused.");
+                }
+                OfficeCommand::Resume => {
+                    runtime.resume()?;
+                    println!("Office resumed.");
+                }
+                OfficeCommand::Stop => {
+                    runtime.stop()?;
+                    println!("Office stopped.");
+                }
+                OfficeCommand::Roles => {
+                    println!("Available roles:");
+                    for role in Role::all() {
+                        let color = role.color();
+                        println!("{}  - {}{}", color, role, Role::reset_color());
+                        println!("    {}", role.description());
+                    }
+                }
+                OfficeCommand::Message { from, to, message } => {
+                    runtime.send_message(from, to, message)?;
+                    println!("Message sent.");
+                }
+            }
+
             Ok(WorkflowLaunchAction::Noop)
         }
     }

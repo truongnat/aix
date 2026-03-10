@@ -48,6 +48,45 @@ graph TB
     WE --> SS
 ```
 
+## Tổng quan chi tiết (Detailed Overview)
+
+```mermaid
+flowchart LR
+    User["User / Operator"] --> CLI["CLI (command parser)"]
+    CLI --> Engine["Execution Engine"]
+    CLI --> Office["Office Simulation"]
+
+    Engine --> Workflow["Workflow Engine"]
+    Engine --> Routing["Routing Policy & Domain Registry"]
+    Engine --> Sandbox["Sandbox & Resource Budget"]
+    Engine --> Context["Context Service & Retrieval"]
+    Engine --> Telemetry["Telemetry & Tracing"]
+
+    Workflow --> Skills["Skills Runner"]
+    Skills --> SkillLib["Skill Library (Markdown + Rust skills)"]
+    Skills --> LLMs["LLM Providers (OpenAI/Anthropic/Gemini/Ollama)"]
+    Skills --> Tools["External Tools / Scripts"]
+
+    Engine --> Platform["Platform Services"]
+    Platform --> Tier1["Tier 1: Execution Intelligence\nAdaptive Planner, Causal Tracer"]
+    Platform --> Tier2["Tier 2: Multi‑Agent\nNegotiation, Shared Memory, Marketplace"]
+    Platform --> Tier3["Tier 3: Trust & Verification\nFormal Verifier, Adversarial Testing, Commitment"]
+    Platform --> Tier4["Tier 4: Organizational\nCost Tracking, Human Review, Tenant Isolation"]
+    Platform --> Tier5["Tier 5: Ecosystem\nWorkflow Marketplace, Benchmarking"]
+
+    Office --> OfficeRoles["Roles (CEO/CTO/PM/Eng/Design/QA)"]
+    Office --> OfficeTasks["Office Tasks & Queue"]
+    Office --> OfficeState["Office State Store"]
+
+    Workflow --> StateStore["Workflow State Store"]
+    Context --> VectorStore["Vector/Graph Index (SQLite/Postgres)"]
+    Telemetry --> TraceStore["Trace/Replay Store"]
+    OfficeState --> LocalState[".antigrav/office/state.json"]
+
+    Engine --> Output["Results / Reports / Artifacts"]
+    Platform --> Output
+```
+
 ## Workflow Execution Flow
 
 ```mermaid
@@ -90,4 +129,4 @@ graph LR
 
 ---
 
-**Last Updated:** 2026-03-06
+**Last Updated:** 2026-03-10

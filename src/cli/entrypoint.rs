@@ -42,6 +42,19 @@ pub(super) async fn run_impl() -> Result<()> {
             WorkflowLaunchAction::StartRole(request) => role_request = Some(request),
             WorkflowLaunchAction::ChatThread(request) => chat_thread_request = Some(request),
             WorkflowLaunchAction::ThreadFlow(request) => thread_flow_request = Some(request),
+            WorkflowLaunchAction::StartOffice(request) => {
+                use crate::office::runtime::OfficeRuntime;
+
+                let project_root = project_layout.agents_root.parent()
+                    .map(|p| p.to_string_lossy().to_string())
+                    .unwrap_or_else(|| ".".to_string());
+
+                let mut runtime = OfficeRuntime::new(&project_root)?;
+                runtime.start(request.task, request.parallel, request.roles)?;
+                println!("Office started successfully.");
+                runtime.office.print_status();
+                return Ok(());
+            }
         }
     }
     if template_request.is_some() && (cli.template.is_some() || cli.task.is_some()) {

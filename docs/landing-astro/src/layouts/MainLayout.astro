@@ -36,6 +36,7 @@ const {
             <ul class="nav-links">
                 <li><a href="#production">Production</a></li>
                 <li><a href="#features">Features</a></li>
+                <li><a href="#architecture-overview">Overview</a></li>
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#quickstart">Quick Start</a></li>
                 <li><a href="#bundles">Bundles</a></li>
@@ -59,6 +60,7 @@ const {
         <ul>
             <li><a href="#production" class="mobile-link">Production</a></li>
             <li><a href="#features" class="mobile-link">Features</a></li>
+            <li><a href="#architecture-overview" class="mobile-link">Overview</a></li>
             <li><a href="#how-it-works" class="mobile-link">How It Works</a></li>
             <li><a href="#quickstart" class="mobile-link">Quick Start</a></li>
             <li><a href="#bundles" class="mobile-link">Bundles</a></li>
@@ -83,6 +85,7 @@ const {
                         <ul>
                             <li><a href="#production">Production</a></li>
                             <li><a href="#features">Features</a></li>
+                            <li><a href="#architecture-overview">Overview</a></li>
                             <li><a href="#how-it-works">How It Works</a></li>
                             <li><a href="#quickstart">Quick Start</a></li>
                             <li><a href="#bundles">Bundles</a></li>
@@ -171,7 +174,7 @@ const {
         }, observerOptions);
 
         // Observe elements for animation
-        document.querySelectorAll('.bento-card, .bundle-card, .workflow-step').forEach(el => {
+        document.querySelectorAll('.bento-card, .bundle-card, .workflow-step, .overview-card').forEach(el => {
             (el as HTMLElement).style.opacity = '0';
             (el as HTMLElement).style.transform = 'translateY(20px)';
             (el as HTMLElement).style.transition = 'all 0.6s ease';

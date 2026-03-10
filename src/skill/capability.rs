@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 /// Skill I/O type enum for capability declaration
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -19,6 +20,53 @@ impl SkillIOType {
             SkillIOType::Boolean => "boolean",
         }
     }
+}
+
+/// Confidence level for skill execution results
+/// Based on "The Dial" pattern from skill-generator
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ConfidenceLevel {
+    /// >= 85% confidence - can act automatically
+    High,
+    /// 50-84% confidence - should ask user for confirmation
+    Medium,
+    /// < 50% confidence - should list possibilities and ask user
+    Low,
+}
+
+impl ConfidenceLevel {
+    pub fn from_score(score: f32) -> Self {
+        if score >= 0.85 {
+            ConfidenceLevel::High
+        } else if score >= 0.50 {
+            ConfidenceLevel::Medium
+        } else {
+            ConfidenceLevel::Low
+        }
+    }
+
+    pub fn should_auto_act(&self) -> bool {
+        matches!(self, ConfidenceLevel::High)
+    }
+
+    pub fn should_confirm(&self) -> bool {
+        matches!(self, ConfidenceLevel::Medium)
+    }
+
+    pub fn should_ask_user(&self) -> bool {
+        matches!(self, ConfidenceLevel::Low)
+    }
+}
+
+/// Result of skill execution with confidence scoring
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SkillResult {
+    pub output: Value,
+    pub confidence: f32,
+    pub confidence_level: ConfidenceLevel,
+    pub reasoning: Option<String>,
+    pub warnings: Vec<String>,
+    pub metadata: Option<Value>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

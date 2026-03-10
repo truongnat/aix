@@ -18,6 +18,7 @@ use crate::engine::workflow_engine::{
     ExecutionEngine, WorkflowInstance, WorkflowInstanceStatus, WorkflowStateStore,
 };
 use crate::skill::capability::{CapabilityPermissions, TrustTier};
+use crate::skills::defuddle::DefuddleSkill;
 use crate::skills::dev_workflow::{EnsureBranchSkill, RunScriptSkill, WriteFileSkill};
 use crate::skills::echo::EchoSkill;
 use crate::skills::flaky::FlakySkill;
@@ -29,6 +30,7 @@ use crate::skills::is_positive::IsPositiveSkill;
 use crate::skills::llm_subagent::LlmSubAgentSkill;
 use crate::skills::loader::{load_skills, parse_skill_markdown};
 use crate::skills::manual_approval::ManualApprovalSkill;
+use crate::skills::pinchtab::PinchTabSkill;
 use crate::skills::role_loader::load_role_profile_if_exists;
 use crate::skills::vector_memory::{EmbedDocumentSkill, SemanticSearchSkill};
 use crate::workflow::loader::{load_workflow, parse_markdown_content};
