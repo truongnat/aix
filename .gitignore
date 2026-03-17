@@ -31,3 +31,6 @@ dist-ssr
 /target
 /local_target
 /local_tmp
+.agents/state/
+.agents/skills_cache/
+*.lock.json
