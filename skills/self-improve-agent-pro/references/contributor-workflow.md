@@ -36,6 +36,21 @@ If a workflow summary shows excessive token usage (>50k tokens or >10 interactio
 2. Propose a more "surgical" prompt or a better specialized skill.
 3. Create a Contributor PR to update the `prompts/` or `skills/` with the optimized version.
 
+## Worked example (cross-skill harvest)
+
+Use this when a bug fix yields **reusable** routing/history knowledge: put the **technical** write-up in the domain skill, and keep **this** file as the “how + pointer”.
+
+| What | Where |
+|------|--------|
+| Case / solution / prevention (browser Back vs in-app after **edit** routes) | **`nextjs-pro`** → [Edge cases — Browser history and edit flows](../../nextjs-pro/references/edge-cases.md#browser-history-and-edit-flows) |
+| Contributor steps (branch, commit, PR) | This document — [Step-by-Step Process](#step-by-step-process) |
+
+**Case:** After **list → detail → edit**, two **browser** Back operations should return to **list**. If the second Back from detail incorrectly returns to **edit**, the history stack and “leave edit” handlers are out of sync (see `nextjs-pro` section above).
+
+**Solution:** Document the pattern in **`nextjs-pro/references/edge-cases.md`**; link from here so self-improve readers know where the harvested edge case lives.
+
+**Prevention:** Before closing the contributor PR, confirm the new text is **framework-level**, not a dump of one app’s file names — and add a regression note (e.g. two consecutive browser Backs on edit).
+
 ## Anti-patterns
 - **Polluting**: Adding very specific project logic that isn't reusable.
 - **Bloating**: Adding large blocks of code without explanation.

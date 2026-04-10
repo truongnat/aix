@@ -8,6 +8,7 @@
 4. [Self-hosting and Docker](#self-hosting-and-docker)
 5. [Monorepos and transpilation](#monorepos-and-transpilation)
 6. [Pages Router coexistence](#pages-router-coexistence)
+7. [Browser history and edit flows](#browser-history-and-edit-flows)
 
 ---
 
@@ -48,6 +49,19 @@
 ## Pages Router coexistence
 
 - **`pages/`** and **`app/`** can coexist during migration — routing precedence and duplicate paths are easy to get wrong; document URL ownership.
+
+---
+
+## Browser history and edit flows
+
+Applies to **App Router** (and SPAs generally) when you guard **edit** screens with “unsaved changes” modals or synthetic history entries.
+
+- **Symptom** — Flow **list → detail → `/edit`**. **Browser Back** from edit returns to detail, but the **next** Back from detail jumps to **edit** again instead of **list**. In-app **Cancel / 戻る** (programmatic `router.push` to known targets) still behaves correctly.
+- **Why** — `popstate` / trap logic that **`pushState`s again on every back** (stack inflation), and/or completing “leave edit” after a **browser-initiated** back using **`router.push(detail)`** instead of matching the real history stack (differs from UI-driven navigation).
+- **Directional fix** — Where **Navigation API** exists: `window.navigation` + `navigate`, intercept **traverse** back, `preventDefault` **before** the URL changes, show confirm; on confirm for **browser back**, leave with **`router.back()`** (or equivalent one history step) — **not** `router.push(detail)`. Legacy: one trap entry via `history.pushState` with a sentinel in **spread** `history.state`; **avoid** extra `pushState` inside `popstate` on each back. Re-arm the trap if the user stays after dismissing the modal.
+- **Verify** — Manually: **two consecutive browser Backs** from edit; compare with **in-app** cancel/back paths.
+
+*Harvested pattern; product-specific hook names belong in the app repo, not here.*
 
 ---
 

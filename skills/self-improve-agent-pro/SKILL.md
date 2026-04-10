@@ -99,6 +99,7 @@ Details: [references/integration-map.md](references/integration-map.md)
 ### Contributor workflow (summary)
 
 - How to harvest knowledge from external projects and create PRs back to this repo.
+- Cross-skill example (browser history / edit flows): [references/contributor-workflow.md#worked-example-cross-skill-harvest](references/contributor-workflow.md#worked-example-cross-skill-harvest) → technical detail in **`nextjs-pro`**.
 
 Details: [references/contributor-workflow.md](references/contributor-workflow.md)
 
