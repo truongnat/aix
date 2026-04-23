@@ -1,130 +1,195 @@
 ---
 name: javascript-pro
 description: |
-  Professional JavaScript guidance for architecture-level decisions, runtime behavior, async flows, performance, and maintainability.
+  Production-grade JavaScript: architecture and maintainability, runtime semantics (event loop, microtasks, ESM/CJS graph), async flows, performance — plus execution/module model, failure modes (lost Promises, `this`, pollution, FP dates, dual-package), trade-offs (JS vs TypeScript, mutability), quality guardrails (engine-accurate features; no sloppy security claims).
 
-  Use this skill when implementing or reviewing JavaScript/TypeScript application logic, debugging tricky runtime behavior, or handling language-level edge cases in browser/Node.js projects.
+  Use this skill when implementing or reviewing JavaScript/TypeScript application logic at the language/runtime level, debugging tricky behavior, or handling edge cases in browser/Node projects.
+
+  Combine with **`testing-pro`**, **`security-pro`**, **`typescript-pro`**, **`code-packaging-pro`**, and stack skills (**`react-pro`**, **`nestjs-pro`**, **`nextjs-pro`**) per integration map.
 
   Triggers: "javascript", "js", "event loop", "promise", "closure", "this", "prototype", "hoisting", "microtask", "edge case", "tip", "trick", "await", "async", "TypeError", "ReferenceError", "undefined is not a function", "ESM", "CommonJS", "cjs", "mjs", "import.meta".
 
-  Combine with `testing-pro` for coverage strategy and `security-pro` for threat-focused hardening.
 metadata:
-  short-description: JavaScript — architecture, async behavior, performance, edge cases
+  short-description: JavaScript — runtime model, async, modules, failure modes, edge cases
+  content-language: en
+  domain: javascript
+  level: professional
 ---
 
 # JavaScript (professional)
 
-Use official [MDN JavaScript docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript), [ECMAScript specification](https://tc39.es/ecma262/), and [Node.js docs](https://nodejs.org/docs/latest/api/) for API truth; this skill encodes **high-value defaults**, **production tips and tricks**, and **failure-prone edge-case patterns**. Confirm **runtime targets** (browser versions, Node.js version) and **module mode** (ESM/CJS) from the project.
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use official [MDN JavaScript docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript), [ECMAScript specification](https://tc39.es/ecma262/), and [Node.js docs](https://nodejs.org/docs/latest/api/) for API truth; this skill encodes **predictable runtime behavior**, **explicit contracts**, and **failure-aware** patterns — not syntax trivia alone.
+
+## Boundary
+
+**`javascript-pro`** owns **language and runtime semantics** (execution order, coercion, modules, async). **`typescript-pro`** owns **static types** configuration; **`react-pro`** / **`nestjs-pro`** own **framework** lifecycles; **`security-pro`** owns **threat modeling** beyond language hygiene.
 
 ## Related skills (this repo)
 
 | Skill | When to combine |
-|-------|------------------|
-| `testing-pro` | Turn edge cases into deterministic unit/integration coverage. |
-| `security-pro` | Evaluate prototype pollution, unsafe eval/dynamic code, and input sanitization risks. |
+|-------|----------------|
+| **`testing-pro`** | Regression tests for async, timers, mocks, ESM/CJS runners |
+| **`security-pro`** | `eval`, prototype pollution, unsafe deserialization |
+| **`typescript-pro`** | Types, `strict`, narrowing — stronger guarantees |
+| **`code-packaging-pro`** | `exports`, dual publish, conditional exports |
+| **`react-pro`** | Client bundles, hydration, browser APIs |
+| **`nestjs-pro`** / **`nextjs-pro`** | Server/framework-specific JS patterns |
 
 ## When to use
 
-- Designing JavaScript logic at module/service level instead of only syntax fixes.
-- Reviewing JS code for runtime correctness, readability, and production safety.
-- Diagnosing hard bugs involving async ordering, object mutation, or scope capture.
-- Hardening browser/Node code against non-obvious language and runtime traps.
-- Trigger keywords: `javascript`, `js`, `event loop`, `promise`, `closure`, `this`, `prototype`, `hoisting`, `microtask`, `await`, `async`, `ESM`, `CommonJS`, `TypeError`, `edge case`
+- Module/service-level logic, not only formatting.
+- Runtime correctness, readability, production safety.
+- Async ordering, mutation, scope/`this` bugs.
+- ESM/CJS interop and engine target alignment.
+
+## When not to use
+
+- **Pure TypeScript config** without JS semantics — **`typescript-pro`**.
+- **CSS/HTML-only** questions — other skills.
+
+## Required inputs
+
+- **Runtime targets** (Node version, browserslist, bundler).
+- **Module system** (ESM/CJS) and **strict** expectations.
+
+## Expected output
+
+Follow **Suggested response format** strictly.
 
 ## Workflow
 
-1. **Confirm** versions / environment / stack (browser support matrix, Node.js version, bundler/transpiler settings, ESM vs CJS).
-2. **Apply the principles and topic summaries below; open `references/` when you need depth.**
-3. **Respond using Suggested response format;** note the main risks (runtime regressions, ordering bugs, silent coercion, compatibility gaps).
+1. Confirm versions, `package.json` `"type"`, bundler, test runner module mode.
+2. Apply summaries; open `references/`; defer types to **`typescript-pro`** when static guarantees dominate.
+3. Respond with **Suggested response format**; include **failure modes** for async and security-sensitive code.
 
 ### Operating principles
 
-1. **Reason about runtime behavior first** - treat execution order, mutability, and async scheduling as primary design constraints.
-2. **Prefer explicitness over cleverness** - remove surprising coercion, hidden side effects, and ambiguous control flow.
-3. **Constrain shared mutable state** - favor pure helpers, narrow mutation boundaries, and immutable update patterns when practical.
-4. **Fail fast at boundaries** - validate inputs/output contracts early, especially around JSON, dates, numbers, and external I/O.
-5. **Lock in behavior with tests** - every discovered edge case should become a regression test.
+1. **Execution order first** — Event loop, microtasks, `await` — **`javascript-execution-and-module-system-model.md`**.
+2. **Prefer explicitness** — `===`, avoid surprise coercion — **`tips-and-tricks.md`**.
+3. **Constrain mutable shared state** — Narrow owners — **`decision-framework-and-trade-offs.md`**.
+4. **Validate at boundaries** — JSON, dates, numbers — **`failure-modes-detection-mitigation.md`**.
+5. **Tests lock regressions** — **`testing-pro`**.
+
+### JavaScript execution and module system model (summary)
+
+Event loop, ESM/CJS, strict mode — **`javascript-execution-and-module-system-model.md`**.
+
+Details: [references/javascript-execution-and-module-system-model.md](references/javascript-execution-and-module-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Lost Promises, races, `this`, pollution, FP/date/JSON — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+JS vs TS maturity, mutability vs perf, async API shape — **`decision-framework-and-trade-offs.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+Shipped features vs proposals; module-mode examples — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### High-level tips and tricks (summary)
 
-- Normalize data at module boundaries (`string`/`number`/`Date`) to prevent coercion drift deeper in the call chain.
-- Use `Object.hasOwn()` (or `Object.prototype.hasOwnProperty.call`) for own-key checks instead of relying on inherited properties.
-- Keep async operations observable: return Promises consistently and avoid mixing callback style with `async/await` in the same flow.
-- Prefer stable, named helpers over inline "smart" expressions to make error handling and profiling easier.
+Normalization, own keys, async hygiene — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### JavaScript edge cases (summary)
 
-- `Promise` microtasks run before timers; perceived ordering often differs from intuitive "top-to-bottom" expectations.
-- `this` depends on call-site, not function declaration; arrow functions capture lexical `this` and cannot be rebound.
-- Numeric pitfalls (`NaN`, floating precision, `-0`) can silently break equality and formatting logic.
-- ESM/CJS interop and top-level await behavior can change import timing and initialization semantics.
+Scheduling, `this`, coercion, modules — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
 ### Decision tree (summary)
 
-- Choose module system, async style, and mutability strategy from constraints; escalate to **`typescript-pro`** for static guarantees.
+Module/async/mutation/strict — **`decision-tree.md`**.
 
 Details: [references/decision-tree.md](references/decision-tree.md)
 
 ### Anti-patterns (summary)
 
-- Avoid coercion traps, lost Promises, unbounded mutation, and `this` surprises — see reference for fixes.
+Coercion, lost Promises, `this` — **`anti-patterns.md`**.
 
 Details: [references/anti-patterns.md](references/anti-patterns.md)
 
 ### Integration map (summary)
 
-- Pair with **`testing-pro`**, **`security-pro`**, **`typescript-pro`**, and stack skills for framework-specific runtime.
+**`typescript-pro`**, **`testing-pro`**, **`security-pro`**, **`react-pro`**, **`code-packaging-pro`**, … — **`integration-map.md`**.
 
 Details: [references/integration-map.md](references/integration-map.md)
 
 ### Versions and runtimes (summary)
 
-- Align ECMAScript target, Node LTS, and browserslist with actual features in use.
+ECMAScript target, Node LTS — **`versions.md`**.
 
 Details: [references/versions.md](references/versions.md)
 
-### Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Issue or goal** - clarify the target behavior or defect.
-2. **Recommendation** - propose the simplest robust approach and explain why.
-3. **Code** - provide concrete JS/TS snippets, tests, or a review checklist.
-4. **Residual risks** - list remaining trade-offs, compatibility caveats, and follow-up tests.
+1. **Context** — Engines, module mode (ESM/CJS), bundler/test runner constraints.
+2. **Problem / goal** — Bug, review, refactor, interop issue.
+3. **System design** — Where behavior lives: loop phase, module graph, mutation boundary — **`javascript-execution-and-module-system-model.md`**.
+4. **Decision reasoning** — Async/style/mutation/TS escalation — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — JS snippets valid for stated runtime — **`quality-validation-and-guardrails.md`**.
+6. **Trade-offs** — Clever vs explicit; perf vs immutability; dual-package complexity.
+7. **Failure modes** — Ordering, coercion, pollution, interop — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Compatibility matrix; **`typescript-pro`**, **`security-pro`**, **`testing-pro`** handoffs.
 
 ## Resources in this skill
 
-Use these files for deeper detail when concise guidance in this file is not enough.
-
 | Topic | File |
 |-------|------|
-| High-level JavaScript tips/tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Runtime and language edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Decision tree (module/async/mutation) | [references/decision-tree.md](references/decision-tree.md) |
+| **Execution & module model** | [references/javascript-execution-and-module-system-model.md](references/javascript-execution-and-module-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
 | Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Integration with other skills | [references/integration-map.md](references/integration-map.md) |
-| Versions and runtimes | [references/versions.md](references/versions.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Versions | [references/versions.md](references/versions.md) |
 
-## Quick example
+## Quick examples
 
-**Input:** "Review this JS service for hidden async bugs and edge cases before release."  
-**Expected output:** A focused review using the four response labels, with concrete fixes for ordering/coercion issues plus test cases for discovered edge paths.
+### 1 — Simple (common)
 
-**Input:** "`forEach` with `async` callback — some DB writes never complete in production."  
-**Expected output:** Explain fire-and-forget hazard; recommend `for…of` + `await`, `Promise.all` with bounded concurrency, or queue worker; add tests for completion and ordering.
+**Input:** Review JS service for hidden async bugs before release.  
+**Expected output:** Full **Suggested response format** — microtasks/`await`, lost Promise patterns, tests — **`failure-modes-detection-mitigation.md`**.
 
-**Input:** "Same package must run on Node 18 ESM and old Jest CJS test runner — imports break."  
-**Expected output:** Map `typescript-pro`/`package.json` `exports` / conditional exports; document test runner config; list residual dual-package hazards.
+### 2 — Tricky (edge case)
+
+**Input:** `forEach` + async — DB writes incomplete in prod.  
+**Expected output:** Fire-and-forget hazard; `for…of` / bounded `Promise.all`; **failure mode** named — **`edge-cases.md`**, **`anti-patterns.md`**.
+
+### 3 — Cross-skill
+
+**Input:** Node 18 ESM + old Jest CJS — imports break.  
+**Expected output:** **`code-packaging-pro`** `exports`; test runner config; **`typescript-pro`** if TS — dual-package hazards — **`integration-map.md`**.
 
 ## Checklist before calling the skill done
 
-- [ ] Runtime targets and module mode (ESM/CJS) were confirmed.
-- [ ] Recommendations prioritize predictable runtime behavior over clever syntax.
-- [ ] At least one relevant tip/trick and one edge case were checked.
-- [ ] Proposed fix includes concrete code or test guidance.
-- [ ] Residual compatibility and regression risks are explicitly stated.
-- [ ] If async ordering is involved, failure mode (lost Promise, race) is named and tested.
-- [ ] If numeric or `Date` logic is involved, precision/timezone assumptions are explicit.
-- [ ] Cross-skill handoff (`typescript-pro`, `security-pro`, `testing-pro`) noted when scope exceeds raw JS semantics.
+### Runtime & modules
+
+- [ ] Targets and **ESM/CJS** mode confirmed — **`versions.md`**.
+- [ ] Predictable behavior over clever syntax — **`decision-framework-and-trade-offs.md`**.
+
+### Depth
+
+- [ ] Tip/trick **and** edge-case path checked — **`tips-and-tricks.md`**, **`edge-cases.md`**.
+- [ ] Concrete code or test guidance — **`quality-validation-and-guardrails.md`**.
+
+### Risks & handoff
+
+- [ ] Compatibility and regression risks explicit — **`failure-modes-detection-mitigation.md`**.
+- [ ] Async ordering failure mode named when relevant — **`javascript-execution-and-module-system-model.md`**.
+- [ ] Numeric/`Date` assumptions explicit — **`edge-cases.md`**.
+- [ ] **`typescript-pro`** / **`security-pro`** / **`testing-pro`** when scope exceeds raw JS — **`integration-map.md`**.

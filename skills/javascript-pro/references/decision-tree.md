@@ -22,3 +22,11 @@
 - **Type-level guarantees** → Combine with **`typescript-pro`**.
 - **Security-sensitive parsing** → **`security-pro`**.
 - **Test design for race bugs** → **`testing-pro`**.
+
+## `"use strict"`
+
+```
+Shipping ESM module?
+├── Strict mode already implied — avoid relying on sloppy `this` patterns
+└── Legacy script tag / Function constructor — explicit `"use strict"` when maintaining old bundles
+```

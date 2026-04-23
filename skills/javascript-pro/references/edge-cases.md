@@ -28,3 +28,8 @@
 - ESM and CommonJS interop can produce different default/named import behavior.
 - Top-level await changes module initialization timing and may create startup deadlocks in dependency cycles.
 - Platform differences (browser vs Node.js) affect globals (`window`, `process`, `Buffer`, `fetch` availability/version).
+
+## Dates and integers
+
+- **`Date`** parsing from locale strings is implementation-sensitive — prefer **UTC ISO** inputs for APIs — **`failure-modes-detection-mitigation.md`**.
+- **`BigInt`** and **Number** don’t mix in arithmetic without explicit conversion — bugs in IDs/money-adjacent code.

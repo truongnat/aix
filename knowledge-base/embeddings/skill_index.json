@@ -636,20 +636,23 @@
   {
     "name": "javascript-pro",
     "folder": "javascript-pro",
-    "description": "Professional JavaScript guidance for architecture-level decisions, runtime behavior, async flows, performance, and maintainability.\n\nUse this skill when implementing or reviewing JavaScript/TypeScript application logic, debugging tricky runtime behavior, or handling language-level edge cases in browser/Node.js projects.\n\nTriggers: \"javascript\", \"js\", \"event loop\", \"promise\", \"closure\", \"this\", \"prototype\", \"hoisting\", \"microtask\", \"edge case\", \"tip\", \"trick\", \"await\", \"async\", \"TypeError\", \"ReferenceError\", \"undefined is not a function\", \"ESM\", \"CommonJS\", \"cjs\", \"mjs\", \"import.meta\".\n\nCombine with `testing-pro` for coverage strategy and `security-pro` for threat-focused hardening.",
+    "description": "Production-grade JavaScript: architecture and maintainability, runtime semantics (event loop, microtasks, ESM/CJS graph), async flows, performance — plus execution/module model, failure modes (lost Promises, `this`, pollution, FP dates, dual-package), trade-offs (JS vs TypeScript, mutability), quality guardrails (engine-accurate features; no sloppy security claims).\n\nUse this skill when implementing or reviewing JavaScript/TypeScript application logic at the language/runtime level, debugging tricky behavior, or handling edge cases in browser/Node projects.\n\nCombine with **`testing-pro`**, **`security-pro`**, **`typescript-pro`**, **`code-packaging-pro`**, and stack skills (**`react-pro`**, **`nestjs-pro`**, **`nextjs-pro`**) per integration map.\n\nTriggers: \"javascript\", \"js\", \"event loop\", \"promise\", \"closure\", \"this\", \"prototype\", \"hoisting\", \"microtask\", \"edge case\", \"tip\", \"trick\", \"await\", \"async\", \"TypeError\", \"ReferenceError\", \"undefined is not a function\", \"ESM\", \"CommonJS\", \"cjs\", \"mjs\", \"import.meta\".",
     "triggers": [],
     "when_to_use": [
-      "Designing JavaScript logic at module/service level instead of only syntax fixes.",
-      "Reviewing JS code for runtime correctness, readability, and production safety.",
-      "Diagnosing hard bugs involving async ordering, object mutation, or scope capture.",
-      "Hardening browser/Node code against non-obvious language and runtime traps.",
-      "Trigger keywords: `javascript`, `js`, `event loop`, `promise`, `closure`, `this`, `prototype`, `hoisting`, `microtask`, `await`, `async`, `ESM`, `CommonJS`, `TypeError`, `edge case`"
+      "Module/service-level logic, not only formatting.",
+      "Runtime correctness, readability, production safety.",
+      "Async ordering, mutation, scope/`this` bugs.",
+      "ESM/CJS interop and engine target alignment."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "javascript-execution-and-module-system-model.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "versions.md"
     ]
