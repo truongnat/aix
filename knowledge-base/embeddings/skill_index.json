@@ -1083,21 +1083,24 @@
   {
     "name": "sql-data-access-pro",
     "folder": "sql-data-access-pro",
-    "description": "Professional SQL data access for local and embedded workflows: SQLite (`sqlite3` stdlib), parameterized queries, schema discovery, safe read-only opens, export to CSV, and clear handoff to PostgreSQL for server-grade features.\n\nUse this skill when the user works with **`.db` / `.sqlite`** files, writes **ad-hoc SQL** in scripts, **explores** schemas, or **exports** query results — not when tuning **PostgreSQL** servers, **RLS**, replication, or **migrations** at scale (use **`postgresql-pro`**).\n\nUse **with** **`postgresql-pro`** when the task **outgrows** SQLite (multi-tenant server, RLS, `EXPLAIN`, ops); **`data-analysis-pro`** for **pandas**-heavy profiling on **exports**; **`content-analysis-pro`** only for **narrative** “what’s in this file” framing, not SQL tuning.\n\nTriggers: \"SQLite\", \".db\", \"sqlite3\", \"SQL injection\", \"parameterized query\", \"SELECT\", \"schema\", \"export CSV\", \"read-only database\", \"embedded database\", \"local SQL\", \"database is locked\", \"WAL\", \"ATTACH\", \"sqlite_master\".",
+    "description": "Production-grade SQL data access for local and embedded workflows: SQLite (`sqlite3` stdlib), parameterized queries, schema discovery, safe read-only opens, CSV export, concurrency and locking model (WAL, writer serialization), and clear handoff to PostgreSQL for server-grade features — plus system model (single-file trust, connections/transactions, reader/writer rules), failure modes (injection, database locked, NFS/corruption, ATTACH path escape, dialect drift), decision trade-offs (SQLite vs PG, in-DB vs export, stdlib vs ORM stack), and quality guardrails (path trust, no fabricated PRAGMAs, PII on export).\n\nUse this skill when the user works with **`.db` / `.sqlite`** files, ad-hoc SQL in scripts, schema exploration, or exports — not when tuning **PostgreSQL** servers, **RLS**, replication, or large-scale migrations (**`postgresql-pro`**).\n\nCombine with **`postgresql-pro`** when the workload outgrows SQLite, **`data-analysis-pro`** for pandas-heavy work on exports, **`security-pro`** for injection and secrets, **`performance-tuning-pro`** for huge export/memory issues, and stack skills (**`nestjs-pro`**, **`nextjs-pro`**) when SQLite sits inside an app ORM.\n\nTriggers: \"SQLite\", \".db\", \"sqlite3\", \"SQL injection\", \"parameterized query\", \"SELECT\", \"schema\", \"export CSV\", \"read-only database\", \"embedded database\", \"local SQL\", \"database is locked\", \"WAL\", \"ATTACH\", \"sqlite_master\".",
     "triggers": [],
     "when_to_use": [
-      "**Open** and **query** `.db` / `.sqlite` files (stdlib or CLI).",
-      "**Discover** tables/columns; **sample** rows; **aggregate** safely.",
-      "**Export** results for **CSV** / **analysis**.",
-      "**Explain** **parameterized** queries vs string interpolation.",
-      "Trigger keywords: `SQLite`, `sqlite3`, `.db`, `SQL`, `schema`, `export`, …"
+      "Open/query `.db` / `.sqlite` (stdlib or CLI).",
+      "Discover schema; sample rows; safe aggregates.",
+      "Export to CSV for downstream analysis.",
+      "Teach or enforce **parameterized** SQL vs interpolation."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
       "sql-safety-and-postgresql-handoff.md",
+      "sqlite-access-and-concurrency-system-model.md",
       "sqlite-and-stdlib.md",
       "tips-and-tricks.md",
       "versions.md"

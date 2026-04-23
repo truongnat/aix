@@ -17,3 +17,11 @@
 ## Safety
 
 - **Any user-influenced fragment in SQL** → Bound parameters only; **`security-pro`** for app-layer injection review.
+
+## Dynamic identifiers (table/column names)
+
+```
+User chooses table or column name at runtime?
+├── Values in WHERE → always bound parameters
+└── Identifiers → fixed allowlist in code OR validated mapping — never raw string concat — **`failure-modes-detection-mitigation.md`**
+```
