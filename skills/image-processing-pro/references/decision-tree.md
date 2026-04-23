@@ -12,3 +12,11 @@
 ## Memory
 
 - **Huge images** → tile/stream; avoid loading full decode when possible.
+
+## Output format quick pick
+
+```
+Need transparency?
+├── Yes → PNG or WebP (lossless or lossy with alpha)
+└── No → JPEG for photos; WebP if clients support — **`decision-framework-and-trade-offs.md`**
+```

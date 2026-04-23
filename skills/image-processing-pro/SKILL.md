@@ -1,105 +1,160 @@
 ---
 name: image-processing-pro
 description: |
-  Professional raster image processing with Pillow (PIL): open/save, resize, crop, rotate, format conversion (JPEG, PNG, WebP), compositing, thumbnails, EXIF orientation, and batch-oriented workflows.
+  Production-grade raster image processing with Pillow (PIL): open/save, resize, crop, rotate, format conversion (JPEG, PNG, WebP), compositing, thumbnails, EXIF orientation, batch workflows — plus pixel pipeline model (decode → mode → encode), failure modes (decompression bomb, EXIF leak, CMYK drift, overwrite, alpha→JPEG), decision trade-offs (lossy vs lossless, Pillow vs CLI/libvips), quality guardrails (no semantic “what’s in the image”; version-accurate APIs).
 
-  Use this skill when the user needs **pixel-level** operations — not **semantic** description of image content (“what is in this screenshot?”). For **meaning**, **OCR**, or **chart reading**, use **`content-analysis-pro`** instead.
+  Use this skill for **pixel-level** operations — not **semantic** description (“what is in this screenshot?”). For **meaning**, **OCR**, or **chart reading**, use **`content-analysis-pro`**.
 
-  Use **with** **`content-analysis-pro`** when a pipeline **extracts** frames then **processes** them; **`security-pro`** when stripping EXIF or handling **sensitive** screenshots. This skill (`image-processing-pro`) owns **imaging transforms**; vision **interpretation** belongs elsewhere.
+  Combine with **`content-analysis-pro`** when extracting then interpreting; **`security-pro`** for EXIF/strip/redaction; **`testing-pro`** for golden outputs; **`docker-pro`** for codec deps in CI.
 
   Triggers: "Pillow", "PIL", "resize image", "crop", "convert to PNG", "WebP", "thumbnail", "composite", "alpha", "EXIF", "rotate image", "batch images", "strip metadata", "LANCZOS", "RGBA to JPEG", "ImageOps.exif_transpose", "decompression bomb", "watermark", "ICO", "HEIC".
 
 metadata:
-  short-description: Image processing — Pillow, resize, crop, formats, compositing, batch
+  short-description: Image processing — Pillow pipeline, transforms, formats, failure modes, batch safety
+  content-language: en
+  domain: imaging
+  level: professional
 ---
 
 # Image processing (professional)
 
-Use **[Pillow](https://pillow.readthedocs.io/)** for API truth; this skill encodes **safe defaults** for **resize**, **format**, **metadata**, and **batch** hygiene. Confirm **source** colorspace, **output** constraints (max dimensions, format), and whether **EXIF** must be stripped.
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use **[Pillow](https://pillow.readthedocs.io/)** for API truth; this skill encodes **safe defaults** for **resize**, **format**, **metadata**, and **batch** hygiene.
+
+## Boundary
+
+**`image-processing-pro`** owns **raster transforms** (geometry, codecs, compositing). **`content-analysis-pro`** owns **semantic** interpretation. **`security-pro`** owns **policy** for sensitive pixels and metadata beyond strip flags.
 
 ## Related skills (this repo)
 
-| Skill | When to combine with `image-processing-pro` |
-|-------|---------------------------------------------|
-| **`content-analysis-pro`** | **Semantic** analysis, OCR, video **meaning** — not just pixels |
-| **`security-pro`** | Redaction, **EXIF** removal before sharing, **screenshots** with secrets |
-| **`data-analysis-pro`** | Plots and **charts** as data; **this** skill for **raster** file ops |
-
-**Boundary:** **`image-processing-pro`** = **transform** images; **`content-analysis-pro`** = **interpret** them.
+| Skill | When to combine |
+|-------|----------------|
+| **`content-analysis-pro`** | Meaning, OCR, charts as **content** |
+| **`security-pro`** | EXIF/GPS, redaction, untrusted uploads |
+| **`data-analysis-pro`** | Chart **data**; use **this** skill for exporting raster figures |
+| **`deployment-pro`** | Asset CI/CD, CDN |
+| **`testing-pro`** | Snapshot/golden image tests |
+| **`docker-pro`** | Imagemagick/font/codec stack in images |
+| **`web-research-pro`** | Stock image licensing |
 
 ## When to use
 
-- **Resize**, **crop**, **rotate**, **thumbnail** for web or upload limits.
-- **Convert** formats (JPEG, PNG, WebP), mode (`RGB`, `RGBA`).
-- **Composite** watermarks or overlays; **alpha** masks.
-- **Batch** folders — consistent naming and no accidental overwrite.
-- Trigger keywords: `Pillow`, `resize`, `crop`, `WebP`, `thumbnail`, `EXIF`, …
+- Resize, crop, rotate, thumbnail for web or limits.
+- Convert formats and modes (`RGB`, `RGBA`, `CMYK` handling).
+- Composite watermarks; batch folders.
+- EXIF transpose; metadata strip policy.
+
+## When not to use
+
+- **“What does this image show?”** — **`content-analysis-pro`** (or vision stack).
+- **Vector** (SVG) authoring — vector tools / other skills.
+
+## Required inputs
+
+- **Input** color mode / source (camera, screenshot, generated).
+- **Output** constraints (max px, format, alpha yes/no).
+- **Metadata** keep vs strip for publishing.
+
+## Expected output
+
+Follow **Suggested response format** strictly.
 
 ## Workflow
 
-1. Confirm **input** paths, **output** format/size, and **metadata** policy (keep vs strip).
-2. Apply the principles and topic summaries below; open `references/` when you need depth; defer **“what does this show?”** to **`content-analysis-pro`**.
-3. Respond using **Suggested response format**; note **color space** and **memory** risks for large files.
+1. Confirm paths, output spec, metadata policy.
+2. Apply summaries; open `references/`; route **meaning** questions away from this skill.
+3. Respond with **Suggested response format**; include **failure modes** for untrusted or huge inputs.
 
 ### Operating principles
 
-1. **Non-destructive** — Keep originals when batching; write to new paths.
-2. **Explicit modes** — `RGB` vs `RGBA` vs `L`; **JPEG** has no alpha.
-3. **Metadata** — Strip **GPS** and identifiers when publishing (**`security-pro`**).
-4. **Resampling** — Use quality resampling (`LANCZOS`) for downscale when available.
-5. **Semantics elsewhere** — Do not substitute **resize** for **understanding** image content.
-6. **Reproducibility** — Fixed dimensions for pipelines that feed models or tests.
+1. **Non-destructive batching** — Separate output dir — **`image-pipeline-and-pixel-model.md`**.
+2. **Explicit modes** — JPEG vs alpha — **`pillow-operations.md`**.
+3. **Metadata** — Strip GPS/identifiers when publishing — **`security-pro`**.
+4. **Resampling** — Quality downscale (`LANCZOS` when available) — **`tips-and-tricks.md`**.
+5. **No vision by resize** — Semantics elsewhere — **`integration-map.md`**.
+6. **Reproducibility** — Fixed dimensions for downstream ML/tests — **`quality-validation-and-guardrails.md`**.
+
+### Image pipeline and pixel model (summary)
+
+Decode → mode → encode; memory scales with pixels — **`image-pipeline-and-pixel-model.md`**.
+
+Details: [references/image-pipeline-and-pixel-model.md](references/image-pipeline-and-pixel-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Bombs, EXIF leaks, overwrite, CMYK, animation frames — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Lossy vs lossless; Pillow vs CLI/libvips; metadata policy — **`decision-framework-and-trade-offs.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+No fake paths; no semantic claims; Pillow/codec caveats — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Pillow operations (summary)
 
-- Resize, crop, thumbnail, rotate, save formats, composite, EXIF.
+Resize, crop, thumbnail, rotate, save, composite, EXIF — **`pillow-operations.md`**.
 
-Details: [references/pillooperations.md](references/pillooperations.md)
+Details: [references/pillow-operations.md](references/pillow-operations.md)
 
 ### Tips and tricks (summary)
 
-- In-place ops, sRGB, batch naming.
+In-place ops, sRGB, batch naming — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- CMYK, huge rasters, animated GIFs, EXIF orientation.
+CMYK, huge rasters, animation, orientation, HEIF — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
 ### Decision flow and anti-patterns (summary)
 
-- Pillow vs ML vision; EXIF, JPEG round-trip, memory bombs.
+Library choice, format, memory — **`decision-tree.md`** · **`anti-patterns.md`**.
 
 Details: [references/decision-tree.md](references/decision-tree.md) · [references/anti-patterns.md](references/anti-patterns.md)
 
 ### Cross-skill handoffs (summary)
 
-- **`content-analysis-pro`**, **`deployment-pro`**, **`web-research-pro`** for licenses.
+**`content-analysis-pro`**, **`security-pro`**, **`testing-pro`**, **`deployment-pro`** — **`integration-map.md`**.
 
 Details: [references/integration-map.md](references/integration-map.md)
 
 ### Versions (summary)
 
-- Pillow major releases, codec wheels, format support flags.
+Pillow majors, codec wheels — **`versions.md`**.
 
 Details: [references/versions.md](references/versions.md)
 
-### Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Issue or goal** — Input/output format, **transform** needed (not “explain image”).
-2. **Recommendation** — Pillow API choices, resampling, metadata handling.
-3. **Code** — Snippets or small script outline — still labeled **Code**.
-4. **Residual risks** — Color loss, memory, accidental overwrite, EXIF leaks.
+1. **Context** — Input source, size trust (user files vs internet), output spec, metadata policy.
+2. **Problem / goal** — Transform needed (explicitly **not** “describe image” unless routed).
+3. **System design** — Pipeline step: orientation → mode → geometry → encode — **`image-pipeline-and-pixel-model.md`**.
+4. **Decision reasoning** — Format/resample/thumbnail strategy — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — Pillow snippets; safe `MAX_IMAGE_PIXELS` for untrusted — **`quality-validation-and-guardrails.md`**.
+6. **Trade-offs** — Quality vs size; ICC strip vs fidelity; batch speed vs memory.
+7. **Failure modes** — Relevant risks — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Untrusted inputs; handoff **`content-analysis-pro`** / **`security-pro`** / **`docker-pro`** as needed.
 
 ## Resources in this skill
 
-- `references/` — Pillow ops, tips, edge cases, Tier A maps.
-
 | Topic | File |
 |-------|------|
-| Pillow operations | [references/pillooperations.md](references/pillooperations.md) |
+| **Pipeline & pixel model** | [references/image-pipeline-and-pixel-model.md](references/image-pipeline-and-pixel-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Pillow operations | [references/pillow-operations.md](references/pillow-operations.md) |
 | Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
 | Decision tree | [references/decision-tree.md](references/decision-tree.md) |
@@ -109,21 +164,33 @@ Details: [references/versions.md](references/versions.md)
 
 ## Quick examples
 
-**Input (simple):** “Resize all PNGs in `./in` to max width 1200px, output JPEG 85% quality to `./out`.”  
-**Expected output:** Loop with `thumbnail` or proportional resize, `convert("RGB")`, `save(..., quality=85, optimize=True)`; warn about **alpha** loss on JPEG.
+### 1 — Simple (common)
 
-**Input (tricky):** “Photos from phones look rotated wrong on the web.”  
-**Expected output:** Apply **`ImageOps.exif_transpose`** (or equivalent) before resize; document **EXIF strip** policy for **`security-pro`** if GPS embedded.
+**Input:** Resize PNGs in `./in` to max width 1200px, JPEG 85% to `./out`.  
+**Expected output:** Full **Suggested response format** — `thumbnail`/resize, `RGB` for JPEG, alpha warning; **failure modes** overwrite/exif.
 
-**Input (cross-skill):** “Extract key frames from MP4 then blur faces for a blog.”  
-**Expected output:** FFmpeg frame extract (tooling) + **this skill** for per-frame **blur/composite**; **`content-analysis-pro`** only if detecting faces semantically — prefer dedicated CV or manual review for **PII**; **`security-pro`** for publication policy.
+### 2 — Tricky (edge case)
+
+**Input:** Phone photos wrong rotation on web.  
+**Expected output:** `ImageOps.exif_transpose` **before** resize — **`edge-cases.md`**; strip policy → **`security-pro`**.
+
+### 3 — Cross-skill
+
+**Input:** MP4 key frames then blur faces for blog.  
+**Expected output:** FFmpeg extract (tooling) + **this skill** blur — face **detection** not Pillow-only → **`content-analysis-pro`** / CV; **`security-pro`** policy.
 
 ## Checklist before calling the skill done
 
-- [ ] **Transform** vs **interpretation** — correct skill (**`content-analysis-pro`** for the latter).
-- [ ] **Metadata** policy applied for **sharing**.
-- [ ] **Outputs** do not silently overwrite sources unless intended.
-- [ ] **Color mode** (`RGB`/`RGBA`) and **format** constraints (JPEG vs PNG) explicit.
-- [ ] **Memory** / max pixel guardrails for huge or untrusted inputs.
-- [ ] **Resampling** choice stated for down/upscale quality.
-- [ ] **Reproducible** paths/naming for batch pipelines.
+### Skill routing
+
+- [ ] **Transform** vs **interpretation** — **`content-analysis-pro`** if meaning required.
+
+### Safety & quality
+
+- [ ] **Metadata** policy for sharing — **`security-pro`** when sensitive.
+- [ ] **Outputs** never silent overwrite sources — **`failure-modes-detection-mitigation.md`**.
+- [ ] **Mode** (`RGB`/`RGBA`) and **format** constraints explicit — **`pillow-operations.md`**.
+- [ ] **MAX_IMAGE_PIXELS** / trust path for untrusted inputs — **`edge-cases.md`**.
+- [ ] **Resampling** stated — **`tips-and-tricks.md`**.
+- [ ] **Reproducible** batch naming/paths — **`anti-patterns.md`**.
+- [ ] **Failure modes** section present for bombs or uploads — **`failure-modes-detection-mitigation.md`**.

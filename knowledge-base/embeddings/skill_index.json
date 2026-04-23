@@ -611,21 +611,24 @@
   {
     "name": "image-processing-pro",
     "folder": "image-processing-pro",
-    "description": "Professional raster image processing with Pillow (PIL): open/save, resize, crop, rotate, format conversion (JPEG, PNG, WebP), compositing, thumbnails, EXIF orientation, and batch-oriented workflows.\n\nUse this skill when the user needs **pixel-level** operations — not **semantic** description of image content (“what is in this screenshot?”). For **meaning**, **OCR**, or **chart reading**, use **`content-analysis-pro`** instead.\n\nUse **with** **`content-analysis-pro`** when a pipeline **extracts** frames then **processes** them; **`security-pro`** when stripping EXIF or handling **sensitive** screenshots. This skill (`image-processing-pro`) owns **imaging transforms**; vision **interpretation** belongs elsewhere.\n\nTriggers: \"Pillow\", \"PIL\", \"resize image\", \"crop\", \"convert to PNG\", \"WebP\", \"thumbnail\", \"composite\", \"alpha\", \"EXIF\", \"rotate image\", \"batch images\", \"strip metadata\", \"LANCZOS\", \"RGBA to JPEG\", \"ImageOps.exif_transpose\", \"decompression bomb\", \"watermark\", \"ICO\", \"HEIC\".",
+    "description": "Production-grade raster image processing with Pillow (PIL): open/save, resize, crop, rotate, format conversion (JPEG, PNG, WebP), compositing, thumbnails, EXIF orientation, batch workflows — plus pixel pipeline model (decode → mode → encode), failure modes (decompression bomb, EXIF leak, CMYK drift, overwrite, alpha→JPEG), decision trade-offs (lossy vs lossless, Pillow vs CLI/libvips), quality guardrails (no semantic “what’s in the image”; version-accurate APIs).\n\nUse this skill for **pixel-level** operations — not **semantic** description (“what is in this screenshot?”). For **meaning**, **OCR**, or **chart reading**, use **`content-analysis-pro`**.\n\nCombine with **`content-analysis-pro`** when extracting then interpreting; **`security-pro`** for EXIF/strip/redaction; **`testing-pro`** for golden outputs; **`docker-pro`** for codec deps in CI.\n\nTriggers: \"Pillow\", \"PIL\", \"resize image\", \"crop\", \"convert to PNG\", \"WebP\", \"thumbnail\", \"composite\", \"alpha\", \"EXIF\", \"rotate image\", \"batch images\", \"strip metadata\", \"LANCZOS\", \"RGBA to JPEG\", \"ImageOps.exif_transpose\", \"decompression bomb\", \"watermark\", \"ICO\", \"HEIC\".",
     "triggers": [],
     "when_to_use": [
-      "**Resize**, **crop**, **rotate**, **thumbnail** for web or upload limits.",
-      "**Convert** formats (JPEG, PNG, WebP), mode (`RGB`, `RGBA`).",
-      "**Composite** watermarks or overlays; **alpha** masks.",
-      "**Batch** folders — consistent naming and no accidental overwrite.",
-      "Trigger keywords: `Pillow`, `resize`, `crop`, `WebP`, `thumbnail`, `EXIF`, …"
+      "Resize, crop, rotate, thumbnail for web or limits.",
+      "Convert formats and modes (`RGB`, `RGBA`, `CMYK` handling).",
+      "Composite watermarks; batch folders.",
+      "EXIF transpose; metadata strip policy."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
+      "image-pipeline-and-pixel-model.md",
       "integration-map.md",
       "pillow-operations.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "versions.md"
     ]
