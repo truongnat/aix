@@ -18,4 +18,4 @@
 ## Over-claiming from LLM summary
 
 - No quotes or line refs.
-- **Fix:** Ground claims in excerpts + locations.
+- **Fix:** Ground claims in excerpts + locations — **`quality-validation-and-grounding-guardrails.md`**, **`failure-modes-detection-mitigation.md`**.

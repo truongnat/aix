@@ -337,22 +337,25 @@
   {
     "name": "content-analysis-pro",
     "folder": "content-analysis-pro",
-    "description": "Professional analysis of user-provided content: documents (text, PDF, slides), images (photos, screenshots, diagrams, charts), and video — structured extraction, summaries, timelines, and detailed reports with evidence references and explicit limitations.\n\nUse this skill when the user supplies files or describes attached media and wants **deep analysis**, **comparison**, **summarization**, **entity/action extraction**, **chart reading**, **scene or transcript review**, or a **formal-style report** with sections, citations (page/time), and confidence notes. This skill encodes **methodology and report shape**; it does not replace domain experts for legal, medical, or forensic decisions.\n\nUse **with** **`business-analysis-pro`** when findings must become requirements or BRD-style artifacts; **`security-pro`** when content may contain secrets or PII handling matters. This skill (`content-analysis-pro`) owns **multimodal analysis framing and reporting**; stack skills own **tooling implementation** (APIs, pipelines).\n\nTriggers: \"analyze this image\", \"analyze video\", \"analyze PDF\", \"analyze document\", \"summarize attachment\", \"OCR\", \"transcript\", \"what is in this screenshot\", \"extract from doc\", \"compare these files\", \"timeline\", \"scene breakdown\", \"chart in image\", \"detailed report\", \"multimodal\", \"ffmpeg\", \"ffprobe\", \"extract frames\", \"video audio track\", \"illegible text\", \"password protected PDF\", \"redact screenshot\", \"frame at timestamp\", \"what does this slide say\", \"compare two PDFs\".",
+    "description": "Production-grade multimodal content analysis: explicit analysis pipeline (modality → decode → segment → extract → verify → report), evidence and provenance rules (page, time, region anchors), grounded vs inferred claims, failure modes (OCR error, sampling gaps, chart number invention, deepfakes, token limits, locked files), decision trade-offs (summary vs extract vs compare, full read vs stratified sample, human-in-the-loop for high-stakes), quality and anti-hallucination guardrails, structured reports with limitations and confidence — for documents, images, video, and audio. Not a replacement for legal, medical, or forensic experts.\n\nUse when the user supplies or points to content to summarize, extract, compare, or audit with traceable evidence. Combine with business-analysis-pro for BRD-style outputs, security-pro for PII/secrets, data-analysis-pro for tabular math on extracted data, web-research-pro for external fact-check, image-processing-pro for raster prep, testing-pro for extraction-regression tests.\n\nTriggers: \"analyze this image\", \"analyze video\", \"analyze PDF\", \"summarize attachment\", \"OCR\", \"transcript\", \"screenshot\", \"extract from doc\", \"compare these files\", \"timeline\", \"evidence map\", \"provenance\", \"grounding\", \"hallucination\", \"illegible\", \"frame at timestamp\", \"password protected PDF\", \"deepfake\", \"sampling strategy\", \"entity extraction\", \"redact\", \"multimodal\", \"chart in image\", \"quote with page number\".",
     "triggers": [],
     "when_to_use": [
-      "User provides **documents**, **images**, or **video** (or paste) and wants **detail**, not one-line answers.",
-      "**Extraction** — tables, entities, dates, action items, quotes with references.",
-      "**Synthesis** — Summary, timeline, comparison across sources.",
-      "**Quality** — Note **uncertainty**, **illegible** regions, **missing context**.",
-      "Trigger keywords: `analyze`, `PDF`, `image`, `video`, `screenshot`, `transcript`, `OCR`, `report`, …"
+      "Documents, images, video (or paste) requiring **detail**, extraction, comparison, or timeline.",
+      "**Formal-style** reports with sections, citations (page/time), confidence.",
+      "Explicit **limitations** and **uncertainty** when media is ambiguous."
     ],
     "references": [
       "analysis-methods-and-frames.md",
+      "analysis-pipeline-system-model.md",
       "anti-patterns.md",
+      "decision-framework-and-tradeoffs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "evidence-and-provenance-rules.md",
+      "failure-modes-detection-mitigation.md",
       "file-formats-dispatch-and-scope.md",
       "integration-map.md",
+      "quality-validation-and-grounding-guardrails.md",
       "reporting-and-limitations.md",
       "tips-and-tricks.md",
       "versions.md"

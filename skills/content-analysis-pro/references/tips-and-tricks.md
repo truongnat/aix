@@ -1,5 +1,7 @@
 # Content analysis tips and tricks
 
+Before choosing depth vs sampling, read [decision-framework-and-tradeoffs.md](decision-framework-and-tradeoffs.md) and [analysis-pipeline-system-model.md](analysis-pipeline-system-model.md).
+
 ## Before analysis
 
 - Ask for **goal** and **constraints** (length of report, language, redaction rules).

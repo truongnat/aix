@@ -1,5 +1,7 @@
 # Reporting, fidelity, and limitations
 
+Grounding pipeline overview: [analysis-pipeline-system-model.md](analysis-pipeline-system-model.md). Citation rules: [evidence-and-provenance-rules.md](evidence-and-provenance-rules.md).
+
 ## Report structure (recommended)
 
 1. **Source summary** — What was provided (type, length, language if known).

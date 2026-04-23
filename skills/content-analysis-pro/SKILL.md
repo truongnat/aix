@@ -1,124 +1,183 @@
 ---
 name: content-analysis-pro
 description: |
-  Professional analysis of user-provided content: documents (text, PDF, slides), images (photos, screenshots, diagrams, charts), and video — structured extraction, summaries, timelines, and detailed reports with evidence references and explicit limitations.
+  Production-grade multimodal content analysis: explicit analysis pipeline (modality → decode → segment → extract → verify → report), evidence and provenance rules (page, time, region anchors), grounded vs inferred claims, failure modes (OCR error, sampling gaps, chart number invention, deepfakes, token limits, locked files), decision trade-offs (summary vs extract vs compare, full read vs stratified sample, human-in-the-loop for high-stakes), quality and anti-hallucination guardrails, structured reports with limitations and confidence — for documents, images, video, and audio. Not a replacement for legal, medical, or forensic experts.
 
-  Use this skill when the user supplies files or describes attached media and wants **deep analysis**, **comparison**, **summarization**, **entity/action extraction**, **chart reading**, **scene or transcript review**, or a **formal-style report** with sections, citations (page/time), and confidence notes. This skill encodes **methodology and report shape**; it does not replace domain experts for legal, medical, or forensic decisions.
+  Use when the user supplies or points to content to summarize, extract, compare, or audit with traceable evidence. Combine with business-analysis-pro for BRD-style outputs, security-pro for PII/secrets, data-analysis-pro for tabular math on extracted data, web-research-pro for external fact-check, image-processing-pro for raster prep, testing-pro for extraction-regression tests.
 
-  Use **with** **`business-analysis-pro`** when findings must become requirements or BRD-style artifacts; **`security-pro`** when content may contain secrets or PII handling matters. This skill (`content-analysis-pro`) owns **multimodal analysis framing and reporting**; stack skills own **tooling implementation** (APIs, pipelines).
-
-  Triggers: "analyze this image", "analyze video", "analyze PDF", "analyze document", "summarize attachment", "OCR", "transcript", "what is in this screenshot", "extract from doc", "compare these files", "timeline", "scene breakdown", "chart in image", "detailed report", "multimodal", "ffmpeg", "ffprobe", "extract frames", "video audio track", "illegible text", "password protected PDF", "redact screenshot", "frame at timestamp", "what does this slide say", "compare two PDFs".
+  Triggers: "analyze this image", "analyze video", "analyze PDF", "summarize attachment", "OCR", "transcript", "screenshot", "extract from doc", "compare these files", "timeline", "evidence map", "provenance", "grounding", "hallucination", "illegible", "frame at timestamp", "password protected PDF", "deepfake", "sampling strategy", "entity extraction", "redact", "multimodal", "chart in image", "quote with page number".
 
 metadata:
-  short-description: Content analysis — docs, images, video, structured reports, limitations
+  short-description: Content analysis — pipeline, evidence, failure modes, grounding, reports
+  content-language: en
+  domain: content-analysis
+  level: professional
 ---
 
 # Content analysis (professional)
 
-Use this skill when **source material** (files, pasted text, described media) must be read **carefully** and returned as **structured intelligence** — not casual chat. This skill encodes **modality-aware methods**, **evidence-linked reporting**, and **honest limits** (resolution, OCR, hallucination risk). **Optional pre-processing** (e.g. **FFmpeg** for frame/audio extraction) is a **tooling** concern — see `references/analysis-methods-and-frames.md`; the skill still governs **what** you report. Confirm **user goal**, **output format**, and **sensitivity** (PII, confidential).
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use this skill when **source material** (files, pasted text, described media) must be read **carefully** and returned as **structured intelligence** with **traceable evidence** — not casual chat. This skill encodes a **pipeline system model** (`analysis-pipeline-system-model.md`), **failure modes**, **decision trade-offs** for coverage vs cost, and **grounding guardrails**. **Optional tooling** (FFmpeg, OCR APIs) implements stages — **`analysis-methods-and-frames.md`** — the skill governs **what** is asserted and **how** limitations are disclosed. Confirm **user goal**, **output format**, and **sensitivity** (PII, confidential).
+
+## Boundary
+
+**`content-analysis-pro`** owns **reading, structuring, synthesizing**, and **evidence-linked reporting** on provided content across modalities. **`business-analysis-pro`** owns **business requirements packaging** from findings. **`data-analysis-pro`** owns **quantitative analysis** of tabular **data** (statistics, pivots), typically **after** clean extraction. **`security-pro`** owns **handling policies** for secrets seen in screenshots. **`image-processing-pro`** owns **pixel transforms** — not semantic interpretation alone.
 
 ## Related skills (this repo)
 
 | Skill | When to combine with `content-analysis-pro` |
 |-------|---------------------------------------------|
-| **`business-analysis-pro`** | Turn extracted facts into requirements, decisions, or BRD sections |
-| **`security-pro`** | Redaction, handling credentials or sensitive data seen in screenshots |
-| **`seo-pro`** | Rare — only if analyzing **web** or **marketing** assets for search |
-| **`data-analysis-pro`** | CSV/Parquet/SQLite **numeric** profiling, pivots, charts — not “what does this PDF say?” |
-| **`image-processing-pro`** | Resize, convert, composite **images** — not semantic description of content |
-| **`sql-data-access-pro`** | **Query** attached `.db` / **SQL** exploration with **stdlib** — not Postgres **RLS** tuning |
-| **`postgresql-pro`** | **Server** PostgreSQL schema, migrations, **EXPLAIN**, ops |
-
-**Boundary:** **`content-analysis-pro`** = **read and report** on provided content (one skill for all modalities — avoid duplicating “read-only” PDF vs doc skills). **`business-analysis-pro`** = **business problem framing** and delivery artifacts. **Authoring** spreadsheets/charts or **pixel** image transforms → **`data-analysis-pro`** / **`image-processing-pro`**.
+| **`business-analysis-pro`** | Turn extracted facts into requirements, BRD, decisions |
+| **`security-pro`** | Redaction, credentials/sensitive handling |
+| **`data-analysis-pro`** | CSV/Parquet numeric work on **structured** extracts |
+| **`web-research-pro`** | External verification of claims not in corpus |
+| **`image-processing-pro`** | Raster prep before vision read |
+| **`testing-pro`** | Golden tests for automated extraction pipelines |
+| **`repo-tooling-pro`** | Shared scripts for repeatable FFmpeg/OCR |
+| **`seo-pro`** | Rare — web/marketing asset angle |
 
 ## When to use
 
-- User provides **documents**, **images**, or **video** (or paste) and wants **detail**, not one-line answers.
-- **Extraction** — tables, entities, dates, action items, quotes with references.
-- **Synthesis** — Summary, timeline, comparison across sources.
-- **Quality** — Note **uncertainty**, **illegible** regions, **missing context**.
-- Trigger keywords: `analyze`, `PDF`, `image`, `video`, `screenshot`, `transcript`, `OCR`, `report`, …
+- Documents, images, video (or paste) requiring **detail**, extraction, comparison, or timeline.
+- **Formal-style** reports with sections, citations (page/time), confidence.
+- Explicit **limitations** and **uncertainty** when media is ambiguous.
+
+## When not to use
+
+- **Pure tabular analytics** without narrative source reading — **`data-analysis-pro`** may lead if data already clean CSV.
+- **Choosing business priorities** without document — **`business-analysis-pro`**.
+
+## Required inputs
+
+- **Goal** (summarize / extract / compare / compliance scan), **modalities**, **constraints** (length, language, redaction).
+
+## Expected output
+
+Follow **Suggested response format** strictly — pipeline through residual risks — with **evidence anchors** unless user explicitly waived (then state waiver).
 
 ## Workflow
 
-1. Confirm **goal** (summarize vs extract vs compare), **modality**, and **constraints** (length, language, redaction).
-2. Apply the principles and topic summaries below; open `references/` when you need depth; defer **business requirements packaging** to **`business-analysis-pro`** when appropriate.
-3. Respond using **Suggested response format**; note **fidelity** limits and **residual** uncertainty.
+1. Confirm goal, modality, sensitivity, and required **evidence granularity** (audit vs informal).
+2. Apply summaries; open `references/`; enforce **grounding** — **`quality-validation-and-grounding-guardrails.md`**.
+3. Respond using **Suggested response format**; delegate BRD packaging to **`business-analysis-pro`** when appropriate.
 
 ### Operating principles
 
-1. **Ground in the source** — Cite page, timestamp, or visible region; separate **quote** from **interpretation**.
-2. **No fabricated facts** — If unclear, say so; **inference** must be labeled.
-3. **Structured output** — Headings, bullets, tables; **executive layer** + **detail** when useful.
-4. **Modality-aware** — Different checks for **scanned text**, **charts**, **video scenes**.
-5. **Safety and privacy** — Minimize reproduction of secrets; refuse harmful requests (**`security-pro`**).
-6. **Human-in-the-loop** for **high-stakes** domains (legal, medical, financial) — analysis assists, does not replace experts.
+1. **Ground in the source** — Cite page, timestamp, or visible region; separate **quote** from **interpretation** — **`evidence-and-provenance-rules.md`**.
+2. **No fabricated facts** — Unclear → say so; **inference** labeled — **`failure-modes-detection-mitigation.md`**.
+3. **Structured output** — Headings, bullets, tables; executive + detail when useful — **`reporting-and-limitations.md`**.
+4. **Modality-aware** — Scanned PDF, charts, video sampling — **`analysis-methods-and-frames.md`**.
+5. **Safety and privacy** — Minimize secret reproduction — **`security-pro`**.
+6. **Human-in-the-loop** for **high-stakes** domains — assist only — **`reporting-and-limitations.md`**.
+
+### Analysis pipeline — system model (summary)
+
+Stages from input to evidence-backed report — **`analysis-pipeline-system-model.md`**.
+
+Details: [references/analysis-pipeline-system-model.md](references/analysis-pipeline-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+OCR, sampling gaps, hallucinated labels, DRM lock — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Coverage vs depth; human review domains — **`decision-framework-and-tradeoffs.md`**.
+
+Details: [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md)
+
+### Evidence and provenance rules (summary)
+
+Anchors per modality; quote discipline — **`evidence-and-provenance-rules.md`**.
+
+Details: [references/evidence-and-provenance-rules.md](references/evidence-and-provenance-rules.md)
+
+### Quality validation and grounding guardrails (summary)
+
+Anti-hallucination checklist — **`quality-validation-and-grounding-guardrails.md`**.
+
+Details: [references/quality-validation-and-grounding-guardrails.md](references/quality-validation-and-grounding-guardrails.md)
 
 ### Analysis methods and frames (summary)
 
-- Per-modality angles; **frames** (entities, timeline, claims); video **timestamps**; image **OCR/chart** cautions.
+Per-modality angles; video paths — **`analysis-methods-and-frames.md`**.
 
 Details: [references/analysis-methods-and-frames.md](references/analysis-methods-and-frames.md)
 
 ### Reporting and limitations (summary)
 
-- Report **sections**, **evidence map**, **confidence**; **hallucination** and **OCR** limits; PII handling.
-- **Repeatable** CLI steps (same FFmpeg/OCR every time) → document or add a **project script**; this repo’s shared helpers are under **`scripts/`** (see **`repo-tooling-pro`**).
+Report sections, fidelity, confidence — **`reporting-and-limitations.md`**.
 
 Details: [references/reporting-and-limitations.md](references/reporting-and-limitations.md)
 
 ### Tips and tricks (summary)
 
-- Goal-first, outline-first, **sampling** strategy for long video, **scanned PDF** caveats.
+Goal-first, sampling, scans — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- Corrupt files, illegal content, **deepfakes**, **satire**, **password PDFs**, **token limits**.
+DRM, tables, RTL, litigation sampling — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
 ### Scope and file-format dispatch (summary)
 
-- **Analysis vs authoring** — this skill does not own building Excel/PDF/slides; **SQLite / Parquet / locked Office** routing in one table.
+Routing formats — **`file-formats-dispatch-and-scope.md`**.
 
 Details: [references/file-formats-dispatch-and-scope.md](references/file-formats-dispatch-and-scope.md)
 
-### Decision flow and anti-patterns (summary)
+### Decision trees (summary)
 
-- Summarize vs extract vs compare; fabricated facts and OCR overconfidence.
+Input type, goal, scale, risk — **`decision-tree.md`**.
 
-Details: [references/decision-tree.md](references/decision-tree.md) · [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/decision-tree.md](references/decision-tree.md)
 
-### Cross-skill handoffs (summary)
+### Anti-patterns (summary)
 
-- **`business-analysis-pro`**, **`data-analysis-pro`**, **`image-processing-pro`** boundaries.
+No sampling frame, OCR blindness — **`anti-patterns.md`**.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Integration map (summary)
+
+**`business-analysis-pro`**, **`security-pro`**, **`data-analysis-pro`**, **`web-research-pro`** — **`integration-map.md`**.
 
 Details: [references/integration-map.md](references/integration-map.md)
 
-### Tooling and doc versions (summary)
+### Versions and tooling (summary)
 
-- FFmpeg flags, model/OCR limits; cite doc **date** when behavior shifts.
+Tool/docs drift — **`versions.md`**.
 
 Details: [references/versions.md](references/versions.md)
 
-### Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Issue or goal** — What the user provided and what they need from it.
-2. **Recommendation** — Analysis approach (sections, timeline, extraction list) and handoff to **`business-analysis-pro`** / **`security-pro`** if needed.
-3. **Code** — Structured report body, tables, or evidence list — **or** markdown template; still labeled **Code** for consistency.
-4. **Residual risks** — Uncertainty, unread regions, model bias, need for human review.
+1. **Context** — What was supplied (modalities, count, language hints), user goal, sensitivity level.
+2. **Problem** — Deliverable shape (summary vs extraction schema vs comparison) and success criteria.
+3. **System design / architecture** — Pipeline sketch: modalities → segmentation/extraction → synthesis; **grounding rule** for this run — **`analysis-pipeline-system-model.md`**.
+4. **Decision reasoning** — Coverage strategy (full vs sample), frames (entities/timeline), handoff to **`business-analysis-pro`** / **`data-analysis-pro`** if needed — **`decision-framework-and-tradeoffs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — Report outline, extraction table schema, or section list — **structured body** (label **Code** if using a fixed template block).
+6. **Trade-offs** — Depth vs token/time; automation vs manual verify; multilingual risk.
+7. **Failure modes** — What could mislead (OCR, missed scene, illegible chart) — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Uncertainty pockets, need for human expert, **`security-pro`** if secrets surfaced.
 
 ## Resources in this skill
 
-- `references/` — methods, reporting, tips, edge cases, Tier A maps.
-
 | Topic | File |
 |-------|------|
+| Analysis pipeline (system model) | [references/analysis-pipeline-system-model.md](references/analysis-pipeline-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md) |
+| Evidence & provenance rules | [references/evidence-and-provenance-rules.md](references/evidence-and-provenance-rules.md) |
+| Quality & grounding guardrails | [references/quality-validation-and-grounding-guardrails.md](references/quality-validation-and-grounding-guardrails.md) |
 | Methods & frames | [references/analysis-methods-and-frames.md](references/analysis-methods-and-frames.md) |
 | Reporting & limitations | [references/reporting-and-limitations.md](references/reporting-and-limitations.md) |
-| Tips and patterns | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
 | Scope & format dispatch | [references/file-formats-dispatch-and-scope.md](references/file-formats-dispatch-and-scope.md) |
 | Decision tree | [references/decision-tree.md](references/decision-tree.md) |
@@ -128,21 +187,30 @@ Details: [references/versions.md](references/versions.md)
 
 ## Quick examples
 
-**Input (simple):** User uploads a screenshot of a dashboard chart — “Is revenue growing?”  
-**Expected output:** Describe **chart type**, **axes**, **visible** trend; **no** exact numbers if unreadable; **confidence**; suggest higher-res crop if ambiguous.
+**Input:** Dashboard screenshot — “Is revenue growing?”  
+**Expected output:** Chart read from **visible** axes; **confidence**; no invented numbers; **failure modes** if unreadable.
 
-**Input (tricky):** Password-protected PDF — “Extract all vendor names.”  
-**Expected output:** Cannot read without password; explain **limit**; offer **redacted** manual paste workflow or **`security-pro`**-safe handling; no guessed content.
+**Input:** Password PDF — extract vendors.  
+**Expected output:** Cannot without unlock; **no** guessed content; **`security-pro`**-safe path.
 
-**Input (cross-skill):** “Summarize this webinar + give acceptance criteria for the feature they demoed.”  
-**Expected output:** **This skill** for transcript/scene summary with timestamps; then **`business-analysis-pro`** for AC, MoSCoW, and traceability; flag **demo ≠ contract** risk.
+**Input:** Webinar → acceptance criteria.  
+**Expected output:** This skill: timestamped summary; **`business-analysis-pro`**: AC; **demo ≠ contract** risk in residual.
 
 ## Checklist before calling the skill done
 
-- [ ] **Goal** and **output shape** matched.
-- [ ] Findings **tied** to evidence (page/time/region) where applicable.
-- [ ] **Limitations** and **uncertainty** stated; **inference** labeled.
-- [ ] **PII/sensitive** handling considered (**`security-pro`** if needed).
-- [ ] **Business packaging** delegated to **`business-analysis-pro`** when the task is “requirements from this doc” not just “summarize doc.”
-- [ ] **Modality** checks applied (scan vs text PDF, video sampling strategy).
-- [ ] **No fabricated** quotes, numbers, or UI labels — gaps explicit.
+### Grounding
+
+- [ ] Findings **tied** to evidence (page/time/region) where applicable — **`evidence-and-provenance-rules.md`**.
+- [ ] **Inference** labeled; **gaps** explicit — **`quality-validation-and-grounding-guardrails.md`**.
+- [ ] **No fabricated** quotes, numbers, or UI labels.
+
+### Process & handoffs
+
+- [ ] **Goal** and **output shape** matched; **modality** checks (scan, video sample) applied.
+- [ ] **PII/sensitive** handling — **`security-pro`** when needed.
+- [ ] **Business packaging** delegated to **`business-analysis-pro`** when task is requirements-from-content, not summary-only.
+
+### Robustness
+
+- [ ] **Failure modes** section addressed — **`failure-modes-detection-mitigation.md`** themes.
+- [ ] **Limitations** and **confidence** stated — **`reporting-and-limitations.md`**.
