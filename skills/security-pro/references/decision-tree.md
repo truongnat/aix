@@ -27,6 +27,14 @@ Resource identified by id in URL/body?
 └── Never trust client-only checks
 ```
 
+## SSRF / egress fetch
+
+```
+Backend fetches user-supplied URL or webhook callback?
+├── Yes → allowlist hosts/schemes; block RFC1918/link-local; separate fetcher with no cloud metadata creds — **`failure-modes-detection-mitigation.md`**
+└── No → still validate outbound integrations (payment, webhooks) with signatures and TLS
+```
+
 ## When to combine skills
 
 ```

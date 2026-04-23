@@ -977,27 +977,30 @@
   {
     "name": "security-pro",
     "folder": "security-pro",
-    "description": "Professional application and platform security: threat modeling, secure design, authn/authz, secrets, crypto hygiene, API and client hardening, and operational security signals — cross-stack (web, mobile, API, backend, cloud).\n\nUse this skill when the user asks about security review, OWASP-style risks, XSS, CSRF, SSRF, injection, IDOR/BOLA, JWT/session hardening, TLS, headers (CSP, HSTS), secrets management, rate limiting, audit logging, dependency/supply-chain risk, mobile secure storage, or hardening CI/CD pipelines.\n\nUse this skill for **network-aware security**: OSI / TCP–IP mapping, DNS/TLS/segmentation concepts, and how attacks relate to layers. Use it for **attack-method literacy** (MITRE ATT&CK, OWASP testing mindset, kill-chain phases) from a **defender** perspective. Use it for **authorized** offensive simulation: internal pen-test style workflows, staging/lab self-assessment, purple-team exercises, and structured bug reporting — **never** for unauthorized testing.\n\nUse **with** stack skills for implementation wiring: **`nestjs-pro`** (Guards, ValidationPipe, HTTP errors), **`nextjs-pro`** (middleware, Server Actions, env boundaries), **`postgresql-pro`** (RLS, least-privilege roles), **`react-pro`** / **`flutter-pro`** / **`react-native-pro`** (XSS-safe UI, WebView, deep links), **`testing-pro`** (security-focused tests, SAST/DAST hooks in CI). This skill (`security-pro`) owns **cross-platform security principles and threat framing**; framework skills own **framework-specific APIs**.\n\nTriggers: \"security\", \"secure\", \"OWASP\", \"XSS\", \"CSRF\", \"SSRF\", \"injection\", \"SQL injection\", \"IDOR\", \"BOLA\", \"auth\", \"authorization\", \"JWT\", \"session\", \"cookie\", \"SameSite\", \"CSP\", \"HSTS\", \"TLS\", \"secrets\", \"vault\", \"rate limit\", \"penetration\", \"threat model\", \"STRIDE\", \"CWE\", \"ASVS\", \"SAST\", \"DAST\", \"Dependabot\", \"supply chain\", \"encryption\", \"PII\", \"audit log\", \"hardening\", \"OSI\", \"TCP/IP\", \"network security\", \"MITRE\", \"ATT&CK\", \"kill chain\", \"red team\", \"purple team\", \"bug bounty\", \"pentest\", \"self-assessment\", \"attack simulation\", \"path traversal\", \"prototype pollution\".",
+    "description": "Production-grade application and platform security: threat modeling, trust boundaries, secure design, authn/authz, secrets, crypto hygiene, API and client hardening, OSI/network-aware controls, defensive attack-method literacy (OWASP, MITRE ATT&CK), and authorized offensive simulation — plus system model (trust boundaries, CIA, prevent/detect/respond, where authorization truth lives), failure modes (BOLA, token theft, SSRF, CI secret leak, multi-tenant bleed), decision trade-offs (cookies vs bearer, RLS vs app-only, CSP strictness, pinning), and quality guardrails (legal scope, no fabricated CVEs, evidence discipline).\n\nUse this skill when the user asks about security review, OWASP-style risks, XSS, CSRF, SSRF, injection, IDOR/BOLA, JWT/session hardening, TLS, headers (CSP, HSTS), secrets management, rate limiting, audit logging, dependency/supply-chain risk, mobile secure storage, CI/CD pipeline security, network segmentation, or structured internal assessment.\n\nUse for **network-aware security** (OSI/TCP–IP, DNS/TLS, segmentation) and **defender-oriented** attack literacy. For **authorized** offensive simulation only: staging/lab, ROE, purple-team — never unauthorized testing.\n\nCombine with **`nestjs-pro`**, **`nextjs-pro`**, **`postgresql-pro`**, **`api-design-pro`**, **`auth-pro`**, **`react-pro`** / **`react-native-pro`** / **`flutter-pro`**, **`testing-pro`**, **`ci-cd-pro`**, **`deployment-pro`**, **`network-infra-pro`** for implementation and infra. This skill owns **cross-platform principles and threat framing**; stack skills own **wiring**.\n\nTriggers: \"security\", \"secure\", \"OWASP\", \"XSS\", \"CSRF\", \"SSRF\", \"injection\", \"SQL injection\", \"IDOR\", \"BOLA\", \"auth\", \"authorization\", \"JWT\", \"session\", \"cookie\", \"SameSite\", \"CSP\", \"HSTS\", \"TLS\", \"secrets\", \"vault\", \"rate limit\", \"penetration\", \"threat model\", \"STRIDE\", \"CWE\", \"ASVS\", \"SAST\", \"DAST\", \"Dependabot\", \"supply chain\", \"encryption\", \"PII\", \"audit log\", \"hardening\", \"OSI\", \"TCP/IP\", \"network security\", \"MITRE\", \"ATT&CK\", \"kill chain\", \"red team\", \"purple team\", \"bug bounty\", \"pentest\", \"self-assessment\", \"attack simulation\", \"path traversal\", \"prototype pollution\".",
     "triggers": [],
     "when_to_use": [
-      "**Threat modeling** or security review of a feature, API, or architecture.",
-      "Hardening **authn/authz**, **sessions**, or **tokens** across web/mobile/API.",
-      "**Secrets**, **TLS**, **headers**, **CORS**, **rate limiting**, **logging** (redaction).",
-      "**Dependency** / supply-chain and **CI** security gates.",
-      "**OSI / TCP–IP**, segmentation, DNS/TLS, and how **network** properties affect app threats (e.g. SSRF, MITM assumptions).",
-      "**Attack-method** literacy: mapping controls to **MITRE ATT&CK** / OWASP-style classes; prioritizing detections and tests.",
-      "**Authorized** self-assessment: staging/lab testing, purple-team collaboration, structured **findings** reports.",
-      "Trigger keywords: `OWASP`, `XSS`, `JWT`, `RLS`, `secrets`, `CSP`, `threat model`, `IDOR`, `OSI`, `MITRE`, `pentest`, …"
+      "Threat modeling or security review of a feature, API, or architecture.",
+      "Hardening authn/authz, sessions, tokens (web and mobile).",
+      "Secrets, TLS, headers, CORS, rate limits, logging redaction.",
+      "Dependency/supply-chain and **CI** security posture.",
+      "OSI/TCP–IP, segmentation, DNS/TLS as they affect app threats (e.g. SSRF).",
+      "Defensive mapping to OWASP / MITRE ATT&CK; detection and test priorities.",
+      "**Authorized** internal assessment workflows and reporting structure."
     ],
     "references": [
       "anti-patterns.md",
       "attack-techniques-and-methods.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "fundamentals-and-threat-model.md",
       "integration-map.md",
       "offensive-simulation-and-self-assessment.md",
       "osi-and-networking.md",
+      "quality-validation-and-guardrails.md",
+      "security-controls-and-trust-boundaries-system-model.md",
       "tips-and-tricks.md",
       "versions.md"
     ]

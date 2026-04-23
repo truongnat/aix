@@ -1,132 +1,179 @@
 ---
 name: security-pro
 description: |
-  Professional application and platform security: threat modeling, secure design, authn/authz, secrets, crypto hygiene, API and client hardening, and operational security signals — cross-stack (web, mobile, API, backend, cloud).
+  Production-grade application and platform security: threat modeling, trust boundaries, secure design, authn/authz, secrets, crypto hygiene, API and client hardening, OSI/network-aware controls, defensive attack-method literacy (OWASP, MITRE ATT&CK), and authorized offensive simulation — plus system model (trust boundaries, CIA, prevent/detect/respond, where authorization truth lives), failure modes (BOLA, token theft, SSRF, CI secret leak, multi-tenant bleed), decision trade-offs (cookies vs bearer, RLS vs app-only, CSP strictness, pinning), and quality guardrails (legal scope, no fabricated CVEs, evidence discipline).
 
-  Use this skill when the user asks about security review, OWASP-style risks, XSS, CSRF, SSRF, injection, IDOR/BOLA, JWT/session hardening, TLS, headers (CSP, HSTS), secrets management, rate limiting, audit logging, dependency/supply-chain risk, mobile secure storage, or hardening CI/CD pipelines.
+  Use this skill when the user asks about security review, OWASP-style risks, XSS, CSRF, SSRF, injection, IDOR/BOLA, JWT/session hardening, TLS, headers (CSP, HSTS), secrets management, rate limiting, audit logging, dependency/supply-chain risk, mobile secure storage, CI/CD pipeline security, network segmentation, or structured internal assessment.
 
-  Use this skill for **network-aware security**: OSI / TCP–IP mapping, DNS/TLS/segmentation concepts, and how attacks relate to layers. Use it for **attack-method literacy** (MITRE ATT&CK, OWASP testing mindset, kill-chain phases) from a **defender** perspective. Use it for **authorized** offensive simulation: internal pen-test style workflows, staging/lab self-assessment, purple-team exercises, and structured bug reporting — **never** for unauthorized testing.
+  Use for **network-aware security** (OSI/TCP–IP, DNS/TLS, segmentation) and **defender-oriented** attack literacy. For **authorized** offensive simulation only: staging/lab, ROE, purple-team — never unauthorized testing.
 
-  Use **with** stack skills for implementation wiring: **`nestjs-pro`** (Guards, ValidationPipe, HTTP errors), **`nextjs-pro`** (middleware, Server Actions, env boundaries), **`postgresql-pro`** (RLS, least-privilege roles), **`react-pro`** / **`flutter-pro`** / **`react-native-pro`** (XSS-safe UI, WebView, deep links), **`testing-pro`** (security-focused tests, SAST/DAST hooks in CI). This skill (`security-pro`) owns **cross-platform security principles and threat framing**; framework skills own **framework-specific APIs**.
+  Combine with **`nestjs-pro`**, **`nextjs-pro`**, **`postgresql-pro`**, **`api-design-pro`**, **`auth-pro`**, **`react-pro`** / **`react-native-pro`** / **`flutter-pro`**, **`testing-pro`**, **`ci-cd-pro`**, **`deployment-pro`**, **`network-infra-pro`** for implementation and infra. This skill owns **cross-platform principles and threat framing**; stack skills own **wiring**.
 
   Triggers: "security", "secure", "OWASP", "XSS", "CSRF", "SSRF", "injection", "SQL injection", "IDOR", "BOLA", "auth", "authorization", "JWT", "session", "cookie", "SameSite", "CSP", "HSTS", "TLS", "secrets", "vault", "rate limit", "penetration", "threat model", "STRIDE", "CWE", "ASVS", "SAST", "DAST", "Dependabot", "supply chain", "encryption", "PII", "audit log", "hardening", "OSI", "TCP/IP", "network security", "MITRE", "ATT&CK", "kill chain", "red team", "purple team", "bug bounty", "pentest", "self-assessment", "attack simulation", "path traversal", "prototype pollution".
 
 metadata:
-  short-description: Security — AppSec, networking (OSI), attack methods (defensive), offensive simulation
+  short-description: Security — trust model, AppSec, network context, failure modes, ethical scope
+  content-language: en
+  domain: security
+  level: professional
 ---
 
 # Security (professional)
 
-Use [OWASP](https://owasp.org/) materials (Top 10, ASVS, cheat sheets) and your org’s security policy for authoritative guidance; this skill encodes **defense-in-depth habits**, **threat-aware design**, **network-layer context** (OSI/TCP–IP as a mental model), and **platform-agnostic** controls. Confirm **deployment model** (internet-facing, internal, mobile, multi-tenant), **regulatory** constraints, and **stack** when combining with repo `*-pro` skills. Any **simulated attack** or **pentest-style** activity must stay **in scope and authorized** (see `references/offensive-simulation-and-self-assessment.md`).
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use [OWASP](https://owasp.org/) (Top 10, ASVS, cheat sheets) and your org’s policy for authoritative guidance; this skill encodes **defense-in-depth**, **trust-boundary discipline**, **network-layer context**, and **ethical scope** for assessments — not legal advice. Confirm **deployment surface**, **data sensitivity**, **regulatory** constraints, and **stack** when pairing with repo **`*-pro`** skills.
+
+**Unauthorized testing is out of scope** — any simulation must follow **[references/offensive-simulation-and-self-assessment.md](references/offensive-simulation-and-self-assessment.md)** (written ROE, staging/lab, reporting).
+
+## Boundary
+
+**`security-pro`** owns **threat framing**, **control selection**, **cross-cutting AppSec/network patterns**, and **assessment ethics**. **`nestjs-pro`** / **`nextjs-pro`** / **`postgresql-pro`** own **framework-specific implementation**. **`auth-pro`** owns **identity protocol and provider integration** detail when it dominates. **`network-infra-pro`** owns **VPC/firewall design** as primary deliverable; **`security-pro`** contributes **threats and control intent**.
 
 ## Related skills (this repo)
 
-| Skill | When to combine with `security-pro` |
-|-------|--------------------------------------|
-| **`nestjs-pro`** | Guards, pipes, DTO validation, exception filters, OpenAPI |
-| **`nextjs-pro`** | Middleware, RSC vs client secrets, `NEXT_PUBLIC_` boundaries |
-| **`postgresql-pro`** | RLS, roles, `BYPASSRLS`, migration safety |
-| **`react-pro`** | XSS-safe patterns, CSP implications for client bundles |
-| **`flutter-pro`** / **`react-native-pro`** | Secure storage, platform channels, deep links |
-| **`testing-pro`** | Security test strategy, abuse-case tests in CI |
+| Skill | When to combine |
+|-------|----------------|
+| **`nestjs-pro`** | Guards, ValidationPipe, HTTP error hygiene |
+| **`nextjs-pro`** | Middleware, cookies, CSP, Server Actions, `NEXT_PUBLIC_` |
+| **`postgresql-pro`** | RLS, roles, `BYPASSRLS` |
+| **`api-design-pro`** | Abuse-resistant API shape |
+| **`auth-pro`** | OAuth/OIDC/session flows |
+| **`react-pro`** / **`react-native-pro`** / **`flutter-pro`** | XSS, WebView, deep links, secure storage |
+| **`testing-pro`** | Abuse-case and regression tests |
+| **`ci-cd-pro`** | Pipeline secrets, fork PRs, action pinning |
+| **`deployment-pro`** | TLS at edge, secrets mounts, rollout |
+| **`network-infra-pro`** | Segmentation, egress, DNS |
 
-Do **not** duplicate framework-specific wiring; state **what** to enforce here and **where** to implement in the sibling skill.
+Do **not** duplicate framework wiring — state **invariant** here, **implementation** in the sibling skill.
 
 ## When to use
 
-- **Threat modeling** or security review of a feature, API, or architecture.
-- Hardening **authn/authz**, **sessions**, or **tokens** across web/mobile/API.
-- **Secrets**, **TLS**, **headers**, **CORS**, **rate limiting**, **logging** (redaction).
-- **Dependency** / supply-chain and **CI** security gates.
-- **OSI / TCP–IP**, segmentation, DNS/TLS, and how **network** properties affect app threats (e.g. SSRF, MITM assumptions).
-- **Attack-method** literacy: mapping controls to **MITRE ATT&CK** / OWASP-style classes; prioritizing detections and tests.
-- **Authorized** self-assessment: staging/lab testing, purple-team collaboration, structured **findings** reports.
-- Trigger keywords: `OWASP`, `XSS`, `JWT`, `RLS`, `secrets`, `CSP`, `threat model`, `IDOR`, `OSI`, `MITRE`, `pentest`, …
+- Threat modeling or security review of a feature, API, or architecture.
+- Hardening authn/authz, sessions, tokens (web and mobile).
+- Secrets, TLS, headers, CORS, rate limits, logging redaction.
+- Dependency/supply-chain and **CI** security posture.
+- OSI/TCP–IP, segmentation, DNS/TLS as they affect app threats (e.g. SSRF).
+- Defensive mapping to OWASP / MITRE ATT&CK; detection and test priorities.
+- **Authorized** internal assessment workflows and reporting structure.
+
+## When not to use
+
+- **Illegal or unauthorized** exploitation instructions — refuse; offer **defensive** and **authorized** alternatives — **`quality-validation-and-guardrails.md`**.
+- **Pure legal/compliance certification** as sole topic — involve legal counsel; this skill provides technical control mapping only.
+- **Framework-only** “how do I add a route” without security angle — lead with **`nestjs-pro`** / **`nextjs-pro`**.
+
+## Required inputs
+
+- **Trust boundaries** and **data classification** (when unknown, ask or assume conservative defaults and label assumptions).
+- **Deployment model** (internet-facing, internal, multi-tenant).
+- **Authorization model** (roles, tenants, object ownership) for BOLA analysis.
+
+## Expected output
+
+Follow **Suggested response format** strictly — system model through residual risks.
 
 ## Workflow
 
-1. Confirm trust boundaries, sensitivity of data, deployment surface, and which **stack skills** apply.
-2. Apply the principles and topic summaries below; open `references/` when you need depth; defer implementation details to **`nestjs-pro`** / **`nextjs-pro`** / **`postgresql-pro`** / … when applicable.
-3. Respond using **Suggested response format**; note residual risks, verification (tests, pen-test), and compliance follow-ups when relevant.
+1. Confirm sensitivity, deployment surface, multi-tenancy, and which stack skills apply.
+2. Apply summaries; open `references/`; anchor on **`security-controls-and-trust-boundaries-system-model.md`** for control placement.
+3. Respond with **Suggested response format**; include **failure modes** and **verification**; never encourage out-of-scope attacks.
 
 ### Operating principles
 
-1. **Assume breach** — Layer controls; monitor and limit blast radius.
-2. **Server-side truth** — Authorization and business rules enforced where attackers can’t bypass (API/server).
-3. **Least privilege** — Users, services, DB roles, cloud IAM — minimum necessary.
-4. **No secrets in code or logs** — Vault/CI secrets; structured redaction.
-5. **Validate and encode** — Every boundary; context-appropriate encoding for output.
-6. **Secure defaults** — Deny by default; explicit allow for dangerous operations.
-7. **Authorized testing only** — No offensive simulation against systems or data outside **written scope** (even “your” prod may require approval).
+1. **Assume breach** — Layer controls; limit blast radius — **`security-controls-and-trust-boundaries-system-model.md`**.
+2. **Server-side truth** — Authz where attackers cannot bypass — **`failure-modes-detection-mitigation.md`**.
+3. **Least privilege** — Users, services, DB, IAM — **`tips-and-tricks.md`**.
+4. **No secrets in code or logs** — Vault/CI secrets; redaction — **`anti-patterns.md`**.
+5. **Validate and encode** — Every boundary — **`attack-techniques-and-methods.md`**.
+6. **Secure defaults** — Deny by default — **`decision-framework-and-trade-offs.md`**.
+7. **Authorized testing only** — ROE, environment, reporting — **`offensive-simulation-and-self-assessment.md`**.
 
 ### Fundamentals and threat modeling (summary)
 
-- STRIDE-style thinking: **S**poofing, **T**ampering, **R**epudiation, **I**nformation disclosure, **D**enial of service, **E**levation of privilege — map to your system.
-- Data classification drives controls (PII, payment, health).
-- Document **trust boundaries** (browser, CDN, API gateway, DB).
+STRIDE, data classification, trust boundaries — **`fundamentals-and-threat-model.md`**.
 
 Details: [references/fundamentals-and-threat-model.md](references/fundamentals-and-threat-model.md)
 
+### Security controls and trust boundaries — system model (summary)
+
+Trust boundaries, CIA, prevent/detect/respond, where invariants live — **`security-controls-and-trust-boundaries-system-model.md`**.
+
+Details: [references/security-controls-and-trust-boundaries-system-model.md](references/security-controls-and-trust-boundaries-system-model.md)
+
 ### OSI and networking (summary)
 
-- Seven-layer **OSI** model as a map for **where** controls and failures appear; **TCP/IP** mapping for real stacks.
-- **DNS**, **TLS**, **segmentation** (L2–L7) tied to common issues: SSRF, smuggling class bugs, lateral movement in flat networks.
+Layers, DNS/TLS, segmentation tied to SSRF and movement — **`osi-and-networking.md`**.
 
 Details: [references/osi-and-networking.md](references/osi-and-networking.md)
 
 ### Attack techniques and methods (summary)
 
-- **Kill-chain** phases and **MITRE ATT&CK** / **OWASP** as catalogs — to design **detections**, **tests**, and **reviews**, not unauthorized exploitation.
-- Web/API classes (injection, access control, SSRF, XSS) linked to **defensive** anchors.
+Kill chain, MITRE/OWASP mapping for **defensive** design — **`attack-techniques-and-methods.md`**.
 
 Details: [references/attack-techniques-and-methods.md](references/attack-techniques-and-methods.md)
 
 ### Offensive simulation and self-assessment (summary)
 
-- **Pen-test**, **red/purple** team, **bug bounty** — roles and when each fits.
-- **Safe lab**: isolated env, synthetic data, CI-friendly **SAST/DAST/SCA**; **reporting** template for internal findings.
+Pen-test / purple-team / lab SAST-DAST; reporting — **`offensive-simulation-and-self-assessment.md`**.
 
 Details: [references/offensive-simulation-and-self-assessment.md](references/offensive-simulation-and-self-assessment.md)
 
 ### Tips and tricks (summary)
 
-- Short-lived credentials; **rotate** on incident; **MFA** for privileged access.
-- **Parameterized queries** / ORM correctly; never concatenate user input into SQL/shell.
-- **Rate limit** auth and expensive endpoints; **size limits** on bodies and uploads.
-- **Dependency** scanning and patch process; pin CI **third-party actions** to commit SHA when possible.
+MFA, parameterization, rate limits, dependency hygiene — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- **JWT** misuse (long-lived, sensitive claims in client, algorithm `none`).
-- **BOLA** / IDOR on every resource id exposed in APIs.
-- **Multi-tenant** isolation failures (cache, logs, admin tools).
-- **CI** secrets exposed to untrusted PR workflows.
+JWT misuse, BOLA, multi-tenant, CI forks, OAuth redirect — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
+### Decision framework (summary)
+
+Cookies vs bearer, RLS vs app, CSP vs third parties, pinning — **`decision-framework-and-trade-offs.md`** + **`decision-tree.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
 ### Anti-patterns (summary)
 
-- **Client-only authz**, **tokens in localStorage for sensitive ops**, **PII in logs/URLs** — [references/anti-patterns.md](references/anti-patterns.md).
+Client-only authz, tokens in `localStorage` for sensitive ops, PII in URLs — **`anti-patterns.md`**.
 
-### Integration map (summary)
+Details: [references/anti-patterns.md](references/anti-patterns.md)
 
-- Same table as **Related skills**, expanded with ownership: [references/integration-map.md](references/integration-map.md).
+### Cross-skill handoffs (summary)
 
-### Suggested response format (implement / review)
+Stack implementation and infra — **`integration-map.md`**.
 
-1. **Issue or goal** — Asset, threat, or compliance driver; which **Related skill** implements the fix.
-2. **Recommendation** — Controls (prevent/detect/respond), priority, and stack touchpoints.
-3. **Code** — Config snippet, pseudo-policy, checklist, or secure pattern — not a full framework tutorial duplicated from other skills.
-4. **Residual risks** — Gaps for pen-test, monitoring, or process (patch cadence, IR).
+Details: [references/integration-map.md](references/integration-map.md)
+
+### Standards / versions (summary)
+
+ASVS/CWE usage, library versions — **`versions.md`**.
+
+Details: [references/versions.md](references/versions.md)
+
+## Suggested response format (STRICT — implement / review)
+
+1. **Context** — Surface (web/mobile/API), sensitivity, multi-tenant?, regulatory hints.
+2. **Problem / goal** — Threat, incident lesson, or hardening ask.
+3. **System design** — Trust boundaries and where controls attach — **`security-controls-and-trust-boundaries-system-model.md`**.
+4. **Decision reasoning** — Control choice vs trade-off (CSP, token storage, RLS) — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — Policy-level steps + which **`nestjs-pro`** / **`nextjs-pro`** / … file owns code — not full duplicated tutorials.
+6. **Trade-offs** — UX, perf, ops cost of security controls.
+7. **Failure modes** — BOLA, SSRF, token theft, CI leaks — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Monitoring, pen-test scope, compliance follow-up; **authorized** test handoff to **`offensive-simulation-and-self-assessment.md`** / **`testing-pro`**.
 
 ## Resources in this skill
 
-- `references/` — fundamentals, networking, attack catalogs, offensive simulation, tips, edge cases; keep long policy text out of `SKILL.md`.
-
 | Topic | File |
 |-------|------|
+| **Trust & control system model** | [references/security-controls-and-trust-boundaries-system-model.md](references/security-controls-and-trust-boundaries-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Fundamentals & threat model | [references/fundamentals-and-threat-model.md](references/fundamentals-and-threat-model.md) |
 | OSI & networking | [references/osi-and-networking.md](references/osi-and-networking.md) |
 | Attack techniques (defensive catalog) | [references/attack-techniques-and-methods.md](references/attack-techniques-and-methods.md) |
@@ -142,26 +189,34 @@ Details: [references/edge-cases.md](references/edge-cases.md)
 
 ### 1 — Simple (common)
 
-**Input:** Public REST API returns 200 with another user’s order when `orderId` is guessed — possible IDOR.  
-**Expected output:** Recommend server-side **authorization** check on every read; deny by default; cite **BOLA**; point to **`nestjs-pro`** for Guard placement; add integration test per **`testing-pro`**.
+**Input:** Public API returns another user’s order when `orderId` is guessed — IDOR.  
+**Expected output:** Full **Suggested response format** — server-side object authz; BOLA; **`nestjs-pro`** for Guard; **`testing-pro`** for two-user test.
 
 ### 2 — Tricky (edge case)
 
-**Input:** Admin UI hides a button, but the API still performs the action when called directly.  
-**Expected output:** Classify as **broken access control**; enforce authz on server; UI hiding is not a control; add negative tests.
+**Input:** Admin button hidden in UI but API still allows action.  
+**Expected output:** Broken access control; server enforcement; negative tests — **`failure-modes-detection-mitigation.md`**.
 
 ### 3 — Cross-skill
 
-**Input:** Team wants a “hack ourselves” Friday on **staging** with a findings report.  
-**Expected output:** Scope + **ROE** checklist from [references/offensive-simulation-and-self-assessment.md](references/offensive-simulation-and-self-assessment.md); tool categories (SAST/DAST/SCA); severity matrix; **no** prod testing without approval; link **`testing-pro`** for regression tests.
+**Input:** “Hack ourselves Friday” on staging with report.  
+**Expected output:** ROE + scope from **`offensive-simulation-and-self-assessment.md`**; tool categories; no prod without approval; **`testing-pro`** for regressions.
 
 ## Checklist before calling the skill done
 
-- [ ] Trust boundaries and data sensitivity stated; authz enforced **server-side**.
-- [ ] Secrets not in repo/logs; TLS and header basics considered for web exposure.
-- [ ] Input validation and safe output encoding considered at boundaries.
-- [ ] Framework-specific steps delegated to the right **`nestjs-pro`** / **`nextjs-pro`** / **`postgresql-pro`** / … skill.
-- [ ] Residual risks and **verification** path (tests, review, pen-test) noted.
-- [ ] If offensive simulation is discussed: **authorization**, **environment** (staging/lab), and **reporting** path are explicit.
-- [ ] **IDOR/BOLA** considered for any resource id exposed to clients.
-- [ ] **Multi-tenant** isolation called out when data mixes tenants or orgs.
+### Controls
+
+- [ ] Trust boundaries and data sensitivity stated; authz **server-side** — **`quality-validation-and-guardrails.md`**.
+- [ ] Secrets, TLS, headers, logging redaction considered — **`tips-and-tricks.md`**.
+
+### Process
+
+- [ ] Framework wiring delegated via **`integration-map.md`**.
+- [ ] Residual risks + verification (tests, scan, pen-test) noted.
+- [ ] Offensive work: **authorized**, scoped, environment explicit — **`offensive-simulation-and-self-assessment.md`**.
+
+### Common classes
+
+- [ ] **BOLA/IDOR** for resource ids — **`decision-tree.md`**.
+- [ ] **Multi-tenant** isolation (cache, logs) — **`edge-cases.md`**.
+- [ ] **No fabricated CVEs** — **`quality-validation-and-guardrails.md`**.

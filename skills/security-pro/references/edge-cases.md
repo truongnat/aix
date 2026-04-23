@@ -24,6 +24,7 @@ Cross-cutting security pitfalls that appear on **multiple** platforms.
 ## Cloud and serverless
 
 - **IAM** over-permissioned roles; **Lambda** env exposure; **metadata** endpoints in cloud — restrict network.
+- **OAuth / OIDC redirect** — strict **`redirect_uri`** allowlist; prevent **open redirect** chaining into token theft — **`failure-modes-detection-mitigation.md`**.
 - **Multi-tenant** — strict tenant id in every query and policy; **no** cross-tenant leakage in caches or logs.
 
 ## Supply chain and CI
