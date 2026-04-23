@@ -8,4 +8,4 @@
 6. **Refactor without tests** — Restructure without characterization tests invites silent behavior drift.
 7. **Abstract factory for one implementation** — YAGNI until a second real backend exists.
 
-See [decision-tree.md](decision-tree.md) and [edge-cases.md](edge-cases.md).
+See [decision-tree.md](decision-tree.md), [edge-cases.md](edge-cases.md), [failure-modes-detection-mitigation.md](failure-modes-detection-mitigation.md).

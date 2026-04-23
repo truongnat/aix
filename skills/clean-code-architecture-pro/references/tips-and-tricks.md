@@ -1,5 +1,7 @@
 # Clean code and architecture tips and tricks
 
+See [dependency-rule-system-model.md](dependency-rule-system-model.md) for the **dependency vs control flow** distinction before reorganizing folders.
+
 ## 1) Keep business rules independent
 
 - Put business logic in core modules that do not import transport/UI/database frameworks.

@@ -256,21 +256,27 @@
   {
     "name": "clean-code-architecture-pro",
     "folder": "clean-code-architecture-pro",
-    "description": "Professional guidance for writing clean, maintainable code and designing boundaries with clean architecture principles.\n\nUse this skill when implementing or reviewing features that need clear module boundaries, low coupling, high cohesion, and long-term maintainability.\n\nTriggers: \"clean code\", \"clean architecture\", \"hexagonal\", \"ports and adapters\", \"refactor\", \"SOLID\", \"SRP\", \"DIP\", \"separation of concerns\", \"dependency inversion\", \"layering\", \"module boundary\", \"circular dependency\", \"god object\", \"maintainability\", \"tech debt\", \"code smell\", \"feature envy\".\n\nCombine with `testing-pro` for architecture-safe tests and `git-operations-pro` for safe incremental refactors.",
+    "description": "Production-grade clean code and Clean Architecture: dependency rule as a system model (inward stability, ports/adapters, dependency vs control flow), bounded contexts and anti-corruption layers, strangler and incremental migration, failure modes (leaky domain, cycles, anemic model, god modules, distributed mud), decision frameworks and trade-offs (strict vs pragmatic layering, monolith vs services), stack dialects (TS/Java/Nest/Spring), boundary testing strategy, quality guardrails against over-engineering and diagram-only architecture, SOLID-informed boundaries, refactoring sequencing, and integration with tests and framework skills.\n\nUse when designing module boundaries, reviewing maintainability, inverting dependencies, breaking cycles, refactoring legacy toward clearer layers, or deciding how much architecture ceremony a codebase earns.\n\nCombine with testing-pro, git-operations-pro, nestjs-pro, react-pro, typescript-pro, api-design-pro as needed.\n\nTriggers: \"clean code\", \"clean architecture\", \"hexagonal\", \"ports and adapters\", \"onion\", \"refactor\", \"SOLID\", \"SRP\", \"DIP\", \"OCP\", \"dependency inversion\", \"layering\", \"module boundary\", \"bounded context\", \"ACL anti-corruption\", \"strangler fig\", \"circular dependency\", \"god object\", \"anemic domain\", \"use case\", \"application service\", \"maintainability\", \"tech debt\", \"code smell\", \"feature envy\", \"dependency rule\", \"aggregate\", \"repository pattern\".",
     "triggers": [],
     "when_to_use": [
-      "Designing or refactoring modules/services with unclear responsibilities.",
-      "Reducing coupling, cyclic dependencies, and business logic leakage into frameworks/adapters.",
-      "Reviewing PRs for readability, maintainability, and long-term changeability.",
-      "Applying incremental architecture improvements without full rewrites.",
-      "Trigger keywords: `clean code`, `clean architecture`, `refactor`, `separation of concerns`, `dependency inversion`, `layering`, `module boundary`, `maintainability`, `tech debt`"
+      "Unclear ownership between domain, application, and infrastructure.",
+      "Domain importing frameworks; ORM/API shapes leaking inward.",
+      "Cycles between modules; god modules; utils dumping ground.",
+      "Choosing **how much** layering for a greenfield vs legacy codebase.",
+      "Reviewing PRs for long-term changeability."
     ],
     "references": [
       "anti-patterns.md",
+      "bounded-context-and-strangler-patterns.md",
+      "decision-framework-and-tradeoffs.md",
       "decision-tree.md",
+      "dependency-rule-system-model.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
-      "tips-and-tricks.md"
+      "quality-validation-and-guardrails.md",
+      "tips-and-tricks.md",
+      "versions-and-stack-dialects.md"
     ]
   },
   {
