@@ -872,21 +872,24 @@
   {
     "name": "postgresql-pro",
     "folder": "postgresql-pro",
-    "description": "Professional PostgreSQL: schema design, SQL performance, migrations, operational edge cases, and Row Level Security (RLS).\n\nUse this skill when the user works on PostgreSQL, SQL, migrations (Flyway, Prisma, TypeORM, knex, raw SQL), indexing, EXPLAIN ANALYZE, transactions, isolation levels, replication, vacuum, connection pooling, partitioning, full-text search, JSONB, LISTEN/NOTIFY, or asks for DB review, slow query tuning, or deadlock investigation.\n\nRLS-focused: row-level security, policies (USING / WITH CHECK), ENABLE ROW LEVEL SECURITY, FORCE ROW LEVEL SECURITY, BYPASSRLS, multi-tenant isolation, tenant_id policies, Supabase RLS, JWT claims in policies, session variables for tenant context, restrictive policies, or debugging \"no rows\" / wrong visibility after enabling RLS.\n\nTriggers: \"PostgreSQL\", \"Postgres\", \"SQL\", \"migration\", \"EXPLAIN\", \"ANALYZE\", \"index\", \"bloat\", \"VACUUM\", \"MVCC\", \"transaction\", \"isolation\", \"deadlock\", \"lock\", \"replication\", \"read replica\", \"JSONB\", \"CTE\", \"partition\", \"pg_stat\", \"autovacuum\", \"connection pool\", \"RLS\", \"row level security\", \"policy\", \"USING\", \"WITH CHECK\", \"BYPASSRLS\", \"tenant\", \"multi-tenant\", \"Supabase RLS\", \"listen notify\", \"serialization failure\", \"40P01\".",
+    "description": "Production-grade PostgreSQL: schema design, SQL performance, migrations, MVCC and vacuum awareness, replication and pooling edge cases, and Row Level Security (RLS) — plus system model (snapshots, tuple versions, isolation, WAL at a glance), failure modes (migration locks, RLS visibility, replica lag, PgBouncer prepared statements), decision trade-offs (normalize vs denorm, RLS vs app-only, partition vs index, isolation vs retries), and quality guardrails (version-accurate docs, EXPLAIN discipline, least privilege, RLS tested as app role).\n\nUse this skill when the user works on PostgreSQL, SQL, migrations (Flyway, Prisma, TypeORM, knex, raw SQL), indexing, EXPLAIN ANALYZE, transactions, isolation levels, replication, vacuum, connection pooling, partitioning, full-text search, JSONB, LISTEN/NOTIFY, or asks for DB review, slow query tuning, or deadlock investigation.\n\nRLS-focused: row-level security, policies (USING / WITH CHECK), ENABLE ROW LEVEL SECURITY, FORCE ROW LEVEL SECURITY, BYPASSRLS, multi-tenant isolation, tenant_id policies, Supabase RLS, JWT claims in policies, session variables for tenant context, restrictive policies, or debugging \"no rows\" / wrong visibility after enabling RLS.\n\nCombine with **`nestjs-pro`** / **`nextjs-pro`** for ORM integration, **`deployment-pro`** for migration rollout, **`security-pro`** / **`auth-pro`** for identity boundaries, **`caching-pro`** for cache invalidation, **`testing-pro`** for CI databases, **`performance-tuning-pro`** for end-to-end latency, and **`sql-data-access-pro`** when SQLite portability matters.\n\nTriggers: \"PostgreSQL\", \"Postgres\", \"SQL\", \"migration\", \"EXPLAIN\", \"ANALYZE\", \"index\", \"bloat\", \"VACUUM\", \"MVCC\", \"transaction\", \"isolation\", \"deadlock\", \"lock\", \"replication\", \"read replica\", \"JSONB\", \"CTE\", \"partition\", \"pg_stat\", \"autovacuum\", \"connection pool\", \"RLS\", \"row level security\", \"policy\", \"USING\", \"WITH CHECK\", \"BYPASSRLS\", \"tenant\", \"multi-tenant\", \"Supabase RLS\", \"listen notify\", \"serialization failure\", \"40P01\".",
     "triggers": [],
     "when_to_use": [
       "Designing or evolving schemas, constraints, indexes, and migrations.",
-      "Tuning queries, interpreting `EXPLAIN (ANALYZE, BUFFERS)`, or reducing lock contention.",
-      "Planning zero-downtime or low-risk migrations (backfills, `CONCURRENTLY` indexes).",
-      "Debugging vacuum bloat, replication lag, connection exhaustion, or deadlocks.",
-      "**`ALTER TABLE … ENABLE ROW LEVEL SECURITY`**, writing or reviewing **policies**, tenant isolation, Supabase-style JWT policies, or **RLS performance** (indexes on policy predicates).",
-      "Trigger keywords: `PostgreSQL`, `EXPLAIN`, `RLS`, `migration`, `index`, `VACUUM`, …"
+      "Tuning queries, interpreting `EXPLAIN (ANALYZE, BUFFERS)`, reducing lock contention.",
+      "Zero-downtime or low-risk migrations (expand/migrate/contract, `CONCURRENTLY`).",
+      "Vacuum bloat, replication lag, pool exhaustion, deadlocks.",
+      "**`ENABLE ROW LEVEL SECURITY`**, policies, tenant isolation, Supabase-style JWT policies, RLS performance."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "postgresql-mvcc-storage-and-transaction-system-model.md",
+      "quality-validation-and-guardrails.md",
       "row-level-security.md",
       "schema-and-query-design.md",
       "tips-and-tricks.md",

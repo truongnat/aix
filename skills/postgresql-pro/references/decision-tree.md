@@ -40,6 +40,14 @@ Schema change could lock or rewrite a hot table?
     └── CREATE INDEX CONCURRENTLY; monitor invalid index and retry pattern
 ```
 
+## Reads: primary vs replica
+
+```
+Need read-your-writes or just-saved consistency?
+├── Yes → route those reads to primary (or sync replica) — **`edge-cases.md`**
+└── Tolerate lag → replica OK; measure replication delay — **`failure-modes-detection-mitigation.md`**
+```
+
 ## Connection: PgBouncer transaction vs session mode
 
 ```

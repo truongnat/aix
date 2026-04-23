@@ -14,6 +14,7 @@
 
 ## MVCC and vacuum
 
+- **`EXPLAIN ANALYZE` on production** — executes the query and adds load; can skew shared buffers — prefer staging or `EXPLAIN` without analyze for shape checks — **`quality-validation-and-guardrails.md`**.
 - **Long-running transactions** (open transactions, idle in transaction) hold **xmin** back — blocks vacuum progress → **bloat**.
 - **Autovacuum** — tune thresholds on append-heavy vs update-heavy tables; watch `n_dead_tup` in `pg_stat_user_tables`.
 - **Wraparound** — rare on modern servers but catastrophic; monitor `datfrozenxid` and vacuum pressure.
