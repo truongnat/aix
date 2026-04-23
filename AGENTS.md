@@ -66,6 +66,11 @@ Bundled **dev** workflows: [`workflows/dev/README.md`](workflows/dev/README.md) 
 
 Edit `config.md` (copy from `config.example.md`) — the `kb-config` block in Markdown, not `.yaml`.
 
+### Response language (skills vs chat)
+
+- **Bundled skills** (`skills/*/SKILL.md`, `references/`) are authored in **English** — see [`skills/SKILL_AUTHORING_RULES.md`](skills/SKILL_AUTHORING_RULES.md) §13.
+- **Assistant reply language** (e.g. Vietnamese) is **not** set inside skill files. Configure it with **Cursor User Rules**, **project rules** under `.cursor/rules/`, or per-chat instructions. Skill content stays English; the model follows your language preference for explanations.
+
 ## Formatting (common)
 
 - Repo root **`.editorconfig`** — UTF-8, LF, indent; Cursor rule **`.cursor/rules/formatting-common.mdc`** applies to all edits unless a narrower rule overrides.

@@ -47,4 +47,22 @@ Both sides are your infra with cert rotation?
     └── Signed tokens or scoped API keys with rotation and audit
 ```
 
+## MFA depth vs password-only
+
+```
+High-risk or privileged users?
+├── Require phishing-resistant factor (WebAuthn/passkeys) or step-up — see mfa-and-assurance.md
+└── Consumer low-risk?
+    └── Risk-based MFA or optional TOTP — align with security-pro for abuse signals
+```
+
+## Token channel for SPA
+
+```
+Browser must call API directly with bearer?
+├── Short TTL + strict storage review
+└── Can you own a same-origin BFF?
+    └── Session cookie to BFF + server-side token exchange — often simpler XSS story
+```
+
 When NOT to build custom auth: buy IdP + OIDC for most B2B SaaS unless you have dedicated security engineering.

@@ -74,26 +74,40 @@
   {
     "name": "auth-pro",
     "folder": "auth-pro",
-    "description": "Professional authentication and authorization guidance across web/mobile/API systems: identity flows, credential and token lifecycle, session/JWT/OAuth/OIDC/API-key patterns, and policy enforcement models (RBAC/ABAC/ReBAC).\n\nUse this skill when the user asks to design or review auth architecture, compare auth methods, implement secure login/session/token flows, enforce authorization boundaries, or troubleshoot access-control failures and token misuse.\n\nUse **with** **`security-pro`** for broader threat modeling and hardening, **`nestjs-pro`** / **`nextjs-pro`** for framework wiring, **`postgresql-pro`** for data-layer policy/RLS boundaries, and **`testing-pro`** for auth regression and abuse-case tests.\n\nTriggers: \"authentication\", \"authorization\", \"auth\", \"login\", \"session\", \"JWT\", \"OAuth\", \"OIDC\", \"SAML\", \"API key\", \"mTLS\", \"RBAC\", \"ABAC\", \"ReBAC\", \"MFA\", \"refresh token\", \"SSO\", \"access control\".",
+    "description": "Professional authentication and authorization guidance across web/mobile/API systems: identity flows, credential and token lifecycle, session/JWT/OAuth/OIDC/API-key patterns, and policy enforcement models (RBAC/ABAC/ReBAC).\n\nUse this skill when the user asks to design or review auth architecture, compare auth methods, implement secure login/session/token flows, enforce authorization boundaries, or troubleshoot access-control failures and token misuse.\n\nDo not use as the only skill for framework-specific wiring, IdP portal configuration, deep pentesting, or full database schema design — combine with stack and security skills (see Boundary).\n\nUse **with** **`security-pro`** for broader threat modeling and hardening, **`nestjs-pro`** / **`nextjs-pro`** for framework wiring, **`postgresql-pro`** for data-layer policy/RLS boundaries, and **`testing-pro`** for auth regression and abuse-case tests.\n\nTriggers: \"authentication\", \"authorization\", \"auth\", \"login\", \"session\", \"session management\", \"JWT\", \"OAuth\", \"OIDC\", \"SAML\", \"API key\", \"mTLS\", \"RBAC\", \"ABAC\", \"ReBAC\", \"MFA\", \"WebAuthn\", \"passkeys\", \"PKCE\", \"refresh token\", \"SSO\", \"access control\", \"BFF\", \"OAuth scopes\", \"device flow\", \"magic link\", \"account lifecycle\", \"SCIM\", \"JIT provisioning\", \"password reset\", \"credential stuffing\", \"break-glass\", \"impersonation\".",
     "triggers": [],
     "when_to_use": [
-      "Choosing among session, JWT, OAuth/OIDC, API key, SAML, or mTLS by context.",
-      "Designing user auth, service-to-service auth, and delegated authorization.",
-      "Building role/attribute/relationship-based access control models.",
+      "Choosing among session, JWT, OAuth/OIDC, SAML, API key, or mTLS by context.",
+      "Designing user auth, service-to-service auth, delegated authorization, MFA/passkeys, or OAuth/OIDC flows (PKCE, BFF, device flow).",
+      "**Account / identity lifecycle** (signup, verification, suspend, delete, linking), **recovery**, **authenticator lifecycle**, **session management** (timeouts, fixation, logout semantics).",
+      "Building RBAC/ABAC/ReBAC, **authorization review matrices**, tenant-aware policies, federation (JIT/SCIM) **architecture**.",
       "Hardening token/session lifecycle (issue, rotate, revoke, expire, recover).",
       "Reviewing or debugging broken permissions, stale sessions, and auth bypass risks.",
-      "Trigger keywords: `authentication`, `authorization`, `JWT`, `OAuth`, `OIDC`, `RBAC`, `ABAC`, `MFA`, `SSO`"
+      "Trigger keywords: `authentication`, `authorization`, `JWT`, `OAuth`, `OIDC`, `RBAC`, `ABAC`, `MFA`, `SSO`, `PKCE`, `WebAuthn`"
     ],
     "references": [
+      "account-recovery-breakglass.md",
       "anti-patterns.md",
+      "auth-observability-detection.md",
       "authentication-methods-and-selection.md",
+      "authenticators-lifecycle.md",
+      "authorization-architecture-review.md",
       "authorization-models-and-policy.md",
+      "client-platform-matrix.md",
       "decision-tree.md",
       "edge-cases.md",
+      "federation-enterprise-lifecycle.md",
+      "identity-account-lifecycle.md",
       "integration-map.md",
+      "mfa-and-assurance.md",
+      "oauth-oidc-patterns.md",
+      "passwords-and-verifiers.md",
+      "session-management.md",
+      "threat-controls-mapping.md",
       "tips-and-tricks.md",
       "token-session-lifecycle.md",
-      "versions.md"
+      "versions.md",
+      "workload-machine-auth.md"
     ]
   },
   {

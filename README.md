@@ -1,65 +1,67 @@
-# SKILLS — Kỹ năng, quy trình & cơ sở tri thức (Markdown)
+# SKILLS — Agent skills, workflows & knowledge (Markdown)
 
-Kho lưu trữ mẫu: **`skills/`** (gói `SKILL.md`), **`workflows/`** (các bước thực hiện Markdown), **`knowledge-base/`** (`.md` + RAG nội bộ). Cấu hình và quy ước quy trình sử dụng **Markdown**, không sử dụng `.yaml`/`.yml` cho các vai trò này (các script có thể xuất JSON cho embeddings).
+Reference layout: **`skills/`** (`SKILL.md` bundles), **`workflows/`** (step-by-step Markdown), **`knowledge-base/`** (`.md` + local RAG). Configuration and workflow conventions use **Markdown** (not `.yaml`/`.yml` for these roles; scripts may emit JSON for embeddings).
 
-## Nội dung
+**Language:** Repository docs and bundled skills are **English**. For assistant replies in another language (e.g. Vietnamese), set **Cursor User Rules** or project rules — see [`AGENTS.md`](AGENTS.md) and [`skills/SKILL_AUTHORING_RULES.md`](skills/SKILL_AUTHORING_RULES.md) §13.
 
-- [Cấu trúc thư mục](#cấu-trúc-thư-mục)
-- [Bắt đầu nhanh](#bắt-đầu-nhanh)
-- [Cơ sở tri thức & RAG](#cơ-sở-tri-thức--rag)
-- [Lập chỉ mục dự án (Bất kỳ mã nguồn nào)](#lập-chỉ-mục-dự-án-bất-kỳ-mã-nguồn-nào)
-- [Kỹ năng (Skills)](#kỹ-năng-skills)
-- [Quy trình (Workflows)](#quy-trình-workflows)
+## Contents
+
+- [Layout](#layout)
+- [Quick start](#quick-start)
+- [Knowledge base & RAG](#knowledge-base--rag)
+- [Project indexing (any codebase)](#project-indexing-any-codebase)
+- [Skills](#skills)
+- [Workflows](#workflows)
 - [Prompt templates](#prompt-templates)
-- [Cursor / Agent](#cursor--agent)
+- [Cursor / agent](#cursor--agent)
 
-## Cấu trúc thư mục
+## Layout
 
-Kiến trúc cơ bản tập trung vào 5 thành phần chính:
+Top-level structure:
 
 ```
 .
-├── skills/                    # Các gói kỹ năng (e.g. react-pro, nestjs-pro, ...)
-├── scripts/                   # Các script công cụ (implementation: `dist/tools.js`)
-├── templates/                 # Các mẫu báo cáo, issue, prompt
-├── workflows/                 # Các quy trình thực hiện (từng bước bằng Markdown)
-└── knowledge-base/            # Cơ sở tri thức nội bộ và embeddings
+├── skills/                    # Skill packs (e.g. react-pro, nestjs-pro, …)
+├── scripts/                   # Tooling (entry: `dist/tools.js`)
+├── templates/                 # Report, issue, and prompt templates
+├── workflows/                 # Runnable procedures (Markdown steps)
+└── knowledge-base/            # Internal KB and embeddings
 ```
 
-Chi tiết đầy đủ:
+Full tree (abridged):
 
 ```
-.                              # Gốc repo
-├── AGENTS.md                  # Gợi ý cho Cursor/agent (skills, commands, KB)
-├── OUTPUT_CONVENTIONS.md      # Quy ước định dạng báo cáo cho workflows
+.                              # Repo root
+├── AGENTS.md                  # Hints for Cursor / agents (skills, commands, KB)
+├── OUTPUT_CONVENTIONS.md      # Report formatting for workflows
 ├── LICENSE                    # MIT
-├── package.json               # CLI npx và các script npm
+├── package.json               # npx CLI and npm scripts
 ├── skills/
 │   ├── README.md
 │   ├── SKILL_AUTHORING_RULES.md
-│   └── <skill-name>/          # ví dụ: react-pro, repo-tooling-pro, …
+│   └── <skill-name>/          # e.g. react-pro, repo-tooling-pro, …
 ├── scripts/
-│   └── README.md              # Bản đồ câu lệnh
+│   └── README.md              # Command map
 ├── templates/
 │   ├── README.md
-│   └── report/                # ví dụ: project-index-report.md
+│   └── report/                # e.g. project-index-report.md
 ├── workflows/
-│   ├── README.md              # Quy ước, thực thi song song
+│   ├── README.md              # Conventions, parallel execution
 │   └── dev/                   # /ticket, /index-project, …
 ├── knowledge-base/
 │   ├── INDEX.md
-│   ├── documents/             # Nguồn .md cho RAG
+│   ├── documents/             # RAG source .md
 │   └── embeddings/            # rag_*.json, skill_index.json
-├── prompts/                   # Các gợi ý (planning, review, …)
-├── src/                       # Mã nguồn TypeScript
-└── dist/                      # JS đã biên dịch (`npm run build`)
+├── prompts/                   # Planning, review, …
+├── src/                       # TypeScript source
+└── dist/                      # Compiled JS (`npm run build`)
 ```
 
-## Tổng quan kiến trúc
+## Architecture overview
 
 ```mermaid
 flowchart LR
-  USER[Người dùng / Agent] --> SKILLS[skills/*-pro]
+  USER[User / agent] --> SKILLS[skills/*-pro]
   USER --> WF[workflows/dev]
   USER --> PROMPTS[prompts/]
 
@@ -69,7 +71,7 @@ flowchart LR
 
   DOCS --> BUILD[node dist/tools.js build-kb]
   BUILD --> EMB[knowledge-base/embeddings]
-  EMB --> QUERY[node dist/tools.js query-kb hoặc query-kb-batch]
+  EMB --> QUERY[node dist/tools.js query-kb or query-kb-batch]
   QUERY --> USER
 
   SKILLS --> VALIDATE[node dist/tools.js validate-skills]
@@ -78,75 +80,83 @@ flowchart LR
   ANALYZE --> USER
 ```
 
-## Bắt đầu nhanh
+## Quick start
 
-### Cài đặt vào dự án khác
+### Install into another project
 
-Chạy từ **thư mục gốc của dự án mục tiêu**.
+Run from the **target project root**.
 
 ```bash
-# Cài đặt (mặc định)
+# Install (default)
 npx github:truongnat/skills
 
-# Cập nhật bản cài đặt hiện có
+# Update an existing install
 npx github:truongnat/skills update
 ```
 
-### Làm việc trong repo này (Node + TypeScript)
+### Work in this repo (Node + TypeScript)
 
 ```bash
 npm install
 npm run build
 node dist/tools.js build-kb
-node dist/tools.js query-kb "câu hỏi của bạn"
+node dist/tools.js query-kb "your question"
 ```
 
-Xem [`scripts/README.md`](scripts/README.md) để biết đầy đủ bản đồ câu lệnh.
+See [`scripts/README.md`](scripts/README.md) for the full command map.
 
-## Cơ sở tri thức & RAG
+## Knowledge base & RAG
 
-1. Chỉnh sửa file `.md` trong [`knowledge-base/documents/`](knowledge-base/documents/).
-2. Cập nhật [`knowledge-base/INDEX.md`](knowledge-base/INDEX.md).
-3. Chạy `node dist/tools.js build-kb`.
-4. Truy vấn: `node dist/tools.js query-kb "..."`.
+1. Edit `.md` files under [`knowledge-base/documents/`](knowledge-base/documents/).
+2. Update [`knowledge-base/INDEX.md`](knowledge-base/INDEX.md).
+3. Run `node dist/tools.js build-kb`.
+4. Query: `node dist/tools.js query-kb "..."`.
 
-## Lập chỉ mục dự án (Project Indexing)
+## Project indexing (any codebase)
 
-Sử dụng khi bạn cần một chỉ mục vector và bản tóm tắt Markdown cho một repository **khác**.
+Use when you need a vector index and Markdown summary for a **different** repository.
 
-1. **CLI:** `node dist/tools.js index-project --dir <gốc_dự_án> --out <thư_mục_chỉ_mục>`.
-2. **Truy vấn:** `node dist/tools.js query-kb "câu hỏi" --index <thư_mục_chỉ_mục>`.
-3. **Wiki:** `node dist/tools.js generate-wiki --docs <thư_mục_chỉ_mục>/docs`.
+1. **CLI:** `node dist/tools.js index-project --dir <project_root> --out <index_dir>`.
+2. **Query:** `node dist/tools.js query-kb "question" --index <index_dir>`.
+3. **Wiki:** `node dist/tools.js generate-wiki --docs <index_dir>/docs`.
 4. **Workflow:** **`/index-project`** ([`workflows/dev/index-project.md`](workflows/dev/index-project.md)).
 
-## Kỹ năng (Skills)
+## Skills
 
-- **Quy tắc:** [`skills/SKILL_AUTHORING_RULES.md`](skills/SKILL_AUTHORING_RULES.md).
-- **Danh mục:** Danh sách đầy đủ trong **[`skills/README.md`](skills/README.md)**.
+- **Rules:** [`skills/SKILL_AUTHORING_RULES.md`](skills/SKILL_AUTHORING_RULES.md).
+- **Catalog:** Full list in **[`skills/README.md`](skills/README.md)**.
 
-## Quy trình (Workflows)
+## Workflows
 
-Quy ước đặt tên và thực thi song song: [`workflows/README.md`](workflows/README.md).
+Naming and parallel execution: [`workflows/README.md`](workflows/README.md).
 
-| Lệnh | File | Mục đích |
-|-------|------|---------|
-| **`/ticket`** | [`workflows/dev/ticket.md`](workflows/dev/ticket.md) | Xử lý Ticket / Kanban |
-| **`/release`** | [`workflows/dev/release.md`](workflows/dev/release.md) | Ghi chú phát hành → triển khai |
-| **`/hotfix`** | [`workflows/dev/hotfix.md`](workflows/dev/hotfix.md) | Sửa lỗi khẩn cấp |
-| **`/code-review`** | [`workflows/dev/code-review.md`](workflows/dev/code-review.md) | Đánh giá mã nguồn có phân cấp mức độ |
-| **`/debug`** | [`workflows/dev/debug.md`](workflows/dev/debug.md) | Quy trình gỡ lỗi hệ thống |
-| **`/security-audit`** | [`workflows/dev/security-audit.md`](workflows/dev/security-audit.md) | Kiểm tra bảo mật |
-| **`/arch-review`** | [`workflows/dev/arch-review.md`](workflows/dev/arch-review.md) | Đánh giá kiến trúc / thiết kế |
-| **`/perf-investigation`** | [`workflows/dev/perf-investigation.md`](workflows/dev/perf-investigation.md) | Điều tra hiệu năng |
-| **`/refactor`** | [`workflows/dev/refactor.md`](workflows/dev/refactor.md) | Tái cấu trúc an toàn (test-first) |
-| **`/incident`** | [`workflows/dev/incident.md`](workflows/dev/incident.md) | Phản ứng sự cố |
-| **`/data-migration`** | [`workflows/dev/data-migration.md`](workflows/dev/data-migration.md) | Di cư dữ liệu / DB |
-| **`/onboarding`** | [`workflows/dev/onboarding.md`](workflows/dev/onboarding.md) | Hướng dẫn thành viên mới |
-| **`/api-design`** | [`workflows/dev/api-design.md`](workflows/dev/api-design.md) | Thiết kế / đánh giá API |
-| **`/test-strategy`** | [`workflows/dev/test-strategy.md`](workflows/dev/test-strategy.md) | Chiến lược kiểm thử |
-| **`/dep-audit`** | [`workflows/dev/dep-audit.md`](workflows/dev/dep-audit.md) | Kiểm tra phụ thuộc hệ thống |
-| **`/index-project`** | [`workflows/dev/index-project.md`](workflows/dev/index-project.md) | Lập chỉ mục cho bất kỳ dự án nào |
+| Command | File | Purpose |
+|---------|------|---------|
+| **`/ticket`** | [`workflows/dev/ticket.md`](workflows/dev/ticket.md) | Ticket / Kanban |
+| **`/release`** | [`workflows/dev/release.md`](workflows/dev/release.md) | Release notes → implementation |
+| **`/hotfix`** | [`workflows/dev/hotfix.md`](workflows/dev/hotfix.md) | Urgent production fix |
+| **`/code-review`** | [`workflows/dev/code-review.md`](workflows/dev/code-review.md) | Structured code review |
+| **`/debug`** | [`workflows/dev/debug.md`](workflows/dev/debug.md) | Systematic debugging |
+| **`/security-audit`** | [`workflows/dev/security-audit.md`](workflows/dev/security-audit.md) | Security review |
+| **`/arch-review`** | [`workflows/dev/arch-review.md`](workflows/dev/arch-review.md) | Architecture / design review |
+| **`/perf-investigation`** | [`workflows/dev/perf-investigation.md`](workflows/dev/perf-investigation.md) | Performance investigation |
+| **`/refactor`** | [`workflows/dev/refactor.md`](workflows/dev/refactor.md) | Safe refactor (test-first) |
+| **`/incident`** | [`workflows/dev/incident.md`](workflows/dev/incident.md) | Incident response |
+| **`/data-migration`** | [`workflows/dev/data-migration.md`](workflows/dev/data-migration.md) | Data / DB migration |
+| **`/onboarding`** | [`workflows/dev/onboarding.md`](workflows/dev/onboarding.md) | New member onboarding |
+| **`/api-design`** | [`workflows/dev/api-design.md`](workflows/dev/api-design.md) | API design / review |
+| **`/test-strategy`** | [`workflows/dev/test-strategy.md`](workflows/dev/test-strategy.md) | Test strategy |
+| **`/dep-audit`** | [`workflows/dev/dep-audit.md`](workflows/dev/dep-audit.md) | Dependency audit |
+| **`/index-project`** | [`workflows/dev/index-project.md`](workflows/dev/index-project.md) | Index any project |
 
-## Bản quyền
+## Prompt templates
+
+See [`templates/README.md`](templates/README.md) and [`prompts/`](prompts/).
+
+## Cursor / agent
+
+See [`AGENTS.md`](AGENTS.md) for skills path, commands, KB usage, and **response language** configuration.
+
+## License
 
 [MIT](LICENSE)

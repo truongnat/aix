@@ -9,6 +9,7 @@ description: |
 
 metadata:
   short-description: CLI — argv design, help/exit codes, pipes/TTY, completions, cross-platform tools
+  content-language: en
 ---
 
 # CLI (professional)
@@ -17,13 +18,15 @@ Canonical ergonomics reference: **[clig.dev](https://clig.dev/)** (community gui
 
 ## Related skills (this repo)
 
-| Skill | When to combine with `cli-pro` |
-|-------|--------------------------------|
+
+| Skill                    | When to combine with `cli-pro`                                                                              |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | **`code-packaging-pro`** | Entry points, `bin`, Docker/CI that invokes the CLI |
 | **`security-pro`** | Credentials via env, `--password` anti-patterns, path safety |
 | **`testing-pro`** | Snapshot tests for `--help`, golden stderr, subprocess integration |
 | **`javascript-pro`** | Node CLIs, ESM/CJS `bin`, shebang edge cases |
 | **`repo-tooling-pro`** | Repo-specific **internal** scripts vs **published** CLIs — this skill focuses on **user-facing** CLI design |
+
 
 ## When to use
 
@@ -74,7 +77,7 @@ Details: [references/decision-tree.md](references/decision-tree.md) · [referenc
 
 ### Cross-skill handoffs (summary)
 
-- **`code-packaging-pro`**, **`security-pro`**, **`testing-pro`**, **`javascript-pro`**.
+- `**code-packaging-pro`**, `**security-pro**`, `**testing-pro**`, `**javascript-pro**`.
 
 Details: [references/integration-map.md](references/integration-map.md)
 
@@ -95,15 +98,17 @@ Details: [references/versions.md](references/versions.md)
 
 - `references/` — Deep dives, Tier A maps; external baseline [clig.dev](https://clig.dev/).
 
-| Topic | File |
-|-------|------|
-| Tips & CLI UX | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+
+| Topic               | File                                                                   |
+| ------------------- | ---------------------------------------------------------------------- |
+| Tips & CLI UX       | [references/tips-and-tricks.md](references/tips-and-tricks.md)         |
 | Patterns by runtime | [references/patterns-by-runtime.md](references/patterns-by-runtime.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Versions | [references/versions.md](references/versions.md) |
+| Edge cases          | [references/edge-cases.md](references/edge-cases.md)                   |
+| Decision tree       | [references/decision-tree.md](references/decision-tree.md)             |
+| Anti-patterns       | [references/anti-patterns.md](references/anti-patterns.md)             |
+| Integration map     | [references/integration-map.md](references/integration-map.md)         |
+| Versions            | [references/versions.md](references/versions.md)                       |
+
 
 ## Quick examples
 
@@ -111,17 +116,17 @@ Details: [references/versions.md](references/versions.md)
 **Expected output:** Catch **SIGPIPE** or handle **EPIPE** on write; exit **0** or **141** per platform convention; document; avoid Python traceback noise on stderr for expected pipe closure.
 
 **Input (tricky):** “Default subcommand deletes files — users typo flags.”  
-**Expected output:** **Require** explicit subcommand or `--force` + **TTY** guard; **dry-run** mode; **`security-pro`** for safe-by-default narrative.
+**Expected output:** **Require** explicit subcommand or `--force` + **TTY** guard; **dry-run** mode; `**security-pro`** for safe-by-default narrative.
 
 **Input (cross-skill):** “Ship Python CLI on PyPI with completions.”  
-**Expected output:** **`code-packaging-pro`** for entry points and publish; **this skill** for **`--help`**, **exit codes**, completion hook; **`testing-pro`** for subprocess golden tests.
+**Expected output:** `**code-packaging-pro`** for entry points and publish; **this skill** for `**--help`**, **exit codes**, completion hook; `**testing-pro`** for subprocess golden tests.
 
 ## Checklist before calling the skill done
 
-- [ ] **stdout vs stderr** contract is explicit for normal operation and errors.
-- [ ] **Exit codes** documented; `--help` / `--version` behave and exit `0`.
-- [ ] **Non-TTY** / **CI** behavior defined (no stuck prompts; or `--yes` with warning).
-- [ ] If **machine-readable** output exists, it is behind **`--json`** (or equivalent) and **stable**.
-- [ ] **Breaking** argv changes called out with migration or semver note for published tools.
-- [ ] **Color** / **progress** behavior defined for pipe and log contexts.
-- [ ] **Windows** path and quoting caveats noted when cross-platform.
+- **stdout vs stderr** contract is explicit for normal operation and errors.
+- **Exit codes** documented; `--help` / `--version` behave and exit `0`.
+- **Non-TTY** / **CI** behavior defined (no stuck prompts; or `--yes` with warning).
+- If **machine-readable** output exists, it is behind `**--json`** (or equivalent) and **stable**.
+- **Breaking** argv changes called out with migration or semver note for published tools.
+- **Color** / **progress** behavior defined for pipe and log contexts.
+- **Windows** path and quoting caveats noted when cross-platform.

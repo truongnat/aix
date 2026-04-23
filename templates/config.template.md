@@ -21,4 +21,6 @@ chunk_overlap = 200
 
 ## Extensions
 
-Other options (API keys, MCP, logging, …) can be added **in Markdown** in the same file (tables, sections) — current scripts do not parse those; they are for human docs or future tooling.
+Other options (API keys, MCP, logging, agent reply language notes, …) can be added **in Markdown** in the same file (tables, sections) — current scripts do not parse those; they are for human docs or future tooling.
+
+For **response language** (e.g. Vietnamese replies): configure **Cursor User Rules** or `.cursor/rules/` — not this config block. See root [`config.example.md`](../config.example.md) and [`AGENTS.md`](../AGENTS.md).
