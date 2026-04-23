@@ -19,3 +19,8 @@
 
 - Breaks user scripts.
 - **Fix:** Deprecation period + release notes.
+
+## Progress / logs on stdout when `--json`
+
+- Breaks `jq` and parsers.
+- **Fix:** Diagnostics only to stderr when machine-readable mode active — **`failure-modes-detection-mitigation.md`**.

@@ -33,3 +33,30 @@
 ## Exit code ambiguity
 
 - Using **`1`** for all failures hurts automation; distinguish **usage** (e.g. `2`), **runtime error** (`1`), **external tool** failure (forward or map), if feasible — and document.
+
+---
+
+## Containers and remote
+
+- **`docker run -T`** / **`kubectl exec`** without TTY — same as CI: **no prompts** unless flags.
+- **SSH batch mode** — Non-interactive; passphrase prompts hang.
+
+## Sudo / elevated shells
+
+- **Different PATH** — `sudo tool` may resolve different binary — document absolute path or `/usr/local/bin`.
+
+## Wrapper scripts
+
+- **`npx`**, **`pnpm dlx`** — Extra latency and version resolution; document **pinned** invocation for reproducible CI.
+
+## Very wide terminals / narrow
+
+- Tabular output: detect width or **`--no-trunc`** / **`--full`** for stable scripting.
+
+## Argument length limits
+
+- **MAX_ARG_STRLEN** / Windows command line limits — huge file lists need **`@file`** or stdin-based input — document.
+
+## sudo / argv visibility
+
+- Arguments still visible to other users on shared systems — reinforces **no secrets on argv** — **`security-pro`**.

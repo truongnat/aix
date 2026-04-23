@@ -1,5 +1,7 @@
 # CLI — tips and tricks
 
+See [cli-runtime-system-model.md](cli-runtime-system-model.md) for **stdin/stdout/stderr/exit** as a system contract before adding features.
+
 ## Help and discoverability
 
 - **`--help`** should print usage and exit `0` quickly (no network, no config file read that can fail).

@@ -11,3 +11,7 @@
 ## OS
 
 - Windows `conhost` vs Unix TTY — test quoting and paths.
+
+## argv as public API
+
+- Renamed flags / removed defaults → treat as **semver** for published tools — communicate in CHANGELOG.

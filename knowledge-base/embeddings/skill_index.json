@@ -282,22 +282,26 @@
   {
     "name": "cli-pro",
     "folder": "cli-pro",
-    "description": "Advanced command-line interfaces — argument design, help/usage, exit codes, stdin/stdout/stderr contracts, signals, completions, and cross-platform packaging — for tools users run in terminals, scripts, and CI.\n\nUse this skill when the user designs or refactors a **CLI** (any language), adds **subcommands** or **global flags**, implements **shell completion**, fixes **broken pipes** / **TTY** behavior, or aligns **machine-readable output** with human-readable logs. Combine with **`code-packaging-pro`** for distribution (pyproject entry points, npm `bin`, Go/Rust install); with **`security-pro`** for secrets and dangerous flags; with **`testing-pro`** for CLI integration tests.\n\nTriggers: \"CLI\", \"command line\", \"argparse\", \"click\", \"typer\", \"clap\", \"cobra\", \"commander\", \"yargs\", \"subcommand\", \"exit code\", \"stderr\", \"POSIX\", \"completion\", \"bash completion\", \"zsh completion\", \"machine readable\", \"JSON output\", \"TTY\", \"SIGPIPE\", \"getopt\", \"EPIPE\", \"dry-run\", \"no-color\", \"FORCE_COLOR\", \"prompt stuck CI\", \"semver CLI\".",
+    "description": "Production-grade CLI design and implementation: stdin/stdout/stderr and exit code as a runtime contract, TTY vs non-interactive behavior, SIGPIPE/EPIPE and signal handling, argv/subcommand design, strict vs permissive parsing, config/env/flag precedence, machine-readable output (--json) policies, cross-platform constraints (Windows paths, encoding), shell completions, failure modes (hung CI, completion drift, mixed JSON/logs), decision trade-offs (flat vs subcommands), semver for argv API, packaging hooks — for tools run in terminals, scripts, containers, and CI.\n\nUse when designing or refactoring CLIs (any language), fixing pipes/completions/exit codes, or reviewing UX and safety of command-line tools.\n\nCombine with code-packaging-pro, security-pro, testing-pro, javascript-pro, docker-pro as needed.\n\nTriggers: \"CLI\", \"command line\", \"argparse\", \"click\", \"typer\", \"clap\", \"cobra\", \"commander\", \"yargs\", \"subcommand\", \"exit code\", \"stderr\", \"POSIX\", \"completion\", \"bash completion\", \"zsh completion\", \"machine readable\", \"JSON output\", \"TTY\", \"SIGPIPE\", \"SIGINT\", \"getopt\", \"EPIPE\", \"broken pipe\", \"dry-run\", \"no-color\", \"FORCE_COLOR\", \"NO_COLOR\", \"prompt stuck CI\", \"semver CLI\", \"strict parsing\", \"argv breaking change\", \"docker exec CLI\", \"non-interactive\".",
     "triggers": [],
     "when_to_use": [
-      "Designing **flags**, **positional args**, **subcommands**, or **config precedence** (CLI > env > file).",
-      "**Help text**, **examples**, **version** flags, and **verbosity** (`-q` / `-v` / `--verbose`).",
-      "**Exit codes**, **stderr** for errors/diagnostics, **stdout** for data; **JSON** / `--json` machine output.",
-      "**Pipes**, **SIGPIPE**, **non-interactive** / **CI** detection, **progress** on tty vs log-friendly mode.",
-      "**Shell completion** (bash/zsh/fish), **dynamic** completions.",
-      "Trigger keywords: `CLI`, `argparse`, `click`, `typer`, `clap`, `cobra`, `completion`, `exit code`, `stderr`, `SIGPIPE`, `TTY`, `--json`"
+      "Designing **flags**, **positionals**, **subcommands**, **precedence** (CLI > env > file).",
+      "**Help**, **examples**, **version**, verbosity, **`--json`** stability.",
+      "**Exit codes**, **stderr** discipline, **pipes**, **SIGPIPE**, **SIGINT**.",
+      "**Completions**, **dynamic** completions, **migration** when argv breaks.",
+      "Reviewing CLIs for **CI safety** (no hung prompts)."
     ],
     "references": [
       "anti-patterns.md",
+      "cli-runtime-system-model.md",
+      "configuration-precedence-and-files.md",
+      "decision-framework-and-tradeoffs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
       "patterns-by-runtime.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "versions.md"
     ]
