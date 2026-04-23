@@ -1,5 +1,7 @@
 # Exploratory analysis and cleaning
 
+Define **row grain** before heavy aggregates — [analysis-pipeline-and-grain-model.md](analysis-pipeline-and-grain-model.md).
+
 ## Defaults
 
 - Load tabular data with explicit **dtypes** where possible; parse **dates** explicitly (`parse_dates`, `dayfirst` awareness).

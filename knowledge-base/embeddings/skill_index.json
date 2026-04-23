@@ -364,22 +364,24 @@
   {
     "name": "data-analysis-pro",
     "folder": "data-analysis-pro",
-    "description": "Professional data analysis in Python: exploratory data analysis (EDA), cleaning, descriptive statistics, pandas workflows, Parquet/CSV/SQLite IO, visualization (matplotlib/seaborn-style), pivot-style summaries, and spreadsheet deliverables (openpyxl charts, freeze panes, validation).\n\nUse this skill when the user asks to **analyze** CSV/Parquet/SQLite exports, profile a dataset, plot distributions or trends, build pivot-style tables, or **author** Excel features (charts, validation, frozen headers) — not for multimodal “what does this PDF/image mean?” interpretation.\n\nUse **with** **`content-analysis-pro`** when the task mixes **narrative documents** and **tabular** extracts; **`postgresql-pro`** when analysis leads to **schema** or warehouse design; **`business-analysis-pro`** when outputs feed **requirements** or KPI definitions. This skill (`data-analysis-pro`) owns **tabular analytics and viz**; **`content-analysis-pro`** owns **semantic reading** of unstructured attachments.\n\nTriggers: \"analyze CSV\", \"pandas\", \"EDA\", \"Parquet\", \"pivot table\", \"matplotlib\", \"seaborn\", \"describe()\", \"missing values\", \"outliers\", \"correlation\", \"histogram\", \"openpyxl\", \"BarChart\", \"data validation\", \"freeze panes\", \"SQLite analyze\", \"profiling\", \"groupby\", \"value_counts\", \"dtype\", \"leakage\", \"Simpson\", \"sample bias\", \"xlsxwriter\", \"read_parquet\".",
+    "description": "Production-grade tabular data analysis in Python: analytical pipeline and grain model (row unit, joins, lineage), EDA and cleaning discipline, descriptive statistics and honest visualization, pivot-style workflows, Parquet/CSV/SQLite IO, failure modes (join explosions, timezone bugs, lookahead leakage, Simpson’s paradox, p-hacking, Excel precision), decision trade-offs (pandas vs SQL pushdown, notebook vs pipeline, descriptive vs causal claims), reproducibility and anti-hallucination guardrails for numbers, spreadsheet delivery (openpyxl charts, validation, freeze panes), and integration with SQL, business analysis, and security for PII-safe exports.\n\nUse when analyzing CSV/Parquet/SQLite exports, profiling datasets, building aggregates and charts, or authoring Excel analytics — not for unstructured PDF/image semantic reading (content-analysis-pro).\n\nUse with content-analysis-pro, business-analysis-pro, postgresql-pro, sql-data-access-pro, security-pro, testing-pro as needed.\n\nTriggers: \"analyze CSV\", \"pandas\", \"EDA\", \"Parquet\", \"pivot\", \"groupby\", \"matplotlib\", \"seaborn\", \"histogram\", \"missing values\", \"outliers\", \"correlation\", \"openpyxl\", \"data validation\", \"freeze panes\", \"SQLite\", \"profiling\", \"dtype\", \"leakage\", \"Simpson\", \"grain\", \"timezone\", \"reproducibility\", \"join\", \"many-to-many\", \"causation\", \"p-hacking\", \"cohort\", \"read_parquet\".",
     "triggers": [],
     "when_to_use": [
-      "**EDA** — dtypes, missingness, duplicates, simple aggregates.",
-      "**Cleaning** — Imputation assumptions, outliers, string normalization (with documented trade-offs).",
-      "**Visualization** — Histograms, scatter, bar, time series with honest axes.",
-      "**Pivot-style** summaries — `pivot_table`, `groupby`, export to Excel.",
-      "**Spreadsheet authoring** — openpyxl **charts**, **freeze_panes**, **DataValidation**.",
-      "Trigger keywords: `pandas`, `CSV`, `Parquet`, `EDA`, `pivot`, `matplotlib`, `histogram`, `openpyxl`, …"
+      "**EDA**, cleaning, profiling, aggregates, pivots.",
+      "**Visualization** with labeled, honest axes.",
+      "**Excel** analytics delivery (charts, validation).",
+      "**Leakage/bias** sanity when metrics or splits appear."
     ],
     "references": [
+      "analysis-pipeline-and-grain-model.md",
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "eda-and-cleaning.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "quality-validation-and-reproducibility-guardrails.md",
       "spreadsheets-charts-and-validation.md",
       "tips-and-tricks.md",
       "versions.md",
