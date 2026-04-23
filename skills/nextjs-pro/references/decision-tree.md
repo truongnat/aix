@@ -33,3 +33,11 @@ Read-heavy segment with expensive pure computation?
 ├── Consider `use cache` / documented cache APIs for your Next major (see official docs)
 └── Always validate invalidation story (tags, revalidatePath)
 ```
+
+## Self-hosted vs Vercel
+
+```
+Need fine-grained edge region control or non-Vercel infra?
+├── Map features to runtime (OpenNext, Docker, K8s) — validate Node vs Edge per route — **`edge-cases.md`**
+└── Vercel-managed — simpler defaults; still watch env + region — **`deployment-pro`**
+```

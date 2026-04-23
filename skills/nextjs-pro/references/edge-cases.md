@@ -23,6 +23,7 @@
 
 - Importing **`headers()`** / **`cookies()`** in a layout or page can force **dynamic** rendering for that subtree — unexpected if you expected SSG.
 - **`export const dynamic`** and **`fetch` options** must align with product SLAs (CDN cache vs fresh data).
+- **Revalidation** — wrong tag in `revalidateTag` or missing webhook/cron → **stale** data until deploy — verify event path — **`failure-modes-detection-mitigation.md`**.
 
 ---
 

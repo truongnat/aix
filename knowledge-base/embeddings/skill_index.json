@@ -791,23 +791,26 @@
   {
     "name": "nextjs-pro",
     "folder": "nextjs-pro",
-    "description": "Professional Next.js development: App Router, Server Components, data fetching and caching, Route Handlers, middleware, and deployment-aware edge cases.\n\nUse this skill when the user works on Next.js (Pages or App Router), `next.config`, `next/image`, `next/font`, `next/link`, layouts, `loading.tsx`, `error.tsx`, Server Actions, `fetch` caching and revalidation, `cookies()` / `headers()` in RSC, Middleware, Edge Runtime, Route Handlers, internationalization (next-intl / i18n), Turbopack, Vercel deployment, or asks for review of RSC boundaries, hydration, or API routes.\n\nTriggers: \"Next.js\", \"Nextjs\", \"App Router\", \"Pages Router\", \"Server Component\", \"RSC\", \"use client\", \"Server Action\", \"next/navigation\", \"next/image\", \"middleware.ts\", \"revalidate\", \"fetch cache\", \"Route Handler\", \"edge runtime\", \"Turbopack\", \"next.config\", \"Vercel\", \"parallel routes\", \"intercepting routes\", \"generateStaticParams\", \"dynamic route\", \"metadata API\", \"next/font\", \"notFound\", \"loading.tsx\", \"error.tsx\", \"dynamic = force-dynamic\".",
+    "description": "Production-grade Next.js: App Router, Server Components, rendering and caching model (RSC pipeline, fetch cache, revalidation), Route Handlers and Server Actions, middleware and Edge vs Node — plus system model (request → RSC payload → cache layers), failure modes (hydration, stale cache, dynamic surprises, secrets, middleware loops), decision trade-offs (Actions vs Route Handlers, static vs dynamic, BFF vs external API), and quality guardrails (version-accurate APIs, env boundaries).\n\nUse this skill when the user works on Next.js (Pages or App Router), `next.config`, `next/image`, `next/font`, `next/link`, layouts, `loading.tsx`, `error.tsx`, Server Actions, `fetch` caching and revalidation, `cookies()` / `headers()` in RSC, Middleware, Edge Runtime, Route Handlers, internationalization (next-intl / i18n), Turbopack, Vercel deployment, or asks for review of RSC boundaries, hydration, or API routes.\n\nCombine with **`react-pro`**, **`deployment-pro`**, **`security-pro`**, **`auth-pro`**, **`caching-pro`**, **`network-infra-pro`**, **`typescript-pro`**, **`nestjs-pro`** / **`api-design-pro`** when contracts and backends matter.\n\nTriggers: \"Next.js\", \"Nextjs\", \"App Router\", \"Pages Router\", \"Server Component\", \"RSC\", \"use client\", \"Server Action\", \"next/navigation\", \"next/image\", \"middleware.ts\", \"revalidate\", \"fetch cache\", \"Route Handler\", \"edge runtime\", \"Turbopack\", \"next.config\", \"Vercel\", \"parallel routes\", \"intercepting routes\", \"generateStaticParams\", \"dynamic route\", \"metadata API\", \"next/font\", \"notFound\", \"loading.tsx\", \"error.tsx\", \"dynamic = force-dynamic\".",
     "triggers": [],
     "when_to_use": [
       "Structuring **App Router** trees: layouts, templates, loading/error boundaries, route groups.",
-      "Choosing **Server vs Client Components** and fixing boundary mistakes (`\"use client\"` placement).",
-      "**Data fetching**: `fetch` in RSC, caching, `revalidatePath` / `revalidateTag`, `unstable_cache` patterns.",
-      "**Mutations**: Server Actions vs Route Handlers; form handling and progressive enhancement.",
+      "Choosing **Server vs Client Components** and fixing `\"use client\"` boundaries.",
+      "**Data fetching**: `fetch` in RSC, caching, `revalidatePath` / `revalidateTag`, segment config.",
+      "**Mutations**: Server Actions vs Route Handlers; forms and progressive enhancement.",
       "**Middleware**, auth redirects, matchers, Edge vs Node runtime.",
-      "**Deployment**: environment variables, `output: standalone`, image domains, region/runtime constraints.",
-      "Trigger keywords: `Next.js`, `App Router`, `RSC`, `Server Action`, `middleware`, `revalidate`, `edge runtime`, …"
+      "**Deployment-aware** config: env vars, `output`, image domains, runtime constraints."
     ],
     "references": [
       "anti-patterns.md",
       "app-router-and-layouts.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "nextjs-rendering-caching-and-request-model.md",
+      "quality-validation-and-guardrails.md",
       "server-client-boundaries.md",
       "tips-and-tricks.md",
       "versions.md"
