@@ -1,158 +1,213 @@
 ---
 name: nestjs-pro
 description: |
-  Professional NestJS backend development: module design, API/DX quality, security patterns, and production edge cases.
+  Production-grade NestJS backend development: modules, DI, HTTP pipeline (middleware → guards → pipes → interceptors → filters), API/DX, security patterns, testing, queues — plus runtime/DI model, failure modes (DTO bypass, error leak, RLS/PgBouncer, long Tx, Bull duplicates), trade-offs (Fastify vs Express, strict validation, monolith vs microservice transport), quality guardrails (Nest major accuracy; RLS needs Postgres policies).
 
-  Use this skill when the user works on NestJS, Node.js APIs, modules, providers, guards, pipes, interceptors, filters, Swagger/OpenAPI, Prisma/TypeORM, microservices, WebSockets, GraphQL, Bull queues, testing (unit/e2e), or asks for Nest code review, DTO validation, exception mapping, lifecycle, or deployment concerns.
+  Use this skill for NestJS, Node APIs, guards/pipes/interceptors, Swagger, Prisma/TypeORM/MikroORM, microservices, WebSockets, GraphQL, Bull, lifecycle, PostgreSQL RLS wiring from Nest.
 
-  PostgreSQL RLS with Nest: row-level security, tenant context per request, `SET LOCAL` / `set_config`, Prisma transaction + RLS, TypeORM QueryRunner + RLS, RLS with PgBouncer, middleware/interceptor setting tenant before DB, or when combining JWT guards with database policies.
+  Combine with **`postgresql-pro`**, **`auth-pro`**, **`security-pro`**, **`testing-pro`**, **`api-design-pro`**, **`deployment-pro`**, **`graphql-pro`**, **`microservices-pro`**, **`caching-pro`**, **`ci-cd-pro`** per integration map.
 
   Triggers: "NestJS", "Nest", "@nestjs", "module", "provider", "inject", "dynamic module", "Guard", "Pipe", "Interceptor", "ExceptionFilter", "ValidationPipe", "Swagger", "OpenAPI", "Prisma", "TypeORM", "MikroORM", "passport", "JWT", "microservice", "Kafka", "RabbitMQ", "Bull", "WebSocket", "GraphQL", "lifecycle", "OnModuleInit", "shutdown hook", "circular dependency", "e2e test", "Jest", "RLS", "row level security", "tenant", "PostgreSQL policy", "set_config", "SET LOCAL", "Cannot resolve dependencies".
 
 metadata:
-  short-description: NestJS — API/DX, RLS integration, edge cases, production
+  short-description: NestJS — pipeline/DI model, API/DX, RLS integration, failure modes
+  content-language: en
+  domain: nestjs
+  level: professional
 ---
 
 # NestJS (professional)
 
-Use official [NestJS docs](https://docs.nestjs.com) for API truth; this skill encodes **professional defaults**, **API and developer experience**, and **edge-case awareness**. Confirm **Nest major version** and **ORM / transport** from the project when known.
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use official [NestJS docs](https://docs.nestjs.com) for API truth; this skill encodes **module discipline**, **request pipeline clarity**, and **production-safe** defaults.
+
+## Boundary
+
+**`nestjs-pro`** owns **Nest application structure**, **DI**, **HTTP/microservice pipeline**, and **ORM wiring patterns** inside Nest. **`postgresql-pro`** owns **SQL**, **RLS policies**, and pool semantics; **`auth-pro`** owns **identity protocol** depth; **`security-pro`** owns **threat modeling** beyond Nest defaults.
+
+## Related skills (this repo)
+
+| Skill | When to combine |
+|-------|----------------|
+| **`postgresql-pro`** | Migrations, `CREATE POLICY`, pool modes, `EXPLAIN` |
+| **`auth-pro`** | JWT/OAuth strategies, token lifecycle |
+| **`security-pro`** | Threat review, OWASP-style abuse |
+| **`testing-pro`** | Coverage strategy beyond `TestingModule` setup |
+| **`api-design-pro`** | Resource modeling, versioning narrative |
+| **`deployment-pro`** | Rollout, traffic switching |
+| **`graphql-pro`** | Schema/resolver design when using `@nestjs/graphql` |
+| **`microservices-pro`** | Distributed boundaries |
+| **`caching-pro`** | Cache invalidation policy |
+| **`ci-cd-pro`** | Pipeline structure |
 
 ## When to use
 
-- Designing or refactoring modules, controllers, services, and cross-cutting concerns.
-- Reviewing Nest code for DI clarity, validation, security (authz), and consistent HTTP responses.
-- Debugging lifecycle, shutdown, transactions, queues, or multi-instance behavior.
-- Aligning APIs with predictable errors, DTO contracts, versioning, and documentation (OpenAPI).
-- Wiring **PostgreSQL RLS** from Nest: per-request tenant context, Prisma/TypeORM transaction boundaries, pooling (PgBouncer).
-- Trigger keywords: `NestJS`, `Guard`, `ValidationPipe`, `Prisma`, `RLS`, `Interceptor`, …
+- Modules, controllers, services, cross-cutting concerns.
+- Validation, guards, errors, OpenAPI.
+- Lifecycle, shutdown, transactions, queues, multi-instance.
+- PostgreSQL RLS + Nest (tenant context, transactions, PgBouncer).
+
+## When not to use
+
+- **Pure SQL tuning** without Nest wiring — **`postgresql-pro`**.
+- **Pure Git/CI YAML** — **`ci-cd-pro`** when Nest isn’t the topic.
+
+## Required inputs
+
+- **Nest major**, **ORM**, **HTTP adapter** (Express/Fastify), **transport** if microservices.
+
+## Expected output
+
+Follow **Suggested response format** strictly.
 
 ## Workflow
 
-1. Confirm Nest version and ORM/transport; read official docs when APIs change across majors.
-2. Apply the principles and topic summaries below; open `references/` when you need depth; for RLS combine with `postgresql-pro` for SQL policies.
-3. Respond using **Suggested response format**; note transaction/pool/multi-instance risks.
+1. Confirm Nest version, ORM, adapters; check migration guides for breaking changes.
+2. Apply summaries; open `references/`; defer SQL policy bodies to **`postgresql-pro`**.
+3. Respond with **Suggested response format**; **failure modes** for auth, validation, RLS, jobs.
 
 ### Operating principles
 
-1. **Module boundaries** — Feature modules own their domain; shared kernel stays minimal; avoid god modules.
-2. **Explicit contracts** — DTOs + `class-validator` / `class-transformer` at the edge; services work with domain types, not raw `any`.
-3. **Security by default** — Guards for authz; never trust client input; secrets via `ConfigService`, not env reads scattered in code.
-4. **Fail predictably** — Map domain errors to HTTP with `HttpException` or custom filters; avoid leaking stack traces in production.
-5. **Verify versions in-repo** — Check `package.json` and Nest migration guides before suggesting APIs that changed across majors.
-6. **RLS is enforced in Postgres** — Nest guards are not enough if the policy requires `current_setting`; set context in the same transaction as queries; see [references/postgresql-rls-integration.md](references/postgresql-rls-integration.md) and SQL details in **`postgresql-pro`**.
+1. **Feature modules** — Clear boundaries — **`nestjs-runtime-pipeline-and-di-model.md`**.
+2. **DTOs at edge** — `ValidationPipe` + whitelist/forbid — **`tips-and-tricks.md`**.
+3. **Security** — Guards for authz; secrets via `ConfigService` — **`failure-modes-detection-mitigation.md`**.
+4. **Predictable errors** — Filters — **`api-design-and-dx.md`**.
+5. **RLS in Postgres** — Nest sets context in correct transaction — **`postgresql-rls-integration.md`**.
+
+### NestJS runtime pipeline and DI model (summary)
+
+Middleware → guards → pipes → controller; scopes — **`nestjs-runtime-pipeline-and-di-model.md`**.
+
+Details: [references/nestjs-runtime-pipeline-and-di-model.md](references/nestjs-runtime-pipeline-and-di-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Mass assignment, error leaks, RLS/PgBouncer, Tx scope, Bull duplicates — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+HTTP vs microservice transport, validation strictness, ORM fit — **`decision-framework-and-trade-offs.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+Version-accurate decorators; correct RLS doc links — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### API design and DX (summary)
 
-- Consistent **error shape** (status, code, message, optional `details`) for clients and observability.
-- **Pagination / filtering** conventions documented once (query DTOs, max limits).
-- **OpenAPI** annotations or plugin where the team uses Swagger — keep DTOs the single source of truth.
-- **Idempotency** for mutating endpoints where payments or webhooks matter (document keys and storage).
-- **Versioning** strategy explicit (URI, header, or media type) before breaking changes accumulate.
+Errors, pagination, OpenAPI — **`api-design-and-dx.md`**.
 
 Details: [references/api-design-and-dx.md](references/api-design-and-dx.md)
 
 ### Tips and tricks (summary)
 
-- Prefer **`@Injectable()`** with explicit constructor injection; use **`@Inject(TOKEN)`** for custom providers and dynamic modules.
-- **`ValidationPipe`** with `whitelist`, `forbidNonWhitelisted`, `transform` globally — strip unknown fields early.
-- **Scoped providers** (`REQUEST`, `TRANSIENT`) only when needed — understand memory and performance tradeoffs.
-- **Interceptors** for logging, timeouts, and response mapping; **Filters** for exception normalization.
-- **Testing**: isolate services with mocked providers; e2e with `TestingModule` + real HTTP stack when integration matters.
+DI, ValidationPipe, testing — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- **Circular dependencies** — `forwardRef()` between modules; prefer restructuring boundaries first.
-- **Shutdown** — `enableShutdownHooks()` and close DB/queue connections; drain Bull workers gracefully.
-- **Transactions** — unit of work boundaries; avoid long-held transactions across `await` to unrelated I/O.
-- **Multi-instance** — Bull locks, idempotent jobs; WebSocket adapters with Redis for scale-out.
-- **Global state** — avoid mutable singletons holding request data; use `ClsService` / ALS patterns if needed.
+Circular deps, shutdown, scope, Tx, Bull, WS — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
 ### PostgreSQL RLS with NestJS (summary)
 
-- **Policies** are defined in PostgreSQL — use skill **`postgresql-pro`** for `CREATE POLICY`, `USING` / `WITH CHECK`, and performance.
-- In Nest, **set tenant (or actor) context** after auth, **before** queries: `SET LOCAL` or `set_config` inside the **same transaction** as ORM work when using transaction pooling.
-- **Prisma**: often `SET` + queries inside `.$transaction()`; verify interaction with connection pool.
-- **TypeORM**: prefer `QueryRunner` + transaction so session state does not leak across requests.
-- **PgBouncer** transaction mode: **session** variables are unreliable across transactions — align with [postgresql-rls-integration.md](references/postgresql-rls-integration.md).
+Tenant context + ORM — **`postgresql-rls-integration.md`**; SQL policies — **`postgresql-pro`**: [row-level-security.md](../postgresql-pro/references/row-level-security.md)
 
-Details: [references/postgresql-rls-integration.md](references/postgresql-rls-integration.md) — deep link to SQL policies: [postgresql-pro rolevel-security.md](../postgresql-pro/references/rolevel-security.md)
+Details: [references/postgresql-rls-integration.md](references/postgresql-rls-integration.md)
 
 ### Decision trees (summary)
 
-- **Guard vs Middleware vs Interceptor vs Pipe vs Filter** — choose by where logic must run (authz → Guard; raw pipeline → Middleware; response shaping → Interceptor).
-- **Dynamic module vs static**, **request scope vs singleton** — see binary trees in the reference.
+Guard vs middleware vs pipe — **`decision-tree.md`**.
 
 Details: [references/decision-tree.md](references/decision-tree.md)
 
 ### Anti-patterns (summary)
 
-- Fat controllers, missing `whitelist` on `ValidationPipe`, `Scope.REQUEST` overuse, `forwardRef` as first fix, RLS confusion — expanded list in reference.
+Fat controllers, `forwardRef` abuse — **`anti-patterns.md`**.
 
 Details: [references/anti-patterns.md](references/anti-patterns.md)
 
 ### Integration map (summary)
 
-- When combining with **`postgresql-pro`**, **`auth-pro`**, **`testing-pro`**, **`api-design-pro`** — ownership split in table form.
+Cross-skill ownership — **`integration-map.md`**.
 
 Details: [references/integration-map.md](references/integration-map.md)
 
 ### Version notes (summary)
 
-- Nest major jumps affect Fastify/Express adapters, Swagger, GraphQL — always use official migration guide for your **from → to** pair.
+Nest majors, adapters — **`versions.md`**.
 
 Details: [references/versions.md](references/versions.md)
 
-### Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Issue or goal** — What is wrong or what we are building.
-2. **Recommendation** — Nest patterns, module placement, security or DX impact.
-3. **Code** — Minimal module/controller/service/DTO snippets or diff-style blocks.
-4. **Residual risks** — Migration steps, load testing, or ops follow-up.
+1. **Context** — Nest version, ORM, Express/Fastify, single app vs hybrid transport.
+2. **Problem / goal** — Feature, bug, review, RLS tenant wiring.
+3. **System design** — Module placement; pipeline hook (guard/pipe/filter) — **`nestjs-runtime-pipeline-and-di-model.md`**.
+4. **Decision reasoning** — From **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`** (scope, validation strictness).
+5. **Implementation sketch** — Minimal Nest snippets; match project major — **`quality-validation-and-guardrails.md`**.
+6. **Trade-offs** — Request scope cost; Fastify vs Express; strict DTOs vs client friction.
+7. **Failure modes** — Auth, validation, DB, jobs — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Migrations, load tests; **`postgresql-pro`**, **`deployment-pro`**, **`auth-pro`** handoffs.
 
 ## Resources in this skill
 
-- `references/` — API design, tips, edge cases, Postgres RLS integration.
-
 | Topic | File |
 |-------|------|
+| **Runtime pipeline & DI model** | [references/nestjs-runtime-pipeline-and-di-model.md](references/nestjs-runtime-pipeline-and-di-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | API design and DX | [references/api-design-and-dx.md](references/api-design-and-dx.md) |
 | Tips and patterns | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
 | **PostgreSQL RLS + Nest** | [references/postgresql-rls-integration.md](references/postgresql-rls-integration.md) |
-| RLS SQL (PostgreSQL) | [postgresql-pro rolevel-security.md](../postgresql-pro/references/rolevel-security.md) |
+| RLS SQL (PostgreSQL) | [row-level-security.md](../postgresql-pro/references/row-level-security.md) |
 | Decision trees | [references/decision-tree.md](references/decision-tree.md) |
 | Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
 | Integration map | [references/integration-map.md](references/integration-map.md) |
 | Version notes | [references/versions.md](references/versions.md) |
 
-## Quick example
+## Quick examples
 
 ### 1 — Simple (common)
 
-**Input:** Need to set `app.tenant_id` before every Prisma query in a multi-tenant request; using PgBouncer transaction mode.  
-**Expected output:** Suggest `.$transaction()` + `SET LOCAL`, warn about session vs transaction pool, and link `postgresql-rls-integration.md` / `postgresql-pro`.
+**Input:** Set tenant before Prisma queries; PgBouncer transaction mode.  
+**Expected output:** Full **Suggested response format** — `.$transaction` + `SET LOCAL` — **`postgresql-rls-integration.md`** — **`failure-modes-detection-mitigation.md`**.
 
 ### 2 — Tricky (edge case)
 
-**Input:** Global `ValidationPipe` with `whitelist` still allows an unexpected field through a nested DTO — clients send `isAdmin: true`.  
-**Expected output:** Recommend `forbidNonWhitelisted`, nested DTO types, and stripping at serialization layer; never trust client for authz (`auth-pro`).
+**Input:** `whitelist` still allows nested `isAdmin`.  
+**Expected output:** `forbidNonWhitelisted`, nested DTOs — **`failure-modes-detection-mitigation.md`** — **`auth-pro`** for authz.
 
 ### 3 — Cross-skill
 
-**Input:** New microservice shares Bull queue with monolith — jobs sometimes processed twice.  
-**Expected output:** **`nestjs-pro`** Bull module idempotency + worker config; **`deployment-pro`** rollout order; align with **`testing-pro`** for job contract tests.
+**Input:** Bull queue shared — duplicate jobs.  
+**Expected output:** **`nestjs-pro`** idempotency — **`deployment-pro`** rollout — **`testing-pro`** contracts — **`failure-modes-detection-mitigation.md`**.
 
 ## Checklist before calling the skill done
 
-- [ ] DTOs validated at boundary; sensitive fields never exposed in responses (`@Exclude` / serializers).
-- [ ] Authn/authz applied consistently (global guard or per-route metadata).
-- [ ] Errors mapped to HTTP semantics; no raw DB errors to clients in production.
-- [ ] Logging structured (request id) where applicable; PII redaction policy respected.
-- [ ] Database migrations or schema changes reviewed; transactions for multi-step writes.
-- [ ] **RLS**: if using Postgres RLS, tenant context is set correctly for pool + ORM; policies tested as app DB role (see `postgresql-pro`).
-- [ ] Tests cover happy path + at least one failure mode for critical flows.
-- [ ] Decision-tree reference consulted when choosing Guard vs Middleware vs Interceptor for new cross-cutting behavior.
+### Boundary & safety
+
+- [ ] DTO validation + **no** sensitive fields in responses — **`tips-and-tricks.md`**.
+- [ ] Authz via **Guards**; not only pipes — **`nestjs-runtime-pipeline-and-di-model.md`**.
+- [ ] Production errors sanitized — **`failure-modes-detection-mitigation.md`**.
+
+### Data & RLS
+
+- [ ] **RLS**: tenant context + transaction + pool mode — **`postgresql-rls-integration.md`**.
+- [ ] Transactions short; no external I/O inside — **`edge-cases.md`**.
+
+### Ops & testing
+
+- [ ] Shutdown hooks for DB/queues — **`edge-cases.md`**.
+- [ ] Critical paths have failure-oriented tests — **`testing-pro`**.
+- [ ] **Decision tree** used for new Guard vs Middleware vs Interceptor — **`decision-tree.md`**.

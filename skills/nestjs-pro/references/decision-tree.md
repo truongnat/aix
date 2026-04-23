@@ -48,6 +48,16 @@ Exposing the same domain to HTTP and a message broker?
 └── Avoid duplicating business rules in @MessagePattern and @Get handlers — delegate to the same service
 ```
 
+## Fastify vs Express adapter
+
+```
+Performance and schema validation on HTTP layer matter most?
+├── Fastify — often lower overhead; plugin ecosystem differs
+└── Express — widest middleware compatibility — verify Nest docs for your major
+```
+
+See pipeline ordering — **`nestjs-runtime-pipeline-and-di-model.md`**.
+
 ## Further reading
 
 - Cross-cutting order: [tips-and-tricks.md](tips-and-tricks.md)

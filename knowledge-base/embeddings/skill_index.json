@@ -737,23 +737,25 @@
   {
     "name": "nestjs-pro",
     "folder": "nestjs-pro",
-    "description": "Professional NestJS backend development: module design, API/DX quality, security patterns, and production edge cases.\n\nUse this skill when the user works on NestJS, Node.js APIs, modules, providers, guards, pipes, interceptors, filters, Swagger/OpenAPI, Prisma/TypeORM, microservices, WebSockets, GraphQL, Bull queues, testing (unit/e2e), or asks for Nest code review, DTO validation, exception mapping, lifecycle, or deployment concerns.\n\nPostgreSQL RLS with Nest: row-level security, tenant context per request, `SET LOCAL` / `set_config`, Prisma transaction + RLS, TypeORM QueryRunner + RLS, RLS with PgBouncer, middleware/interceptor setting tenant before DB, or when combining JWT guards with database policies.\n\nTriggers: \"NestJS\", \"Nest\", \"@nestjs\", \"module\", \"provider\", \"inject\", \"dynamic module\", \"Guard\", \"Pipe\", \"Interceptor\", \"ExceptionFilter\", \"ValidationPipe\", \"Swagger\", \"OpenAPI\", \"Prisma\", \"TypeORM\", \"MikroORM\", \"passport\", \"JWT\", \"microservice\", \"Kafka\", \"RabbitMQ\", \"Bull\", \"WebSocket\", \"GraphQL\", \"lifecycle\", \"OnModuleInit\", \"shutdown hook\", \"circular dependency\", \"e2e test\", \"Jest\", \"RLS\", \"row level security\", \"tenant\", \"PostgreSQL policy\", \"set_config\", \"SET LOCAL\", \"Cannot resolve dependencies\".",
+    "description": "Production-grade NestJS backend development: modules, DI, HTTP pipeline (middleware → guards → pipes → interceptors → filters), API/DX, security patterns, testing, queues — plus runtime/DI model, failure modes (DTO bypass, error leak, RLS/PgBouncer, long Tx, Bull duplicates), trade-offs (Fastify vs Express, strict validation, monolith vs microservice transport), quality guardrails (Nest major accuracy; RLS needs Postgres policies).\n\nUse this skill for NestJS, Node APIs, guards/pipes/interceptors, Swagger, Prisma/TypeORM/MikroORM, microservices, WebSockets, GraphQL, Bull, lifecycle, PostgreSQL RLS wiring from Nest.\n\nCombine with **`postgresql-pro`**, **`auth-pro`**, **`security-pro`**, **`testing-pro`**, **`api-design-pro`**, **`deployment-pro`**, **`graphql-pro`**, **`microservices-pro`**, **`caching-pro`**, **`ci-cd-pro`** per integration map.\n\nTriggers: \"NestJS\", \"Nest\", \"@nestjs\", \"module\", \"provider\", \"inject\", \"dynamic module\", \"Guard\", \"Pipe\", \"Interceptor\", \"ExceptionFilter\", \"ValidationPipe\", \"Swagger\", \"OpenAPI\", \"Prisma\", \"TypeORM\", \"MikroORM\", \"passport\", \"JWT\", \"microservice\", \"Kafka\", \"RabbitMQ\", \"Bull\", \"WebSocket\", \"GraphQL\", \"lifecycle\", \"OnModuleInit\", \"shutdown hook\", \"circular dependency\", \"e2e test\", \"Jest\", \"RLS\", \"row level security\", \"tenant\", \"PostgreSQL policy\", \"set_config\", \"SET LOCAL\", \"Cannot resolve dependencies\".",
     "triggers": [],
     "when_to_use": [
-      "Designing or refactoring modules, controllers, services, and cross-cutting concerns.",
-      "Reviewing Nest code for DI clarity, validation, security (authz), and consistent HTTP responses.",
-      "Debugging lifecycle, shutdown, transactions, queues, or multi-instance behavior.",
-      "Aligning APIs with predictable errors, DTO contracts, versioning, and documentation (OpenAPI).",
-      "Wiring **PostgreSQL RLS** from Nest: per-request tenant context, Prisma/TypeORM transaction boundaries, pooling (PgBouncer).",
-      "Trigger keywords: `NestJS`, `Guard`, `ValidationPipe`, `Prisma`, `RLS`, `Interceptor`, …"
+      "Modules, controllers, services, cross-cutting concerns.",
+      "Validation, guards, errors, OpenAPI.",
+      "Lifecycle, shutdown, transactions, queues, multi-instance.",
+      "PostgreSQL RLS + Nest (tenant context, transactions, PgBouncer)."
     ],
     "references": [
       "anti-patterns.md",
       "api-design-and-dx.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "nestjs-runtime-pipeline-and-di-model.md",
       "postgresql-rls-integration.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "versions.md"
     ]

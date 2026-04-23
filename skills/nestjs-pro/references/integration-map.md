@@ -13,5 +13,6 @@ When you use **`nestjs-pro`**, you often need these skills together. Clarify **w
 | **`ci-cd-pro`** | Pipeline YAML | Build/test commands for Nest apps | Workflow structure, secrets in CI |
 | **`caching-pro`** | Redis/CDN | Interceptor-level caching, cache keys per route | Invalidation policy, stampede protection |
 | **`microservices-pro`** | Multi-service boundaries | Nest microservice module patterns | Broader distributed design |
+| **`graphql-pro`** | GraphQL schema/resolvers | `@nestjs/graphql` wiring, resolver DI | Federation and domain schema depth |
 
 **Handoff hint:** After Nest-specific wiring is settled, name the **next** skill for SQL (`postgresql-pro`) or auth protocol (`auth-pro`) before deep implementation.
