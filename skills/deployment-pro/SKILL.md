@@ -1,119 +1,175 @@
 ---
 name: deployment-pro
 description: |
-  Professional software deployment: hosting models (static, PaaS, containers, serverless, VM), CI/CD flows, release strategies (rolling, blue-green, canary, GitOps), environments, rollback, and operational edge cases.
+  Production-grade software deployment and release engineering: deployment runtime model (control plane vs workloads, artifact promotion graph, drift, consistency expectations per platform), CI/CD flows and gates, hosting trade-offs (static, PaaS, containers, serverless, VM), release strategies (rolling, blue-green, canary, recreate, feature flags), GitOps promotion, environments and rollback literacy, coordinated DB migrations (expand/contract handoff), failure modes (crash loops, PDB blocks, regional canary failure, forward-only migrations, CDN mixed assets), decision frameworks (staging vs prod-only mitigation), observability-linked deploy markers, OIDC/supply-chain pointers — cross-stack orchestration narrative, not vendor-docs paste.
 
-  Use this skill when the user designs or debugs deployment pipelines, chooses hosting, promotes builds across environments, configures Kubernetes/serverless releases, manages migrations with zero-downtime goals, or asks about GitHub Actions / GitLab CI / cloud deploy patterns at a cross-stack level.
+  Use when designing pipelines, promoting builds, choosing rollout strategies, debugging failed deploys, zero-downtime migrations, rollback, GitOps drift, multi-region concerns.
 
-  Use **with** **`testing-pro`** for what runs **in** CI (tests, quality gates); **`deployment-pro`** owns **ship path**, **release strategy**, and **runtime promotion**. Use **`security-pro`** for secrets and supply chain; **`postgresql-pro`** for migration ordering; **`nextjs-pro`** / **`nestjs-pro`** for framework-specific deploy targets (e.g. Vercel, Node Docker); **`electron-pro`** / **`tauri-pro`** for desktop release channels.
+  Combine with testing-pro, security-pro, postgresql-pro, code-packaging-pro, ci-cd-pro, git-operations-pro, network-infra-pro, caching-pro, api-design-pro, framework skills as needed.
 
-  Triggers: "deploy", "deployment", "CI/CD", "CD", "pipeline", "release", "rollback", "blue-green", "canary", "rolling deploy", "Kubernetes", "K8s", "Helm", "GitOps", "Argo CD", "Flux", "Docker", "container", "image", "registry", "serverless", "Lambda", "Cloud Functions", "Terraform", "IaC", "staging", "production", "promote", "environment", "Vercel", "Netlify", "Railway", "Render", "Fly.io", "zero downtime", "migration deploy", "readiness probe", "liveness probe", "PDB", "OIDC pipeline", "immutable artifact", "expand contract migration".
+  Triggers: "deploy", "deployment", "rollback", "canary", "blue-green", "rolling", "Kubernetes", "Helm", "GitOps", "Argo CD", "Flux", "promote", "staging", "production", "immutable artifact", "digest", "readiness probe", "liveness", "PDB", "crashloop", "drift", "zero downtime", "migration deploy", "expand contract", "traffic shift", "Lambda alias", "CloudFront", "rollout undo", "SLO deploy".
 
 metadata:
-  short-description: Deployment — methods, CI/CD flows, release strategies, rollback, edge cases
+  short-description: Deployment — runtime model, pipelines, strategies, rollback, failures, migrations
+  content-language: en
+  domain: deployment
+  level: professional
 ---
 
 # Deployment (professional)
 
-Use your cloud or platform **official docs** (AWS/GCP/Azure, Kubernetes, GitHub Actions, GitLab CI) for exact syntax; this skill encodes **deployment strategy**, **pipeline flow**, and **cross-platform** release hygiene. Confirm **target environments**, **compliance** (regions, data residency), and **orchestrator** (K8s, serverless, PaaS) from the project.
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use your cloud or platform **official docs** for exact syntax; this skill encodes **runtime system behavior** (promotion, consistency, drift), **release strategy trade-offs**, **failure modes**, and **safe rollback/migration coupling** — not documentation duplicates. Confirm **orchestrator** (K8s, serverless, PaaS), **environments**, **SLO/downtime tolerance**, and **schema change** presence.
+
+## Boundary
+
+**`deployment-pro`** owns **ship path**: artifact → registry → environment promotion → traffic/routing → observe → rollback/forward-fix. **`testing-pro`** owns **what runs in CI** as quality gates. **`ci-cd-pro`** owns **workflow YAML patterns** when the question is pipeline mechanics without strategy depth. **`code-packaging-pro`** owns **build** of artifacts. **`postgresql-pro`** owns **migration mechanics**. **`security-pro`** owns **secrets and threat model** detail.
 
 ## Related skills (this repo)
 
 | Skill | When to combine with `deployment-pro` |
 |-------|----------------------------------------|
-| **`testing-pro`** | What runs in CI (lint, unit, integration, e2e), flakiness, artifacts — not the same as *where* the app runs |
-| **`security-pro`** | Secrets in CI/CD, OIDC to cloud, signing, SBOM, fork-PR safety |
-| **`postgresql-pro`** | Migration strategy, expand/contract, locks during deploy |
-| **`nextjs-pro`** | Next.js / Vercel-style deploy, env and runtime boundaries |
-| **`nestjs-pro`** | Node containers, health checks, graceful shutdown hooks |
-| **`electron-pro`** / **`tauri-pro`** | Desktop installers, auto-update, store-style releases |
-| **`code-packaging-pro`** | **Dockerfile**, **pyproject**, **GitHub Actions** that **build** images/wheels — before **where** they run |
-| **`git-operations-pro`** | **Tags**, **release branches**, **merge** hygiene — before **promotion** to environments |
-
-**Boundary:** **`testing-pro`** = quality **gates** in automation; **`deployment-pro`** = **build → publish → promote → observe → rollback** for runnable systems.
+| **`testing-pro`** | CI gates, artifacts, flaky policy |
+| **`security-pro`** | OIDC deploy, secrets, signing, fork PR safety |
+| **`postgresql-pro`** | Migration ordering, expand/contract |
+| **`code-packaging-pro`** | Image/wheel build before promotion |
+| **`git-operations-pro`** | Tags, release branches |
+| **`ci-cd-pro`** | Reusable workflows, concurrency, job graph |
+| **`network-infra-pro`** | LB, DNS, TLS, multi-region traffic |
+| **`caching-pro`** | CDN purge, cache busting with deploy |
+| **`api-design-pro`** | Backward-compatible contracts during rollouts |
+| **`nextjs-pro`** / **`nestjs-pro`** | Framework deploy targets |
+| **`electron-pro`** / **`tauri-pro`** | Desktop release channels |
 
 ## When to use
 
-- Choosing or comparing **deployment methods** (static, PaaS, containers, serverless, VM).
-- Designing **CI/CD flow**: stages, approvals, artifacts, environment promotion.
-- **Release strategies**: rolling, blue-green, canary, feature flags vs big-bang.
-- **Rollback**, **drift** (GitOps), and **zero-downtime** constraints with **DB** changes.
-- **Edge cases**: ordering (API vs clients), cold starts, readiness vs liveness, secret rotation during deploy.
-- Trigger keywords: `deploy`, `pipeline`, `canary`, `Kubernetes`, `rollback`, `staging`, `production`, `GitOps`, …
+- Hosting comparison, env promotion, release strategy, rollback design.
+- GitOps/drift, canary health gates, zero-downtime with DB.
+- Blast radius, ordering (API vs clients), operational deploy failures.
+
+## When not to use
+
+- **Pure pandas analysis** — **`data-analysis-pro`**.
+- **Dockerfile layer optimization only** — **`docker-pro`** / **`code-packaging-pro`**.
+
+## Required inputs
+
+- **Runtime** class, **regions**, **whether schema changes**, **observability maturity**.
+
+## Expected output
+
+Follow **Suggested response format** strictly — runtime design through residual risks.
 
 ## Workflow
 
-1. Confirm runtime (containers, serverless, static), environments, and **SLO** / downtime tolerance; identify stack skills (**`nextjs-pro`**, **`nestjs-pro`**, …) if framework-tied.
-2. Apply the principles and topic summaries below; open `references/` when you need depth; defer **test suite design** to **`testing-pro`** and **DB migration detail** to **`postgresql-pro`** when those dominate.
-3. Respond using **Suggested response format**; note blast radius, rollback path, and env drift risks.
+1. Confirm orchestrator, environments, downtime tolerance, migration coupling.
+2. Apply summaries; open `references/`; avoid **fake ARNs** — **`quality-validation-and-guardrails.md`**.
+3. Respond using **Suggested response format**; route DB detail to **`postgresql-pro`**.
 
 ### Operating principles
 
-1. **Build once, deploy many** — Same artifact across envs with config injected per stage (where feasible).
-2. **Automate the path to prod** — Manual SSH deploys do not scale; document exceptions.
-3. **Rollback is first-class** — Know the **previous good** revision (image digest, release version) before shipping.
-4. **Migrations are part of deploy** — Coordinate schema with **running** app versions (**expand/contract**).
-5. **Observe releases** — Mark deploys in telemetry; alert on **golden signals** after promotion.
-6. **Least privilege in pipelines** — OIDC to cloud over long-lived keys when possible (**`security-pro`**).
+1. **Build once, deploy many** — Same digest across envs; config per stage — **`deployment-runtime-system-model.md`**.
+2. **Rollback first-class** — Know previous good revision before shipping — **`failure-modes-detection-mitigation.md`**.
+3. **Migrations coordinate with rollouts** — Expand/contract — **`postgresql-pro`**.
+4. **Observe releases** — Markers, golden signals, automated abort — **`anti-patterns.md`**.
+5. **Least privilege pipelines** — OIDC — **`security-pro`**.
+6. **GitOps / IaC** — Reduce click-ops drift — **`flows-and-pipelines.md`**.
+
+### Deployment runtime system model (summary)
+
+Control vs data plane; promotion graph; consistency — **`deployment-runtime-system-model.md`**.
+
+Details: [references/deployment-runtime-system-model.md](references/deployment-runtime-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+CrashLoop, PDB, partial canary, forward-only DB — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Strategy matrix; staging trade-off; hosting orientation — **`decision-framework-and-trade-offs.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+Platform honesty; no false “zero downtime” — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Methods and environments (summary)
 
-- **Static/CDN**, **PaaS**, **containers/K8s**, **serverless**, **VM/bare metal**, **edge** — when each fits and main tradeoffs.
+Static, PaaS, K8s, serverless — **`methods-and-environments.md`**.
 
 Details: [references/methods-and-environments.md](references/methods-and-environments.md)
 
 ### Flows and pipelines (summary)
 
-- **CI/CD stages** from commit to prod; **rolling / blue-green / canary**; **GitOps** promotion; branching vs trunk.
+Stages, GitOps, DORA orientation — **`flows-and-pipelines.md`**.
 
 Details: [references/flows-and-pipelines.md](references/flows-and-pipelines.md)
 
 ### Tips and tricks (summary)
 
-- Immutable artifacts, health checks, **12-factor** config, **IaC plan/apply**, cache discipline in CI.
+12-factor, health checks, digests — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- Deploy **ordering**, long jobs and **drain**, migration **compatibility**, serverless **cold start**, **PDB** and readiness mistakes.
+Ordering, CDN mixed assets, GitOps — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
-### Decision flow and anti-patterns (summary)
+### Decision trees (summary)
 
-- Runtime choice, blast radius, DB coupling; build-per-env and silent rollback gaps.
+Runtime, DB, strategy, staging — **`decision-tree.md`**.
 
-Details: [references/decision-tree.md](references/decision-tree.md) · [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/decision-tree.md](references/decision-tree.md)
 
-### Cross-skill handoffs (summary)
+### Anti-patterns (summary)
 
-- **`testing-pro`**, **`security-pro`**, **`postgresql-pro`**, **`code-packaging-pro`**, **`git-operations-pro`**.
+Build-per-env, silent rollback, no observability — **`anti-patterns.md`**.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Integration map (summary)
+
+**`ci-cd-pro`**, **`network-infra-pro`**, **`caching-pro`**, **`postgresql-pro`** — **`integration-map.md`**.
 
 Details: [references/integration-map.md](references/integration-map.md)
 
 ### Platform versions (summary)
 
-- Pin K8s, Actions, serverless runtimes; IaC provider lock.
+Pin runtimes, IaC — **`versions.md`**.
 
 Details: [references/versions.md](references/versions.md)
 
-### Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Issue or goal** — Environment, strategy, or pipeline stage in question; which **Related skill** owns follow-up.
-2. **Recommendation** — Method + flow (stages, gates, release type); explicit handoff to **`testing-pro`** / **`postgresql-pro`** / framework skill when needed.
-3. **Code** — Pipeline sketch, stage list, checklist, or pseudo-YAML — not a full cloud tutorial duplicated from vendor docs.
-4. **Residual risks** — Downtime, failed rollback, schema coupling, cost of canaries, observability gaps.
+1. **Context** — Platform(s), envs, regions, workload type, schema change yes/no.
+2. **Problem** — Goal (first rollout, fix stuck deploy, reduce blast radius) and constraints (SLO, budget).
+3. **System design / architecture** — Promotion path; control vs workload; traffic + migration ordering — **`deployment-runtime-system-model.md`**.
+4. **Decision reasoning** — Strategy (canary vs rolling vs blue-green); staging policy; GitOps vs imperative — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — Stage list, gates, rollback trigger, pseudo-config — **no fabricated resource names** — **`quality-validation-and-guardrails.md`**.
+6. **Trade-offs** — Speed vs safety; cost of canary; regional complexity.
+7. **Failure modes** — Top risks for this design — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Migration forward-fix, **`security-pro`** for IAM, **`postgresql-pro`** for schema, **`network-infra-pro`** for traffic.
 
 ## Resources in this skill
 
-- `references/` — methods, flows, tips, edge cases, Tier A maps.
-
 | Topic | File |
 |-------|------|
+| Deployment runtime model | [references/deployment-runtime-system-model.md](references/deployment-runtime-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Methods & environments | [references/methods-and-environments.md](references/methods-and-environments.md) |
 | Flows & pipelines | [references/flows-and-pipelines.md](references/flows-and-pipelines.md) |
-| Tips and patterns | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
 | Decision tree | [references/decision-tree.md](references/decision-tree.md) |
 | Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
@@ -122,21 +178,31 @@ Details: [references/versions.md](references/versions.md)
 
 ## Quick examples
 
-**Input (simple):** Team deploys API and SPA together; DB migration drops a column on deploy — brief outage.  
-**Expected output:** Recommend **expand/contract** migrations; deploy order (backward-compatible API first); reference **`postgresql-pro`**; use **`deployment-pro`** release strategy (rolling + health) not big-bang.
+**Input:** API + SPA + DB drop column — outage.  
+**Expected output:** Expand/contract; deploy order; **`postgresql-pro`**; rolling + readiness — full **Suggested response format**.
 
-**Input (tricky):** “We only test in prod” — leadership rejects staging.  
-**Expected output:** **Risk** articulation; smallest **safe** substitute (canary, feature flags, synthetic checks); **`testing-pro`** for shift-left minimum; never pretend parity.
+**Input:** No staging — leadership.  
+**Expected output:** Risk; canary + synth; **`testing-pro`** minimum — **`decision-framework-and-trade-offs.md`**.
 
-**Input (cross-skill):** “Rotate registry credentials in GitHub Actions.”  
-**Expected output:** **`security-pro`** for OIDC migration pattern; **this skill** for **workflow** stages and **rollback** if push fails; **`code-packaging-pro`** for build job wiring.
+**Input:** Rotate registry creds in Actions.  
+**Expected output:** **`security-pro`** OIDC; **this skill** rollback if push fails; **`code-packaging-pro`** build wiring.
 
 ## Checklist before calling the skill done
 
-- [ ] Hosting model and **environments** (dev/stage/prod) are clear.
-- [ ] **CI/CD** stages and **approval** gates match risk; **`testing-pro`** referenced for test layers if relevant.
-- [ ] **Release strategy** (rolling/canary/blue-green) matches capacity and observability.
-- [ ] **Rollback** path and **migration** safety addressed; **`postgresql-pro`** if schema changes.
-- [ ] Secrets and pipeline **permissions** not hand-waved — **`security-pro`** when non-trivial.
-- [ ] **Observability** after promote (deploy markers, golden signals) mentioned when relevant.
-- [ ] **Artifact** immutability (same image/wheel across envs) stated where applicable.
+### Strategy & runtime
+
+- [ ] **Hosting model** and **environments** clear; **promotion** path sketched — **`deployment-runtime-system-model.md`**.
+- [ ] **Release strategy** matches observability and capacity — **`decision-framework-and-trade-offs.md`**.
+- [ ] **Rollback** / forward-fix path for migrations addressed — **`failure-modes-detection-mitigation.md`**.
+
+### Safety & integration
+
+- [ ] **Secrets/pipeline permissions** not hand-waved — **`security-pro`** when non-trivial.
+- [ ] **Schema changes** coordinated — **`postgresql-pro`** when relevant.
+- [ ] **Artifact immutability** (digest) stated — **`tips-and-tricks.md`**.
+
+### Operations
+
+- [ ] **Observability** after promote (markers, signals, abort) when prod — **`anti-patterns.md`**.
+- [ ] **Failure modes** section present — not only happy path.
+- [ ] **`ci-cd-pro`** / **`network-infra-pro`** cited when workflow or traffic path dominates.

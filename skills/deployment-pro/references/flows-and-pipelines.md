@@ -1,5 +1,7 @@
 # Deployment flows and pipelines
 
+Control vs workload and promotion stages: [deployment-runtime-system-model.md](deployment-runtime-system-model.md).
+
 End-to-end **flow** from commit to production: automation, promotion, and safe rollback.
 
 ## Typical CI/CD stages

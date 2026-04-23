@@ -1,5 +1,7 @@
 # Deployment tips and tricks
 
+See [deployment-runtime-system-model.md](deployment-runtime-system-model.md) for artifact promotion and consistency expectations across environments.
+
 ## Configuration
 
 - **12-factor config** — env vars per environment; **no** secrets in repo (**`security-pro`**).

@@ -19,3 +19,8 @@
 
 - Leak and blast radius.
 - **Fix:** OIDC, short TTL — **`security-pro`**.
+
+## Declaring victory without observability
+
+- Deploy “green” but errors spike unnoticed.
+- **Fix:** Deploy markers + golden metrics + rollback triggers — **`failure-modes-detection-mitigation.md`**.

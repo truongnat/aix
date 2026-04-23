@@ -391,23 +391,24 @@
   {
     "name": "deployment-pro",
     "folder": "deployment-pro",
-    "description": "Professional software deployment: hosting models (static, PaaS, containers, serverless, VM), CI/CD flows, release strategies (rolling, blue-green, canary, GitOps), environments, rollback, and operational edge cases.\n\nUse this skill when the user designs or debugs deployment pipelines, chooses hosting, promotes builds across environments, configures Kubernetes/serverless releases, manages migrations with zero-downtime goals, or asks about GitHub Actions / GitLab CI / cloud deploy patterns at a cross-stack level.\n\nUse **with** **`testing-pro`** for what runs **in** CI (tests, quality gates); **`deployment-pro`** owns **ship path**, **release strategy**, and **runtime promotion**. Use **`security-pro`** for secrets and supply chain; **`postgresql-pro`** for migration ordering; **`nextjs-pro`** / **`nestjs-pro`** for framework-specific deploy targets (e.g. Vercel, Node Docker); **`electron-pro`** / **`tauri-pro`** for desktop release channels.\n\nTriggers: \"deploy\", \"deployment\", \"CI/CD\", \"CD\", \"pipeline\", \"release\", \"rollback\", \"blue-green\", \"canary\", \"rolling deploy\", \"Kubernetes\", \"K8s\", \"Helm\", \"GitOps\", \"Argo CD\", \"Flux\", \"Docker\", \"container\", \"image\", \"registry\", \"serverless\", \"Lambda\", \"Cloud Functions\", \"Terraform\", \"IaC\", \"staging\", \"production\", \"promote\", \"environment\", \"Vercel\", \"Netlify\", \"Railway\", \"Render\", \"Fly.io\", \"zero downtime\", \"migration deploy\", \"readiness probe\", \"liveness probe\", \"PDB\", \"OIDC pipeline\", \"immutable artifact\", \"expand contract migration\".",
+    "description": "Production-grade software deployment and release engineering: deployment runtime model (control plane vs workloads, artifact promotion graph, drift, consistency expectations per platform), CI/CD flows and gates, hosting trade-offs (static, PaaS, containers, serverless, VM), release strategies (rolling, blue-green, canary, recreate, feature flags), GitOps promotion, environments and rollback literacy, coordinated DB migrations (expand/contract handoff), failure modes (crash loops, PDB blocks, regional canary failure, forward-only migrations, CDN mixed assets), decision frameworks (staging vs prod-only mitigation), observability-linked deploy markers, OIDC/supply-chain pointers — cross-stack orchestration narrative, not vendor-docs paste.\n\nUse when designing pipelines, promoting builds, choosing rollout strategies, debugging failed deploys, zero-downtime migrations, rollback, GitOps drift, multi-region concerns.\n\nCombine with testing-pro, security-pro, postgresql-pro, code-packaging-pro, ci-cd-pro, git-operations-pro, network-infra-pro, caching-pro, api-design-pro, framework skills as needed.\n\nTriggers: \"deploy\", \"deployment\", \"rollback\", \"canary\", \"blue-green\", \"rolling\", \"Kubernetes\", \"Helm\", \"GitOps\", \"Argo CD\", \"Flux\", \"promote\", \"staging\", \"production\", \"immutable artifact\", \"digest\", \"readiness probe\", \"liveness\", \"PDB\", \"crashloop\", \"drift\", \"zero downtime\", \"migration deploy\", \"expand contract\", \"traffic shift\", \"Lambda alias\", \"CloudFront\", \"rollout undo\", \"SLO deploy\".",
     "triggers": [],
     "when_to_use": [
-      "Choosing or comparing **deployment methods** (static, PaaS, containers, serverless, VM).",
-      "Designing **CI/CD flow**: stages, approvals, artifacts, environment promotion.",
-      "**Release strategies**: rolling, blue-green, canary, feature flags vs big-bang.",
-      "**Rollback**, **drift** (GitOps), and **zero-downtime** constraints with **DB** changes.",
-      "**Edge cases**: ordering (API vs clients), cold starts, readiness vs liveness, secret rotation during deploy.",
-      "Trigger keywords: `deploy`, `pipeline`, `canary`, `Kubernetes`, `rollback`, `staging`, `production`, `GitOps`, …"
+      "Hosting comparison, env promotion, release strategy, rollback design.",
+      "GitOps/drift, canary health gates, zero-downtime with DB.",
+      "Blast radius, ordering (API vs clients), operational deploy failures."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
+      "deployment-runtime-system-model.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "flows-and-pipelines.md",
       "integration-map.md",
       "methods-and-environments.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "versions.md"
     ]

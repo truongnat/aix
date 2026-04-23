@@ -27,6 +27,7 @@
 - **Readiness** too aggressive — traffic before DB migrations complete.
 - **PodDisruptionBudget** missing — voluntary evictions during node drain break SLOs.
 - **Resource limits** unset — noisy neighbor OOM; **limits** without **requests** skew scheduling.
+- **MaxUnavailable + surge** — Too aggressive rolling → thundering herd on DB — tune waves.
 
 ## Serverless
 
@@ -37,3 +38,17 @@
 
 - **Forward-only** migration already applied — rollback is **new migration**, not `down` in panic.
 - **Cache** poisoning after bad deploy — purge CDN/feature-flag state explicitly.
+
+---
+
+## CDN / static
+
+- **Stale HTML referencing new JS hash** — mixed asset versions — atomic deploy or cache headers — **`deployment-runtime-system-model.md`**.
+
+## Multi-cluster / GitOps
+
+- **Promotion PR merged but cluster offline** — reconcile backlog; avoid manual hotfix drift.
+
+## Desktop / mobile
+
+- **Forced upgrade** vs **optional** update — crash analytics on old versions — **`electron-pro`** / **`tauri-pro`**.
