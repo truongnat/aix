@@ -30,3 +30,11 @@ Two services writing same table?
 Shared read model?
 └── OK if read-only and rebuild path is defined (CQRS-style)
 ```
+
+## Service mesh?
+
+```
+Cross-cutting mTLS + L7 retries needed at platform scale?
+├── Yes → Evaluate mesh complexity vs ingress + library resilience — **`decision-framework-and-trade-offs.md`**
+└── Small fleet → Often YARP/gateway + lib patterns suffice
+```

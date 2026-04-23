@@ -7,3 +7,6 @@
 | **`deployment-pro`** | Rollouts | Canary, rollback across services | Pipelines |
 | **`security-pro`** | Trust boundaries | mTLS policy, service identity | Threat model |
 | **`postgresql-pro`** | Per-service data | When DB-per-service applies | SQL, RLS |
+| **`testing-pro`** | Quality gates across services | Contract test strategy | Runner mechanics |
+| **`ci-cd-pro`** | Orchestration | Multi-artifact sequencing | YAML detail |
+| **`nestjs-pro`** | Node stack | Module boundaries vs DDD mapping | Nest APIs |

@@ -30,3 +30,7 @@
 
 - Team boundaries that do not match service boundaries create ownership ambiguity.
 - On-call maturity gaps can turn manageable incidents into prolonged outages.
+
+## Zero-trust between services
+
+- **“Internal” headers** (user id, roles) forwarded unchecked across hops → lateral privilege escalation — validate at **each** entry — **`failure-modes-detection-mitigation.md`**.

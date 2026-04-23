@@ -686,21 +686,25 @@
   {
     "name": "microservices-pro",
     "folder": "microservices-pro",
-    "description": "Professional microservices guidance for designing service boundaries, inter-service communication, resilience, and operational reliability at scale.\n\nUse this skill when designing or reviewing microservices architecture, service decomposition, data ownership, integration patterns, and production operations.\n\nTriggers: \"microservices\", \"service boundary\", \"bounded context\", \"distributed system\", \"CAP\", \"eventual consistency\", \"saga\", \"choreography\", \"orchestration\", \"event-driven\", \"outbox\", \"idempotency\", \"service mesh\", \"Istio\", \"Linkerd\", \"api gateway\", \"Kong\", \"resilience\", \"circuit breaker\", \"bulkhead\", \"retry storm\", \"observability\", \"distributed tracing\", \"correlation id\", \"split brain\", \"backpressure\", \"edge case\".\n\nCombine with `api-design-pro` for service contracts and `performance-tuning-pro` for distributed latency/throughput optimization.",
+    "description": "Production-grade microservices: bounded contexts, service boundaries, sync/async integration (RPC, events), data ownership, resilience (timeouts, circuit breakers, idempotency, outbox), observability, and operations — plus distributed system model (ownership planes, network hops), failure modes (retry storms, dual writes, contract skew, trust boundaries), decision trade-offs (monolith vs split, mesh vs gateway, consistency), quality guardrails (no fake ARNs, honest SLO/mesh claims).\n\nUse this skill when designing or reviewing microservices architecture, decomposition, data ownership, integration patterns, and production operations.\n\nCombine with **`api-design-pro`**, **`performance-tuning-pro`**, **`deployment-pro`**, **`security-pro`**, **`network-infra-pro`**, **`postgresql-pro`**, **`testing-pro`**, **`ci-cd-pro`**, **`nestjs-pro`**, and other stack skills as needed.\n\nTriggers: \"microservices\", \"service boundary\", \"bounded context\", \"distributed system\", \"CAP\", \"eventual consistency\", \"saga\", \"choreography\", \"orchestration\", \"event-driven\", \"outbox\", \"idempotency\", \"service mesh\", \"Istio\", \"Linkerd\", \"api gateway\", \"Kong\", \"resilience\", \"circuit breaker\", \"bulkhead\", \"retry storm\", \"observability\", \"distributed tracing\", \"correlation id\", \"split brain\", \"backpressure\", \"edge case\".",
     "triggers": [],
     "when_to_use": [
-      "Splitting monolith domains into services with clear ownership boundaries.",
-      "Designing synchronous/asynchronous communication among services.",
-      "Handling distributed consistency, retries, partial failures, and resilience patterns.",
-      "Improving observability, incident isolation, and operational readiness in production.",
-      "Trigger keywords: `microservices`, `service boundary`, `distributed system`, `saga`, `event-driven`, `service mesh`, `api gateway`, `resilience`, `observability`, `edge case`"
+      "Decomposition, bounded contexts, ownership.",
+      "Sync vs messaging, saga/choreography.",
+      "Resilience, timeouts, duplication/reorder handling.",
+      "Observability and operational readiness."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
+      "distributed-services-system-model.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
-      "tips-and-tricks.md"
+      "quality-validation-and-guardrails.md",
+      "tips-and-tricks.md",
+      "versions.md"
     ]
   },
   {
