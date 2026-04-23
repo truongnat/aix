@@ -1,5 +1,7 @@
 # Business analysis tips and tricks
 
+For **structured decisions**, **product outcomes**, **risk registers**, and **metric trees**, see [decision-making-framework.md](decision-making-framework.md), [product-thinking-and-outcomes.md](product-thinking-and-outcomes.md), [risk-modeling.md](risk-modeling.md), and [metrics-hierarchy-and-guardrails.md](metrics-hierarchy-and-guardrails.md).
+
 ## Workshops
 
 - **Agenda and outcomes** — Send before; capture **decisions** and **actions** in the same meeting.

@@ -159,23 +159,31 @@
   {
     "name": "business-analysis-pro",
     "folder": "business-analysis-pro",
-    "description": "Professional business analysis: requirements elicitation, structured reasoning (systems-analyst style), prioritization, traceability, NFRs, and clear deliverables — BRD-style narratives, decision logs, and executive-ready reports.\n\nUse this skill when the user clarifies business or product requirements, writes a BRD/FRD, analyzes gaps (as-is vs to-be), defines acceptance criteria, prioritizes with MoSCoW, maps stakeholders, or needs **detailed, report-quality** output with explicit assumptions and decisions — beyond informal SA notes.\n\nUse **with** **`content-analysis-pro`** when **source documents or media** must be read in depth before structuring requirements; **`testing-pro`** (acceptance criteria and testability), **`security-pro`** (compliance and data sensitivity), **`design-system-pro`** / **`mobile-design-pro`** (UX requirements), stack skills when requirements imply technical constraints. This skill (`business-analysis-pro`) owns **analysis, reasoning trace, and communication artifacts**; implementation skills own **build details**.\n\nTriggers: \"business analysis\", \"BA\", \"BRD\", \"FRD\", \"SRS\", \"requirements\", \"stakeholder\", \"MoSCoW\", \"acceptance criteria\", \"user story\", \"as-is\", \"to-be\", \"gap analysis\", \"RACI\", \"traceability\", \"NFR\", \"functional requirement\", \"systems analyst\", \"SA\", \"elicitation\", \"scope\", \"prioritization\", \"decision log\", \"ambiguous requirements\", \"scope creep\", \"who decides\", \"Definition of Ready\", \"INVEST\", \"non-functional\", \"compliance requirement\", \"stakeholder map\".",
+    "description": "Professional business and product analysis: requirements elicitation, SA-style reasoning, prioritization and traceability, explicit decision frameworks (criteria, weights, sensitivity), product outcomes (segments, value proposition, north star), metrics hierarchy and guardrails, structured risk modeling, stakeholder power and escalation, discovery loops (hypothesize–measure–learn), system constraints and cost bands (scale, latency, data, infra), MoSCoW, FR/NFR, BRD/FRD/RACI, decision logs, and executive-ready reporting.\n\nUse when clarifying business or product requirements, comparing options with trade-offs, defining success metrics, modeling risks, resolving stakeholder conflict, writing BRD/FRD, gap analysis (as-is vs to-be), acceptance criteria, or producing auditable deliverables. Combine with content-analysis-pro for source documents, data-analysis-pro for evidence, security-pro for compliance, planning-pro for phasing. This skill owns analysis, decisions-as-artifacts, and communication; implementation skills own build details.\n\nTriggers: \"business analysis\", \"BA\", \"BRD\", \"FRD\", \"SRS\", \"requirements\", \"stakeholder\", \"MoSCoW\", \"acceptance criteria\", \"user story\", \"as-is\", \"to-be\", \"gap analysis\", \"RACI\", \"traceability\", \"NFR\", \"functional requirement\", \"systems analyst\", \"SA\", \"elicitation\", \"scope\", \"prioritization\", \"decision log\", \"ambiguous requirements\", \"scope creep\", \"who decides\", \"Definition of Ready\", \"INVEST\", \"non-functional\", \"compliance requirement\", \"stakeholder map\", \"north star\", \"KPI\", \"OKR\", \"trade-off\", \"weighted score\", \"risk register\", \"RACI\", \"escalation\", \"product outcome\", \"discovery\", \"experiment\", \"vanity metric\", \"guardrail metric\".",
     "triggers": [],
     "when_to_use": [
       "**Eliciting** and **structuring** requirements from vague asks.",
+      "**Comparing options** with explicit criteria, scores, and rejected alternatives.",
       "**Prioritizing** and documenting **scope** (MVP vs phase 2).",
       "**As-is / to-be** and **gap** analysis.",
-      "Writing or reviewing **BRD/FRD**, **user stories**, **RACI**, **decision logs**.",
-      "Producing **reports** for sponsors (executive summary + detail + appendix).",
-      "Trigger keywords: `BRD`, `requirements`, `MoSCoW`, `acceptance criteria`, `stakeholder`, `traceability`, …"
+      "Writing or reviewing **BRD/FRD**, **user stories**, **RACI**, **decision logs**, **risk registers**.",
+      "Defining **outcomes**, **metric hierarchy**, and **guardrails**.",
+      "Producing **reports** for sponsors (executive summary + detail + appendix)."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-making-framework.md",
       "decision-tree.md",
+      "discovery-and-iteration.md",
       "edge-cases.md",
       "integration-map.md",
+      "metrics-hierarchy-and-guardrails.md",
+      "product-thinking-and-outcomes.md",
       "reporting-and-deliverables.md",
       "requirements-and-reasoning.md",
+      "risk-modeling.md",
+      "stakeholder-dynamics.md",
+      "system-constraints-and-cost.md",
       "tips-and-tricks.md",
       "versions.md"
     ]
