@@ -924,21 +924,24 @@
   {
     "name": "react-pro",
     "folder": "react-pro",
-    "description": "Professional React (web) development: component design, hooks and performance, UI/a11y, and framework edge cases (Vite, Next.js, SSR).\n\nUse this skill when the user works on React, JSX/TSX, hooks (useState, useEffect, useMemo, useCallback, useRef, useReducer, useContext, useLayoutEffect), Server Components (Next/App Router), client boundaries, React Router / TanStack Router, TanStack Query, Zustand/Redux, forms (React Hook Form), testing (Vitest/Jest, RTL, Playwright), bundlers (Vite, webpack), or asks for review of effects, memoization, lists/keys, hydration, or bundle size.\n\nTriggers: \"React\", \"JSX\", \"TSX\", \"hooks\", \"useEffect\", \"infinite loop\", \"maximum update depth\", \"useMemo\", \"useCallback\", \"useRef\", \"memo\", \"React.memo\", \"re-render\", \"Strict Mode\", \"hydration\", \"hydration mismatch\", \"SSR\", \"RSC\", \"Server Component\", \"use client\", \"Next.js\", \"Vite\", \"React Router\", \"TanStack Query\", \"React Hook Form\", \"forwardRef\", \"lazy\", \"Suspense\", \"Error Boundary\", \"key prop\", \"Virtual DOM\", \"flushSync\", \"a11y\", \"ARIA\", \"semantic HTML\".",
+    "description": "Production-grade React (web): component design, hooks and effect correctness, performance habits, UI/a11y, SSR/hydration — plus system model (render vs commit, reconciliation/keys, effects as external sync, concurrent rendering), failure modes (infinite updates, stale closures, hydration mismatch, list identity, unsafe JSX spread), decision trade-offs (derived vs stored state, server vs client state, controlled inputs, transitions, colocation vs store), and quality guardrails (React major accuracy, Rules of Hooks, no fabricated APIs).\n\nUse this skill when the user works on React, JSX/TSX, hooks (useState, useEffect, useMemo, useCallback, useRef, useReducer, useContext, useLayoutEffect), Server Components context (Next App Router), client boundaries, React Router / TanStack Router, TanStack Query, Zustand/Redux, forms (React Hook Form), testing (Vitest/Jest, RTL, Playwright), bundlers (Vite, webpack), or asks for review of effects, memoization, lists/keys, hydration, or bundle size.\n\nCombine with **`nextjs-pro`** for RSC and Next-specific data/cache, **`react-native-pro`** for mobile, **`testing-pro`** for RTL/CI, **`typescript-pro`** for TSX typing, **`security-pro`** for XSS/CSP, **`design-system-pro`** for tokens, and **`performance-tuning-pro`** when web vitals or backend dominate.\n\nTriggers: \"React\", \"JSX\", \"TSX\", \"hooks\", \"useEffect\", \"infinite loop\", \"maximum update depth\", \"useMemo\", \"useCallback\", \"useRef\", \"memo\", \"React.memo\", \"re-render\", \"Strict Mode\", \"hydration\", \"hydration mismatch\", \"SSR\", \"RSC\", \"Server Component\", \"use client\", \"Next.js\", \"Vite\", \"React Router\", \"TanStack Query\", \"React Hook Form\", \"forwardRef\", \"lazy\", \"Suspense\", \"Error Boundary\", \"key prop\", \"Virtual DOM\", \"flushSync\", \"a11y\", \"ARIA\", \"semantic HTML\".",
     "triggers": [],
     "when_to_use": [
-      "Building or refactoring components, hooks, context, and data-fetching boundaries.",
-      "Reviewing React code for effect correctness, memoization scope, list keys, and a11y.",
-      "Debugging hydration mismatches, double effects in Strict Mode, stale closures, or SSR/RSC boundaries.",
-      "Aligning UI with semantic HTML, keyboard support, and responsive layouts.",
-      "Trigger keywords: `React`, `useEffect`, `hydration`, `RSC`, `use client`, `TanStack Query`, `a11y`, …"
+      "Components, hooks, context, forms, and data-fetching **boundaries** on the web.",
+      "Effect correctness, memoization scope, list keys, stale closures, Strict Mode surprises.",
+      "Hydration mismatches, concurrent rendering assumptions, Error Boundaries + Suspense.",
+      "Semantic HTML, keyboard flows, modals, responsive and accessible UI."
     ],
     "references": [
       "anti-patterns.md",
       "components-and-jsx.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
+      "react-rendering-and-effects-system-model.md",
       "tips-and-tricks.md",
       "ui-ux-design.md",
       "versions.md"

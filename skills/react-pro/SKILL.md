@@ -1,101 +1,154 @@
 ---
 name: react-pro
 description: |
-  Professional React (web) development: component design, hooks and performance, UI/a11y, and framework edge cases (Vite, Next.js, SSR).
+  Production-grade React (web): component design, hooks and effect correctness, performance habits, UI/a11y, SSR/hydration — plus system model (render vs commit, reconciliation/keys, effects as external sync, concurrent rendering), failure modes (infinite updates, stale closures, hydration mismatch, list identity, unsafe JSX spread), decision trade-offs (derived vs stored state, server vs client state, controlled inputs, transitions, colocation vs store), and quality guardrails (React major accuracy, Rules of Hooks, no fabricated APIs).
 
-  Use this skill when the user works on React, JSX/TSX, hooks (useState, useEffect, useMemo, useCallback, useRef, useReducer, useContext, useLayoutEffect), Server Components (Next/App Router), client boundaries, React Router / TanStack Router, TanStack Query, Zustand/Redux, forms (React Hook Form), testing (Vitest/Jest, RTL, Playwright), bundlers (Vite, webpack), or asks for review of effects, memoization, lists/keys, hydration, or bundle size.
+  Use this skill when the user works on React, JSX/TSX, hooks (useState, useEffect, useMemo, useCallback, useRef, useReducer, useContext, useLayoutEffect), Server Components context (Next App Router), client boundaries, React Router / TanStack Router, TanStack Query, Zustand/Redux, forms (React Hook Form), testing (Vitest/Jest, RTL, Playwright), bundlers (Vite, webpack), or asks for review of effects, memoization, lists/keys, hydration, or bundle size.
+
+  Combine with **`nextjs-pro`** for RSC and Next-specific data/cache, **`react-native-pro`** for mobile, **`testing-pro`** for RTL/CI, **`typescript-pro`** for TSX typing, **`security-pro`** for XSS/CSP, **`design-system-pro`** for tokens, and **`performance-tuning-pro`** when web vitals or backend dominate.
 
   Triggers: "React", "JSX", "TSX", "hooks", "useEffect", "infinite loop", "maximum update depth", "useMemo", "useCallback", "useRef", "memo", "React.memo", "re-render", "Strict Mode", "hydration", "hydration mismatch", "SSR", "RSC", "Server Component", "use client", "Next.js", "Vite", "React Router", "TanStack Query", "React Hook Form", "forwardRef", "lazy", "Suspense", "Error Boundary", "key prop", "Virtual DOM", "flushSync", "a11y", "ARIA", "semantic HTML".
 
 metadata:
-  short-description: React — components, performance, UI/a11y, SSR and edge cases
+  short-description: React — render/effect model, hooks, hydration, failure modes, guardrails
+  content-language: en
+  domain: ui-framework
+  level: professional
 ---
 
 # React (professional)
 
-Use official [React](https://react.dev/) docs for API truth; this skill encodes **professional defaults**, **UI and accessibility habits**, and **edge-case awareness** (effects, hydration, concurrent React). Confirm **React major version**, **framework** (CRA/Vite/Next/Remix), and **SSR vs SPA** when known.
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use official [React](https://react.dev/) docs for API truth; this skill encodes **rendering discipline**, **effect correctness**, **accessibility defaults**, and **SSR/hydration awareness** — not framework-specific routing or server cache (see **`nextjs-pro`**). Confirm **React major**, **meta-framework** (Vite/Next/Remix), and **SSR vs SPA** when known.
+
+## Boundary
+
+**`react-pro`** owns **React component model** (hooks, JSX, composition, web DOM semantics, client-side performance patterns, hydration on the web). **`nextjs-pro`** owns **Next.js App Router**, **RSC**, **`fetch` caching**, **middleware**, and **deployment-shaped** React. **`react-native-pro`** owns **React Native / Expo** platform APIs. **`testing-pro`** owns **test pyramid and CI** beyond component examples.
+
+## Related skills (this repo)
+
+| Skill | When to combine |
+|-------|----------------|
+| **`nextjs-pro`** | RSC, `"use client"`, Server Actions, Next data/cache |
+| **`react-native-pro`** | RN lists, native modules, EAS |
+| **`testing-pro`** | RTL, Vitest/Jest, Playwright, CI |
+| **`typescript-pro`** | TSX types, generics, strictness |
+| **`security-pro`** | XSS, CSP, sanitization policy |
+| **`design-system-pro`** | Tokens and design consistency |
+| **`performance-tuning-pro`** | LCP/INP with CDN/API factors |
 
 ## When to use
 
-- Building or refactoring components, hooks, context, and data-fetching boundaries.
-- Reviewing React code for effect correctness, memoization scope, list keys, and a11y.
-- Debugging hydration mismatches, double effects in Strict Mode, stale closures, or SSR/RSC boundaries.
-- Aligning UI with semantic HTML, keyboard support, and responsive layouts.
-- Trigger keywords: `React`, `useEffect`, `hydration`, `RSC`, `use client`, `TanStack Query`, `a11y`, …
+- Components, hooks, context, forms, and data-fetching **boundaries** on the web.
+- Effect correctness, memoization scope, list keys, stale closures, Strict Mode surprises.
+- Hydration mismatches, concurrent rendering assumptions, Error Boundaries + Suspense.
+- Semantic HTML, keyboard flows, modals, responsive and accessible UI.
+
+## When not to use
+
+- **Next.js-specific** routing, `fetch` revalidation, middleware — **`nextjs-pro`**.
+- **React Native** screens and native build issues — **`react-native-pro`**.
+- **Pure backend** API design — **`api-design-pro`** / **`nestjs-pro`** (pair for client consumption).
+
+## Required inputs
+
+- **`react` + `react-dom` major** (from `package.json` or user).
+- **Bundler/framework** when SSR, code splitting, or RSC boundaries matter.
+
+## Expected output
+
+Follow **Suggested response format** strictly — system model through residual risks.
 
 ## Workflow
 
-1. Confirm React version and framework (Vite/Next/…); prefer react.dev for API details.
-2. Apply the principles and topic summaries below; open `references/` when you need depth.
-3. Respond using **Suggested response format**; call out SSR/hydration risks when relevant.
+1. Confirm React version, framework, and SSR/RSC context.
+2. Apply summaries below; open `references/`; use **`react-rendering-and-effects-system-model.md`** when explaining render vs effects.
+3. Respond with **Suggested response format**; include **hydration** and **effect failure modes** when relevant.
 
 ### Operating principles
 
-1. **Effects are for synchronization** — Not every “on change” belongs in `useEffect`; prefer event handlers or derived state during render when possible.
-2. **Minimize re-render surface** — Split components; use `memo` / selectors after measuring; avoid premature optimization.
-3. **Lists need stable keys** — Prefer domain ids over array index when order/content changes.
-4. **Framework-aware** — Next.js App Router, RSC, and `"use client"` change where hooks and browser APIs run.
-5. **Accessibility is not optional** — Labels, roles, focus management for interactive UIs.
+1. **Effects synchronize** — Prefer handlers and derived state when sufficient — **`decision-tree.md`**.
+2. **Minimize re-render surface** — Split components; memoize after measurement — **`decision-tree.md`**.
+3. **Stable list keys** — Domain ids for mutable lists — **`components-and-jsx.md`**.
+4. **Framework-aware** — RSC and `"use client"` change where hooks run — **`nextjs-pro`**.
+5. **Accessibility by default** — Semantic HTML first; focus for modals — **`ui-ux-design.md`**.
+6. **Observable async UI** — Loading, error, empty — **`ui-ux-design.md`**.
 
 ### UI / UX and semantics (summary)
 
-- Prefer **semantic HTML** (`button`, `nav`, `main`, headings) before ARIA; add ARIA when semantics are insufficient.
-- **Focus** — visible focus styles; trap focus in modals; restore focus on close.
-- **Responsive** — mobile-first layout; avoid fixed widths for entire layouts; test zoom and text scaling.
-- **Loading / error / empty** — explicit UI states; avoid silent failures.
+Semantic HTML, focus, responsive, explicit async states — **`ui-ux-design.md`**.
 
 Details: [references/ui-ux-design.md](references/ui-ux-design.md)
 
 ### Components and JSX craft (summary)
 
-- **Composition** over inheritance; **children** and render props when they clarify APIs.
-- **`key`** on lists — stable identity; avoid index keys for reorderable or mutable lists.
-- **`forwardRef`** when parents must measure or focus wrapped components.
-- **Controlled vs uncontrolled** inputs — pick explicitly; avoid mixing incorrectly.
+Composition, keys, `forwardRef`, controlled inputs — **`components-and-jsx.md`**.
 
 Details: [references/components-and-jsx.md](references/components-and-jsx.md)
 
+### Rendering and effects system model (summary)
+
+Render vs commit, keys, effects, concurrency, SSR two-tree mental model — **`react-rendering-and-effects-system-model.md`**.
+
+Details: [references/react-rendering-and-effects-system-model.md](references/react-rendering-and-effects-system-model.md)
+
 ### Tips and tricks (summary)
 
-- **Dependency arrays** — exhaustive and honest; ESLint `react-hooks/exhaustive-deps` as aid, not oracle.
-- **Memoization** — `useMemo` for expensive pure computation; `useCallback` when passing callbacks to memoized children; profile first.
-- **Code splitting** — `React.lazy` + `Suspense` for route-level chunks; error boundaries around lazy trees.
-- **Data fetching** — prefer libraries with caching/deduping (TanStack Query) over raw `useEffect` + `fetch` for server state.
-- **Forms** — controlled fields + validation library when forms are non-trivial.
+Deps, memoization, splitting, TanStack Query, forms — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- **Strict Mode** — development double-invocation of certain lifecycles/effects; cleanup must be idempotent.
-- **Hydration** — server HTML must match client first render; watch for `Date`, `random`, locale, or browser-only APIs during SSR.
-- **Concurrent rendering** — interruptible rendering; avoid relying on synchronous flush except where documented (`flushSync` sparingly).
-- **Stale closures** — functional updates `setState(s => …)` and correct effect deps.
+Strict Mode, hydration, RSC boundaries, concurrent rendering, portals — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
+### Decision framework (summary)
+
+Derived vs stored state, transitions, stores vs colocation — **`decision-framework-and-trade-offs.md`** + **`decision-tree.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
 ### Anti-patterns (summary)
 
-- **Conditional hooks**, **index keys on mutable lists**, **`{...props}` to DOM**, **effects instead of derived state**, **memo/useCallback without measurement** — see [references/anti-patterns.md](references/anti-patterns.md).
+Conditional hooks, index keys, spread to DOM, effects for derived state — **`anti-patterns.md`**.
 
-### Integration with other skills (summary)
+Details: [references/anti-patterns.md](references/anti-patterns.md)
 
-- Common pairs: **`nextjs-pro`** (RSC boundaries), **`testing-pro`** (RTL), **`typescript-pro`** (TSX). See [references/integration-map.md](references/integration-map.md).
+### Cross-skill handoffs (summary)
 
-### Suggested response format (implement / review)
+**`nextjs-pro`**, **`react-native-pro`**, **`testing-pro`**, **`security-pro`** — **`integration-map.md`**.
 
-1. **Issue or goal** — Bug, feature, or review ask.
-2. **Recommendation** — Hook/component pattern and framework constraint.
-3. **Code** — TSX snippets or diff-style blocks.
-4. **Residual risks** — SSR, tests, or migration notes.
+Details: [references/integration-map.md](references/integration-map.md)
+
+### Version notes (summary)
+
+React major, framework matrices — **`versions.md`**.
+
+Details: [references/versions.md](references/versions.md)
+
+## Suggested response format (STRICT — implement / review)
+
+1. **Context** — React major, framework (Vite/Next/…), CSR vs SSR/RSC, browser targets if relevant.
+2. **Problem / goal** — Bug, review, or feature; hydration/effect/list/perf.
+3. **System design** — Render vs effect vs external system; where state should live — **`react-rendering-and-effects-system-model.md`**.
+4. **Decision reasoning** — Handler vs effect; memo vs split; server state library — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — TSX/hooks snippets aligned to documented APIs — **`quality-validation-and-guardrails.md`**.
+6. **Trade-offs** — Readability vs memo; client duplicate vs server source of truth.
+7. **Failure modes** — Max depth, hydration, list identity, unsafe spread — **`failure-modes-detection-mitigation.md`**.
+8. **Residual risks** — Tests, a11y audit, hand off to **`nextjs-pro`** / **`security-pro`** / **`performance-tuning-pro`** as needed.
 
 ## Resources in this skill
 
-- `references/` — topic deep-dives; do not paste entire reference docs into SKILL.md.
-
 | Topic | File |
 |-------|------|
-| **Components and JSX** | [references/components-and-jsx.md](references/components-and-jsx.md) |
+| **Rendering & effects model** | [references/react-rendering-and-effects-system-model.md](references/react-rendering-and-effects-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Components and JSX | [references/components-and-jsx.md](references/components-and-jsx.md) |
 | UI / UX and semantics | [references/ui-ux-design.md](references/ui-ux-design.md) |
 | Tips and patterns | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
@@ -104,29 +157,42 @@ Details: [references/edge-cases.md](references/edge-cases.md)
 | Version notes | [references/versions.md](references/versions.md) |
 | Integration map | [references/integration-map.md](references/integration-map.md) |
 
-## Quick example
+## Quick examples
 
 ### 1 — Simple (common)
 
-**Input:** Hydration mismatch warning when rendering `new Date().toLocaleString()` in a server-rendered page.  
-**Expected output:** Explain client vs server output; use `useEffect` + state, or `suppressHydrationWarning` with a justified reason, plus a snippet.
+**Input:** Hydration mismatch when rendering `new Date().toLocaleString()` on SSR page.  
+**Expected output:** Full **Suggested response format** — server vs client first paint; `useEffect` + state or documented `suppressHydrationWarning` — **`edge-cases.md`**.
 
 ### 2 — Tricky (edge case)
 
-**Input:** List reorders in place but local `useState` keyed by index shows wrong row selected after sort.  
-**Expected output:** Replace index keys with stable ids; explain why identity must follow domain objects; optional `key` on controlled sub-trees.
+**Input:** List reorders in place; selection state wrong after sort (index keys).  
+**Expected output:** Stable domain keys; identity model — **`failure-modes-detection-mitigation.md`**.
 
 ### 3 — Cross-skill
 
-**Input:** Next.js App Router page mixes `useState` with data that actually comes from the server on every navigation.  
-**Expected output:** Split server vs client: **`nextjs-pro`** for RSC/`fetch` and URL as source of truth; **`react-pro`** for client-only UI state; avoid duplicating server data in client state without a reason.
+**Input:** App Router page duplicates server data in `useState` on every navigation.  
+**Expected output:** **`nextjs-pro`** for URL/RSC data; **`react-pro`** for minimal client UI state; avoid mirroring server truth — **`decision-framework-and-trade-offs.md`**.
 
 ## Checklist before calling the skill done
 
-- [ ] Effects have correct dependencies and cleanup (subscriptions, timers, abort controllers).
-- [ ] Lists use stable keys; no index keys for dynamic lists when identity matters.
-- [ ] Interactive elements are keyboard-accessible; modals trap focus where required.
-- [ ] No hydration warnings in SSR apps; client-only APIs behind `useEffect` or dynamic import.
-- [ ] Loading and error states for async UI.
-- [ ] Hooks are unconditional; no hook rules violations.
-- [ ] Derived state is not duplicated in `useState` when computable from props/state in render.
+### Hooks and state
+
+- [ ] Effects have correct deps and cleanup — **`quality-validation-and-guardrails.md`**.
+- [ ] No derived state duplicated in `useState` — **`decision-tree.md`**.
+- [ ] Hooks unconditional — **`anti-patterns.md`**.
+
+### Lists and identity
+
+- [ ] Stable keys for mutable lists — **`failure-modes-detection-mitigation.md`**.
+
+### SSR and DOM
+
+- [ ] No hydration warnings; browser APIs deferred — **`edge-cases.md`**.
+- [ ] No unsafe `dangerouslySetInnerHTML` / blind DOM spread — **`failure-modes-detection-mitigation.md`**.
+
+### UX and cross-skill
+
+- [ ] Keyboard-accessible interactives; modal focus — **`ui-ux-design.md`**.
+- [ ] Loading / error / empty for async UI — **`ui-ux-design.md`**.
+- [ ] **`integration-map.md`** used when Next, RN, security, or perf outside React dominates.

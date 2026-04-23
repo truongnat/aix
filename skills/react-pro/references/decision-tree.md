@@ -40,3 +40,11 @@ Measured re-render cost?
 ├── No → skip memoization; ship readable code first
 └── Yes → memoize the smallest child that stabilizes props; useCallback only if a memoized child depends on referential identity
 ```
+
+## Error Boundary vs Suspense-only
+
+```
+Recoverable render error in a subtree (bad data, lazy chunk)?
+├── Yes → Error Boundary at route/feature boundary + fallback UI
+└── Async wait only → Suspense fallback; still add Boundary above lazy imports where chunk load can throw
+```
