@@ -1109,25 +1109,28 @@
   {
     "name": "strategic-consulting-pro",
     "folder": "strategic-consulting-pro",
-    "description": "Professional strategic consulting: problem framing, strategic options, scenario planning, portfolio and capability fit, prioritization, and decision-ready recommendations for leadership.\n\nUse this skill when the user needs board/executive-level strategy support: growth choices, market-entry sequencing, build/partner/buy decisions, operating model trade-offs, strategic risks, or a concise strategy memo with assumptions and confidence levels.\n\nUse **with** **`market-research-pro`** for market and competitor evidence, **`business-analysis-pro`** for requirements and execution planning, and **`web-research-pro`** for external source validation. This skill (`strategic-consulting-pro`) owns **strategy framing and option evaluation**; other skills own deep domain analysis and implementation detail.\n\nTriggers: \"strategy\", \"strategic consulting\", \"go-to-market strategy\", \"market entry\", \"prioritization\", \"portfolio strategy\", \"build vs buy\", \"partner strategy\", \"operating model\", \"scenario planning\", \"decision memo\", \"north star\", \"strategic options\", \"kill criteria\", \"RACI strategy\", \"initiative sequencing\", \"moat\", \"where to play\", \"how to win\", \"strategic risk\".",
+    "description": "Production-grade strategic consulting: problem framing, strategic options, scenario planning, portfolio fit, prioritization, and decision-ready leadership memos — plus system model (decision spine, stakeholder governance, evidence loop, execution handoff), failure modes (framework theater, confirmation bias, HiPPO, stale evidence, execution gap), decision trade-offs (where-to-play/how-to-win, build-partner-buy, concentration vs diversification, speed vs certainty), and quality guardrails (confidence tags, no fabricated market facts, not legal advice).\n\nUse this skill for board/executive-level strategy: growth choices, market-entry sequencing, build/partner/buy, operating model trade-offs, strategic risks, concise strategy memos with assumptions and confidence.\n\nCombine with **`market-research-pro`** for market evidence, **`web-research-pro`** for source validation, **`data-analysis-pro`** for quantitative baselines, **`business-analysis-pro`** for requirements from chosen strategy, **`planning-pro`** for roadmaps after decisions, **`feedback-pro`** for review cycles, **`security-pro`** when posture or regulation constrains options, and **`auth-pro`** for identity strategy depth.\n\nTriggers: \"strategy\", \"strategic consulting\", \"go-to-market strategy\", \"market entry\", \"prioritization\", \"portfolio strategy\", \"build vs buy\", \"partner strategy\", \"operating model\", \"scenario planning\", \"decision memo\", \"north star\", \"strategic options\", \"kill criteria\", \"RACI strategy\", \"initiative sequencing\", \"moat\", \"where to play\", \"how to win\", \"strategic risk\".",
     "triggers": [],
     "when_to_use": [
-      "Clarifying strategic problem statements before jumping to solutions.",
-      "Evaluating options with explicit criteria and trade-offs.",
-      "Prioritizing initiatives under limited resources.",
-      "Building leadership-facing strategy memos and recommendations.",
-      "Scenario planning under uncertainty and risk.",
-      "Trigger keywords: `strategy`, `portfolio`, `scenario`, `prioritization`, `build vs buy`, ..."
+      "Clarify strategic questions before jumping to tactics.",
+      "Compare options on shared criteria with explicit trade-offs.",
+      "Prioritize initiatives under resource constraints.",
+      "Scenario planning under uncertainty.",
+      "Executive memos, decision logs, and kill criteria."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
       "prioritization-and-resource-allocation.md",
       "problem-framing-and-options.md",
+      "quality-validation-and-guardrails.md",
       "reporting-and-executive-communication.md",
       "scenario-planning-and-risk.md",
+      "strategic-decision-and-stakeholder-system-model.md",
       "tips-and-tricks.md",
       "versions.md"
     ]
