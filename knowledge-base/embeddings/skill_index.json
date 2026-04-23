@@ -532,21 +532,24 @@
   {
     "name": "flutter-pro",
     "folder": "flutter-pro",
-    "description": "Professional Flutter development: UI/UX quality (Material 3), performance, multi-platform edge cases, and Dart patterns.\n\nUse this skill when the user works on Flutter, Dart, widgets, Material / Cupertino, theming, navigation (go_router, Navigator 2), state management (Provider, Riverpod, Bloc, GetIt), animations, platform channels, web, desktop (Windows/macOS/Linux), iOS/Android builds, Impeller/Skia, accessibility, or asks for Flutter code review, layout, lists, isolates, or compile-size concerns.\n\nWidget-focused: composing StatelessWidget / StatefulWidget, pure `build`, `Key` (ValueKey, GlobalKey), `BuildContext` and InheritedWidget, widget lifecycle (`initState`, `dispose`, `mounted`), splitting widgets vs helper methods, const constructors, or refactoring widget trees.\n\nTriggers: \"Flutter\", \"Dart\", \"Widget\", \"StatelessWidget\", \"StatefulWidget\", \"State\", \"setState\", \"build method\", \"const widget\", \"Key\", \"ValueKey\", \"GlobalKey\", \"InheritedWidget\", \"Theme.of\", \"Material 3\", \"Cupertino\", \"go_router\", \"Navigator\", \"Riverpod\", \"Provider\", \"Bloc\", \"BuildContext\", \"mounted\", \"async gap\", \"Sliver\", \"ListView\", \"CustomScrollView\", \"RepaintBoundary\", \"Impeller\", \"Skia\", \"platform channel\", \"MethodChannel\", \"FFI\", \"web\", \"Flutter desktop\", \"semantics\", \"a11y\", \"Golden test\", \"integration_test\".",
+    "description": "Production-grade Flutter development: widgets (Element/RenderObject pipeline), Material 3 / UX, performance and frame budgets, multi-platform edge cases (web, desktop, channels), Dart patterns — plus framework/render pipeline model, failure modes (async gaps, overflow, jank, plugin skew, golden flake, CORS), decision trade-offs (platform scope, state routing, add-to-app), quality guardrails (SDK-accurate APIs, no fabricated pub versions).\n\nUse this skill when the user works on Flutter, Dart, widgets, Material / Cupertino, theming, navigation (go_router, Navigator 2), state management (Provider, Riverpod, Bloc, GetIt), animations, platform channels, web, desktop (Windows/macOS/Linux), iOS/Android builds, Impeller/Skia, accessibility, or asks for Flutter code review, layout, lists, isolates, or compile-size concerns.\n\nCombine with **`testing-pro`**, **`deployment-pro`**, **`security-pro`**, **`design-system-pro`**, **`sql-data-access-pro`**, **`ci-cd-pro`**, **`mobile-design-pro`** as needed.\n\nTriggers: \"Flutter\", \"Dart\", \"Widget\", \"StatelessWidget\", \"StatefulWidget\", \"State\", \"setState\", \"build method\", \"const widget\", \"Key\", \"ValueKey\", \"GlobalKey\", \"InheritedWidget\", \"Theme.of\", \"Material 3\", \"Cupertino\", \"go_router\", \"Navigator\", \"Riverpod\", \"Provider\", \"Bloc\", \"BuildContext\", \"mounted\", \"async gap\", \"Sliver\", \"ListView\", \"CustomScrollView\", \"RepaintBoundary\", \"Impeller\", \"Skia\", \"platform channel\", \"MethodChannel\", \"FFI\", \"web\", \"Flutter desktop\", \"semantics\", \"a11y\", \"Golden test\", \"integration_test\".",
     "triggers": [],
     "when_to_use": [
-      "Building or refactoring screens, navigation, theming, forms, lists, or animations.",
-      "Reviewing Flutter code for widget structure, state management boundaries, and performance.",
-      "Debugging iOS vs Android vs web vs desktop differences, async/`BuildContext`, or plugin behavior.",
-      "Aligning UI with Material 3 (or design system), accessibility, and responsive layouts.",
-      "Refactoring **widget trees**: keys, lifecycle, extracting widgets, `const`, and `build` purity.",
-      "Trigger keywords: `Flutter`, `Dart`, `Widget`, `Riverpod`, `go_router`, `BuildContext`, `mounted`, `Material 3`, `a11y`, `integration_test`, …"
+      "Screens, navigation, theming, forms, lists, animations.",
+      "Code review: widget structure, state boundaries, performance.",
+      "iOS vs Android vs web vs desktop differences; async/`BuildContext`; plugins.",
+      "Material 3, accessibility, responsive layouts.",
+      "Refactoring trees: keys, lifecycle, `const`, pure `build`."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
+      "flutter-framework-and-render-pipeline-model.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "ui-ux-design.md",
       "versions.md",

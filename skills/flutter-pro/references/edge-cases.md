@@ -56,6 +56,11 @@
 
 - **Debug** — asserts and dev tooling; **Profile** — performance; **Release** — tree shaking and obfuscation (`--obfuscate` with symbol files for crash reports).
 
+## Frame budget and profiling
+
+- **`SchedulerBinding`** schedules frames; synchronous work in `build` or listeners steals from **layout/paint** budget → dropped frames — **`flutter-framework-and-render-pipeline-model.md`**.
+- **Impeller vs Skia** — Behavior can differ per platform/driver; validate on **target devices**, not emulator only — **`failure-modes-detection-mitigation.md`**.
+
 ---
 
 *Test on real devices for each shipped platform — simulators/emulators miss GPU and IME behavior.*

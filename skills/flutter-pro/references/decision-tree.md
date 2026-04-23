@@ -32,6 +32,15 @@ Primary users on web?
 └── Mobile-first — still verify tablet breakpoints
 ```
 
+## Standalone Flutter vs add-to-app
+
+```
+Embedding Flutter in existing native shell (iOS/Android)?
+├── Define engine/cache lifecycle contract with native team; module boundaries
+└── Pure Flutter app → simpler default architecture
+```
+
 ## Further reading
 
 - [widgets.md](widgets.md), [tips-and-tricks.md](tips-and-tricks.md)
+
