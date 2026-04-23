@@ -29,6 +29,14 @@ Beta users vs stable?
 ├── Separate update channels; sign all artifacts
 ```
 
+## Sandbox (`webPreferences.sandbox`)
+
+```
+Need Node-ish native addons or legacy preload patterns incompatible with sandbox?
+├── Document exception; minimize exposed surface
+└── Prefer sandbox: true — validate with integration tests on each OS
+```
+
 ## Further reading
 
 - [main-preload-and-ipc.md](main-preload-and-ipc.md), [edge-cases.md](edge-cases.md)
