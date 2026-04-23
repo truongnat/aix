@@ -16,3 +16,11 @@
 ## Mobile (if applicable)
 
 - **Separate** constraints vs desktop — permissions, store rules, background limits.
+
+## Web UI source
+
+```
+Ship only bundled Vite dist vs load remote SPA?
+├── Bundled only → simpler CSP; still audit asset and `tauri:` URLs — **`decision-framework-and-trade-offs.md`**
+└── Remote UI → treat as untrusted web; strict CSP + TLS; minimize privileged commands — **`security-pro`**
+```

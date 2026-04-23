@@ -1,114 +1,155 @@
 ---
 name: tauri-pro
 description: |
-  Professional Tauri desktop (and mobile) apps: Rust core, invoke/commands, capabilities/permissions, webview integration, bundling, and cross-platform edge cases.
+  Production-grade Tauri desktop (and mobile): Rust core, invoke/commands, capabilities/permissions, webview integration, bundling, updater, and cross-platform edge cases — plus system model (Rust host + webview, IPC invoke/events, capabilities as ACL, threading), failure modes (over-broad capabilities, shell injection, path traversal, IPC payload jank, WebView2/CSP prod surprises), decision trade-offs (sidecar vs in-process, Tauri vs Electron, bundled vs remote UI, desktop vs mobile), and quality guardrails (Tauri 1 vs 2 config accuracy, safe errors, release-build parity).
 
-  Use this skill when the user works on Tauri (`src-tauri`, `#[tauri::command]`, `invoke`, `tauri.conf`, plugins, updater, sidecars), Rust–frontend boundaries, or packaging Tauri for Windows/macOS/Linux.
+  Use this skill for Tauri (`src-tauri`, `#[tauri::command]`, `invoke`, `tauri.conf`, plugins, updater, sidecars), Rust–frontend boundaries, or packaging for Windows/macOS/Linux (and mobile when applicable).
 
-  Use **with** **`react-pro`** (or Vue/Svelte) for SPA patterns in the webview, **`security-pro`** for capability/CSP/shell hardening, **`testing-pro`** for CI and E2E. This skill (`tauri-pro`) owns **Tauri + Rust integration**; front-end framework skills own **component UI** details.
+  Combine with **`react-pro`** (or Vue/Svelte) for webview UI, **`typescript-pro`** for typed invoke contracts, **`security-pro`** for capabilities/CSP/shell hardening, **`testing-pro`** for CI and E2E, **`deployment-pro`** for signing and updater pipelines, **`performance-tuning-pro`** for IPC/startup, and **`docker-pro`** for cross-compile CI.
 
   Triggers: "Tauri", "tauri", "src-tauri", "tauri.conf", "invoke", "tauri::command", "WebView", "WebView2", "Rust desktop", "Tauri plugin", "Tauri updater", "capability", "Tauri 2", "v1", "v2", "sidecar", "Cargo.toml".
 
 metadata:
-  short-description: Tauri — Rust commands, capabilities, webview, bundle, updates
+  short-description: Tauri — IPC model, capabilities, bundle, updater, failure modes
+  content-language: en
+  domain: cross-platform-desktop
+  level: professional
 ---
 
 # Tauri (professional)
 
-Use official [Tauri documentation](https://tauri.app/) for your major version (1 vs 2 — capabilities and config differ); this skill encodes **command boundaries**, **permission hygiene**, and **shipping** desktop bundles. Confirm **Tauri major**, **Rust toolchain**, and **front-end** stack (Vite + React/Vue/Svelte).
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
 
-Webview UI component patterns: skill **`react-pro`** when using React.
+Use official [Tauri documentation](https://tauri.app/) for the user’s **major version** (1 vs 2); this skill encodes **IPC boundaries**, **capability hygiene**, and **shipping** concerns — not generic SPA tutorials. Confirm **Tauri major**, **Rust toolchain**, and **frontend** stack (e.g. Vite + React).
+
+Webview UI patterns: **`react-pro`** when using React.
+
+## Boundary
+
+**`tauri-pro`** owns **Tauri configuration**, **Rust commands**, **capabilities/plugins**, **packaging/updater**, and **webview host integration**. **`react-pro`** owns **component-level web UI**. **`electron-pro`** applies only to **Electron** codebases. **`deployment-pro`** owns **org-wide signing/release policy** beyond Tauri-specific steps.
 
 ## Related skills (this repo)
 
-| Skill | When to combine with `tauri-pro` |
-|-------|----------------------------------|
-| **`react-pro`** | React (or solid) in webview — hooks, state, a11y |
-| **`security-pro`** | Threat modeling, CSP, path/shell abuse cases |
-| **`testing-pro`** | Rust tests, web E2E against built app, CI matrices |
-
-**`electron-pro`** — Node/Chromium desktop stack; use when the project is Electron, not Tauri.
+| Skill | When to combine |
+|-------|----------------|
+| **`react-pro`** | SPA in webview — hooks, state, a11y |
+| **`typescript-pro`** | Typed `invoke` payloads and shared types |
+| **`security-pro`** | CSP, capabilities, shell/fs/open policies |
+| **`testing-pro`** | Rust tests, E2E on packaged app, CI |
+| **`deployment-pro`** | Signing, notarization, updater channels |
+| **`performance-tuning-pro`** | IPC size, startup, memory |
+| **`docker-pro`** | Cross-compile in CI |
+| **`electron-pro`** | Stack comparison only — not Tauri impl |
 
 ## When to use
 
-- Designing **Rust commands** and **`invoke`** contracts; error handling to the UI.
-- Configuring **capabilities** / permissions (Tauri 2) or legacy allowlists — least privilege.
-- **Bundling**, **updater**, **sidecars**, and **cross-platform** webview quirks.
-- **Performance**: async commands, large payloads, blocking work off the main path.
-- Trigger keywords: `Tauri`, `invoke`, `src-tauri`, `tauri.conf`, `command`, `capability`, `plugin`, …
+- Rust **`#[tauri::command]`** design, `invoke` contracts, error mapping to UI.
+- **Capabilities** / permissions (Tauri 2) or legacy allowlists — least privilege.
+- **Bundling**, **updater**, **sidecars**, platform webview differences.
+- Async vs blocking commands; large payload patterns.
+
+## When not to use
+
+- **Pure React** question with no Tauri/Rust — **`react-pro`**.
+- **Electron app** — **`electron-pro`**.
+- **Generic Rust** with no Tauri APIs — narrow to Tauri or defer to Rust ecosystem docs.
+
+## Required inputs
+
+- **Tauri major** (1 vs 2) and **target OS** (desktop vs mobile).
+- **Rust version** / MSRV when suggesting features.
+
+## Expected output
+
+Follow **Suggested response format** strictly — system model through residual risks.
 
 ## Workflow
 
-1. Confirm Tauri major, Rust edition/MSRV, and target platforms (desktop vs mobile if applicable).
-2. Apply the principles and topic summaries below; open `references/` when you need depth; defer pure React questions to **`react-pro`**.
-3. Respond using **Suggested response format**; note permission/CSP and platform webview risks.
+1. Confirm Tauri major, Rust toolchain, platforms, and frontend stack.
+2. Apply summaries; open `references/`; use **`tauri-runtime-and-ipc-system-model.md`** when explaining invoke vs events vs capabilities.
+3. Respond with **Suggested response format**; include **failure modes** for permissions, shell, and IPC.
 
 ### Operating principles
 
-1. **Rust owns privilege** — Filesystem, shell, and native APIs only behind reviewed commands.
-2. **Capabilities are contracts** — Enable minimum plugins/commands per window; avoid global “allow all”.
-3. **Untrusted web content rules** — Treat front-end input as hostile when it reaches commands.
-4. **Ship reproducibly** — Pin Rust and Tauri CLI in CI; document cross-compile setup.
-5. **Align with platform stores** — Signing, notarization, and updater policies differ by OS.
+1. **Rust owns privilege** — Native APIs only behind reviewed commands — **`rust-core-and-commands.md`**.
+2. **Capabilities are contracts** — Minimal per window — **`failure-modes-detection-mitigation.md`**.
+3. **Untrusted web input** — Validate before fs/shell/open — **`security-pro`**.
+4. **Reproducible builds** — Pin toolchain in CI — **`tips-and-tricks.md`**.
+5. **Store alignment** — Signing/notarization per OS — **`deployment-pro`**.
 
 ### Rust core and commands (summary)
 
-- **`#[tauri::command]`** handlers; **`invoke`** from JS/TS; **serialize** errors safely.
-- **Tauri 2 capabilities** — map windows to allowed **APIs** explicitly.
+`#[tauri::command]`, `invoke`, serialization, Tauri 2 capabilities — **`rust-core-and-commands.md`**.
 
 Details: [references/rust-core-and-commands.md](references/rust-core-and-commands.md)
 
+### Tauri runtime and IPC — system model (summary)
+
+Host + webview, invoke/events, ACL mindset, async — **`tauri-runtime-and-ipc-system-model.md`**.
+
+Details: [references/tauri-runtime-and-ipc-system-model.md](references/tauri-runtime-and-ipc-system-model.md)
+
 ### Tips and tricks (summary)
 
-- **Vite** (typical) integration; **CI** caching; **updater** and signing.
-- **Shell plugin** — never pass raw user input to shells.
+Vite, CI cache, updater, signing, shell safety — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- **WebView2 / WKWebView / WebKitGTK** behavioral differences.
-- **Path traversal** and **URL** open policies; **async** vs blocking commands.
+WebView2/WKWebView/WebKitGTK, paths, async blocking, mobile — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
+### Decision framework (summary)
+
+Sidecar vs in-process, Tauri vs Electron, bundled vs remote UI — **`decision-framework-and-trade-offs.md`** + **`decision-tree.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
 ### Decision tree (summary)
 
-- Tauri 1 vs 2; sidecar vs in-process; desktop vs mobile constraints.
+Tauri 1 vs 2, sidecar, frontend stack, mobile, web UI source — **`decision-tree.md`**.
 
 Details: [references/decision-tree.md](references/decision-tree.md)
 
 ### Anti-patterns (summary)
 
-- Shell injection, broad capabilities, blocking commands, leaky errors, weak CSP.
+Shell injection, broad capabilities, blocking commands — **`anti-patterns.md`**.
 
 Details: [references/anti-patterns.md](references/anti-patterns.md)
 
-### Integration map (summary)
+### Cross-skill handoffs (summary)
 
-- **`react-pro`**, **`security-pro`**, **`testing-pro`**, **`deployment-pro`**.
+**`react-pro`**, **`security-pro`**, **`testing-pro`**, **`deployment-pro`** — **`integration-map.md`**.
 
 Details: [references/integration-map.md](references/integration-map.md)
 
 ### Versions (summary)
 
-- Tauri major, Rust MSRV, WebView2 / WebKitGTK baselines.
+Tauri major, Rust MSRV, webview baselines — **`versions.md`**.
 
 Details: [references/versions.md](references/versions.md)
 
-### Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Issue or goal** — Command design, config, bundle, or platform-specific bug.
-2. **Recommendation** — Tauri/Rust pattern; reference capabilities or plugin boundaries.
-3. **Code** — Rust command sketch, `tauri.conf` snippet, or front-end `invoke` — not generic SPA-only advice unless delegated.
-4. **Residual risks** — Permission gaps, webview variance, mobile vs desktop if mixed.
+1. **Context** — Tauri major, OS targets, frontend stack, dev vs packaged issue.
+2. **Problem / goal** — Command, capability, bundle, updater, or webview bug.
+3. **System design** — IPC path, trust boundary web→Rust — **`tauri-runtime-and-ipc-system-model.md`**.
+4. **Decision reasoning** — Capability scope, sidecar vs in-process, bundled vs remote — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — Rust command, `tauri.conf` / capability JSON, `invoke` — **`quality-validation-and-guardrails.md`** (version-accurate keys).
+6. **Trade-offs** — Security vs DX; async complexity; mobile vs desktop.
+7. **Failure modes** — Over-capability, shell/path abuse, IPC size, CSP prod — **`failure-modes-detection-mitigation.md`**.
+8. **Residual risks** — Webview runtime deps; hand off **`deployment-pro`**, **`security-pro`**, **`react-pro`** as needed.
 
 ## Resources in this skill
 
-- `references/` — Rust/commands, tips, edge cases.
-
 | Topic | File |
 |-------|------|
+| **Tauri runtime & IPC model** | [references/tauri-runtime-and-ipc-system-model.md](references/tauri-runtime-and-ipc-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Rust core & commands | [references/rust-core-and-commands.md](references/rust-core-and-commands.md) |
 | Tips and patterns | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
@@ -119,22 +160,33 @@ Details: [references/versions.md](references/versions.md)
 
 ## Quick example
 
-**Input:** Front end calls `invoke('run_script', userPath)` and Rust uses `std::process::Command` with `shell true`.  
-**Expected output:** Forbid shell interpolation on user paths; use fixed programs + args list; narrow **capability** to specific use case; cite **`security-pro`** for command injection pattern.
+### 1 — Simple (common)
 
-**Input:** "After Tauri 2 migration, window cannot read files it used to."  
-**Expected output:** Map old allowlist → capabilities per window; minimal repro; link to plugin permission names; document breaking permission changes.
+**Input:** `invoke('run_script', userPath)` with `shell true`.  
+**Expected output:** Full **Suggested response format** — no shell; argv; capabilities; **`security-pro`** injection pattern.
 
-**Input:** "Updater works on Windows but macOS Gatekeeper blocks."  
-**Expected output:** Notarization + signing checklist; **`deployment-pro`** handoff for Apple pipeline; dev vs prod entitlements.
+### 2 — Tricky (edge case)
+
+**Input:** After Tauri 2 migration, window cannot read files.  
+**Expected output:** Capabilities per window; plugin permission names; migration doc anchor — **`failure-modes-detection-mitigation.md`**.
+
+### 3 — Cross-skill
+
+**Input:** macOS Gatekeeper blocks updater.  
+**Expected output:** Signing + notarization — **`deployment-pro`** — entitlements — **`tips-and-tricks.md`**.
 
 ## Checklist before calling the skill done
 
-- [ ] Commands validate inputs; no secret leakage in error strings to UI.
-- [ ] Capabilities / plugins match least privilege for each window.
-- [ ] Shell, fs, and open-URL flows reviewed for injection and traversal.
-- [ ] Platform targets (WebView2, etc.) considered for release issues.
-- [ ] Pure React/UI work delegated to **`react-pro`** when that is the whole question.
-- [ ] Tauri **major** and Rust **MSRV** stated when behavior differs between versions.
-- [ ] CSP and remote content policy reviewed for shipped build.
-- [ ] Async vs blocking command usage justified for UI responsiveness.
+### Security
+
+- [ ] Commands validate inputs; errors safe for UI — **`quality-validation-and-guardrails.md`**.
+- [ ] Capabilities/plugins minimal per window — **`failure-modes-detection-mitigation.md`**.
+- [ ] Shell, fs, open-url reviewed — **`edge-cases.md`**.
+
+### Ship
+
+- [ ] WebView2 / WebKit baselines for targets — **`versions.md`**.
+- [ ] Pure UI delegated to **`react-pro`** when appropriate — **`integration-map.md`**.
+- [ ] Tauri **major** + Rust **MSRV** stated when version-sensitive — **`quality-validation-and-guardrails.md`**.
+- [ ] **CSP** and remote content for **release** build — **`quality-validation-and-guardrails.md`**.
+- [ ] Async vs blocking justified — **`tauri-runtime-and-ipc-system-model.md`**.

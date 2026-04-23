@@ -1,5 +1,7 @@
 # Tauri edge cases
 
+See mitigations table — **`failure-modes-detection-mitigation.md`**.
+
 ## Security
 
 - **Open external URLs** — validate schemes (`https` vs `javascript:`); use **allowlists** for `shell.open`.

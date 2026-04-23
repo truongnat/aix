@@ -1162,21 +1162,24 @@
   {
     "name": "tauri-pro",
     "folder": "tauri-pro",
-    "description": "Professional Tauri desktop (and mobile) apps: Rust core, invoke/commands, capabilities/permissions, webview integration, bundling, and cross-platform edge cases.\n\nUse this skill when the user works on Tauri (`src-tauri`, `#[tauri::command]`, `invoke`, `tauri.conf`, plugins, updater, sidecars), Rust–frontend boundaries, or packaging Tauri for Windows/macOS/Linux.\n\nUse **with** **`react-pro`** (or Vue/Svelte) for SPA patterns in the webview, **`security-pro`** for capability/CSP/shell hardening, **`testing-pro`** for CI and E2E. This skill (`tauri-pro`) owns **Tauri + Rust integration**; front-end framework skills own **component UI** details.\n\nTriggers: \"Tauri\", \"tauri\", \"src-tauri\", \"tauri.conf\", \"invoke\", \"tauri::command\", \"WebView\", \"WebView2\", \"Rust desktop\", \"Tauri plugin\", \"Tauri updater\", \"capability\", \"Tauri 2\", \"v1\", \"v2\", \"sidecar\", \"Cargo.toml\".",
+    "description": "Production-grade Tauri desktop (and mobile): Rust core, invoke/commands, capabilities/permissions, webview integration, bundling, updater, and cross-platform edge cases — plus system model (Rust host + webview, IPC invoke/events, capabilities as ACL, threading), failure modes (over-broad capabilities, shell injection, path traversal, IPC payload jank, WebView2/CSP prod surprises), decision trade-offs (sidecar vs in-process, Tauri vs Electron, bundled vs remote UI, desktop vs mobile), and quality guardrails (Tauri 1 vs 2 config accuracy, safe errors, release-build parity).\n\nUse this skill for Tauri (`src-tauri`, `#[tauri::command]`, `invoke`, `tauri.conf`, plugins, updater, sidecars), Rust–frontend boundaries, or packaging for Windows/macOS/Linux (and mobile when applicable).\n\nCombine with **`react-pro`** (or Vue/Svelte) for webview UI, **`typescript-pro`** for typed invoke contracts, **`security-pro`** for capabilities/CSP/shell hardening, **`testing-pro`** for CI and E2E, **`deployment-pro`** for signing and updater pipelines, **`performance-tuning-pro`** for IPC/startup, and **`docker-pro`** for cross-compile CI.\n\nTriggers: \"Tauri\", \"tauri\", \"src-tauri\", \"tauri.conf\", \"invoke\", \"tauri::command\", \"WebView\", \"WebView2\", \"Rust desktop\", \"Tauri plugin\", \"Tauri updater\", \"capability\", \"Tauri 2\", \"v1\", \"v2\", \"sidecar\", \"Cargo.toml\".",
     "triggers": [],
     "when_to_use": [
-      "Designing **Rust commands** and **`invoke`** contracts; error handling to the UI.",
-      "Configuring **capabilities** / permissions (Tauri 2) or legacy allowlists — least privilege.",
-      "**Bundling**, **updater**, **sidecars**, and **cross-platform** webview quirks.",
-      "**Performance**: async commands, large payloads, blocking work off the main path.",
-      "Trigger keywords: `Tauri`, `invoke`, `src-tauri`, `tauri.conf`, `command`, `capability`, `plugin`, …"
+      "Rust **`#[tauri::command]`** design, `invoke` contracts, error mapping to UI.",
+      "**Capabilities** / permissions (Tauri 2) or legacy allowlists — least privilege.",
+      "**Bundling**, **updater**, **sidecars**, platform webview differences.",
+      "Async vs blocking commands; large payload patterns."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
       "rust-core-and-commands.md",
+      "tauri-runtime-and-ipc-system-model.md",
       "tips-and-tricks.md",
       "versions.md"
     ]
