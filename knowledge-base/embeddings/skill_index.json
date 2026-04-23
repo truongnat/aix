@@ -586,20 +586,24 @@
   {
     "name": "graphql-pro",
     "folder": "graphql-pro",
-    "description": "Professional GraphQL guidance for schema design, resolver architecture, performance optimization, and secure API evolution.\n\nUse this skill when designing GraphQL schemas, implementing resolvers, reviewing query/mutation patterns, or stabilizing GraphQL behavior in production.\n\nTriggers: \"graphql\", \"schema\", \"resolver\", \"query\", \"mutation\", \"subscription\", \"n+1\", \"dataloader\", \"federation\", \"persisted query\", \"graphql edge case\", \"Apollo\", \"Mercurius\", \"complexity limit\", \"introspection\", \"GraphQL Playground\".\n\nCombine with `api-design-pro` for contract governance and `security-pro` for GraphQL-specific hardening.",
+    "description": "Production-grade GraphQL: schema design, resolver architecture, execution model (parse → validate → execute), performance (N+1, DataLoader, complexity limits), security (field-level authZ, introspection, query abuse), federation/monolith trade-offs — plus failure modes (null propagation, DoS queries, federated skew, subscription overload), decision framework (pagination, persisted queries, REST coexistence), quality guardrails (server-accurate directives and resolver APIs).\n\nUse this skill when designing GraphQL schemas, implementing resolvers, reviewing query/mutation/subscription patterns, stabilizing GraphQL in production, or tuning Apollo/Mercurius/Yoga/other servers.\n\nCombine with **`api-design-pro`** for contract governance, **`security-pro`** for GraphQL-specific hardening, **`nestjs-pro`** / **`postgresql-pro`** / **`testing-pro`** / **`caching-pro`** per integration map.\n\nTriggers: \"graphql\", \"schema\", \"resolver\", \"query\", \"mutation\", \"subscription\", \"n+1\", \"dataloader\", \"federation\", \"persisted query\", \"graphql edge case\", \"Apollo\", \"Mercurius\", \"complexity limit\", \"introspection\", \"GraphQL Playground\".",
     "triggers": [],
     "when_to_use": [
-      "Designing new GraphQL schema types, fields, and mutation contracts.",
-      "Reviewing resolver implementation quality, N+1 risks, and batching strategies.",
-      "Improving GraphQL latency/cost and limiting abusive query patterns.",
-      "Planning backward-compatible schema evolution and deprecation.",
-      "Trigger keywords: `graphql`, `schema`, `resolver`, `query`, `mutation`, `subscription`, `n+1`, `dataloader`, `federation`, `persisted query`, `graphql edge case`"
+      "Types, fields, mutations, subscriptions design.",
+      "Resolver review: N+1, batching, errors, authZ per field.",
+      "Latency/cost: complexity limits, DataLoader patterns.",
+      "Backward-compatible evolution, deprecation.",
+      "Federation ownership and composition issues."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
+      "graphql-execution-and-schema-system-model.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "versions.md"
     ]

@@ -19,3 +19,11 @@
 
 - **Public internet** → Depth/complexity limits; disable or gate introspection in prod if needed.
 - **Internal only** → Still authZ per field; logs may contain sensitive args.
+
+## Persisted queries vs open query surface
+
+```
+Need arbitrary ad-hoc queries from clients?
+├── Yes → Strong complexity/depth limits + monitoring
+└── Prefer known operations only → Persisted queries / APQ — **`decision-framework-and-trade-offs.md`**, **`caching-pro`**
+```

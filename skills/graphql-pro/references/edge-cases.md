@@ -29,3 +29,7 @@
 
 - High fan-out subscriptions can overload brokers/workers without filtering/backpressure.
 - Unbounded subscription lifetimes can leak memory and connection resources.
+
+## HTTP caching and GET queries
+
+- **GET** requests with query strings may be cached by **CDNs/proxies** incorrectly if auth headers are mishandled — prefer **POST** for authenticated traffic or configure **cache-control** explicitly — **`decision-framework-and-trade-offs.md`**.
