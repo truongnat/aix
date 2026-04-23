@@ -450,24 +450,27 @@
   {
     "name": "docker-pro",
     "folder": "docker-pro",
-    "description": "Professional Docker and container development: Dockerfile authoring, multi-stage builds, image optimization, Docker Compose, networking, volumes, secrets, and production hardening.\n\nUse this skill when the user works on Docker, Dockerfile, docker-compose, container images, multi-stage builds, .dockerignore, image layers, container networking, volumes, bind mounts, secrets, health checks, Docker Hub, container registries, BuildKit, or containerizing Node/Python/Go/Java applications.\n\nTriggers: \"Docker\", \"Dockerfile\", \"docker-compose\", \"container\", \"image\", \"multi-stage build\", \"layer\", \"BuildKit\", \"COPY\", \"RUN\", \"CMD\", \"ENTRYPOINT\", \"ARG\", \"ENV\", \"volume\", \"bind mount\", \"health check\", \"registry\", \"docker push\", \"docker pull\", \"distroless\", \".dockerignore\", \"compose\", \"docker network\", \"bridge network\", \"overlay\".",
+    "description": "Production-grade Docker and container development: Dockerfile authoring, multi-stage builds, image optimization, Docker Compose, networking, volumes, secrets, BuildKit, and production hardening — plus system model (build context → layers → image digest → runtime), failure modes (cache bust, secret leak, PID 1, arch/libc mismatch, compose races, OOM), decision trade-offs (Alpine vs slim vs distroless, speed vs reproducibility), quality guardrails (no fabricated registry digests; pin bases deliberately).\n\nUse this skill when the user works on Docker, Dockerfile, docker-compose, container images, multi-stage builds, .dockerignore, image layers, container networking, volumes, bind mounts, secrets, health checks, Docker Hub, container registries, BuildKit, or containerizing Node/Python/Go/Java applications.\n\nCombine with **`ci-cd-pro`**, **`deployment-pro`**, **`security-pro`**, **`network-infra-pro`**, **`code-packaging-pro`**, **`testing-pro`** (Testcontainers), **`postgresql-pro`** when databases are containerized.\n\nTriggers: \"Docker\", \"Dockerfile\", \"docker-compose\", \"container\", \"image\", \"multi-stage build\", \"layer\", \"BuildKit\", \"COPY\", \"RUN\", \"CMD\", \"ENTRYPOINT\", \"ARG\", \"ENV\", \"volume\", \"bind mount\", \"health check\", \"registry\", \"docker push\", \"docker pull\", \"distroless\", \".dockerignore\", \"compose\", \"docker network\", \"bridge network\", \"overlay\".",
     "triggers": [],
     "when_to_use": [
-      "Writing or reviewing Dockerfiles for any runtime (Node, Python, Go, Java, etc.).",
-      "Optimizing image size with multi-stage builds, layer caching, and `.dockerignore`.",
-      "Composing multi-service environments with Docker Compose.",
-      "Hardening containers for production: non-root user, read-only filesystem, health checks.",
-      "Debugging container networking, volume mounts, and environment variable injection.",
-      "Trigger keywords: `Docker`, `Dockerfile`, `multi-stage`, `docker-compose`, `container`, `image size`, `distroless`, …"
+      "Writing or reviewing Dockerfiles for any runtime (Node, Python, Go, Java, …).",
+      "Optimizing image size: multi-stage builds, layer caching, `.dockerignore`, BuildKit.",
+      "Multi-service **Compose** for dev/staging; profiles, health-gated startup.",
+      "Hardening: non-root, read-only root (where applicable), minimal base, health checks.",
+      "Debugging networking, volumes, UID mismatches, multi-arch builds."
     ],
     "references": [
       "anti-patterns.md",
       "compose.md",
+      "container-image-and-runtime-system-model.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "dockerfile.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "image-optimization.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "versions.md"
     ]

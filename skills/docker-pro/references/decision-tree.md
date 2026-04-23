@@ -42,6 +42,14 @@ Need host to edit files live?
     └── Named volume — avoid host UID issues for Postgres data dirs
 ```
 
+## Rootless Docker / desktop VM
+
+```
+Host is macOS/Windows?
+├── Engine runs in Linux VM (Docker Desktop, Colima, Rancher Desktop)
+└── Bind mount paths and performance differ from Linux bare metal — test on CI Linux when prod is Linux
+```
+
 ## Further reading
 
 - [dockerfile.md](dockerfile.md), [image-optimization.md](image-optimization.md)

@@ -59,6 +59,15 @@ RUN --mount=type=secret,id=secret_key \
 
 Docker has a soft limit around 127 layers. Chain `RUN` commands to avoid hitting it in large Dockerfiles.
 
+## Memory and cgroup limits
+
+- **OOM kill (exit 137)** — JVM/Node heap larger than cgroup memory limit → tune `-Xmx` / `NODE_OPTIONS`; verify limits in Compose/K8s — **`failure-modes-detection-mitigation.md`**.
+- **`ulimits`** — open files (`nofile`) too low under load → set in Compose `ulimits:` or orchestrator — official docs for your Engine version.
+
+## Read-only root filesystem
+
+- Production hardening often sets **`readOnlyRootFilesystem`** (K8s). App must write only to mounted volumes/`tmpfs` (`/tmp`). Validate **logs**, **uploads**, **PID files** paths — **`container-image-and-runtime-system-model.md`**.
+
 ## .dockerignore doesn't follow .gitignore syntax exactly
 
 - Uses Docker's own pattern matching — slightly different from gitignore.
