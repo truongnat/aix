@@ -16,3 +16,11 @@
 ## Audit vs daily dev
 
 - **Bundle quality** → `analyze-skills` + **`skills-self-review-pro`**.
+
+## Default KB vs custom project index
+
+```
+Querying this repo's bundled KB vs arbitrary tree?
+├── Bundled docs under knowledge-base → default index path from config — **`kb-and-repo-scripts.md`**
+└── External tree → `index-project` then `query-kb --index <dir>` — **`repo-tooling-and-kb-lifecycle-system-model.md`**
+```

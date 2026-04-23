@@ -11,3 +11,5 @@
 - **Template skill** — `list-skills` may include `examples/skill-template` with flags; **`validate-skills`** behavior matches tool help for template inclusion.
 
 - **`dist/` missing** — Run **`npm install`** and **`npm run build`** (see root **`package.json`**) so `dist/tools.js` exists before invoking CLI.
+
+- **Interrupted `build-kb` / `index-project`** — Partial artifacts can confuse `verify-kb` or queries; clean output dir or re-run full build per **`scripts/README.md`** — **`failure-modes-detection-mitigation.md`**.

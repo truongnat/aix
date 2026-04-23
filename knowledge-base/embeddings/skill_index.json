@@ -950,24 +950,26 @@
   {
     "name": "repo-tooling-pro",
     "folder": "repo-tooling-pro",
-    "description": "Repository automation for this skills template: Node/TypeScript commands (`dist/tools.js`) for knowledge-base batch queries, skill inventory, validation, KB build/verify, and skill-index generation — when to use them vs reading Markdown only.\n\nUse this skill when the user runs or wires CI for build-kb, query-kb, query-kb-batch, verify-kb, list-skills, validate-skills, analyze-skills, build-skill-index, index-project, generate-wiki; asks how to speed up multiple KB queries; or needs a JSON list of bundled skills — or a report on which skills should link helpers under `scripts/` (self-support automation). This skill (`repo-tooling-pro`) owns **CLI usage and performance**; other **`*-pro`** skills own domain content.\n\nTriggers: \"scripts\", \"dist/tools.js\", \"query-kb-batch\", \"batch query\", \"list_skills\", \"validate_skills\", \"analyze_skills\", \"skill analysis report\", \"build_kb\", \"verify_kb\", \"index-project\", \"generate-wiki\", \"project index\", \"wiki html\", \"CI skills\", \"RAG performance\", \"embeddings\", \"repo automation\", \"npm run validate-skills\", \"build-skill-index\", \"OOM query-kb\", \"wrong cwd\", \"list-skills --json\", \"query_kb_batch\".",
+    "description": "Production-grade repository tooling for this devkit: Node/TypeScript CLI (`dist/tools.js`) for KB batch queries, skill inventory, validation, KB build/verify, skill-index generation, project indexing, and wiki generation — plus system model (repo-root workspace, skills vs KB artifact lifecycles, batch query execution), failure modes (wrong cwd, missing dist, stale embeddings/index, OOM batch, interrupted builds), decision trade-offs (batch vs single query, when to rebuild KB, analyze depth, CI vs local), and quality guardrails (canonical scripts/README, no invented flags, reproducible Node/commit).\n\nUse this skill when the user runs or wires CI for build-kb, query-kb, query-kb-batch, verify-kb, list-skills, validate-skills, analyze-skills, build-skill-index, index-project, generate-wiki; asks how to speed up multiple KB queries; needs a JSON list of bundled skills; or wants automation reports for skills vs `scripts/` helpers.\n\nCombine with **`skills-self-review-pro`** for bundle audits, **`ci-cd-pro`** for pipeline YAML, **`deployment-pro`** for runner capacity and secrets, **`security-pro`** for API keys and log hygiene, and **`web-research-pro`** for external verification.\n\nTriggers: \"scripts\", \"dist/tools.js\", \"query-kb-batch\", \"batch query\", \"list_skills\", \"validate_skills\", \"analyze_skills\", \"skill analysis report\", \"build_kb\", \"verify_kb\", \"index-project\", \"generate-wiki\", \"project index\", \"wiki html\", \"CI skills\", \"RAG performance\", \"embeddings\", \"repo automation\", \"npm run validate-skills\", \"build-skill-index\", \"OOM query-kb\", \"wrong cwd\", \"list-skills --json\", \"query_kb_batch\".",
     "triggers": [],
     "when_to_use": [
-      "**Multiple** KB questions in one session — **`node dist/tools.js query-kb-batch`** (or `npm run query-kb-batch`).",
-      "**Project index + wiki** — **`index-project`** builds embeddings for an arbitrary tree; **`query-kb --index <dir>`** queries it; **`generate-wiki`** turns `<index_base>/docs/**/*.md` into static HTML (tables, sidebar search, **`--watch`** / **`--open`**; see **`/index-project`**).",
-      "**CI** — **`validate-skills`** after skill changes; **`verify-kb`** after KB build.",
-      "**Agent inventory** — **`list-skills --json`**.",
-      "**Authoring / audit** — **`analyze-skills`** (`--markdown` for paste-ready report; see **`skills-self-review-pro`**).",
-      "Explaining **performance** difference vs N× separate **`query-kb`** invocations.",
-      "Trigger keywords: `query-kb-batch`, `validate-skills`, `analyze-skills`, `list-skills`, `build-kb`, `index-project`, `generate-wiki`, `dist/tools.js`, …"
+      "Many KB questions in one session — **`query-kb-batch`** vs N× **`query-kb`**.",
+      "**`validate-skills`** / **`build-skill-index`** after skill changes.",
+      "**`build-kb`** → **`verify-kb`** after document corpus changes.",
+      "**`index-project`**, **`generate-wiki`**, **`list-skills --json`**, performance of RAG batch jobs.",
+      "Explaining OOM, cwd, missing `dist/`, or stale index behavior."
     ],
     "references": [
       "anti-patterns.md",
       "command-matrix.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
       "kb-and-repo-scripts.md",
+      "quality-validation-and-guardrails.md",
+      "repo-tooling-and-kb-lifecycle-system-model.md",
       "tips-and-tricks.md",
       "versions.md"
     ]
