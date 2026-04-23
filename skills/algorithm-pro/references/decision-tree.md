@@ -1,5 +1,18 @@
 # Algorithm — decision tree
 
+## Problem type taxonomy (mindset)
+
+| Type | Question shape | Typical tools |
+|------|----------------|----------------|
+| **Optimization** | Min/max objective under constraints | Greedy (with proof), DP, convex tricks |
+| **Counting / combinatorics** | Number of valid objects | DP, inclusion–exclusion, generating functions (advanced) |
+| **Decision / feasibility** | Exists? Yes/no | Binary search on answer, SAT-like small n |
+| **Enumeration / listing** | Output all / k-best | Backtracking, heaps, divide & conquer |
+| **Search** | Find element / structure | Binary search, graph search, A* (domain-specific) |
+| **Online / streaming** | Bounded memory, adversarial order | Heaps, reservoirs, amortized structures |
+
+Mixed problems — classify **primary objective** first, then nested structure.
+
 ## Problem signals → family
 
 - **Optimal substructure + overlapping subproblems** → Dynamic programming (top-down with memo or bottom-up table).

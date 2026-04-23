@@ -1,151 +1,198 @@
 ---
 name: algorithm-pro
 description: |
-  Professional algorithm engineering guidance for deep problem solving: formal problem modeling, strategy selection (greedy/DP/graph/search), correctness reasoning, complexity analysis, and performance-aware implementation trade-offs.
+  Professional algorithm engineering: formal modeling, problem taxonomy (optimization, counting, online, …), strategy selection (greedy/DP/graph/search), correctness and complexity proofs, pattern recognition, competitive debugging (WA/TLE/MLE), systems constraints (memory, IO, streaming), and performance trade-offs.
 
-  Use this skill when the user asks to design or optimize algorithms, solve hard coding interview style problems, compare multiple algorithmic approaches, prove correctness, or reduce time/memory complexity under strict constraints.
+  Use this skill when the user designs or optimizes algorithms, compares approaches, proves correctness, solves hard CS problems, or tunes implementations under strict limits.
 
-  Use **with** **`testing-pro`** to design adversarial and property-based test coverage, **`data-analysis-pro`** when benchmark datasets or profiling outputs need interpretation, and stack/framework `*-pro` skills when integrating algorithms into production systems.
+  Use **with** **`testing-pro`** for adversarial and property-based tests, **`data-analysis-pro`** for benchmarks, **`network-infra-pro`** / **`caching-pro`** when algorithms run in distributed or cached pipelines.
 
-  Triggers: "algorithm", "data structure", "dynamic programming", "graph", "greedy", "complexity", "Big-O", "optimize", "time complexity", "space complexity", "proof", "LeetCode", "competitive programming", "two pointers", "binary search on answer", "Dijkstra", "bitmask", "TLE", "WA", "overflow".
+  Triggers: "algorithm", "data structure", "dynamic programming", "graph", "greedy", "complexity", "Big-O", "optimize", "proof", "LeetCode", "competitive programming", "two pointers", "binary search on answer", "Dijkstra", "bitmask", "TLE", "WA", "MLE", "overflow", "streaming", "batch", "pattern", "prefix sum", "segment tree".
 
 metadata:
-  short-description: Algorithm - deep modeling, correctness, complexity, optimization
+  short-description: Algorithm — modeling, taxonomy, correctness, patterns, systems, debugging
+  content-language: en
+  domain: algorithms
+  level: professional
 ---
 
 # Algorithm design and analysis (professional)
 
-Use canonical references such as [CLRS](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/) and [CP-Algorithms](https://cp-algorithms.com/) for formal methods and patterns; this skill encodes **constraint-first modeling**, **correctness-first reasoning**, and **measured optimization discipline**. Confirm **input constraints**, **correctness requirements**, **latency/memory limits**, and **integration context** before proposing a solution.
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
 
-## Related skills (this repo)
+Use [CLRS](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/) and [CP-Algorithms](https://cp-algorithms.com/) for formal references; this skill encodes **constraint-first modeling**, **correctness-first reasoning**, **explicit pattern selection**, and **systems-aware trade-offs**. Confirm **input constraints**, **objective**, **memory/time limits**, and **execution context** (batch, streaming, distributed) before proposing a solution.
 
-| Skill | When to combine with `algorithm-pro` |
-|-------|--------------------------------------|
-| **`testing-pro`** | Build edge/adversarial/property-based tests for algorithm reliability |
-| **`data-analysis-pro`** | Interpret benchmark data, distributions, and performance regressions |
-| **Stack `*-pro` skills** | Integrate algorithmic solution into app/backend/mobile/runtime contexts |
+## Boundary
 
-**Boundary:** **`algorithm-pro`** owns problem modeling, algorithm choice, complexity/correctness depth; paired skills own system integration and broader engineering workflow.
+**`algorithm-pro`** owns **problem modeling**, **taxonomy**, **algorithm family choice**, **proof sketches**, **complexity**, **pattern catalog usage**, **WA/TLE/MLE debugging**, and **algorithmic aspects** of batch/streaming design. It does **not** replace **`postgresql-pro`** for SQL-centric solutions, **`security-pro`** for crypto protocols, or full **SRE** ownership — pair as needed.
+
+| Skill | When to combine |
+|-------|-----------------|
+| **`testing-pro`** | Adversarial tests, property-based tests, regression suites |
+| **`data-analysis-pro`** | Benchmark interpretation, distributions |
+| **`typescript-pro`** / **`javascript-pro`** | Numeric limits, BigInt, typed arrays |
+| **`postgresql-pro`** | Query + index equals “algorithm” in DB |
+| **`network-infra-pro`**, **`caching-pro`**, **`deployment-pro`** | Distributed runs, caches, rollout — with **`algorithms-in-systems.md`** |
 
 ## When to use
 
-- Solving difficult algorithmic tasks under strict constraints.
-- Choosing among multiple approaches with clear complexity trade-offs.
-- Refactoring brute-force code to near-optimal complexity.
-- Verifying correctness via invariants, exchange arguments, or induction.
-- Tuning memory usage and constant factors for real workloads.
-- Trigger keywords: `algorithm`, `DP`, `graph`, `greedy`, `Big-O`, `complexity`, `optimize`, `proof`
+- Hard algorithmic tasks under tight constraints; proof of greedy or DP correctness.
+- **WA / TLE / MLE** triage; complexity audit of nested loops and DS usage.
+- Choosing patterns (prefix sum, sliding window, graphs, segment trees, …).
+- **Systems**: streaming vs batch, memory ceilings, parallel stages — algorithmic implications.
+
+## When not to use
+
+- Pure **product requirements** without an algorithmic core — other skills first.
+- **Formal verification** / theorem-prover obligations — specialized tooling.
+- **Cryptographic protocol design** — **`security-pro`** + domain experts.
+
+## Required inputs
+
+- Constraints: **n**, value ranges, **time/memory** limits, **online** vs offline.
+- **Correctness** definition (optimization target, counting mod, etc.).
+- **Language/runtime** if constants matter.
+
+## Expected output
+
+Follow **Suggested response format** — modeling through residual risks, including **complexity table** and **edge-case** scan.
 
 ## Workflow
 
-1. Confirm formal problem statement, constraints, objective function, and resource limits (time, memory, precision).
-2. Apply the principles and topic summaries below; open `references/` when you need depth; keep correctness argument and complexity derivation explicit.
-3. Respond using **Suggested response format**; note residual risks such as edge-case failures, hidden constants, or assumption mismatch.
+1. Confirm formal statement, constraints, objective, resource limits, and **execution shape** (batch/stream/distributed sketch).
+2. Apply principles and summaries; open `references/`; keep **proof sketch** and **complexity** explicit.
+3. Respond using **Suggested response format**; cite **debugging** path if symptom-driven (WA/TLE/MLE).
 
 ### Operating principles
 
-1. **Model before coding** - define states, transitions, and constraints explicitly.
-2. **Pick strategy by structure** - map problem signals to known families (DP, graph, greedy, divide-and-conquer, search).
-3. **Prove correctness early** - invariants and proof sketch prevent fast-but-wrong code.
-4. **Optimize complexity in stages** - baseline, improved asymptotic, then constant-factor tuning.
-5. **Respect data shape** - distribution and sparsity often dominate practical performance.
-6. **Test adversarially** - worst-case and boundary inputs are first-class.
+1. **Model before coding** — states, transitions, objectives.
+2. **Classify problem type** — taxonomy in **`decision-tree.md`**.
+3. **Pick strategy by structure** — map signals to families; use **`pattern-catalog.md`**.
+4. **Prove early** — invariants, exchange argument, or counterexample search for greedy.
+5. **Optimize in stages** — asymptotic → DS → constants; **systems** layer when relevant (**`algorithms-in-systems.md`**).
+6. **Test adversarially** — boundaries, overflow, degenerate (**`edge-cases.md`**).
 
 ### Problem modeling and strategy selection (summary)
 
-- Convert narrative requirements into formal model, constraints, and candidate algorithm families.
-
 Details: [references/modeling-and-strategy-selection.md](references/modeling-and-strategy-selection.md)
+
+### Decision tree and taxonomy (summary)
+
+Problem types + signals → algorithm families.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+### Pattern catalog (summary)
+
+Explicit map: prefix sums, sliding window, graphs, segtree/BIT, DP families.
+
+Details: [references/pattern-catalog.md](references/pattern-catalog.md)
 
 ### Correctness and complexity analysis (summary)
 
-- Derive invariants, proof sketch, and asymptotic bounds with assumptions and caveats.
-
 Details: [references/correctness-and-complexity.md](references/correctness-and-complexity.md)
 
-### Optimization and implementation trade-offs (summary)
-
-- Balance asymptotic gains, memory pressure, and practical constants under runtime limits.
+### Optimization and trade-offs (summary)
 
 Details: [references/optimization-and-trade-offs.md](references/optimization-and-trade-offs.md)
 
-### Tips and tricks (summary)
+### Algorithms in systems (summary)
 
-- Apply reusable patterns for pruning, preprocessing, monotonic structures, and caching.
+Batch vs streaming, memory/IO, concurrency hints, failure — not only Big-O.
+
+Details: [references/algorithms-in-systems.md](references/algorithms-in-systems.md)
+
+### Debugging WA / TLE / MLE (summary)
+
+Structured triage and checklist.
+
+Details: [references/algorithm-debugging.md](references/algorithm-debugging.md)
+
+### Tips and tricks (summary)
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- Handle overflow, degenerate inputs, pathological graphs, and recursion depth limits.
+Expanded catalog: indices, modulo, graphs, DP init.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
-### Decision tree (summary)
-
-- Map constraints to algorithm family; know when greedy needs proof vs DP.
-
-Details: [references/decision-tree.md](references/decision-tree.md)
-
 ### Anti-patterns (summary)
-
-- Code-first, no proof, float equality, recursion depth surprises, wrong bottleneck.
 
 Details: [references/anti-patterns.md](references/anti-patterns.md)
 
 ### Integration map (summary)
 
-- **`testing-pro`**, **`data-analysis-pro`**, language skills for numeric limits.
-
 Details: [references/integration-map.md](references/integration-map.md)
 
 ### Implementation environment (summary)
 
-- JS `BigInt`, Python big ints, library vs stdlib trade-offs.
-
 Details: [references/versions.md](references/versions.md)
 
-### Suggested response format (implement / review)
+## Suggested response format (implement / review)
 
-1. **Issue or goal** - Problem, constraints, and optimization target.
-2. **Recommendation** - Chosen algorithm strategy and why alternatives are weaker.
-3. **Code** - Pseudocode/snippet, complexity table, and proof sketch - still labeled **Code**.
-4. **Residual risks** - Edge cases, assumption gaps, benchmark uncertainty, and maintainability cost.
+1. **Problem modeling** — Formal inputs/outputs, constraints, objective, problem **type** (taxonomy).
+2. **Strategy selection** — Candidate approaches; why chosen family fits; greedy counterexample risk if applicable.
+3. **Algorithm design** — States, transitions, pseudocode-level steps; key DS.
+4. **Complexity analysis** — Time and space with assumptions; bottleneck identification.
+5. **Code** — Implementation sketch or snippet; still labeled **Code**.
+6. **Edge cases** — Overflow, boundaries, degenerate data; link **`edge-cases.md`** themes.
+7. **Residual risks** — Hidden constants, benchmark uncertainty, systems limits (**memory/IO/streaming**), maintainability.
 
 ## Resources in this skill
 
-- `references/` - deep notes for modeling, correctness, complexity, and optimization.
-
 | Topic | File |
 |-------|------|
-| Modeling and strategy selection | [references/modeling-and-strategy-selection.md](references/modeling-and-strategy-selection.md) |
+| Modeling and strategy | [references/modeling-and-strategy-selection.md](references/modeling-and-strategy-selection.md) |
+| Decision tree & taxonomy | [references/decision-tree.md](references/decision-tree.md) |
+| Pattern catalog | [references/pattern-catalog.md](references/pattern-catalog.md) |
 | Correctness and complexity | [references/correctness-and-complexity.md](references/correctness-and-complexity.md) |
 | Optimization and trade-offs | [references/optimization-and-trade-offs.md](references/optimization-and-trade-offs.md) |
+| Algorithms in systems | [references/algorithms-in-systems.md](references/algorithms-in-systems.md) |
+| Debugging WA/TLE/MLE | [references/algorithm-debugging.md](references/algorithm-debugging.md) |
 | Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
 | Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
 | Integration map | [references/integration-map.md](references/integration-map.md) |
 | Implementation environment | [references/versions.md](references/versions.md) |
 
 ## Quick example
 
-**Input:** "Given up to 2e5 nodes and weighted edges, find minimum cost path with one discounted edge."  
-**Expected output:** Formalize state-space extension, compare Dijkstra variants, provide complexity/proof sketch, and list edge cases plus stress-test plan.
+### 1 — Modeling + proof
 
-**Input:** "Greedy interval scheduling variant — not sure if greedy works."  
-**Expected output:** Attempt exchange argument or show counterexample; if counterexample exists, switch to DP or known correct greedy conditions.
+**Input:** Interval scheduling variant — unsure greedy works.  
+**Expected output:** Formalize; exchange argument or counterexample; alternative algorithm if greedy fails — full **Suggested response format**.
 
-**Input:** "Solution TLE on n=2e5 but O(n log n) on paper."  
-**Expected output:** Check hidden O(n²) from `map`/`find` in loop, cache misses, or JavaScript/Python constant factors; propose data structure swap; **`testing-pro`** for benchmark harness.
+### 2 — Complexity audit
+
+**Input:** O(n log n) on paper but TLE at n=2e5.  
+**Expected output:** Hidden quadratic, DS misuse, or language constants; profiling plan — **`algorithm-debugging.md`**, **`data-analysis-pro`**.
+
+### 3 — Systems
+
+**Input:** Need one-pass memory-bounded frequency for infinite stream.  
+**Expected output:** Streaming constraints; approximate vs exact trade-offs — **`algorithms-in-systems.md`**.
 
 ## Checklist before calling the skill done
 
-- [ ] Problem model and constraints are explicit.
-- [ ] Strategy choice is justified against alternatives.
-- [ ] Correctness argument and complexity bounds are stated.
-- [ ] Implementation notes include key optimizations and limits.
-- [ ] Edge-case and adversarial test ideas are included.
-- [ ] Numeric overflow / precision risks named for language and constraints.
-- [ ] If greedy: proof sketch or counterexample search documented.
-- [ ] If graph: state directed vs undirected, weights, negative edges explicitly.
+### Core
+
+- [ ] Problem model, constraints, and **problem type** explicit.
+- [ ] Strategy justified vs alternatives; **pattern** or **decision-tree** link clear.
+- [ ] Correctness argument and **complexity** stated.
+- [ ] **Numeric** overflow/precision risks named.
+
+### Debugging & edges
+
+- [ ] If symptom **WA/TLE/MLE**: **`algorithm-debugging.md`** checklist addressed.
+- [ ] **Edge cases** scan: empty, boundaries, duplicates, graphs, mod (**`edge-cases.md`**).
+
+### Systems (when applicable)
+
+- [ ] **Batch vs streaming**, memory ceiling, IO, or parallelism considered — **`algorithms-in-systems.md`**.
+- [ ] Greedy: **proof sketch** or counterexample documented.
+
+### Integration
+
+- [ ] Tests/adversarial ideas reference **`testing-pro`** when shipping code.
