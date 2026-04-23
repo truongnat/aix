@@ -1,1 +1,0 @@
-../../commands/w-release.md

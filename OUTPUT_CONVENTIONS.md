@@ -1,100 +1,272 @@
-# Output conventions — agent & human reports
+# 📋 Tiêu chuẩn Báo cáo & Đầu ra — Dành cho Agent và Con người
 
-Use this **visual contract** for workflow outputs, skill responses, audits, and reviews so severity and structure stay consistent across the repo.
+> **Ngày:** 2026-04-23
+> **Tác giả:** truongdq1
+> **Phiên bản:** 1.0
+> **Trạng thái:** Hoàn tất
 
-## Severity emoji system
+---
 
-| Level | Emoji | Use for |
-|-------|-------|---------|
-| Critical / blocker | 🔴 | Must fix before merge; security critical; data-loss risk |
-| High / important | 🟡 | Should fix; important warnings |
-| Medium | 🟠 | Notable findings; consider addressing |
-| Low / minor | 🟢 | Optional improvements; style |
-| Info / praise | ✅ | Good patterns; passing checks |
-| In progress | 🔵 | Active work; pending |
-| Skipped / N/A | ⚪ | Out of scope; not reviewed |
+## 🎯 Mục đích
 
-## Callout blocks (GFM alerts)
+Chuẩn hóa cách trình bày đầu ra cho:
+
+* Gỡ lỗi / Phân tích nguyên nhân gốc (RCA)
+* Rà soát mã nguồn
+* Kiểm tra bảo mật
+* Phân tích hiệu năng
+* Báo cáo sự cố
+* Quy trình AI
+
+Yêu cầu:
+
+* Định dạng thống nhất
+* Dễ đọc, dễ quét nhanh
+* Luôn dẫn tới hành động cụ thể
+* Áp dụng cho cả con người và hệ thống tự động
+
+---
+
+# 🚨 1. Phân loại mức độ
+
+| Mức độ        | Ký hiệu | Ý nghĩa                        |
+| ------------- | ------- | ------------------------------ |
+| Nghiêm trọng  | 🔴      | Chặn hệ thống, phải xử lý ngay |
+| Quan trọng    | 🟡      | Ảnh hưởng lớn, cần ưu tiên     |
+| Trung bình    | 🟠      | Có vấn đề, nên cải thiện       |
+| Nhỏ           | 🟢      | Không bắt buộc                 |
+| Tốt           | ✅       | Đúng chuẩn                     |
+| Đang xử lý    | 🔵      | Đang thực hiện                 |
+| Không áp dụng | ⚪       | Ngoài phạm vi                  |
+
+---
+
+# 📦 2. Khối thông tin
 
 ```markdown
 > [!NOTE]
-> Informational context.
+> Thông tin bổ sung
 
 > [!TIP]
-> Non-obvious best practice.
+> Thực hành tốt / tối ưu
 
 > [!WARNING]
-> Risk or gotcha.
+> Cảnh báo rủi ro
 
 > [!CAUTION]
-> Data loss, security breach, or outage risk.
+> Nguy cơ nghiêm trọng
 ```
 
-## Report header (standard)
+---
+
+# 🧾 3. Tiêu đề báo cáo
 
 ```markdown
-# {{Report type}} — {{subject}}
+# {{Loại báo cáo}} — {{Đối tượng}}
 
-> **Date:** {{ISO date}}  **Author:** {{name}}  **Version:** 1.0  
-> **Status:** Draft | Final | Superseded
+> **Ngày:** {{ISO date}}  
+> **Tác giả:** {{name}}  
+> **Phiên bản:** {{version}}  
+> **Trạng thái:** Nháp | Hoàn tất | Thay thế  
+> **Độ tin cậy:** Cao | Trung bình | Thấp
 ```
 
-## Code blocks
+---
 
-- Always specify a **language** on fenced blocks (` ```typescript `, ` ```bash `).
-
-## Before / after (recommendations)
+# 🌍 4. Ngữ cảnh
 
 ```markdown
-**Before** (current):
+## Ngữ cảnh
 
-```ts
-// problematic code
+- Hệ thống:
+- Phạm vi:
+- Môi trường:
+- Giả định:
+- Ràng buộc:
 ```
 
-**After** (recommended):
+---
 
-```ts
-// fixed code
+# ❗ 5. Vấn đề
+
+```markdown
+## Vấn đề
+
+- Kỳ vọng:
+- Thực tế:
+- Ảnh hưởng:
 ```
+
+---
+
+# 🧠 6. Phân tích
+
+```markdown
+## Phân tích
+
+- Quan sát:
+- Giả thuyết:
+- Xác minh:
+- Nguyên nhân gốc:
 ```
 
-## Progress tables
+---
 
-| Step | Status | Notes |
-|------|--------|-------|
-| Reproduce | ✅ Done | … |
-| Root cause | 🔵 In progress | — |
+# 🧪 7. Cách tái hiện
 
-## Token Usage Reporting
+```markdown
+## Cách tái hiện
 
-Every significant action and workflow completion MUST include a token usage summary at the very end of the response. This ensures transparency and provides data for self-optimization.
+1. Bước 1
+2. Bước 2
+3. Kết quả mong đợi
+4. Kết quả thực tế
+```
 
-### Action Summary (Short)
-Use at the end of individual tool calls or mid-workflow responses.
-`[Tokens: I:{{input}} | O:{{output}} | T:{{total}}]`
+---
 
-### Workflow Summary (Detailed)
-Use at the end of a completed workflow (e.g., `/w-ticket`, `/w-hotfix`).
+# ⚠️ 8. Phát hiện
 
-| Metric | Count | Note |
-|--------|-------|------|
-| Input Tokens | {{count}} | |
-| Output Tokens | {{count}} | |
-| **Total Tokens** | **{{total}}** | |
-| Total Actions | {{count}} | Number of model interactions |
+```markdown
+## Phát hiện
 
-> [!TIP]
-> If total tokens for a workflow exceed 50k, consider triggering `self-improve-agent-pro` to optimize prompting for this task.
+| Vấn đề | Mức độ | Mô tả | Ảnh hưởng |
+|-------|--------|------|----------|
+| Ví dụ | 🔴 | Mô tả | Ảnh hưởng |
+```
 
-## Related templates
+---
 
-- Code review report: [`templates/report/code-review.md`](templates/report/code-review.md)
-- Security audit: [`templates/report/security-audit.md`](templates/report/security-audit.md)
-- Performance investigation: [`templates/report/performance-report.md`](templates/report/performance-report.md)
-- Incident: [`templates/report/incident-report.md`](templates/report/incident-report.md)
-- Test strategy: [`templates/report/test-strategy.md`](templates/report/test-strategy.md)
-- Dependency audit: [`templates/report/dependency-audit.md`](templates/report/dependency-audit.md)
-- Debug / RCA: [`templates/report/debug-report.md`](templates/report/debug-report.md)
-- Project index (`/w-index-project`): [`templates/report/project-index-report.md`](templates/report/project-index-report.md)
-- ADR: [`templates/report/architecture-decision-record.md`](templates/report/architecture-decision-record.md)
+# 🧨 9. Vấn đề ưu tiên
+
+```markdown
+## Vấn đề ưu tiên
+
+1. 🔴 Vấn đề A  
+2. 🔴 Vấn đề B  
+3. 🟡 Vấn đề C  
+```
+
+---
+
+# ⚖️ 10. Quyết định
+
+```markdown
+## Quyết định
+
+| Quyết định | Người phụ trách | Thời hạn | Trạng thái |
+|-----------|----------------|----------|------------|
+| Sửa lỗi A | Backend | 2026-04-25 | 🔵 |
+```
+
+> [!CAUTION]
+> Bắt buộc có phần này.
+
+---
+
+# 🛠 11. Đề xuất
+
+**Hiện tại:**
+
+```typescript
+// mã hiện tại
+```
+
+**Đề xuất:**
+
+```typescript
+// mã đã chỉnh sửa
+```
+
+---
+
+# 📊 12. Tiến độ
+
+```markdown
+## Tiến độ
+
+| Bước | Trạng thái | Ghi chú |
+|------|------------|--------|
+| Tái hiện | ✅ | |
+| Phân tích | 🔵 | |
+| Sửa lỗi | ⚪ | |
+```
+
+---
+
+# 💥 13. Ảnh hưởng
+
+```markdown
+## Ảnh hưởng
+
+- Người dùng bị ảnh hưởng:
+- Hệ thống:
+- Mức độ rủi ro:
+```
+
+---
+
+# 🧭 14. Đánh đổi
+
+```markdown
+## Đánh đổi
+
+- Giải pháp nhanh vs lâu dài  
+- Hiệu năng vs chi phí  
+- Đơn giản vs mở rộng  
+```
+
+---
+
+# 🧾 15. Quy tắc khối mã
+
+```typescript
+const example = true;
+```
+
+```bash
+npm run start
+```
+
+---
+
+# 🤖 16. Theo dõi token
+
+```text
+[Tokens: I:{{input}} | O:{{output}} | T:{{total}}]
+```
+
+---
+
+```markdown
+| Chỉ số | Giá trị | Ghi chú |
+|--------|--------|--------|
+| Token đầu vào | | |
+| Token đầu ra | | |
+| Tổng token | | |
+| Tổng số bước | | |
+```
+
+---
+
+# 🧩 17. Phạm vi áp dụng
+
+* Rà soát mã nguồn
+* Gỡ lỗi / RCA
+* Bảo mật
+* Hiệu năng
+* Sự cố
+* Quy trình AI
+
+---
+
+# 🏁 Nguyên tắc
+
+1. Rõ ràng, không mơ hồ
+2. Luôn có nguyên nhân gốc
+3. Mọi vấn đề phải dẫn tới hành động
+4. Ưu tiên theo mức độ ảnh hưởng
+5. Giữ định dạng thống nhất
+
+---
+

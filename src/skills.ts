@@ -34,7 +34,7 @@ const DEFAULT_REPO = 'truongnat/skills';
 const BUNDLE_DIR_SEGMENTS = ['.agents', 'devkit'] as const;
 const BUNDLE_MARKER = '.devkit-bundle';
 /** Legacy install path (uninstall + verify still honor). */
-const LEGACY_VENDOR_SEGMENTS = ['vendor', 'own-skills'] as const;
+const LEGACY_VENDOR_SEGMENTS = ['vendor', 'skills'] as const;
 
 const COMMAND_IDE_DIRS: Record<string, [string, string]> = {
   cursor: ['.cursor', 'commands'],
@@ -77,7 +77,7 @@ function collectCommandExcludePatterns(bundleDir: string): string[] {
 }
 
 function printHelp() {
-  console.log(`devkit / own-skills
+  console.log(`devkit / skills
 
 Usage:
   npx github:${DEFAULT_REPO} [install|uninstall|update] [options]
@@ -110,7 +110,7 @@ function httpsCloneUrl(repo: string) {
 }
 
 async function fetchRepo(repo: string): Promise<string> {
-  const temp = mkdtempSync(join(tmpdir(), 'own-skills-'));
+  const temp = mkdtempSync(join(tmpdir(), 'skills-'));
   const url = httpsCloneUrl(repo);
   console.log(chalk.blue(`Source: ${url}`));
   const spin = ora(`Fetching bundle from ${repo}...`).start();
@@ -195,7 +195,7 @@ type InstalledArtifactManifest = {
 };
 
 function loadInstallManifest(projectDir: string): InstalledArtifactManifest {
-  const path = join(projectDir, '.cursor', '.own-skills-install.json');
+  const path = join(projectDir, '.cursor', '.skills-install.json');
   if (!existsSync(path)) return { version: 1, createdPaths: [] };
   try {
     const parsed = JSON.parse(readFileSync(path, 'utf8')) as InstalledArtifactManifest;
@@ -207,7 +207,7 @@ function loadInstallManifest(projectDir: string): InstalledArtifactManifest {
 
 function saveInstallManifest(projectDir: string, manifest: InstalledArtifactManifest) {
   writeFileSync(
-    join(projectDir, '.cursor', '.own-skills-install.json'),
+    join(projectDir, '.cursor', '.skills-install.json'),
     `${JSON.stringify(manifest, null, 2)}\n`,
     'utf8',
   );
@@ -286,14 +286,14 @@ function installAllSkills(repoRoot: string, projectDir: string, mode: 'symlink' 
   else spin.succeed(chalk.green(`Installed ${ok} skills`));
 }
 
-const GIT_EXCLUDE_MARKER_START = '# own-skills-begin';
-const GIT_EXCLUDE_MARKER_END = '# own-skills-end';
+const GIT_EXCLUDE_MARKER_START = '# skills-begin';
+const GIT_EXCLUDE_MARKER_END = '# skills-end';
 
 function ensureGitExcludeBlock(projectDir: string, patterns: string[]) {
   const excludePath = join(projectDir, '.git', 'info', 'exclude');
   if (!existsSync(join(projectDir, '.git', 'info'))) return;
   const existing = existsSync(excludePath) ? readFileSync(excludePath, 'utf8') : '';
-  // Remove any existing own-skills block
+  // Remove any existing skills block
   const withoutBlock = existing
     .replace(
       new RegExp(
@@ -370,7 +370,7 @@ function uninstall(projectDir: string, nuclear: boolean) {
         rmSync(abs, { recursive: true, force: true });
       }
     }
-    rmSync(join(projectDir, '.cursor', '.own-skills-install.json'), { force: true });
+    rmSync(join(projectDir, '.cursor', '.skills-install.json'), { force: true });
   }
   spin.succeed('Uninstall completed');
 }
@@ -495,7 +495,7 @@ async function main() {
         ensureGitExcludeBlock(projectDir, [
           '.agents/devkit/',
           ...skillDirs,
-          '.cursor/.own-skills-install.json',
+          '.cursor/.skills-install.json',
           ...cmdExcludes,
           ...rulesExcludes,
         ]);
@@ -526,7 +526,7 @@ async function main() {
           name: 'nuclear',
           message: chalk.red('NUCLEAR: delete entire .cursor directory?'),
           choices: [
-            { name: 'No (keep .cursor except own-skills artifacts)', value: false },
+            { name: 'No (keep .cursor except skills artifacts)', value: false },
             { name: 'Yes (remove entire .cursor)', value: true },
           ],
           default: nuclear,

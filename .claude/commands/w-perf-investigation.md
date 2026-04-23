@@ -1,1 +1,0 @@
-../../commands/w-perf-investigation.md

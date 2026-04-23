@@ -1,11 +1,10 @@
 {
-  "name": "devkit-bundle",
+  "name": "devkit",
   "version": "1.0.1",
   "description": "npx installer: sync devkit bundle to .agents/devkit (skills, workflows, rules, commands, KB tooling)",
   "type": "module",
   "bin": {
-    "devkit": "./dist/own-skills.js",
-    "own-skills": "./dist/own-skills.js"
+    "devkit": "./dist/skills.js"
   },
   "engines": {
     "node": ">=18"
@@ -24,8 +23,8 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "tsx src/own-skills.ts",
-    "lint:cli": "tsx --tsconfig tsconfig.json --no-warnings src/own-skills.ts --help",
+    "dev": "tsx src/skills.ts",
+    "lint:cli": "tsx --tsconfig tsconfig.json --no-warnings src/skills.ts --help",
     "tool": "tsx src/tools.ts",
     "list-skills": "node dist/tools.js list-skills",
     "validate-skills": "node dist/tools.js validate-skills",
