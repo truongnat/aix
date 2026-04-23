@@ -26,4 +26,4 @@
 
 ## Reproducibility vs convenience
 
-- **Interactive** OK for discovery; **published** numbers need pinned env — **`quality-validation-and-reproducibility-guardrails.md`**.
+- **Interactive** OK for discovery; **published** numbers need pinned env — **`quality-validation-and-guardrails.md`**.

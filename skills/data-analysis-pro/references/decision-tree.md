@@ -44,7 +44,7 @@ Dirty ingest?
 
 ```
 Notebook for self?
-├── Explore freely — quality-validation-and-reproducibility-guardrails.md when sharing
+├── Explore freely — quality-validation-and-guardrails.md when sharing
 └── Leadership Excel deck?
     └── pandas compute + openpyxl polish — spreadsheets-charts-and-validation.md
 ```

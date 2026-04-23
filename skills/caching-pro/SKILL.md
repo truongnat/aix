@@ -59,13 +59,13 @@ Use official [Redis docs](https://redis.io/docs/latest/) and [HTTP caching docs 
 
 ## Expected output
 
-Follow **Suggested response format** — workload through risks — with explicit **flows** and **consistency class**.
+Follow **Suggested response format (STRICT)** — eight sections with explicit **flows** and **consistency class**.
 
 ## Workflow
 
 1. Confirm consistency target, freshness SLA, **write rate**, hot-key risk, and **layers** in use (L1/L2/edge).
 2. Apply summaries; open `references/`; **invalidate-before-storage mindset** — **`pattern-selection.md`**, **`invalidation-and-consistency.md`**.
-3. Respond using **Suggested response format**; pair **`security-pro`** when user-specific data at edge.
+3. Respond using **Suggested response format (STRICT)**; pair **`security-pro`** when user-specific data at edge.
 
 ### Operating principles
 
@@ -76,6 +76,30 @@ Follow **Suggested response format** — workload through risks — with explici
 5. **Protect origin systems** — Coalescing, jittered TTL, backpressure, circuit breakers — **`failure-modes-and-resilience.md`**.
 6. **Instrument outcomes** — Hit ratio, latency, evictions, stale-serve rate, **invalidation job** health — **`performance-and-observability.md`**.
 7. **Secure shared caches** — Tenant/auth scope in keys — **`cache-security-and-isolation.md`**.
+
+### Cache layers and consistency (system model) (summary)
+
+Layer stack, read/write paths, consistency class, degradation — **`cache-consistency-layer-system-model.md`**.
+
+Details: [references/cache-consistency-layer-system-model.md](references/cache-consistency-layer-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Symptom→check mapping; deep resilience in **`failure-modes-and-resilience.md`** — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Cache vs origin fix, TTL vs active invalidation, edge vs origin — **`decision-framework-and-trade-offs.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+Measured hit rates; PII boundaries — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Cache architecture and data flows (summary)
 
@@ -179,23 +203,25 @@ CDN features, Redis/Memcached majors — **`versions.md`**.
 
 Details: [references/versions.md](references/versions.md)
 
-## Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Workload & constraints** — Read/write ratio, latency budget, regions, hot-key risk, **consistency SLA** per surface.
-2. **Cache architecture** — Layers (L1/L2/edge), origin topology, single vs multi-region sketch.
-3. **Read/write flows** — Hit/miss path, mutation → invalidation/update order — **`cache-architecture-and-data-flows.md`**, **`write-path-and-coherence.md`**.
-4. **Key & TTL design** — Namespace, versioning, TTL + jitter, admission limits.
-5. **Invalidation strategy** — Sync vs async triggers; fan-out (tags vs keys); **`multi-layer-cache.md`** if stacked.
-6. **Consistency model** — Class per entity (**read-your-writes** vs **bounded stale**); replica/CDN caveats — **`distributed-consistency-models.md`**.
-7. **Observability & metrics** — Hit ratio, staleness signals, eviction rate, invalidation job health — **`performance-and-observability.md`**.
-8. **Risks & trade-offs** — Dual-write, outage fallback, cost, security (**`cache-security-and-isolation.md`**), rollout — **`failure-modes-and-resilience.md`**, **`cost-and-capacity-modeling.md`**.
-
-*(Implementation snippets, config tables, or header matrices — present as **Code** when showing concrete artifacts.)*
+1. **Context** — Read/write ratio, latency budget, regions, hot-key risk, **consistency SLA** per surface.
+2. **Problem / goal** — Stale reads, cost reduction, incident hardening, or new surface to cache.
+3. **System design** — Layer stack and consistency class — **`cache-consistency-layer-system-model.md`**.
+4. **Decision reasoning** — Pattern and invalidation strategy — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — Keys, TTL, invalidation triggers — **Code** for config/header matrices.
+6. **Trade-offs** — Freshness vs origin load; edge vs complexity.
+7. **Failure modes** — Stampede, dual-write, tenant bleed — **`failure-modes-detection-mitigation.md`** / **`failure-modes-and-resilience.md`** themes.
+8. **Residual risks** — Cost, security, rollout — **`cost-and-capacity-modeling.md`**, **`deployment-pro`** when needed.
 
 ## Resources in this skill
 
 | Topic | File |
 |-------|------|
+| **Cache & consistency model** | [references/cache-consistency-layer-system-model.md](references/cache-consistency-layer-system-model.md) |
+| Failure modes (quick map) | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Architecture & data flows | [references/cache-architecture-and-data-flows.md](references/cache-architecture-and-data-flows.md) |
 | Distributed consistency models | [references/distributed-consistency-models.md](references/distributed-consistency-models.md) |
 | Write path & coherence | [references/write-path-and-coherence.md](references/write-path-and-coherence.md) |
@@ -219,7 +245,7 @@ Details: [references/versions.md](references/versions.md)
 ### 1 — Simple
 
 **Input:** Product list API slow, DB spikes.  
-**Expected output:** Cache-aside, keys + TTL + jitter, **write path** invalidates on admin update, stampede guard, metrics, **fallback** if Redis down — full **Suggested response format**.
+**Expected output:** Cache-aside, keys + TTL + jitter, **write path** invalidates on admin update, stampede guard, metrics, **fallback** if Redis down — full **Suggested response format (STRICT)**.
 
 ### 2 — Tricky
 

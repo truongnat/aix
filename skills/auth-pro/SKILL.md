@@ -67,13 +67,13 @@ Gather (or ask for) minimally:
 
 ## Expected output
 
-Responses should follow **Suggested response format** so outputs are comparable: **Context** → **Authentication recommendation** → **Authorization recommendation** → **Token/session lifecycle** → **Implementation / infrastructure notes** → **Residual risks & verification**.
+Follow **Suggested response format (STRICT)** — eight sections from context through residual risks.
 
 ## Workflow
 
 1. Confirm actors, trust boundaries, client types, data sensitivity, and required assurance level.
 2. Apply operating principles and summaries below; open `references/` for depth; keep authn method and authz enforcement boundaries explicit.
-3. Respond using **Suggested response format**; note token leakage, privilege escalation, and revocation gaps.
+3. Respond using **Suggested response format (STRICT)**; note token leakage, privilege escalation, and revocation gaps.
 
 ### Operating principles
 
@@ -83,6 +83,30 @@ Responses should follow **Suggested response format** so outputs are comparable:
 4. **Short-lived credentials** — minimize token/session lifetime and rotate secrets.
 5. **Explicit lifecycle controls** — issuance, refresh, revocation, and auditability are mandatory.
 6. **Method follows context** — choose protocols by actor, trust, and operational constraints.
+
+### Identity, trust, and session (system model) (summary)
+
+Actors, credential classes, authz surface, lifecycle — **`identity-trust-session-system-model.md`**.
+
+Details: [references/identity-trust-session-system-model.md](references/identity-trust-session-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Leakage, weak authz, CSRF, refresh reuse — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Session vs bearer, BFF, RBAC vs ABAC, MFA friction — **`decision-framework-and-trade-offs.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+RFC/OIDC evidence; no invented portal steps — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ## Default recommendations by scenario
 
@@ -178,18 +202,18 @@ Details: [references/versions.md](references/versions.md)
 
 Details: [references/integration-map.md](references/integration-map.md)
 
-## Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-Answer so these blocks are explicit (skip only if clearly N/A; say why):
+Skip sections only if clearly N/A; say why.
 
 1. **Context** — Actors, **client type** (browser / SPA / mobile / machine), **trust boundaries**, data sensitivity, compliance hooks.
-2. **Authentication recommendation** — Chosen method(s), assurance level (incl. MFA/WebAuthn where relevant), rationale vs alternatives.
-3. **Authorization recommendation** — Model (RBAC/ABAC/ReBAC/etc.), enforcement surface (API/gateway/DB); never trust raw client role claims for sensitive actions.
-4. **Token/session lifecycle** — Issuance, storage (cookie vs bearer), rotation, revocation, logout; **audience/scope/expiry**.
-5. **Implementation / infrastructure notes** — What to wire in code vs platform (brief); pair with stack skills for APIs.
-6. **Residual risks & verification** — CSRF/XSS posture for cookie flows, audit/monitoring gaps, tests to run (**`testing-pro`**).
-
-Optional diagram or pseudocode under **Implementation / infrastructure notes** when it clarifies flow.
+2. **Problem / goal** — New login flow, hardening review, federation change, or incident follow-up.
+3. **System design** — Identity + session + authz enforcement surfaces — **`identity-trust-session-system-model.md`**.
+4. **Decision reasoning** — Authn/authz method choices vs alternatives — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — Cookie/bearer/OIDC sketch, key rotation notes — optional diagram (**Code** if pseudocode/config).
+6. **Trade-offs** — UX vs MFA; BFF hop vs SPA tokens; session vs stateless.
+7. **Failure modes** — Leakage, IDOR, CSRF, refresh reuse — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Revocation gaps, audit blind spots, **`security-pro`** / **`testing-pro`** verification.
 
 ## Resources in this skill
 
@@ -197,6 +221,10 @@ Optional diagram or pseudocode under **Implementation / infrastructure notes** w
 
 | Topic | File |
 |-------|------|
+| **Identity & trust model** | [references/identity-trust-session-system-model.md](references/identity-trust-session-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Authentication methods and selection | [references/authentication-methods-and-selection.md](references/authentication-methods-and-selection.md) |
 | OAuth / OIDC patterns | [references/oauth-oidc-patterns.md](references/oauth-oidc-patterns.md) |
 | MFA, step-up, assurance | [references/mfa-and-assurance.md](references/mfa-and-assurance.md) |
@@ -225,7 +253,7 @@ Optional diagram or pseudocode under **Implementation / infrastructure notes** w
 ### 1 — Simple (common)
 
 **Input:** "Need full auth for web + mobile + API partners. Which methods should we use?"  
-**Expected output:** Follow **Suggested response format** — include method matrix, lifecycle, stack handoffs, rollout/testing notes, residual risks.
+**Expected output:** Follow **Suggested response format (STRICT)** — include method matrix, lifecycle, stack handoffs, rollout/testing notes, residual risks.
 
 ### 2 — Tricky (edge case)
 

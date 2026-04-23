@@ -28,4 +28,4 @@
 ## Metric without denominator
 
 - “Conversion up 20%” — from what base?
-- **Fix:** Always report **n** and window — **`quality-validation-and-reproducibility-guardrails.md`**.
+- **Fix:** Always report **n** and window — **`quality-validation-and-guardrails.md`**.

@@ -44,7 +44,7 @@ Legal / medical / financial obligations detected?
 Litigation / audit traceability?
 ├── Verbatim quotes + page; tool versions if automated — evidence-and-provenance-rules.md
 └── Informal review?
-    └── Still no invented facts — quality-validation-and-grounding-guardrails.md
+    └── Still no invented facts — quality-validation-and-guardrails.md
 ```
 
 ## Further reading

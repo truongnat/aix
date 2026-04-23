@@ -71,7 +71,7 @@ Follow **Suggested response format** strictly — pipeline through residual risk
 2. **Define grain** — One row meaning; join discipline — **`analysis-pipeline-and-grain-model.md`**.
 3. **Label uncertainty** — Missing data handling is a **claim** — document it.
 4. **Plots serve questions** — Units, zero baseline, **n** — **`visualization-and-communication.md`**.
-5. **Reproducibility** — Seeds, versions for non-trivial results — **`quality-validation-and-reproducibility-guardrails.md`**.
+5. **Reproducibility** — Seeds, versions for non-trivial results — **`quality-validation-and-guardrails.md`**.
 6. **Security** — Treat exports/notebooks as leaks — **`security-pro`**.
 7. **Honest scope** — Descriptive vs inferential vs causal — **`decision-framework-and-trade-offs.md`**.
 
@@ -95,9 +95,9 @@ Details: [references/decision-framework-and-trade-offs.md](references/decision-f
 
 ### Quality validation and reproducibility guardrails (summary)
 
-n, denominators, seeds, anti-number-fabrication — **`quality-validation-and-reproducibility-guardrails.md`**.
+n, denominators, seeds, anti-number-fabrication — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-reproducibility-guardrails.md](references/quality-validation-and-reproducibility-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### EDA and cleaning (summary)
 
@@ -171,7 +171,7 @@ Details: [references/versions.md](references/versions.md)
 | Pipeline & grain model | [references/analysis-pipeline-and-grain-model.md](references/analysis-pipeline-and-grain-model.md) |
 | Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
 | Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
-| Quality & reproducibility | [references/quality-validation-and-reproducibility-guardrails.md](references/quality-validation-and-reproducibility-guardrails.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | EDA & cleaning | [references/eda-and-cleaning.md](references/eda-and-cleaning.md) |
 | Visualization | [references/visualization-and-communication.md](references/visualization-and-communication.md) |
 | Spreadsheets | [references/spreadsheets-charts-and-validation.md](references/spreadsheets-charts-and-validation.md) |
@@ -198,7 +198,7 @@ Details: [references/versions.md](references/versions.md)
 ### Analytical correctness
 
 - [ ] **Grain** explicit for aggregates; joins validated — **`analysis-pipeline-and-grain-model.md`**.
-- [ ] **Denominators** and **n** for rates — **`quality-validation-and-reproducibility-guardrails.md`**.
+- [ ] **Denominators** and **n** for rates — **`quality-validation-and-guardrails.md`**.
 - [ ] **Leakage / bias / Simpson** considered when metrics or splits discussed — **`edge-cases.md`**.
 
 ### Delivery

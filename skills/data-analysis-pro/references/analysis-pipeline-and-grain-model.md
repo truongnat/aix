@@ -37,4 +37,4 @@ This skill defaults to **descriptive** honesty — **`decision-framework-and-tra
 
 ## Lineage (lightweight)
 
-For deliverables: **source file(s)**, **filter definition**, **as-of date**, **tool versions** — **`quality-validation-and-reproducibility-guardrails.md`**.
+For deliverables: **source file(s)**, **filter definition**, **as-of date**, **tool versions** — **`quality-validation-and-guardrails.md`**.

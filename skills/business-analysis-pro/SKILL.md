@@ -64,13 +64,13 @@ Use the [IIBA BABOK Guide](https://www.iiba.org/business-analysis-babok-guide/) 
 
 ## Expected output
 
-Follow **Suggested response format** — problem through open questions, with **decisions**, **requirements**, and **metrics** aligned.
+Follow **Suggested response format (STRICT)** — eight sections with **decisions**, **requirements**, and **metrics** aligned.
 
 ## Workflow
 
 1. Confirm **problem domain**, **stakeholders**, **decision makers**, **constraints**, and whether **discovery** or **delivery** mode dominates.
 2. Apply principles and summaries; open `references/`; defer **test design** to **`testing-pro`** and **threats** to **`security-pro`** when those dominate.
-3. Respond using **Suggested response format**; note **residual risks**, **metric conflicts**, and **approval** gaps.
+3. Respond using **Suggested response format (STRICT)**; note **residual risks**, **metric conflicts**, and **approval** gaps.
 
 ### Operating principles
 
@@ -82,6 +82,30 @@ Follow **Suggested response format** — problem through open questions, with **
 6. **Readable by two audiences** — Executive summary + detail engineers can implement — **`reporting-and-deliverables.md`**.
 7. **Change is managed** — Scope changes get **impact** (time, risk, metrics), not silent edits.
 8. **Learn continuously** — Discovery loop for uncertain value — **`discovery-and-iteration.md`**.
+
+### Stakeholder, requirement, and decision artifacts (system model) (summary)
+
+Outcome chain, traceability, decision records, risks — **`stakeholder-requirement-decision-system-model.md`**.
+
+Details: [references/stakeholder-requirement-decision-system-model.md](references/stakeholder-requirement-decision-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Solution-first, vanity metrics, authority gaps, scope creep — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Depth vs time-box, scoring vs judgment, BRD vs lean — **`decision-framework-and-trade-offs.md`** (numeric criteria in **`decision-making-framework.md`**).
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+Evidence for decisions; legal boundaries — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Decision-making framework (summary)
 
@@ -167,23 +191,25 @@ Org template versions; BABOK edition as external reference only.
 
 Details: [references/versions.md](references/versions.md)
 
-## Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Problem & context** — Business problem, audience, urgency, constraints.
-2. **Stakeholders & constraints** — Decision authority, power/interest highlights, compliance or fixed dates.
-3. **Options & trade-offs** — Real alternatives; **criteria** table or short narrative; **rejected** options with reasons.
-4. **Decision (with reasoning)** — Chosen path; link to **decision record** fields; sensitivity if scores used.
-5. **Requirements (FR/NFR)** — IDs, testable statements; **system constraints** where known — **`system-constraints-and-cost.md`**.
-6. **Metrics & success criteria** — Outcome metrics, leading indicators, **guardrails**, baseline/target when known.
-7. **Risks & mitigation** — Structured rows (**`risk-modeling.md`**); owners and review dates when possible.
-8. **Open questions** — Unknowns, approvals needed, spikes, delegated skills (**`testing-pro`**, **`security-pro`**, …).
-
-*(Artifact tables — matrices, RACI, decision log — belong in sections **4–7** as appropriate; label structured snippets **Code** only when mirroring other skills’ convention for machine-readable outlines.)*
+1. **Context** — Business problem, audience, urgency, constraints.
+2. **Problem / goal** — Decision to unblock or delivery outcome to define.
+3. **System design** — Outcome → requirements trace spine — **`stakeholder-requirement-decision-system-model.md`**.
+4. **Decision reasoning** — Options, criteria, rejected paths — **`decision-framework-and-trade-offs.md`** / **`decision-making-framework.md`**.
+5. **Implementation sketch** — FR/NFR table, RACI, or decision log excerpt — **Code** when structured.
+6. **Trade-offs** — Scope vs time; metric conflicts; discovery vs big-design.
+7. **Failure modes** — Solution-first, vanity KPIs, authority gaps — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Open questions, approvals, delegated skills (**`testing-pro`**, **`security-pro`**, …).
 
 ## Resources in this skill
 
 | Topic | File |
 |-------|------|
+| **Stakeholder & decision artifact model** | [references/stakeholder-requirement-decision-system-model.md](references/stakeholder-requirement-decision-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Decision-making framework | [references/decision-making-framework.md](references/decision-making-framework.md) |
 | Product thinking & outcomes | [references/product-thinking-and-outcomes.md](references/product-thinking-and-outcomes.md) |
 | Metrics hierarchy & guardrails | [references/metrics-hierarchy-and-guardrails.md](references/metrics-hierarchy-and-guardrails.md) |

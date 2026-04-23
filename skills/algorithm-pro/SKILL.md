@@ -55,13 +55,13 @@ Use [CLRS](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/) a
 
 ## Expected output
 
-Follow **Suggested response format** — modeling through residual risks, including **complexity table** and **edge-case** scan.
+Follow **Suggested response format (STRICT)** — eight sections including **complexity** and **edge-case** scan.
 
 ## Workflow
 
 1. Confirm formal statement, constraints, objective, resource limits, and **execution shape** (batch/stream/distributed sketch).
 2. Apply principles and summaries; open `references/`; keep **proof sketch** and **complexity** explicit.
-3. Respond using **Suggested response format**; cite **debugging** path if symptom-driven (WA/TLE/MLE).
+3. Respond using **Suggested response format (STRICT)**; cite **debugging** path if symptom-driven (WA/TLE/MLE).
 
 ### Operating principles
 
@@ -71,6 +71,30 @@ Follow **Suggested response format** — modeling through residual risks, includ
 4. **Prove early** — invariants, exchange argument, or counterexample search for greedy.
 5. **Optimize in stages** — asymptotic → DS → constants; **systems** layer when relevant (**`algorithms-in-systems.md`**).
 6. **Test adversarially** — boundaries, overflow, degenerate (**`edge-cases.md`**).
+
+### Algorithm constraints and proof (system model) (summary)
+
+Formal object, resource envelope, proof obligations, systems coupling — **`algorithm-constraints-and-proof-system-model.md`**.
+
+Details: [references/algorithm-constraints-and-proof-system-model.md](references/algorithm-constraints-and-proof-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+WA/TLE/MLE, overflow — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Exact vs approximate, DS vs heuristic, streaming — **`decision-framework-and-trade-offs.md`** (see also **`optimization-and-trade-offs.md`**).
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+Evidence on complexity and benchmarks — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Problem modeling and strategy selection (summary)
 
@@ -130,15 +154,16 @@ Details: [references/integration-map.md](references/integration-map.md)
 
 Details: [references/versions.md](references/versions.md)
 
-## Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Problem modeling** — Formal inputs/outputs, constraints, objective, problem **type** (taxonomy).
-2. **Strategy selection** — Candidate approaches; why chosen family fits; greedy counterexample risk if applicable.
-3. **Algorithm design** — States, transitions, pseudocode-level steps; key DS.
-4. **Complexity analysis** — Time and space with assumptions; bottleneck identification.
-5. **Code** — Implementation sketch or snippet; still labeled **Code**.
-6. **Edge cases** — Overflow, boundaries, degenerate data; link **`edge-cases.md`** themes.
-7. **Residual risks** — Hidden constants, benchmark uncertainty, systems limits (**memory/IO/streaming**), maintainability.
+1. **Context** — Constraints (n, values), limits, execution shape (batch/stream/distributed), language/runtime.
+2. **Problem / goal** — Objective (optimize/count/decide) and correctness notion.
+3. **System design** — State/transition view or reduction — **`algorithm-constraints-and-proof-system-model.md`**.
+4. **Decision reasoning** — Family choice vs alternatives; greedy proof obligation — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — Pseudocode or snippet — label **Code**.
+6. **Trade-offs** — Asymptotic vs constants; memory vs time; exact vs approximate.
+7. **Failure modes** — WA/TLE/MLE/overflow angles — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Unproven greedy, benchmark noise, systems limits — **`algorithms-in-systems.md`**, **`testing-pro`**.
 
 ## Resources in this skill
 
@@ -162,7 +187,7 @@ Details: [references/versions.md](references/versions.md)
 ### 1 — Modeling + proof
 
 **Input:** Interval scheduling variant — unsure greedy works.  
-**Expected output:** Formalize; exchange argument or counterexample; alternative algorithm if greedy fails — full **Suggested response format**.
+**Expected output:** Formalize; exchange argument or counterexample; alternative algorithm if greedy fails — full **Suggested response format (STRICT)**.
 
 ### 2 — Complexity audit
 

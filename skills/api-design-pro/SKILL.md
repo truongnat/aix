@@ -56,13 +56,13 @@ Use official [HTTP Semantics RFC 9110](https://www.rfc-editor.org/rfc/rfc9110), 
 
 ## Expected output
 
-Follow **Suggested response format** — from context through residual risks, including at least one **concrete spec or payload** example when inventing or changing a contract.
+Follow **Suggested response format (STRICT)** — eight sections; include at least one **concrete spec or payload** example when inventing or changing a contract.
 
 ## Workflow
 
 1. **Confirm** versions / environment / stack (API style, transport, auth model, client expectations, compatibility window).
 2. **Apply** the principles and topic summaries below; open `references/` when you need depth.
-3. **Respond** using **Suggested response format**; note main risks (breaking changes, ambiguous contracts, insecure defaults, inconsistent errors, consistency model gaps).
+3. **Respond** using **Suggested response format (STRICT)**; note main risks (breaking changes, ambiguous contracts, insecure defaults, inconsistent errors, consistency model gaps).
 
 ### Operating principles
 
@@ -72,6 +72,30 @@ Follow **Suggested response format** — from context through residual risks, in
 4. **Consistency over endpoint-by-endpoint style** — shared patterns for naming, errors, pagination, and filtering.
 5. **Idempotency where retry is expected** — safe retry semantics for network and client failures; scope **Idempotency-Key** correctly.
 6. **Observability-ready APIs** — traceability and actionable errors without leaking sensitive internals — **`observability-and-api-governance.md`**.
+
+### API contract lifecycle (system model) (summary)
+
+Contract surfaces, mutation/read paths, evolution, governance — **`api-contract-lifecycle-system-model.md`**.
+
+Details: [references/api-contract-lifecycle-system-model.md](references/api-contract-lifecycle-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Ambiguous PATCH, retry duplicates, cursor instability, webhooks — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+REST vs RPC/events, pagination, errors, sync/async — **`decision-framework-and-trade-offs.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+RFC/spec alignment, no invented semantics — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Resource modeling and action design (summary)
 
@@ -151,20 +175,25 @@ URL vs header versioning; deprecation headers; OpenAPI per major version.
 
 Details: [references/versions.md](references/versions.md)
 
-## Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Context and client constraints** — consumers, compatibility window, auth/sensitivity, consistency expectations.
-2. **Resource and action model** — aggregates, identifiers, canonical paths, domain actions vs CRUD (**workflow** reference when relevant).
-3. **Proposed contract** — endpoints, verbs, schemas, status codes at a glance.
-4. **Evolution and compatibility plan** — additive vs breaking; versioning/deprecation; migration notes.
-5. **Error, retry, and idempotency semantics** — envelope, codes, **429**, **Idempotency-Key**, concurrency (**ETag** / conflicts).
-6. **Spec / payload examples** — OpenAPI fragments, JSON request/response/error examples (**label as Code** when showing snippets).
-7. **Residual risks** — rollout, monitoring, ambiguous PATCH, replica lag, webhook delivery, governance gaps.
+1. **Context** — Consumers, compatibility window, auth/sensitivity, consistency expectations.
+2. **Problem / goal** — New surface, breaking review, or workflow API need.
+3. **System design** — Contract lifecycle sketch — **`api-contract-lifecycle-system-model.md`**.
+4. **Decision reasoning** — REST/RPC/events, pagination, sync/async — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — Endpoints, schemas, status codes — **Code** for OpenAPI/JSON fragments.
+6. **Trade-offs** — Evolution safety vs velocity; verbose errors vs leakage.
+7. **Failure modes** — PATCH ambiguity, retries, cursors, webhooks — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Rollout, replica lag, **`security-pro`** for abuse-sensitive surfaces.
 
 ## Resources in this skill
 
 | Topic | File |
 |-------|------|
+| **API contract lifecycle model** | [references/api-contract-lifecycle-system-model.md](references/api-contract-lifecycle-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Resource modeling and actions | [references/resource-modeling-and-actions.md](references/resource-modeling-and-actions.md) |
 | Mutation semantics and concurrency | [references/mutation-semantics-and-concurrency.md](references/mutation-semantics-and-concurrency.md) |
 | Workflow and state transitions | [references/workflow-and-state-transitions.md](references/workflow-and-state-transitions.md) |
@@ -182,7 +211,7 @@ Details: [references/versions.md](references/versions.md)
 ## Quick example
 
 **Input:** "Design v2 order API with backward compatibility and consistent error model."  
-**Expected output:** Full **Suggested response format**: resource model, contract, evolution, idempotency for payments, spec examples, risks.
+**Expected output:** Full **Suggested response format (STRICT)**: resource model, contract, evolution, idempotency for payments, spec examples, risks.
 
 **Input:** "Clients retry POST /payments on timeout — we see duplicate charges."  
 **Expected output:** **Idempotency-Key** pattern or natural keys; document 409 vs 200 semantics; webhook reconciliation — pair **`security-pro`** for abuse.

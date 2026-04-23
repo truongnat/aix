@@ -4,7 +4,7 @@
 |---------|-----|--------|----------|
 | **OCR garbage** | Scan skew, low DPI | Nonsense words; layout breaks | Higher-res crop; manual verify sample — **`anti-patterns.md`** |
 | **Missed video moment** | Sparse frame sampling | User says “you skipped X” | Finer sampling or user-provided clip — **`tips-and-tricks.md`** |
-| **Hallucinated UI label** | Model fills plausible text | No exact match in crop | Require visible quote or mark **uncertain** — **`quality-validation-and-grounding-guardrails.md`** |
+| **Hallucinated UI label** | Model fills plausible text | No exact match in crop | Require visible quote or mark **uncertain** — **`quality-validation-and-guardrails.md`** |
 | **Wrong language / script** | Mixed locales | Gibberish summary | Detect script; translate with **uncertainty** flag |
 | **Truncated doc** | Token/window limits | Abrupt cutoff mid-section | Continue in parts; outline remainder — **`edge-cases.md`** |
 | **Password / DRM lock** | Cannot decode | Error on open | Request unlock or paste excerpt — **`edge-cases.md`** |

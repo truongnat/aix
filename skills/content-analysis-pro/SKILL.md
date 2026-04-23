@@ -59,7 +59,7 @@ Follow **Suggested response format** strictly — pipeline through residual risk
 ## Workflow
 
 1. Confirm goal, modality, sensitivity, and required **evidence granularity** (audit vs informal).
-2. Apply summaries; open `references/`; enforce **grounding** — **`quality-validation-and-grounding-guardrails.md`**.
+2. Apply summaries; open `references/`; enforce **grounding** — **`quality-validation-and-guardrails.md`**.
 3. Respond using **Suggested response format**; delegate BRD packaging to **`business-analysis-pro`** when appropriate.
 
 ### Operating principles
@@ -97,9 +97,9 @@ Details: [references/evidence-and-provenance-rules.md](references/evidence-and-p
 
 ### Quality validation and grounding guardrails (summary)
 
-Anti-hallucination checklist — **`quality-validation-and-grounding-guardrails.md`**.
+Anti-hallucination checklist — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-grounding-guardrails.md](references/quality-validation-and-grounding-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Analysis methods and frames (summary)
 
@@ -174,7 +174,7 @@ Details: [references/versions.md](references/versions.md)
 | Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
 | Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md) |
 | Evidence & provenance rules | [references/evidence-and-provenance-rules.md](references/evidence-and-provenance-rules.md) |
-| Quality & grounding guardrails | [references/quality-validation-and-grounding-guardrails.md](references/quality-validation-and-grounding-guardrails.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Methods & frames | [references/analysis-methods-and-frames.md](references/analysis-methods-and-frames.md) |
 | Reporting & limitations | [references/reporting-and-limitations.md](references/reporting-and-limitations.md) |
 | Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
@@ -201,7 +201,7 @@ Details: [references/versions.md](references/versions.md)
 ### Grounding
 
 - [ ] Findings **tied** to evidence (page/time/region) where applicable — **`evidence-and-provenance-rules.md`**.
-- [ ] **Inference** labeled; **gaps** explicit — **`quality-validation-and-grounding-guardrails.md`**.
+- [ ] **Inference** labeled; **gaps** explicit — **`quality-validation-and-guardrails.md`**.
 - [ ] **No fabricated** quotes, numbers, or UI labels.
 
 ### Process & handoffs

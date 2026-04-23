@@ -59,13 +59,13 @@ Use official [Anthropic docs](https://docs.anthropic.com/) and [OpenAI docs](htt
 
 ## Expected output
 
-Follow **Suggested response format** — context, architecture, flows, prompt/tool strategy, reliability, safety/validation, metrics and risks.
+Follow **Suggested response format (STRICT)** — eight sections from context through residual risks.
 
 ## Workflow
 
 1. Confirm provider/model, SDK, context window, streaming vs batch, and **eval/budget** constraints.
 2. Apply principles and summaries below; open `references/` for depth; tie **conversation**, **tools**, **RAG**, and **safety** together explicitly.
-3. Respond using **Suggested response format**; flag injection, cost, latency, hallucination, and **parse/tool** failure risks.
+3. Respond using **Suggested response format (STRICT)**; flag injection, cost, latency, hallucination, and **parse/tool** failure risks.
 
 ### Operating principles
 
@@ -76,6 +76,30 @@ Follow **Suggested response format** — context, architecture, flows, prompt/to
 5. **Prompt injection is real** — delimiters; never let user content override system instructions.
 6. **Fallback and retry** — backoff; **routing matrix** when primary model/provider fails (**`model-selection-and-routing.md`**).
 7. **Measure changes** — golden sets or metrics before prompt/model upgrades (**`evaluation-and-quality.md`**).
+
+### LLM integration and context (system model) (summary)
+
+Request path, context budget, tool/RAG injection, observability — **`llm-integration-and-context-system-model.md`**.
+
+Details: [references/llm-integration-and-context-system-model.md](references/llm-integration-and-context-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Injection, parse failures, RAG leaks, cost/outage — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Routing, context vs RAG, streaming, client vs server inference — **`decision-framework-and-trade-offs.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+Evidence discipline, eval metrics, version truth — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Prompt engineering (summary)
 
@@ -155,20 +179,25 @@ Details: [references/integration-map.md](references/integration-map.md)
 
 Details: [references/versions.md](references/versions.md)
 
-## Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Context and constraints** — Provider/model, SDK, SLOs, sensitivity, structured-output needs.
-2. **Proposed architecture** — Components: API layer, LLM, tools, RAG, memory store.
-3. **Request/response flow** — Single-turn vs multi-turn; stream path; where validation runs.
-4. **Prompt and tool strategy** — System prompt highlights; tool schemas; RAG injection pattern.
-5. **Reliability** — Retries, fallbacks, timeouts, idempotency for tools, trimming policy reference.
-6. **Safety and validation** — Injection boundaries, output checks, tool-side authorization, moderation hooks.
-7. **Metrics, eval, and residual risks** — What to measure; golden tests; cost/latency; known failure modes.
+1. **Context** — Provider/model, SDK, SLOs, sensitivity, structured-output needs, data residency.
+2. **Problem / goal** — User-visible outcome, internal automation, or eval gate to satisfy.
+3. **System design** — Request path, context budget, tool/RAG boundaries — **`llm-integration-and-context-system-model.md`**.
+4. **Decision reasoning** — Routing, streaming, client vs server inference — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — Prompt/tool/RAG sketch, validation hooks — label **Code** when showing snippets.
+6. **Trade-offs** — Cost/latency vs quality; memory vs retrieval; human-in-loop vs automation.
+7. **Failure modes** — Injection, parse/tool errors, ACL, outages — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Eval gaps, moderation limits, **`security-pro`** / **`testing-pro`** handoffs.
 
 ## Resources in this skill
 
 | Topic | File |
 |-------|------|
+| **LLM integration & context model** | [references/llm-integration-and-context-system-model.md](references/llm-integration-and-context-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Prompt engineering | [references/prompt-engineering.md](references/prompt-engineering.md) |
 | Tool use | [references/tool-use.md](references/tool-use.md) |
 | Streaming | [references/streaming.md](references/streaming.md) |
@@ -191,7 +220,7 @@ Details: [references/versions.md](references/versions.md)
 ### 1 — Simple (common)
 
 **Input:** Build a streaming Claude chat endpoint with a weather tool.  
-**Expected output:** Architecture, stream + tool loop, validation, injection notes, metrics — follow **Suggested response format**.
+**Expected output:** Architecture, stream + tool loop, validation, injection notes, metrics — follow **Suggested response format (STRICT)**.
 
 ### 2 — Tricky (edge case)
 

@@ -1,4 +1,4 @@
-# Quality validation and reproducibility guardrails
+# Quality validation and guardrails (data analysis — reproducibility)
 
 ## Before stating numbers in the wild
 

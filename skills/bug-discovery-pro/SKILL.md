@@ -63,13 +63,13 @@ No tool yields **100%** of all bugs — treat outputs as **candidates** with **e
 
 ## Expected output
 
-Follow **Suggested response format** — from symptom through **confidence-labeled** candidates, experiments, and residual risks.
+Follow **Suggested response format (STRICT)** — eight sections with **confidence-labeled** candidates and explicit experiments.
 
 ## Workflow
 
 1. Confirm **symptom**, **repro** or **logs/traces**, **branch**, GitNexus **index** status, and **taxonomy** hint.
 2. Apply principles and summaries; open `references/`; run MCP tools **after** reading schemas; use **runtime** guides when failure is production-shaped.
-3. Respond using **Suggested response format**; note **stale graph**, **false positives**, **untested** paths, and **observability** gaps.
+3. Respond using **Suggested response format (STRICT)**; note **stale graph**, **false positives**, **untested** paths, and **observability** gaps.
 
 ### Operating principles
 
@@ -81,6 +81,30 @@ Follow **Suggested response format** — from symptom through **confidence-label
 6. **Related bugs** — Use **`impact`** / **`api_impact`** to widen regression surface.
 7. **Index currency** — Re-index after large refactors before trusting **impact**.
 8. **Security** — Do not treat graph output as **pen-test**; use **`security-pro`** for abuse models.
+
+### Evidence, graph, and hypothesis (system model) (summary)
+
+Observe → reproduce → narrow; hypothesis ledger; graph accelerates — **`evidence-graph-and-hypothesis-system-model.md`**.
+
+Details: [references/evidence-graph-and-hypothesis-system-model.md](references/evidence-graph-and-hypothesis-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Stale graph, false confidence, missing telemetry, intermittent repro — **`failure-modes-detection-mitigation.md`** (see also **`failure-modes.md`** for system failure shapes).
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Graph-first vs telemetry-first; bisect vs read; stop rules — **`decision-framework-and-trade-offs.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+Evidence vs inference; confidence labels; no false certainty — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Debugging methodology (summary)
 
@@ -172,15 +196,16 @@ Index schema, monorepo `repo` param, tool naming by CLI version.
 
 Details: [references/versions.md](references/versions.md)
 
-## Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Symptom** — What fails, where, scope (env/version), severity, repro status.
-2. **Hypothesis** — Ranked guesses tied to **taxonomy**; what would falsify each.
-3. **Evidence** — Logs/traces/metrics snippets (redacted), graph findings, code pointers — facts vs inference separated.
-4. **Investigation steps** — Ordered actions (including **`query`** / **`impact`** / **`shape_check`** when applicable; **profiling** / **trace** drill-down when production-shaped).
-5. **Candidate bugs (with confidence)** — Table: candidate, confidence (confirmed/likely/hypothesis), supporting evidence.
-6. **Suggested repro/tests** — Minimal repro, bisect hint, tests or monitors to add — **`testing-pro`** handoff.
-7. **Residual risks** — Uncovered paths, index age, false positives, concurrency/intermittency, missing telemetry, fix delegation (**`*-pro`**).
+1. **Context** — Symptom, env/version, severity, repro status, GitNexus index freshness if used.
+2. **Problem / goal** — What “fixed” means; blast radius if unknown.
+3. **System design** — Evidence loop (observe→repro→narrow) — **`evidence-graph-and-hypothesis-system-model.md`**.
+4. **Decision reasoning** — Graph-first vs telemetry-first; next experiment choice — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — Ordered investigation steps, tool calls — **Code** for command lines or query snippets.
+6. **Trade-offs** — Speed vs depth; wide `impact` vs deep file read.
+7. **Failure modes** — Stale index, false positives, missing spans — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Confidence table; delegation to **`testing-pro`** / **`security-pro`** / stack **`*-pro`**.
 
 ## Resources in this skill
 
@@ -189,6 +214,10 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
+| **Evidence & hypothesis model** | [references/evidence-graph-and-hypothesis-system-model.md](references/evidence-graph-and-hypothesis-system-model.md) |
+| Failure modes (debugging) | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Debugging methodology | [references/debugging-methodology.md](references/debugging-methodology.md) |
 | Hypothesis-driven debugging | [references/hypothesis-driven-debugging.md](references/hypothesis-driven-debugging.md) |
 | Bug taxonomy | [references/bug-taxonomy.md](references/bug-taxonomy.md) |

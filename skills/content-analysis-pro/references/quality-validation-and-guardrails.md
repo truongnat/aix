@@ -1,4 +1,4 @@
-# Quality validation and grounding guardrails (anti-hallucination)
+# Quality validation and guardrails (content analysis — grounding)
 
 ## Mandatory checks before asserting facts
 
