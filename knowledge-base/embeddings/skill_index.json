@@ -899,20 +899,23 @@
   {
     "name": "react-native-pro",
     "folder": "react-native-pro",
-    "description": "Professional React Native and Expo development: UI/UX quality, performance patterns, and platform edge cases.\n\nUse this skill when the user works on React Native, Expo, mobile screens, navigation, lists, animations, native modules, EAS builds, Hermes, New Architecture, or asks for RN code review, styling, accessibility, keyboard handling, Safe Area, Android back behavior, deep linking, images, or FlatList/FlashList performance.\n\nTriggers: \"React Native\", \"Expo\", \"RN\", \"FlatList\", \"FlashList\", \"SafeArea\", \"keyboard avoiding\", \"Android back\", \"Hermes\", \"Reanimated\", \"Expo Router\", \"EAS\", \"touch target\", \"a11y\", \"accessibility\", \"StatusBar\", \"notch\", \"pixel ratio\", \"deep link\", \"New Architecture\", \"performance\", \"re-render\", \"memo\".",
+    "description": "Production-grade React Native and Expo: screens, navigation, lists, animations, native modules, EAS builds, Hermes, New Architecture — plus system model (JS thread vs native UI, Hermes, bridge/JSI/Fabric, list virtualization), failure modes (list keys, nav/back/deep link races, keyboard softInputMode, OTA vs native builds, insecure storage), decision trade-offs (Expo managed vs prebuild vs bare, FlatList vs FlashList, animations), and quality guardrails (SDK-accurate APIs, Release-on-device checks, a11y minimum).\n\nUse this skill when the user works on React Native, Expo, mobile screens, navigation, lists, animations, native modules, EAS builds, Hermes, New Architecture, or asks for RN code review, styling, accessibility, keyboard handling, Safe Area, Android back behavior, deep linking, images, or FlatList/FlashList performance.\n\nCombine with **`react-pro`** for shared React patterns, **`testing-pro`** for Detox/Maestro, **`security-pro`** for tokens and deep links, **`deployment-pro`** for store release, **`design-system-pro`** / **`mobile-design-pro`** for design tokens and mobile UX, **`performance-tuning-pro`** when latency is dominated outside the app, and **`typescript-pro`** for strict typing.\n\nTriggers: \"React Native\", \"Expo\", \"RN\", \"FlatList\", \"FlashList\", \"SafeArea\", \"keyboard avoiding\", \"Android back\", \"Hermes\", \"Reanimated\", \"Expo Router\", \"EAS\", \"touch target\", \"a11y\", \"accessibility\", \"StatusBar\", \"notch\", \"pixel ratio\", \"deep link\", \"New Architecture\", \"performance\", \"re-render\", \"memo\".",
     "triggers": [],
     "when_to_use": [
-      "Building or refactoring screens, navigation, lists, forms, modals, or animations.",
-      "Reviewing RN/Expo code for performance, accessibility, or platform correctness.",
-      "Debugging iOS vs Android differences, keyboard, safe areas, linking, or build/runtime issues.",
-      "Aligning UI with sensible spacing, typography, loading/error/empty states, and touch targets.",
-      "Trigger keywords: `React Native`, `Expo`, `FlatList`, `SafeArea`, `Hermes`, `a11y`, `EAS`, …"
+      "Building or refactoring screens, navigation, lists, forms, modals, animations.",
+      "RN/Expo code review for performance, accessibility, or iOS vs Android correctness.",
+      "Debugging keyboard, safe areas, linking, Hermes, New Arch, or EAS build issues.",
+      "Aligning UI with spacing, typography, loading/error/empty states, touch targets."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
+      "react-native-runtime-and-threading-system-model.md",
       "tips-and-tricks.md",
       "ui-ux-design.md",
       "versions.md"

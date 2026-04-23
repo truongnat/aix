@@ -30,6 +30,14 @@ File-based routes and web parity important?
 Default on modern RN/Expo — keep Hermes unless a blocking native module issue — then verify compatibility matrix
 ```
 
+## OTA (EAS Update) vs new store build
+
+```
+Change touches native code, permissions, entitlements, or new native dependency?
+├── Yes → new binary + store submission — **`edge-cases.md`**
+└── No → JS/asset-only may ship via OTA; verify runtime compatibility matrix — **`versions.md`**
+```
+
 ## Further reading
 
 - [tips-and-tricks.md](tips-and-tricks.md), [edge-cases.md](edge-cases.md)

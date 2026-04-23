@@ -49,6 +49,7 @@
 - **`PixelRatio.get()`** for hairline borders: `1 / PixelRatio.get()` for 1px crisp lines.
 - Avoid mixing **dp** mental model with raw pixels — RN uses density-independent units in most style props.
 - **Blur**, **shadows**, and **elevation** render differently — verify on both platforms.
+- **`onLayout` → `setState` loops** — remeasure every frame → jank; debounce or derive layout without feedback — **`failure-modes-detection-mitigation.md`**.
 
 ## Fast Refresh and dev-only bugs
 
