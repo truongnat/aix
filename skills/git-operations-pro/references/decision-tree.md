@@ -47,3 +47,12 @@ Change type?
 ## When NOT to use interactive rebase
 
 - Branch has **multiple collaborators** actively pushing — coordinate or avoid rewriting.
+
+## Submodule: bump workflow
+
+```
+Need newer submodule commit on main?
+├── cd submodule && git fetch && checkout <sha>
+├── cd .. && git add submodule-path
+└── Commit superproject pointer — reviewers see explicit bump
+```

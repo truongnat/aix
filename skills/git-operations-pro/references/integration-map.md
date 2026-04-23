@@ -7,3 +7,4 @@
 | **`security-pro`** | Signed commits, secret scanning hooks. |
 | **`feedback-pro`** | PR review flow, CODEOWNERS. |
 | **`repo-tooling-pro`** | Hooks or scripts that run on commit in this repo. |
+| **`planning-pro`** | Release trains, freeze windows vs branch strategy. |

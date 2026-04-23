@@ -559,23 +559,26 @@
   {
     "name": "git-operations-pro",
     "folder": "git-operations-pro",
-    "description": "Professional Git workflow: conventional commits, branch strategies, merge vs rebase discipline, pull requests, useful log/diff/bisect patterns, and safe collaboration — without replacing CI/CD or deployment orchestration.\n\nUse this skill when the user asks about **commit conventions**, **branch naming**, **feature vs trunk flow**, **resolving conflicts**, **review hygiene**, **git log** interpretation, **revert vs reset**, or **what not to commit** — high-frequency in day-to-day coding sessions.\n\nUse **with** **`testing-pro`** for what runs in **CI**; **`security-pro`** for **secrets** and leaked keys; **`deployment-pro`** for **release** paths — not branch topology. This skill (`git-operations-pro`) owns **VCS** workflow; **`code-packaging-pro`** owns **artifact** build YAML when the task is “workflow file” not “merge strategy”.\n\nTriggers: \"git\", \"commit\", \"conventional commits\", \"branch\", \"merge\", \"rebase\", \"pull request\", \"PR\", \"conflict\", \"git log\", \"bisect\", \"revert\", \"cherry-pick\", \"stash\", \"force push\", \"trunk\", \"Git Flow\", \"CODEOWNERS\".",
+    "description": "Production-grade Git workflow: conventional commits, branch strategies, merge vs rebase vs squash discipline, PR hygiene, inspection (log, blame, bisect), recovery (revert vs reset) — plus repository/history/ref model (DAG, three trees), failure modes (force-push, leaked secrets, submodule drift, merge-queue conflicts), decision trade-offs (squash vs merge commit, velocity vs safety), quality guardrails (no fabricated SHAs; rotate secrets not only rewrite history).\n\nUse this skill when the user asks about **commit conventions**, **branch naming**, **feature vs trunk flow**, **resolving conflicts**, **review hygiene**, **git log** interpretation, **revert vs reset**, or **what not to commit**.\n\nUse **with** **`testing-pro`** for CI gates; **`security-pro`** for secrets and signing; **`deployment-pro`** for tags/releases; **`ci-cd-pro`** for workflow triggers; **`feedback-pro`** for review policy; **`planning-pro`** for release trains. This skill owns **VCS** mechanics; **`code-packaging-pro`** owns workflow **file** authoring when the task is YAML syntax, not merge strategy.\n\nTriggers: \"git\", \"commit\", \"conventional commits\", \"branch\", \"merge\", \"rebase\", \"pull request\", \"PR\", \"conflict\", \"git log\", \"bisect\", \"revert\", \"cherry-pick\", \"stash\", \"force push\", \"trunk\", \"Git Flow\", \"CODEOWNERS\".",
     "triggers": [],
     "when_to_use": [
-      "**Commit messages** — Conventional Commits, **scope**, **breaking** notation.",
-      "**Branches** — Naming, short-lived, **trunk** vs **long-lived** release branches.",
-      "**PRs** — Size, review, **draft**, **description** template.",
-      "**Recovery** — **Revert** on shared `main`, **reset** only on private branches.",
-      "**Inspection** — `log`, `blame`, **bisect** for regressions.",
-      "Trigger keywords: `git`, `commit`, `branch`, `merge`, `rebase`, `PR`, `conflict`, …"
+      "Commit messages, branch naming, trunk vs feature flow.",
+      "PR size, description, draft, review hygiene.",
+      "Conflicts, merge/rebase/squash choice per policy.",
+      "Recovery: **revert** on shared branches, **reset** locally.",
+      "Inspection: `log`, `blame`, **bisect**."
     ],
     "references": [
       "anti-patterns.md",
       "collaboration-and-safety.md",
       "commits-and-branching.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
+      "repository-history-and-ref-model.md",
       "tips-and-tricks.md",
       "versions.md"
     ]

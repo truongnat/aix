@@ -66,4 +66,9 @@ git switch -c fix/from-detached
 - **Submodule:** separate repo pointer; reviewers must understand two repos.
 - **Subtree:** vendor code merged in; simpler clone but heavier history — team should pick one pattern.
 
+## Merge queue / stacked PRs
+
+- **Merge queue** (GitHub/GitLab features) rebases **topic onto moving `main`** before merge — conflicts can appear **only** in queue; coordinate with **`ci-cd-pro`** — **`decision-framework-and-trade-offs.md`**.
+- **Stacked branches** (`feat-a` → `feat-b`): rebasing bottom PR changes top PR bases — reorder or communicate — **`failure-modes-detection-mitigation.md`**.
+
 See [commits-and-branching.md](commits-and-branching.md) and [decision-tree.md](decision-tree.md).
