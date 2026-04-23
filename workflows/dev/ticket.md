@@ -2,9 +2,9 @@
 
 End-to-end **ticket / Kanban** execution using **only bundled skills** under [`skills/`](../../skills/) in this repo (`skills/<name>/SKILL.md`). Pick domain and tooling skills from the **[`skills/README.md`](../../skills/README.md)** catalog (and `node dist/tools.js list-skills` from repo root for a full list). Work is tracked under **`kanban/<ticket>/`** per the **on-disk contract** below — no separate `ex/` package.
 
-**Domain:** `dev` — this file lives under **`workflows/dev/`**. **Filename** follows **`w-<slug>.md`** (see [`workflows/README.md`](../README.md#naming)).
+**Domain:** `dev` — this file lives under **`workflows/dev/`**. **Filename** follows **`<slug>.md`** (see [`workflows/README.md`](../README.md#naming)).
 
-**Invoke:** `/w-ticket` (see [`.claude/commands/w-ticket.md`](../../.claude/commands/w-ticket.md)).
+**Invoke:** `/ticket` (see [`.claude/commands/ticket.md`](../../.claude/commands/ticket.md)).
 
 ## Metadata
 

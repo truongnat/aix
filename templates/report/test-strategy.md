@@ -44,5 +44,5 @@
 
 ## Related
 
-- Workflow: [`workflows/dev/w-test-strategy.md`](../../workflows/dev/w-test-strategy.md)
+- Workflow: [`workflows/dev/test-strategy.md`](../../workflows/dev/test-strategy.md)
 - Conventions: [`OUTPUT_CONVENTIONS.md`](../../OUTPUT_CONVENTIONS.md)

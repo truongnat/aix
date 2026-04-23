@@ -2,9 +2,9 @@
 
 Systematic **debugging** workflow using the scientific method: reproduce → hypothesize → isolate → fix → verify. Works for runtime errors, logic bugs, performance regressions, and intermittent failures.
 
-**Domain:** `dev` — lives under **`workflows/dev/`**. **Filename:** `w-debug.md`.
+**Domain:** `dev` — lives under **`workflows/dev/`**. **Filename:** `debug.md`.
 
-**Invoke:** `/w-debug`
+**Invoke:** `/debug`
 
 ## Metadata
 

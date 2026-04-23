@@ -2,9 +2,9 @@
 
 Turn **release notes** (bullets, changelog intent, stakeholder summary) into **actionable implementation detail**: scoped work items, dependencies, ship path, and verification. Uses **`planning-pro`**, **`business-analysis-pro`**, **`deployment-pro`**, **`git-operations-pro`**, **`testing-pro`**, **`code-packaging-pro`**, and stack **`*-pro`** as needed.
 
-**Domain:** `dev` — lives under **`workflows/dev/`** alongside [`w-ticket.md`](w-ticket.md) and [`w-hotfix.md`](w-hotfix.md). **Filename** **`w-<slug>.md`** — [`workflows/README.md`](../README.md#naming).
+**Domain:** `dev` — lives under **`workflows/dev/`** alongside [`ticket.md`](ticket.md) and [`hotfix.md`](hotfix.md). **Filename** **`w-<slug>.md`** — [`workflows/README.md`](../README.md#naming).
 
-**Invoke:** `/w-release` (see [`.claude/commands/w-release.md`](../../.claude/commands/w-release.md)).
+**Invoke:** `/release` (see [`.claude/commands/release.md`](../../.claude/commands/release.md)).
 
 ## Metadata
 
@@ -25,7 +25,7 @@ Turn **release notes** (bullets, changelog intent, stakeholder summary) into **a
 
 - **`release_notes` vague:** Loop Step 1–2 until acceptance criteria and **must-ship** vs **defer** are explicit.
 - **No `version_target`:** Infer from branch/tag policy or ask once; do not invent semver without confirmation.
-- **Hotfix-level urgency:** If prod is down, switch mentally to [`w-hotfix.md`](w-hotfix.md) instead of full release sequencing.
+- **Hotfix-level urgency:** If prod is down, switch mentally to [`hotfix.md`](hotfix.md) instead of full release sequencing.
 
 ## Error handling
 
@@ -110,5 +110,5 @@ Structured plans can align with **[`templates/report/architecture-decision-recor
 
 ## Notes
 
-- This workflow is for **planned releases** with notes upfront; use [`w-hotfix.md`](w-hotfix.md) for **prod emergencies** and [`w-ticket.md`](w-ticket.md) for **Kanban / ticket-shaped** feature work (bundled skills + `kanban/` layout in that workflow).
+- This workflow is for **planned releases** with notes upfront; use [`hotfix.md`](hotfix.md) for **prod emergencies** and [`ticket.md`](ticket.md) for **Kanban / ticket-shaped** feature work (bundled skills + `kanban/` layout in that workflow).
 - If `release_notes` are vague, return to Step 1 with explicit **acceptance criteria** before large implementation work.

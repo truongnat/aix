@@ -178,7 +178,7 @@
       "pull_request",
       "workflow_dispatch",
       "schedule",
-      "release.\n- jobs: run in parallel by default; use needs: for dependencies.\n- steps: are sequential within a job; each run: starts a new shell.\n- env: at workflow/job/step scope; job-level overrides workflow-level.\n- outputs: pass data between jobs via steps.<id>.outputs.<key>."
+      "release.\r\n- jobs: run in parallel by default; use needs: for dependencies.\r\n- steps: are sequential within a job; each run: starts a new shell.\r\n- env: at workflow/job/step scope; job-level overrides workflow-level.\r\n- outputs: pass data between jobs via steps.<id>.outputs.<key>.\r\n\r\ndetails: [references/github-actions.md](references/github-actions.md)"
     ],
     "when_to_use": [
       "Designing or reviewing GitHub Actions workflows or GitLab CI YAML.",
@@ -819,7 +819,7 @@
     "triggers": [],
     "when_to_use": [
       "**Multiple** KB questions in one session — **`node dist/tools.js query-kb-batch`** (or `npm run query-kb-batch`).",
-      "**Project index + wiki** — **`index-project`** builds embeddings for an arbitrary tree; **`query-kb --index <dir>`** queries it; **`generate-wiki`** turns `<index_base>/docs/**/*.md` into static HTML (tables, sidebar search, **`--watch`** / **`--open`**; see **`/w-index-project`**).",
+      "**Project index + wiki** — **`index-project`** builds embeddings for an arbitrary tree; **`query-kb --index <dir>`** queries it; **`generate-wiki`** turns `<index_base>/docs/**/*.md` into static HTML (tables, sidebar search, **`--watch`** / **`--open`**; see **`/index-project`**).",
       "**CI** — **`validate-skills`** after skill changes; **`verify-kb`** after KB build.",
       "**Agent inventory** — **`list-skills --json`**.",
       "**Authoring / audit** — **`analyze-skills`** (`--markdown` for paste-ready report; see **`skills-self-review-pro`**).",
@@ -880,6 +880,7 @@
     ],
     "references": [
       "anti-patterns.md",
+      "contributor-workflow.md",
       "decision-tree.md",
       "edge-cases.md",
       "failure-diagnosis-and-patterns.md",

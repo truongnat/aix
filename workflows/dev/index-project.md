@@ -2,9 +2,9 @@
 
 Build a **queryable index** of an arbitrary project: directory overview, tech stack, module summaries as Markdown, and a **local vector index** for retrieval. Use when onboarding to a codebase, preparing architecture review, or enabling agents to answer “where does X live?” without re-reading the whole tree.
 
-**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `w-index-project.md`.
+**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `index-project.md`.
 
-**Invoke:** `/w-index-project`
+**Invoke:** `/index-project`
 
 ## Metadata
 
@@ -147,7 +147,7 @@ Use **sub-agents** when the host IDE exposes a Task / sub-agent API (e.g. Cursor
   node dist/tools.js query-kb "where is authentication handled?" -k 3 --index <index_path>
   ```
 
-  Use queries tailored to the project (routing, database, API, UI). Compile **`project_index_report`** using **[`templates/report/project-index-report.md`](../../templates/report/project-index-report.md)** including sample results and recommended follow-ups (`/w-arch-review`, `/w-dep-audit`, `/w-onboarding`).
+  Use queries tailored to the project (routing, database, API, UI). Compile **`project_index_report`** using **[`templates/report/project-index-report.md`](../../templates/report/project-index-report.md)** including sample results and recommended follow-ups (`/arch-review`, `/dep-audit`, `/onboarding`).
 - **Output:** `project_index_report`.
 
 ### Step 7 — `generate-wiki`

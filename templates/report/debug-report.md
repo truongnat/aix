@@ -39,6 +39,6 @@
 
 ## Related
 
-- Workflow: [`workflows/dev/w-debug.md`](../../workflows/dev/w-debug.md)
+- Workflow: [`workflows/dev/debug.md`](../../workflows/dev/debug.md)
 - Prompt: [`prompts/debugging/root-cause-analysis.md`](../../prompts/debugging/root-cause-analysis.md)
 - Conventions: [`OUTPUT_CONVENTIONS.md`](../../OUTPUT_CONVENTIONS.md)

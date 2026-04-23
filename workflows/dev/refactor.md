@@ -2,9 +2,9 @@
 
 **Safe refactoring** with tests-first guardrails: intent → scope → tests → small steps → verify. Reduces regression risk when restructuring code without intended behavior change.
 
-**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `w-refactor.md`.
+**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `refactor.md`.
 
-**Invoke:** `/w-refactor`
+**Invoke:** `/refactor`
 
 ## Metadata
 

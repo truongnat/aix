@@ -54,7 +54,7 @@ Use **[Pillow](https://pillow.readthedocs.io/)** for API truth; this skill encod
 
 - Resize, crop, thumbnail, rotate, save formats, composite, EXIF.
 
-Details: [references/pillow-operations.md](references/pillow-operations.md)
+Details: [references/pillooperations.md](references/pillooperations.md)
 
 ### Tips and tricks (summary)
 
@@ -99,7 +99,7 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
-| Pillow operations | [references/pillow-operations.md](references/pillow-operations.md) |
+| Pillow operations | [references/pillooperations.md](references/pillooperations.md) |
 | Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
 | Decision tree | [references/decision-tree.md](references/decision-tree.md) |

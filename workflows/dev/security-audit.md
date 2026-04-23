@@ -2,9 +2,9 @@
 
 Structured **security audit** of a defined scope (service, PR, release candidate, or environment) using `security-pro`, `auth-pro`, and related skills. Produces a severity-ranked report aligned with OWASP-style thinking.
 
-**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `w-security-audit.md`.
+**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `security-audit.md`.
 
-**Invoke:** `/w-security-audit`
+**Invoke:** `/security-audit`
 
 ## Metadata
 
@@ -99,5 +99,5 @@ Final artifact MUST follow **[`templates/report/security-audit.md`](../../templa
 
 ## Notes
 
-- Pair with **`prompts/review/security-review-request.md`** when the user only has a natural-language ask.
+- Pair with **`prompts/review/security-revierequest.md`** when the user only has a natural-language ask.
 - Do not treat this workflow as penetration testing unless tools and authorization are explicit.

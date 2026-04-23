@@ -2,9 +2,9 @@
 
 Structured **API design review** (REST, GraphQL, or RPC-style) before implementation: contracts, versioning, errors, authz, and operability.
 
-**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `w-api-design.md`.
+**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `api-design.md`.
 
-**Invoke:** `/w-api-design`
+**Invoke:** `/api-design`
 
 ## Metadata
 
@@ -44,7 +44,7 @@ Structured **API design review** (REST, GraphQL, or RPC-style) before implementa
 
 Follow **[`OUTPUT_CONVENTIONS.md`](../../OUTPUT_CONVENTIONS.md)**.  
 Major design decisions: **[`templates/report/architecture-decision-record.md`](../../templates/report/architecture-decision-record.md)**.  
-Pair with **`prompts/review/api-review-request.md`** for a single prompt pass.
+Pair with **`prompts/review/api-revierequest.md`** for a single prompt pass.
 
 ## Time estimate
 

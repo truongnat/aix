@@ -2,9 +2,9 @@
 
 Structured **testing strategy** for a feature, release, or codebase area: pyramid shape, risk-based coverage, environments, and measurable exit criteria.
 
-**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `w-test-strategy.md`.
+**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `test-strategy.md`.
 
-**Invoke:** `/w-test-strategy`
+**Invoke:** `/test-strategy`
 
 ## Metadata
 

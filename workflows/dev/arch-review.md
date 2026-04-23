@@ -2,9 +2,9 @@
 
 Structured **architecture / design review** before or after a significant change: boundaries, coupling, failure modes, and alignment with NFRs (scalability, operability, security).
 
-**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `w-arch-review.md`.
+**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `arch-review.md`.
 
-**Invoke:** `/w-arch-review`
+**Invoke:** `/arch-review`
 
 ## Metadata
 

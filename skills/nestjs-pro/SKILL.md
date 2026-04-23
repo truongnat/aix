@@ -79,7 +79,7 @@ Details: [references/edge-cases.md](references/edge-cases.md)
 - **TypeORM**: prefer `QueryRunner` + transaction so session state does not leak across requests.
 - **PgBouncer** transaction mode: **session** variables are unreliable across transactions — align with [postgresql-rls-integration.md](references/postgresql-rls-integration.md).
 
-Details: [references/postgresql-rls-integration.md](references/postgresql-rls-integration.md) — deep link to SQL policies: [postgresql-pro row-level-security.md](../postgresql-pro/references/row-level-security.md)
+Details: [references/postgresql-rls-integration.md](references/postgresql-rls-integration.md) — deep link to SQL policies: [postgresql-pro rolevel-security.md](../postgresql-pro/references/rolevel-security.md)
 
 ### Decision trees (summary)
 
@@ -123,7 +123,7 @@ Details: [references/versions.md](references/versions.md)
 | Tips and patterns | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
 | **PostgreSQL RLS + Nest** | [references/postgresql-rls-integration.md](references/postgresql-rls-integration.md) |
-| RLS SQL (PostgreSQL) | [postgresql-pro row-level-security.md](../postgresql-pro/references/row-level-security.md) |
+| RLS SQL (PostgreSQL) | [postgresql-pro rolevel-security.md](../postgresql-pro/references/rolevel-security.md) |
 | Decision trees | [references/decision-tree.md](references/decision-tree.md) |
 | Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
 | Integration map | [references/integration-map.md](references/integration-map.md) |

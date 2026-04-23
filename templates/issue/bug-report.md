@@ -30,4 +30,4 @@ SEV-4 … SEV-1
 ## Related
 
 - Prompt: [`prompts/debugging/bug-report.md`](../../prompts/debugging/bug-report.md)
-- Workflow: [`workflows/dev/w-debug.md`](../../workflows/dev/w-debug.md)
+- Workflow: [`workflows/dev/debug.md`](../../workflows/dev/debug.md)

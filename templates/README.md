@@ -5,7 +5,7 @@ Authoring and **output** templates for skills, workflows, prompts, and reports.
 | Area | Path |
 |------|------|
 | Skill scaffold | [`skill/`](skill/) (see [`skills/examples/skill-template/`](../skills/examples/skill-template/)) |
-| Workflow scaffold | [`workflow/w-template.md`](workflow/w-template.md) |
+| Workflow scaffold | [`workflow/template.md`](workflow/template.md) |
 | Prompt scaffold | [`prompt/prompt-template.md`](prompt/prompt-template.md) |
 | Report — code review | [`report/code-review.md`](report/code-review.md) |
 | Report — security audit | [`report/security-audit.md`](report/security-audit.md) |

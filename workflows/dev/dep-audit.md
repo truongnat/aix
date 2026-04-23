@@ -2,9 +2,9 @@
 
 **Dependency and supply-chain audit** of manifests and lockfiles: known vulnerabilities, upgrade risk, license posture, and build integrity.
 
-**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `w-dep-audit.md`.
+**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `dep-audit.md`.
 
-**Invoke:** `/w-dep-audit`
+**Invoke:** `/dep-audit`
 
 ## Metadata
 

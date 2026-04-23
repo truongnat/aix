@@ -2,7 +2,7 @@
 
 **Domain:** `{{domain}}` — **`workflows/{{domain}}/`**. **Filename:** `w-{{slug}}.md`.
 
-**Invoke:** `/w-{{slug}}`
+**Invoke:** `/{{slug}}`
 
 ## Metadata
 

@@ -42,6 +42,6 @@
 
 ## Related
 
-- Workflow: [`workflows/dev/w-dep-audit.md`](../../workflows/dev/w-dep-audit.md)
+- Workflow: [`workflows/dev/dep-audit.md`](../../workflows/dev/dep-audit.md)
 - Prompt: [`prompts/analysis/dependency-audit.md`](../../prompts/analysis/dependency-audit.md)
 - Conventions: [`OUTPUT_CONVENTIONS.md`](../../OUTPUT_CONVENTIONS.md)

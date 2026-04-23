@@ -2,9 +2,9 @@
 
 Structured **onboarding** for new engineers or agents: repo layout, build/test commands, conventions, and a short path to a first meaningful contribution.
 
-**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `w-onboarding.md`.
+**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `onboarding.md`.
 
-**Invoke:** `/w-onboarding`
+**Invoke:** `/onboarding`
 
 ## Metadata
 

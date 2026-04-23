@@ -2,9 +2,9 @@
 
 **Production-urgent** fix: minimal change set, short branch lifetime, promote to prod, then merge back to ongoing dev lines. Uses **`git-operations-pro`**, **`deployment-pro`**, **`testing-pro`**, and stack **`*-pro`** as needed.
 
-**Domain:** `dev` — this file lives under **`workflows/dev/`** alongside [`w-ticket.md`](w-ticket.md). **Filename** follows the repo rule **`w-<slug>.md`** (see [`workflows/README.md`](../README.md#naming)).
+**Domain:** `dev` — this file lives under **`workflows/dev/`** alongside [`ticket.md`](ticket.md). **Filename** follows the repo rule **`w-<slug>.md`** (see [`workflows/README.md`](../README.md#naming)).
 
-**Invoke:** `/w-hotfix` (see [`.claude/commands/w-hotfix.md`](../../.claude/commands/w-hotfix.md)).
+**Invoke:** `/hotfix` (see [`.claude/commands/hotfix.md`](../../.claude/commands/hotfix.md)).
 
 ## Metadata
 
@@ -24,7 +24,7 @@
 ## Decision paths
 
 - **Symptom unclear:** Extend Step 1 until impact and blast radius are known; do not branch until scope is minimal.
-- **Fix requires feature work:** Stop hotfix path; use [`w-ticket.md`](w-ticket.md) or [`w-release.md`](w-release.md).
+- **Fix requires feature work:** Stop hotfix path; use [`ticket.md`](ticket.md) or [`release.md`](release.md).
 - **DB migration in hotfix:** Extra care — involve **`postgresql-pro`** + **`deployment-pro`**; prefer reversible or expand/contract ordering.
 
 ## Error handling
@@ -103,5 +103,5 @@ Follow **[`OUTPUT_CONVENTIONS.md`](../../OUTPUT_CONVENTIONS.md)** for risk callo
 
 ## Notes
 
-- Hotfix is **not** a substitute for full **`ticket`** / Kanban process — use [`w-ticket.md`](w-ticket.md) when the change can follow normal planning and `kanban/<ticket>/` artifacts.
+- Hotfix is **not** a substitute for full **`ticket`** / Kanban process — use [`ticket.md`](ticket.md) when the change can follow normal planning and `kanban/<ticket>/` artifacts.
 - If DB migrations are involved, use **`postgresql-pro`** (ordering, `CONCURRENTLY`, rollback) and **`deployment-pro`** zero-downtime cautions.

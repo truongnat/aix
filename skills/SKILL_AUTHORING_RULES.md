@@ -75,7 +75,7 @@ When you **add**, **remove**, or **rename** a bundled skill, or **add** a workfl
 |---------|------------------|
 | **Add** a bundled skill (`skills/<name>/`) | `skills/README.md` (table row); root **`README.md`** (Skills → Bundled examples); **`AGENTS.md`** (Bundled examples line); **§1** above (parenthesized skill list); **`knowledge-base/documents/repo/skills-layout.md`** (tree or folder list must include the new skill) |
 | **Remove** or **rename** a bundled skill | Same locations: delete or fix all mentions; **§1** list; **`skills-layout.md`** |
-| **Add** a workflow under `workflows/` | Root **`README.md`** (Workflows list); name runnable files **`w-<slug>.md`** (see [`workflows/README.md`](../workflows/README.md#naming)); domain **`README.md`** if under `workflows/<domain>/` |
+| **Add** a workflow under `workflows/` | Root **`README.md`** (Workflows list); name runnable files **`<slug>.md`** (see [`workflows/README.md`](../workflows/README.md#naming)); domain **`README.md`** if under `workflows/<domain>/` |
 | **Add** a new document under `knowledge-base/documents/**` | **`knowledge-base/INDEX.md`** (new row with path and short description) |
 | **Substantive edit** to a bundled skill (`skills/<name>/SKILL.md` or `references/*.md` when text changes what the skill “says” for routing/embeddings) | **`node dist/tools.js build-skill-index`** so `knowledge-base/embeddings/skill_index.json` stays current (used by `/route`, `/find-skill`, etc.). If **`name`** or YAML frontmatter changed: **`node dist/tools.js validate-skills`** first |
 

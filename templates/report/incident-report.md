@@ -36,5 +36,5 @@
 
 ## Related
 
-- Workflow: [`workflows/dev/w-incident.md`](../../workflows/dev/w-incident.md)
+- Workflow: [`workflows/dev/incident.md`](../../workflows/dev/incident.md)
 - Conventions: [`OUTPUT_CONVENTIONS.md`](../../OUTPUT_CONVENTIONS.md)

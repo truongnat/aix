@@ -2,9 +2,9 @@
 
 Structured **production incident response**: triage → mitigate → communicate → resolve → follow-up. Complements `w-debug` (technical root cause) with coordination and reporting.
 
-**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `w-incident.md`.
+**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `incident.md`.
 
-**Invoke:** `/w-incident`
+**Invoke:** `/incident`
 
 ## Metadata
 

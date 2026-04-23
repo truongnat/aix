@@ -24,7 +24,7 @@ Official command list: **[`scripts/README.md`](../../scripts/README.md)** at rep
 ## When to use
 
 - **Multiple** KB questions in one session — **`node dist/tools.js query-kb-batch`** (or `npm run query-kb-batch`).
-- **Project index + wiki** — **`index-project`** builds embeddings for an arbitrary tree; **`query-kb --index <dir>`** queries it; **`generate-wiki`** turns `<index_base>/docs/**/*.md` into static HTML (tables, sidebar search, **`--watch`** / **`--open`**; see **`/w-index-project`**).
+- **Project index + wiki** — **`index-project`** builds embeddings for an arbitrary tree; **`query-kb --index <dir>`** queries it; **`generate-wiki`** turns `<index_base>/docs/**/*.md` into static HTML (tables, sidebar search, **`--watch`** / **`--open`**; see **`/index-project`**).
 - **CI** — **`validate-skills`** after skill changes; **`verify-kb`** after KB build.
 - **Agent inventory** — **`list-skills --json`**.
 - **Authoring / audit** — **`analyze-skills`** (`--markdown` for paste-ready report; see **`skills-self-review-pro`**).

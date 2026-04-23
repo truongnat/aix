@@ -55,7 +55,7 @@ Use **vendor official documentation** and **primary** repositories for **API tru
 
 - Decomposition, **authority**, **recency**, **cross-check**; relation to **`query_kb`**.
 
-Details: [references/workflow-sources-and-evaluation.md](references/workflow-sources-and-evaluation.md)
+Details: [references/workflosources-and-evaluation.md](references/workflosources-and-evaluation.md)
 
 ### Citations and stale URLs (summary)
 
@@ -106,7 +106,7 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
-| Workflow & evaluation | [references/workflow-sources-and-evaluation.md](references/workflow-sources-and-evaluation.md) |
+| Workflow & evaluation | [references/workflosources-and-evaluation.md](references/workflosources-and-evaluation.md) |
 | Citations & stale URLs | [references/citations-and-stale-urls.md](references/citations-and-stale-urls.md) |
 | Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |

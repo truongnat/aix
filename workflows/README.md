@@ -6,16 +6,16 @@ This repo does **not** require an automated engine: an agent (or you) reads the 
 
 ## Naming
 
-- **Runnable workflow files** use the prefix **`w-`**: pattern **`w-<slug>.md`** (e.g. `w-ticket.md`, `w-hotfix.md`, `w-release.md`). This matches slash commands **`/w-<slug>`** via a single stub in **`commands/w-<slug>.md`** (deployed to **`.cursor/commands/`** and **`.claude/commands/`** by the installer, or symlinked in this repo for dev).
-- **Index files** only: `README.md` in `workflows/` or `workflows/<domain>/` — **no** `w-` prefix.
+- **Runnable workflow files** use a **slug** name: pattern **`<slug>.md`** (e.g. `ticket.md`, `hotfix.md`, `release.md`). This matches slash commands **`/<slug>`** via a single stub in **`commands/<slug>.md`** (deployed to **`.cursor/commands/`** and **`.claude/commands/`** by the installer, or symlinked in this repo for dev).
+- **Index files** only: `README.md` in `workflows/` or `workflows/<domain>/` — no prefix.
 
 ## Bundled workflows (by domain)
 
 | Domain | Index | Workflows |
 |--------|--------|-----------|
-| **dev** | [`dev/README.md`](dev/README.md) | [`dev/w-ticket.md`](dev/w-ticket.md) (`ticket`, **`/w-ticket`**), [`dev/w-hotfix.md`](dev/w-hotfix.md) (`hotfix`, **`/w-hotfix`**), [`dev/w-release.md`](dev/w-release.md) (`release`, **`/w-release`**), [`dev/w-code-review.md`](dev/w-code-review.md), [`dev/w-debug.md`](dev/w-debug.md), [`dev/w-security-audit.md`](dev/w-security-audit.md), [`dev/w-arch-review.md`](dev/w-arch-review.md), [`dev/w-perf-investigation.md`](dev/w-perf-investigation.md), [`dev/w-refactor.md`](dev/w-refactor.md), [`dev/w-incident.md`](dev/w-incident.md), [`dev/w-data-migration.md`](dev/w-data-migration.md), [`dev/w-onboarding.md`](dev/w-onboarding.md), [`dev/w-api-design.md`](dev/w-api-design.md), [`dev/w-test-strategy.md`](dev/w-test-strategy.md), [`dev/w-dep-audit.md`](dev/w-dep-audit.md), [`dev/w-index-project.md`](dev/w-index-project.md) (**`/w-index-project`**) |
+| **dev** | [`dev/README.md`](dev/README.md) | [`dev/ticket.md`](dev/ticket.md) (`ticket`, **`/ticket`**), [`dev/hotfix.md`](dev/hotfix.md) (`hotfix`, **`/hotfix`**), [`dev/release.md`](dev/release.md) (`release`, **`/release`**), [`dev/code-review.md`](dev/code-review.md), [`dev/debug.md`](dev/debug.md), [`dev/security-audit.md`](dev/security-audit.md), [`dev/arch-review.md`](dev/arch-review.md), [`dev/perf-investigation.md`](dev/perf-investigation.md), [`dev/refactor.md`](dev/refactor.md), [`dev/incident.md`](dev/incident.md), [`dev/data-migration.md`](dev/data-migration.md), [`dev/onboarding.md`](dev/onboarding.md), [`dev/api-design.md`](dev/api-design.md), [`dev/test-strategy.md`](dev/test-strategy.md), [`dev/dep-audit.md`](dev/dep-audit.md), [`dev/index-project.md`](dev/index-project.md) (**`/index-project`**) |
 
-Slash commands are authored once under **`commands/`** (see [`commands/README.md`](../commands/README.md)). **`w-*.md`** stubs include **`targets: [cursor, claude]`** by default. Routing helpers (`route`, `optimize`, `find-skill`, `run-workflow`) use **`targets: [claude]`** only. **`.cursor/commands/`** and **`.claude/commands/`** in this repo are symlinks into **`commands/`** for IDE discovery.
+Slash commands are authored once under **`commands/`** (see [`commands/README.md`](../commands/README.md)). **`*.md`** stubs include **`targets: [cursor, claude]`** by default. Routing helpers (`route`, `optimize`, `find-skill`, `run-workflow`) use **`targets: [claude]`** only. **`.cursor/commands/`** and **`.claude/commands/`** in this repo are symlinks into **`commands/`** for IDE discovery.
 
 ## Parallel execution
 
@@ -46,7 +46,7 @@ Each workflow should include:
 
 ## Short example
 
-Save as **`w-my-flow.md`** (see [Naming](#naming) above).
+Save as **`my-flow.md`** (see [Naming](#naming) above).
 
 ```markdown
 # Workflow: my-flow

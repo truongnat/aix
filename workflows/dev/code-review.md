@@ -2,9 +2,9 @@
 
 Structured **code review** using bundled skills under [`skills/`](../../skills/). Produces actionable, severity-ranked feedback covering correctness, security, performance, maintainability, and test coverage.
 
-**Domain:** `dev` — lives under **`workflows/dev/`**. **Filename:** `w-code-review.md`.
+**Domain:** `dev` — lives under **`workflows/dev/`**. **Filename:** `code-review.md`.
 
-**Invoke:** `/w-code-review`
+**Invoke:** `/code-review`
 
 ## Metadata
 

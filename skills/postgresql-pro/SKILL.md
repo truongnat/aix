@@ -88,7 +88,7 @@ Details: [references/edge-cases.md](references/edge-cases.md)
 - **Connection pooling** (`PgBouncer`, serverless pools): session variables / JWT context must be set **per connection or transaction** as required.
 - Prefer **restrictive** policies (PostgreSQL 15+) when you need AND semantics across multiple policies.
 
-Details: [references/row-level-security.md](references/row-level-security.md)
+Details: [references/rolevel-security.md](references/rolevel-security.md)
 
 ### Decision trees (summary)
 
@@ -130,7 +130,7 @@ Details: [references/versions.md](references/versions.md)
 | Schema and query design | [references/schema-and-query-design.md](references/schema-and-query-design.md) |
 | Tips and patterns | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases and ops | [references/edge-cases.md](references/edge-cases.md) |
-| **Row Level Security (RLS)** | [references/row-level-security.md](references/row-level-security.md) |
+| **Row Level Security (RLS)** | [references/rolevel-security.md](references/rolevel-security.md) |
 | Decision trees | [references/decision-tree.md](references/decision-tree.md) |
 | Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
 | Integration map | [references/integration-map.md](references/integration-map.md) |

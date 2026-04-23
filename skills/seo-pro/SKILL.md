@@ -55,7 +55,7 @@ Do **not** duplicate framework API tutorials; state **SEO requirement** here and
 
 - Phases: **baseline → audit → strategy → implement → measure → iterate**; roles and KPIs; GSC as primary diagnostic surface.
 
-Details: [references/seo-flow-and-lifecycle.md](references/seo-flow-and-lifecycle.md)
+Details: [references/seo-floand-lifecycle.md](references/seo-floand-lifecycle.md)
 
 ### Technical SEO and crawl (summary)
 
@@ -106,7 +106,7 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
-| Flow & lifecycle | [references/seo-flow-and-lifecycle.md](references/seo-flow-and-lifecycle.md) |
+| Flow & lifecycle | [references/seo-floand-lifecycle.md](references/seo-floand-lifecycle.md) |
 | Technical SEO & crawl | [references/technical-seo-and-crawl.md](references/technical-seo-and-crawl.md) |
 | Tips and patterns | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |

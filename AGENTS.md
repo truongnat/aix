@@ -26,22 +26,22 @@ Use these commands to analyze, optimize, and route prompts to the best skills:
 | `/optimize <prompt>` | Reduce prompt tokens while preserving meaning |
 | `/find-skill <prompt>` | Find best matching skill(s) for a prompt |
 | `/run-workflow <prompt>` | Match prompt to workflows under `workflows/` and skills, guide execution |
-| `/w-ticket` | Run the **ticket** workflow ([`workflows/dev/w-ticket.md`](workflows/dev/w-ticket.md)) — Kanban; layout and phases in that file (skills under [`skills/`](skills/)) |
-| `/w-release` | Run the **release** workflow ([`workflows/dev/w-release.md`](workflows/dev/w-release.md)) — release notes → implementation detail |
-| `/w-hotfix` | Run the **hotfix** workflow ([`workflows/dev/w-hotfix.md`](workflows/dev/w-hotfix.md)) — prod-urgent fix path |
-| `/w-code-review` | Structured code review ([`workflows/dev/w-code-review.md`](workflows/dev/w-code-review.md)) |
-| `/w-debug` | Systematic debugging ([`workflows/dev/w-debug.md`](workflows/dev/w-debug.md)) |
-| `/w-security-audit` | Security audit ([`workflows/dev/w-security-audit.md`](workflows/dev/w-security-audit.md)) |
-| `/w-arch-review` | Architecture review ([`workflows/dev/w-arch-review.md`](workflows/dev/w-arch-review.md)) |
-| `/w-perf-investigation` | Performance investigation ([`workflows/dev/w-perf-investigation.md`](workflows/dev/w-perf-investigation.md)) |
-| `/w-refactor` | Safe refactor ([`workflows/dev/w-refactor.md`](workflows/dev/w-refactor.md)) |
-| `/w-incident` | Incident response ([`workflows/dev/w-incident.md`](workflows/dev/w-incident.md)) |
-| `/w-data-migration` | Data migration ([`workflows/dev/w-data-migration.md`](workflows/dev/w-data-migration.md)) |
-| `/w-onboarding` | Onboarding ([`workflows/dev/w-onboarding.md`](workflows/dev/w-onboarding.md)) |
-| `/w-api-design` | API design review ([`workflows/dev/w-api-design.md`](workflows/dev/w-api-design.md)) |
-| `/w-test-strategy` | Test strategy ([`workflows/dev/w-test-strategy.md`](workflows/dev/w-test-strategy.md)) |
-| `/w-dep-audit` | Dependency audit ([`workflows/dev/w-dep-audit.md`](workflows/dev/w-dep-audit.md)) |
-| `/w-index-project` | Index a project: overview docs + `index-project` CLI + query via `query-kb --index`; optional **parallel** Steps 3–4 via Task/sub-agents; **Step 7** wiki: `generate-wiki` or GitNexus `wiki` ([`workflows/dev/w-index-project.md`](workflows/dev/w-index-project.md)) |
+| `/ticket` | Run the **ticket** workflow ([`workflows/dev/ticket.md`](workflows/dev/ticket.md)) — Kanban; layout and phases in that file (skills under [`skills/`](skills/)) |
+| `/release` | Run the **release** workflow ([`workflows/dev/release.md`](workflows/dev/release.md)) — release notes → implementation detail |
+| `/hotfix` | Run the **hotfix** workflow ([`workflows/dev/hotfix.md`](workflows/dev/hotfix.md)) — prod-urgent fix path |
+| `/code-review` | Structured code review ([`workflows/dev/code-review.md`](workflows/dev/code-review.md)) |
+| `/debug` | Systematic debugging ([`workflows/dev/debug.md`](workflows/dev/debug.md)) |
+| `/security-audit` | Security audit ([`workflows/dev/security-audit.md`](workflows/dev/security-audit.md)) |
+| `/arch-review` | Architecture review ([`workflows/dev/arch-review.md`](workflows/dev/arch-review.md)) |
+| `/perf-investigation` | Performance investigation ([`workflows/dev/perf-investigation.md`](workflows/dev/perf-investigation.md)) |
+| `/refactor` | Safe refactor ([`workflows/dev/refactor.md`](workflows/dev/refactor.md)) |
+| `/incident` | Incident response ([`workflows/dev/incident.md`](workflows/dev/incident.md)) |
+| `/data-migration` | Data migration ([`workflows/dev/data-migration.md`](workflows/dev/data-migration.md)) |
+| `/onboarding` | Onboarding ([`workflows/dev/onboarding.md`](workflows/dev/onboarding.md)) |
+| `/api-design` | API design review ([`workflows/dev/api-design.md`](workflows/dev/api-design.md)) |
+| `/test-strategy` | Test strategy ([`workflows/dev/test-strategy.md`](workflows/dev/test-strategy.md)) |
+| `/dep-audit` | Dependency audit ([`workflows/dev/dep-audit.md`](workflows/dev/dep-audit.md)) |
+| `/index-project` | Index a project: overview docs + `index-project` CLI + query via `query-kb --index`; optional **parallel** Steps 3–4 via Task/sub-agents; **Step 7** wiki: `generate-wiki` or GitNexus `wiki` ([`workflows/dev/index-project.md`](workflows/dev/index-project.md)) |
 
 Commands read from `knowledge-base/embeddings/skill_index.json`. Rebuild after adding/changing skills:
 
@@ -60,7 +60,7 @@ Agents should prefer:
 
 ## Workflows
 
-Bundled **dev** workflows: [`workflows/dev/README.md`](workflows/dev/README.md) — ticket, release, hotfix, code review, debug, security audit, arch review, perf investigation, refactor, incident, data migration, onboarding, API design, test strategy, dep audit, **index project** (see table in dev README). Naming: runnable workflow files **`w-<slug>.md`** — see [`workflows/README.md`](workflows/README.md#naming). For ticket flow, **`kanban/<ticket>/`** layout and steps are in [`workflows/dev/w-ticket.md`](workflows/dev/w-ticket.md).
+Bundled **dev** workflows: [`workflows/dev/README.md`](workflows/dev/README.md) — ticket, release, hotfix, code review, debug, security audit, arch review, perf investigation, refactor, incident, data migration, onboarding, API design, test strategy, dep audit, **index project** (see table in dev README). Naming: runnable workflow files **`<slug>.md`** — see [`workflows/README.md`](workflows/README.md#naming). For ticket flow, **`kanban/<ticket>/`** layout and steps are in [`workflows/dev/ticket.md`](workflows/dev/ticket.md).
 
 ## Configuration
 

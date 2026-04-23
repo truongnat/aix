@@ -1,6 +1,6 @@
 # Project index report
 
-Use this template after **`w-index-project`** / **`/w-index-project`**. Replace placeholders. Follow **[`OUTPUT_CONVENTIONS.md`](../../OUTPUT_CONVENTIONS.md)**.
+Use this template after **`w-index-project`** / **`/index-project`**. Replace placeholders. Follow **[`OUTPUT_CONVENTIONS.md`](../../OUTPUT_CONVENTIONS.md)**.
 
 ## Executive summary
 
@@ -62,9 +62,9 @@ Run with: `node dist/tools.js query-kb "<query>" -k 3 --index {{index_path}}`
 
 | Workflow | Why |
 |----------|-----|
-| `/w-arch-review` | {{reason}} |
-| `/w-dep-audit` | {{reason}} |
-| `/w-onboarding` | {{reason}} |
+| `/arch-review` | {{reason}} |
+| `/dep-audit` | {{reason}} |
+| `/onboarding` | {{reason}} |
 
 ## Related artifacts
 

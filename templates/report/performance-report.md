@@ -47,5 +47,5 @@
 
 ## Related
 
-- Workflow: [`workflows/dev/w-perf-investigation.md`](../../workflows/dev/w-perf-investigation.md)
+- Workflow: [`workflows/dev/perf-investigation.md`](../../workflows/dev/perf-investigation.md)
 - Conventions: [`OUTPUT_CONVENTIONS.md`](../../OUTPUT_CONVENTIONS.md)

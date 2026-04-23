@@ -2,9 +2,9 @@
 
 Structured **database / data migration** planning and execution: schema changes, backfills, cutovers, and rollback — with explicit risk tiers and verification gates.
 
-**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `w-data-migration.md`.
+**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `data-migration.md`.
 
-**Invoke:** `/w-data-migration`
+**Invoke:** `/data-migration`
 
 ## Metadata
 

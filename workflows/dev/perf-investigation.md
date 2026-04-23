@@ -2,9 +2,9 @@
 
 Repeatable **performance investigation**: baseline → reproduce → profile → hypothesis → fix → verify. Works for latency, throughput, memory, and DB-bound regressions.
 
-**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `w-perf-investigation.md`.
+**Domain:** `dev` — **`workflows/dev/`**. **Filename:** `perf-investigation.md`.
 
-**Invoke:** `/w-perf-investigation`
+**Invoke:** `/perf-investigation`
 
 ## Metadata
 
