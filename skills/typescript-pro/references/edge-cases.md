@@ -1,5 +1,7 @@
 # TypeScript — Edge cases
 
+**Related:** checker/boundary model — [typescript-typechecking-and-boundaries-system-model.md](typescript-typechecking-and-boundaries-system-model.md), [failure-modes-detection-mitigation.md](failure-modes-detection-mitigation.md).
+
 ## Excess property checks
 
 Only triggered on fresh object literals:

@@ -12,3 +12,4 @@
 ## Local vs web
 
 - **Repo has `build-kb`** → query **`query-kb`** before expensive browsing.
+- **KB hit looks authoritative** → still verify **versioned** facts on official docs when the stack moves fast — stale embeddings are a first-class risk.

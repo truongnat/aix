@@ -1,5 +1,7 @@
 # Edge cases and flakiness
 
+**Related:** signal and failure framing — [testing-pyramid-ci-and-feedback-system-model.md](testing-pyramid-ci-and-feedback-system-model.md), [failure-modes-detection-mitigation.md](failure-modes-detection-mitigation.md).
+
 ## Flaky tests
 
 **Symptoms**: pass locally, fail in CI, or random order failures.

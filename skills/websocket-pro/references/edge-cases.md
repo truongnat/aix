@@ -1,5 +1,7 @@
 # WebSocket edge cases
 
+**Related:** lifecycle/scaling model — [websocket-connection-and-message-system-model.md](websocket-connection-and-message-system-model.md), [failure-modes-detection-mitigation.md](failure-modes-detection-mitigation.md).
+
 ## Reconnect and ordering hazards
 
 - In-flight messages during disconnect can be lost or delivered out of order.

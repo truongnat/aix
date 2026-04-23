@@ -1,29 +1,40 @@
 ---
 name: typescript-pro
 description: |
-  Professional TypeScript development: type system depth, compiler configuration, generics, utility types, strict mode, declaration files, and migration from JavaScript.
+  Production-grade TypeScript: typechecking and boundary model, failure modes (resolution drift, `any` creep, build vs editor TS version), decision trade-offs (strictness ramp, `satisfies` vs annotation, branded types vs runtime validation), quality guardrails (no invented `compilerOptions`; cite TS version and official docs).
 
   Use this skill when the user works on TypeScript, tsconfig, type inference, generics, mapped/conditional/template-literal types, utility types (Partial, Required, Pick, Omit, Record, ReturnType, etc.), declaration files (.d.ts), type narrowing, discriminated unions, module resolution, path aliases, strict null checks, type guards, satisfies operator, const assertions, or migrating JavaScript to TypeScript.
+
+  Combine with **`javascript-pro`** for runtime JS semantics, **`react-pro`** / **`nextjs-pro`** / **`nestjs-pro`** for framework typing, **`testing-pro`** for test utility typing.
 
   Triggers: "TypeScript", "tsconfig", "type error", "TS2322", "TS2532", "TS18048", "generic", "interface", "type alias", "infer", "conditional type", "mapped type", "utility type", "ReturnType", "Partial", "Pick", "Omit", "satisfies", "as const", ".d.ts", "declaration file", "strict mode", "noImplicitAny", "exactOptionalPropertyTypes", "module resolution", "path alias", "NodeNext", "verbatimModuleSyntax", "tsc", "type guard", "discriminated union", "never", "unknown", "keyof", "typeof", "branded type".
 
 metadata:
-  short-description: TypeScript — type system, generics, strict config, migration
+  short-description: TypeScript — type flow, tsconfig, failure modes, strictness, migration
+  content-language: en
+  domain: typescript
+  level: professional
 ---
 
 # TypeScript (professional)
 
-Use official [TypeScript docs](https://www.typescriptlang.org/docs/) for language reference; this skill encodes **type system discipline**, **compiler configuration best practices**, and **edge-case awareness** (inference limits, module resolution, declaration merging). Confirm **TypeScript version**, **tsconfig `strict` settings**, and **module system** (`ESM` vs `CJS`) when known.
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use official [TypeScript docs](https://www.typescriptlang.org/docs/) for language reference; this skill encodes **type system discipline**, **compiler configuration**, **failure modes**, and **edge-case awareness** — not a full duplicate of the handbook. Confirm **TypeScript version**, **`tsconfig` `strict` settings**, and **module system** (`ESM` vs `CJS` / `NodeNext`) when known.
+
+## Boundary
+
+**`typescript-pro`** owns **types, narrowing, generics, and `tsconfig` semantics** at the language level. **`javascript-pro`** owns **runtime JS** behavior when the bug is not a type issue. Framework skills own **idiomatic patterns** for React/Nest/Next wiring.
 
 ## Related skills (this repo)
 
 | Skill | When to combine |
 |-------|----------------|
-| `javascript-pro` | When JS runtime behavior (closures, prototypes, async) underlies the TS issue |
-| `react-pro` | TSX, component prop types, hook generics |
-| `nextjs-pro` | App Router types, `metadata`, server/client component boundaries |
-| `nestjs-pro` | Decorator metadata, controller/service types |
-| `testing-pro` | Typing test utilities, mock types |
+| **`javascript-pro`** | Runtime behavior (closures, prototypes, async) underlies the issue |
+| **`react-pro`** | TSX, props, hook generics |
+| **`nextjs-pro`** | App Router types, `metadata`, server/client boundaries |
+| **`nestjs-pro`** | Decorator metadata, controller/service DTO types |
+| **`testing-pro`** | Mock typing, helper generics |
 
 ## When to use
 
@@ -32,85 +43,122 @@ Use official [TypeScript docs](https://www.typescriptlang.org/docs/) for languag
 - Configuring `tsconfig.json` for strict correctness and module compatibility.
 - Writing declaration files for JS libraries or augmenting third-party types.
 - Migrating a JavaScript codebase to TypeScript incrementally.
-- Trigger keywords: `TypeScript`, `tsconfig`, `generic`, `type error`, `infer`, `conditional type`, `strict`, `discriminated union`, `.d.ts`, …
+
+## When not to use
+
+- **Pure runtime** bug with no type angle — **`javascript-pro`** or stack skill.
+- **Bundler-only** config (e.g. Vite plugins) as primary topic — framework/build skill; pair here for `moduleResolution` alignment.
+
+## Required inputs
+
+- **TypeScript version** (or `package.json` constraint).
+- **`tsconfig.json`** relevant flags when debugging resolution/strict errors.
+
+## Expected output
+
+Follow **Suggested response format (STRICT)** — context through residual risks.
 
 ## Workflow
 
-1. Confirm TypeScript version, `strict` flags in `tsconfig.json`, and module system (ESM/CJS/NodeNext).
-2. Apply the principles and topic summaries below; open `references/` when you need depth.
-3. Respond using **Suggested response format**; call out breaking type changes and migration risks.
+1. Confirm TypeScript version, `strict` flags, and module system (`ESM`/`CJS`/`NodeNext`).
+2. Apply summaries; open `references/` for depth.
+3. Respond with **Suggested response format (STRICT)**; call out breaking type changes and migration risks.
 
 ### Operating principles
 
-1. **Enable strict mode** — `"strict": true` catches the most bugs; enable per-flag only when migrating incrementally.
-2. **Prefer `unknown` over `any`** — forces explicit narrowing; reserve `any` for genuine escape hatches with a comment.
-3. **Type at boundaries** — strongest types at external input (API responses, user input, env vars); let inference flow inward.
-4. **Narrow explicitly** — use type guards, discriminated unions, and `satisfies` rather than assertions.
-5. **Generics express relationships** — a generic `<T>` should connect input to output; avoid generics that just rename `unknown`.
-6. **Avoid type gymnastics** — complex mapped/conditional types should live in `references/` with documentation; keep call-site types readable.
+1. **Enable strict mode** — `"strict": true` catches the most bugs; enable per-flag only when migrating incrementally — **`decision-framework-and-trade-offs.md`**.
+2. **Prefer `unknown` over `any`** — forces explicit narrowing; reserve `any` for genuine escape hatches with a comment — **`decision-tree.md`**.
+3. **Type at boundaries** — strongest types at external input (API responses, user input, env vars); let inference flow inward — **`typescript-typechecking-and-boundaries-system-model.md`**.
+4. **Narrow explicitly** — type guards, discriminated unions, `satisfies` rather than blind assertions — **`decision-tree.md`**.
+5. **Generics express relationships** — a generic `<T>` should connect input to output — **`type-system.md`**.
+6. **Avoid type gymnastics** — complex mapped/conditional types live in well-documented modules — **`anti-patterns.md`**.
+
+### Typechecking flow and boundaries (summary)
+
+Parse/check/emit mental model, structural typing, IO boundaries — **`typescript-typechecking-and-boundaries-system-model.md`**.
+
+Details: [references/typescript-typechecking-and-boundaries-system-model.md](references/typescript-typechecking-and-boundaries-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+`any` creep, resolution drift, generic inference, CI vs editor TS — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Strictness ramp, `satisfies` vs annotation, brands vs runtime validation, project references — **`decision-framework-and-trade-offs.md`**, **`decision-tree.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+No invented `compilerOptions`; evidence from official docs/version — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Type system depth (summary)
 
-- **Generics** — constrain with `extends`; use `infer` for extraction inside conditional types; default type parameters for convenience.
-- **Mapped types** — `{ [K in keyof T]: ... }` for transformations; `+readonly`/`-?` modifiers to add/remove flags.
-- **Conditional types** — `T extends U ? X : Y`; distributive over unions; `infer` captures sub-types.
-- **Template literal types** — combine string unions: `` `on${Capitalize<E>}` `` for event maps.
-- **Utility types** — `Partial`, `Required`, `Readonly`, `Pick`, `Omit`, `Record`, `ReturnType`, `Parameters`, `Awaited`, `NonNullable`.
+Generics, mapped/conditional types, utilities — **`type-system.md`**.
 
 Details: [references/type-system.md](references/type-system.md)
 
 ### Compiler configuration (summary)
 
-- **`target`** — JS output level; set to the minimum runtime you support.
-- **`module` / `moduleResolution`** — use `NodeNext` for Node ESM; `Bundler` for Vite/webpack; match `module` and `moduleResolution`.
-- **`paths` and `baseUrl`** — path aliases require bundler/loader support; document the mapping.
-- **`isolatedModules`** — required for transpile-only tools (esbuild, SWC, Babel); bans `const enum` and `namespace` merging.
-- **`declaration` + `declarationMap`** — emit `.d.ts` for libraries; sourcemaps for IDE navigation.
+`target`, `module`, `moduleResolution`, `paths`, `isolatedModules`, declarations — **`tsconfig.md`**.
 
 Details: [references/tsconfig.md](references/tsconfig.md)
 
 ### Tips and tricks (summary)
 
-- **`satisfies` operator** — validate shape without widening: `const config = { ... } satisfies Config`.
-- **`as const`** — narrow literal types; use for enum-like objects and route tables.
-- **Discriminated unions** — add a literal `kind` or `type` field; exhaustive checks with `never` in the default branch.
-- **Type narrowing** — `typeof`, `instanceof`, `in`, custom type predicates (`is`), assertion functions.
-- **Module augmentation** — extend third-party types with `declare module 'pkg' { ... }` in `.d.ts` files.
+`satisfies`, `as const`, discriminated unions, narrowing, module augmentation — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- **Excess property checks** — only on fresh object literals; assign to variable first to bypass (intentionally).
-- **Variance** — function parameters are bivariant by default under `strictFunctionTypes`; return types are covariant.
-- **`isolatedModules` gotchas** — must use `import type` for type-only imports; no `const enum`.
-- **Declaration merging** — `interface` merges; `type` does not; prefer `interface` for extensible public APIs.
-- **`noUncheckedIndexedAccess`** — adds `| undefined` to indexed access; enables safer array/record reads.
+Excess property checks, variance, `isolatedModules`, declaration merging, `noUncheckedIndexedAccess` — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
 ### Anti-patterns (summary)
 
-- **`as` silencing**, **`any` in public APIs**, **path alias mismatch** — [references/anti-patterns.md](references/anti-patterns.md).
+`as` silencing, `any` in public APIs, path alias mismatch — **`anti-patterns.md`**.
 
-### Integration with other skills (summary)
+Details: [references/anti-patterns.md](references/anti-patterns.md)
 
-- **`react-pro`**, **`nestjs-pro`**, **`testing-pro`** — [references/integration-map.md](references/integration-map.md).
+### Cross-skill handoffs (summary)
 
-### Suggested response format (implement / review)
+**`integration-map.md`**.
 
-1. **Issue or goal** — Type error, design question, or migration task.
-2. **Recommendation** — Type strategy, tsconfig change, or refactor approach.
-3. **Code** — TypeScript snippets with inline type annotations or diff-style blocks.
-4. **Residual risks** — Breaking type changes, inference surprises, or runtime/compile mismatches.
+Details: [references/integration-map.md](references/integration-map.md)
+
+### Versions (summary)
+
+`@types` lag, TS release alignment — **`versions.md`**.
+
+Details: [references/versions.md](references/versions.md)
+
+## Suggested response format (STRICT — implement / review)
+
+1. **Context** — TS version, `strict` flags, `module`/`moduleResolution`, monorepo vs single package.
+2. **Problem / goal** — Type error, API design typing, migration step, or config change.
+3. **System design** — Where types flow (boundary → core) — **`typescript-typechecking-and-boundaries-system-model.md`**.
+4. **Decision reasoning** — `satisfies` vs annotation, strict ramp, project references — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — TS snippets or `tsconfig` diff; align with **`quality-validation-and-guardrails.md`** (no invented flags).
+6. **Trade-offs** — Readability vs advanced conditional types; strictness vs migration speed.
+7. **Failure modes** — Resolution, widening, version skew — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Runtime validation still needed; hand off to **`react-pro`** / **`nestjs-pro`** / **`javascript-pro`** when appropriate.
 
 ## Resources in this skill
 
-- `references/` — topic deep-dives; do not paste entire reference docs into SKILL.md.
-
 | Topic | File |
 |-------|------|
-| **Type system depth** | [references/type-system.md](references/type-system.md) |
+| **Typechecking & boundaries model** | [references/typescript-typechecking-and-boundaries-system-model.md](references/typescript-typechecking-and-boundaries-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Type system depth | [references/type-system.md](references/type-system.md) |
 | Compiler config | [references/tsconfig.md](references/tsconfig.md) |
 | Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
@@ -123,26 +171,25 @@ Details: [references/edge-cases.md](references/edge-cases.md)
 
 ### 1 — Simple (common)
 
-**Input:** TypeScript error `Type 'string | undefined' is not assignable to type 'string'` after enabling `strictNullChecks`.  
-**Expected output:** Explain null narrowing; show `if (x !== undefined)` guard, optional chaining `x?.trim()`, and nullish coalescing `x ?? 'default'`; note when to use non-null assertion `!` and when not to.
+**Input:** `Type 'string | undefined' is not assignable to type 'string'` after `strictNullChecks`.  
+**Expected output:** Full **Suggested response format (STRICT)** — guards, `?.`, `??`, when `!` is unacceptable.
 
 ### 2 — Tricky (edge case)
 
-**Input:** `satisfies` vs `: Config` vs `as Config` for a large config object — which to pick?  
-**Expected output:** Prefer `satisfies Config` to validate without widening literals; use `: Config` when intentional widening; reserve `as` for narrow escape with comment.
+**Input:** `satisfies` vs `: Config` vs `as Config` for a large config object.  
+**Expected output:** Prefer `satisfies`; widening vs escape hatch — **`decision-tree.md`**, **`decision-framework-and-trade-offs.md`**.
 
 ### 3 — Cross-skill
 
-**Input:** React component props typed with `any` for `children` and event handlers.  
-**Expected output:** **`typescript-pro`** for `ReactNode`, `ComponentProps`, `MouseEvent` typing; **`react-pro`** for whether composition/API is idiomatic.
+**Input:** React props typed `any` for `children` and events.  
+**Expected output:** **`typescript-pro`** for `ReactNode`, `ComponentProps`, events; **`react-pro`** for idiomatic component API.
 
 ## Checklist before calling the skill done
 
-- [ ] `strict: true` (or explicit flags) enabled; no unintentional `any` without comment.
-- [ ] Generics constrain and connect types rather than being aliases for `unknown`.
-- [ ] `tsconfig.json` `module`/`moduleResolution` match the build tool.
-- [ ] Discriminated unions or type guards used for narrowing; no blind `as` casts.
-- [ ] `import type` used for type-only imports when `isolatedModules` is enabled.
-- [ ] External input validated at boundaries (schema) when runtime shape matters.
-- [ ] `satisfies` / `as const` considered before widening or assertion.
-- [ ] Public library APIs use `interface` for extensibility; `.d.ts` emitted if publishing.
+- [ ] `strict: true` (or explicit flags) policy clear; no silent `any` — **`quality-validation-and-guardrails.md`**.
+- [ ] Generics constrain and connect types — **`type-system.md`**.
+- [ ] `module`/`moduleResolution` match the build tool — **`tsconfig.md`**.
+- [ ] Narrowing via unions/guards; no blind `as` — **`decision-tree.md`**.
+- [ ] `import type` when `isolatedModules` — **`tsconfig.md`** / **`edge-cases.md`**.
+- [ ] External input validated at runtime when shape matters — **`typescript-typechecking-and-boundaries-system-model.md`**.
+- [ ] **`integration-map.md`** used for cross-skill splits.

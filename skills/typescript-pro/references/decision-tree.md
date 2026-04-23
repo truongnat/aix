@@ -13,6 +13,14 @@ Only escape hatch for impossible narrowing (with comment)?
 └── `as` — last resort
 ```
 
+## Monorepo: composite and project references
+
+```
+Multiple packages with shared types?
+├── `composite` + project references — incremental builds
+└── Single `tsconfig` — OK for small repos; watch path/`rootDir` surprises
+```
+
 ## Narrowing strategy
 
 ```

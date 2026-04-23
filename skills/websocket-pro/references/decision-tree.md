@@ -1,5 +1,10 @@
 # WebSocket — decision tree
 
+## Raw WebSocket vs opinionated libraries
+
+- **Need rooms, fallbacks, reconnect UX** → evaluate Socket.IO/engine.io (or stack-native gateway) — document semantics vs RFC 6455 alone.
+- **Full control + minimal deps** → raw `ws` / platform WebSocket — you own heartbeat, framing, and backpressure.
+
 ## WebSocket vs SSE vs long poll
 
 - **Server push one-way, HTTP-friendly** → SSE (simpler ops, reconnect built-in).

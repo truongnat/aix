@@ -1187,23 +1187,26 @@
   {
     "name": "testing-pro",
     "folder": "testing-pro",
-    "description": "Professional software testing and test automation: test design, unit/integration/e2e layers, CI pipelines, flakiness, and quality signals.\n\nUse this skill when the user writes or reviews tests, sets up automation (CI/CD), uses Jest/Vitest/Mocha, React Testing Library, Playwright, Cypress, pytest, JUnit, TestNG, xUnit, Detox, XCTest, Espresso, k6/Gatling, Pact/contract tests, Testcontainers, or asks about coverage, mocks, stubs, TDD, BDD, test data, parallel runs, selectors, snapshots, visual regression, API testing, load/performance tests, or debugging flaky tests.\n\nUse **with** the relevant framework skill when tests are product-specific: **`react-pro`** / **`nextjs-pro`** (RTL, SSR/hydration test setup), **`nestjs-pro`** (TestingModule, e2e HTTP), **`flutter-pro`** (widget_test, integration_test), **`react-native-pro`** (Detox/Jest RN), **`postgresql-pro`** (DB fixtures, migration tests). This skill (`testing-pro`) owns **strategy, layers, CI, and flakiness**; framework skills own **APIs and project conventions** for that stack.\n\nTriggers: \"test\", \"testing\", \"unit test\", \"integration test\", \"e2e\", \"end-to-end\", \"automation\", \"CI\", \"CD\", \"GitHub Actions\", \"Jest\", \"Vitest\", \"Playwright\", \"Cypress\", \"pytest\", \"RTL\", \"React Testing Library\", \"mock\", \"stub\", \"spy\", \"fixture\", \"coverage\", \"flaky\", \"quarantine\", \"assertion\", \"TDD\", \"BDD\", \"Gherkin\", \"snapshot\", \"visual regression\", \"contract test\", \"Pact\", \"Load test\", \"k6\", \"Testcontainers\", \"MSW\", \"test harness\", \"arrange act assert\", \"given when then\", \"test timeout\", \"UnhandledPromiseRejection\".",
+    "description": "Production-grade software testing and automation: test pyramid and CI feedback loop, failure modes (flaky tests, layer mistakes, env drift, coverage gaming), decision trade-offs (integration vs mocks, e2e breadth vs CI time, snapshots vs roles), quality guardrails (no invented metrics; evidence from pipeline).\n\nUse this skill when the user writes or reviews tests, sets up automation (CI/CD), uses Jest/Vitest/Mocha, React Testing Library, Playwright, Cypress, pytest, JUnit, TestNG, xUnit, Detox, XCTest, Espresso, k6/Gatling, Pact/contract tests, Testcontainers, or asks about coverage, mocks, stubs, TDD, BDD, test data, parallel runs, selectors, snapshots, visual regression, API testing, load/performance tests, or debugging flaky tests.\n\nUse **with** the relevant framework skill when tests are product-specific: **`react-pro`** / **`nextjs-pro`** (RTL, SSR/hydration test setup), **`nestjs-pro`** (TestingModule, e2e HTTP), **`flutter-pro`** (widget_test, integration_test), **`react-native-pro`** (Detox/Jest RN), **`postgresql-pro`** (DB fixtures, migration tests), **`ci-cd-pro`** (pipeline YAML). This skill (`testing-pro`) owns **strategy, layers, CI signal, and flakiness**; framework skills own **APIs and project conventions** for that stack.\n\nTriggers: \"test\", \"testing\", \"unit test\", \"integration test\", \"e2e\", \"end-to-end\", \"automation\", \"CI\", \"CD\", \"GitHub Actions\", \"Jest\", \"Vitest\", \"Playwright\", \"Cypress\", \"pytest\", \"RTL\", \"React Testing Library\", \"mock\", \"stub\", \"spy\", \"fixture\", \"coverage\", \"flaky\", \"quarantine\", \"assertion\", \"TDD\", \"BDD\", \"Gherkin\", \"snapshot\", \"visual regression\", \"contract test\", \"Pact\", \"Load test\", \"k6\", \"Testcontainers\", \"MSW\", \"test harness\", \"arrange act assert\", \"given when then\", \"test timeout\", \"UnhandledPromiseRejection\".",
     "triggers": [],
     "when_to_use": [
       "Designing or refactoring a test suite (layers, naming, folder layout).",
       "**Automation**: CI workflows, parallel jobs, reports, artifacts, retries policy.",
       "Choosing tools (runner vs e2e vs browser vs API vs load).",
       "**Debugging** flaky tests, timeouts, async races, or environment drift.",
-      "Reviewing **coverage** and what it does *not* prove.",
-      "Trigger keywords: `test`, `e2e`, `Playwright`, `CI`, `pytest`, `flaky`, `coverage`, `mock`, …"
+      "Reviewing **coverage** and what it does *not* prove."
     ],
     "references": [
       "anti-patterns.md",
       "automation-and-ci.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
       "test-pyramid-and-strategy.md",
+      "testing-pyramid-ci-and-feedback-system-model.md",
       "tips-and-tricks.md",
       "versions.md"
     ]
@@ -1211,69 +1214,78 @@
   {
     "name": "typescript-pro",
     "folder": "typescript-pro",
-    "description": "Professional TypeScript development: type system depth, compiler configuration, generics, utility types, strict mode, declaration files, and migration from JavaScript.\n\nUse this skill when the user works on TypeScript, tsconfig, type inference, generics, mapped/conditional/template-literal types, utility types (Partial, Required, Pick, Omit, Record, ReturnType, etc.), declaration files (.d.ts), type narrowing, discriminated unions, module resolution, path aliases, strict null checks, type guards, satisfies operator, const assertions, or migrating JavaScript to TypeScript.\n\nTriggers: \"TypeScript\", \"tsconfig\", \"type error\", \"TS2322\", \"TS2532\", \"TS18048\", \"generic\", \"interface\", \"type alias\", \"infer\", \"conditional type\", \"mapped type\", \"utility type\", \"ReturnType\", \"Partial\", \"Pick\", \"Omit\", \"satisfies\", \"as const\", \".d.ts\", \"declaration file\", \"strict mode\", \"noImplicitAny\", \"exactOptionalPropertyTypes\", \"module resolution\", \"path alias\", \"NodeNext\", \"verbatimModuleSyntax\", \"tsc\", \"type guard\", \"discriminated union\", \"never\", \"unknown\", \"keyof\", \"typeof\", \"branded type\".",
+    "description": "Production-grade TypeScript: typechecking and boundary model, failure modes (resolution drift, `any` creep, build vs editor TS version), decision trade-offs (strictness ramp, `satisfies` vs annotation, branded types vs runtime validation), quality guardrails (no invented `compilerOptions`; cite TS version and official docs).\n\nUse this skill when the user works on TypeScript, tsconfig, type inference, generics, mapped/conditional/template-literal types, utility types (Partial, Required, Pick, Omit, Record, ReturnType, etc.), declaration files (.d.ts), type narrowing, discriminated unions, module resolution, path aliases, strict null checks, type guards, satisfies operator, const assertions, or migrating JavaScript to TypeScript.\n\nCombine with **`javascript-pro`** for runtime JS semantics, **`react-pro`** / **`nextjs-pro`** / **`nestjs-pro`** for framework typing, **`testing-pro`** for test utility typing.\n\nTriggers: \"TypeScript\", \"tsconfig\", \"type error\", \"TS2322\", \"TS2532\", \"TS18048\", \"generic\", \"interface\", \"type alias\", \"infer\", \"conditional type\", \"mapped type\", \"utility type\", \"ReturnType\", \"Partial\", \"Pick\", \"Omit\", \"satisfies\", \"as const\", \".d.ts\", \"declaration file\", \"strict mode\", \"noImplicitAny\", \"exactOptionalPropertyTypes\", \"module resolution\", \"path alias\", \"NodeNext\", \"verbatimModuleSyntax\", \"tsc\", \"type guard\", \"discriminated union\", \"never\", \"unknown\", \"keyof\", \"typeof\", \"branded type\".",
     "triggers": [],
     "when_to_use": [
       "Designing interfaces, type aliases, generics, and utility types for domain models.",
       "Debugging type errors: excess property checks, `never`, widening, narrowing, contextual typing.",
       "Configuring `tsconfig.json` for strict correctness and module compatibility.",
       "Writing declaration files for JS libraries or augmenting third-party types.",
-      "Migrating a JavaScript codebase to TypeScript incrementally.",
-      "Trigger keywords: `TypeScript`, `tsconfig`, `generic`, `type error`, `infer`, `conditional type`, `strict`, `discriminated union`, `.d.ts`, …"
+      "Migrating a JavaScript codebase to TypeScript incrementally."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "tsconfig.md",
       "type-system.md",
+      "typescript-typechecking-and-boundaries-system-model.md",
       "versions.md"
     ]
   },
   {
     "name": "web-research-pro",
     "folder": "web-research-pro",
-    "description": "Professional multi-step web and technical research: query decomposition, source hierarchy (official docs first), cross-checking, recency/version awareness, citation habits, and handling stale or moved documentation URLs.\n\nUse this skill when the user needs **reliable** answers from **external** sources (framework docs, APIs, standards), **not** only local Markdown — or when combining **local KB** with **web** verification. Complements **`repo-tooling-pro`** (local RAG scripts) but does not replace **reading** `knowledge-base/documents/` when the answer is already in-repo.\n\nUse **with** **`repo-tooling-pro`** when the corpus is **this** repo’s KB; **`security-pro`** when sources might touch **secrets** or **unsafe** links. This skill (`web-research-pro`) owns **research method and citations**; stack skills own **implementation details**.\n\nTriggers: \"search the docs\", \"official documentation\", \"404\", \"source evaluation\", \"citation\", \"compare sources\", \"multi-step research\", \"API reference\", \"changelog\", \"is this still true\", \"link rot\", \"query_kb\", \"Wayback\", \"SEO blog wrong\", \"breaking change\", \"deprecation\", \"RFC\", \"MDN\", \"Stack Overflow outdated\".",
+    "description": "Production-grade multi-step web and technical research: verification model (source hierarchy, triangulation), failure modes (single weak source, SEO drift, 404/link rot, fabricated citations), decision trade-offs (depth vs time, KB-first vs web-first, archive vs live), quality guardrails (no invented URLs or benchmarks; uncertainty explicit).\n\nUse this skill when the user needs **reliable** answers from **external** sources (framework docs, APIs, standards), **not** only local Markdown — or when combining **local KB** with **web** verification. Complements **`repo-tooling-pro`** (local RAG scripts) but does not replace **reading** `knowledge-base/documents/` when the answer is already in-repo.\n\nUse **with** **`repo-tooling-pro`** when the corpus is **this** repo’s KB; **`security-pro`** when sources might touch **secrets** or **unsafe** links; **`planning-pro`** when research informs release decisions.\n\nTriggers: \"search the docs\", \"official documentation\", \"404\", \"source evaluation\", \"citation\", \"compare sources\", \"multi-step research\", \"API reference\", \"changelog\", \"is this still true\", \"link rot\", \"query_kb\", \"Wayback\", \"SEO blog wrong\", \"breaking change\", \"deprecation\", \"RFC\", \"MDN\", \"Stack Overflow outdated\".",
     "triggers": [],
     "when_to_use": [
       "**Framework** or **API** behavior **not** in the local project.",
       "**Comparing** multiple sources or **resolving** a **404** / moved doc path.",
-      "**Version-specific** questions (requires **release notes** or **changelog**).",
-      "**Citations** — user wants **links** and **traceable** claims.",
-      "Trigger keywords: `official docs`, `citation`, `404`, `changelog`, `source`, …"
+      "**Version-specific** questions (release notes / changelog).",
+      "**Citations** — user wants **links** and **traceable** claims."
     ],
     "references": [
       "anti-patterns.md",
       "citations-and-stale-urls.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "versions.md",
+      "web-research-verification-system-model.md",
       "workflow-sources-and-evaluation.md"
     ]
   },
   {
     "name": "websocket-pro",
     "folder": "websocket-pro",
-    "description": "Professional WebSocket guidance for designing reliable, secure, and scalable realtime communication in production systems.\n\nUse this skill when implementing or reviewing WebSocket architecture, message contracts, connection lifecycle, reconnection behavior, and realtime operational reliability.\n\nTriggers: \"websocket\", \"realtime\", \"ws\", \"wss\", \"connection lifecycle\", \"heartbeat\", \"ping\", \"pong\", \"reconnect\", \"backpressure\", \"pubsub\", \"socket auth\", \"delivery guarantee\", \"edge case\", \"socket.io\", \"upgrade\", \"502\", \"proxy timeout\".\n\nCombine with `security-pro` for hardening realtime channels and `performance-tuning-pro` for throughput/latency optimization.",
+    "description": "Production-grade WebSocket guidance: connection/message lifecycle and scaling model, failure modes (reconnect storms, proxy/LB idle drops, token leakage, duplicates), decision trade-offs (WebSocket vs SSE vs long poll, sticky vs pub/sub, binary vs text), quality guardrails (no fabricated timeout/connection limits; cite RFC/library and deployment assumptions).\n\nUse this skill when implementing or reviewing WebSocket architecture, message contracts, connection lifecycle, reconnection behavior, and realtime operational reliability.\n\nTriggers: \"websocket\", \"realtime\", \"ws\", \"wss\", \"connection lifecycle\", \"heartbeat\", \"ping\", \"pong\", \"reconnect\", \"backpressure\", \"pubsub\", \"socket auth\", \"delivery guarantee\", \"edge case\", \"socket.io\", \"upgrade\", \"502\", \"proxy timeout\".\n\nCombine with **`security-pro`** (authZ, abuse), **`performance-tuning-pro`** (throughput/latency), **`deployment-pro`** / **`network-infra-pro`** (ingress timeouts, TLS), **`api-design-pro`** (idempotency, dedup), **`stream-rtc-pro`** (signaling vs media).",
     "triggers": [],
     "when_to_use": [
       "Designing realtime features with persistent client-server socket connections.",
       "Reviewing WebSocket reliability (heartbeat, reconnect, ordering, duplicate handling).",
       "Scaling pub/sub fan-out across instances and regions.",
-      "Hardening WebSocket endpoints against abuse, leaks, and operational instability.",
-      "Trigger keywords: `websocket`, `realtime`, `ws`, `connection lifecycle`, `heartbeat`, `reconnect`, `backpressure`, `pubsub`, `socket auth`, `delivery guarantee`, `edge case`"
+      "Hardening WebSocket endpoints against abuse, leaks, and operational instability."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
-      "versions.md"
+      "versions.md",
+      "websocket-connection-and-message-system-model.md"
     ]
   }
 ]
