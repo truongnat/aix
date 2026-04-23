@@ -1,5 +1,7 @@
 # AI Integration — RAG and embeddings
 
+For **ingestion, ACL, staleness, re-indexing**, and chunk lifecycle see **`rag-ingestion-and-freshness.md`**.
+
 ## RAG pipeline overview
 
 ```
