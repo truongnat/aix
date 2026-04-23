@@ -763,21 +763,24 @@
   {
     "name": "network-infra-pro",
     "folder": "network-infra-pro",
-    "description": "Professional network and infrastructure guidance for application delivery: VPC/subnet design, DNS and TLS, ingress/egress controls, load balancing, connectivity patterns, and production observability.\n\nUse this skill when the user asks to design or review cloud/on-prem network topology, diagnose connectivity issues, harden service-to-service traffic, configure reverse proxy/load balancer behavior, or plan infrastructure rollout safety.\n\nUse **with** **`deployment-pro`** for rollout/rollback strategy, **`security-pro`** for threat modeling and hardening controls, and **`nestjs-pro`** / **`nextjs-pro`** when infrastructure decisions depend on framework runtime behavior.\n\nTriggers: \"network\", \"infra\", \"VPC\", \"subnet\", \"NAT\", \"load balancer\", \"reverse proxy\", \"ingress\", \"egress\", \"DNS\", \"TLS\", \"service mesh\", \"connectivity\", \"latency\", \"firewall\", \"security group\", \"NACL\", \"MTU\", \"asymmetric routing\", \"private link\", \"mTLS east-west\", \"flow logs\".",
+    "description": "Professional network and infrastructure: VPC/VNet segmentation, DNS and TLS, ingress/egress, load balancing, reverse proxy, service mesh trade-offs, hybrid connectivity — plus path/policy model (hops, trust zones, control vs data plane), failure modes (DNS, MTU, asymmetry, NAT/SNAT, cert expiry, partial region, control-plane throttling), decision trade-offs (mesh vs LB, private link vs VPN), quality guardrails (no fake ARNs/CIDR; multi-cloud naming).\n\nUse this skill for cloud/on-prem topology, connectivity diagnosis, mTLS east-west, hardening service-to-service paths, and rollout safety for network changes.\n\nUse **with** **`deployment-pro`**, **`security-pro`**, **`caching-pro`**, **`nextjs-pro`**, **`nestjs-pro`**, **`microservices-pro`**, **`postgresql-pro`**, **`ci-cd-pro`**, **`docker-pro`**.\n\nTriggers: \"network\", \"infra\", \"VPC\", \"subnet\", \"NAT\", \"load balancer\", \"reverse proxy\", \"ingress\", \"egress\", \"DNS\", \"TLS\", \"service mesh\", \"connectivity\", \"latency\", \"firewall\", \"security group\", \"NACL\", \"MTU\", \"asymmetric routing\", \"private link\", \"mTLS east-west\", \"flow logs\".",
     "triggers": [],
     "when_to_use": [
-      "Designing VPC/VNet, subnet segmentation, NAT, and private/public service boundaries.",
-      "Defining ingress/egress policy, firewall/SG rules, and service-to-service communication paths.",
-      "Configuring DNS, TLS termination, reverse proxy, and load balancer routing behavior.",
-      "Troubleshooting timeout, packet loss, cross-region latency, and intermittent connectivity failures.",
-      "Reviewing network changes for blast radius, failover behavior, and observability readiness.",
-      "Trigger keywords: `network`, `infra`, `VPC`, `subnet`, `NAT`, `DNS`, `TLS`, `load balancer`, `ingress`, `egress`"
+      "VPC/subnet/NAT design; private vs public tiers.",
+      "Ingress/egress, SG/NSG/firewalls, Private Link patterns.",
+      "DNS/TLS termination, LB health checks, failover.",
+      "MTU/asymmetry/timeouts; cross-region paths.",
+      "Blast radius review for infra changes."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "network-path-and-policy-model.md",
+      "quality-validation-and-guardrails.md",
       "reliability-and-observability.md",
       "tips-and-tricks.md",
       "topology-and-segmentation.md",

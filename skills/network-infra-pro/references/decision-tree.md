@@ -13,3 +13,11 @@
 
 - **Few services** → LB + SG may suffice.
 - **Many east-west hops** → Consider mesh — cost/complexity trade-off.
+
+## SaaS connectivity (hybrid)
+
+```
+Need private access to PaaS (DB, APIs) without public internet?
+├── Private Link / Private Service Connect style endpoints — **`decision-framework-and-trade-offs.md`**
+└── VPN only when link product unavailable or cost wins
+```
