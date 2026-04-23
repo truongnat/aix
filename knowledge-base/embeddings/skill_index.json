@@ -839,22 +839,26 @@
   {
     "name": "planning-pro",
     "folder": "planning-pro",
-    "description": "Professional planning guidance for turning goals into executable plans: scope framing, task decomposition, dependency mapping, sequencing, estimation ranges, risk controls, and delivery checkpoints.\n\nUse this skill when the user asks to create an implementation plan, break a complex project into phases, define milestones, estimate effort, or review whether a plan is realistic and safe to execute.\n\nUse **with** **`business-analysis-pro`** to refine requirements before planning, **`deployment-pro`** for release sequencing, and domain `*-pro` skills for implementation details in each phase.\n\nTriggers: \"planning\", \"plan\", \"roadmap\", \"milestone\", \"phase breakdown\", \"execution plan\", \"timeline\", \"dependency\", \"effort estimate\", \"delivery plan\", \"implementation plan\".",
+    "description": "Production-grade planning: turning goals into executable plans with scope framing, decomposition, dependency mapping, sequencing, estimation ranges, risk controls, delivery checkpoints — plus system model (goals → work graph → execution feedback → re-plan), failure modes (planning fallacy, hidden dependencies, scope creep, milestone theater, stale plans), decision trade-offs (outcome-first vs activity-first, MVP vs foundation-first, predictive vs adaptive, spikes), and quality guardrails (verifiable milestones, honest estimates, no fabricated constraints).\n\nUse this skill when the user asks to create an implementation plan, break a complex project into phases, define milestones, estimate effort, review whether a plan is realistic, or design execution controls and dependency order.\n\nCombine with **`business-analysis-pro`** before fixing scope, **`deployment-pro`** and **`ci-cd-pro`** for release integration, **`testing-pro`** for quality gates, **`feedback-pro`** when reviews drive reprioritization, **`strategic-consulting-pro`** for portfolio-level sequencing, and domain **`*-pro`** skills for technical depth per phase.\n\nTriggers: \"planning\", \"plan\", \"roadmap\", \"milestone\", \"phase breakdown\", \"execution plan\", \"timeline\", \"dependency\", \"effort estimate\", \"delivery plan\", \"implementation plan\", \"critical path\", \"rolling wave\", \"spike\".",
     "triggers": [],
     "when_to_use": [
       "Breaking large goals into phases, milestones, and deliverables.",
       "Building realistic execution plans with dependencies and constraints.",
-      "Prioritizing tasks for MVP vs later phases.",
-      "Estimating effort ranges and identifying critical path risks.",
-      "Reviewing an existing plan for gaps, sequencing errors, or hidden risks.",
-      "Trigger keywords: `planning`, `roadmap`, `milestone`, `phase`, `timeline`, `dependency`, `estimate`"
+      "Prioritizing MVP vs later phases under deadline pressure.",
+      "Estimating effort ranges and surfacing critical path risks.",
+      "Reviewing plans for sequencing errors, hidden dependencies, or governance gaps.",
+      "Designing **rolling-wave** updates when uncertainty is high."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
       "estimation-and-risk-controls.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "plan-system-model-and-feedback-loops.md",
+      "quality-validation-and-guardrails.md",
       "scope-and-decomposition.md",
       "sequencing-and-dependencies.md",
       "tips-and-tricks.md",

@@ -34,6 +34,14 @@ Slip exceeds agreed buffer OR critical path risk realized?
 └── No → Update plan at next checkpoint only
 ```
 
+## Rolling wave vs big design upfront
+
+```
+Certainty high for next month but fuzzy beyond?
+├── Yes → Detail 2–4 weeks; later phases stay milestone-only — **`edge-cases.md`**
+└── No → Short spikes first; avoid fake task lists — **`plan-system-model-and-feedback-loops.md`**
+```
+
 ## When NOT to use a Gantt chart
 
 - One-person tasks with no cross-team dependencies — a simple ordered list + milestones is enough.

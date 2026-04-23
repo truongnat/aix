@@ -1,5 +1,13 @@
 # Planning — edge cases
 
+## Vague or shifting goals
+
+**Symptom:** Work starts before “done” is defined; replanning every week for the same feature set.
+
+**Mitigation:** Stabilize **acceptance criteria** with **`business-analysis-pro`** before deep sequencing — **`quality-validation-and-guardrails.md`**.
+
+---
+
 ## Scope churn
 
 **Symptom:** Requirements change mid-phase; downstream tasks are obsolete.
