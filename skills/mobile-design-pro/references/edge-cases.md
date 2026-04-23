@@ -13,6 +13,7 @@
 
 ## Hardware and OS
 
+- **Home indicator / gesture bar** — Bottom **inset** competes with FAB and tab bars — raise content or use **embedded** tabs — **`failure-modes-detection-mitigation.md`**.
 - **Split screen / multi-window** — Resize; state survives **narrow** width.
 - **Foldables** — **Hinge** area: don’t put primary actions under crease; **continuity** across folded states.
 - **Low memory** — Background kill; **restore** form state and scroll position.

@@ -710,22 +710,25 @@
   {
     "name": "mobile-design-pro",
     "folder": "mobile-design-pro",
-    "description": "Professional mobile product design: touch targets, safe areas, thumb reach, one-handed use, screen density, mobile navigation patterns, iOS vs Android conventions, keyboards and forms, accessibility on small screens, and platform-specific UX edge cases.\n\nUse this skill when the user designs or reviews **mobile-native** UX (phone/tablet), touch and gesture patterns, bottom navigation vs tabs, sheets and modals, onboarding and permissions, offline states, foldables, or asks how iOS HIG differs from Material on mobile.\n\nUse **with** **`design-system-pro`** (tokens, brand, dark mode), **`react-native-pro`** or **`flutter-pro`** (implementation: SafeArea, navigation APIs, keyboard avoiding). This skill (`mobile-design-pro`) owns **mobile-specific UX and layout rules**; framework skills own **code and APIs**.\n\nTriggers: \"mobile design\", \"mobile UX\", \"iOS HIG\", \"Material Design mobile\", \"touch target\", \"safe area\", \"notch\", \"bottom navigation\", \"thumb zone\", \"one-handed\", \"mobile keyboard\", \"gesture\", \"bottom sheet\", \"mobile onboarding\", \"tablet layout\", \"foldable\", \"mobile a11y\", \"VoiceOver\", \"TalkBack\", \"dynamic type\", \"hitSlop\", \"home indicator\", \"predictive back\", \"reduce motion\", \"large content size\", \"split view iPad\", \"Cupertino vs Material\".",
+    "description": "Production-grade mobile product design: touch targets, safe areas, thumb reach, density, navigation (tabs, stacks, sheets), iOS vs Material behavior, keyboards and forms, accessibility on small screens, offline and permissions — plus mobile UX constraint layers (hardware → OS chrome → layout), failure modes (tiny CTAs, keyboard occlusion, gesture conflict, RTL/fold issues, motion-only cues), trade-offs (parity vs native-first, density), guardrails (44pt vs 48dp honesty, no store approval promises).\n\nUse this skill when designing or reviewing **mobile-native** UX (phone/tablet), gestures, onboarding, foldables, or comparing HIG vs Material.\n\nUse **with** **`design-system-pro`** (tokens, dark mode), **`react-native-pro`** / **`flutter-pro`** (SafeArea, navigation, keyboard avoidance), **`testing-pro`**, **`performance-tuning-pro`**, **`security-pro`** when sensitive UI matters. This skill owns **mobile-specific UX rules**; framework skills own **code**.\n\nTriggers: \"mobile design\", \"mobile UX\", \"iOS HIG\", \"Material Design mobile\", \"touch target\", \"safe area\", \"notch\", \"bottom navigation\", \"thumb zone\", \"one-handed\", \"mobile keyboard\", \"gesture\", \"bottom sheet\", \"mobile onboarding\", \"tablet layout\", \"foldable\", \"mobile a11y\", \"VoiceOver\", \"TalkBack\", \"dynamic type\", \"hitSlop\", \"home indicator\", \"predictive back\", \"reduce motion\", \"large content size\", \"split view iPad\", \"Cupertino vs Material\".",
     "triggers": [],
     "when_to_use": [
-      "**Layout and touch** — Targets, spacing, **thumb-friendly** primary actions, safe areas, keyboard overlap.",
-      "**Navigation** — Tabs, stacks, sheets, **back** behavior expectations per platform.",
-      "**Patterns** — Onboarding, permissions timing, pull-to-refresh, empty/offline/error.",
-      "**Inclusivity** — Dynamic type, screen readers, RTL, reduce motion.",
-      "**Form factors** — Tablet split view, **foldable** hinge, landscape.",
-      "Trigger keywords: `mobile UX`, `safe area`, `touch target`, `HIG`, `Material`, `bottom sheet`, `gesture`, …"
+      "Touch layout, thumb zones, safe areas, keyboard overlap.",
+      "Navigation patterns, back expectations, sheets/modals.",
+      "Onboarding, permissions, offline/error states.",
+      "Dynamic type, RTL, reduce motion, VoiceOver/TalkBack.",
+      "Tablets, foldables, landscape."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "mobile-ux-constraints-system-model.md",
       "navigation-and-platform-ios-android.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "touch-layout-safe-areas-and-density.md",
       "versions.md"

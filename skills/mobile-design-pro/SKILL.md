@@ -1,146 +1,209 @@
 ---
 name: mobile-design-pro
 description: |
-  Professional mobile product design: touch targets, safe areas, thumb reach, one-handed use, screen density, mobile navigation patterns, iOS vs Android conventions, keyboards and forms, accessibility on small screens, and platform-specific UX edge cases.
+  Production-grade mobile product design: touch targets, safe areas, thumb reach, density, navigation (tabs, stacks, sheets), iOS vs Material behavior, keyboards and forms, accessibility on small screens, offline and permissions — plus mobile UX constraint layers (hardware → OS chrome → layout), failure modes (tiny CTAs, keyboard occlusion, gesture conflict, RTL/fold issues, motion-only cues), trade-offs (parity vs native-first, density), guardrails (44pt vs 48dp honesty, no store approval promises).
 
-  Use this skill when the user designs or reviews **mobile-native** UX (phone/tablet), touch and gesture patterns, bottom navigation vs tabs, sheets and modals, onboarding and permissions, offline states, foldables, or asks how iOS HIG differs from Material on mobile.
+  Use this skill when designing or reviewing **mobile-native** UX (phone/tablet), gestures, onboarding, foldables, or comparing HIG vs Material.
 
-  Use **with** **`design-system-pro`** (tokens, brand, dark mode), **`react-native-pro`** or **`flutter-pro`** (implementation: SafeArea, navigation APIs, keyboard avoiding). This skill (`mobile-design-pro`) owns **mobile-specific UX and layout rules**; framework skills own **code and APIs**.
+  Use **with** **`design-system-pro`** (tokens, dark mode), **`react-native-pro`** / **`flutter-pro`** (SafeArea, navigation, keyboard avoidance), **`testing-pro`**, **`performance-tuning-pro`**, **`security-pro`** when sensitive UI matters. This skill owns **mobile-specific UX rules**; framework skills own **code**.
 
   Triggers: "mobile design", "mobile UX", "iOS HIG", "Material Design mobile", "touch target", "safe area", "notch", "bottom navigation", "thumb zone", "one-handed", "mobile keyboard", "gesture", "bottom sheet", "mobile onboarding", "tablet layout", "foldable", "mobile a11y", "VoiceOver", "TalkBack", "dynamic type", "hitSlop", "home indicator", "predictive back", "reduce motion", "large content size", "split view iPad", "Cupertino vs Material".
 
 metadata:
-  short-description: Mobile design — touch, safe area, navigation, iOS/Android, edge cases
+  short-description: Mobile design — constraint model, touch/safe area, iOS/Android, failure modes
+  content-language: en
+  domain: mobile-ux
+  level: professional
 ---
 
 # Mobile design (professional)
 
-Use [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/) and [Material Design](https://m3.material.io/) for platform **truth**; this skill encodes **mobile-first constraints**, **touch ergonomics**, and **iOS vs Android** behavioral differences. Confirm **phone vs tablet**, **primary platform** (or unified), and **implementation stack** (RN, Flutter, native).
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use [Apple HIG](https://developer.apple.com/design/human-interface-guidelines/) and [Material Design](https://m3.material.io/) for platform truth; this skill encodes **touch-first ergonomics**, **safe-area discipline**, and **platform-appropriate** patterns.
+
+## Boundary
+
+**`mobile-design-pro`** owns **mobile UX and layout intent** (targets, flows, platform conventions). **`react-native-pro`** / **`flutter-pro`** own **implementation APIs**. **`design-system-pro`** owns **web** responsive/CSS and cross-surface tokens when the primary surface is **browser**.
 
 ## Related skills (this repo)
 
-| Skill | When to combine with `mobile-design-pro` |
-|-------|------------------------------------------|
-| **`design-system-pro`** | Tokens, typography scale, themes, cross-platform brand |
-| **`react-native-pro`** | RN/Expo: SafeAreaView, navigation, KeyboardAvoidingView, platform files |
-| **`flutter-pro`** | Material/Cupertino widgets, `SafeArea`, `MediaQuery` |
-| **`testing-pro`** | Maestro/Detox flows, screenshot tests per device class |
-| **`design-system-pro`** | **Responsive web** breakpoints, `@media`, `prefers-reduced-motion`, webfont loading — not the same as native safe-area work |
-
-**Boundary:** **`mobile-design-pro`** = **what** the mobile experience should be; **`react-native-pro`** / **`flutter-pro`** = **how** to build it. **`design-system-pro`** owns **CSS/web responsive** and **web** a11y baselines when the surface is the **browser**.
+| Skill | When to combine |
+|-------|----------------|
+| **`design-system-pro`** | Tokens, typography, themes; **web** breakpoints/CSS when comparing to browser |
+| **`react-native-pro`** | RN/Expo: SafeAreaView, navigation, KeyboardAvoidingView |
+| **`flutter-pro`** | Material/Cupertino, `SafeArea`, layout APIs |
+| **`testing-pro`** | Maestro/Detox, screenshots per device class |
+| **`performance-tuning-pro`** | Scroll jank, animation cost |
+| **`security-pro`** | Sensitive on-screen data, biometric flows |
 
 ## When to use
 
-- **Layout and touch** — Targets, spacing, **thumb-friendly** primary actions, safe areas, keyboard overlap.
-- **Navigation** — Tabs, stacks, sheets, **back** behavior expectations per platform.
-- **Patterns** — Onboarding, permissions timing, pull-to-refresh, empty/offline/error.
-- **Inclusivity** — Dynamic type, screen readers, RTL, reduce motion.
-- **Form factors** — Tablet split view, **foldable** hinge, landscape.
-- Trigger keywords: `mobile UX`, `safe area`, `touch target`, `HIG`, `Material`, `bottom sheet`, `gesture`, …
+- Touch layout, thumb zones, safe areas, keyboard overlap.
+- Navigation patterns, back expectations, sheets/modals.
+- Onboarding, permissions, offline/error states.
+- Dynamic type, RTL, reduce motion, VoiceOver/TalkBack.
+- Tablets, foldables, landscape.
+
+## When not to use
+
+- **Semantic image understanding** — **`content-analysis-pro`**.
+- **Pure web CSS layout** — **`design-system-pro`**.
+
+## Required inputs
+
+- **Phone vs tablet**, **primary platform**, **stack** (RN/Flutter/native).
+- **Accessibility** constraints (dynamic type range) if known.
+
+## Expected output
+
+Follow **Suggested response format** strictly.
 
 ## Workflow
 
-1. Confirm device classes (phone/tablet), platform priorities, and stack (**RN/Flutter/native**).
-2. Apply the principles and topic summaries below; open `references/` when you need depth; defer **API-level** answers to **`react-native-pro`** / **`flutter-pro`**.
-3. Respond using **Suggested response format**; note **iOS vs Android** deltas and **accessibility** residual risk.
+1. Confirm device classes, platform priorities, implementation stack.
+2. Apply summaries; open `references/`; defer component APIs to **`react-native-pro`** / **`flutter-pro`**.
+3. Respond with **Suggested response format**; include **failure modes** for gestures, keyboard, and a11y.
 
 ### Operating principles
 
-1. **Touch first** — Fingers are imprecise; **generous** targets and spacing beat pixel-perfect tight UI.
-2. **Respect safe areas and system UI** — Notch, home indicator, status bar — content and gestures must fit.
-3. **Platform-appropriate** — Follow HIG/Material unless a **documented** branded exception.
-4. **One task per screen** (for critical flows) — Reduce cognitive load on small displays.
-5. **Accessibility is default** — Scalable type, labels, focus order, not only color.
-6. **Real devices** — Figma is not enough; **test** on actual phones and **large font** modes.
+1. **Touch first** — Generous targets — **`mobile-ux-constraints-system-model.md`**.
+2. **Safe areas & system UI** — Notch, keyboard, gesture bar — **`touch-layout-safe-areas-and-density.md`**.
+3. **Platform-appropriate** — HIG/Material unless documented brand exception — **`navigation-and-platform-ios-android.md`**.
+4. **One critical task per critical screen** — Cognitive load — **`tips-and-tricks.md`**.
+5. **Accessibility default** — **`edge-cases.md`**.
+6. **Real devices** — **`tips-and-tricks.md`**.
 
-### Touch, layout, and safe areas (summary)
+### Mobile UX constraints system model (summary)
 
-- **44/48pt** targets, **hitSlop**, **thumb zone**; **notch** and **keyboard**; **dynamic type** and density; forms with mobile keyboards.
+Hardware → OS chrome → app layout → controls — **`mobile-ux-constraints-system-model.md`**.
+
+Details: [references/mobile-ux-constraints-system-model.md](references/mobile-ux-constraints-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Targets, keyboard, gestures, motion-only, RTL, fold, store risk — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Parity vs native-first; density; motion — **`decision-framework-and-trade-offs.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+Platform numbers; scope vs implementation — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+
+### Touch, layout, safe areas (summary)
+
+Targets, keyboard, density — **`touch-layout-safe-areas-and-density.md`**.
 
 Details: [references/touch-layout-safe-areas-and-density.md](references/touch-layout-safe-areas-and-density.md)
 
-### Navigation and platform patterns (summary)
+### Navigation & platforms (summary)
 
-- **iOS vs Android** back, tabs, toolbars, sheets; **master-detail** on tablets; **gesture** discoverability.
+iOS/Android patterns — **`navigation-and-platform-ios-android.md`**.
 
 Details: [references/navigation-and-platform-ios-android.md](references/navigation-and-platform-ios-android.md)
 
-### Web responsive vs native mobile (summary)
+### Web responsive (cross-skill)
 
-- **Browser** layouts use breakpoints and CSS media queries; **native** apps use platform navigation and safe areas — do not conflate. For **web** WCAG contrast, motion preferences, and **`@media`** examples, use **`design-system-pro`**.
-
-Details: [../design-system-pro/references/a11y-responsive-and-web-typography.md](../design-system-pro/references/a11y-responsive-and-web-typography.md)
+Browser breakpoints — **`design-system-pro`**: [../design-system-pro/references/a11y-responsive-and-web-typography.md](../design-system-pro/references/a11y-responsive-and-web-typography.md)
 
 ### Tips and tricks (summary)
 
-- Onboarding brevity, **in-context** permissions, haptics discipline, offline clarity, dark mode on mobile.
+Onboarding, permissions, haptics — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- RTL, foldables, split screen, **store** compliance touchpoints, deep link cold start, screen reader order.
+a11y, i18n, hardware, network, store — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
 ### Decision flow and anti-patterns (summary)
 
-- Platform parity vs native patterns; shrunk desktop UI; safe-area misses.
+**`decision-tree.md`** · **`anti-patterns.md`**.
 
 Details: [references/decision-tree.md](references/decision-tree.md) · [references/anti-patterns.md](references/anti-patterns.md)
 
-### Cross-skill handoffs (summary)
+### Integration map (summary)
 
-- **`design-system-pro`**, **`react-native-pro`** / **`flutter-pro`**, **`performance-tuning-pro`**.
+**`design-system-pro`**, **`react-native-pro`**, **`flutter-pro`**, **`testing-pro`**, **`security-pro`**, … — **`integration-map.md`**.
 
 Details: [references/integration-map.md](references/integration-map.md)
 
 ### OS and guideline versions (summary)
 
-- iOS/Android API level; HIG/Material edition when citing rules.
+**`versions.md`**.
 
 Details: [references/versions.md](references/versions.md)
 
-### Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Issue or goal** — Screen, flow, or pattern (e.g. “checkout on small phone”).
-2. **Recommendation** — Mobile UX pattern + platform note (iOS/Android); cite **Related skill** for code.
-3. **Code** — Layout **rules**, spacing sketch, or checklist — not full RN/Flutter components unless paired with **`react-native-pro`** / **`flutter-pro`**.
-4. **Residual risks** — Gesture discovery, a11y at large text, tablet/fold assumptions untested.
+1. **Context** — Device class, platform priority, stack (RN/Flutter/native), accessibility baseline.
+2. **Problem / goal** — Screen/flow (e.g. checkout, onboarding).
+3. **System design** — Constraint layers; where primary action sits — **`mobile-ux-constraints-system-model.md`**.
+4. **Decision reasoning** — Native vs parity; density; bottom vs top — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Deliverable sketch** — Layout rules, spacing/target checklist — not fabricated frames — **`quality-validation-and-guardrails.md`**.
+6. **Trade-offs** — Information density vs errors; animation vs clarity.
+7. **Failure modes** — Keyboard, gestures, dynamic type, store — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Untested fold/tablet; delegate APIs to **`react-native-pro`** / **`flutter-pro`**; **`security-pro`** for sensitive UI.
 
 ## Resources in this skill
 
-- `references/` — touch/layout, navigation/platforms, tips, edge cases, Tier A maps.
-
 | Topic | File |
 |-------|------|
+| **UX constraints model** | [references/mobile-ux-constraints-system-model.md](references/mobile-ux-constraints-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Touch, safe area, density | [references/touch-layout-safe-areas-and-density.md](references/touch-layout-safe-areas-and-density.md) |
 | Navigation & iOS/Android | [references/navigation-and-platform-ios-android.md](references/navigation-and-platform-ios-android.md) |
-| Web responsive (cross-skill) | [`design-system-pro` / a11y & responsive](../design-system-pro/references/a11y-responsive-and-web-typography.md) |
-| Tips and patterns | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
 | Decision tree | [references/decision-tree.md](references/decision-tree.md) |
 | Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
 | Integration map | [references/integration-map.md](references/integration-map.md) |
-| Versions (OS, guidelines) | [references/versions.md](references/versions.md) |
+| Versions | [references/versions.md](references/versions.md) |
 
 ## Quick examples
 
-**Input (simple):** Primary “Save” button at top-right on a 6" phone — users miss it one-handed.  
-**Expected output:** Move **primary** action to **bottom** toolbar or sticky footer; keep top for **destructive** secondary; cite **thumb reach**; implementation details in **`react-native-pro`**.
+### 1 — Simple (common)
 
-**Input (tricky):** Heavy animation on onboarding — users complain dizziness.  
-**Expected output:** Respect **`prefers-reduced-motion`** / system settings; offer **static** path; reduce **parallax**; test **large text** + **VoiceOver** order.
+**Input:** Primary “Save” top-right on 6" phone — missed one-handed.  
+**Expected output:** Full **Suggested response format** — thumb zone; bottom/sticky primary — **`failure-modes-detection-mitigation.md`**; **`react-native-pro`** for implementation.
 
-**Input (cross-skill):** “Same nav as our React web app in RN.”  
-**Expected output:** **This skill** for **native** patterns (tabs, back, sheets); **`design-system-pro`** for **tokens**; **`react-native-pro`** for **React Navigation** / platform files; flag **web metaphor** mismatches (hover, URL bar).
+### 2 — Tricky (edge case)
+
+**Input:** Heavy onboarding animation — dizziness complaints.  
+**Expected output:** Reduce motion path; static alternative — **`edge-cases.md`**; **failure modes** motion-only — **`failure-modes-detection-mitigation.md`**.
+
+### 3 — Cross-skill
+
+**Input:** Same nav as React web in RN.  
+**Expected output:** **This skill** native patterns — **`design-system-pro`** tokens — **`react-native-pro`** navigation — anti **web metaphor** — **`anti-patterns.md`**.
 
 ## Checklist before calling the skill done
 
-- [ ] **Touch** targets and spacing justified for real fingers.
-- [ ] **Safe area** / keyboard / **system** gestures considered.
-- [ ] **iOS vs Android** behavior called out where it diverges.
-- [ ] **Accessibility** (dynamic type, SR) not ignored.
-- [ ] Code-level work **delegated** to **`react-native-pro`** / **`flutter-pro`** when applicable.
-- [ ] **Motion** preferences and **haptics** used with restraint.
-- [ ] **Tablet / foldable** assumptions stated or deferred with test plan.
+### UX core
+
+- [ ] **Touch** targets and spacing justified — **`touch-layout-safe-areas-and-density.md`**.
+- [ ] **Safe area** / keyboard / gesture bar — **`mobile-ux-constraints-system-model.md`**.
+- [ ] **iOS vs Android** called out when divergent — **`navigation-and-platform-ios-android.md`**.
+
+### Inclusion & risk
+
+- [ ] **Accessibility** (dynamic type, SR) — **`edge-cases.md`**.
+- [ ] **Motion** / haptics restrained — **`decision-framework-and-trade-offs.md`**.
+- [ ] **Failure modes** when keyboard, gestures, or store risk applies — **`failure-modes-detection-mitigation.md`**.
+
+### Handoff
+
+- [ ] Code/API work → **`react-native-pro`** / **`flutter-pro`** when applicable.
+- [ ] **Tablet / foldable** test plan stated or deferred — **`decision-tree.md`**.
