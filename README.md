@@ -1,161 +1,206 @@
-# SKILLS — Agent skills, workflows & knowledge (Markdown)
+# Skills devkit
 
-Reference layout: **`skills/`** (`SKILL.md` bundles), **`workflows/`** (step-by-step Markdown), **`knowledge-base/`** (`.md` + local RAG). Configuration and workflow conventions use **Markdown** (not `.yaml`/`.yml` for these roles; scripts may emit JSON for embeddings).
+**Production-grade agent skills**, runnable **workflows**, and a **Markdown knowledge base** with optional local RAG — one repo you can install into any project or use as the source of truth for Cursor / Claude / Codex skills.
 
-**Language:** Repository docs and bundled skills are **English**. For assistant replies in another language (e.g. Vietnamese), set **Cursor User Rules** or project rules — see [`AGENTS.md`](AGENTS.md) and [`skills/SKILL_AUTHORING_RULES.md`](skills/SKILL_AUTHORING_RULES.md) §13.
+> **Language:** Docs and bundled `SKILL.md` files are authored in **English**. Assistant reply language (e.g. Vietnamese) is configured with **Cursor User Rules** or project rules — see [`AGENTS.md`](AGENTS.md) and [`skills/SKILL_AUTHORING_RULES.md`](skills/SKILL_AUTHORING_RULES.md) §13.
+
+---
 
 ## Contents
 
-- [Layout](#layout)
-- [Quick start](#quick-start)
-- [Knowledge base & RAG](#knowledge-base--rag)
-- [Project indexing (any codebase)](#project-indexing-any-codebase)
-- [Skills](#skills)
-- [Workflows](#workflows)
-- [Prompt templates](#prompt-templates)
-- [Cursor / agent](#cursor--agent)
+| Section | What you get |
+|--------|----------------|
+| [Layout](#layout) | Repository map at a glance |
+| [Architecture](#architecture-overview) | How skills, KB, and CLI connect |
+| [Quick start](#quick-start) | Install into another repo · work in this repo |
+| [Knowledge base & RAG](#knowledge-base--rag) | Author → index → query |
+| [Project indexing](#project-indexing-any-codebase) | Index *any* codebase + wiki |
+| [Skills](#skills) | Bundled `*-pro` packs and authoring rules |
+| [Workflows](#workflows) | Slash-style dev procedures |
+| [Prompt templates](#prompt-templates) | Reusable prompts |
+| [Cursor / agent](#cursor--agent) | Where to read next |
+
+---
 
 ## Layout
 
-Top-level structure:
+```
+.
+├── skills/                 # Skill packs (SKILL.md + references/)
+├── scripts/                # CLI entry: dist/tools.js
+├── templates/              # Reports, issues, prompts
+├── workflows/              # Runnable Markdown procedures
+└── knowledge-base/         # Internal KB + embeddings
+```
+
+Abridged tree:
 
 ```
 .
-├── skills/                    # Skill packs (e.g. react-pro, nestjs-pro, …)
-├── scripts/                   # Tooling (entry: `dist/tools.js`)
-├── templates/                 # Report, issue, and prompt templates
-├── workflows/                 # Runnable procedures (Markdown steps)
-└── knowledge-base/            # Internal KB and embeddings
-```
-
-Full tree (abridged):
-
-```
-.                              # Repo root
-├── AGENTS.md                  # Hints for Cursor / agents (skills, commands, KB)
-├── OUTPUT_CONVENTIONS.md      # Report formatting for workflows
-├── LICENSE                    # MIT
-├── package.json               # npx CLI and npm scripts
+├── AGENTS.md               # Cursor / agent hints (skills, commands, KB)
+├── OUTPUT_CONVENTIONS.md   # Workflow report shape
+├── LICENSE                 # MIT
+├── package.json            # npx CLI + npm scripts
 ├── skills/
 │   ├── README.md
 │   ├── SKILL_AUTHORING_RULES.md
-│   └── <skill-name>/          # e.g. react-pro, repo-tooling-pro, …
-├── scripts/
-│   └── README.md              # Command map
-├── templates/
-│   ├── README.md
-│   └── report/                # e.g. project-index-report.md
+│   └── <skill-name>/       # e.g. react-pro, docker-pro, …
+├── scripts/README.md       # Full command map
 ├── workflows/
-│   ├── README.md              # Conventions, parallel execution
-│   └── dev/                   # /ticket, /index-project, …
+│   ├── README.md
+│   └── dev/                # /ticket, /index-project, …
 ├── knowledge-base/
 │   ├── INDEX.md
-│   ├── documents/             # RAG source .md
-│   └── embeddings/            # rag_*.json, skill_index.json
-├── prompts/                   # Planning, review, …
-├── src/                       # TypeScript source
-└── dist/                      # Compiled JS (`npm run build`)
+│   ├── documents/          # RAG source Markdown
+│   └── embeddings/         # rag_*.json, skill_index.json
+├── prompts/
+├── src/                    # TypeScript source
+└── dist/                   # npm run build → JS
 ```
+
+---
 
 ## Architecture overview
 
 ```mermaid
 flowchart LR
-  USER[User / agent] --> SKILLS[skills/*-pro]
-  USER --> WF[workflows/dev]
-  USER --> PROMPTS[prompts/]
+  subgraph Authoring
+    SKILLS[skills/*-pro]
+    WF[workflows/dev]
+    PROMPTS[prompts/]
+  end
 
-  SKILLS --> DOCS[knowledge-base/documents]
+  subgraph Knowledge
+    DOCS[knowledge-base/documents]
+    EMB[knowledge-base/embeddings]
+  end
+
+  subgraph CLI["node dist/tools.js"]
+    BUILD[build-kb]
+    QUERY[query-kb]
+    VALID[validate-skills]
+    ANALYZE[analyze-skills]
+  end
+
+  SKILLS --> DOCS
   WF --> DOCS
   PROMPTS --> DOCS
 
-  DOCS --> BUILD[node dist/tools.js build-kb]
-  BUILD --> EMB[knowledge-base/embeddings]
-  EMB --> QUERY[node dist/tools.js query-kb or query-kb-batch]
-  QUERY --> USER
+  DOCS --> BUILD
+  BUILD --> EMB
+  EMB --> QUERY
 
-  SKILLS --> VALIDATE[node dist/tools.js validate-skills]
-  SKILLS --> ANALYZE[node dist/tools.js analyze-skills]
-  VALIDATE --> USER
-  ANALYZE --> USER
+  SKILLS --> VALID
+  SKILLS --> ANALYZE
 ```
+
+---
 
 ## Quick start
 
 ### Install into another project
 
-Run from the **target project root**.
+Run from the **target project root**:
 
 ```bash
-# Install (default)
 npx github:truongnat/skills
+```
 
-# Update an existing install
+Update an existing install:
+
+```bash
 npx github:truongnat/skills update
 ```
 
-### Work in this repo (Node + TypeScript)
+### Work in this repository
 
 ```bash
 npm install
 npm run build
+node dist/tools.js validate-skills
+node dist/tools.js build-skill-index
 node dist/tools.js build-kb
 node dist/tools.js query-kb "your question"
 ```
 
-See [`scripts/README.md`](scripts/README.md) for the full command map.
+Full CLI reference: **[`scripts/README.md`](scripts/README.md)**.
+
+---
 
 ## Knowledge base & RAG
 
-1. Edit `.md` files under [`knowledge-base/documents/`](knowledge-base/documents/).
+1. Add or edit `.md` under [`knowledge-base/documents/`](knowledge-base/documents/).
 2. Update [`knowledge-base/INDEX.md`](knowledge-base/INDEX.md).
-3. Run `node dist/tools.js build-kb`.
-4. Query: `node dist/tools.js query-kb "..."`.
+3. `node dist/tools.js build-kb`
+4. `node dist/tools.js query-kb "…"` (or `query-kb-batch` for many queries)
+
+---
 
 ## Project indexing (any codebase)
 
-Use when you need a vector index and Markdown summary for a **different** repository.
+| Step | Command / workflow |
+|------|----------------------|
+| 1. Index | `node dist/tools.js index-project --dir <project_root> --out <index_dir>` |
+| 2. Query | `node dist/tools.js query-kb "question" --index <index_dir>` |
+| 3. Wiki | `node dist/tools.js generate-wiki --docs <index_dir>/docs` |
+| 4. Guided | Workflow **`/index-project`** — [`workflows/dev/index-project.md`](workflows/dev/index-project.md) |
 
-1. **CLI:** `node dist/tools.js index-project --dir <project_root> --out <index_dir>`.
-2. **Query:** `node dist/tools.js query-kb "question" --index <index_dir>`.
-3. **Wiki:** `node dist/tools.js generate-wiki --docs <index_dir>/docs`.
-4. **Workflow:** **`/index-project`** ([`workflows/dev/index-project.md`](workflows/dev/index-project.md)).
+---
 
 ## Skills
 
-- **Rules:** [`skills/SKILL_AUTHORING_RULES.md`](skills/SKILL_AUTHORING_RULES.md).
-- **Catalog:** Full list in **[`skills/README.md`](skills/README.md)**.
+Bundled skills follow a **consistent professional shape**: boundary in `SKILL.md`, deep dives under `references/`, and for most `*-pro` packs — **system model**, **failure modes**, **decision trade-offs**, **quality guardrails**, plus a **strict 8-step** suggested response format for agents.
+
+| Doc | Purpose |
+|-----|---------|
+| [`skills/SKILL_AUTHORING_RULES.md`](skills/SKILL_AUTHORING_RULES.md) | Mandatory rules before adding a skill |
+| [`skills/README.md`](skills/README.md) | Catalog of all bundled skills |
+
+Validate and audit from repo root:
+
+```bash
+node dist/tools.js validate-skills
+node dist/tools.js analyze-skills --self-review
+```
+
+---
 
 ## Workflows
 
-Naming and parallel execution: [`workflows/README.md`](workflows/README.md).
+Conventions (naming, parallel steps): [`workflows/README.md`](workflows/README.md).
 
-| Command | File | Purpose |
-|---------|------|---------|
+| Command | Document | Purpose |
+|---------|----------|---------|
 | **`/ticket`** | [`workflows/dev/ticket.md`](workflows/dev/ticket.md) | Ticket / Kanban |
-| **`/release`** | [`workflows/dev/release.md`](workflows/dev/release.md) | Release notes → implementation |
+| **`/release`** | [`workflows/dev/release.md`](workflows/dev/release.md) | Release notes → work |
 | **`/hotfix`** | [`workflows/dev/hotfix.md`](workflows/dev/hotfix.md) | Urgent production fix |
-| **`/code-review`** | [`workflows/dev/code-review.md`](workflows/dev/code-review.md) | Structured code review |
+| **`/code-review`** | [`workflows/dev/code-review.md`](workflows/dev/code-review.md) | Structured review |
 | **`/debug`** | [`workflows/dev/debug.md`](workflows/dev/debug.md) | Systematic debugging |
 | **`/security-audit`** | [`workflows/dev/security-audit.md`](workflows/dev/security-audit.md) | Security review |
-| **`/arch-review`** | [`workflows/dev/arch-review.md`](workflows/dev/arch-review.md) | Architecture / design review |
-| **`/perf-investigation`** | [`workflows/dev/perf-investigation.md`](workflows/dev/perf-investigation.md) | Performance investigation |
-| **`/refactor`** | [`workflows/dev/refactor.md`](workflows/dev/refactor.md) | Safe refactor (test-first) |
+| **`/arch-review`** | [`workflows/dev/arch-review.md`](workflows/dev/arch-review.md) | Architecture review |
+| **`/perf-investigation`** | [`workflows/dev/perf-investigation.md`](workflows/dev/perf-investigation.md) | Performance |
+| **`/refactor`** | [`workflows/dev/refactor.md`](workflows/dev/refactor.md) | Safe refactor |
 | **`/incident`** | [`workflows/dev/incident.md`](workflows/dev/incident.md) | Incident response |
 | **`/data-migration`** | [`workflows/dev/data-migration.md`](workflows/dev/data-migration.md) | Data / DB migration |
-| **`/onboarding`** | [`workflows/dev/onboarding.md`](workflows/dev/onboarding.md) | New member onboarding |
-| **`/api-design`** | [`workflows/dev/api-design.md`](workflows/dev/api-design.md) | API design / review |
+| **`/onboarding`** | [`workflows/dev/onboarding.md`](workflows/dev/onboarding.md) | Onboarding |
+| **`/api-design`** | [`workflows/dev/api-design.md`](workflows/dev/api-design.md) | API design |
 | **`/test-strategy`** | [`workflows/dev/test-strategy.md`](workflows/dev/test-strategy.md) | Test strategy |
-| **`/dep-audit`** | [`workflows/dev/dep-audit.md`](workflows/dev/dep-audit.md) | Dependency audit |
-| **`/index-project`** | [`workflows/dev/index-project.md`](workflows/dev/index-project.md) | Index any project |
+| **`/dep-audit`** | [`workflows/dev/dep-audit.md`](workflows/dev/dep-audit.md) | Dependencies |
+| **`/index-project`** | [`workflows/dev/index-project.md`](workflows/dev/index-project.md) | Index any repo |
+
+---
 
 ## Prompt templates
 
-See [`templates/README.md`](templates/README.md) and [`prompts/`](prompts/).
+See [`templates/README.md`](templates/README.md) and the [`prompts/`](prompts/) directory.
+
+---
 
 ## Cursor / agent
 
-See [`AGENTS.md`](AGENTS.md) for skills path, commands, KB usage, and **response language** configuration.
+[`AGENTS.md`](AGENTS.md) — skills paths, slash commands, KB usage, and how to point Cursor at this bundle.
+
+---
 
 ## License
 
