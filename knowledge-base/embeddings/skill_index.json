@@ -60,22 +60,29 @@
   {
     "name": "api-design-pro",
     "folder": "api-design-pro",
-    "description": "Professional API design guidance for building clear, evolvable, and secure service contracts across REST-style and RPC-style interfaces.\n\nUse this skill when designing new APIs, reviewing API changes, improving contract consistency, or planning backward-compatible evolution.\n\nTriggers: \"api design\", \"rest api\", \"endpoint\", \"contract\", \"versioning\", \"pagination\", \"error model\", \"idempotency\", \"backward compatibility\", \"schema evolution\", \"openapi\", \"swagger\", \"429\", \"400 vs 500\", \"webhook\", \"HATEOAS\", \"rate limit\".\n\nCombine with `security-pro` for threat-focused hardening and `testing-pro` for contract and integration verification.",
+    "description": "Professional API design guidance: contract-first REST/RPC/event interfaces, resource and action modeling, mutation semantics and concurrency (PUT/PATCH/DELETE, upsert, soft delete, bulk), workflow and state-transition APIs, query/filter/search/projection, async jobs and webhooks, consistency and conflicts, versioning, pagination, error models, idempotency, backward compatibility, observability and governance, and production edge cases.\n\nUse this skill when designing new APIs, reviewing API changes, improving contract consistency, or planning backward-compatible evolution.\n\nTriggers: \"api design\", \"rest api\", \"endpoint\", \"contract\", \"versioning\", \"pagination\", \"error model\", \"idempotency\", \"backward compatibility\", \"schema evolution\", \"openapi\", \"swagger\", \"429\", \"400 vs 500\", \"webhook\", \"HATEOAS\", \"rate limit\", \"resource modeling\", \"nested resource\", \"bulk api\", \"ETag\", \"If-Match\", \"workflow api\", \"state transition\", \"cursor pagination\", \"async job\", \"202 accepted\", \"webhook signing\", \"projection\", \"sparse fieldset\", \"include expand\".\n\nCombine with `security-pro` for threat-focused hardening and `testing-pro` for contract and integration verification.",
     "triggers": [],
     "when_to_use": [
       "Designing new public/internal APIs with clear request/response contracts.",
       "Reviewing breaking-change risk in endpoint/schema updates.",
+      "Modeling **resources vs actions**, **state machines**, **bulk/long-running** operations.",
       "Standardizing pagination, filtering, sorting, error handling, and idempotency behavior.",
-      "Planning API versioning and deprecation strategy without disrupting clients.",
-      "Trigger keywords: `api design`, `rest api`, `endpoint`, `contract`, `versioning`, `pagination`, `error model`, `idempotency`, `backward compatibility`, `schema evolution`"
+      "Planning API versioning and deprecation strategy without disrupting clients."
     ],
     "references": [
       "anti-patterns.md",
+      "async-webhooks-and-jobs.md",
+      "consistency-and-conflicts.md",
       "decision-tree.md",
       "edge-cases.md",
       "integration-map.md",
+      "mutation-semantics-and-concurrency.md",
+      "observability-and-api-governance.md",
+      "query-filtering-and-projection.md",
+      "resource-modeling-and-actions.md",
       "tips-and-tricks.md",
-      "versions.md"
+      "versions.md",
+      "workflow-and-state-transitions.md"
     ]
   },
   {
