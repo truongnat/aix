@@ -32,3 +32,12 @@
 
 - **“Just this once”** — Document **exception** with expiry or risk acceptance; else debt accumulates.
 - **Third-party embeds** — Charts, maps, chat widgets — style clashes; **isolate** or theme-wrapper.
+
+## SPA / hydration
+
+- **Theme flash** — Wrong background before CSS vars apply; use **blocking script**, **same-class SSR**, or **color-scheme** meta — **`dark-mode-and-semantic-theming-deep-dive.md`**.
+- **Focus order** — Modals and route changes must **trap** focus and restore; random port order breaks SR — **`a11y-responsive-and-web-typography.md`**.
+
+## Rebrand / migration
+
+- **Mixed-era UI** — Old cards + new buttons on one page; define **cutover** or **wrapper** until migration ends — **`failure-modes-detection-mitigation.md`**.

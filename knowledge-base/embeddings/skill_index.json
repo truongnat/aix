@@ -416,28 +416,32 @@
   {
     "name": "design-system-pro",
     "folder": "design-system-pro",
-    "description": "Professional product UI design: design systems, visual foundations, accessibility baselines, data-dense interfaces, guidelines and consistency, web vs native vs desktop patterns, themes and visual direction, and trend-aware (judgment-first) styling.\n\nUse this skill when the user asks about design tokens, component libraries, Figma variables, UI kits, WCAG contrast, typography and spacing scales, dashboards and data tables, dark/light themes, **semantic token mapping**, **AI/copilot/chat UI**, streaming assistant layouts, citations and tool-use UI, design documentation, visual trends, brand-consistent UI, or cross-platform UX patterns.\n\nUse **with** **`mobile-design-pro`** for **mobile-native** touch, safe area, and iOS/Android UX depth; implementation skills: **`react-pro`** / **`nextjs-pro`** (web), **`react-native-pro`** / **`flutter-pro`** (mobile), **`electron-pro`** / **`tauri-pro`** (desktop), **`testing-pro`** (visual regression). This skill (`design-system-pro`) owns **design language, system rules, and UX patterns**; framework skills own **code APIs**.\n\nTriggers: \"design system\", \"design tokens\", \"UI kit\", \"Figma\", \"component library\", \"style guide\", \"baseline\", \"WCAG\", \"accessibility\", \"dark mode\", \"semantic color\", \"CSS variables theme\", \"dashboard\", \"data table\", \"UX\", \"UI\", \"visual design\", \"consistency\", \"spacing\", \"typography\", \"color palette\", \"HIG\", \"Material\", \"Fluent\", \"brand\", \"handoff\", \"trend\", \"motion\", \"responsive\", \"copilot\", \"chat UI\", \"AI assistant\", \"streaming UI\", \"RAG UI\", \"citations\", \"focus ring\", \"live region\", \"token naming\", \"density scale\", \"glassmorphism\".",
+    "description": "Production-grade product UI design: design systems, visual foundations, accessibility baselines, data-dense interfaces, guidelines and consistency, web vs native vs desktop patterns, themes and visual direction, token pipeline (primitive → semantic → component → code), failure modes (token drift, a11y regression, dark contrast, chart honesty, i18n), decision frameworks (maturity, build vs buy, density × audience), quality guardrails (no invented brand colors, WCAG pairs only with context), trend-aware (judgment-first) styling.\n\nUse this skill when the user asks about design tokens, component libraries, Figma variables, UI kits, WCAG contrast, typography and spacing scales, dashboards and data tables, dark/light themes, **semantic token mapping**, **AI/copilot/chat UI**, streaming assistant layouts, citations and tool-use UI, design documentation, visual trends, brand-consistent UI, or cross-platform UX patterns.\n\nUse **with** **`mobile-design-pro`** for **mobile-native** touch, safe area, and iOS/Android UX depth; implementation skills: **`react-pro`** / **`nextjs-pro`** (web), **`react-native-pro`** / **`flutter-pro`** (mobile), **`electron-pro`** / **`tauri-pro`** (desktop), **`testing-pro`** (visual regression), **`business-analysis-pro`** / **`content-analysis-pro`** when UX outcomes or brand inputs need grounding. This skill owns **design language, system rules, and UX patterns**; framework skills own **code APIs**.\n\nTriggers: \"design system\", \"design tokens\", \"UI kit\", \"Figma\", \"component library\", \"style guide\", \"baseline\", \"WCAG\", \"accessibility\", \"dark mode\", \"semantic color\", \"CSS variables theme\", \"dashboard\", \"data table\", \"UX\", \"UI\", \"visual design\", \"consistency\", \"spacing\", \"typography\", \"color palette\", \"HIG\", \"Material\", \"Fluent\", \"brand\", \"handoff\", \"trend\", \"motion\", \"responsive\", \"copilot\", \"chat UI\", \"AI assistant\", \"streaming UI\", \"RAG UI\", \"citations\", \"focus ring\", \"live region\", \"token naming\", \"density scale\", \"glassmorphism\".",
     "triggers": [],
     "when_to_use": [
       "Defining or evolving a **design system** (tokens, primitives, documentation).",
       "Setting **baseline**: type scale, spacing, color roles, **WCAG** targets, **data** density.",
       "**Web vs app vs desktop** — adapting patterns without cloning the wrong platform.",
-      "**Themes** (light/dark), **visual direction**, and **trend** evaluation (fit vs fad).",
+      "**Themes** (light/dark), **semantic mapping**, **visual direction**, trend evaluation (fit vs fad).",
       "**Consistency** audits, handoff rules, governance anti-patterns.",
-      "Trigger keywords: `design tokens`, `WCAG`, `dashboard`, `theme`, `Figma`, `UI kit`, `consistency`, …"
+      "**AI/copilot** UI: streaming layout, citations, tool states, live regions."
     ],
     "references": [
       "a11y-responsive-and-web-typography.md",
       "ai-copilot-ui-patterns-deep-dive.md",
       "anti-patterns.md",
       "dark-mode-and-semantic-theming-deep-dive.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "design-system-guidelines-and-consistency.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "foundations-baseline-and-data-ui.md",
       "integration-map.md",
       "platforms-web-app-desktop.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
+      "token-pipeline-and-source-of-truth.md",
       "trends-themes-and-visual-language.md",
       "versions.md",
       "web-performance-basics.md"
