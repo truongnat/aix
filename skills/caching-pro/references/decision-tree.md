@@ -18,6 +18,8 @@ App controls when to populate cache?
     └── Read-through / write-through — complexity in one layer
 ```
 
+Complex write paths → **[write-path-and-coherence.md](write-path-and-coherence.md)**.
+
 ## Redis vs in-process vs HTTP cache
 
 ```
@@ -26,6 +28,8 @@ Single instance app, tiny data?
 └── Multiple instances or shared data?
     └── Redis/Memcached — watch network latency and failure modes
 ```
+
+Multiple layers → **[multi-layer-cache.md](multi-layer-cache.md)**.
 
 ## When to add CDN / edge cache
 
@@ -45,4 +49,22 @@ Know exact keys when entity updates?
     └── TTL + versioned keys or tag-based invalidation if store supports
 ```
 
-See also [pattern-selection.md](pattern-selection.md) and [invalidation-and-consistency.md](invalidation-and-consistency.md).
+## Consistency strictness
+
+```
+Must readers see own writes immediately?
+├── Session-scoped cache + sync invalidate — see distributed-consistency-models.md
+└── Seconds of staleness OK?
+    └── TTL + async invalidation with documented lag budget
+```
+
+## Failure & capacity
+
+```
+Cache or origin outage risk unacceptable?
+├── Circuit breaker, backoff, origin protection — failure-modes-and-resilience.md
+└── Memory / $ trade-off unclear?
+    └── cost-and-capacity-modeling.md before scaling cluster
+```
+
+See also [pattern-selection.md](pattern-selection.md), [invalidation-and-consistency.md](invalidation-and-consistency.md), [cache-architecture-and-data-flows.md](cache-architecture-and-data-flows.md).

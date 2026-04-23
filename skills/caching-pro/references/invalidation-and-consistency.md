@@ -12,3 +12,5 @@ Guardrails:
 2. Add jitter to TTL to avoid synchronized expiration storms.
 3. On cache failure, degrade gracefully to origin with rate limits/backoff.
 4. For multi-key objects, define atomic invalidation strategy or consistency warning.
+
+Formal consistency vocabulary (read-your-writes, eventual, session): [distributed-consistency-models.md](distributed-consistency-models.md).

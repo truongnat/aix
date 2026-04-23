@@ -191,26 +191,34 @@
   {
     "name": "caching-pro",
     "folder": "caching-pro",
-    "description": "Professional caching guidance for application, API, and data workloads: strategy selection, key design, TTL policy, invalidation, consistency trade-offs, and observability.\n\nUse this skill when the user asks to speed up reads, reduce DB/API load, design Redis or in-memory caching, troubleshoot stale data, or review cache safety before rollout.\n\nUse **with** **`nextjs-pro`** for framework-level cache behavior, **`postgresql-pro`** and **`sql-data-access-pro`** for query-layer boundaries, and **`deployment-pro`** for production rollout/rollback controls.\n\nTriggers: \"caching\", \"cache strategy\", \"Redis\", \"TTL\", \"invalidation\", \"stale data\", \"cache miss\", \"cache-aside\", \"write-through\", \"ETag\", \"CDN cache\", \"performance bottleneck\".",
+    "description": "Professional distributed and multi-layer caching: patterns (cache-aside, read/write-through, write-behind), end-to-end data flows (read, write, invalidate, warm, refresh), formal consistency models (read-after-write, bounded staleness, eventual, session/monotonic hints), write-path ordering and dual-write risks, L1/L2/CDN architectures and cross-layer invalidation, failure modes (outage, partition, eviction storm, stale forever), stampede and resilience (circuit breaker, backoff), cost and capacity modeling, security (tenant isolation, poisoning, auth-aware keys), lifecycle (warm, expire, evict, rebuild), key/TTL design, observability, and operational rollout.\n\nUse when speeding reads, cutting DB/API load, designing Redis or in-memory tiers, troubleshooting stale data, reviewing cache safety, or aligning HTTP/CDN behavior with correctness.\n\nUse with nextjs-pro, postgresql-pro, sql-data-access-pro, deployment-pro, security-pro, api-design-pro as needed.\n\nTriggers: \"caching\", \"cache strategy\", \"Redis\", \"TTL\", \"invalidation\", \"stale data\", \"cache miss\", \"cache-aside\", \"write-through\", \"write-behind\", \"dual write\", \"ETag\", \"CDN cache\", \"L1 L2\", \"distributed cache\", \"cache stampede\", \"thundering herd\", \"circuit breaker cache\", \"read-after-write\", \"eventual consistency cache\", \"hot key\", \"cache poisoning\", \"multi-layer cache\", \"Redis cluster\".",
     "triggers": [],
     "when_to_use": [
-      "Choosing between cache-aside, read-through, write-through, write-behind, or HTTP/CDN caching.",
-      "Designing cache key schema, TTL policy, and stampede protection.",
-      "Investigating stale data, high miss ratio, or poor p95/p99 latency.",
-      "Reducing database or third-party API load while preserving correctness.",
-      "Reviewing cache changes for consistency, invalidation, and failure modes.",
-      "Trigger keywords: `caching`, `Redis`, `TTL`, `invalidation`, `cache miss`, `stale data`, `ETag`, `CDN cache`"
+      "Choosing patterns and **multi-layer** placement (process, Redis, CDN).",
+      "Designing **read/write/invalidate** paths and **key/TTL** policy.",
+      "Formalizing **consistency** per entity (prices vs static assets).",
+      "**Write-path** review (ordering, dual write, write-behind risk).",
+      "**Failure** and **degradation** design; **cost** justification.",
+      "Investigating stale data, miss ratio, hot keys, eviction storms."
     ],
     "references": [
       "anti-patterns.md",
+      "cache-architecture-and-data-flows.md",
+      "cache-lifecycle.md",
+      "cache-security-and-isolation.md",
+      "cost-and-capacity-modeling.md",
       "decision-tree.md",
+      "distributed-consistency-models.md",
       "edge-cases.md",
+      "failure-modes-and-resilience.md",
       "integration-map.md",
       "invalidation-and-consistency.md",
+      "multi-layer-cache.md",
       "pattern-selection.md",
       "performance-and-observability.md",
       "tips-and-tricks.md",
-      "versions.md"
+      "versions.md",
+      "write-path-and-coherence.md"
     ]
   },
   {
