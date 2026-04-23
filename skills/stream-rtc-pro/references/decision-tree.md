@@ -18,3 +18,11 @@
 ## Codecs
 
 - **Interop first** → Opus + VP8/AV1 policy per browser matrix; hardware encode where stable.
+
+## Interactive WebRTC vs broadcast fallback
+
+```
+Need sub-second two-way interaction for many viewers?
+├── Yes → WebRTC SFU + adaptation; watch TURN/SFU cost — **`decision-framework-and-trade-offs.md`**
+└── Mostly one-way mass view → consider HLS/DASH + higher latency budget — **`deployment-pro`**
+```

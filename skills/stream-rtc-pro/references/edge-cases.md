@@ -1,5 +1,7 @@
 # Stream/RTC edge cases
 
+See grouped mitigations — **`failure-modes-detection-mitigation.md`**.
+
 ## Signaling and negotiation races
 
 - Offer/answer collisions can cause negotiation loops without glare handling.

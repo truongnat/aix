@@ -1138,20 +1138,23 @@
   {
     "name": "stream-rtc-pro",
     "folder": "stream-rtc-pro",
-    "description": "Professional realtime streaming and RTC guidance for designing low-latency media systems with reliable signaling, adaptive quality, and secure operation.\n\nUse this skill when building or reviewing WebRTC/RTC streaming architecture, call/session lifecycle, media transport behavior, and production scaling strategy.\n\nTriggers: \"webrtc\", \"rtc\", \"streaming\", \"rtp\", \"sfu\", \"mcu\", \"turn\", \"stun\", \"signaling\", \"jitter\", \"packet loss\", \"media edge case\", \"simulcast\", \"SVC\", \"Opus\", \"ICE restart\", \"getUserMedia\".\n\nCombine with `websocket-pro` for signaling channels and `performance-tuning-pro` for realtime quality/latency optimization.",
+    "description": "Production-grade realtime streaming and RTC: WebRTC architecture, signaling vs media planes, ICE/TURN/STUN, SFU/MCU topology, adaptive bitrate, simulcast/SVC, session lifecycle and reconnect — plus system model (two-plane design, ICE path, SFU adaptation loop), failure modes (ICE stuck, SDP glare, TURN exhaustion, jitter freezes, weak join auth), decision trade-offs (mesh vs SFU vs MCU, WebRTC vs broadcast fallback, simulcast vs SVC, UDP vs TCP TURN), and quality guardrails (standards-accurate SDP, privacy/recording, test matrix).\n\nUse this skill when building or reviewing WebRTC/RTC streaming, call/session lifecycle, media transport, scaling SFUs, or production QoS under loss and jitter.\n\nCombine with **`websocket-pro`** for signaling channels, **`performance-tuning-pro`** for latency and resource profiling, **`security-pro`** for tokens and recording consent, **`deployment-pro`** and **`network-infra-pro`** for TURN/SFU ops, **`nestjs-pro`** / **`nextjs-pro`** for signaling backends, and **`react-native-pro`** for mobile media lifecycle.\n\nTriggers: \"webrtc\", \"rtc\", \"streaming\", \"rtp\", \"sfu\", \"mcu\", \"turn\", \"stun\", \"signaling\", \"jitter\", \"packet loss\", \"media edge case\", \"simulcast\", \"SVC\", \"Opus\", \"ICE restart\", \"getUserMedia\".",
     "triggers": [],
     "when_to_use": [
-      "Designing realtime audio/video architecture for conferencing, live rooms, or interactive streaming.",
-      "Reviewing signaling flow, ICE negotiation, reconnect, and media session lifecycle.",
-      "Improving quality under packet loss, jitter, bandwidth fluctuation, and device variability.",
-      "Scaling SFU-based systems while preserving stability and user experience.",
-      "Trigger keywords: `webrtc`, `rtc`, `streaming`, `rtp`, `sfu`, `turn`, `stun`, `signaling`, `jitter`, `packet loss`, `media edge case`"
+      "Realtime A/V architecture: rooms, calls, interactive streaming.",
+      "Signaling flow, ICE negotiation, reconnect, renegotiation.",
+      "QoS under loss/jitter/bandwidth collapse; simulcast/SVC policy.",
+      "Scaling SFU systems and TURN strategy."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
+      "rtc-signaling-and-media-plane-system-model.md",
       "tips-and-tricks.md",
       "versions.md"
     ]
