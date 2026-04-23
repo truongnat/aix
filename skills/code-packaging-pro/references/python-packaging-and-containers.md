@@ -15,3 +15,5 @@
 
 - **`code-packaging-pro`** — **Artifact** shape: image, wheel, **CI** that **builds** them.
 - **`deployment-pro`** — **Where** and **how** images run (K8s, serverless, **rollback**, **canary**) — orchestration and **promotion**, not the Dockerfile alone.
+
+End-to-end artifact flow: [artifact-build-and-registry-model.md](artifact-build-and-registry-model.md).

@@ -309,22 +309,27 @@
   {
     "name": "code-packaging-pro",
     "folder": "code-packaging-pro",
-    "description": "Professional code packaging and automation: pyproject.toml / setuptools-style metadata, Dockerfiles (multi-stage, slim runtime), GitHub Actions workflows for test matrices, build artifacts, and container or library publishing — complementing deployment strategy.\n\nUse this skill when the user authors **`pyproject.toml`**, writes or refactors a **Dockerfile**, or wires **GitHub Actions** for **CI** (lint, test, build wheel/image) — not when choosing **Kubernetes** vs **serverless** **runtime** (see **`deployment-pro`**).\n\nUse **with** **`deployment-pro`** when **images** must be **promoted** across environments; **`security-pro`** for **OIDC**, **secrets**, and **supply chain**; **`testing-pro`** for **what** runs in CI. This skill (`code-packaging-pro`) owns **build artifacts** and **workflow structure**; **`deployment-pro`** owns **release** and **runtime** promotion.\n\nTriggers: \"pyproject.toml\", \"Dockerfile\", \"multi-stage\", \"GitHub Actions\", \"workflow yml\", \"build wheel\", \"publish PyPI\", \"container image\", \"CI matrix\", \"dockerignore\", \"hatchling\", \"setuptools\", \"trusted publishing\", \"GHCR\", \"ECR\", \"non-root container\", \"OIDC PyPI\", \"cibuildwheel\", \"uv lock\", \"poetry export\".",
+    "description": "Production-grade code packaging and CI build automation: artifact graph (wheel, sdist, OCI image) from source to registry; reproducible builds, lockfiles vs semver library ranges, pyproject.toml / build backends (hatchling, setuptools), multi-stage Docker and .dockerignore, GitHub Actions job graphs (lint → test → build → publish), trusted publishing OIDC to PyPI/GHCR, supply-chain hooks (SBOM, attestations pointers), failure modes (ABI mismatch, PEP 668, cache drift, fork secrets, publish races), decision trade-offs (library vs app, slim vs fat image), multi-ecosystem notes (npm), boundary with deployment runtime promotion.\n\nUse when authoring pyproject.toml, Dockerfiles, CI workflows for build/publish, choosing packaging tooling, or reviewing reproducibility and registry safety — not for choosing Kubernetes vs Lambda runtime topology alone.\n\nUse with deployment-pro, testing-pro, security-pro, ci-cd-pro, docker-pro, javascript-pro as needed.\n\nTriggers: \"pyproject.toml\", \"Dockerfile\", \"multi-stage\", \"GitHub Actions\", \"workflow yml\", \"build wheel\", \"publish PyPI\", \"trusted publishing\", \"OIDC PyPI\", \"GHCR\", \"ECR\", \"manylinux\", \"cibuildwheel\", \"dockerignore\", \"hatchling\", \"setuptools\", \"uv lock\", \"poetry export\", \"pip-tools\", \"PEP 621\", \"PEP 668\", \"sigstore\", \"SBOM\", \"npm publish\", \"package.json files\", \"digest pin\", \"reproducible build\".",
     "triggers": [],
     "when_to_use": [
-      "**`pyproject.toml`** — `project` metadata, optional deps, **build** backend choice.",
-      "**Dockerfile** — **multi-stage**, **slim** base, **non-root**, `.dockerignore`.",
-      "**GitHub Actions** — matrices, **cache**, **build** job vs **release** job.",
-      "**Publishing** — wheels, **container** push, **trusted publishing** patterns (overview).",
-      "Trigger keywords: `pyproject`, `Dockerfile`, `Actions`, `workflow`, `wheel`, `CI`, …"
+      "**`pyproject.toml`**, build backend, **`requires-python`**, optional deps.",
+      "**Dockerfile** multi-stage, non-root, `.dockerignore`.",
+      "**GitHub Actions**: matrices, cache keys, build vs release jobs, **trusted publishing**.",
+      "**Supply chain**: provenance hooks, SBOM step placement — **`supply-chain-and-provenance-hooks.md`**."
     ],
     "references": [
       "anti-patterns.md",
+      "artifact-build-and-registry-model.md",
+      "decision-framework-and-tradeoffs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "github-actions-and-ci.md",
       "integration-map.md",
+      "multi-ecosystem-packaging-notes.md",
       "python-packaging-and-containers.md",
+      "quality-validation-and-guardrails.md",
+      "supply-chain-and-provenance-hooks.md",
       "tips-and-tricks.md",
       "versions.md"
     ]

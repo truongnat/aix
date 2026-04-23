@@ -19,3 +19,8 @@
 
 - Slow builds, accidental secret context.
 - **Fix:** Mirror `.gitignore` patterns + explicit allow.
+
+## Duplicate releases / race on tag
+
+- Two workflows publish same version → index errors.
+- **Fix:** Single release workflow; concurrency group on release; idempotent guards — **`failure-modes-detection-mitigation.md`**.

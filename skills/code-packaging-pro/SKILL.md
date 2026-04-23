@@ -1,113 +1,184 @@
 ---
 name: code-packaging-pro
 description: |
-  Professional code packaging and automation: pyproject.toml / setuptools-style metadata, Dockerfiles (multi-stage, slim runtime), GitHub Actions workflows for test matrices, build artifacts, and container or library publishing — complementing deployment strategy.
+  Production-grade code packaging and CI build automation: artifact graph (wheel, sdist, OCI image) from source to registry; reproducible builds, lockfiles vs semver library ranges, pyproject.toml / build backends (hatchling, setuptools), multi-stage Docker and .dockerignore, GitHub Actions job graphs (lint → test → build → publish), trusted publishing OIDC to PyPI/GHCR, supply-chain hooks (SBOM, attestations pointers), failure modes (ABI mismatch, PEP 668, cache drift, fork secrets, publish races), decision trade-offs (library vs app, slim vs fat image), multi-ecosystem notes (npm), boundary with deployment runtime promotion.
 
-  Use this skill when the user authors **`pyproject.toml`**, writes or refactors a **Dockerfile**, or wires **GitHub Actions** for **CI** (lint, test, build wheel/image) — not when choosing **Kubernetes** vs **serverless** **runtime** (see **`deployment-pro`**).
+  Use when authoring pyproject.toml, Dockerfiles, CI workflows for build/publish, choosing packaging tooling, or reviewing reproducibility and registry safety — not for choosing Kubernetes vs Lambda runtime topology alone.
 
-  Use **with** **`deployment-pro`** when **images** must be **promoted** across environments; **`security-pro`** for **OIDC**, **secrets**, and **supply chain**; **`testing-pro`** for **what** runs in CI. This skill (`code-packaging-pro`) owns **build artifacts** and **workflow structure**; **`deployment-pro`** owns **release** and **runtime** promotion.
+  Use with deployment-pro, testing-pro, security-pro, ci-cd-pro, docker-pro, javascript-pro as needed.
 
-  Triggers: "pyproject.toml", "Dockerfile", "multi-stage", "GitHub Actions", "workflow yml", "build wheel", "publish PyPI", "container image", "CI matrix", "dockerignore", "hatchling", "setuptools", "trusted publishing", "GHCR", "ECR", "non-root container", "OIDC PyPI", "cibuildwheel", "uv lock", "poetry export".
+  Triggers: "pyproject.toml", "Dockerfile", "multi-stage", "GitHub Actions", "workflow yml", "build wheel", "publish PyPI", "trusted publishing", "OIDC PyPI", "GHCR", "ECR", "manylinux", "cibuildwheel", "dockerignore", "hatchling", "setuptools", "uv lock", "poetry export", "pip-tools", "PEP 621", "PEP 668", "sigstore", "SBOM", "npm publish", "package.json files", "digest pin", "reproducible build".
 
 metadata:
-  short-description: Code packaging — pyproject, Docker, GitHub Actions, build & publish
+  short-description: Packaging — artifacts, registries, Docker/CI, OIDC publish, supply chain hooks
+  content-language: en
+  domain: packaging
+  level: professional
 ---
 
 # Code packaging (professional)
 
-Use **[Python packaging](https://packaging.python.org/)** and **GitHub Actions** official docs for syntax; this skill encodes **artifact** hygiene (**wheels**, **images**) and **CI** layout. Confirm **Python** versions, **registry** targets, and **public** vs **private** package index.
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use **[Python packaging](https://packaging.python.org/)** and **GitHub Actions** official docs for syntax truth; this skill encodes **artifact/registry system behavior**, **build CI graphs**, **supply-chain-aware publish**, and **failure modes** — not only snippet collection. Depth defaults to **Python + Docker + Actions**; see **`multi-ecosystem-packaging-notes.md`** for Node/Rust orientation. Confirm **artifact type** (library vs deployable), **Python range**, **registry**, and **public vs private** index.
+
+## Boundary
+
+**`code-packaging-pro`** owns **how artifacts are produced and pushed** (metadata, locks, Dockerfile structure, workflow jobs for build/publish, OIDC wiring **at CI level**). **`deployment-pro`** owns **where artifacts run**, **traffic**, **rollback**, **environment promotion** beyond registry push. **`security-pro`** owns **threat model** for tokens and attestations policy detail.
 
 ## Related skills (this repo)
 
 | Skill | When to combine with `code-packaging-pro` |
 |-------|-------------------------------------------|
-| **`deployment-pro`** | After **build** — **where** artifacts run, **rollback**, **canary** |
-| **`testing-pro`** | **Test** job design, **flakiness**, coverage gates |
-| **`security-pro`** | **Secrets**, **OIDC**, **SBOM**, **fork** PR safety |
-| **`nestjs-pro`** / **`nextjs-pro`** | Framework-specific **Docker** or **standalone** output |
-
-**Boundary:** **`code-packaging-pro`** = **build** and **package**; **`deployment-pro`** = **ship** and **operate** in **environments**.
+| **`deployment-pro`** | Promote digest, canary, rollback after artifact exists |
+| **`testing-pro`** | CI test gates, flake policy, what to run before build |
+| **`security-pro`** | OIDC trust, SBOM/signing gates, fork PR safety |
+| **`ci-cd-pro`** | Workflow patterns, concurrency, reusable workflows |
+| **`docker-pro`** | Advanced BuildKit, layer optimization |
+| **`javascript-pro`** / **`cli-pro`** | npm publish, `bin` entry when shipping CLI |
+| **`nestjs-pro`** / **`nextjs-pro`** | Framework-specific container or output |
 
 ## When to use
 
-- **`pyproject.toml`** — `project` metadata, optional deps, **build** backend choice.
-- **Dockerfile** — **multi-stage**, **slim** base, **non-root**, `.dockerignore`.
-- **GitHub Actions** — matrices, **cache**, **build** job vs **release** job.
-- **Publishing** — wheels, **container** push, **trusted publishing** patterns (overview).
-- Trigger keywords: `pyproject`, `Dockerfile`, `Actions`, `workflow`, `wheel`, `CI`, …
+- **`pyproject.toml`**, build backend, **`requires-python`**, optional deps.
+- **Dockerfile** multi-stage, non-root, `.dockerignore`.
+- **GitHub Actions**: matrices, cache keys, build vs release jobs, **trusted publishing**.
+- **Supply chain**: provenance hooks, SBOM step placement — **`supply-chain-and-provenance-hooks.md`**.
+
+## When not to use
+
+- **Cluster topology / SRE rollout** only — **`deployment-pro`** first for “where it runs.”
+
+## Required inputs
+
+- **Library** vs **application** image; **single package** vs **monorepo** hint.
+
+## Expected output
+
+Follow **Suggested response format** strictly — artifact system through residual risks.
 
 ## Workflow
 
-1. Confirm **artifact** type (library wheel, **app** image), **Python** range, and **registry** (PyPI, GHCR, ECR).
-2. Apply the principles and topic summaries below; open `references/` when you need depth; defer **runtime** topology to **`deployment-pro`**.
-3. Respond using **Suggested response format**; note **supply chain** and **reproducibility** risks.
+1. Confirm artifact type, Python range, registry, and trust model (internal vs OSS forks).
+2. Apply summaries; open `references/`; validate **PEP 621** claims — **`quality-validation-and-guardrails.md`**.
+3. Respond using **Suggested response format**; delegate runtime promotion to **`deployment-pro`**.
 
 ### Operating principles
 
-1. **Reproducible builds** — **Lockfiles** or pinned deps for **apps**; **tested** ranges for **libraries**.
-2. **Smallest** runnable image — **multi-stage**, **minimal** base, **no** dev tools in production stage.
-3. **CI clarity** — **Lint** → **test** → **build**; **fail fast** on cheap jobs.
-4. **Secrets** — **Short-lived** and **scoped**; **OIDC** over long PATs where possible.
-5. **Dockerignore** — Same importance as **.gitignore** for **context** size and **security**.
-6. **Docs** — **CHANGELOG** and **version** policy for **library** consumers.
+1. **Reproducible builds** — Lock apps; test matrix for libs — **`decision-framework-and-tradeoffs.md`**.
+2. **Smallest runnable image** — Multi-stage, slim runtime, no compilers in final stage — **`python-packaging-and-containers.md`**.
+3. **CI clarity** — Lint → test → build → publish; fail fast — **`github-actions-and-ci.md`**.
+4. **Secrets** — OIDC over PAT; no secrets in image layers — **`failure-modes-detection-mitigation.md`**.
+5. **Dockerignore** — Same class of importance as `.gitignore` for context and leaks — **`anti-patterns.md`**.
+6. **Immutable references** — Image **digest** for serious deploys; library **version** as public API — **`artifact-build-and-registry-model.md`**.
+
+### Artifact build and registry model (summary)
+
+Source → CI gates → artifact → registry; handoff to **`deployment-pro`** — **`artifact-build-and-registry-model.md`**.
+
+Details: [references/artifact-build-and-registry-model.md](references/artifact-build-and-registry-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+ABI drift, PEP 668, publish/OIDC failures, cache keys — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Library vs app, backends, OIDC vs token, image slim vs debug — **`decision-framework-and-tradeoffs.md`**.
+
+Details: [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md)
+
+### Supply chain and provenance hooks (summary)
+
+Trusted publishing, SBOM/sign steps — **`supply-chain-and-provenance-hooks.md`**.
+
+Details: [references/supply-chain-and-provenance-hooks.md](references/supply-chain-and-provenance-hooks.md)
+
+### Multi-ecosystem packaging notes (summary)
+
+npm / other ecosystems — same artifact discipline — **`multi-ecosystem-packaging-notes.md`**.
+
+Details: [references/multi-ecosystem-packaging-notes.md](references/multi-ecosystem-packaging-notes.md)
+
+### Quality validation and guardrails (summary)
+
+PEP 621 honesty; no secrets in Dockerfile — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Python packaging and containers (summary)
 
-- **`pyproject.toml`**, **Dockerfile** patterns, **boundary** vs **`deployment-pro`**.
+`pyproject`, Docker boundaries — **`python-packaging-and-containers.md`**.
 
 Details: [references/python-packaging-and-containers.md](references/python-packaging-and-containers.md)
 
 ### GitHub Actions and CI (summary)
 
-- Matrices, **caching**, job split, **trusted publishing** pointer, **`testing-pro`** handoff.
+Matrices, caching, publish jobs — **`github-actions-and-ci.md`**.
 
 Details: [references/github-actions-and-ci.md](references/github-actions-and-ci.md)
 
 ### Tips and tricks (summary)
 
-- Slim images, lockfiles, semver discipline.
+Locks, semver, slim images — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- Monorepos, **native** wheels, **private** indexes.
+Monorepo, manylinux, PEP 668, platforms — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
-### Decision flow and anti-patterns (summary)
+### Decision trees (summary)
 
-- Library vs service image; trusted publishing; secrets in layers/workflows.
+Artifact type, publish path, backend choice — **`decision-tree.md`**.
 
-Details: [references/decision-tree.md](references/decision-tree.md) · [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/decision-tree.md](references/decision-tree.md)
 
-### Cross-skill handoffs (summary)
+### Anti-patterns (summary)
 
-- **`deployment-pro`**, **`testing-pro`**, **`security-pro`**, stack skills.
+Secrets in layers, fat images, unpinned actions — **`anti-patterns.md`**.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Integration map (summary)
+
+**`deployment-pro`**, **`security-pro`**, **`ci-cd-pro`**, **`docker-pro`** — **`integration-map.md`**.
 
 Details: [references/integration-map.md](references/integration-map.md)
 
 ### Versions (summary)
 
-- Python matrix, base image digests, Actions majors.
+Python matrix, digests, Actions majors — **`versions.md`**.
 
 Details: [references/versions.md](references/versions.md)
 
-### Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Issue or goal** — **Wheel**, **image**, or **workflow** change.
-2. **Recommendation** — **pyproject** / **Docker** / **YAML** structure; cite **`deployment-pro`** for **promotion**.
-3. **Code** — Snippets or **workflow** skeleton — still labeled **Code**.
-4. **Residual risks** — **Secret** exposure, **wrong** Python ABI, **unpinned** actions.
+1. **Context** — Repo type (lib vs service), Python range, registry target, fork/OSS exposure.
+2. **Problem** — Goal (ship wheel, fix CI, harden Docker) and constraints (air gap, private index).
+3. **System design / architecture** — Artifact types; build graph (lint → test → build → publish); registry handoff — cite **`artifact-build-and-registry-model.md`** when non-trivial.
+4. **Decision reasoning** — Build backend / lock strategy; OIDC vs token; image slim strategy — **`decision-framework-and-tradeoffs.md`** / **`decision-tree.md`**.
+5. **Implementation sketch** — `pyproject` / Dockerfile / workflow **outline**; placeholders for org/registry; pin policy for Actions — **`quality-validation-and-guardrails.md`**.
+6. **Trade-offs** — Reproducibility vs velocity; matrix cost; debug image vs attack surface.
+7. **Failure modes** — ABI, PEP 668, cache, fork workflow, publish race — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Promotion/rollback (**`deployment-pro`**), deep security (**`security-pro`**), secret scanning gaps.
 
 ## Resources in this skill
 
-- `references/` — packaging, Actions, tips, edge cases, Tier A maps.
-
 | Topic | File |
 |-------|------|
+| Artifact & registry model | [references/artifact-build-and-registry-model.md](references/artifact-build-and-registry-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md) |
+| Supply chain & provenance | [references/supply-chain-and-provenance-hooks.md](references/supply-chain-and-provenance-hooks.md) |
+| Multi-ecosystem notes | [references/multi-ecosystem-packaging-notes.md](references/multi-ecosystem-packaging-notes.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Python & Docker | [references/python-packaging-and-containers.md](references/python-packaging-and-containers.md) |
-| GitHub Actions | [references/github-actions-and-ci.md](references/github-actions-and-ci.md) |
+| GitHub Actions & CI | [references/github-actions-and-ci.md](references/github-actions-and-ci.md) |
 | Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
 | Decision tree | [references/decision-tree.md](references/decision-tree.md) |
@@ -117,21 +188,29 @@ Details: [references/versions.md](references/versions.md)
 
 ## Quick examples
 
-**Input (simple):** “Add a **Dockerfile** for a FastAPI app with **multi-stage** and **non-root**.”  
-**Expected output:** **build** stage installs deps; **runtime** `python:slim`, **copy** only needed files, **`USER`**, **`EXPOSE`**, **health** note; mention **`.dockerignore`**; **`deployment-pro`** for **orchestration**.
+**Input:** Multi-stage Dockerfile for FastAPI, non-root.  
+**Expected output:** Full **Suggested response format** — stages, `.dockerignore`, USER; **`deployment-pro`** for orchestration; failure **secret-in-layer**.
 
-**Input (tricky):** “Bake `DATABASE_URL` into the image for staging.”  
-**Expected output:** **Reject** secret-in-image; use **runtime** env / secret manager; **`security-pro`** pattern; rebuild vs **promote same artifact** story.
+**Input:** Bake `DATABASE_URL` into image.  
+**Expected output:** **Reject**; runtime env; **`security-pro`**; promote **same digest** story.
 
-**Input (cross-skill):** “PyPI publish from GHA with least privilege.”  
-**Expected output:** **This skill** for **trusted publishing** / OIDC workflow skeleton; **`security-pro`** for token scopes and **fork** PR safety; **`deployment-pro`** not required unless promoting runtime.
+**Input:** PyPI OIDC from GHA.  
+**Expected output:** Trusted publishing skeleton; fork safety; **`security-pro`** trust alignment.
 
 ## Checklist before calling the skill done
 
-- [ ] **Artifact** type matches **library** vs **service** conventions.
-- [ ] **Secrets** not embedded in **Dockerfile** or **public** YAML.
-- [ ] **Deployment** concerns (**K8s**, **rollback**) **delegated** when beyond **build**.
-- [ ] **`.dockerignore`** and **multi-stage** hygiene explicitly considered for images.
-- [ ] **CI** job graph **lint → test → build** with fail-fast on cheap steps.
-- [ ] **Versioning** / **CHANGELOG** policy mentioned for **library** consumers.
-- [ ] **Pin** or **review** policy stated for **third-party Actions** when security-sensitive.
+### Artifact & CI
+
+- [ ] **Artifact** type (lib wheel vs image) clear; **`requires-python`** matches matrix.
+- [ ] **Workflow** order lint → test → build; release triggers safe for secrets.
+
+### Safety
+
+- [ ] **No secrets** baked into Dockerfile or logged; **OIDC** preferred for publish — **`supply-chain-and-provenance-hooks.md`**.
+- [ ] **`.dockerignore`** / multi-stage explicitly considered for images — **`anti-patterns.md`**.
+
+### Boundaries
+
+- [ ] **Runtime rollout** delegated when beyond build/push — **`deployment-pro`**.
+- [ ] **Failure modes** addressed — not only happy path — **`failure-modes-detection-mitigation.md`**.
+- [ ] **Supply chain**: pinning policy for Actions stated when relevant — **`versions.md`**.

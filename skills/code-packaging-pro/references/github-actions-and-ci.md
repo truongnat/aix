@@ -22,3 +22,5 @@
 ## Relationship to **`testing-pro`**
 
 - **`testing-pro`** — **What** tests mean (pyramid, flakiness); **this** skill — **workflow YAML** structure for **build** and **publish**.
+
+Supply chain hooks (OIDC publish, attestations): [supply-chain-and-provenance-hooks.md](supply-chain-and-provenance-hooks.md).
