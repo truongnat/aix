@@ -1,114 +1,202 @@
 ---
 name: bug-discovery-pro
 description: |
-  Professional defect discovery: deep repository analysis, triage of bug candidates (not false “100%” guarantees), finding related failures via blast-radius and call-graph reasoning, and integration with GitNexus (knowledge graph, query, impact, API shape) when available.
+  Professional defect discovery and production-oriented debugging: full methodology (observe, reproduce, narrow, hypothesize, validate, handoff fix, regression prevention), bug taxonomy (logic, state, concurrency, data, integration, config, infra, performance, security), hypothesis-driven experiments, GitNexus graph-assisted exploration (query, context, impact, api_impact, shape_check, detect_changes), runtime signals (logs, traces, metrics, profiling, dumps), failure modes (timeout, partial failure, retry storm, cascade, stale cache, split-brain), state/concurrency and distributed-boundary debugging, observability correlation — always as triaged candidates with confidence, never false "100%" guarantees.
 
-  Use this skill when the user hunts bugs, traces regressions, asks what else could break, wants a structured **candidate** list with confidence, or uses **GitNexus** MCP (`query`, `context`, `impact`, `api_impact`, `shape_check`, `detect_changes`) after indexing. This skill does **not** claim exhaustive detection — combine with tests, runtime evidence, and **`security-pro`** for vulns.
+  Use this skill when hunting bugs, tracing regressions, triaging production incidents with telemetry, asking what else could break, or needing structured candidate lists with confidence when GitNexus MCP is available after indexing. Combine with tests, runtime evidence, and security-pro for vulns. Fixes delegate to domain *-pro skills.
 
-  Use **with** **`testing-pro`** (repro, coverage gaps), **`security-pro`** (abuse and trust boundaries), and **external GitNexus Cursor skills** (`gitnexus-cli`, `gitnexus-debugging`, `gitnexus-exploring`, `gitnexus-impact-analysis`) for CLI and deeper graph usage. This skill (`bug-discovery-pro`) owns **bug-hunting workflow and graph-assisted discovery**; stack **`*-pro`** skills own framework fixes.
+  Use with testing-pro (repro, coverage), security-pro (abuse boundaries), content-analysis-pro (logs/dumps), api-design-pro (contracts), deployment-pro / network-infra-pro (infra rollouts). External Cursor skills: gitnexus-cli, gitnexus-debugging, gitnexus-exploring, gitnexus-impact-analysis.
 
-  Triggers: "bug", "bugs", "find bug", "regression", "root cause", "blast radius", "who calls", "impact", "GitNexus", "knowledge graph", "related bug", "deep scan repo", "candidate defect", "shape mismatch", "API consumers", "stale index", "git bisect", "api_impact", "shape_check", "detect_changes", "false positive graph".
+  Triggers: "bug", "bugs", "find bug", "regression", "root cause", "blast radius", "who calls", "impact", "GitNexus", "knowledge graph", "candidate defect", "hypothesis", "race condition", "deadlock", "memory leak", "distributed trace", "retry storm", "stale cache", "incident", "production bug", "flaky", "timeout", "span", "correlation id", "shape mismatch", "stale index", "git bisect", "false positive graph".
 
 metadata:
-  short-description: Bug discovery — deep scan, GitNexus graph, candidates, related impact
+  short-description: Bug discovery — methodology, taxonomy, graph + runtime debugging, candidates, confidence
+  content-language: en
+  domain: debugging
+  level: professional
 ---
 
 # Bug discovery (professional)
 
-No tool yields **100%** of all bugs — treat outputs as **candidates** with **evidence** and **confidence**. This skill encodes **triage discipline**, **graph-assisted exploration** (GitNexus when installed), and **related-defect** analysis via **impact** and **API consumer** paths. Confirm **repro** (or logs), **indexed** graph freshness, and **repo** identity in multi-repo setups.
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
 
-**GitNexus:** Index the codebase first ( **`gitnexus-cli`** skill or org pipeline), then use MCP tools on the **`user-gitnexus`** server per [references/gitnexus-graph-workflow.md](references/gitnexus-graph-workflow.md).
+No tool yields **100%** of all bugs — treat outputs as **candidates** with **evidence** and **confidence** (**`bug-candidates-and-confidence.md`**). This skill encodes **end-to-end debugging methodology** (static + graph + runtime), **taxonomy-informed triage**, and **related-defect** analysis via GitNexus **`impact`** and **`api_impact`** when indexed. Confirm **repro** (or logs), **indexed** graph freshness, and **repo** identity in multi-repo setups.
+
+**GitNexus:** Index the codebase first (**`gitnexus-cli`** skill or org pipeline), then use MCP tools on the **`user-gitnexus`** server per [references/gitnexus-graph-workflow.md](references/gitnexus-graph-workflow.md).
+
+## Boundary
+
+**`bug-discovery-pro`** owns **debugging process**, **hypothesis discipline**, **bug classification cues**, **graph-assisted** and **telemetry-aware** investigation narratives, and **candidate** reporting. It does **not** replace **on-call runbooks**, full **APM** ownership, or **`*-pro`** implementations — delegate **fixes** and deep **framework** edits to the right skill.
 
 ## Related skills (this repo)
 
 | Skill | When to combine with `bug-discovery-pro` |
 |-------|------------------------------------------|
-| **`testing-pro`** | Repro, flaky tests, coverage, CI signals |
+| **`testing-pro`** | Repro, flaky tests, coverage, CI signals, regression tests after root cause |
 | **`security-pro`** | Vulnerability-class issues, threat-relevant bugs |
 | **`content-analysis-pro`** | Parse **logs**, **build output**, or **crash dumps** as attached text |
+| **`api-design-pro`** | Contract drift, idempotency/retry semantics at boundaries |
+| **`deployment-pro`** | Rollouts, flags, mixed versions during incidents |
+| **`network-infra-pro`** | DNS, LB, saturation, cascading failure patterns |
 
-**External (Cursor):** **`gitnexus-cli`** (index/analyze), **`gitnexus-debugging`**, **`gitnexus-exploring`**, **`gitnexus-impact-analysis`** — use their `SKILL.md` for tool-specific steps; **`bug-discovery-pro`** ties them into a **bug-hunting** narrative.
+**External (Cursor):** **`gitnexus-cli`** (index/analyze), **`gitnexus-debugging`**, **`gitnexus-exploring`**, **`gitnexus-impact-analysis`** — use their `SKILL.md` for tool-specific steps; **`bug-discovery-pro`** ties them into a **bug-hunting** and **incident triage** narrative.
 
 ## When to use
 
 - **Root-cause** and **related** breakage analysis (shared code paths).
+- **Production** symptoms — pair **runtime** references with graph when code location is unclear.
 - **Deep repo** exploration when grep is not enough — **execution flows** and **impact**.
-- **API** response vs consumer **shape** mismatches (with `shape_check` / `api_impact`).
+- **API** response vs consumer **shape** mismatches (`shape_check` / `api_impact`).
 - **Pre-commit** / **pre-PR** “what did I break?” (`detect_changes`).
 - Honest **candidate** lists — not a promise of total bug enumeration.
-- Trigger keywords: `bug`, `regression`, `GitNexus`, `impact`, `blast radius`, `related`, …
+
+## When not to use
+
+- **Authoritative pen-test or compliance sign-off** — **`security-pro`** + human review.
+- **Pure feature design** with no failure — other skills first.
+
+## Required inputs (when triaging)
+
+- **Symptom** and **scope** (env, version, user cohort).
+- **Repro** status or **telemetry** pointers (trace id, time window).
+- **GitNexus** availability and **index** freshness if using graph steps.
+
+## Expected output
+
+Follow **Suggested response format** — from symptom through **confidence-labeled** candidates, experiments, and residual risks.
 
 ## Workflow
 
-1. Confirm **symptom**, **repro** or **logs**, **branch**, and whether **GitNexus** index exists for this repo.
-2. Apply the principles and topic summaries below; open `references/` when you need depth; run MCP tools **after** reading schemas; defer **framework fixes** to the right **`*-pro`** skill.
-3. Respond using **Suggested response format**; note **stale graph**, **false positives**, and **untested** paths.
+1. Confirm **symptom**, **repro** or **logs/traces**, **branch**, GitNexus **index** status, and **taxonomy** hint.
+2. Apply principles and summaries; open `references/`; run MCP tools **after** reading schemas; use **runtime** guides when failure is production-shaped.
+3. Respond using **Suggested response format**; note **stale graph**, **false positives**, **untested** paths, and **observability** gaps.
 
 ### Operating principles
 
-1. **Candidates, not certainty** — Label confidence; prove or falsify with tests/runtime.
-2. **Repro first** — Smallest failing case wins; **bisect** when useful.
-3. **Graph augments reading** — GitNexus **does not** replace reading suspicious code.
-4. **Related bugs** — Use **`impact`** / **`api_impact`** to widen regression surface.
-5. **Index currency** — Re-index after large refactors before trusting **impact**.
-6. **Security** — Do not treat graph output as **pen-test**; use **`security-pro`** for abuse models.
+1. **Candidates, not certainty** — Label confidence; prove or falsify with tests/runtime (**`hypothesis-driven-debugging.md`**).
+2. **Methodology over gadgets** — Graph augments **`debugging-methodology.md`**; it does not replace reproduce/narrow.
+3. **Repro first** when feasible — Smallest failing case wins; **bisect** when useful.
+4. **Taxonomy steers tactics** — **`bug-taxonomy.md`** picks graph-heavy vs trace-heavy vs infra-heavy steps.
+5. **Graph augments reading** — GitNexus **does not** replace reading suspicious code.
+6. **Related bugs** — Use **`impact`** / **`api_impact`** to widen regression surface.
+7. **Index currency** — Re-index after large refactors before trusting **impact**.
+8. **Security** — Do not treat graph output as **pen-test**; use **`security-pro`** for abuse models.
+
+### Debugging methodology (summary)
+
+Observe → reproduce → narrow → hypothesize → validate → fix handoff → regression prevention.
+
+Details: [references/debugging-methodology.md](references/debugging-methodology.md)
+
+### Hypothesis-driven debugging (summary)
+
+Hypothesis → experiment → result → update belief; pair **`bug-candidates-and-confidence.md`**.
+
+Details: [references/hypothesis-driven-debugging.md](references/hypothesis-driven-debugging.md)
+
+### Bug taxonomy (summary)
+
+Logic, state, concurrency, data, integration, config, infra, performance, security — drives next investigation step.
+
+Details: [references/bug-taxonomy.md](references/bug-taxonomy.md)
+
+### Runtime debugging (summary)
+
+Logs, traces, metrics, profiling, dumps — production-first evidence.
+
+Details: [references/runtime-debugging.md](references/runtime-debugging.md)
+
+### Failure modes (summary)
+
+Timeouts, partial failure, retry storms, cascades, stale cache, split-brain, config drift.
+
+Details: [references/failure-modes.md](references/failure-modes.md)
+
+### State and concurrency debugging (summary)
+
+Races, deadlocks, ordering, async, retries, eventual consistency read issues.
+
+Details: [references/state-and-concurrency-debugging.md](references/state-and-concurrency-debugging.md)
+
+### Distributed systems debugging (summary)
+
+Boundaries, contracts, queues, duplicate/out-of-order delivery, cross-service traces.
+
+Details: [references/distributed-systems-debugging.md](references/distributed-systems-debugging.md)
+
+### Observability integration (summary)
+
+Correlation IDs, tracing, sampling, metrics alignment — **`observability-integration.md`**.
+
+Details: [references/observability-integration.md](references/observability-integration.md)
 
 ### GitNexus graph workflow (summary)
 
-- Preconditions: **indexed** repo; tool order **`query`** → **`context`** → **`impact`** / **`api_impact`** / **`shape_check`** / **`detect_changes`**.
+Preconditions: **indexed** repo; tool order **`query`** → **`context`** → **`impact`** / **`api_impact`** / **`shape_check`** / **`detect_changes`**.
 
 Details: [references/gitnexus-graph-workflow.md](references/gitnexus-graph-workflow.md)
 
 ### Bug candidates and confidence (summary)
 
-- Why **100%** is impossible; **related bug** meanings; triage vocabulary; handoff to **`testing-pro`** / **`security-pro`**.
+Why **100%** is impossible; **related bug** meanings; triage vocabulary; handoff to **`testing-pro`** / **`security-pro`**.
 
 Details: [references/bug-candidates-and-confidence.md](references/bug-candidates-and-confidence.md)
 
 ### Tips and tricks (summary)
 
-- Repro, bisect, **`query`** hints, **`impact`** d=1 priority, IDE fallback without graph.
+Repro, bisect, **`query`** hints, **`impact`** d=1 priority, IDE fallback without graph.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- Stale graph, name collisions, dynamic imports, monorepo **`repo`**, shape_check false positives.
+Stale graph, dynamic imports, monorepo **`repo`**, shape_check false positives — plus runtime, concurrency, distributed, infra, observability edges.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
 ### Decision flow and anti-patterns (summary)
 
-- Graph vs no graph; intermittent repro; 100% claims; stale index.
+Where to start (graph vs telemetry); intermittent repro; 100% claims; stale index.
 
 Details: [references/decision-tree.md](references/decision-tree.md) · [references/anti-patterns.md](references/anti-patterns.md)
 
 ### Cross-skill handoffs (summary)
 
-- **`testing-pro`**, **`security-pro`**, **`content-analysis-pro`**, GitNexus Cursor skills.
+**`testing-pro`**, **`security-pro`**, **`content-analysis-pro`**, **`api-design-pro`**, **`deployment-pro`**, GitNexus Cursor skills.
 
 Details: [references/integration-map.md](references/integration-map.md)
 
 ### Versions (summary)
 
-- Index schema, monorepo `repo` param, tool naming by CLI version.
+Index schema, monorepo `repo` param, tool naming by CLI version.
 
 Details: [references/versions.md](references/versions.md)
 
-### Suggested response format (implement / review)
+## Suggested response format (implement / review)
 
-1. **Issue or goal** — Symptom, scope, and whether GitNexus is available.
-2. **Recommendation** — Search order (repro → query → context → impact); which **Related skill** fixes code.
-3. **Code** — Candidate list table, **repro** steps, or **graph-assisted** checklist — not a fabricated stack trace.
-4. **Residual risks** — Uncovered paths, index age, false positives, missing tests.
+1. **Symptom** — What fails, where, scope (env/version), severity, repro status.
+2. **Hypothesis** — Ranked guesses tied to **taxonomy**; what would falsify each.
+3. **Evidence** — Logs/traces/metrics snippets (redacted), graph findings, code pointers — facts vs inference separated.
+4. **Investigation steps** — Ordered actions (including **`query`** / **`impact`** / **`shape_check`** when applicable; **profiling** / **trace** drill-down when production-shaped).
+5. **Candidate bugs (with confidence)** — Table: candidate, confidence (confirmed/likely/hypothesis), supporting evidence.
+6. **Suggested repro/tests** — Minimal repro, bisect hint, tests or monitors to add — **`testing-pro`** handoff.
+7. **Residual risks** — Uncovered paths, index age, false positives, concurrency/intermittency, missing telemetry, fix delegation (**`*-pro`**).
 
 ## Resources in this skill
 
-- `references/` — GitNexus workflow, confidence model, tips, edge cases, Tier A maps.
+- `references/` — Methodology, taxonomy, runtime, failure modes, GitNexus workflow, confidence model, integration map.
 - **MCP:** read tool schemas under your IDE’s GitNexus MCP folder before calling tools.
 
 | Topic | File |
 |-------|------|
+| Debugging methodology | [references/debugging-methodology.md](references/debugging-methodology.md) |
+| Hypothesis-driven debugging | [references/hypothesis-driven-debugging.md](references/hypothesis-driven-debugging.md) |
+| Bug taxonomy | [references/bug-taxonomy.md](references/bug-taxonomy.md) |
+| Runtime debugging | [references/runtime-debugging.md](references/runtime-debugging.md) |
+| Failure modes | [references/failure-modes.md](references/failure-modes.md) |
+| State & concurrency | [references/state-and-concurrency-debugging.md](references/state-and-concurrency-debugging.md) |
+| Distributed systems | [references/distributed-systems-debugging.md](references/distributed-systems-debugging.md) |
+| Observability integration | [references/observability-integration.md](references/observability-integration.md) |
 | GitNexus workflow | [references/gitnexus-graph-workflow.md](references/gitnexus-graph-workflow.md) |
 | Candidates & confidence | [references/bug-candidates-and-confidence.md](references/bug-candidates-and-confidence.md) |
 | Tips and patterns | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
@@ -120,21 +208,39 @@ Details: [references/versions.md](references/versions.md)
 
 ## Quick examples
 
-**Input (simple):** Intermittent 500 on `/api/orders` after deploy — find related risk.  
-**Expected output:** **`api_impact`** on route (if indexed); **`shape_check`** for mismatches; **`impact`** on handler symbol; list **candidates** and **tests** to add; no claim of finding “all” bugs.
+**Input:** Intermittent 500 on `/api/orders` after deploy — find related risk.  
+**Expected output:** Taxonomy hint (**integration**/**failure mode**); **`api_impact`** / **`shape_check`** if indexed; **trace** correlation suggestion; **candidates** table with confidence; **no** “all bugs found.”
 
-**Input (tricky):** “Graph says no callers — bug impossible.”  
-**Expected output:** **Dynamic import**, reflection, scripts, **unindexed** paths; **confidence** low; **`testing-pro`** repro; do not close on graph alone.
+**Input:** “Graph says no callers — bug impossible.”  
+**Expected output:** **Dynamic import**, scripts, **unindexed** paths; **confidence** low; **`testing-pro`** repro; do not close on graph alone.
 
-**Input (cross-skill):** “Possible auth bypass in diff — triage.”  
-**Expected output:** **`security-pro`** threat model and abuse cases; **this skill** for **blast radius** / related endpoints via graph; **no** vuln certainty without tests + review.
+**Input:** Memory grows over 24h — leak suspected.  
+**Expected output:** **Runtime** path (**heap**, allocation profile); graph only for **who allocates** after narrowing; hypothesis loop.
 
 ## Checklist before calling the skill done
 
-- [ ] **Repro** or **log evidence** referenced where possible.
-- [ ] **GitNexus** steps skipped or noted if index unavailable.
+### Core
+
+- [ ] **Symptom** and **repro or telemetry** referenced where possible.
+- [ ] **Taxonomy** considered — at least implicit — so tactics match bug class.
+- [ ] **Hypothesis / evidence** distinguished from conclusions.
 - [ ] **Candidates** labeled; **no false 100%** claim.
-- [ ] **Related** code paths considered via **impact** or equivalent.
-- [ ] Fix implementation **delegated** to appropriate **`*-pro`** skill when coding.
+
+### Methodology & graph
+
+- [ ] **`debugging-methodology.md`** phases respected — not **only** graph traversal.
+- [ ] **GitNexus** steps skipped or noted if index unavailable.
+- [ ] **Related** code paths considered via **impact** or equivalent when graph exists.
 - [ ] **Index freshness** considered after large refactors.
 - [ ] **Graph limitations** (dynamic imports, monorepo root) stated when relevant.
+
+### Runtime & distribution (when relevant)
+
+- [ ] **Logs/traces/metrics** angle mentioned for production-shaped failures.
+- [ ] **Concurrency** / **ordering** / **duplicate delivery** noted if flaky or messaging involved.
+- [ ] **Failure modes** (timeout, retry storm, stale cache) considered for incidents.
+
+### Handoff
+
+- [ ] Fix implementation **delegated** to appropriate **`*-pro`** skill when coding.
+- [ ] **Regression prevention** (test or monitor) mentioned when root cause identified.

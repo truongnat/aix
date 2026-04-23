@@ -1,5 +1,7 @@
 # Bug discovery tips and tricks
 
+For the **full pipeline** (observe → repro → narrow → hypothesize → validate → regression), see [debugging-methodology.md](debugging-methodology.md). Graph tools sit mostly in **narrow** and **validate** — not before **repro** when a deterministic case exists.
+
 ## Before graph search
 
 - **Minimal repro** — Smallest command or URL that fails; **bisect** git commits.
