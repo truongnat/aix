@@ -1008,25 +1008,27 @@
   {
     "name": "self-improve-agent-pro",
     "folder": "self-improve-agent-pro",
-    "description": "Professional guidance for self-improving agent workflows: performance diagnosis, feedback-loop design, iteration planning, failure pattern analysis, and continuous quality uplift with measurable outcomes.\n\nUse this skill when the user asks to make an agent improve itself, analyze repeated mistakes, design reflection loops, define learning checkpoints, or establish a structured process to raise reliability over time.\n\nUse **with** **`feedback-pro`** for high-quality review signals, **`planning-pro`** for iteration roadmaps, and **`testing-pro`** to validate that improvements actually reduce failures.\n\nTriggers: \"self improve agent\", \"agent improvement\", \"reflection loop\", \"learning loop\", \"improve accuracy\", \"reduce failures\", \"retrospective\", \"continuous improvement\", \"quality iteration\", \"eval harness\", \"quality drift\", \"PDCA\", \"before after metrics\", \"rollback prompt\", \"experiment table\".",
+    "description": "Production-grade self-improving agent workflows: evidence-driven failure diagnosis, closed-loop improvement design (observe → diagnose → intervene → verify), measurable verification, and knowledge harvest back into skills — plus system model (feedback sources, control loop, attribution), failure modes (Goodhart, confounded changes, eval leakage, reviewer drift, delayed regression, token bloat), decision trade-offs (automation vs human gate, eval breadth vs depth, prompt vs skills), and quality guardrails (reproducible metrics, ethical scope, no fabricated win rates).\n\nUse this skill when the user asks to make an agent improve itself, analyze repeated mistakes, design reflection loops, define learning checkpoints, reduce quality drift, or run structured PDCA-style uplift with before/after metrics.\n\nCombine with **`feedback-pro`** for review signals, **`planning-pro`** for roadmaps, **`testing-pro`** for regression and eval harnesses, **`repo-tooling-pro`** / **`skills-self-review-pro`** for bundle audits, **`git-operations-pro`** for contribution hygiene, **`security-pro`** for high-stakes gates, and **`bug-discovery-pro`** for hard repros.\n\nTriggers: \"self improve agent\", \"agent improvement\", \"reflection loop\", \"learning loop\", \"improve accuracy\", \"reduce failures\", \"retrospective\", \"continuous improvement\", \"quality iteration\", \"eval harness\", \"quality drift\", \"PDCA\", \"before after metrics\", \"rollback prompt\", \"experiment table\".",
     "triggers": [],
     "when_to_use": [
-      "Building a repeatable self-improvement cycle for an agent.",
-      "Diagnosing recurring failures or quality drift.",
-      "Designing reflection and correction loops after each run.",
-      "Prioritizing improvement actions under limited time.",
-      "Proving improvement with before/after metrics.",
-      "Trigger keywords: `self improve`, `reflection`, `iteration`, `quality drift`, `retrospective`, `improvement loop`"
+      "Repeatable self-improvement cycle for an agent or agent team.",
+      "Recurring failures, quality drift, or post-mortem → structured follow-up.",
+      "Reflection checkpoints after runs; prioritization under time pressure.",
+      "Before/after proof and rollback rules for prompt/skill/tool changes."
     ],
     "references": [
+      "agent-improvement-feedback-system-model.md",
       "anti-patterns.md",
       "contributor-workflow.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
       "failure-diagnosis-and-patterns.md",
+      "failure-modes-detection-mitigation.md",
       "improvement-loop-design.md",
       "integration-map.md",
       "metrics-and-verification.md",
+      "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "versions.md"
     ]
