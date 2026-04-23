@@ -8,6 +8,14 @@ Have baseline (p50/p95, throughput, errors)?
 └── Yes → profile hottest segment only
 ```
 
+## CPU-bound vs waiting (off-CPU)
+
+```
+Profiler shows mostly on-CPU vs blocked on I/O / locks?
+├── On-CPU heavy → algorithm, allocations, serialization — **`algorithm-pro`**, profiles
+└── Waiting heavy → queries, network, pools, contention — **`postgresql-pro`**, **`caching-pro`**, infra limits
+```
+
 ## Frontend vs backend vs data
 
 ```

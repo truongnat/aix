@@ -4,6 +4,7 @@
 
 - Benchmarking debug builds or local dev mode gives misleading numbers versus production mode.
 - Microbenchmarks may optimize the wrong thing when real latency is dominated by I/O or lock contention.
+- **Coordinated omission** — load generators or clients that pause when the server stalls report artificially low latency; correlate with **timeouts and error rate** — **`failure-modes-detection-mitigation.md`**.
 - Noisy neighbors and autoscaling transitions can distort short measurement windows.
 
 ## Data and traffic realism

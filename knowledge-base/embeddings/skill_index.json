@@ -819,21 +819,25 @@
   {
     "name": "performance-tuning-pro",
     "folder": "performance-tuning-pro",
-    "description": "Professional performance tuning guidance for diagnosing bottlenecks, selecting optimizations, and avoiding premature optimization across frontend, backend, and data flows.\n\nUse this skill when improving application latency/throughput, reducing resource usage, investigating slow paths, or reviewing performance-sensitive changes.\n\nTriggers: \"performance\", \"optimize\", \"bottleneck\", \"latency\", \"p99\", \"p95\", \"throughput\", \"cpu\", \"memory\", \"heap\", \"GC pause\", \"profiling\", \"flamegraph\", \"slow query\", \"N+1\", \"cache\", \"cold start\", \"tail latency\", \"saturation\", \"load test\", \"edge case\".\n\nCombine with `testing-pro` for repeatable performance checks and `repo-tooling-pro` for script-driven diagnostics.",
+    "description": "Production-grade performance tuning: diagnose bottlenecks and tail latency across browser, API, data, and infra — plus system model (end-to-end latency chain, queues, saturation, on-CPU vs off-CPU), failure modes (wrong bottleneck, coordinated omission, cache stampede, retry storms, premature micro-optimization), decision trade-offs (latency vs throughput vs cost, consistency vs cache, scale-out vs fix-in-place), and quality guardrails (reproducible baselines, percentile honesty, no fabricated benchmarks).\n\nUse this skill when improving latency or throughput, reducing CPU/memory, investigating slow paths, profiling hotspots, tuning caches and pools, or reviewing performance-sensitive PRs.\n\nCombine with **`postgresql-pro`** for queries and indexes, **`caching-pro`** for CDN and cache layers, **`testing-pro`** for regression budgets, **`repo-tooling-pro`** for scripted benchmarks, **`deployment-pro`** / **`docker-pro`** for quotas and scaling, **`network-infra-pro`** for edge latency, **`algorithm-pro`** for complexity, and framework skills (**`nestjs-pro`**, **`nextjs-pro`**, **`react-pro`**) for stack-specific hooks.\n\nTriggers: \"performance\", \"optimize\", \"bottleneck\", \"latency\", \"p99\", \"p95\", \"throughput\", \"cpu\", \"memory\", \"heap\", \"GC pause\", \"profiling\", \"flamegraph\", \"slow query\", \"N+1\", \"cache\", \"cold start\", \"tail latency\", \"saturation\", \"load test\", \"edge case\", \"INP\", \"LCP\", \"backpressure\".",
     "triggers": [],
     "when_to_use": [
-      "Fixing slow endpoints/screens, long startup time, high CPU, memory growth, or unstable p95/p99.",
-      "Reviewing PRs where caching, batching, concurrency, or algorithmic complexity changes behavior.",
-      "Deciding whether to optimize code, queries, I/O, rendering, or infrastructure first.",
-      "Preventing regressions by defining baselines, budgets, and reproducible measurement.",
-      "Trigger keywords: `performance`, `optimize`, `bottleneck`, `latency`, `throughput`, `cpu`, `memory`, `profiling`, `slow query`, `cache`, `edge case`"
+      "Fixing slow endpoints, screens, jobs, cold starts, memory growth, or unstable p95/p99.",
+      "Reviewing PRs that touch caching, batching, concurrency, pooling, or complexity.",
+      "Choosing whether to optimize code, queries, network, rendering, or capacity first.",
+      "Establishing baselines, budgets, and repeatable measurement scenarios."
     ],
     "references": [
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "integration-map.md",
-      "tips-and-tricks.md"
+      "latency-and-resources-system-model.md",
+      "quality-validation-and-guardrails.md",
+      "tips-and-tricks.md",
+      "versions.md"
     ]
   },
   {
