@@ -504,23 +504,26 @@
   {
     "name": "feedback-pro",
     "folder": "feedback-pro",
-    "description": "Professional deep-feedback guidance for engineering and product work: evidence-based review framing, issue severity calibration, actionable recommendations, communication tone control, and closure tracking.\n\nUse this skill when the user asks to give detailed feedback on code/docs/design/process decisions, review quality gaps, prioritize improvements, or convert raw comments into structured, high-impact feedback plans.\n\nUse **with** **`testing-pro`** for test-quality feedback, **`security-pro`** for risk-sensitive findings, and domain `*-pro` skills to validate technical correctness in specialized areas.\n\nTriggers: \"feedback\", \"review comments\", \"code feedback\", \"deep review\", \"improvement feedback\", \"critique\", \"quality review\", \"severity\", \"action items\", \"follow-up plan\".",
+    "description": "Production-grade deep feedback for engineering and product: evidence-based review framing, review lifecycle (artifact → finding → action → verification), issue severity calibration, actionable recommendations, communication tone, decision trade-offs (depth vs velocity, async vs sync, block vs follow-up), failure modes (severity inflation, nit avalanches, ping-pong reviews, silent debt), quality guardrails (confidence labels, no invented evidence), and closure tracking.\n\nUse this skill when the user asks to give detailed feedback on code/docs/design/process decisions, review quality gaps, prioritize improvements, or convert raw comments into structured, high-impact feedback plans.\n\nUse **with** **`testing-pro`**, **`security-pro`**, **`planning-pro`**, **`git-operations-pro`**, **`business-analysis-pro`**, domain `*-pro` skills for technical truth, and **`skills-self-review-pro`** for meta review of templates in this repo.\n\nTriggers: \"feedback\", \"review comments\", \"code feedback\", \"deep review\", \"improvement feedback\", \"critique\", \"quality review\", \"severity\", \"action items\", \"follow-up plan\".",
     "triggers": [],
     "when_to_use": [
-      "Turning vague comments into specific, prioritized, and actionable feedback.",
-      "Reviewing code/docs/design with clear evidence and impact statements.",
-      "Calibrating severity (critical/high/medium/low) and rollout risk.",
-      "Producing executive-friendly review summaries plus implementer-level detail.",
-      "Tracking follow-up actions until closure criteria are met.",
+      "Turning vague comments into **specific**, **prioritized**, **actionable** feedback.",
+      "Reviews with clear **evidence**, **impact**, and **severity** calibration.",
+      "Executive summaries **plus** implementer-level detail.",
+      "**Follow-up** tracking until verification or explicit risk acceptance.",
       "Trigger keywords: `feedback`, `review`, `critique`, `severity`, `action items`, `quality gaps`, `follow-up`"
     ],
     "references": [
       "action-planning-and-closure.md",
       "anti-patterns.md",
+      "decision-framework-and-trade-offs.md",
       "decision-tree.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "finding-structure-and-evidence.md",
       "integration-map.md",
+      "quality-validation-and-guardrails.md",
+      "review-feedback-system-model.md",
       "severity-and-prioritization.md",
       "tips-and-tricks.md",
       "versions.md"

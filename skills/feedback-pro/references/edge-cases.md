@@ -36,6 +36,18 @@
 
 **Mitigation:** **Summary first** (3–5 bullets); group nits into one “polish” section or optional commit; use **severity** labels consistently.
 
+## Tool and AI-generated suggestions
+
+**Symptom:** Copilot/linter emits many low-value comments; hides a real defect.
+
+**Mitigation:** Reviewer **triage**: adopt batch fixes in one commit; preserve **human summary** with severity ordering — **`failure-modes-detection-mitigation.md`**.
+
+## Distributed teams / timezone lag
+
+**Symptom:** Round-trip per comment takes days.
+
+**Mitigation:** **Written merge gate** at top of PR; async OK for nits; **sync** only for blocker disagreements — **`decision-framework-and-trade-offs.md`**.
+
 ## Example — triage under pressure
 
 ```markdown

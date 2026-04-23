@@ -1,157 +1,220 @@
 ---
 name: feedback-pro
 description: |
-  Professional deep-feedback guidance for engineering and product work: evidence-based review framing, issue severity calibration, actionable recommendations, communication tone control, and closure tracking.
+  Production-grade deep feedback for engineering and product: evidence-based review framing, review lifecycle (artifact → finding → action → verification), issue severity calibration, actionable recommendations, communication tone, decision trade-offs (depth vs velocity, async vs sync, block vs follow-up), failure modes (severity inflation, nit avalanches, ping-pong reviews, silent debt), quality guardrails (confidence labels, no invented evidence), and closure tracking.
 
   Use this skill when the user asks to give detailed feedback on code/docs/design/process decisions, review quality gaps, prioritize improvements, or convert raw comments into structured, high-impact feedback plans.
 
-  Use **with** **`testing-pro`** for test-quality feedback, **`security-pro`** for risk-sensitive findings, and domain `*-pro` skills to validate technical correctness in specialized areas.
+  Use **with** **`testing-pro`**, **`security-pro`**, **`planning-pro`**, **`git-operations-pro`**, **`business-analysis-pro`**, domain `*-pro` skills for technical truth, and **`skills-self-review-pro`** for meta review of templates in this repo.
 
   Triggers: "feedback", "review comments", "code feedback", "deep review", "improvement feedback", "critique", "quality review", "severity", "action items", "follow-up plan".
 
 metadata:
-  short-description: Feedback - deep review, severity, actionable closure
+  short-description: Feedback — review lifecycle, severity, actionable closure, failure modes
+  content-language: en
+  domain: feedback
+  level: professional
 ---
 
 # Feedback and review quality (professional)
 
-Use professional review communication references such as [Google Engineering Practices: Code Review](https://google.github.io/eng-practices/review/) and [Atlassian feedback guide](https://www.atlassian.com/blog/add-ons/how-to-give-effective-feedback) for baseline principles; this skill encodes **evidence-first feedback**, **severity-aware prioritization**, and **actionable closure discipline**. Confirm **review scope**, **audience**, **decision context**, and **quality bar** before producing feedback.
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use references such as [Google Engineering Practices: Code Review](https://google.github.io/eng-practices/review/) for baseline norms; this skill encodes **evidence-first findings**, **lifecycle discipline**, **severity-aware prioritization**, and **constructive closure** — not generic “be nice” advice.
+
+## Boundary
+
+**`feedback-pro`** owns **how** to structure, prioritize, tone, and close feedback. **Domain `*-pro`** skills (**`security-pro`**, **`testing-pro`**, …) own whether a technical claim is **true**. **`business-analysis-pro`** owns **requirements alignment** when “correct behavior” is ambiguous.
 
 ## Related skills (this repo)
 
 | Skill | When to combine with `feedback-pro` |
 |-------|-------------------------------------|
-| **`testing-pro`** | Evaluate missing coverage, flaky tests, and verification gaps |
-| **`security-pro`** | Classify security findings and mitigation urgency |
-| **Domain `*-pro` skills** | Validate correctness and architecture details for specialized stacks |
-| **`business-analysis-pro`** | Align feedback with requirement intent and stakeholder priorities |
-
-**Boundary:** **`feedback-pro`** owns how to structure, prioritize, and communicate feedback deeply; other skills provide domain-specific truth for each finding.
+| **`testing-pro`** | Coverage, repro, flaky-test feedback |
+| **`security-pro`** | Threat severity and mitigation urgency |
+| **Domain `*-pro` skills** | Correctness of specialized findings |
+| **`business-analysis-pro`** | Requirement intent vs code feedback |
+| **`planning-pro`** | Backlog shaping from review outcomes |
+| **`git-operations-pro`** | PR hygiene, commit narrative |
+| **`skills-self-review-pro`** | Meta: skill/review template quality in-repo |
+| **`self-improve-agent-pro`** | Systematic uplift from recurring themes |
 
 ## When to use
 
-- Turning vague comments into specific, prioritized, and actionable feedback.
-- Reviewing code/docs/design with clear evidence and impact statements.
-- Calibrating severity (critical/high/medium/low) and rollout risk.
-- Producing executive-friendly review summaries plus implementer-level detail.
-- Tracking follow-up actions until closure criteria are met.
+- Turning vague comments into **specific**, **prioritized**, **actionable** feedback.
+- Reviews with clear **evidence**, **impact**, and **severity** calibration.
+- Executive summaries **plus** implementer-level detail.
+- **Follow-up** tracking until verification or explicit risk acceptance.
 - Trigger keywords: `feedback`, `review`, `critique`, `severity`, `action items`, `quality gaps`, `follow-up`
+
+## When not to use
+
+- **Pure technical answer** with no review structure (e.g. “what is JWT”) — domain skill only.
+- **People/HR incidents** — use appropriate human channels; this skill covers **professional artifact review**, not mediation.
+
+## Required inputs
+
+- **Artifact scope** (PR, doc, design) and **audience** (peer, lead, exec).
+- **Quality bar** or policy (e.g. must-have tests on auth paths) when known.
+
+## Expected output
+
+Follow **Suggested response format** strictly — lifecycle and risks explicit.
 
 ## Workflow
 
-1. Confirm review objective, artifacts in scope, target audience, and acceptance threshold for quality.
-2. Apply the principles and topic summaries below; open `references/` when you need depth; keep evidence, impact, and actionability explicit.
-3. Respond using **Suggested response format**; note residual risks, ambiguity, and closure dependencies.
+1. Confirm objective, scope, audience, and merge/release pressure.
+2. Apply summaries; open `references/` for templates; defer **truth** of specialized claims to domain skills.
+3. Respond with **Suggested response format**; include **failure modes** when review dynamics are risky.
 
 ### Operating principles
 
-1. **Evidence before opinion** - every finding maps to observable behavior or requirement mismatch.
-2. **Severity reflects impact** - prioritize by user/system risk, not reviewer preference.
-3. **Actionability is mandatory** - each issue includes concrete next step and owner hint.
-4. **Separate must-fix vs nice-to-have** - avoid mixed signals during execution.
-5. **Tone stays constructive** - feedback critiques artifacts, not people.
-6. **Close the loop** - define verification criteria for done/not-done.
+1. **Evidence before opinion** — Map findings to observable behavior or requirement mismatch — **`finding-structure-and-evidence.md`**.
+2. **Severity reflects impact** — User/system risk first — **`severity-and-prioritization.md`**.
+3. **Actionability is mandatory** — Next step + verification — **`action-planning-and-closure.md`**.
+4. **Separate must-fix vs nice-to-have** — **`decision-framework-and-trade-offs.md`**.
+5. **Tone critiques artifacts** — Not people — **`tips-and-tricks.md`**.
+6. **Close the loop** — Done criteria or ticket — **`review-feedback-system-model.md`**.
+
+### Review feedback system model (summary)
+
+Lifecycle, roles, merge gate contract — **`review-feedback-system-model.md`**.
+
+Details: [references/review-feedback-system-model.md](references/review-feedback-system-model.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Inflation, ping-pong, nit avalanche, silent debt, AI noise — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Depth vs velocity; consensus vs escalate; summary-first layout — **`decision-framework-and-trade-offs.md`**.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Quality validation and guardrails (summary)
+
+Confidence labels; no fake paths/tickets/metrics — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
 
 ### Finding structure and evidence quality (summary)
 
-- Write findings with context, observed issue, impact, and reproducible evidence.
+Context, observation, impact, reproducible evidence — **`finding-structure-and-evidence.md`**.
 
 Details: [references/finding-structure-and-evidence.md](references/finding-structure-and-evidence.md)
 
 ### Severity and prioritization framework (summary)
 
-- Classify severity consistently with risk matrix and remediation urgency.
+Risk matrix and remediation urgency — **`severity-and-prioritization.md`**.
 
 Details: [references/severity-and-prioritization.md](references/severity-and-prioritization.md)
 
 ### Action planning and closure tracking (summary)
 
-- Convert findings into owner-ready action items, checkpoints, and verification steps.
+Owner-ready actions, checkpoints, verification — **`action-planning-and-closure.md`**.
 
 Details: [references/action-planning-and-closure.md](references/action-planning-and-closure.md)
 
 ### Tips and tricks (summary)
 
-- Use concise templates, language patterns, and conflict-reduction phrasing.
+Templates, phrasing, conflict reduction — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- Handle partial evidence, conflicting reviewers, and deadline-pressure triage.
+Conflict, low confidence, deadlines, overload, AI noise, timezones — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
-### Decision trees (summary) — optional support-tier
+### Decision trees (summary)
 
-- Block merge vs follow-up, severity calibration, request changes vs comment.
+Block vs follow-up, severity, request changes vs comment — **`decision-tree.md`**.
 
 Details: [references/decision-tree.md](references/decision-tree.md)
 
-### Anti-patterns (summary) — optional support-tier
+### Anti-patterns (summary)
 
-- Severity inflation, vague feedback, bikeshedding — see reference.
+Severity inflation, vague feedback — **`anti-patterns.md`**.
 
 Details: [references/anti-patterns.md](references/anti-patterns.md)
 
-### Cross-skill handoffs (summary)
+### Integration map (summary)
 
-- **`testing-pro`**, **`security-pro`**, **`planning-pro`**, **`git-operations-pro`**, **`self-improve-agent-pro`**.
+**`testing-pro`**, **`security-pro`**, **`planning-pro`**, **`business-analysis-pro`**, … — **`integration-map.md`**.
 
 Details: [references/integration-map.md](references/integration-map.md)
 
 ### Versions (summary)
 
-- Commit SHA context, severity rubric versioning, static-tool rule IDs.
+SHA context, rubric versioning — **`versions.md`**.
 
 Details: [references/versions.md](references/versions.md)
 
-### Suggested response format (implement / review)
+## Suggested response format (STRICT — implement / review)
 
-1. **Issue or goal** - Review intent, scope, and quality target.
-2. **Recommendation** - Prioritized findings with rationale and severity calibration.
-3. **Code** - Finding table, action checklist, or remediation plan - still labeled **Code**.
-4. **Residual risks** - Ambiguities, blocked fixes, regressions, and unresolved dependencies.
+1. **Context** — Artifact type, audience, urgency (ship pressure), decision authority if known.
+2. **Problem / goal** — What “good feedback” must achieve (merge bar, learning, stakeholder alignment).
+3. **System design** — Feedback lifecycle for this case; roles — **`review-feedback-system-model.md`**.
+4. **Decision reasoning** — Depth vs velocity; block vs ticket; async vs sync — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
+5. **Deliverable sketch** — Summary table or checklist (findings with severity + confidence + evidence pointers) — **`quality-validation-and-guardrails.md`** for honesty about gaps.
+6. **Trade-offs** — Thoroughness vs time; risk of deferral.
+7. **Failure modes** — Review dynamics or evidence gaps — **`failure-modes-detection-mitigation.md`** themes.
+8. **Residual risks** — Ambiguity, escalation to **`security-pro`** / **`business-analysis-pro`** / domain skills; unresolved dependencies.
 
 ## Resources in this skill
 
-- `references/` - deeper material for evidence quality, severity, and feedback closure.
-
 | Topic | File |
 |-------|------|
+| **Review feedback system model** | [references/review-feedback-system-model.md](references/review-feedback-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
 | Finding structure and evidence | [references/finding-structure-and-evidence.md](references/finding-structure-and-evidence.md) |
 | Severity and prioritization | [references/severity-and-prioritization.md](references/severity-and-prioritization.md) |
 | Action planning and closure | [references/action-planning-and-closure.md](references/action-planning-and-closure.md) |
 | Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Decision trees (optional) | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns (optional) | [references/anti-patterns.md](references/anti-patterns.md) |
+| Decision trees | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
 | Integration map | [references/integration-map.md](references/integration-map.md) |
 | Versions | [references/versions.md](references/versions.md) |
 
-## Quick example
+## Quick examples
 
 ### 1 — Simple (common)
 
-**Input:** "Review this PR and give deep feedback, not just style comments."  
-**Expected output:** Evidence-backed findings with severity labels, must-fix vs should-improve split, concrete remediation steps, and closure checklist.
+**Input:** “Review this PR and give deep feedback, not just style.”  
+**Expected output:** Full **Suggested response format** — evidence-backed findings, severity + **confidence**, must-fix vs follow-up, verification steps.
 
 ### 2 — Tricky (edge case)
 
-**Input:** Two reviewers disagree on architecture; author is blocked.  
-**Expected output:** Consolidate decision path, one explicit direction, escalate if product-owned; template in [edge-cases.md](references/edge-cases.md).
+**Input:** Two reviewers disagree on architecture; author blocked.  
+**Expected output:** Consolidation path, single **decision owner**, product vs engineering split — **`edge-cases.md`**; **failure modes** ping-pong — **`failure-modes-detection-mitigation.md`**.
 
 ### 3 — Cross-skill
 
-**Input:** Possible security issue but not sure if exploitable.  
-**Expected output:** **`feedback-pro`** structure + evidence gaps; **`security-pro`** for exploit scenarios; label confidence **Low** until verified.
+**Input:** Possible security issue; exploitability unclear.  
+**Expected output:** **`feedback-pro`** structure + evidence gaps + **Low** confidence; **`security-pro`** for scenarios; no false **Critical** — **`quality-validation-and-guardrails.md`**.
 
 ## Checklist before calling the skill done
 
-- [ ] Findings include evidence and impact, not opinion-only statements.
-- [ ] Severity and priority are explicit and consistent.
-- [ ] Recommendations are actionable with verification criteria.
-- [ ] Must-fix vs optional items are clearly separated.
-- [ ] Residual risks and follow-up dependencies are documented.
-- [ ] Optional: [anti-patterns.md](references/anti-patterns.md) checked for severity inflation and vague wording.
-- [ ] **`security-pro`** (or other domain skill) **escalation** path clear when impact exceeds code quality.
+### Findings quality
+
+- [ ] Findings include **evidence** and **impact**, not opinion-only — **`finding-structure-and-evidence.md`**.
+- [ ] **Severity** and **confidence** explicit and consistent — **`severity-and-prioritization.md`**.
+- [ ] **Must-fix** vs optional clearly split — **`decision-framework-and-trade-offs.md`**.
+
+### Closure & handoff
+
+- [ ] Actions are **actionable** with verification or ticket/risk acceptance — **`action-planning-and-closure.md`**.
+- [ ] **Residual risks** and dependencies documented — **`review-feedback-system-model.md`**.
+- [ ] **`security-pro`** / domain **`*-pro`** escalation path when impact exceeds generic code quality — **`integration-map.md`**.
+
+### Dynamics
+
+- [ ] **Failure modes** considered when review volume, conflict, or ship pressure is high — **`failure-modes-detection-mitigation.md`**.
+- [ ] [anti-patterns.md](references/anti-patterns.md) checked for inflation and vague wording.

@@ -33,6 +33,8 @@ Disagreement on architecture or product?
 └── No → Resolve in PR with concrete examples
 ```
 
+**Timezone / distributed teams:** Prefer a **sticky PR summary** (merge gate + owner questions) so async readers see state without reading full thread — **`review-feedback-system-model.md`**.
+
 ## When NOT to give deep feedback
 
 - **Auto-generated** or **vendor** code you cannot maintain — flag upstream or wrap; do not nitpick generated lines.
