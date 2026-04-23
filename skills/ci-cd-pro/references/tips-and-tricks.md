@@ -1,5 +1,7 @@
 # CI/CD — tips and tricks
 
+See [pipeline-system-architecture.md](pipeline-system-architecture.md) for control/execution planes, artifact flow, and scaling limits before micro-optimizing YAML.
+
 - **Fail fast:** lint → typecheck → unit tests before expensive integration or visual tests.
 
 - **Artifacts:** upload test reports and coverage even on failure (`if: always()` where appropriate) for debugging.

@@ -224,30 +224,30 @@
   {
     "name": "ci-cd-pro",
     "folder": "ci-cd-pro",
-    "description": "Professional CI/CD pipeline design: GitHub Actions, GitLab CI, pipeline architecture, test automation, deployment strategies, secrets management, and pipeline reliability.\n\nUse this skill when the user works on GitHub Actions, GitLab CI/CD, CircleCI, Jenkins, pipeline YAML, workflows, jobs, steps, runners, secrets, environment variables, cache, artifacts, matrix builds, deployment gates, release automation, branch protection, or continuous delivery.\n\nTriggers: \"GitHub Actions\", \"GitLab CI\", \"CircleCI\", \"Jenkins\", \"pipeline\", \"workflow\", \"YAML\", \".github/workflows\", \"runner\", \"job\", \"step\", \"artifact\", \"cache\", \"matrix\", \"deploy\", \"release\", \"secrets\", \"environment\", \"branch protection\", \"merge queue\", \"CD\", \"CI\", \"continuous integration\", \"continuous delivery\", \"canary deploy\", \"blue-green\", \"rollback\".",
-    "triggers": [
-      "push",
-      "pull_request",
-      "workflow_dispatch",
-      "schedule",
-      "release.\r\n- jobs: run in parallel by default; use needs: for dependencies.\r\n- steps: are sequential within a job; each run: starts a new shell.\r\n- env: at workflow/job/step scope; job-level overrides workflow-level.\r\n- outputs: pass data between jobs via steps.<id>.outputs.<key>.\r\n\r\ndetails: [references/github-actions.md](references/github-actions.md)"
-    ],
+    "description": "Production-grade CI/CD system design: pipeline control plane vs runner execution, trigger-to-deploy data flow, immutable artifact and digest promotion, GitHub Actions and GitLab CI/CD patterns, secrets/OIDC/IAM boundaries, caching and parallelism economics, deployment strategies (blue-green, canary, rolling), merge queue and migration gates, failure-mode detection/mitigation, pipeline observability and governance (cost, audit, approvals), artifact signing/provenance hooks, fork/untrusted PR safety, self-hosted runner risk, and YAML quality guardrails — not syntax tutorials alone.\n\nUse when designing or reviewing pipelines, workflows, runners, OIDC deploys, release automation, branch protection, merge queues, flake strategy in CI, supply-chain gates, or aligning CI with rollout/rollback beyond the workflow file.\n\nUse with docker-pro, deployment-pro, testing-pro, security-pro, git-operations-pro, code-packaging-pro, postgresql-pro as needed.\n\nTriggers: \"GitHub Actions\", \"GitLab CI\", \"CircleCI\", \"Jenkins\", \"pipeline\", \"workflow\", \"YAML\", \".github/workflows\", \".gitlab-ci.yml\", \"runner\", \"OIDC\", \"Workload identity\", \"artifact\", \"digest\", \"provenance\", \"SBOM\", \"matrix\", \"concurrency\", \"environment protection\", \"merge queue\", \"branch protection\", \"fork PR secrets\", \"self-hosted runner\", \"flake\", \"canary\", \"blue-green\", \"rollback\", \"migration pipeline\", \"DORA\", \"immutable tag\".",
+    "triggers": [],
     "when_to_use": [
-      "Designing or reviewing GitHub Actions workflows or GitLab CI YAML.",
-      "Optimizing pipeline speed with caching, parallelism, and job splitting.",
-      "Securing secrets with OIDC, environment protection rules, and least-privilege tokens.",
-      "Implementing deployment strategies: blue-green, canary, feature flags.",
-      "Setting up matrix builds, reusable workflows, and composite actions.",
-      "Trigger keywords: `GitHub Actions`, `pipeline`, `.github/workflows`, `matrix`, `OIDC`, `deploy`, `canary`, …"
+      "Designing or reviewing **GitHub Actions** / **GitLab CI** pipelines end-to-end.",
+      "**OIDC** deploy from CI to cloud; environment protection and approvals.",
+      "**Throughput vs safety** trade-offs (matrix, concurrency, caches).",
+      "**Supply chain**: pinned actions, signing/provenance awareness.",
+      "**Incident-style** CI failures: queues, OIDC, rate limits, flaky greens."
     ],
     "references": [
       "anti-patterns.md",
+      "artifact-signing-and-provenance.md",
+      "decision-framework-and-tradeoffs.md",
       "decision-tree.md",
       "deployment-strategies.md",
       "edge-cases.md",
+      "failure-modes-detection-mitigation.md",
       "github-actions.md",
+      "gitlab-ci-overview.md",
       "integration-map.md",
       "optimization.md",
+      "pipeline-observability-and-governance.md",
+      "pipeline-system-architecture.md",
+      "quality-validation-and-guardrails.md",
       "secrets-security.md",
       "tips-and-tricks.md",
       "versions.md"

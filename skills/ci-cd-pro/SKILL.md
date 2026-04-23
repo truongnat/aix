@@ -1,178 +1,238 @@
 ---
 name: ci-cd-pro
 description: |
-  Professional CI/CD pipeline design: GitHub Actions, GitLab CI, pipeline architecture, test automation, deployment strategies, secrets management, and pipeline reliability.
+  Production-grade CI/CD system design: pipeline control plane vs runner execution, trigger-to-deploy data flow, immutable artifact and digest promotion, GitHub Actions and GitLab CI/CD patterns, secrets/OIDC/IAM boundaries, caching and parallelism economics, deployment strategies (blue-green, canary, rolling), merge queue and migration gates, failure-mode detection/mitigation, pipeline observability and governance (cost, audit, approvals), artifact signing/provenance hooks, fork/untrusted PR safety, self-hosted runner risk, and YAML quality guardrails — not syntax tutorials alone.
 
-  Use this skill when the user works on GitHub Actions, GitLab CI/CD, CircleCI, Jenkins, pipeline YAML, workflows, jobs, steps, runners, secrets, environment variables, cache, artifacts, matrix builds, deployment gates, release automation, branch protection, or continuous delivery.
+  Use when designing or reviewing pipelines, workflows, runners, OIDC deploys, release automation, branch protection, merge queues, flake strategy in CI, supply-chain gates, or aligning CI with rollout/rollback beyond the workflow file.
 
-  Triggers: "GitHub Actions", "GitLab CI", "CircleCI", "Jenkins", "pipeline", "workflow", "YAML", ".github/workflows", "runner", "job", "step", "artifact", "cache", "matrix", "deploy", "release", "secrets", "environment", "branch protection", "merge queue", "CD", "CI", "continuous integration", "continuous delivery", "canary deploy", "blue-green", "rollback".
+  Use with docker-pro, deployment-pro, testing-pro, security-pro, git-operations-pro, code-packaging-pro, postgresql-pro as needed.
+
+  Triggers: "GitHub Actions", "GitLab CI", "CircleCI", "Jenkins", "pipeline", "workflow", "YAML", ".github/workflows", ".gitlab-ci.yml", "runner", "OIDC", "Workload identity", "artifact", "digest", "provenance", "SBOM", "matrix", "concurrency", "environment protection", "merge queue", "branch protection", "fork PR secrets", "self-hosted runner", "flake", "canary", "blue-green", "rollback", "migration pipeline", "DORA", "immutable tag".
 
 metadata:
-  short-description: CI/CD — GitHub Actions, pipelines, deployment strategies, reliability
+  short-description: CI/CD — pipeline architecture, OIDC, strategies, failures, observability, supply chain
+  content-language: en
+  domain: ci-cd
+  level: professional
 ---
 
 # CI/CD (professional)
 
-Use official [GitHub Actions docs](https://docs.github.com/en/actions) and [GitLab CI/CD docs](https://docs.gitlab.com/ee/ci/) for syntax reference; this skill encodes **pipeline architecture discipline**, **secrets hygiene**, and **deployment strategy patterns**. Confirm the **CI platform** (GitHub Actions / GitLab / CircleCI), **deployment target**, and **existing branching strategy** when known.
+Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+
+Use official [GitHub Actions docs](https://docs.github.com/en/actions) and [GitLab CI/CD docs](https://docs.gitlab.com/ee/ci/) for syntax truth; this skill encodes **system architecture** for pipelines (control plane, ephemeral runners, artifact graph), **security boundaries** (OIDC, forks, pinning), **operational failure modes**, **decision frameworks**, and **governance** — not only YAML snippets. Confirm **CI platform**, **runner model** (hosted vs self-hosted), **deploy target**, and **branching strategy** before prescribing changes.
+
+## Boundary
+
+**`ci-cd-pro`** owns **workflow structure**, **job graph economics**, **secrets/OIDC wiring at pipeline level**, **cache/artifact contracts**, **CI-side gates**, and **failure/reliability patterns**. **`deployment-pro`** owns **runtime rollout** (traffic shift, K8s rollout, DB expand/contract detail) **after** the pipeline hands off an immutable reference; **`security-pro`** owns **threat modeling** for dangerous workflow patterns; **`testing-pro`** owns **test design and flake elimination**.
 
 ## Related skills (this repo)
 
 | Skill | When to combine |
 |-------|----------------|
-| `docker-pro` | Container builds and registry pushes in pipelines |
-| `deployment-pro` | Release strategies, rollbacks, environment promotion |
-| `testing-pro` | Test stage structure, parallelism, flakiness handling |
-| `security-pro` | Secrets management, OIDC, supply chain security |
-| `git-operations-pro` | Branch strategy that drives pipeline triggers |
+| **`docker-pro`** | Container builds, registry push, digest immutability |
+| **`deployment-pro`** | Promotion, canary/rollback, migration sequencing with releases |
+| **`testing-pro`** | Stage ordering, flakes, coverage/contract gates |
+| **`security-pro`** | OIDC trust policies, fork PR policy, SBOM/signing gates |
+| **`git-operations-pro`** | Triggers, protected branches, merge queue |
+| **`code-packaging-pro`** | Publish packages from pipeline outputs |
+| **`postgresql-pro`** | Migration jobs and backwards-compatible rollout |
 
 ## When to use
 
-- Designing or reviewing GitHub Actions workflows or GitLab CI YAML.
-- Optimizing pipeline speed with caching, parallelism, and job splitting.
-- Securing secrets with OIDC, environment protection rules, and least-privilege tokens.
-- Implementing deployment strategies: blue-green, canary, feature flags.
-- Setting up matrix builds, reusable workflows, and composite actions.
-- Trigger keywords: `GitHub Actions`, `pipeline`, `.github/workflows`, `matrix`, `OIDC`, `deploy`, `canary`, …
+- Designing or reviewing **GitHub Actions** / **GitLab CI** pipelines end-to-end.
+- **OIDC** deploy from CI to cloud; environment protection and approvals.
+- **Throughput vs safety** trade-offs (matrix, concurrency, caches).
+- **Supply chain**: pinned actions, signing/provenance awareness.
+- **Incident-style** CI failures: queues, OIDC, rate limits, flaky greens.
+
+## When not to use
+
+- **Pure application code review** with no pipeline angle — other skills first.
+- **Kubernetes internals** of rollout — **`deployment-pro`** once image reference exists.
+
+## Required inputs
+
+- Platform (**GitHub** / **GitLab** / other), **event triggers** needed, **trust model** for PRs (internal-only vs OSS forks).
+
+## Expected output
+
+Follow **Suggested response format** strictly — context through residual risks — with explicit **system view** and **failure modes**.
 
 ## Workflow
 
-1. Confirm CI platform, deployment target, and branching strategy (trunk-based, Gitflow, etc.).
-2. Apply the principles and topic summaries below; open `references/` when you need depth.
-3. Respond using **Suggested response format**; call out secrets exposure, flakiness, and rollback risks.
+1. Confirm platform, triggers, runner type, environments (staging/prod), and **fork** exposure.
+2. Apply summaries; open `references/`; never recommend **`pull_request_target`** casually — **`quality-validation-and-guardrails.md`**.
+3. Respond using **Suggested response format**; delegate rollout nuance to **`deployment-pro`** when execution leaves CI.
 
 ### Operating principles
 
-1. **Fail fast** — lint and type-check before tests; unit tests before integration; shift left.
-2. **Cache aggressively** — cache dependencies keyed on lockfile hash; cache Docker layers with registry.
-3. **Least-privilege secrets** — use OIDC over long-lived credentials; scope environment secrets to target environments.
-4. **Idempotent deployments** — re-running a deploy should be safe; use version tags not `latest`.
-5. **Pipeline as code, reviewed as code** — workflow files go through PR review; protect default branch.
-6. **Observability in pipelines** — surface test reports, coverage, and deploy duration as pipeline artifacts.
+1. **Fail fast** — lint/type/unit before integration/e2e; shift expensive work behind cheap gates.
+2. **Cache with correct keys** — lockfile-hash keys; treat cache as **optimization**, not correctness — **`optimization.md`**.
+3. **Least-privilege secrets** — OIDC over long-lived keys; narrow IAM — **`secrets-security.md`**.
+4. **Immutable references** — deploy **digest** or pinned version; avoid silent **`latest`** — **`artifact-signing-and-provenance.md`**.
+5. **Pipeline as code, reviewed as code** — **`CODEOWNERS`** on workflows where policy requires.
+6. **Observable pipelines** — reports on failure; duration and queue metrics — **`pipeline-observability-and-governance.md`**.
+7. **Know the distributed system** — queues, concurrency caps, eventual consistency of artifacts — **`pipeline-system-architecture.md`**.
+
+### Pipeline system architecture (summary)
+
+Control plane vs runners; trigger → job graph → artifacts → deploy handoff; scaling and idempotency — **`pipeline-system-architecture.md`**.
+
+Details: [references/pipeline-system-architecture.md](references/pipeline-system-architecture.md)
+
+### Failure modes — detection and mitigation (summary)
+
+Queue starvation, OIDC misconfig, fork leaks, flaky green, rate limits — structured table — **`failure-modes-detection-mitigation.md`**.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Scenario defaults; speed vs safety matrix — **`decision-framework-and-tradeoffs.md`**.
+
+Details: [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md)
+
+### Pipeline observability and governance (summary)
+
+Signals, approvals, cost, audit — **`pipeline-observability-and-governance.md`**.
+
+Details: [references/pipeline-observability-and-governance.md](references/pipeline-observability-and-governance.md)
+
+### Artifact signing and provenance (summary)
+
+Digest deploy, signing/SBOM hooks — **`artifact-signing-and-provenance.md`**.
+
+Details: [references/artifact-signing-and-provenance.md](references/artifact-signing-and-provenance.md)
+
+### Quality validation and guardrails (summary)
+
+Anti-hallucination checklist; fork/OIDC foot-guns — **`quality-validation-and-guardrails.md`**.
+
+Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+
+### GitLab CI overview (summary)
+
+Stages, includes, runner tags — conceptual map from Actions — **`gitlab-ci-overview.md`**.
+
+Details: [references/gitlab-ci-overview.md](references/gitlab-ci-overview.md)
 
 ### GitHub Actions structure (summary)
 
-- `on:` triggers: `push`, `pull_request`, `workflow_dispatch`, `schedule`, `release`.
-- `jobs:` run in parallel by default; use `needs:` for dependencies.
-- `steps:` are sequential within a job; each `run:` starts a new shell.
-- `env:` at workflow/job/step scope; job-level overrides workflow-level.
-- `outputs:` pass data between jobs via `steps.<id>.outputs.<key>`.
+Triggers, jobs, steps, outputs, concurrency — **`github-actions.md`**.
 
 Details: [references/github-actions.md](references/github-actions.md)
 
 ### Secrets and security (summary)
 
-- **OIDC** — authenticate to AWS/GCP/Azure without long-lived keys: `permissions: id-token: write`.
-- **Environment secrets** — scope secrets to `production`/`staging` environments with protection rules.
-- **`GITHUB_TOKEN`** — use for repo-scoped operations; scope permissions with `permissions:` block.
-- **Secret scanning** — enable in repo settings; never echo secrets; use `::add-mask::` for dynamic values.
-- **Pinned actions** — pin third-party actions to full SHA (`uses: actions/checkout@a81bbbf...`) to prevent supply chain attacks.
+OIDC, environments, `GITHUB_TOKEN`, pinning — **`secrets-security.md`**.
 
 Details: [references/secrets-security.md](references/secrets-security.md)
 
 ### Pipeline optimization (summary)
 
-- **Dependency caching**: `actions/cache` keyed on `hashFiles('**/package-lock.json')`.
-- **Matrix builds**: test across Node versions, OS, or browser in parallel.
-- **Reusable workflows**: `workflow_call` for DRY pipelines across repos.
-- **Job concurrency**: `concurrency: group: ${{ github.ref }}` to cancel stale runs on the same branch.
-- **Self-hosted runners**: for larger workloads or private network access; use ephemeral runners.
+Cache, matrix, reusable workflows, concurrency — **`optimization.md`**.
 
 Details: [references/optimization.md](references/optimization.md)
 
 ### Deployment strategies (summary)
 
-- **Blue-green** — two identical environments; switch traffic at load balancer; instant rollback.
-- **Canary** — route small % of traffic to new version; monitor; expand or rollback.
-- **Rolling** — replace instances one-by-one; no double-capacity cost; slower rollback.
-- **Feature flags** — decouple deploy from release; gate new code paths in production.
-- **Environment promotion gates** — manual approval step before production via `environment: production` with required reviewers.
+Blue-green, canary, rolling, flags — **`deployment-strategies.md`** (handoff to **`deployment-pro`** for execution).
 
 Details: [references/deployment-strategies.md](references/deployment-strategies.md)
 
 ### Decision trees (summary)
 
-- **Reusable workflow vs composite vs matrix**, **OIDC vs long-lived secrets**, **canary vs blue-green** — see trees.
+Reusable vs composite, OIDC vs keys, hosted vs self-hosted, path filters, migrations — **`decision-tree.md`**.
 
 Details: [references/decision-tree.md](references/decision-tree.md)
 
 ### Anti-patterns (summary)
 
-- Unpinned actions, bad cache keys, missing concurrency, secrets on fork PRs — see reference.
+Unpinned actions, fork secrets, bad caches — **`anti-patterns.md`**.
 
 Details: [references/anti-patterns.md](references/anti-patterns.md)
 
-### Cross-skill handoffs (summary)
-
-- **`docker-pro`**, **`deployment-pro`**, **`testing-pro`**, **`security-pro`**, **`git-operations-pro`**, **`code-packaging-pro`**.
-
-Details: [references/integration-map.md](references/integration-map.md)
-
-### Versions (summary)
-
-- Runner images, pinned Actions, platform YAML dialects.
-
-Details: [references/versions.md](references/versions.md)
-
 ### Tips and tricks (summary)
 
-- Fail-fast job order, artifacts on failure, matrix trimming, environment protection — expanded in reference.
+Fail-fast ordering, artifacts on failure, matrix trimming — **`tips-and-tricks.md`**.
 
 Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
-- Merge queue ordering, flaky retries, OIDC misconfiguration, Windows/Linux matrix differences.
+Merge queue, OIDC, self-hosted poison, migrations, miners — **`edge-cases.md`**.
 
 Details: [references/edge-cases.md](references/edge-cases.md)
 
-### Suggested response format (implement / review)
+### Cross-skill handoffs (summary)
 
-1. **Issue or goal** — Pipeline problem, new workflow design, or deployment strategy question.
-2. **Recommendation** — Pipeline structure, caching strategy, or secrets approach.
-3. **Code** — YAML workflow snippet with inline comments.
-4. **Residual risks** — Secret exposure, flaky tests, rollback gaps, or cost concerns.
+**`docker-pro`**, **`deployment-pro`**, **`testing-pro`**, **`security-pro`**, **`postgresql-pro`** — **`integration-map.md`**.
+
+Details: [references/integration-map.md](references/integration-map.md)
+
+### Versions (summary)
+
+Runner images, pinning, dialect differences — **`versions.md`**.
+
+Details: [references/versions.md](references/versions.md)
+
+## Suggested response format (STRICT — implement / review)
+
+1. **Context** — Org/repo type (OSS vs internal), platform (**GitHub**/**GitLab**/…), runner model, environments, **fork/trust** model.
+2. **Problem** — Symptom (slow, flaky, insecure, unclear deploy) and **success criteria** (time, reliability, compliance).
+3. **System design / architecture** — Trigger → job DAG → artifacts → reference passed to CD; control vs execution; what state is **durable** (artifacts, registry) vs **ephemeral** (runner disk) — cite **`pipeline-system-architecture.md`** when non-trivial.
+4. **Decision reasoning** — Chosen pattern (reuse/matrix/OIDC/canary/etc.) vs alternatives; link **`decision-tree.md`** / **`decision-framework-and-tradeoffs.md`**.
+5. **Implementation sketch** — YAML or job graph **outline** with **pinned** third-party actions where shown; placeholders for secrets; explicit **assumptions** (e.g. hosted `ubuntu-latest`).
+6. **Trade-offs** — Speed vs reproducibility; parallel cost; fork safety vs full CI; cache hit vs strict install — matrix row style acceptable.
+7. **Failure modes** — Top 3–5 failures for this design (**failure-modes-detection-mitigation.md** themes): what breaks, detection, mitigation.
+8. **Residual risks** — Unknowns (cloud IAM outside repo), governance gaps (missing approval env), delegation to **`deployment-pro`** / **`security-pro`** when execution or threat model dominates.
 
 ## Resources in this skill
 
-- `references/` — topic deep-dives; do not paste entire reference docs into SKILL.md.
-
 | Topic | File |
 |-------|------|
-| **GitHub Actions structure** | [references/github-actions.md](references/github-actions.md) |
+| Pipeline system architecture | [references/pipeline-system-architecture.md](references/pipeline-system-architecture.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md) |
+| Observability & governance | [references/pipeline-observability-and-governance.md](references/pipeline-observability-and-governance.md) |
+| Artifact signing & provenance | [references/artifact-signing-and-provenance.md](references/artifact-signing-and-provenance.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| GitLab CI overview | [references/gitlab-ci-overview.md](references/gitlab-ci-overview.md) |
+| GitHub Actions structure | [references/github-actions.md](references/github-actions.md) |
 | Secrets and security | [references/secrets-security.md](references/secrets-security.md) |
 | Pipeline optimization | [references/optimization.md](references/optimization.md) |
 | Deployment strategies | [references/deployment-strategies.md](references/deployment-strategies.md) |
 | Decision trees | [references/decision-tree.md](references/decision-tree.md) |
 | Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
 | Integration map | [references/integration-map.md](references/integration-map.md) |
-| Versions | [references/versions.md](references/versions.md) |
-| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
 | Edge cases | [references/edge-cases.md](references/edge-cases.md) |
+| Versions | [references/versions.md](references/versions.md) |
 
-## Quick example
+## Quick examples
 
-### 1 — Simple (common)
+**Input:** 12-minute CI; `npm install` every run.  
+**Expected output:** Full **Suggested response format** — cache keying, job split, trade-off of cold vs warm, failure **rate limit/cache miss**, residual **fork** irrelevance.
 
-**Input:** GitHub Actions workflow that runs tests takes 12 minutes; `npm install` runs every time.  
-**Expected output:** Add `actions/cache` keyed on `package-lock.json` hash, split into lint/test/build jobs running in parallel, estimate to ~3 min; show full updated YAML.
-
-### 2 — Tricky (edge case)
-
-**Input:** `pull_request` from fork fails with “secret not found” on deploy job — team wants previews for externals.  
-**Expected output:** Explain fork secret boundaries; use `workflow_run` / `deploy` from trusted path or disable secrets on fork PRs; never expose prod credentials.
-
-### 3 — Cross-skill
-
-**Input:** Pipeline builds Docker image and pushes to registry — slow and expensive.  
-**Expected output:** **`ci-cd-pro`** cache + matrix; **`docker-pro`** multi-stage and layer order; **`deployment-pro`** tag/digest promotion.
+**Input:** Fork PR needs preview deploy.  
+**Expected output:** **Context/Problem** fork trust; **Decision** no prod secrets on fork; **Implementation** trusted workflow pattern or **`workflow_run`** sketch; **Failure modes** secret exfiltration; **`security-pro`**.
 
 ## Checklist before calling the skill done
 
-- [ ] Secrets use OIDC or environment-scoped secrets; no long-lived credentials in workflow env.
-- [ ] Third-party actions pinned to full SHA.
-- [ ] Dependency cache present, keyed on lockfile hash.
-- [ ] Jobs fail fast: lint before test, unit before integration.
-- [ ] Production deploy has manual approval gate or canary step.
-- [ ] Concurrency cancellation configured to avoid stale runs.
-- [ ] Test artifacts (reports, coverage) uploaded for visibility.
-- [ ] Fork / external PR behavior reviewed for secret exposure and required checks.
+### Pipeline correctness
+
+- [ ] Platform and **trigger semantics** stated (fork vs internal PR).
+- [ ] Third-party actions **SHA-pinned** in examples where org policy expects it; never unsafe **`pull_request_target`** without **`security-pro`** review.
+- [ ] OIDC: `id-token: write` **and** cloud trust side acknowledged if recommending OIDC deploy.
+
+### Reliability & ops
+
+- [ ] **Concurrency** / cancel stale runs where rapid pushes matter.
+- [ ] **Artifacts** or **reports** on failure where triage needs them (`if: always()` pattern when applicable).
+- [ ] **Failure modes** section addressed — not only happy path.
+
+### Boundaries
+
+- [ ] Rollback/traffic migration detail delegated to **`deployment-pro`** when out of CI scope.
+- [ ] **Quality guardrails** — no invented tenant-specific secret values; placeholders labeled.
