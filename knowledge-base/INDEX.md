@@ -13,4 +13,4 @@ Update this table when adding documents so agents and teammates can find them qu
 | Doc persistence policy | [documents/policies/documentation-persistence.md](documents/policies/documentation-persistence.md) | When to write under `documents/`, update INDEX, RAG |
 | Verification | [VERIFY.md](VERIFY.md) | How to test KB scripts and what “100%” means |
 
-**Last reviewed:** 2026-04-01
+**Last reviewed:** 2026-04-24
