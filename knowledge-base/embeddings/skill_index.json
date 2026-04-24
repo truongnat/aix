@@ -1006,6 +1006,23 @@
     ]
   },
   {
+    "name": "router-pro",
+    "folder": "router-pro",
+    "description": "System skill for automatic request analysis, prompt optimization, and intelligent routing to skills, workflows, or templates. Instead of calling skills individually, this skill analyzes user input, researches and improves the prompt for clarity and accuracy, identifies relevant skills, workflows, or templates, and coordinates execution.\n\nUse this skill when the user provides a general request that needs automatic decomposition, when the prompt needs optimization for better AI understanding, when appropriate skills or workflows need to be identified and executed, or when a template is needed for reports, issues, or other structured outputs.\n\nThis is a **system skill** - it does not perform domain-specific work but routes to and coordinates **working skills** (auth-pro, react-pro, docker-pro, etc.), **workflows** (/ticket, /debug, /release, etc.), and **templates** (reports, issues, prompts, etc.).\n\nTriggers: \"route\", \"analyze\", \"plan\", \"break down\", \"how should I\", \"what skills\", \"optimize prompt\", \"orchestrate\", \"help me with\", \"template\", \"report format\", \"issue template\".",
+    "triggers": [],
+    "when_to_use": [
+      "User provides a general request that needs automatic analysis and routing",
+      "Prompt needs research and optimization for clarity and accuracy",
+      "Appropriate skills, workflows, or templates need to be identified automatically",
+      "User asks \"how should I approach X\" or \"help me with Y\"",
+      "Request needs decomposition into actionable steps",
+      "Multiple skills, workflows, or templates might be needed for a complex task",
+      "User needs a report format, issue template, or other structured output",
+      "User asks for \"template\", \"report format\", \"issue template\""
+    ],
+    "references": []
+  },
+  {
     "name": "security-pro",
     "folder": "security-pro",
     "description": "Production-grade application and platform security: threat modeling, trust boundaries, secure design, authn/authz, secrets, crypto hygiene, API and client hardening, OSI/network-aware controls, defensive attack-method literacy (OWASP, MITRE ATT&CK), and authorized offensive simulation — plus system model (trust boundaries, CIA, prevent/detect/respond, where authorization truth lives), failure modes (BOLA, token theft, SSRF, CI secret leak, multi-tenant bleed), decision trade-offs (cookies vs bearer, RLS vs app-only, CSP strictness, pinning), and quality guardrails (legal scope, no fabricated CVEs, evidence discipline).\n\nUse this skill when the user asks about security review, OWASP-style risks, XSS, CSRF, SSRF, injection, IDOR/BOLA, JWT/session hardening, TLS, headers (CSP, HSTS), secrets management, rate limiting, audit logging, dependency/supply-chain risk, mobile secure storage, CI/CD pipeline security, network segmentation, or structured internal assessment.\n\nUse for **network-aware security** (OSI/TCP–IP, DNS/TLS, segmentation) and **defender-oriented** attack literacy. For **authorized** offensive simulation only: staging/lab, ROE, purple-team — never unauthorized testing.\n\nCombine with **`nestjs-pro`**, **`nextjs-pro`**, **`postgresql-pro`**, **`api-design-pro`**, **`auth-pro`**, **`react-pro`** / **`react-native-pro`** / **`flutter-pro`**, **`testing-pro`**, **`ci-cd-pro`**, **`deployment-pro`**, **`network-infra-pro`** for implementation and infra. This skill owns **cross-platform principles and threat framing**; stack skills own **wiring**.\n\nTriggers: \"security\", \"secure\", \"OWASP\", \"XSS\", \"CSRF\", \"SSRF\", \"injection\", \"SQL injection\", \"IDOR\", \"BOLA\", \"auth\", \"authorization\", \"JWT\", \"session\", \"cookie\", \"SameSite\", \"CSP\", \"HSTS\", \"TLS\", \"secrets\", \"vault\", \"rate limit\", \"penetration\", \"threat model\", \"STRIDE\", \"CWE\", \"ASVS\", \"SAST\", \"DAST\", \"Dependabot\", \"supply chain\", \"encryption\", \"PII\", \"audit log\", \"hardening\", \"OSI\", \"TCP/IP\", \"network security\", \"MITRE\", \"ATT&CK\", \"kill chain\", \"red team\", \"purple team\", \"bug bounty\", \"pentest\", \"self-assessment\", \"attack simulation\", \"path traversal\", \"prototype pollution\".",
