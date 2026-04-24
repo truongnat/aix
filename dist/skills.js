@@ -261,6 +261,26 @@ function installAllSkills(repoRoot, projectDir, mode, allIdes) {
         .filter((d) => d.isDirectory() && existsSync(join(skillsRoot, d.name, 'SKILL.md')))
         .map((d) => join(skillsRoot, d.name));
     const spin = ora(`Installing ${dirs.length} skills...`).start();
+    // Backup custom skills before installation
+    const customSkills = getCustomSkills(projectDir, repoRoot);
+    const backupDir = join(projectDir, '.skills-backup');
+    if (customSkills.length > 0) {
+        mkdirSync(backupDir, { recursive: true });
+        const ides = ['.cursor', '.claude', '.agent', '.codex'];
+        for (const ide of ides) {
+            const skillsDir = join(projectDir, ide, 'skills');
+            if (!existsSync(skillsDir))
+                continue;
+            for (const skill of customSkills) {
+                const skillPath = join(skillsDir, skill);
+                if (existsSync(skillPath)) {
+                    const backupPath = join(backupDir, ide, skill);
+                    mkdirSync(join(backupDir, ide), { recursive: true });
+                    cpSync(skillPath, backupPath, { recursive: true });
+                }
+            }
+        }
+    }
     let ok = 0;
     let fail = 0;
     for (const dir of dirs) {
@@ -302,9 +322,21 @@ function installAllSkills(repoRoot, projectDir, mode, allIdes) {
         spin.warn(chalk.yellow(`Installed ${ok}/${dirs.length} skills (${fail} failed)`));
     else
         spin.succeed(chalk.green(`Installed ${ok} skills`));
-    // Preserve custom skills in project directory
-    const customSkills = getCustomSkills(projectDir, repoRoot);
+    // Restore custom skills after installation
     if (customSkills.length > 0) {
+        const ides = ['.cursor', '.claude', '.agent', '.codex'];
+        for (const ide of ides) {
+            const skillsDir = join(projectDir, ide, 'skills');
+            mkdirSync(skillsDir, { recursive: true });
+            for (const skill of customSkills) {
+                const backupPath = join(backupDir, ide, skill);
+                const skillPath = join(skillsDir, skill);
+                if (existsSync(backupPath)) {
+                    cpSync(backupPath, skillPath, { recursive: true });
+                }
+            }
+        }
+        rmSync(backupDir, { recursive: true, force: true });
         console.log(chalk.cyan(`\nPreserved ${customSkills.length} custom skills: ${customSkills.join(', ')}`));
     }
 }
