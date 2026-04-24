@@ -98,6 +98,35 @@ Generate summary report including:
 - **Conflict resolution:** If git pull has conflicts, resolve them manually before proceeding to Step 3
 - **INDEX.md:** If INDEX.md was updated, review it to ensure new documents are properly indexed
 
+## Auto-sync script
+
+### Mac/Linux
+
+```bash
+# Run after git pull to auto-rebuild KB if documents changed
+./scripts/auto-sync-kb.sh
+```
+
+### Windows
+
+```powershell
+# Run after git pull to auto-rebuild KB if documents changed
+.\scripts\auto-sync-kb.ps1
+```
+
+Both scripts:
+- Detect if `knowledge-base/documents/` changed after pull
+- Automatically run `build-kb` and `verify-kb` if changes detected
+- Skip rebuild if no document changes (saves time)
+
+### Git hooks
+
+Git hooks are in `.git/hooks/`:
+- **Mac/Linux:** `post-merge`, `post-checkout` (bash scripts, executable)
+- **Windows:** Hooks require additional Git configuration; use manual script for reliability
+
+On Mac/Linux, hooks auto-run after `git pull` or branch checkout. On Windows, run the manual script after pulling.
+
 ---
 
 ## Related
