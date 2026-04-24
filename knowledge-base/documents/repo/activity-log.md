@@ -13,6 +13,12 @@
 
 ---
 
+### 2026-04-24
+
+- **Change:** **Major refactor: Removed Skill System v1, replaced with router-pro system skill.** Removed TypeScript-based Skill System v1 code (`src/core/`, `src/skills/`) and CLI scripts. Created **router-pro** system skill for automatic request analysis, prompt optimization, and dynamic skill/workflow/template discovery. Added **/route** command and workflow. Updated skill architecture documentation to distinguish system skills vs working skills. Upgraded all report and issue templates to professional quality with executive summaries, risk assessments, and detailed sections. Removed local skill installation option - now always installs to global IDE directories. Fixed `saveInstallManifest` to create `.cursor` directory before writing manifest. Updated AGENTS.md, skills-layout.md, and rebuilt skill index (now 48 skills including router-pro).
+
+- **Source:** user + agent
+
 ### 2026-04-03
 
 - **Change:** **Skills Pro Tier A sweep (plan):** Upgraded remaining **Tier C/B** bundles with **`references/decision-tree.md`**, **`anti-patterns.md`**, **`integration-map.md`**, **`versions.md`** (where applicable), expanded **`SKILL.md`** (3 Quick examples, 7+ checklist, triggers) for **Wave 2** (analysis/research), **Wave 3** (ops/meta incl. **`repo-tooling-pro`** **`command-matrix.md`**), **Wave 4** (Tier B: **`docker-pro`**, **`ci-cd-pro`**, **`planning-pro`**, **`feedback-pro`**, **`git-operations-pro`**, **`caching-pro`**, **`auth-pro`**, **`design-system-pro`** — integration + versions maps). **Wave 5:** README stubs for **`typescript-pro`**, **`ai-integration-pro`**, **`microservices-pro`**, **`performance-tuning-pro`**, **`clean-code-architecture-pro`**; trigger/Related-skill polish across existing Tier A stacks. Ran **`validate-skills`**, **`build-skill-index`**, **`build-kb`**, **`verify-kb`**, **`npm run build`**.
