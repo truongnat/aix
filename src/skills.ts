@@ -12,7 +12,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { tmpdir, homedir } from 'node:os';
 import { join, relative, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
@@ -400,8 +400,8 @@ async function main() {
   if (cmd === 'install' || cmd === 'update') {
     let repo = normalizeRepo(String(argv.repo || DEFAULT_REPO));
     let projectDir = resolve(String(argv['project-dir'] || process.cwd()));
-    let mode: 'full' | 'skills' = argv['skills-only'] ? 'skills' : 'full';
-    let allIdes = !argv['cursor-only'];
+    let mode: 'full' | 'skills' = 'full';
+    let allIdes = true;
 
     if (cmd === 'update' && !existsSync(bundlePath(projectDir)) && mode === 'full') {
       console.log(chalk.yellow(`No bundle found at ${bundlePath(projectDir)}. Switching to 'install' mode.`));
@@ -409,33 +409,21 @@ async function main() {
 
     if (interactive) {
       const a = await inquirer.prompt([
-        { type: 'input', name: 'repo', message: 'GitHub repo (user/repo or HTTPS)', default: repo },
-        { type: 'input', name: 'projectDir', message: 'Target project directory', default: projectDir },
         {
           type: 'list',
-          name: 'mode',
-          message: 'Install mode',
+          name: 'target',
+          message: 'Install target',
           choices: [
-            { name: 'Full bundle (.agents/devkit + rules + IDE skills)', value: 'full' },
-            { name: 'Skills only (copy into project; no vendor bundle)', value: 'skills' },
+            { name: 'Current project (local)', value: 'local' },
+            { name: 'Global (.agents)', value: 'global' },
           ],
-          default: mode,
-        },
-        {
-          type: 'list',
-          name: 'allIdes',
-          message: 'IDE targets',
-          choices: [
-            { name: 'All IDEs (.cursor + .claude + .codex + .agent)', value: true },
-            { name: 'Cursor only (.cursor)', value: false },
-          ],
-          default: allIdes,
+          default: 'local',
         },
       ]);
-      repo = normalizeRepo(String(a.repo));
-      projectDir = resolve(String(a.projectDir));
-      mode = a.mode;
-      allIdes = a.allIdes;
+      if (a.target === 'global') {
+        projectDir = resolve(join(homedir(), '.agents'));
+        mkdirSync(projectDir, { recursive: true });
+      }
     }
 
     const temp = await fetchRepo(repo);
@@ -466,40 +454,33 @@ async function main() {
         }
       }
 
-      if (mode === 'skills') {
-        installAllSkills(temp, projectDir, 'copy', allIdes);
-        const skillDirs = ['.cursor/skills/', '.claude/skills/', '.agent/skills/'];
-        if (allIdes) skillDirs.push('.codex/skills/');
-        ensureGitExcludeBlock(projectDir, skillDirs);
-      } else {
-        const bundle = bundlePath(projectDir);
-        const s = ora('Syncing bundle...').start();
-        syncBundle(temp, bundle);
-        linkRules(bundle, projectDir);
-        const manifest = loadInstallManifest(projectDir);
-        installCommands(bundle, projectDir, manifest);
-        saveInstallManifest(projectDir, manifest);
-        s.succeed('Bundle synced');
-        installAllSkills(bundle, projectDir, process.platform === 'win32' ? 'copy' : 'symlink', allIdes);
-        const cmdExcludes = collectCommandExcludePatterns(bundle);
-        const rulesExcludes: string[] = [];
-        const rulesSrc = join(bundle, '.cursor', 'rules');
-        if (existsSync(rulesSrc)) {
-          for (const f of readdirSync(rulesSrc)) {
-            if (f.endsWith('.mdc')) rulesExcludes.push(`.cursor/rules/${f}`);
-          }
+      const bundle = bundlePath(projectDir);
+      const s = ora('Syncing bundle...').start();
+      syncBundle(temp, bundle);
+      linkRules(bundle, projectDir);
+      const manifest = loadInstallManifest(projectDir);
+      installCommands(bundle, projectDir, manifest);
+      saveInstallManifest(projectDir, manifest);
+      s.succeed('Bundle synced');
+      installAllSkills(bundle, projectDir, process.platform === 'win32' ? 'copy' : 'symlink', allIdes);
+      const cmdExcludes = collectCommandExcludePatterns(bundle);
+      const rulesExcludes: string[] = [];
+      const rulesSrc = join(bundle, '.cursor', 'rules');
+      if (existsSync(rulesSrc)) {
+        for (const f of readdirSync(rulesSrc)) {
+          if (f.endsWith('.mdc')) rulesExcludes.push(`.cursor/rules/${f}`);
         }
-        const skillDirs = ['.cursor/skills/', '.claude/skills/', '.agent/skills/'];
-        if (allIdes) skillDirs.push('.codex/skills/');
-        ensureGitExcludeBlock(projectDir, [
-          '.agents/devkit/',
-          ...skillDirs,
-          '.cursor/.skills-install.json',
-          ...cmdExcludes,
-          ...rulesExcludes,
-        ]);
-        console.log(chalk.cyan('Verify: node .agents/devkit/dist/tools.js verify-bundle-install --project-dir .'));
       }
+      const skillDirs = ['.cursor/skills/', '.claude/skills/', '.agent/skills/'];
+      if (allIdes) skillDirs.push('.codex/skills/');
+      ensureGitExcludeBlock(projectDir, [
+        '.agents/devkit/',
+        ...skillDirs,
+        '.cursor/.skills-install.json',
+        ...cmdExcludes,
+        ...rulesExcludes,
+      ]);
+      console.log(chalk.cyan('Verify: node .agents/devkit/dist/tools.js verify-bundle-install --project-dir .'));
     } finally {
       rmSync(temp, { recursive: true, force: true });
     }
