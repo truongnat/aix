@@ -6,7 +6,16 @@
 
 ---
 
-## Contents
+## Skill Architecture
+
+Skills are organized into two categories:
+
+- **System Skills**: Routing and orchestration skills that analyze queries, optimize prompts, and coordinate working skills
+- **Working Skills**: Domain-specific skills that perform actual work (auth, react, docker, etc.)
+
+Example: The `/route` command uses the system skill to analyze a request, refine the prompt, identify relevant working skills, and execute the workflow.
+
+---
 
 | Section | What you get |
 |--------|----------------|
@@ -150,6 +159,13 @@ Full CLI reference: **[`scripts/README.md`](scripts/README.md)**.
 ## Skills
 
 Bundled skills follow a **consistent professional shape**: boundary in `SKILL.md`, deep dives under `references/`, and for most `*-pro` packs — **system model**, **failure modes**, **decision trade-offs**, **quality guardrails**, plus a **strict 8-step** suggested response format for agents.
+
+### Skill Types
+
+| Type | Purpose | Examples |
+|------|---------|----------|
+| System Skills | Routing, prompt optimization, orchestration | router-pro, planner-pro |
+| Working Skills | Domain-specific implementation | auth-pro, react-pro, docker-pro |
 
 | Doc | Purpose |
 |-----|---------|

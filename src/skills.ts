@@ -206,6 +206,10 @@ function loadInstallManifest(projectDir: string): InstalledArtifactManifest {
 }
 
 function saveInstallManifest(projectDir: string, manifest: InstalledArtifactManifest) {
+  const cursorDir = join(projectDir, '.cursor');
+  if (!existsSync(cursorDir)) {
+    mkdirSync(cursorDir, { recursive: true });
+  }
   writeFileSync(
     join(projectDir, '.cursor', '.skills-install.json'),
     `${JSON.stringify(manifest, null, 2)}\n`,
@@ -375,10 +379,6 @@ function uninstall(projectDir: string, nuclear: boolean) {
   spin.succeed('Uninstall completed');
 }
 
-function isLocalRepo(repo: string): boolean {
-  if (repo !== DEFAULT_REPO) return false;
-  return existsSync(join(PKG_ROOT, 'skills')) && existsSync(join(PKG_ROOT, 'commands'));
-}
 
 async function main() {
   const pkg = JSON.parse(readFileSync(join(PKG_ROOT, 'package.json'), 'utf8'));
@@ -438,8 +438,7 @@ async function main() {
       allIdes = a.allIdes;
     }
 
-    const useLocal = isLocalRepo(repo);
-    const temp = useLocal ? PKG_ROOT : await fetchRepo(repo);
+    const temp = await fetchRepo(repo);
 
     try {
       if (cmd === 'update' && mode === 'full') {
@@ -474,13 +473,13 @@ async function main() {
         ensureGitExcludeBlock(projectDir, skillDirs);
       } else {
         const bundle = bundlePath(projectDir);
-        const s = ora(useLocal ? 'Using local bundle...' : 'Syncing bundle...').start();
+        const s = ora('Syncing bundle...').start();
         syncBundle(temp, bundle);
         linkRules(bundle, projectDir);
         const manifest = loadInstallManifest(projectDir);
         installCommands(bundle, projectDir, manifest);
         saveInstallManifest(projectDir, manifest);
-        s.succeed(useLocal ? 'Local bundle ready' : 'Bundle synced');
+        s.succeed('Bundle synced');
         installAllSkills(bundle, projectDir, process.platform === 'win32' ? 'copy' : 'symlink', allIdes);
         const cmdExcludes = collectCommandExcludePatterns(bundle);
         const rulesExcludes: string[] = [];
@@ -502,7 +501,7 @@ async function main() {
         console.log(chalk.cyan('Verify: node .agents/devkit/dist/tools.js verify-bundle-install --project-dir .'));
       }
     } finally {
-      if (!useLocal) rmSync(temp, { recursive: true, force: true });
+      rmSync(temp, { recursive: true, force: true });
     }
   } else {
     let projectDir = resolve(String(argv['project-dir'] || process.cwd()));

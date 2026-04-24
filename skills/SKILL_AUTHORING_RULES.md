@@ -24,11 +24,28 @@ Every bundled skill should cover these layers (some sections live in `SKILL.md`,
 
 ## 1. When you may add a new skill
 
-- The topic is **not** already covered by an existing bundled skill (`react-pro`, `nextjs-pro`, `react-native-pro`, `flutter-pro`, `nestjs-pro`, `postgresql-pro`, `sql-data-access-pro`, `testing-pro`, `security-pro`, `electron-pro`, `tauri-pro`, `deployment-pro`, `seo-pro`, `design-system-pro`, `mobile-design-pro`, `business-analysis-pro`, `content-analysis-pro`, `data-analysis-pro`, `image-processing-pro`, `web-research-pro`, `market-research-pro`, `strategic-consulting-pro`, `code-packaging-pro`, `caching-pro`, `network-infra-pro`, `planning-pro`, `algorithm-pro`, `feedback-pro`, `auth-pro`, `self-improve-agent-pro`, `git-operations-pro`, `skills-self-review-pro`, `bug-discovery-pro`, `repo-tooling-pro`, `typescript-pro`, `docker-pro`, `ci-cd-pro`, `ai-integration-pro`).
+- The topic is **not** already covered by an existing bundled skill (`router-pro`, `react-pro`, `nextjs-pro`, `react-native-pro`, `flutter-pro`, `nestjs-pro`, `postgresql-pro`, `sql-data-access-pro`, `testing-pro`, `security-pro`, `electron-pro`, `tauri-pro`, `deployment-pro`, `seo-pro`, `design-system-pro`, `mobile-design-pro`, `business-analysis-pro`, `content-analysis-pro`, `data-analysis-pro`, `image-processing-pro`, `web-research-pro`, `market-research-pro`, `strategic-consulting-pro`, `code-packaging-pro`, `caching-pro`, `network-infra-pro`, `planning-pro`, `algorithm-pro`, `feedback-pro`, `auth-pro`, `self-improve-agent-pro`, `git-operations-pro`, `skills-self-review-pro`, `bug-discovery-pro`, `repo-tooling-pro`, `typescript-pro`, `docker-pro`, `ci-cd-pro`, `ai-integration-pro`).
 - The topic is **distinct** enough that merging into an existing skill would blur scope (document the reason in the PR or commit message).
 - You have (or will add) at least `**SKILL.md`** and, for non-trivial domains, a `**references/**` folder — not a dump of all docs inside `SKILL.md`.
+- Determine if the skill is a **system skill** (routing/orchestration) or a **working skill** (domain-specific implementation). System skills should be rare and focused on coordination.
 
-## 2. Canonical `SKILL.md` structure (required order)
+## 2. Skill types
+
+### System Skills
+- **Purpose**: Routing, prompt optimization, orchestration of working skills
+- **Examples**: router-pro, planner-pro
+- **Characteristics**: Coordinate but don't implement domain-specific logic
+- **Boundary section**: Must clearly delegate to working skills
+
+### Working Skills
+- **Purpose**: Domain-specific implementation and guidance
+- **Examples**: auth-pro, react-pro, docker-pro
+- **Characteristics**: Perform actual work in a specific domain
+- **Boundary section**: Define scope vs related skills
+
+When creating a new skill, first determine if it should be a system skill or working skill. Most new skills should be working skills. System skills should only be added when there's a clear need for new coordination capabilities not covered by existing system skills.
+
+## 3. Canonical `SKILL.md` structure (required order)
 
 Use **exactly** these section headings and order for **new** skills and **refactored** skills. Older bundled skills may use a legacy layout until migrated.
 
@@ -39,7 +56,7 @@ Use **exactly** these section headings and order for **new** skills and **refact
 | —     | Optional: `metadata.content-language`, `metadata.domain`, `metadata.level`    | Metadata            | No                              |
 | 1     | `# <Display name> (professional)`                                             | —                   | **Yes**                         |
 | 2     | Intro paragraph (§3); optional language note (§13)                            | Contract            | **Yes**                         |
-| 3     | `## Boundary` — owns vs defers; optional **Related skills (this repo)** table | Contract            | **Yes**                         |
+| 3     | `## Boundary` — owns vs defers; **system skills must delegate to working skills** | Contract            | **Yes**                         |
 | 4     | `## When to use` — bullets + `- Trigger keywords: ...`                        | Contract            | **Yes**                         |
 | 5     | `## When not to use` — explicit out-of-scope                                  | Contract            | **Yes** for new/refactored      |
 | 6     | `## Required inputs`                                                          | Contract            | Optional                        |
@@ -109,12 +126,13 @@ More blocks **only** if listed in `**## Suggested response format`** and `**## E
 
 | Trigger                                                      | Updates                                                                                                                            |
 | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| **Add** bundled skill                                        | `skills/README.md`; root `**README.md`**; `**AGENTS.md**`; **§1** skill list; `**knowledge-base/documents/repo/skills-layout.md`** |
+| **Add** bundled skill                                        | `skills/README.md`; root `**README.md`**; `**AGENTS.md``; **§1** skill list; `**knowledge-base/documents/repo/skills-layout.md`** |
 | **Remove/rename** skill                                      | Same; fix all mentions                                                                                                             |
-| **Add** workflow under `workflows/`                          | Root `**README.md`**; `<slug>.md` naming per `[workflows/README.md](../workflows/README.md#naming)`; domain `**README.md**` if new |
-| **Add** `knowledge-base/documents/`** file                   | `**knowledge-base/INDEX.md**`                                                                                                      |
-| **Substantive** `SKILL.md` / `references/` (routing meaning) | `**node dist/tools.js build-skill-index`**; if `name`/frontmatter changed: `**validate-skills**` first                             |
+| **Add** workflow under `workflows/`                          | Root `**README.md`**; `<slug>.md` naming per `[workflows/README.md](../workflows/README.md#naming)`; domain `**README.md`** if new |
+| **Add** `knowledge-base/documents/`** file                   | `**knowledge-base/INDEX.md`**                                                                                                      |
+| **Substantive** `SKILL.md` / `references/` (routing meaning) | `**node dist/tools.js build-skill-index`**; if `name`/frontmatter changed: `**validate-skills`** first                             |
 
+**Note for system skills**: When adding a system skill, update the "Skill Types" section in `skills/README.md` and ensure the workflow (e.g., `/route`) is documented in `workflows/README.md`.
 
 ## 9. Review
 
