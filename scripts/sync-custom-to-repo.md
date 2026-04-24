@@ -5,7 +5,7 @@ Script to sync custom skills/workflows/templates to upstream repository via PR.
 ## Usage
 
 ```bash
-node scripts/sync-custom-to-repo.mjs
+node scripts/sync-custom-to-repo.cjs
 ```
 
 ## What it does

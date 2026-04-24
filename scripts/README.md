@@ -6,6 +6,7 @@ All runtime tooling is now implemented in TypeScript and compiled to `dist/tools
 
 - Install/uninstall bundle CLI: `node dist/own-skills.js` (npm bin: **`devkit`** or **`own-skills`**) or `npx github:truongnat/skills`. Full install syncs to **`.agents/devkit/`**.
 - Tool command runner: `node dist/tools.js <command> ...`.
+- Unified script wrapper: `node scripts/tools.js <command> ...` (simpler alternative to bash wrappers)
 
 ## Command map
 
@@ -41,6 +42,11 @@ All runtime tooling is now implemented in TypeScript and compiled to `dist/tools
 - `npm run query-kb`
 - `npm run query-kb-batch`
 - `npm run verify-kb`
+
+## Additional scripts
+
+- `node scripts/tools.js <command>` - Unified wrapper for all dist/tools.js commands
+- `node scripts/sync-custom-to-repo.cjs` - Sync custom skills/workflows/templates to upstream repo via PR
 
 ## Build
 
