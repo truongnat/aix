@@ -42,6 +42,7 @@ Use these commands to analyze, optimize, and route prompts to the best skills:
 | `/test-strategy` | Test strategy ([`workflows/dev/test-strategy.md`](workflows/dev/test-strategy.md)) |
 | `/dep-audit` | Dependency audit ([`workflows/dev/dep-audit.md`](workflows/dev/dep-audit.md)) |
 | `/index-project` | Index a project: overview docs + `index-project` CLI + query via `query-kb --index`; optional **parallel** Steps 3–4 via Task/sub-agents; **Step 7** wiki: `generate-wiki` or GitNexus `wiki` ([`workflows/dev/index-project.md`](workflows/dev/index-project.md)) |
+| `/sync-kb` | Sync KB from origin, auto-rebuild embeddings, verify ([`workflows/dev/sync-kb.md`](workflows/dev/sync-kb.md)) — pull KB changes, detect document changes, rebuild embeddings |
 
 Commands read from `knowledge-base/embeddings/skill_index.json`. Rebuild after adding/changing skills:
 
