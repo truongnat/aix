@@ -6,8 +6,9 @@
  */
 
 const { execSync } = require('child_process');
-const { readFileSync, existsSync, readdirSync, lstatSync, rmSync, mkdirSync, cpSync } = require('fs');
-const { join, resolve, tmpdir } = require('path');
+const { existsSync, readdirSync, lstatSync, rmSync, mkdirSync, cpSync } = require('fs');
+const { join, resolve } = require('path');
+const os = require('os');
 
 // Constants
 const REPO_URL = 'https://github.com/truongnat/skills.git';
@@ -99,7 +100,7 @@ function main() {
   if (customWorkflows.length > 0) log(`  Workflows: ${customWorkflows.join(', ')}`, 'cyan');
   if (customTemplates.length > 0) log(`  Templates: ${customTemplates.join(', ')}`, 'cyan');
 
-  const tempDir = join(tmpdir(), `skills-sync-${Date.now()}`);
+  const tempDir = join(os.tmpdir(), `skills-sync-${Date.now()}`);
   const branchName = `sync-custom-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`;
 
   try {
