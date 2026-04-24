@@ -382,7 +382,24 @@ function uninstall(projectDir: string, nuclear: boolean) {
 
 async function main() {
   const pkg = JSON.parse(readFileSync(join(PKG_ROOT, 'package.json'), 'utf8'));
-  console.log(chalk.bold(`\n${pkg.name} v${pkg.version}`));
+  
+  // Display logo
+  console.log(chalk.cyan(`
+  ╔════════════════════════════════════════════════════════════╗
+  ║                                                            ║
+  ║   ███╗   ██╗██╗ ██████╗██████╗ ███████╗██████╗             ║
+  ║   ████╗  ██║██║██╔════╝██╔══██╗██╔════╝██╔══██╗            ║
+  ║   ██╔██╗ ██║██║██║     ██████╔╝█████╗  ██████╔╝            ║
+  ║   ██║╚██╗██║██║██║     ██╔══██╗██╔══╝  ██╔══██╗            ║
+  ║   ██║ ╚████║██║╚██████╗██║  ██║███████╗██║  ██║            ║
+  ║   ╚═╝  ╚═══╝╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝            ║
+  ║                                                            ║
+  ║                    Skills Bundle Installer                 ║
+  ║                                                            ║
+  ╚════════════════════════════════════════════════════════════╝
+  `));
+  
+  console.log(chalk.bold(`\n${pkg.name} v${pkg.version}\n`));
 
   const argv = minimist(process.argv.slice(2), {
     boolean: ['full', 'skills-only', 'cursor-only', 'yes', 'force', 'nuclear', 'help'],
