@@ -28,6 +28,10 @@ Check for changes in `knowledge-base/documents/` directory.
 
 **Output:** List of changed files in KB documents.
 
+**Post-pull auto-sync (optional):**
+- **Mac/Linux:** Git hooks auto-run `build-kb` if documents changed
+- **Windows:** Run `./scripts/auto-sync-kb.sh` (Mac) or `.\scripts\auto-sync-kb.ps1` (Windows)
+
 ---
 
 ### Step 2 — Detect document changes
