@@ -355,19 +355,17 @@ async function main() {
     console.log(chalk.cyan(`
   ╔════════════════════════════════════════════════════════════╗
   ║                                                            ║
-  ║   ███████╗ ██████╗ ███████╗ ██████╗██╗  ██╗██╗  ██╗██╗     ║
-  ║   ██╔════╝██╔═══██╗██╔════╝██╔════╝██║  ██║╚██╗██╔╝██║     ║
-  ║   █████╗  ██║   ██║█████╗  ██║     ███████║ ╚███╔╝ ██║     ║
-  ║   ██╔══╝  ██║   ██║██╔══╝  ██║     ██╔══██║ ██╔██╗ ██║     ║
-  ║   ██║     ╚██████╔╝███████╗╚██████╗██║  ██║██╔╝ ██╗██║     ║
-  ║   ╚═╝      ╚═════╝ ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ║
+  ║   DDDD    EEEEE   V   V   K   K   III   TTTT                 ║
+  ║   D   D   E      V   V   K  K    I      T                   ║
+  ║   D   D   EEEE   V   V   KKK     I      T                   ║
+  ║   D   D   E      V V    K  K    I      T                   ║
+  ║   DDDD    EEEEE   V     K   K   III    T                   ║
   ║                                                            ║
-  ║                    Skills Bundle Installer                 ║
-  ║                        devkit v${pkg.version}                  ║
+  ║                        devkit                             ║
   ║                                                            ║
   ╚════════════════════════════════════════════════════════════╝
   `));
-    console.log(chalk.bold(`\n${pkg.name} v${pkg.version}\n`));
+    console.log(chalk.bold(`Installing skills bundle...\n`));
     const argv = minimist(process.argv.slice(2), {
         boolean: ['full', 'skills-only', 'cursor-only', 'yes', 'force', 'nuclear', 'help'],
         string: ['repo', 'project-dir'],
