@@ -5,7 +5,7 @@ Script to sync custom skills/workflows/templates to upstream repository via PR.
 ## Usage
 
 ```bash
-node scripts/sync-custom-to-repo.js
+node scripts/sync-custom-to-repo.mjs
 ```
 
 ## What it does
@@ -15,7 +15,7 @@ node scripts/sync-custom-to-repo.js
 3. Creates new branch in cloned repo
 4. Copies custom additions to cloned repo
 5. Commits and pushes branch to upstream
-6. Creates pull request
+6. Creates pull request (if GitHub CLI is available)
 7. Cleans up temp directory
 
 ## Requirements
@@ -43,5 +43,15 @@ Copying custom skills to cloned repo...
 
 ...
 
+Pushing branch to upstream...
+✓ Pushing branch to upstream (2.91s)
+
+Creating pull request...
+✓ PR created successfully
+
 === Sync complete ===
 ```
+
+## Note
+
+If GitHub CLI is not installed, the script will still push the branch and provide manual instructions for creating the PR.

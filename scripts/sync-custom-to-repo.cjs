@@ -2,7 +2,7 @@
 
 /**
  * Sync custom skills/workflows/templates to upstream repo via PR
- * Usage: node scripts/sync-custom-to-repo.js
+ * Usage: node scripts/sync-custom-to-repo.mjs
  */
 
 const { execSync } = require('child_process');
@@ -25,20 +25,11 @@ function log(message, color = 'reset') {
   console.log(`${colors[color]}${message}${colors.reset}`);
 }
 
-function exec(cmd, options = {}) {
-  try {
-    return execSync(cmd, { encoding: 'utf8', ...options }).trim();
-  } catch (error) {
-    if (options.ignoreError) return '';
-    throw error;
-  }
-}
-
-function step(message, action) {
+async function step(message, action) {
   log(`\n${message}...`, 'cyan');
   const start = Date.now();
   try {
-    action();
+    await action();
     const elapsed = ((Date.now() - start) / 1000).toFixed(2);
     log(`✓ ${message} (${elapsed}s)`, 'green');
   } catch (error) {
@@ -47,46 +38,52 @@ function step(message, action) {
   }
 }
 
-function detectCustomSkills() {
-  const skillsDir = join(REPO_ROOT, 'skills');
-  if (!existsSync(skillsDir)) return [];
+async function detectCustomSkills() {
+  const skillsDir = path.join(REPO_ROOT, 'skills');
+  if (!await fs.exists(skillsDir)) return [];
 
-  const skills = readdirSync(skillsDir, { withFileTypes: true })
-    .filter(d => d.isDirectory() && existsSync(join(skillsDir, d.name, 'SKILL.md')))
-    .map(d => d.name);
-
+  const skills = [];
+  for await (const d of await fs.readdir(skillsDir, { withFileTypes: true })) {
+    if (d.isDirectory() && await fs.exists(path.join(skillsDir, d.name, 'SKILL.md'))) {
+      skills.push(d.name);
+    }
+  }
   return skills;
 }
 
-function detectCustomWorkflows() {
-  const workflowsDir = join(REPO_ROOT, 'workflows');
-  if (!existsSync(workflowsDir)) return [];
+async function detectCustomWorkflows() {
+  const workflowsDir = path.join(REPO_ROOT, 'workflows');
+  if (!await fs.exists(workflowsDir)) return [];
 
-  const workflows = readdirSync(workflowsDir, { withFileTypes: true })
-    .filter(d => d.isDirectory())
-    .map(d => d.name);
-
+  const workflows = [];
+  for await (const d of await fs.readdir(workflowsDir, { withFileTypes: true })) {
+    if (d.isDirectory()) {
+      workflows.push(d.name);
+    }
+  }
   return workflows;
 }
 
-function detectCustomTemplates() {
-  const templatesDir = join(REPO_ROOT, 'templates');
-  if (!existsSync(templatesDir)) return [];
+async function detectCustomTemplates() {
+  const templatesDir = path.join(REPO_ROOT, 'templates');
+  if (!await fs.exists(templatesDir)) return [];
 
-  const templates = readdirSync(templatesDir, { withFileTypes: true })
-    .filter(d => d.isDirectory())
-    .map(d => d.name);
-
+  const templates = [];
+  for await (const d of await fs.readdir(templatesDir, { withFileTypes: true })) {
+    if (d.isDirectory()) {
+      templates.push(d.name);
+    }
+  }
   return templates;
 }
 
-function main() {
+async function main() {
   log('=== Sync Custom to Upstream Repo ===', 'cyan');
 
   // Detect custom additions
-  const customSkills = detectCustomSkills();
-  const customWorkflows = detectCustomWorkflows();
-  const customTemplates = detectCustomTemplates();
+  const customSkills = await detectCustomSkills();
+  const customWorkflows = await detectCustomWorkflows();
+  const customTemplates = await detectCustomTemplates();
 
   const total = customSkills.length + customWorkflows.length + customTemplates.length;
 
@@ -100,68 +97,68 @@ function main() {
   if (customWorkflows.length > 0) log(`  Workflows: ${customWorkflows.join(', ')}`, 'cyan');
   if (customTemplates.length > 0) log(`  Templates: ${customTemplates.join(', ')}`, 'cyan');
 
-  const tempDir = join(os.tmpdir(), `skills-sync-${Date.now()}`);
+  const tempDir = path.join(os.tmpdir(), `skills-sync-${Date.now()}`);
   const branchName = `sync-custom-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`;
 
   try {
-    step('Cloning upstream repo to temp directory', () => {
-      mkdirSync(tempDir, { recursive: true });
-      exec(`git clone ${REPO_URL} ${tempDir}`);
+    await step('Cloning upstream repo to temp directory', async () => {
+      await fs.mkdir(tempDir, { recursive: true });
+      await $`git clone ${REPO_URL} ${tempDir}`;
     });
 
-    step('Creating new branch in cloned repo', () => {
-      exec(`git checkout -b ${branchName}`, { cwd: tempDir });
+    await step('Creating new branch in cloned repo', async () => {
+      await $`git checkout -b ${branchName}`.cwd(tempDir);
     });
 
-    step('Copying custom skills to cloned repo', () => {
+    await step('Copying custom skills to cloned repo', async () => {
       if (customSkills.length > 0) {
-        const destSkillsDir = join(tempDir, 'skills');
-        mkdirSync(destSkillsDir, { recursive: true });
-        customSkills.forEach(skill => {
-          const src = join(REPO_ROOT, 'skills', skill);
-          const dest = join(destSkillsDir, skill);
-          cpSync(src, dest, { recursive: true });
-        });
+        const destSkillsDir = path.join(tempDir, 'skills');
+        await fs.mkdir(destSkillsDir, { recursive: true });
+        for (const skill of customSkills) {
+          const src = path.join(REPO_ROOT, 'skills', skill);
+          const dest = path.join(destSkillsDir, skill);
+          await $`cp -r ${src} ${dest}`;
+        }
       }
     });
 
-    step('Copying custom workflows to cloned repo', () => {
+    await step('Copying custom workflows to cloned repo', async () => {
       if (customWorkflows.length > 0) {
-        const destWorkflowsDir = join(tempDir, 'workflows');
-        mkdirSync(destWorkflowsDir, { recursive: true });
-        customWorkflows.forEach(wf => {
-          const src = join(REPO_ROOT, 'workflows', wf);
-          const dest = join(destWorkflowsDir, wf);
-          cpSync(src, dest, { recursive: true });
-        });
+        const destWorkflowsDir = path.join(tempDir, 'workflows');
+        await fs.mkdir(destWorkflowsDir, { recursive: true });
+        for (const wf of customWorkflows) {
+          const src = path.join(REPO_ROOT, 'workflows', wf);
+          const dest = path.join(destWorkflowsDir, wf);
+          await $`cp -r ${src} ${dest}`;
+        }
       }
     });
 
-    step('Copying custom templates to cloned repo', () => {
+    await step('Copying custom templates to cloned repo', async () => {
       if (customTemplates.length > 0) {
-        const destTemplatesDir = join(tempDir, 'templates');
-        mkdirSync(destTemplatesDir, { recursive: true });
-        customTemplates.forEach(tpl => {
-          const src = join(REPO_ROOT, 'templates', tpl);
-          const dest = join(destTemplatesDir, tpl);
-          cpSync(src, dest, { recursive: true });
-        });
+        const destTemplatesDir = path.join(tempDir, 'templates');
+        await fs.mkdir(destTemplatesDir, { recursive: true });
+        for (const tpl of customTemplates) {
+          const src = path.join(REPO_ROOT, 'templates', tpl);
+          const dest = path.join(destTemplatesDir, tpl);
+          await $`cp -r ${src} ${dest}`;
+        }
       }
     });
 
-    step('Committing changes in cloned repo', () => {
-      exec('git add -A', { cwd: tempDir });
+    await step('Committing changes in cloned repo', async () => {
+      await $`git add -A`.cwd(tempDir);
       const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' ');
-      exec(`git commit -m "Sync custom changes - ${timestamp}"`, { cwd: tempDir });
+      await $`git commit -m "Sync custom changes - ${timestamp}"`.cwd(tempDir);
     });
 
-    step('Pushing branch to upstream', () => {
-      exec(`git push -u origin ${branchName}`, { cwd: tempDir });
+    await step('Pushing branch to upstream', async () => {
+      await $`git push -u origin ${branchName}`.cwd(tempDir);
     });
 
-    step('Creating pull request', () => {
+    await step('Creating pull request', async () => {
       try {
-        exec(`gh pr create --base main --head ${branchName} --title "Sync custom changes" --body "Sync custom skills/workflows/templates from local devkit"`, { cwd: tempDir });
+        await $`gh pr create --base main --head ${branchName} --title "Sync custom changes" --body "Sync custom skills/workflows/templates from local devkit"`.cwd(tempDir);
         log('PR created successfully', 'green');
       } catch (error) {
         log('GitHub CLI not available or failed', 'yellow');
@@ -171,8 +168,8 @@ function main() {
     });
 
   } finally {
-    step('Cleaning up temp directory', () => {
-      rmSync(tempDir, { recursive: true, force: true });
+    await step('Cleaning up temp directory', async () => {
+      await fs.rm(tempDir, { recursive: true, force: true });
     });
   }
 
