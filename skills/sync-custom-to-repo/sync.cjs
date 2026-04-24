@@ -6,7 +6,7 @@
  */
 
 const { execSync } = require('child_process');
-const { existsSync, readdirSync, rmSync, mkdirSync } = require('fs');
+const { existsSync, readdirSync, rmSync, mkdirSync, copyFileSync, mkdirSync: fsMkdirSync } = require('fs');
 const { join, resolve } = require('path');
 const os = require('os');
 
@@ -80,6 +80,25 @@ function detectCustomTemplates() {
   return templates;
 }
 
+function copyDirectoryRecursive(src, dest) {
+  if (!existsSync(dest)) {
+    fsMkdirSync(dest, { recursive: true });
+  }
+
+  const entries = readdirSync(src, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const srcPath = join(src, entry.name);
+    const destPath = join(dest, entry.name);
+
+    if (entry.isDirectory()) {
+      copyDirectoryRecursive(srcPath, destPath);
+    } else {
+      copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
 function main() {
   log('=== Sync Custom to Upstream Repo ===', 'cyan');
 
@@ -123,7 +142,7 @@ function main() {
         for (const skill of customSkills) {
           const src = join(REPO_ROOT, 'skills', skill);
           const dest = join(destSkillsDir, skill);
-          execSync(`xcopy "${src}" "${dest}" /E /I /Y`, { stdio: 'inherit' });
+          copyDirectoryRecursive(src, dest);
         }
       }
     });
@@ -135,7 +154,7 @@ function main() {
         for (const wf of customWorkflows) {
           const src = join(REPO_ROOT, 'workflows', wf);
           const dest = join(destWorkflowsDir, wf);
-          execSync(`xcopy "${src}" "${dest}" /E /I /Y`, { stdio: 'inherit' });
+          copyDirectoryRecursive(src, dest);
         }
       }
     });
@@ -147,7 +166,7 @@ function main() {
         for (const tpl of customTemplates) {
           const src = join(REPO_ROOT, 'templates', tpl);
           const dest = join(destTemplatesDir, tpl);
-          execSync(`xcopy "${src}" "${dest}" /E /I /Y`, { stdio: 'inherit' });
+          copyDirectoryRecursive(src, dest);
         }
       }
     });
