@@ -6,6 +6,7 @@
  * Options:
  *   --push: Push directly to main branch
  *   --pr: Create branch, push, and create PR
+ *   --repo <url>: Target repository URL (e.g., https://github.com/user/repo.git)
  *   --branch <name>: Custom branch name (default: sync-custom-<timestamp>)
  */
 
@@ -40,18 +41,29 @@ function main() {
   const args = process.argv.slice(2);
   const pushToMain = args.includes('--push');
   const createPr = args.includes('--pr');
+  const repoArgIndex = args.indexOf('--repo');
+  const targetRepo = repoArgIndex !== -1 ? args[repoArgIndex + 1] : null;
   const branchArgIndex = args.indexOf('--branch');
   const customBranchName = branchArgIndex !== -1 ? args[branchArgIndex + 1] : null;
 
   if (!pushToMain && !createPr) {
     log('Usage:', 'yellow');
-    log('  node scripts/sync-custom-to-repo.js --push    # Push directly to main', 'cyan');
-    log('  node scripts/sync-custom-to-repo.js --pr      # Create PR from new branch', 'cyan');
-    log('  node scripts/sync-custom-to-repo.js --pr --branch <name>  # Custom branch name', 'cyan');
+    log('  node scripts/sync-custom-to-repo.js --push [--repo <url>]', 'cyan');
+    log('  node scripts/sync-custom-to-repo.js --pr [--repo <url>] [--branch <name>]', 'cyan');
+    log('');
+    log('Options:', 'yellow');
+    log('  --repo <url>  Target repository (e.g., https://github.com/user/repo.git)', 'cyan');
+    log('  --branch <name>  Custom branch name', 'cyan');
     return;
   }
 
   log('=== Sync to Repo ===', 'cyan');
+  if (targetRepo) {
+    log(`Target repo: ${targetRepo}`, 'cyan');
+  } else {
+    log('Target repo: origin (from git config)', 'cyan');
+  }
+  log('');
 
   // Check working tree
   const status = exec('git status --porcelain');
@@ -68,10 +80,20 @@ function main() {
   exec(`git commit -m "Sync custom changes - ${timestamp}"`);
   log('Changes committed', 'green');
 
+  // Add remote if specified
+  if (targetRepo) {
+    log('Adding target remote...', 'cyan');
+    exec('git remote remove sync-target 2>/dev/null || true', { ignoreError: true });
+    exec(`git remote add sync-target ${targetRepo}`);
+    log('Remote added', 'green');
+  }
+
+  const remote = targetRepo ? 'sync-target' : 'origin';
+
   if (pushToMain) {
-    log('Pushing to main...', 'cyan');
-    exec('git push origin main');
-    log('Pushed to main successfully', 'green');
+    log(`Pushing to ${remote}...`, 'cyan');
+    exec(`git push ${remote} main`);
+    log('Pushed successfully', 'green');
   } else if (createPr) {
     const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const branchName = customBranchName || `sync-custom-${timestamp}`;
@@ -79,19 +101,32 @@ function main() {
     log(`Creating branch: ${branchName}`, 'cyan');
     exec(`git checkout -b ${branchName}`);
     
-    log('Pushing to remote...', 'cyan');
-    exec(`git push -u origin ${branchName}`);
+    log(`Pushing to ${remote}...`, 'cyan');
+    exec(`git push -u ${remote} ${branchName}`);
     log('Branch pushed successfully', 'green');
     
     // Create PR
     try {
-      exec(`gh pr create --base main --head ${branchName} --title "Sync custom changes" --body "Sync custom skills/workflows/templates from local devkit"`);
-      log('PR created successfully', 'green');
+      const repoUrl = targetRepo || exec('git config --get remote.origin.url');
+      const repoMatch = repoUrl.match(/github\.com[:/](.+?)(\.git)?$/);
+      if (repoMatch) {
+        const repoPath = repoMatch[1];
+        exec(`gh pr create --base main --head ${branchName} --repo ${repoPath} --title "Sync custom changes" --body "Sync custom skills/workflows/templates from local devkit"`);
+        log('PR created successfully', 'green');
+      } else {
+        throw new Error('Not a GitHub repo');
+      }
     } catch (error) {
       log('GitHub CLI not available or failed', 'yellow');
       log('Please create PR manually:', 'yellow');
+      log(`  Remote: ${remote}`, 'yellow');
       log(`  Branch: ${branchName}`, 'yellow');
     }
+  }
+
+  // Cleanup temporary remote
+  if (targetRepo) {
+    exec('git remote remove sync-target', { ignoreError: true });
   }
 
   log('\n=== Sync complete ===', 'green');
