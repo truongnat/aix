@@ -1293,6 +1293,34 @@
     ]
   },
   {
+    "name": "ui-reverse-engineer-pro",
+    "folder": "ui-reverse-engineer-pro",
+    "description": "Professional skill for reverse-engineering UI from images, screenshots, mockups, or reference UIs into clean, maintainable, system-based code without blind pixel cloning",
+    "triggers": [],
+    "when_to_use": [
+      "Converting screenshots/mockups to UI code",
+      "Analyzing reference UIs for design system extraction",
+      "Working with visual-only references (PNG/JPG without design files)",
+      "AI-generated mockups that need clean implementation",
+      "Figma exports that are images only",
+      "Building UI from customer-provided screenshots",
+      "Extracting layout patterns from competitor UIs",
+      "Reverse-engineering UI for component library development",
+      "**Trigger keywords:** image to code, screenshot to UI, mockup implementation, reverse engineer UI, clone UI, design from reference, visual to code, pixel-perfect (avoid), UI analysis, layout extraction"
+    ],
+    "references": [
+      "7-step-process.md",
+      "anti-patterns.md",
+      "blur-and-box.md",
+      "core-methodology.md",
+      "lastc-framework.md",
+      "platform-specific.md",
+      "prompt-templates.md",
+      "quality-rubric.md",
+      "quick-run.md"
+    ]
+  },
+  {
     "name": "web-research-pro",
     "folder": "web-research-pro",
     "description": "Production-grade multi-step web and technical research: verification model (source hierarchy, triangulation), failure modes (single weak source, SEO drift, 404/link rot, fabricated citations), decision trade-offs (depth vs time, KB-first vs web-first, archive vs live), quality guardrails (no invented URLs or benchmarks; uncertainty explicit).\n\nUse this skill when the user needs **reliable** answers from **external** sources (framework docs, APIs, standards), **not** only local Markdown — or when combining **local KB** with **web** verification. Complements **`repo-tooling-pro`** (local RAG scripts) but does not replace **reading** `knowledge-base/documents/` when the answer is already in-repo.\n\nUse **with** **`repo-tooling-pro`** when the corpus is **this** repo’s KB; **`security-pro`** when sources might touch **secrets** or **unsafe** links; **`planning-pro`** when research informs release decisions.\n\nTriggers: \"search the docs\", \"official documentation\", \"404\", \"source evaluation\", \"citation\", \"compare sources\", \"multi-step research\", \"API reference\", \"changelog\", \"is this still true\", \"link rot\", \"query_kb\", \"Wayback\", \"SEO blog wrong\", \"breaking change\", \"deprecation\", \"RFC\", \"MDN\", \"Stack Overflow outdated\".",

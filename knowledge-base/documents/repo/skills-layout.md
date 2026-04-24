@@ -18,6 +18,7 @@ skills/
   examples/
     skill-template/
   router-pro/
+  ui-reverse-engineer-pro/
   react-pro/
   nextjs-pro/
   react-native-pro/

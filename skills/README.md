@@ -125,6 +125,7 @@ Use skill **`skills-self-review-pro`** for how to read tiers and manual checklis
 | [postgresql-pro](postgresql-pro/) | PostgreSQL — SQL, migrations, RLS |
 | [sql-data-access-pro](sql-data-access-pro/) | SQLite & safe access patterns |
 | [testing-pro](testing-pro/) | Test strategy — pyramid, CI, flakes |
+| [ui-reverse-engineer-pro](ui-reverse-engineer-pro/) | UI reverse engineering — images to system-based code |
 | [security-pro](security-pro/) | Threat-aware hardening |
 | [auth-pro](auth-pro/) | Authn / authz — sessions, OAuth, tokens |
 | [electron-pro](electron-pro/) | Electron — IPC, packaging |
