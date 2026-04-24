@@ -47,57 +47,34 @@ Automatically analyze a user request, research and optimize the prompt for clari
 
 ## Output format
 
-Provide a structured response with:
+**Internal analysis (do not output to user):**
+1. Analyze the request - extract domain, action, constraints, output format
+2. Research and optimize the prompt - add context, clarify ambiguities, make actionable
+3. Discover relevant skills/workflows/templates - match triggers, descriptions, procedures
+4. Coordinate execution - sequence based on dependencies, define handoffs
 
-1. **Analyzed request** - What was understood from the original input
-2. **Optimized prompt** - Refined, clean prompt for AI execution
-3. **Skills/workflows/templates identified** - Which skills, workflows, or templates to use and why
-4. **Execution plan** - Step-by-step workflow with clear next steps
-5. **Context requirements** - What context is needed
-6. **Potential issues** - Known risks or edge cases
+**Output to user (concise):**
+- Brief summary of what will be done (1 sentence)
+- Primary skill(s)/workflow(s) being used
+- Execute immediately without showing intermediate analysis
+
+**Example output:**
+"Analyzing request... Using auth-pro for authentication and react-pro for React integration. Starting implementation now."
 
 ## Example
 
 **Input**: "I need to add login to my React app"
 
-**Output**:
-```
-### Analyzed request
+**Internal analysis** (hidden):
 - Domain: React web application
 - Action: Implement authentication/login
 - Context: Existing React app (assumed SPA)
+- Optimized prompt: "Implement OAuth 2.0 Authorization Code Flow with PKCE..."
+- Skills: auth-pro (primary), react-pro (secondary), security-pro (optional)
+- Execution: auth-pro → react-pro → security-pro
 
-### Optimized prompt
-"Implement OAuth 2.0 Authorization Code Flow with PKCE for a React Single Page Application. The application uses React and needs secure authentication with login/logout functionality. Focus on: (1) secure token storage avoiding localStorage, (2) proper OAuth flow with PKCE, (3) login/logout UI components, (4) integration with a standard OAuth provider (e.g., Auth0, Google), (5) session management and token refresh. Provide code examples with proper error handling."
-
-### Skills/workflows/templates identified
-- Primary: auth-pro (authentication implementation) - matched via trigger "authentication"
-- Secondary: react-pro (React-specific patterns) - matched via trigger "React"
-- Optional: security-pro (security review) - dependency of auth-pro
-- Template: report/architecture-decision-record.md (if ADR needed)
-
-### Execution plan
-1. Execute auth-pro with the optimized prompt
-2. Execute react-pro for React-specific integration patterns
-3. Optionally execute security-pro for security review
-4. Use architecture-decision-record template if documenting the decision
-
-### Discovery method
-- Skills discovered via automatic trigger/description matching from skills/
-- Workflows matched by procedure name
-- Templates matched by output type
-
-### Context requirements
-- React version and setup
-- Existing authentication infrastructure (if any)
-- OAuth provider preferences
-- Security requirements
-
-### Potential issues
-- Token storage in SPA environment
-- CSRF protection
-- Session management
-```
+**Output to user**:
+"Analyzing request... Using auth-pro for authentication and react-pro for React integration. Starting implementation now."
 
 ## Skill reference
 
