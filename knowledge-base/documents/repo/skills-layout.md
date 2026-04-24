@@ -17,6 +17,7 @@ skills/
   SKILL_AUTHORING_RULES.md
   examples/
     skill-template/
+  router-pro/
   react-pro/
   nextjs-pro/
   react-native-pro/
@@ -60,6 +61,8 @@ skills/
   bug-discovery-pro/
   skills-self-review-pro/
   repo-tooling-pro/
+  typescript-pro/
+  ci-cd-pro/
 ```
 
 Each skill requires **`SKILL.md`** with YAML frontmatter (`name`, `description`, optional `metadata.short-description`). Optional folders: `references/`, `scripts/`, `assets/`. Many bundles also ship a short **`README.md`** (entry point + links) for IDE or repo browsing — not required by validation, but preferred for Tier A polish.
