@@ -102,8 +102,9 @@ function main() {
 
   const tempDir = join(os.tmpdir(), `skills-sync-${Date.now()}`);
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const timeStr = new Date().toISOString().slice(11, 19).replace(/:/g, '');
   const contentStr = [...customSkills, ...customWorkflows, ...customTemplates].join('-').slice(0, 30);
-  const branchName = `sync-${contentStr}-${dateStr}`;
+  const branchName = `sync-${contentStr}-${dateStr}-${timeStr}`;
 
   try {
     step('Cloning upstream repo to temp directory', () => {
