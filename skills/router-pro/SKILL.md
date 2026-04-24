@@ -189,64 +189,35 @@ When multiple skills or workflows are needed:
 
 ## Suggested response format (STRICT)
 
-1. **Analyzed request**
-   - Original input
-   - Key information extracted
-   - Intent and scope identified
+**Internal analysis (do not output):**
+1. Analyze the user input to understand intent, scope, and complexity
+2. Research and optimize the prompt for clarity, accuracy, and completeness
+3. Discover relevant skills, workflows, or templates
+4. Define execution plan with skill/workflow execution order
+5. Identify context requirements and potential issues
 
-2. **Optimized prompt**
-   - Refined prompt for AI execution
-   - Added context and constraints
-   - Clarified ambiguities
-   - Expected output format
+**Output to user (concise):**
+- Brief summary of what will be done
+- Primary skill(s)/workflow(s) being used
+- Execute immediately without showing intermediate analysis
 
-3. **Skills/workflows/templates identified**
-   - Primary skill(s), workflow, or template to use
-   - Secondary/dependency skills (from skill metadata dependencies)
-   - Rationale for each selection (trigger matches, description relevance, domain alignment)
-   - Preference for workflow over skills when applicable
-   - Template recommendation for structured output
-   - Relevance scores for each match
-
-4. **Execution plan**
-   - Step-by-step workflow
-   - Skill/workflow execution order
-   - Handoff points between skills/workflows
-   - Clear next steps
-
-5. **Context requirements**
-   - What context is needed
-   - What information to preserve
-   - What assumptions are made
-
-6. **Potential issues**
-   - Known risks or edge cases
-   - Skill/workflow/template conflicts or overlaps
-   - Dependencies that might fail
-   - Template customization needs
+**Example output:**
+"Analyzing request... Using nestjs-pro for backend guard patterns and nextjs-pro for frontend error handling. Starting code review now."
 
 ## Quick example
 
 **User input**: "I need to add login to my React app"
 
-**Analyzed request**:
+**Internal analysis** (hidden):
 - Domain: React web application
 - Action: Implement authentication/login
 - Context: Existing React app (assumed SPA)
+- Optimized prompt: "Implement OAuth 2.0 Authorization Code Flow with PKCE for a React Single Page Application..."
+- Skills: auth-pro (primary), react-pro (secondary), security-pro (optional)
+- Execution: auth-pro → react-pro → security-pro
 
-**Optimized prompt**: "Implement OAuth 2.0 Authorization Code Flow with PKCE for a React Single Page Application. The application uses React and needs secure authentication with login/logout functionality. Focus on: (1) secure token storage avoiding localStorage, (2) proper OAuth flow with PKCE, (3) login/logout UI components, (4) integration with a standard OAuth provider (e.g., Auth0, Google), (5) session management and token refresh. Provide code examples with proper error handling."
-
-**Skills/workflows identified**:
-- Primary: auth-pro (authentication implementation)
-- Secondary: react-pro (React-specific patterns)
-- Optional: security-pro (security review)
-
-**Execution plan**:
-1. Use auth-pro to determine auth method and implementation approach
-2. Use react-pro for React-specific integration patterns and component structure
-3. Optionally use security-pro for security review of the implementation
-
-**Next steps**: Execute auth-pro with the optimized prompt, then react-pro for React integration.
+**Output to user**:
+"Analyzing request... Using auth-pro for authentication implementation and react-pro for React-specific patterns. Starting implementation now."
 
 ## Checklist before calling the skill done
 
