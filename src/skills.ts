@@ -399,7 +399,7 @@ async function main() {
   ╚════════════════════════════════════════════════════════════╝
   `));
   
-  console.log(chalk.bold(`\n${pkg.name} v${pkg.version}\n`));
+  console.log(chalk.bold(`Installing skills bundle...\n`));
 
   const argv = minimist(process.argv.slice(2), {
     boolean: ['full', 'skills-only', 'cursor-only', 'yes', 'force', 'nuclear', 'help'],
