@@ -135,6 +135,24 @@ function shouldIgnore(rel) {
 }
 function syncBundle(src, dest) {
     const spin = ora('Cleaning bundle destination...').start();
+    // Preserve custom skills that are not in the source bundle
+    const srcSkills = existsSync(join(src, 'skills'))
+        ? readdirSync(join(src, 'skills')).filter((f) => lstatSync(join(src, 'skills', f)).isDirectory())
+        : [];
+    const destSkills = existsSync(join(dest, 'skills'))
+        ? readdirSync(join(dest, 'skills')).filter((f) => lstatSync(join(dest, 'skills', f)).isDirectory())
+        : [];
+    const customSkills = destSkills.filter((s) => !srcSkills.includes(s));
+    if (customSkills.length > 0) {
+        // Temporarily move custom skills to a safe location
+        const tempDir = join(dest, '.skills-backup');
+        mkdirSync(tempDir, { recursive: true });
+        for (const skill of customSkills) {
+            const skillPath = join(dest, 'skills', skill);
+            const backupPath = join(tempDir, skill);
+            cpSync(skillPath, backupPath, { recursive: true });
+        }
+    }
     rmSync(dest, { recursive: true, force: true });
     spin.text = 'Syncing files to bundle...';
     cpSync(src, dest, {
@@ -149,7 +167,22 @@ function syncBundle(src, dest) {
         },
     });
     writeFileSync(join(dest, BUNDLE_MARKER), '');
-    spin.succeed('Bundle synced to disk');
+    // Restore custom skills
+    if (customSkills.length > 0) {
+        const tempDir = join(dest, '.skills-backup');
+        for (const skill of customSkills) {
+            const backupPath = join(tempDir, skill);
+            const skillPath = join(dest, 'skills', skill);
+            if (existsSync(backupPath)) {
+                cpSync(backupPath, skillPath, { recursive: true });
+            }
+        }
+        rmSync(tempDir, { recursive: true, force: true });
+        spin.succeed(`Bundle synced (preserved ${customSkills.length} custom skills)`);
+    }
+    else {
+        spin.succeed('Bundle synced to disk');
+    }
 }
 function linkRules(bundleDir, project) {
     const rulesSrc = join(bundleDir, '.cursor', 'rules');
@@ -269,6 +302,32 @@ function installAllSkills(repoRoot, projectDir, mode, allIdes) {
         spin.warn(chalk.yellow(`Installed ${ok}/${dirs.length} skills (${fail} failed)`));
     else
         spin.succeed(chalk.green(`Installed ${ok} skills`));
+    // Preserve custom skills in project directory
+    const customSkills = getCustomSkills(projectDir, repoRoot);
+    if (customSkills.length > 0) {
+        console.log(chalk.cyan(`\nPreserved ${customSkills.length} custom skills: ${customSkills.join(', ')}`));
+    }
+}
+function getCustomSkills(projectDir, bundleDir) {
+    const bundleSkills = existsSync(join(bundleDir, 'skills'))
+        ? new Set(readdirSync(join(bundleDir, 'skills')).filter((f) => lstatSync(join(bundleDir, 'skills', f)).isDirectory()))
+        : new Set();
+    const customSkills = [];
+    const ides = ['.cursor', '.claude', '.agent', '.codex'];
+    for (const ide of ides) {
+        const skillsDir = join(projectDir, ide, 'skills');
+        if (!existsSync(skillsDir))
+            continue;
+        const skills = readdirSync(skillsDir, { withFileTypes: true })
+            .filter((d) => d.isDirectory() && existsSync(join(skillsDir, d.name, 'SKILL.md')))
+            .map((d) => d.name);
+        for (const skill of skills) {
+            if (!bundleSkills.has(skill) && !customSkills.includes(skill)) {
+                customSkills.push(skill);
+            }
+        }
+    }
+    return customSkills;
 }
 const GIT_EXCLUDE_MARKER_START = '# skills-begin';
 const GIT_EXCLUDE_MARKER_END = '# skills-end';
