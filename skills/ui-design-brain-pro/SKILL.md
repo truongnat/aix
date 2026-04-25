@@ -1,35 +1,49 @@
 ---
 name: ui-design-brain-pro
-description: |
-  Production-grade UI component knowledge from 60+ documented interface patterns.
-  Best practices, layout guidance, and usage rules from component.gallery.
-  Replaces generic AI output with real design-system knowledge.
-  
-  Use when building web interfaces, dashboards, forms, navigation, or any UI 
-  that needs modern, minimal, SaaS-quality output grounded in conventions.
-when_to_use:
-  - Building web interfaces or pages
-  - Creating dashboards or admin panels
-  - Designing forms and inputs
-  - Building navigation systems
-  - Creating data tables or lists
-  - Designing cards, modals, dialogs
-  - Need component selection guidance
-  - Reviewing existing UI for best practices
-when_not_to_use:
-  - Mobile native apps (use platform-design-pro)
-  - Highly customized artistic designs (use frontend-design-pro)
-  - Brand-new component inventions (research first)
-inputs:
-  - component_type: Button, card, modal, table, etc.
-  - context: Dashboard, marketing, e-commerce, etc.
-  - tech_stack: React, Vue, HTML/CSS, etc.
-outputs:
-  - component_pattern: Specific pattern with rationale
-  - layout_guidance: Responsive behavior, spacing
-  - interaction_rules: States, accessibility
-  - code_structure: Recommended implementation
+description: "Production-grade UI component knowledge from 60+ documented interface\
+  \ patterns.\nBest practices, layout guidance, and usage rules from component.gallery.\n\
+  Replaces generic AI output with real design-system knowledge.\n\nUse when building\
+  \ web interfaces, dashboards, forms, navigation, or any UI \nthat needs modern,\
+  \ minimal, SaaS-quality output grounded in conventions.\n"
+metadata:
+  content-language: en
+  level: professional
 ---
+
+## Boundary
+
+[Define boundary with related skills]
+
+## When to use
+
+- Building web interfaces or pages
+- Creating dashboards or admin panels
+- Designing forms and inputs
+- Building navigation systems
+- Creating data tables or lists
+- Designing cards, modals, dialogs
+- Need component selection guidance
+- Reviewing existing UI for best practices
+
+## When not to use
+
+- Mobile native apps (use platform-design-pro)
+- Highly customized artistic designs (use frontend-design-pro)
+- Brand-new component inventions (research first)
+
+## Required inputs
+
+- **component_type**: Button, card, modal, table, etc.
+- **context**: Dashboard, marketing, e-commerce, etc.
+- **tech_stack**: React, Vue, HTML/CSS, etc.
+
+## Expected output
+
+- **component_pattern**: Specific pattern with rationale
+- **layout_guidance**: Responsive behavior, spacing
+- **interaction_rules**: States, accessibility
+- **code_structure**: Recommended implementation
+
 
 ## Workflow
 

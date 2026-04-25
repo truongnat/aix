@@ -1,35 +1,49 @@
 ---
 name: frontend-design-pro
-description: |
-  Anti-slop frontend design with distinctive aesthetics, motion, and spatial composition. 
-  Breaks AI-generated clichés (no Inter/Roboto, no purple-on-white) for memorable, 
-  professional interfaces with character and purpose.
-  
-  Use when building landing pages, marketing sites, portfolios, dashboards, or any 
-  interface where visual personality matters.
-when_to_use:
-  - Building landing pages or marketing sites
-  - Creating portfolio projects
-  - Designing dashboards with visual identity
-  - Breaking out of generic AI-generated aesthetics
-  - Need distinctive typography, color, and motion
-  - Client work requiring professional polish
-when_not_to_use:
-  - Internal tools where consistency > creativity
-  - Strict corporate design systems already defined
-  - Rapid prototyping without aesthetic requirements
-  - Accessibility-first projects (use accessibility-pro first)
-inputs:
-  - target_audience: Who uses this and why
-  - aesthetic_direction: Desired tone (minimalist, brutalist, playful, elegant, etc.)
-  - content_type: Landing page, dashboard, form, e-commerce, etc.
-  - tech_stack: React, Vue, vanilla HTML, Next.js, etc.
-outputs:
-  - design_decisions: Documented aesthetic choices with rationale
-  - component_code: Styled components following design principles
-  - css_variables: Cohesive color palette and typography system
-  - motion_spec: Animation timing and choreography notes
+description: "Anti-slop frontend design with distinctive aesthetics, motion, and spatial\
+  \ composition. \nBreaks AI-generated clich\xE9s (no Inter/Roboto, no purple-on-white)\
+  \ for memorable, \nprofessional interfaces with character and purpose.\n\nUse when\
+  \ building landing pages, marketing sites, portfolios, dashboards, or any \ninterface\
+  \ where visual personality matters.\n"
+metadata:
+  content-language: en
+  level: professional
 ---
+
+## Boundary
+
+[Define boundary with related skills]
+
+## When to use
+
+- Building landing pages or marketing sites
+- Creating portfolio projects
+- Designing dashboards with visual identity
+- Breaking out of generic AI-generated aesthetics
+- Need distinctive typography, color, and motion
+- Client work requiring professional polish
+
+## When not to use
+
+- Internal tools where consistency > creativity
+- Strict corporate design systems already defined
+- Rapid prototyping without aesthetic requirements
+- Accessibility-first projects (use accessibility-pro first)
+
+## Required inputs
+
+- **target_audience**: Who uses this and why
+- **aesthetic_direction**: Desired tone (minimalist, brutalist, playful, elegant, etc.)
+- **content_type**: Landing page, dashboard, form, e-commerce, etc.
+- **tech_stack**: React, Vue, vanilla HTML, Next.js, etc.
+
+## Expected output
+
+- **design_decisions**: Documented aesthetic choices with rationale
+- **component_code**: Styled components following design principles
+- **css_variables**: Cohesive color palette and typography system
+- **motion_spec**: Animation timing and choreography notes
+
 
 ## Workflow
 

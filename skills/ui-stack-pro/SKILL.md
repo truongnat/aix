@@ -1,34 +1,48 @@
 ---
 name: ui-stack-pro
-description: |
-  Configuration-driven design system enforcement for all AI-generated UI.
-  8px grid, 60-30-10 color rule, typography scale, dark mode, 5-state interactions.
-  Prevents inconsistent padding, mismatched colors, and forgotten hover states.
-  
-  Use when generating any UI components to ensure design system consistency 
-  across the entire project.
-when_to_use:
-  - Generating any UI component
-  - Starting new project with design system
-  - Reviewing existing UI for consistency
-  - Creating design tokens
-  - Ensuring dark mode support
-  - Verifying accessibility compliance
-  - Onboarding new team members to design system
-when_not_to_use:
-  - Legacy projects without design system buy-in
-  - One-off prototypes without UI requirements
-  - Projects with established, different conventions
-inputs:
-  - component_type: Button, card, form, modal, etc.
-  - current_tokens: Existing design tokens (if any)
-  - platform: Web, iOS, Android
-outputs:
-  - compliant_component: Following 8px grid, 60-30-10 color
-  - token_spec: CSS variables or design tokens
-  - state_implementation: 5 interaction states
-  - dark_mode_mapping: Light/dark theme values
+description: "Configuration-driven design system enforcement for all AI-generated\
+  \ UI.\n8px grid, 60-30-10 color rule, typography scale, dark mode, 5-state interactions.\n\
+  Prevents inconsistent padding, mismatched colors, and forgotten hover states.\n\n\
+  Use when generating any UI components to ensure design system consistency \nacross\
+  \ the entire project.\n"
+metadata:
+  content-language: en
+  level: professional
 ---
+
+## Boundary
+
+[Define boundary with related skills]
+
+## When to use
+
+- Generating any UI component
+- Starting new project with design system
+- Reviewing existing UI for consistency
+- Creating design tokens
+- Ensuring dark mode support
+- Verifying accessibility compliance
+- Onboarding new team members to design system
+
+## When not to use
+
+- Legacy projects without design system buy-in
+- One-off prototypes without UI requirements
+- Projects with established, different conventions
+
+## Required inputs
+
+- **component_type**: Button, card, form, modal, etc.
+- **current_tokens**: Existing design tokens (if any)
+- **platform**: Web, iOS, Android
+
+## Expected output
+
+- **compliant_component**: Following 8px grid, 60-30-10 color
+- **token_spec**: CSS variables or design tokens
+- **state_implementation**: 5 interaction states
+- **dark_mode_mapping**: Light/dark theme values
+
 
 ## Workflow
 

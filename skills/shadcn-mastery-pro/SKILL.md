@@ -1,34 +1,47 @@
 ---
 name: shadcn-mastery-pro
-description: |
-  Deep expertise in shadcn/ui components, patterns, and best practices.
-  Knows every primitive, block, and customization technique.
-  Generates accessible, composable, well-structured React components.
-  
-  Use when building with shadcn/ui, customizing themes, or creating 
-  component libraries based on Radix primitives.
-when_to_use:
-  - Building with shadcn/ui
-  - Customizing shadcn components
-  - Creating new components following shadcn patterns
-  - Theme customization (colors, radius, etc.)
-  - Need accessible React components
-  - Building design systems on shadcn
-when_not_to_use:
-  - Not using React/Tailwind
-  - Need Vue/Angular components
-  - Building from scratch without component library
-inputs:
-  - component_type: Button, Dialog, Table, etc.
-  - customization: Theme, size, variant requirements
-  - composition: How components work together
-  - accessibility: ARIA, keyboard nav requirements
-outputs:
-  - component_code: shadcn/ui compatible code
-  - theme_config: CSS variables and Tailwind config
-  - composition_pattern: How to combine primitives
-  - accessibility_notes: ARIA labels, roles, etc.
+description: "Deep expertise in shadcn/ui components, patterns, and best practices.\n\
+  Knows every primitive, block, and customization technique.\nGenerates accessible,\
+  \ composable, well-structured React components.\n\nUse when building with shadcn/ui,\
+  \ customizing themes, or creating \ncomponent libraries based on Radix primitives.\n"
+metadata:
+  content-language: en
+  level: professional
 ---
+
+## Boundary
+
+[Define boundary with related skills]
+
+## When to use
+
+- Building with shadcn/ui
+- Customizing shadcn components
+- Creating new components following shadcn patterns
+- Theme customization (colors, radius, etc.)
+- Need accessible React components
+- Building design systems on shadcn
+
+## When not to use
+
+- Not using React/Tailwind
+- Need Vue/Angular components
+- Building from scratch without component library
+
+## Required inputs
+
+- **component_type**: Button, Dialog, Table, etc.
+- **customization**: Theme, size, variant requirements
+- **composition**: How components work together
+- **accessibility**: ARIA, keyboard nav requirements
+
+## Expected output
+
+- **component_code**: shadcn/ui compatible code
+- **theme_config**: CSS variables and Tailwind config
+- **composition_pattern**: How to combine primitives
+- **accessibility_notes**: ARIA labels, roles, etc.
+
 
 ## Workflow
 

@@ -1,224 +1,224 @@
-# 📋 Tiêu chuẩn Báo cáo & Đầu ra — Dành cho Agent và Con người
+# 📋 Output & Report Standards — For Agents and Humans
 
-> **Ngày:** 2026-04-23
-> **Tác giả:** truongdq1
-> **Phiên bản:** 1.0
-> **Trạng thái:** Hoàn tất
-
----
-
-## 🎯 Mục đích
-
-Chuẩn hóa cách trình bày đầu ra cho:
-
-* Gỡ lỗi / Phân tích nguyên nhân gốc (RCA)
-* Rà soát mã nguồn
-* Kiểm tra bảo mật
-* Phân tích hiệu năng
-* Báo cáo sự cố
-* Quy trình AI
-
-Yêu cầu:
-
-* Định dạng thống nhất
-* Dễ đọc, dễ quét nhanh
-* Luôn dẫn tới hành động cụ thể
-* Áp dụng cho cả con người và hệ thống tự động
+> **Date:** 2026-04-25  
+> **Author:** truongdq1  
+> **Version:** 1.1  
+> **Status:** Complete
 
 ---
 
-# 🚨 1. Phân loại mức độ
+## 🎯 Purpose
 
-| Mức độ        | Ký hiệu | Ý nghĩa                        |
-| ------------- | ------- | ------------------------------ |
-| Nghiêm trọng  | 🔴      | Chặn hệ thống, phải xử lý ngay |
-| Quan trọng    | 🟡      | Ảnh hưởng lớn, cần ưu tiên     |
-| Trung bình    | 🟠      | Có vấn đề, nên cải thiện       |
-| Nhỏ           | 🟢      | Không bắt buộc                 |
-| Tốt           | ✅       | Đúng chuẩn                     |
-| Đang xử lý    | 🔵      | Đang thực hiện                 |
-| Không áp dụng | ⚪       | Ngoài phạm vi                  |
+Standardize output presentation for:
+
+* Debugging / Root Cause Analysis (RCA)
+* Code Review
+* Security Audit
+* Performance Analysis
+* Incident Reports
+* AI Workflows
+
+Requirements:
+
+* Unified format
+* Easy to read and scan
+* Always leads to concrete action
+* Applies to both humans and automated systems
 
 ---
 
-# 📦 2. Khối thông tin
+# 🚨 1. Severity Levels
+
+| Level | Symbol | Meaning |
+|-------|--------|---------|
+| Critical | 🔴 | System-blocking, must fix immediately |
+| High | 🟡 | Major impact, prioritize |
+| Medium | 🟠 | Issues present, should improve |
+| Low | 🟢 | Not required |
+| Good | ✅ | Meets standard |
+| In Progress | 🔵 | Currently working |
+| Not Applicable | ⚪ | Out of scope |
+
+---
+
+# 📦 2. Information Blocks
 
 ```markdown
 > [!NOTE]
-> Thông tin bổ sung
+> Additional information
 
 > [!TIP]
-> Thực hành tốt / tối ưu
+> Best practice / optimization
 
 > [!WARNING]
-> Cảnh báo rủi ro
+> Risk warning
 
 > [!CAUTION]
-> Nguy cơ nghiêm trọng
+> Critical danger
 ```
 
 ---
 
-# 🧾 3. Tiêu đề báo cáo
+# 🧾 3. Report Header
 
 ```markdown
-# {{Loại báo cáo}} — {{Đối tượng}}
+# {{Report Type}} — {{Subject}}
 
-> **Ngày:** {{ISO date}}  
-> **Tác giả:** {{name}}  
-> **Phiên bản:** {{version}}  
-> **Trạng thái:** Nháp | Hoàn tất | Thay thế  
-> **Độ tin cậy:** Cao | Trung bình | Thấp
+> **Date:** {{ISO date}}  
+> **Author:** {{name}}  
+> **Version:** {{version}}  
+> **Status:** Draft | Complete | Superseded  
+> **Confidence:** High | Medium | Low
 ```
 
 ---
 
-# 🌍 4. Ngữ cảnh
+# 🌍 4. Context
 
 ```markdown
-## Ngữ cảnh
+## Context
 
-- Hệ thống:
-- Phạm vi:
-- Môi trường:
-- Giả định:
-- Ràng buộc:
+- System:
+- Scope:
+- Environment:
+- Assumptions:
+- Constraints:
 ```
 
 ---
 
-# ❗ 5. Vấn đề
+# ❗ 5. Issue
 
 ```markdown
-## Vấn đề
+## Issue
 
-- Kỳ vọng:
-- Thực tế:
-- Ảnh hưởng:
+- Expected:
+- Actual:
+- Impact:
 ```
 
 ---
 
-# 🧠 6. Phân tích
+# 🧠 6. Analysis
 
 ```markdown
-## Phân tích
+## Analysis
 
-- Quan sát:
-- Giả thuyết:
-- Xác minh:
-- Nguyên nhân gốc:
+- Observations:
+- Hypothesis:
+- Verification:
+- Root Cause:
 ```
 
 ---
 
-# 🧪 7. Cách tái hiện
+# 🧪 7. Reproduction Steps
 
 ```markdown
-## Cách tái hiện
+## Steps to Reproduce
 
-1. Bước 1
-2. Bước 2
-3. Kết quả mong đợi
-4. Kết quả thực tế
+1. Step 1
+2. Step 2
+3. Expected result
+4. Actual result
 ```
 
 ---
 
-# ⚠️ 8. Phát hiện
+# ⚠️ 8. Findings
 
 ```markdown
-## Phát hiện
+## Findings
 
-| Vấn đề | Mức độ | Mô tả | Ảnh hưởng |
-|-------|--------|------|----------|
-| Ví dụ | 🔴 | Mô tả | Ảnh hưởng |
+| Issue | Severity | Description | Impact |
+|-------|----------|-------------|--------|
+| Example | 🔴 | Description | Impact |
 ```
 
 ---
 
-# 🧨 9. Vấn đề ưu tiên
+# 🧨 9. Priority Issues
 
 ```markdown
-## Vấn đề ưu tiên
+## Priority Issues
 
-1. 🔴 Vấn đề A  
-2. 🔴 Vấn đề B  
-3. 🟡 Vấn đề C  
+1. 🔴 Issue A  
+2. 🔴 Issue B  
+3. 🟡 Issue C  
 ```
 
 ---
 
-# ⚖️ 10. Quyết định
+# ⚖️ 10. Decisions
 
 ```markdown
-## Quyết định
+## Decisions
 
-| Quyết định | Người phụ trách | Thời hạn | Trạng thái |
-|-----------|----------------|----------|------------|
-| Sửa lỗi A | Backend | 2026-04-25 | 🔵 |
+| Decision | Owner | Deadline | Status |
+|----------|-------|----------|--------|
+| Fix A | Backend | 2026-04-25 | 🔵 |
 ```
 
 > [!CAUTION]
-> Bắt buộc có phần này.
+> This section is mandatory.
 
 ---
 
-# 🛠 11. Đề xuất
+# 🛠 11. Recommendations
 
-**Hiện tại:**
+**Current:**
 
 ```typescript
-// mã hiện tại
+// current code
 ```
 
-**Đề xuất:**
+**Proposed:**
 
 ```typescript
-// mã đã chỉnh sửa
+// modified code
 ```
 
 ---
 
-# 📊 12. Tiến độ
+# 📊 12. Progress
 
 ```markdown
-## Tiến độ
+## Progress
 
-| Bước | Trạng thái | Ghi chú |
-|------|------------|--------|
-| Tái hiện | ✅ | |
-| Phân tích | 🔵 | |
-| Sửa lỗi | ⚪ | |
+| Step | Status | Notes |
+|------|--------|-------|
+| Reproduce | ✅ | |
+| Analyze | 🔵 | |
+| Fix | ⚪ | |
 ```
 
 ---
 
-# 💥 13. Ảnh hưởng
+# 💥 13. Impact
 
 ```markdown
-## Ảnh hưởng
+## Impact
 
-- Người dùng bị ảnh hưởng:
-- Hệ thống:
-- Mức độ rủi ro:
+- Affected users:
+- Systems:
+- Risk level:
 ```
 
 ---
 
-# 🧭 14. Đánh đổi
+# 🧭 14. Trade-offs
 
 ```markdown
-## Đánh đổi
+## Trade-offs
 
-- Giải pháp nhanh vs lâu dài  
-- Hiệu năng vs chi phí  
-- Đơn giản vs mở rộng  
+- Quick fix vs long-term solution  
+- Performance vs cost  
+- Simplicity vs extensibility  
 ```
 
 ---
 
-# 🧾 15. Quy tắc khối mã
+# 🧾 15. Code Block Rules
 
 ```typescript
 const example = true;
@@ -230,7 +230,7 @@ npm run start
 
 ---
 
-# 🤖 16. Theo dõi token
+# 🤖 16. Token Tracking
 
 ```text
 [Tokens: I:{{input}} | O:{{output}} | T:{{total}}]
@@ -238,35 +238,32 @@ npm run start
 
 ---
 
-```markdown
-| Chỉ số | Giá trị | Ghi chú |
-|--------|--------|--------|
-| Token đầu vào | | |
-| Token đầu ra | | |
-| Tổng token | | |
-| Tổng số bước | | |
-```
+| Metric | Value | Notes |
+|--------|-------|-------|
+| Input tokens | | |
+| Output tokens | | |
+| Total tokens | | |
+| Total steps | | |
 
 ---
 
-# 🧩 17. Phạm vi áp dụng
+# 🧩 17. Scope
 
-* Rà soát mã nguồn
-* Gỡ lỗi / RCA
-* Bảo mật
-* Hiệu năng
-* Sự cố
-* Quy trình AI
-
----
-
-# 🏁 Nguyên tắc
-
-1. Rõ ràng, không mơ hồ
-2. Luôn có nguyên nhân gốc
-3. Mọi vấn đề phải dẫn tới hành động
-4. Ưu tiên theo mức độ ảnh hưởng
-5. Giữ định dạng thống nhất
+* Code Review
+* Debugging / RCA
+* Security Audit
+* Performance Analysis
+* Incident Reports
+* AI Workflows
 
 ---
 
+# 🏁 Principles
+
+1. Clear, unambiguous
+2. Always has root cause
+3. Every issue leads to action
+4. Prioritize by impact
+5. Maintain consistent format
+
+---

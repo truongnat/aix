@@ -1,36 +1,57 @@
 ---
 name: motion-design-pro
-description: |
-  Expert in animation, micro-interactions, and choreographed motion.
+description: 'Expert in animation, micro-interactions, and choreographed motion.
+
   GSAP, Framer Motion, CSS animations with performance optimization.
+
   Creates delightful, purposeful animations that enhance UX.
-  
+
+
   Use when adding motion to interfaces, creating page transitions,
+
   scroll animations, or complex choreographed sequences.
-when_to_use:
-  - Page load animations
-  - Scroll-triggered animations
-  - Micro-interactions (hover, click states)
-  - Page transitions
-  - Complex choreographed sequences
-  - Loading states and skeletons
-  - Gesture-based interactions
-when_not_to_use:
-  - Users prefer reduced motion
-  - Performance-critical paths
-  - Simple UI without animation needs
-  - Accessibility-first interfaces (without fallbacks)
-inputs:
-  - animation_type: Page load, scroll, interaction, gesture
-  - technology: GSAP, Framer Motion, CSS
-  - performance: 60fps target, reduced-motion support
-  - user_experience: Purpose, timing, easing
-outputs:
-  - animation_code: GSAP/Framer/CSS implementation
-  - timing_spec: Durations, delays, easings
-  - performance_notes: Optimization strategies
-  - fallback_strategy: Reduced motion support
+
+  '
+metadata:
+  content-language: en
+  level: professional
 ---
+
+## Boundary
+
+[Define boundary with related skills]
+
+## When to use
+
+- Page load animations
+- Scroll-triggered animations
+- Micro-interactions (hover, click states)
+- Page transitions
+- Complex choreographed sequences
+- Loading states and skeletons
+- Gesture-based interactions
+
+## When not to use
+
+- Users prefer reduced motion
+- Performance-critical paths
+- Simple UI without animation needs
+- Accessibility-first interfaces (without fallbacks)
+
+## Required inputs
+
+- **animation_type**: Page load, scroll, interaction, gesture
+- **technology**: GSAP, Framer Motion, CSS
+- **performance**: 60fps target, reduced-motion support
+- **user_experience**: Purpose, timing, easing
+
+## Expected output
+
+- **animation_code**: GSAP/Framer/CSS implementation
+- **timing_spec**: Durations, delays, easings
+- **performance_notes**: Optimization strategies
+- **fallback_strategy**: Reduced motion support
+
 
 ## Workflow
 

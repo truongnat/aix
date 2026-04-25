@@ -7,29 +7,52 @@ description: |
   
   Use when implementing Figma designs in code, connecting design system components,
   or building screens section-by-section from design files.
-when_to_use:
-  - Implementing Figma designs in code
-  - Connecting Figma components to code
-  - Extracting design tokens from Figma
-  - Building screens from Figma mockups
-  - Auditing implemented UI against Figma
-  - Generating responsive layouts from designs
-  - Converting design system to code
-when_not_to_use:
-  - No Figma file access
-  - Conceptual designs without specs
-  - Rushed prototyping without design review
-inputs:
-  - figma_file: Figma file URL or ID
-  - node_id: Specific frame/component node
-  - design_system: Existing component library
-  - target_tech: React, Vue, HTML/CSS, etc.
-outputs:
-  - implementation_plan: Section-by-section breakdown
-  - component_mapping: Figma → Code component links
-  - token_extraction: Colors, typography, spacing
-  - generated_code: Framework-specific implementation
+
+metadata:
+  short-description: Figma → Code — MCP integration, token extraction, component mapping
+  content-language: en
+  domain: design-implementation
+  level: professional
 ---
+
+# Figma to Code (professional)
+
+Use official [Figma API](https://www.figma.com/developers/api) and [MCP Figma Server](https://github.com/anthropics/mcp-server-figma) for protocol truth; this skill encodes **design-to-code workflows**, **token extraction**, **component mapping**, and **responsive strategy** — assuming Figma file access via MCP.
+
+## Boundary
+
+**`figma-mcp-pro`** owns **Figma design files → code implementation**, **design tokens extraction**, and **component system mapping**. **`design-system-pro`** owns **code-side design system architecture** (Tailwind, CSS variables). **`frontend-design-pro`** owns **UI/UX design principles**. **`shadcn-mastery-pro`** owns **shadcn/ui component library**.
+
+## When to use
+
+- Implementing Figma designs in code (sections or full pages)
+- Extracting design tokens (colors, typography, spacing) from Figma
+- Mapping Figma components to code component library
+- Building screens from mockups with responsive behavior
+- Auditing implemented UI against design specs
+- Converting design systems to code
+
+## When not to use
+
+- No Figma file access available
+- Conceptual designs without specifications
+- Rushed prototyping without design review
+- Pure design/UX consultation — **`design-system-pro`**
+
+## Required inputs
+
+- **Figma file URL or ID** (file access required)
+- **Node ID** (specific frame/component) or full-page scope
+- **Design system** (existing component library, or new)
+- **Target framework** (React, Vue, HTML/CSS)
+
+## Expected output
+
+- **Implementation plan** — section-by-section breakdown with Figma node references
+- **Component mapping** — Figma components → code components with props
+- **Token extraction** — colors, typography, spacing, shadows as variables
+- **Generated code** — framework-specific implementation with responsive behavior
+- **Verification checklist** — pixel-perfect, responsive, accessible
 
 ## Workflow
 
@@ -247,13 +270,15 @@ Figma Component → Code Component
 - Typography scale
 - Elevation/shadows
 
-## References
+## Resources in this skill
 
-- `/skills/figma-mcp-pro/references/mcp-commands.md` — MCP server capabilities
-- `/skills/figma-mcp-pro/references/token-extraction.md` — Token organization
-- `/skills/figma-mcp-pro/references/component-mapping.md` — Mapping strategies
-- `/skills/figma-mcp-pro/references/responsive-strategy.md` — Breakpoint handling
-- `/skills/figma-mcp-pro/references/verification.md` — Visual regression testing
+| Topic | File |
+|-------|------|
+| MCP Integration | [references/mcp-integration.md](references/mcp-integration.md) |
+| Token Extraction | [references/token-extraction.md](references/token-extraction.md) |
+| Component Mapping | [references/component-mapping.md](references/component-mapping.md) |
+| Responsive Strategy | [references/responsive-strategy.md](references/responsive-strategy.md) |
+| Verification Checklist | [references/verification.md](references/verification.md) |
 
 ## Checklist
 

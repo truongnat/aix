@@ -1,37 +1,51 @@
 ---
 name: platform-design-pro
-description: |
-  Cross-platform design system expertise covering iOS Human Interface Guidelines (HIG), 
-  Android Material Design 3, and Web platform best practices.
-  450+ rules for Apple platforms (iOS, iPadOS, macOS, watchOS, visionOS, tvOS), 
-  Android, and Web with WCAG 2.2 compliance.
-  
-  Use when building native mobile apps, cross-platform apps, or need platform-specific 
-  design guidance with accessibility compliance.
-when_to_use:
-  - Building iOS apps (SwiftUI, UIKit)
-  - Building Android apps (Jetpack Compose, XML)
-  - Building cross-platform (React Native, Flutter)
-  - Building macOS, watchOS, visionOS, tvOS apps
-  - Designing responsive web interfaces
-  - Reviewing platform compliance
-  - Choosing navigation patterns for platform
-  - Implementing platform-specific gestures
-when_not_to_use:
-  - Web-only projects without native elements
-  - Pure design exploration without platform constraints
-  - Highly custom UIs that break all conventions
-inputs:
-  - platform: iOS, Android, Web, or cross-platform
-  - device_type: Phone, tablet, desktop, watch, TV, AR
-  - framework: SwiftUI, UIKit, Jetpack Compose, React Native, Flutter
-  - feature_type: Navigation, forms, gestures, accessibility
-outputs:
-  - platform_guidelines: Specific HIG/Material rules
-  - component_patterns: Platform-native components
-  - gesture_specs: Touch, pointer, voice interactions
-  - accessibility_requirements: WCAG 2.2 compliance notes
+description: "Cross-platform design system expertise covering iOS Human Interface\
+  \ Guidelines (HIG), \nAndroid Material Design 3, and Web platform best practices.\n\
+  450+ rules for Apple platforms (iOS, iPadOS, macOS, watchOS, visionOS, tvOS), \n\
+  Android, and Web with WCAG 2.2 compliance.\n\nUse when building native mobile apps,\
+  \ cross-platform apps, or need platform-specific \ndesign guidance with accessibility\
+  \ compliance.\n"
+metadata:
+  content-language: en
+  level: professional
 ---
+
+## Boundary
+
+[Define boundary with related skills]
+
+## When to use
+
+- Building iOS apps (SwiftUI, UIKit)
+- Building Android apps (Jetpack Compose, XML)
+- Building cross-platform (React Native, Flutter)
+- Building macOS, watchOS, visionOS, tvOS apps
+- Designing responsive web interfaces
+- Reviewing platform compliance
+- Choosing navigation patterns for platform
+- Implementing platform-specific gestures
+
+## When not to use
+
+- Web-only projects without native elements
+- Pure design exploration without platform constraints
+- Highly custom UIs that break all conventions
+
+## Required inputs
+
+- **platform**: iOS, Android, Web, or cross-platform
+- **device_type**: Phone, tablet, desktop, watch, TV, AR
+- **framework**: SwiftUI, UIKit, Jetpack Compose, React Native, Flutter
+- **feature_type**: Navigation, forms, gestures, accessibility
+
+## Expected output
+
+- **platform_guidelines**: Specific HIG/Material rules
+- **component_patterns**: Platform-native components
+- **gesture_specs**: Touch, pointer, voice interactions
+- **accessibility_requirements**: WCAG 2.2 compliance notes
+
 
 ## Workflow
 

@@ -1,39 +1,53 @@
 ---
 name: ui-ux-system-pro
-description: |
-  Comprehensive design system intelligence with searchable database of 50+ UI styles, 
-  97 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types.
-  Generates complete design systems with rationale, best practices, and accessibility compliance.
-  
-  Use when building design systems, creating comprehensive style guides, or need 
-  data-driven design decisions with professional rationale.
-when_to_use:
-  - Building a complete design system from scratch
-  - Creating style guides for teams
-  - Need color palette with accessibility compliance
-  - Choosing typography for specific industry
-  - Designing complex data visualizations
-  - Building SaaS, dashboards, or enterprise apps
-  - Need UX rationale for design decisions
-  - Multi-platform design (web + mobile)
-when_not_to_use:
-  - Quick prototypes without design requirements
-  - One-off landing pages (use frontend-design-pro)
-  - Strictly following existing brand guidelines
-  - Need creative/aesthetic direction only
-inputs:
-  - product_type: SaaS, e-commerce, dashboard, etc.
-  - industry: Fintech, healthcare, education, etc.
-  - target_users: B2B, B2C, internal, public
-  - platforms: Web, mobile, desktop
-  - accessibility_level: AA, AAA
-outputs:
-  - design_system: Complete design tokens and rationale
-  - component_library: Patterns for buttons, forms, tables, etc.
-  - color_palette: Accessible color system with contrast ratios
-  - typography_scale: Type ramp with font pairings
-  - ux_guidelines: 99 UX rules prioritized by impact
+description: "Comprehensive design system intelligence with searchable database of\
+  \ 50+ UI styles, \n97 color palettes, 57 font pairings, 99 UX guidelines, and 25\
+  \ chart types.\nGenerates complete design systems with rationale, best practices,\
+  \ and accessibility compliance.\n\nUse when building design systems, creating comprehensive\
+  \ style guides, or need \ndata-driven design decisions with professional rationale.\n"
+metadata:
+  content-language: en
+  level: professional
 ---
+
+## Boundary
+
+[Define boundary with related skills]
+
+## When to use
+
+- Building a complete design system from scratch
+- Creating style guides for teams
+- Need color palette with accessibility compliance
+- Choosing typography for specific industry
+- Designing complex data visualizations
+- Building SaaS, dashboards, or enterprise apps
+- Need UX rationale for design decisions
+- Multi-platform design (web + mobile)
+
+## When not to use
+
+- Quick prototypes without design requirements
+- One-off landing pages (use frontend-design-pro)
+- Strictly following existing brand guidelines
+- Need creative/aesthetic direction only
+
+## Required inputs
+
+- **product_type**: SaaS, e-commerce, dashboard, etc.
+- **industry**: Fintech, healthcare, education, etc.
+- **target_users**: B2B, B2C, internal, public
+- **platforms**: Web, mobile, desktop
+- **accessibility_level**: AA, AAA
+
+## Expected output
+
+- **design_system**: Complete design tokens and rationale
+- **component_library**: Patterns for buttons, forms, tables, etc.
+- **color_palette**: Accessible color system with contrast ratios
+- **typography_scale**: Type ramp with font pairings
+- **ux_guidelines**: 99 UX rules prioritized by impact
+
 
 ## Workflow
 
