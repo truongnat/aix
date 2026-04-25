@@ -20,7 +20,7 @@ metadata:
 
 Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
 
-Official command list: **[`scripts/README.md`](../../scripts/README.md)** at repo root. This skill encodes **artifact lifecycles** (skills vs KB), **batch vs single query economics**, and **safe automation defaults** — not domain skill content (**`*-pro`** skills stay separate). Confirm **repo root cwd**, **`npm install`**, **`npm run build`** when `dist/` is absent, and **`config.md`** / **`config.example.md`** for KB paths.
+Official command list: **[`scripts/README.md`](/scripts/README.md)** at repo root. This skill encodes **artifact lifecycles** (skills vs KB), **batch vs single query economics**, and **safe automation defaults** — not domain skill content (**`*-pro`** skills stay separate). Confirm **repo root cwd**, **`npm install`**, **`npm run build`** when `dist/` is absent, and **`config.md`** / **`config.example.md`** for KB paths.
 
 ## Boundary
 
@@ -62,132 +62,11 @@ Follow **Suggested response format** strictly — system model through residual 
 
 ## Workflow
 
-1. Confirm cwd, Node install, `dist/tools.js` presence; read **`scripts/README.md`** for exact flags.
-2. Apply summaries; open `references/`; use **`repo-tooling-and-kb-lifecycle-system-model.md`** when explaining stale answers vs rebuild.
-3. Respond with **Suggested response format**; include **failure modes** for CI and large batches.
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
 
-### Operating principles
-
-1. **Batch for many queries** — One model load; avoid shell loops — **`anti-patterns.md`**.
-2. **Validate skills on change** — **`validate-skills`** catches layout/YAML drift — **`decision-tree.md`**.
-3. **Rebuild KB when docs change** — Otherwise RAG is stale — **`repo-tooling-and-kb-lifecycle-system-model.md`**.
-4. **CLI ≠ domain** — Commands support hygiene; domain skills stay separate — **`integration-map.md`**.
-
-### KB and repo commands (summary)
-
-`query-kb-batch`, `list-skills`, `validate-skills`, `analyze-skills`, `build-kb` → `verify-kb` — **`kb-and-repo-scripts.md`**.
-
-Details: [references/kb-and-repo-scripts.md](references/kb-and-repo-scripts.md)
-
-### System model — lifecycles (summary)
-
-Repo root, skills pipeline, KB pipeline, batch query model — **`repo-tooling-and-kb-lifecycle-system-model.md`**.
-
-Details: [references/repo-tooling-and-kb-lifecycle-system-model.md](references/repo-tooling-and-kb-lifecycle-system-model.md)
-
-### Tips and tricks (summary)
-
-Golden query files, `--json`, CI hooks — **`tips-and-tricks.md`**.
-
-Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
-
-### Edge cases (summary)
-
-OOM, cwd, missing index/dist, Windows UTF-8, interrupted builds — **`edge-cases.md`**.
-
-Details: [references/edge-cases.md](references/edge-cases.md)
-
-### Decision framework (summary)
-
-Batch vs single, rebuild policy, analyze depth, CI ownership — **`decision-framework-and-trade-offs.md`** + **`decision-tree.md`**.
-
-Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
-
-### Anti-patterns (summary)
-
-Shell-loop `query-kb`, skipping verify, skipping index rebuild — **`anti-patterns.md`**.
-
-Details: [references/anti-patterns.md](references/anti-patterns.md)
-
-### Cross-skill handoffs (summary)
-
-**`skills-self-review-pro`**, **`ci-cd-pro`**, **`web-research-pro`** — **`integration-map.md`**.
-
-Details: [references/integration-map.md](references/integration-map.md)
-
-### Versions (summary)
-
-Node, `dist/` build, embedding model churn — **`versions.md`**.
-
-Details: [references/versions.md](references/versions.md)
-
-### Command matrix (summary)
-
-One-page map — **`command-matrix.md`**.
-
-Details: [references/command-matrix.md](references/command-matrix.md)
-
-## Suggested response format (STRICT — implement / review)
-
-1. **Context** — Repo root?, Node/dist present?, CI vs local?, batch size.
-2. **Problem / goal** — Slow queries, stale RAG, validate failure, inventory, wiki.
-3. **System design** — Which artifact pipeline: skills index vs KB embeddings — **`repo-tooling-and-kb-lifecycle-system-model.md`**.
-4. **Decision reasoning** — Batch vs single; rebuild vs query only; default KB vs `index-project` — **`decision-framework-and-trade-offs.md`** / **`decision-tree.md`**.
-5. **Implementation sketch** — Exact commands from **`scripts/README.md`** / `package.json` — **`quality-validation-and-guardrails.md`** (no invented flags).
-6. **Trade-offs** — RAM vs throughput; full rebuild cost vs correctness.
-7. **Failure modes** — cwd, missing dist, stale index, OOM, interrupted build — **`failure-modes-detection-mitigation.md`**.
-8. **Residual risks** — Runner limits; hand off to **`ci-cd-pro`** / **`security-pro`** / **`skills-self-review-pro`** as needed.
-
-## Resources in this skill
-
-| Topic | File |
-|-------|------|
-| **System model & lifecycles** | [references/repo-tooling-and-kb-lifecycle-system-model.md](references/repo-tooling-and-kb-lifecycle-system-model.md) |
-| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
-| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
-| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
-| KB & repo commands | [references/kb-and-repo-scripts.md](references/kb-and-repo-scripts.md) |
-| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Versions | [references/versions.md](references/versions.md) |
-| Command matrix | [references/command-matrix.md](references/command-matrix.md) |
-| **Canonical command list** | [`scripts/README.md`](../../scripts/README.md) |
-
-## Quick examples
-
-### 1 — Simple (common)
-
-**Input:** Twenty KB queries; each `query-kb` is slow.  
-**Expected output:** Full **Suggested response format** — `query-kb-batch`, one model load, pointer to **`scripts/README.md`**; warn RAM — **`failure-modes-detection-mitigation.md`**.
-
-### 2 — Tricky (edge case)
-
-**Input:** CI fails: `dist/tools.js` not found.  
-**Expected output:** `npm install` + `npm run build`; cache strategy; not a skill-content bug — **`edge-cases.md`**, **`quality-validation-and-guardrails.md`**.
-
-### 3 — Cross-skill
-
-**Input:** Full skills bundle audit for PR.  
-**Expected output:** **`analyze-skills --with-references --only-actionable --markdown`** — **`skills-self-review-pro`** for checklist narrative — exact CLI from this skill.
-
-## Checklist before calling the skill done
-
-### Commands
-
-- [ ] **Batch vs single** chosen correctly — **`decision-tree.md`**.
-- [ ] cwd = **repo root**; `dist/` build documented — **`quality-validation-and-guardrails.md`**.
-
-### Artifacts
-
-- [ ] **`validate-skills`** when `skills/**` changes — **`decision-tree.md`**.
-- [ ] **`build-skill-index`** when skills change for routing — **`repo-tooling-and-kb-lifecycle-system-model.md`**.
-- [ ] **`build-kb`** + **`verify-kb`** when KB docs changed — **`decision-tree.md`**.
-
-### Safety
-
-- [ ] **OOM** / RAM flagged for huge batches — **`edge-cases.md`**.
-- [ ] No **invented** CLI flags — **`quality-validation-and-guardrails.md`**.
-- [ ] **`integration-map.md`** used when CI wiring or security dominates.
+1. **Confirm** cwd, Node install, `dist/tools.js` presence; read **`scripts/README.md`** for exact flags. → verify: [context documented].
+2. **State assumptions** about requirements, constraints (**Think Before Coding**).
+3. **Apply** minimum solution first; escalate only when justified (**Simplicity First**).
+4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
+5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; note main risks.

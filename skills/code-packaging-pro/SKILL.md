@@ -59,102 +59,111 @@ Follow **Suggested response format** strictly — artifact system through residu
 
 ## Workflow
 
-1. Confirm artifact type, Python range, registry, and trust model (internal vs OSS forks).
-2. Apply summaries; open `references/`; validate **PEP 621** claims — **`quality-validation-and-guardrails.md`**.
-3. Respond using **Suggested response format**; delegate runtime promotion to **`deployment-pro`**.
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** artifact type, Python range, registry, trust model → verify: [context documented].
+2. **State assumptions** about packaging needs, deployment target (**Think Before Coding**).
+3. **Apply** minimum packaging first; add complexity only when justified (**Simplicity First**).
+4. **Make surgical changes** — only modify packaging config directly related to the request (**Surgical Changes**).
+5. **Define success criteria** (build reproducibility, image size, CI time); loop until verified (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; delegate runtime promotion to **`deployment-pro`**.
 
 ### Operating principles
 
-1. **Reproducible builds** — Lock apps; test matrix for libs — **`decision-framework-and-tradeoffs.md`**.
-2. **Smallest runnable image** — Multi-stage, slim runtime, no compilers in final stage — **`python-packaging-and-containers.md`**.
-3. **CI clarity** — Lint → test → build → publish; fail fast — **`github-actions-and-ci.md`**.
-4. **Secrets** — OIDC over PAT; no secrets in image layers — **`failure-modes-detection-mitigation.md`**.
-5. **Dockerignore** — Same class of importance as `.gitignore` for context and leaks — **`anti-patterns.md`**.
-6. **Immutable references** — Image **digest** for serious deploys; library **version** as public API — **`artifact-build-and-registry-model.md`**.
+1. **Think Before Coding** — State assumptions: artifact type, target registry, deployment needs. Ask when uncertain.
+2. **Simplicity First** — Start with basic packaging; add multi-stage/optimization only when justified.
+3. **Surgical Changes** — Only touch packaging config related to the request. Don't refactor unrelated build steps.
+4. **Goal-Driven Execution** — Define build reproducibility, image size, CI time targets upfront.
+5. **Reproducible builds** — Lock apps; test matrix for libs — **`decision-framework-and-tradeoffs.md`**.
+6. **Smallest runnable image** — Multi-stage, slim runtime, no compilers in final stage — **`python-packaging-and-containers.md`**.
+7. **CI clarity** — Lint → test → build → publish; fail fast — **`github-actions-and-ci.md`**.
+8. **Secrets** — OIDC over PAT; no secrets in image layers — **`failure-modes-detection-mitigation.md`**.
+9. **Dockerignore** — Same class of importance as `.gitignore` for context and leaks — **`anti-patterns.md`**.
+10. **Immutable references** — Image **digest** for serious deploys; library **version** as public API — **`artifact-build-and-registry-model.md`**.
 
 ### Artifact build and registry model (summary)
 
 Source → CI gates → artifact → registry; handoff to **`deployment-pro`** — **`artifact-build-and-registry-model.md`**.
 
-Details: [references/artifact-build-and-registry-model.md](references/artifact-build-and-registry-model.md)
+Details: [references/artifact-build-and-registry-model.md](/skills/code-packaging-pro/references/artifact-build-and-registry-model.md)
 
 ### Failure modes — detection and mitigation (summary)
 
 ABI drift, PEP 668, publish/OIDC failures, cache keys — **`failure-modes-detection-mitigation.md`**.
 
-Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+Details: [references/failure-modes-detection-mitigation.md](/skills/code-packaging-pro/references/failure-modes-detection-mitigation.md)
 
 ### Decision framework and trade-offs (summary)
 
 Library vs app, backends, OIDC vs token, image slim vs debug — **`decision-framework-and-tradeoffs.md`**.
 
-Details: [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md)
+Details: [references/decision-framework-and-tradeoffs.md](/skills/code-packaging-pro/references/decision-framework-and-tradeoffs.md)
 
 ### Supply chain and provenance hooks (summary)
 
 Trusted publishing, SBOM/sign steps — **`supply-chain-and-provenance-hooks.md`**.
 
-Details: [references/supply-chain-and-provenance-hooks.md](references/supply-chain-and-provenance-hooks.md)
+Details: [references/supply-chain-and-provenance-hooks.md](/skills/code-packaging-pro/references/supply-chain-and-provenance-hooks.md)
 
 ### Multi-ecosystem packaging notes (summary)
 
 npm / other ecosystems — same artifact discipline — **`multi-ecosystem-packaging-notes.md`**.
 
-Details: [references/multi-ecosystem-packaging-notes.md](references/multi-ecosystem-packaging-notes.md)
+Details: [references/multi-ecosystem-packaging-notes.md](/skills/code-packaging-pro/references/multi-ecosystem-packaging-notes.md)
 
 ### Quality validation and guardrails (summary)
 
 PEP 621 honesty; no secrets in Dockerfile — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](/skills/code-packaging-pro/references/quality-validation-and-guardrails.md)
 
 ### Python packaging and containers (summary)
 
 `pyproject`, Docker boundaries — **`python-packaging-and-containers.md`**.
 
-Details: [references/python-packaging-and-containers.md](references/python-packaging-and-containers.md)
+Details: [references/python-packaging-and-containers.md](/skills/code-packaging-pro/references/python-packaging-and-containers.md)
 
 ### GitHub Actions and CI (summary)
 
 Matrices, caching, publish jobs — **`github-actions-and-ci.md`**.
 
-Details: [references/github-actions-and-ci.md](references/github-actions-and-ci.md)
+Details: [references/github-actions-and-ci.md](/skills/code-packaging-pro/references/github-actions-and-ci.md)
 
 ### Tips and tricks (summary)
 
 Locks, semver, slim images — **`tips-and-tricks.md`**.
 
-Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
+Details: [references/tips-and-tricks.md](/skills/code-packaging-pro/references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
 Monorepo, manylinux, PEP 668, platforms — **`edge-cases.md`**.
 
-Details: [references/edge-cases.md](references/edge-cases.md)
+Details: [references/edge-cases.md](/skills/code-packaging-pro/references/edge-cases.md)
 
 ### Decision trees (summary)
 
 Artifact type, publish path, backend choice — **`decision-tree.md`**.
 
-Details: [references/decision-tree.md](references/decision-tree.md)
+Details: [references/decision-tree.md](/skills/code-packaging-pro/references/decision-tree.md)
 
 ### Anti-patterns (summary)
 
 Secrets in layers, fat images, unpinned actions — **`anti-patterns.md`**.
 
-Details: [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/anti-patterns.md](/skills/code-packaging-pro/references/anti-patterns.md)
 
 ### Integration map (summary)
 
 **`deployment-pro`**, **`security-pro`**, **`ci-cd-pro`**, **`docker-pro`** — **`integration-map.md`**.
 
-Details: [references/integration-map.md](references/integration-map.md)
+Details: [references/integration-map.md](/skills/code-packaging-pro/references/integration-map.md)
 
 ### Versions (summary)
 
 Python matrix, digests, Actions majors — **`versions.md`**.
 
-Details: [references/versions.md](references/versions.md)
+Details: [references/versions.md](/skills/code-packaging-pro/references/versions.md)
 
 ## Suggested response format (STRICT — implement / review)
 
@@ -171,20 +180,20 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
-| Artifact & registry model | [references/artifact-build-and-registry-model.md](references/artifact-build-and-registry-model.md) |
-| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
-| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md) |
-| Supply chain & provenance | [references/supply-chain-and-provenance-hooks.md](references/supply-chain-and-provenance-hooks.md) |
-| Multi-ecosystem notes | [references/multi-ecosystem-packaging-notes.md](references/multi-ecosystem-packaging-notes.md) |
-| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
-| Python & Docker | [references/python-packaging-and-containers.md](references/python-packaging-and-containers.md) |
-| GitHub Actions & CI | [references/github-actions-and-ci.md](references/github-actions-and-ci.md) |
-| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Versions | [references/versions.md](references/versions.md) |
+| Artifact & registry model | [references/artifact-build-and-registry-model.md](/skills/code-packaging-pro/references/artifact-build-and-registry-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](/skills/code-packaging-pro/references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](/skills/code-packaging-pro/references/decision-framework-and-tradeoffs.md) |
+| Supply chain & provenance | [references/supply-chain-and-provenance-hooks.md](/skills/code-packaging-pro/references/supply-chain-and-provenance-hooks.md) |
+| Multi-ecosystem notes | [references/multi-ecosystem-packaging-notes.md](/skills/code-packaging-pro/references/multi-ecosystem-packaging-notes.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](/skills/code-packaging-pro/references/quality-validation-and-guardrails.md) |
+| Python & Docker | [references/python-packaging-and-containers.md](/skills/code-packaging-pro/references/python-packaging-and-containers.md) |
+| GitHub Actions & CI | [references/github-actions-and-ci.md](/skills/code-packaging-pro/references/github-actions-and-ci.md) |
+| Tips | [references/tips-and-tricks.md](/skills/code-packaging-pro/references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](/skills/code-packaging-pro/references/edge-cases.md) |
+| Decision tree | [references/decision-tree.md](/skills/code-packaging-pro/references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](/skills/code-packaging-pro/references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](/skills/code-packaging-pro/references/integration-map.md) |
+| Versions | [references/versions.md](/skills/code-packaging-pro/references/versions.md) |
 
 ## Quick examples
 

@@ -18,6 +18,7 @@ import { loadKbConfig } from './lib/kbConfig.js';
 import { embedText, cosine } from './lib/embeddings.js';
 import { installSkill } from './commands/installSkill.js';
 import { listSkillDirs, readSkillInfo } from './lib/skills.js';
+import { buildGraph, saveGraph, loadGraph, queryGraph, getCallers, getCallees, impactAnalysis } from './lib/graph.js';
 
 type ManifestItem = {
   id: string;
@@ -1092,6 +1093,103 @@ function cmdVerifyKb(_args: minimist.ParsedArgs, repoRoot: string) {
   console.log('KB verification: OK');
 }
 
+function cmdBuildGraph(args: minimist.ParsedArgs) {
+  const targetDir = resolve(String(args.dir || args.d || '.'));
+  const outDir = resolve(String(args.out || join(targetDir, '.agents', 'devkit', 'project-graph')));
+  const dry = Boolean(args['dry-run']);
+
+  if (!existsSync(outDir)) {
+    mkdirSync(outDir, { recursive: true });
+  }
+
+  const graphPath = join(outDir, 'graph.json');
+
+  if (dry) {
+    console.log(`[dry-run] Would build graph for ${targetDir} → ${graphPath}`);
+    return;
+  }
+
+  console.log(`Building code graph for ${targetDir}...`);
+  const graph = buildGraph(targetDir);
+  saveGraph(graph, graphPath);
+  console.log(`Graph built: ${graph.nodes.length} nodes, ${graph.edges.length} edges`);
+  console.log(`Saved to: ${graphPath}`);
+}
+
+function cmdQueryGraph(args: minimist.ParsedArgs) {
+  const targetDir = resolve(String(args.dir || args.d || '.'));
+  const graphPath = resolve(String(args.graph || join(targetDir, '.agents', 'devkit', 'project-graph', 'graph.json')));
+  const query = String(args._[1] || '');
+  const mode = String(args.mode || 'search'); // search, callers, callees
+
+  if (!existsSync(graphPath)) {
+    console.error(`Graph not found: ${graphPath}. Run build-graph first.`);
+    process.exit(1);
+  }
+
+  const graph = loadGraph(graphPath);
+
+  if (!query) {
+    console.log(`Graph stats: ${graph.nodes.length} nodes, ${graph.edges.length} edges`);
+    return;
+  }
+
+  console.log(`Query: "${query}" (mode: ${mode})`);
+
+  let results: { id: string; name: string; type: string; file: string; line: number }[] = [];
+
+  switch (mode) {
+    case 'callers':
+      results = getCallers(graph, query);
+      console.log(`\nCallers of "${query}":`);
+      break;
+    case 'callees':
+      results = getCallees(graph, query);
+      console.log(`\nCallees of "${query}":`);
+      break;
+    case 'search':
+    default:
+      results = queryGraph(graph, query);
+      console.log(`\nSearch results for "${query}":`);
+      break;
+  }
+
+  if (results.length === 0) {
+    console.log('  No results found.');
+    return;
+  }
+
+  results.forEach((r, i) => {
+    console.log(`  ${i + 1}. ${r.name} (${r.type}) @ ${r.file}:${r.line}`);
+  });
+}
+
+function cmdImpactAnalysis(args: minimist.ParsedArgs) {
+  const targetDir = resolve(String(args.dir || args.d || '.'));
+  const graphPath = resolve(String(args.graph || join(targetDir, '.agents', 'devkit', 'project-graph', 'graph.json')));
+  const filePath = String(args._[1] || '');
+
+  if (!existsSync(graphPath)) {
+    console.error(`Graph not found: ${graphPath}. Run build-graph first.`);
+    process.exit(1);
+  }
+
+  if (!filePath) {
+    console.error('Usage: impact-analysis <file-path>');
+    process.exit(1);
+  }
+
+  const graph = loadGraph(graphPath);
+  console.log(`Analyzing impact of changes to: ${filePath}`);
+
+  const impacted = impactAnalysis(graph, filePath);
+
+  console.log(`\nBlast radius: ${impacted.length} affected symbols`);
+  impacted.forEach((node, i) => {
+    console.log(`  ${i + 1}. ${node.name} (${node.type}) @ ${node.file}:${node.line}`);
+  });
+}
+
 function help() {
   console.log(`Usage: node dist/tools.js <command> [args]
 
@@ -1107,7 +1205,10 @@ Commands:
   generate-wiki [--docs <project-index/docs>] [--out <wiki-dir>] [--watch] [--open]
   query-kb "<query>" [-k 5] [--index <project-index-dir>]
   query-kb-batch [-q "..."]... [-f file] [-k 5] [--json] [--index <project-index-dir>]
-  verify-kb`);
+  verify-kb
+  build-graph [--dir <path>] [--out <path>] [--dry-run]
+  query-graph <query> [--mode search|callers|callees] [--graph <path>]
+  impact-analysis <file-path> [--graph <path>]`);
 }
 
 function main() {
@@ -1148,6 +1249,7 @@ function main() {
       'chunk-size',
       'chunk-overlap',
       'docs',
+      'graph',
     ],
   });
   const cmd = String(args._[0] || '');
@@ -1188,6 +1290,15 @@ function main() {
       break;
     case 'verify-kb':
       cmdVerifyKb(args, root);
+      break;
+    case 'build-graph':
+      cmdBuildGraph(args);
+      break;
+    case 'query-graph':
+      cmdQueryGraph(args);
+      break;
+    case 'impact-analysis':
+      cmdImpactAnalysis(args);
       break;
     default:
       help();

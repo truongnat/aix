@@ -42,7 +42,7 @@ Use this when a bug fix yields **reusable** routing/history knowledge: put the *
 
 | What | Where |
 |------|--------|
-| Case / solution / prevention (browser Back vs in-app after **edit** routes) | **`nextjs-pro`** → [Edge cases — Browser history and edit flows](../../nextjs-pro/references/edge-cases.md#browser-history-and-edit-flows) |
+| Case / solution / prevention (browser Back vs in-app after **edit** routes) | **`nextjs-pro`** → [Edge cases — Browser history and edit flows](/skills/nextjs-pro/references/edge-cases.md#browser-history-and-edit-flows) |
 | Contributor steps (branch, commit, PR) | This document — [Step-by-Step Process](#step-by-step-process) |
 
 **Case:** After **list → detail → edit**, two **browser** Back operations should return to **list**. If the second Back from detail incorrectly returns to **edit**, the history stack and “leave edit” handlers are out of sync (see `nextjs-pro` section above).

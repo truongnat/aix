@@ -1,6 +1,6 @@
 # Repo tooling tips
 
-- Put **golden queries** in a file or repeat **`-q`** flags for **`query-kb-batch`** — see [`scripts/README.md`](../../../scripts/README.md).
+- Put **golden queries** in a file or repeat **`-q`** flags for **`query-kb-batch`** — see [`scripts/README.md`](/scripts/README.md).
 
 ```bash
 node dist/tools.js query-kb-batch -q "first question" -q "second question"

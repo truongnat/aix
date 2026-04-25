@@ -9,4 +9,4 @@ Professional **design system & product UI** skill: tokens, baselines, data-heavy
 - **Desktop:** **`electron-pro`**, **`tauri-pro`**
 - **Visual QA in CI:** **`testing-pro`**
 - **Marketing content hierarchy:** **`seo-pro`**
-- **Deep dives:** [references/dark-mode-and-semantic-theming-deep-dive.md](references/dark-mode-and-semantic-theming-deep-dive.md), [references/ai-copilot-ui-patterns-deep-dive.md](references/ai-copilot-ui-patterns-deep-dive.md) — plus [references/](references/)
+- **Deep dives:** [references/dark-mode-and-semantic-theming-deep-dive.md](/skills/design-system-pro/references/dark-mode-and-semantic-theming-deep-dive.md), [references/ai-copilot-ui-patterns-deep-dive.md](/skills/design-system-pro/references/ai-copilot-ui-patterns-deep-dive.md) — plus [references/](/skills/design-system-pro/references/)

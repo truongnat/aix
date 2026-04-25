@@ -61,121 +61,130 @@ Follow **Suggested response format** strictly — context through residual risks
 
 ## Workflow
 
-1. Confirm platform, triggers, runner type, environments (staging/prod), and **fork** exposure.
-2. Apply summaries; open `references/`; never recommend **`pull_request_target`** casually — **`quality-validation-and-guardrails.md`**.
-3. Respond using **Suggested response format**; delegate rollout nuance to **`deployment-pro`** when execution leaves CI.
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** platform, triggers, runner type, environments, **fork** exposure → verify: [context documented].
+2. **State assumptions** about deployment needs, security requirements (**Think Before Coding**).
+3. **Apply** minimum pipeline first; add complexity only when justified (**Simplicity First**).
+4. **Make surgical changes** — only modify CI/CD code directly related to the request (**Surgical Changes**).
+5. **Define success criteria** (build time, test coverage, security gates); loop until verified (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; delegate rollout nuance to **`deployment-pro`** when execution leaves CI.
 
 ### Operating principles
 
-1. **Fail fast** — lint/type/unit before integration/e2e; shift expensive work behind cheap gates.
-2. **Cache with correct keys** — lockfile-hash keys; treat cache as **optimization**, not correctness — **`optimization.md`**.
-3. **Least-privilege secrets** — OIDC over long-lived keys; narrow IAM — **`secrets-security.md`**.
-4. **Immutable references** — deploy **digest** or pinned version; avoid silent **`latest`** — **`artifact-signing-and-provenance.md`**.
-5. **Pipeline as code, reviewed as code** — **`CODEOWNERS`** on workflows where policy requires.
-6. **Observable pipelines** — reports on failure; duration and queue metrics — **`pipeline-observability-and-governance.md`**.
-7. **Know the distributed system** — queues, concurrency caps, eventual consistency of artifacts — **`pipeline-system-architecture.md`**.
+1. **Think Before Coding** — State assumptions: platform constraints, security needs, deployment pattern. Ask when uncertain.
+2. **Simplicity First** — Start with basic pipeline; add stages only when justified.
+3. **Surgical Changes** — Only touch pipeline code related to the request. Don't refactor unrelated workflows.
+4. **Goal-Driven Execution** — Define build time, test coverage, security gate criteria upfront.
+5. **Fail fast** — lint/type/unit before integration/e2e; shift expensive work behind cheap gates.
+6. **Cache with correct keys** — lockfile-hash keys; treat cache as **optimization**, not correctness — **`optimization.md`**.
+7. **Least-privilege secrets** — OIDC over long-lived keys; narrow IAM — **`secrets-security.md`**.
+8. **Immutable references** — deploy **digest** or pinned version; avoid silent **`latest`** — **`artifact-signing-and-provenance.md`**.
+9. **Pipeline as code, reviewed as code** — **`CODEOWNERS`** on workflows where policy requires.
+10. **Observable pipelines** — reports on failure; duration and queue metrics — **`pipeline-observability-and-governance.md`**.
+11. **Know the distributed system** — queues, concurrency caps, eventual consistency of artifacts — **`pipeline-system-architecture.md`**.
 
 ### Pipeline system architecture (summary)
 
 Control plane vs runners; trigger → job graph → artifacts → deploy handoff; scaling and idempotency — **`pipeline-system-architecture.md`**.
 
-Details: [references/pipeline-system-architecture.md](references/pipeline-system-architecture.md)
+Details: [references/pipeline-system-architecture.md](/skills/ci-cd-pro/references/pipeline-system-architecture.md)
 
 ### Failure modes — detection and mitigation (summary)
 
 Queue starvation, OIDC misconfig, fork leaks, flaky green, rate limits — structured table — **`failure-modes-detection-mitigation.md`**.
 
-Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+Details: [references/failure-modes-detection-mitigation.md](/skills/ci-cd-pro/references/failure-modes-detection-mitigation.md)
 
 ### Decision framework and trade-offs (summary)
 
 Scenario defaults; speed vs safety matrix — **`decision-framework-and-tradeoffs.md`**.
 
-Details: [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md)
+Details: [references/decision-framework-and-tradeoffs.md](/skills/ci-cd-pro/references/decision-framework-and-tradeoffs.md)
 
 ### Pipeline observability and governance (summary)
 
 Signals, approvals, cost, audit — **`pipeline-observability-and-governance.md`**.
 
-Details: [references/pipeline-observability-and-governance.md](references/pipeline-observability-and-governance.md)
+Details: [references/pipeline-observability-and-governance.md](/skills/ci-cd-pro/references/pipeline-observability-and-governance.md)
 
 ### Artifact signing and provenance (summary)
 
 Digest deploy, signing/SBOM hooks — **`artifact-signing-and-provenance.md`**.
 
-Details: [references/artifact-signing-and-provenance.md](references/artifact-signing-and-provenance.md)
+Details: [references/artifact-signing-and-provenance.md](/skills/ci-cd-pro/references/artifact-signing-and-provenance.md)
 
 ### Quality validation and guardrails (summary)
 
 Anti-hallucination checklist; fork/OIDC foot-guns — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](/skills/ci-cd-pro/references/quality-validation-and-guardrails.md)
 
 ### GitLab CI overview (summary)
 
 Stages, includes, runner tags — conceptual map from Actions — **`gitlab-ci-overview.md`**.
 
-Details: [references/gitlab-ci-overview.md](references/gitlab-ci-overview.md)
+Details: [references/gitlab-ci-overview.md](/skills/ci-cd-pro/references/gitlab-ci-overview.md)
 
 ### GitHub Actions structure (summary)
 
 Triggers, jobs, steps, outputs, concurrency — **`github-actions.md`**.
 
-Details: [references/github-actions.md](references/github-actions.md)
+Details: [references/github-actions.md](/skills/ci-cd-pro/references/github-actions.md)
 
 ### Secrets and security (summary)
 
 OIDC, environments, `GITHUB_TOKEN`, pinning — **`secrets-security.md`**.
 
-Details: [references/secrets-security.md](references/secrets-security.md)
+Details: [references/secrets-security.md](/skills/ci-cd-pro/references/secrets-security.md)
 
 ### Pipeline optimization (summary)
 
 Cache, matrix, reusable workflows, concurrency — **`optimization.md`**.
 
-Details: [references/optimization.md](references/optimization.md)
+Details: [references/optimization.md](/skills/ci-cd-pro/references/optimization.md)
 
 ### Deployment strategies (summary)
 
 Blue-green, canary, rolling, flags — **`deployment-strategies.md`** (handoff to **`deployment-pro`** for execution).
 
-Details: [references/deployment-strategies.md](references/deployment-strategies.md)
+Details: [references/deployment-strategies.md](/skills/ci-cd-pro/references/deployment-strategies.md)
 
 ### Decision trees (summary)
 
 Reusable vs composite, OIDC vs keys, hosted vs self-hosted, path filters, migrations — **`decision-tree.md`**.
 
-Details: [references/decision-tree.md](references/decision-tree.md)
+Details: [references/decision-tree.md](/skills/ci-cd-pro/references/decision-tree.md)
 
 ### Anti-patterns (summary)
 
 Unpinned actions, fork secrets, bad caches — **`anti-patterns.md`**.
 
-Details: [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/anti-patterns.md](/skills/ci-cd-pro/references/anti-patterns.md)
 
 ### Tips and tricks (summary)
 
 Fail-fast ordering, artifacts on failure, matrix trimming — **`tips-and-tricks.md`**.
 
-Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
+Details: [references/tips-and-tricks.md](/skills/ci-cd-pro/references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
 Merge queue, OIDC, self-hosted poison, migrations, miners — **`edge-cases.md`**.
 
-Details: [references/edge-cases.md](references/edge-cases.md)
+Details: [references/edge-cases.md](/skills/ci-cd-pro/references/edge-cases.md)
 
 ### Cross-skill handoffs (summary)
 
 **`docker-pro`**, **`deployment-pro`**, **`testing-pro`**, **`security-pro`**, **`postgresql-pro`** — **`integration-map.md`**.
 
-Details: [references/integration-map.md](references/integration-map.md)
+Details: [references/integration-map.md](/skills/ci-cd-pro/references/integration-map.md)
 
 ### Versions (summary)
 
 Runner images, pinning, dialect differences — **`versions.md`**.
 
-Details: [references/versions.md](references/versions.md)
+Details: [references/versions.md](/skills/ci-cd-pro/references/versions.md)
 
 ## Suggested response format (STRICT — implement / review)
 
@@ -192,23 +201,23 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
-| Pipeline system architecture | [references/pipeline-system-architecture.md](references/pipeline-system-architecture.md) |
-| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
-| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md) |
-| Observability & governance | [references/pipeline-observability-and-governance.md](references/pipeline-observability-and-governance.md) |
-| Artifact signing & provenance | [references/artifact-signing-and-provenance.md](references/artifact-signing-and-provenance.md) |
-| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
-| GitLab CI overview | [references/gitlab-ci-overview.md](references/gitlab-ci-overview.md) |
-| GitHub Actions structure | [references/github-actions.md](references/github-actions.md) |
-| Secrets and security | [references/secrets-security.md](references/secrets-security.md) |
-| Pipeline optimization | [references/optimization.md](references/optimization.md) |
-| Deployment strategies | [references/deployment-strategies.md](references/deployment-strategies.md) |
-| Decision trees | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Versions | [references/versions.md](references/versions.md) |
+| Pipeline system architecture | [references/pipeline-system-architecture.md](/skills/ci-cd-pro/references/pipeline-system-architecture.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](/skills/ci-cd-pro/references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](/skills/ci-cd-pro/references/decision-framework-and-tradeoffs.md) |
+| Observability & governance | [references/pipeline-observability-and-governance.md](/skills/ci-cd-pro/references/pipeline-observability-and-governance.md) |
+| Artifact signing & provenance | [references/artifact-signing-and-provenance.md](/skills/ci-cd-pro/references/artifact-signing-and-provenance.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](/skills/ci-cd-pro/references/quality-validation-and-guardrails.md) |
+| GitLab CI overview | [references/gitlab-ci-overview.md](/skills/ci-cd-pro/references/gitlab-ci-overview.md) |
+| GitHub Actions structure | [references/github-actions.md](/skills/ci-cd-pro/references/github-actions.md) |
+| Secrets and security | [references/secrets-security.md](/skills/ci-cd-pro/references/secrets-security.md) |
+| Pipeline optimization | [references/optimization.md](/skills/ci-cd-pro/references/optimization.md) |
+| Deployment strategies | [references/deployment-strategies.md](/skills/ci-cd-pro/references/deployment-strategies.md) |
+| Decision trees | [references/decision-tree.md](/skills/ci-cd-pro/references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](/skills/ci-cd-pro/references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](/skills/ci-cd-pro/references/integration-map.md) |
+| Tips | [references/tips-and-tricks.md](/skills/ci-cd-pro/references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](/skills/ci-cd-pro/references/edge-cases.md) |
+| Versions | [references/versions.md](/skills/ci-cd-pro/references/versions.md) |
 
 ## Quick examples
 

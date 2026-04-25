@@ -5,5 +5,5 @@ Professional **Next.js** skill: App Router, Server Components, caching, middlewa
 - **Entry point:** [SKILL.md](SKILL.md)
 - **Generic React (hooks, JSX):** skill `**react-pro`**
 - **Backend API in Nest:** skill `**nestjs-pro`**
-- **References:** [references/](references/)
+- **References:** [references/](/skills/nextjs-pro/references/)
 

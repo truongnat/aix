@@ -6,4 +6,4 @@
 - **Acceptance criteria & QA alignment:** **`testing-pro`**
 - **Compliance / threats in reqs:** **`security-pro`**
 - **UX / platform:** **`design-system-pro`**, **`mobile-design-pro`**
-- **Deep dives:** [references/](references/)
+- **Deep dives:** [references/](/skills/business-analysis-pro/references/)

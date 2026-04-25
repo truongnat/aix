@@ -6,4 +6,4 @@ Professional **SEO** skill: full lifecycle, technical crawl/index, on-page patte
 - **Next.js metadata & sitemaps:** skill **`nextjs-pro`**
 - **React / SPA rendering:** skill **`react-pro`**
 - **CDN / performance at edge:** skill **`deployment-pro`**
-- **Deep dives:** [references/](references/)
+- **Deep dives:** [references/](/skills/seo-pro/references/)

@@ -16,53 +16,60 @@ Routing and orchestration skills that analyze queries, optimize prompts, and coo
 ### Working Skills
 Domain-specific skills that perform actual work.
 
-- [react-pro](react-pro/) | React web — components, hooks, a11y, SSR
-- [nextjs-pro](nextjs-pro/) | Next.js — App Router, RSC, caching, middleware
-- [react-native-pro](react-native-pro/) | RN / Expo — UI, perf, platform edges
-- [flutter-pro](flutter-pro/) | Flutter — Material 3, multi-platform
-- [javascript-pro](javascript-pro/) | JS runtime — async, modules, edges
-- [typescript-pro](typescript-pro/) | TypeScript — types, `tsconfig`, migration
-- [performance-tuning-pro](performance-tuning-pro/) | Profiling, bottlenecks, tuning
-- [clean-code-architecture-pro](clean-code-architecture-pro/) | Boundaries, coupling, maintainability
-- [cli-pro](cli-pro/) | CLI design — argv, UX, pipes, cross-platform
-- [api-design-pro](api-design-pro/) | HTTP APIs — contracts, versioning, idempotency
-- [graphql-pro](graphql-pro/) | GraphQL — schema, resolvers, perf, security
-- [websocket-pro](websocket-pro/) | WebSocket — lifecycle, scale, reliability
-- [microservices-pro](microservices-pro/) | Distributed systems — boundaries, resilience
-- [stream-rtc-pro](stream-rtc-pro/) | Streaming / WebRTC — signaling, QoS
-- [nestjs-pro](nestjs-pro/) | NestJS — APIs, modules, testing
-- [postgresql-pro](postgresql-pro/) | PostgreSQL — SQL, migrations, RLS
-- [sql-data-access-pro](sql-data-access-pro/) | SQLite & safe access patterns
-- [testing-pro](testing-pro/) | Test strategy — pyramid, CI, flakes
-- [security-pro](security-pro/) | Threat-aware hardening
-- [auth-pro](auth-pro/) | Authn / authz — sessions, OAuth, tokens
-- [electron-pro](electron-pro/) | Electron — IPC, packaging
-- [tauri-pro](tauri-pro/) | Tauri — commands, capabilities
-- [deployment-pro](deployment-pro/) | Release & rollout
-- [docker-pro](docker-pro/) | Containers — Dockerfile, Compose
-- [ci-cd-pro](ci-cd-pro/) | Pipelines — Actions, reliability
-- [seo-pro](seo-pro/) | Organic search — technical + lifecycle
-- [design-system-pro](design-system-pro/) | Design systems — tokens, components
-- [mobile-design-pro](mobile-design-pro/) | Mobile UX patterns
-- [business-analysis-pro](business-analysis-pro/) | Requirements, decisions, metrics
-- [content-analysis-pro](content-analysis-pro/) | Docs, images, video — structured analysis
-- [data-analysis-pro](data-analysis-pro/) | EDA, pandas, viz, spreadsheets
-- [image-processing-pro](image-processing-pro/) | Raster — Pillow, formats
-- [web-research-pro](web-research-pro/) | Sources, citations, verification
-- [market-research-pro](market-research-pro/) | TAM/SAM/SOM, competitors, ICP
-- [strategic-consulting-pro](strategic-consulting-pro/) | Options, prioritization, memos
-- [code-packaging-pro](code-packaging-pro/) | pyproject, Docker, publish
-- [caching-pro](caching-pro/) | Cache patterns, TTL, consistency
-- [network-infra-pro](network-infra-pro/) | Topology, traffic, diagnostics
-- [planning-pro](planning-pro/) | Scope, dependencies, estimates
-- [algorithm-pro](algorithm-pro/) | Modeling, correctness, complexity
-- [feedback-pro](feedback-pro/) | Deep review, severity, closure
-- [self-improve-agent-pro](self-improve-agent-pro/) | Agent quality loops
-- [git-operations-pro](git-operations-pro/) | Git — PRs, branches
-- [bug-discovery-pro](bug-discovery-pro/) | Defect discovery, GitNexus, telemetry
-- [skills-self-review-pro](skills-self-review-pro/) | Audit this bundle
-- [repo-tooling-pro](repo-tooling-pro/) | Repo scripts — KB, skill index
-- [ai-integration-pro](ai-integration-pro/) | LLM apps — prompts, tools, RAG
+- [react-pro](/skills/react-pro/) | React web — components, hooks, a11y, SSR
+- [nextjs-pro](/skills/nextjs-pro/) | Next.js — App Router, RSC, caching, middleware
+- [react-native-pro](/skills/react-native-pro/) | RN / Expo — UI, perf, platform edges
+- [flutter-pro](/skills/flutter-pro/) | Flutter — Material 3, multi-platform
+- [javascript-pro](/skills/javascript-pro/) | JS runtime — async, modules, edges
+- [typescript-pro](/skills/typescript-pro/) | TypeScript — types, `tsconfig`, migration
+- [performance-tuning-pro](/skills/performance-tuning-pro/) | Profiling, bottlenecks, tuning
+- [clean-code-architecture-pro](/skills/clean-code-architecture-pro/) | Boundaries, coupling, maintainability
+- [cli-pro](/skills/cli-pro/) | CLI design — argv, UX, pipes, cross-platform
+- [api-design-pro](/skills/api-design-pro/) | HTTP APIs — contracts, versioning, idempotency
+- [graphql-pro](/skills/graphql-pro/) | GraphQL — schema, resolvers, perf, security
+- [websocket-pro](/skills/websocket-pro/) | WebSocket — lifecycle, scale, reliability
+- [microservices-pro](/skills/microservices-pro/) | Distributed systems — boundaries, resilience
+- [stream-rtc-pro](/skills/stream-rtc-pro/) | Streaming / WebRTC — signaling, QoS
+- [nestjs-pro](/skills/nestjs-pro/) | NestJS — APIs, modules, testing
+- [postgresql-pro](/skills/postgresql-pro/) | PostgreSQL — SQL, migrations, RLS
+- [sql-data-access-pro](/skills/sql-data-access-pro/) | SQLite & safe access patterns
+- [testing-pro](/skills/testing-pro/) | Test strategy — pyramid, CI, flakes
+- [test-driven-development-pro](/skills/test-driven-development-pro/) | TDD — RED-GREEN-REFACTOR, test-first discipline
+- [security-pro](/skills/security-pro/) | Threat-aware hardening
+- [auth-pro](/skills/auth-pro/) | Authn / authz — sessions, OAuth, tokens
+- [electron-pro](/skills/electron-pro/) | Electron — IPC, packaging
+- [tauri-pro](/skills/tauri-pro/) | Tauri — commands, capabilities
+- [deployment-pro](/skills/deployment-pro/) | Release & rollout
+- [docker-pro](/skills/docker-pro/) | Containers — Dockerfile, Compose
+- [ci-cd-pro](/skills/ci-cd-pro/) | Pipelines — Actions, reliability
+- [seo-pro](/skills/seo-pro/) | Organic search — technical + lifecycle
+- [design-system-pro](/skills/design-system-pro/) | Design systems — tokens, components
+- [mobile-design-pro](/skills/mobile-design-pro/) | Mobile UX patterns
+- [business-analysis-pro](/skills/business-analysis-pro/) | Requirements, decisions, metrics
+- [content-analysis-pro](/skills/content-analysis-pro/) | Docs, images, video — structured analysis
+- [data-analysis-pro](/skills/data-analysis-pro/) | EDA, pandas, viz, spreadsheets
+- [image-processing-pro](/skills/image-processing-pro/) | Raster — Pillow, formats
+- [web-research-pro](/skills/web-research-pro/) | Sources, citations, verification
+- [market-research-pro](/skills/market-research-pro/) | TAM/SAM/SOM, competitors, ICP
+- [strategic-consulting-pro](/skills/strategic-consulting-pro/) | Options, prioritization, memos
+- [code-packaging-pro](/skills/code-packaging-pro/) | pyproject, Docker, publish
+- [caching-pro](/skills/caching-pro/) | Cache patterns, TTL, consistency
+- [network-infra-pro](/skills/network-infra-pro/) | Topology, traffic, diagnostics
+- [parallel-agents-pro](/skills/parallel-agents-pro/) | Concurrent workflows — agent coordination, result aggregation
+- [planning-pro](/skills/planning-pro/) | Scope, dependencies, estimates
+- [systematic-debugging-pro](/skills/systematic-debugging-pro/) | 4-phase debugging — hypothesis-driven, root cause tracing
+- [writing-plans-pro](/skills/writing-plans-pro/) | Detailed planning — task breakdown, acceptance criteria
+- [executing-plans-pro](/skills/executing-plans-pro/) | Plan execution — batch, checkpoints, adaptive replanning
+- [algorithm-pro](/skills/algorithm-pro/) | Modeling, correctness, complexity
+- [brainstorming-pro](/skills/brainstorming-pro/) | Socratic brainstorming — assumption surfacing, convergence
+- [feedback-pro](/skills/feedback-pro/) | Deep review, severity, closure
+- [self-improve-agent-pro](/skills/self-improve-agent-pro/) | Agent quality loops
+- [git-operations-pro](/skills/git-operations-pro/) | Git — PRs, branches
+- [karpathy-coding-pro](/skills/karpathy-coding-pro/) | Karpathy principles — Think, Simplicity, Surgical, Goal-Driven
+- [bug-discovery-pro](/skills/bug-discovery-pro/) | Defect discovery, GitNexus, telemetry
+- [skills-self-review-pro](/skills/skills-self-review-pro/) | Audit this bundle
+- [repo-tooling-pro](/skills/repo-tooling-pro/) | Repo scripts — KB, skill index
+- [ai-integration-pro](/skills/ai-integration-pro/) | LLM apps — prompts, tools, RAG
 
 ---
 
@@ -99,7 +106,7 @@ node dist/tools.js analyze-skills --self-review
 node dist/tools.js build-skill-index
 ```
 
-Use skill **`skills-self-review-pro`** for how to read tiers and manual checklists. CLI map: **[`../scripts/README.md`](../scripts/README.md)**.
+Use skill **`skills-self-review-pro`** for how to read tiers and manual checklists. CLI map: **[`../scripts/README.md`](/scripts/README.md)**.
 
 ---
 
@@ -107,57 +114,62 @@ Use skill **`skills-self-review-pro`** for how to read tiers and manual checklis
 
 | Skill | Focus |
 |-------|--------|
-| [react-pro](react-pro/) | React web — components, hooks, a11y, SSR |
-| [nextjs-pro](nextjs-pro/) | Next.js — App Router, RSC, caching, middleware |
-| [react-native-pro](react-native-pro/) | RN / Expo — UI, perf, platform edges |
-| [flutter-pro](flutter-pro/) | Flutter — Material 3, multi-platform |
-| [javascript-pro](javascript-pro/) | JS runtime — async, modules, edges |
-| [typescript-pro](typescript-pro/) | TypeScript — types, `tsconfig`, migration |
-| [performance-tuning-pro](performance-tuning-pro/) | Profiling, bottlenecks, tuning |
-| [clean-code-architecture-pro](clean-code-architecture-pro/) | Boundaries, coupling, maintainability |
-| [cli-pro](cli-pro/) | CLI design — argv, UX, pipes, cross-platform |
-| [api-design-pro](api-design-pro/) | HTTP APIs — contracts, versioning, idempotency |
-| [graphql-pro](graphql-pro/) | GraphQL — schema, resolvers, perf, security |
-| [websocket-pro](websocket-pro/) | WebSocket — lifecycle, scale, reliability |
-| [microservices-pro](microservices-pro/) | Distributed systems — boundaries, resilience |
-| [stream-rtc-pro](stream-rtc-pro/) | Streaming / WebRTC — signaling, QoS |
-| [nestjs-pro](nestjs-pro/) | NestJS — APIs, modules, testing |
-| [postgresql-pro](postgresql-pro/) | PostgreSQL — SQL, migrations, RLS |
-| [sql-data-access-pro](sql-data-access-pro/) | SQLite & safe access patterns |
-| [testing-pro](testing-pro/) | Test strategy — pyramid, CI, flakes |
-| [ui-reverse-engineer-pro](ui-reverse-engineer-pro/) | UI reverse engineering — images to system-based code |
-| [security-pro](security-pro/) | Threat-aware hardening |
-| [auth-pro](auth-pro/) | Authn / authz — sessions, OAuth, tokens |
-| [electron-pro](electron-pro/) | Electron — IPC, packaging |
-| [tauri-pro](tauri-pro/) | Tauri — commands, capabilities |
-| [deployment-pro](deployment-pro/) | Release & rollout |
-| [docker-pro](docker-pro/) | Containers — Dockerfile, Compose |
-| [ci-cd-pro](ci-cd-pro/) | Pipelines — Actions, reliability |
-| [seo-pro](seo-pro/) | Organic search — technical + lifecycle |
-| [design-system-pro](design-system-pro/) | Design systems — tokens, components |
-| [mobile-design-pro](mobile-design-pro/) | Mobile UX patterns |
-| [business-analysis-pro](business-analysis-pro/) | Requirements, decisions, metrics |
-| [content-analysis-pro](content-analysis-pro/) | Docs, images, video — structured analysis |
-| [data-analysis-pro](data-analysis-pro/) | EDA, pandas, viz, spreadsheets |
-| [image-processing-pro](image-processing-pro/) | Raster — Pillow, formats |
-| [web-research-pro](web-research-pro/) | Sources, citations, verification |
-| [market-research-pro](market-research-pro/) | TAM/SAM/SOM, competitors, ICP |
-| [strategic-consulting-pro](strategic-consulting-pro/) | Options, prioritization, memos |
-| [code-packaging-pro](code-packaging-pro/) | pyproject, Docker, publish |
-| [caching-pro](caching-pro/) | Cache patterns, TTL, consistency |
-| [network-infra-pro](network-infra-pro/) | Topology, traffic, diagnostics |
-| [planning-pro](planning-pro/) | Scope, dependencies, estimates |
-| [algorithm-pro](algorithm-pro/) | Modeling, correctness, complexity |
-| [feedback-pro](feedback-pro/) | Deep review, severity, closure |
-| [self-improve-agent-pro](self-improve-agent-pro/) | Agent quality loops |
-| [git-operations-pro](git-operations-pro/) | Git — PRs, branches |
-| [bug-discovery-pro](bug-discovery-pro/) | Defect discovery, GitNexus, telemetry |
-| [skills-self-review-pro](skills-self-review-pro/) | Audit this bundle |
-| [repo-tooling-pro](repo-tooling-pro/) | Repo scripts — KB, skill index |
-| [ai-integration-pro](ai-integration-pro/) | LLM apps — prompts, tools, RAG |
+| [router-pro](/skills/router-pro/) | System skill — routing / orchestration |
+| [react-pro](/skills/react-pro/) | React web — components, hooks, a11y, SSR |
+| [nextjs-pro](/skills/nextjs-pro/) | Next.js — App Router, RSC, caching, middleware |
+| [react-native-pro](/skills/react-native-pro/) | RN / Expo — UI, perf, platform edges |
+| [flutter-pro](/skills/flutter-pro/) | Flutter — Material 3, multi-platform |
+| [javascript-pro](/skills/javascript-pro/) | JS runtime — async, modules, edges |
+| [typescript-pro](/skills/typescript-pro/) | TypeScript — types, `tsconfig`, migration |
+| [performance-tuning-pro](/skills/performance-tuning-pro/) | Profiling, bottlenecks, tuning |
+| [clean-code-architecture-pro](/skills/clean-code-architecture-pro/) | Boundaries, coupling, maintainability |
+| [cli-pro](/skills/cli-pro/) | CLI design — argv, UX, pipes, cross-platform |
+| [api-design-pro](/skills/api-design-pro/) | HTTP APIs — contracts, versioning, idempotency |
+| [graphql-pro](/skills/graphql-pro/) | GraphQL — schema, resolvers, perf, security |
+| [websocket-pro](/skills/websocket-pro/) | WebSocket — lifecycle, scale, reliability |
+| [microservices-pro](/skills/microservices-pro/) | Distributed systems — boundaries, resilience |
+| [stream-rtc-pro](/skills/stream-rtc-pro/) | Streaming / WebRTC — signaling, QoS |
+| [nestjs-pro](/skills/nestjs-pro/) | NestJS — APIs, modules, testing |
+| [postgresql-pro](/skills/postgresql-pro/) | PostgreSQL — SQL, migrations, RLS |
+| [sql-data-access-pro](/skills/sql-data-access-pro/) | SQLite & safe access patterns |
+| [testing-pro](/skills/testing-pro/) | Test strategy — pyramid, CI, flakes |
+| [test-driven-development-pro](/skills/test-driven-development-pro/) | TDD — RED-GREEN-REFACTOR, test-first discipline |
+| [ui-reverse-engineer-pro](/skills/ui-reverse-engineer-pro/) | UI reverse engineering — images to system-based code |
+| [security-pro](/skills/security-pro/) | Threat-aware hardening |
+| [auth-pro](/skills/auth-pro/) | Authn / authz — sessions, OAuth, tokens |
+| [electron-pro](/skills/electron-pro/) | Electron — IPC, packaging |
+| [tauri-pro](/skills/tauri-pro/) | Tauri — commands, capabilities |
+| [deployment-pro](/skills/deployment-pro/) | Release & rollout |
+| [docker-pro](/skills/docker-pro/) | Containers — Dockerfile, Compose |
+| [ci-cd-pro](/skills/ci-cd-pro/) | Pipelines — Actions, reliability |
+| [seo-pro](/skills/seo-pro/) | Organic search — technical + lifecycle |
+| [design-system-pro](/skills/design-system-pro/) | Design systems — tokens, components |
+| [mobile-design-pro](/skills/mobile-design-pro/) | Mobile UX patterns |
+| [business-analysis-pro](/skills/business-analysis-pro/) | Requirements, decisions, metrics |
+| [content-analysis-pro](/skills/content-analysis-pro/) | Docs, images, video — structured analysis |
+| [data-analysis-pro](/skills/data-analysis-pro/) | EDA, pandas, viz, spreadsheets |
+| [image-processing-pro](/skills/image-processing-pro/) | Raster — Pillow, formats |
+| [web-research-pro](/skills/web-research-pro/) | Sources, citations, verification |
+| [market-research-pro](/skills/market-research-pro/) | TAM/SAM/SOM, competitors, ICP |
+| [strategic-consulting-pro](/skills/strategic-consulting-pro/) | Options, prioritization, memos |
+| [code-packaging-pro](/skills/code-packaging-pro/) | pyproject, Docker, publish |
+| [caching-pro](/skills/caching-pro/) | Cache patterns, TTL, consistency |
+| [network-infra-pro](/skills/network-infra-pro/) | Topology, traffic, diagnostics |
+| [parallel-agents-pro](/skills/parallel-agents-pro/) | Concurrent workflows — agent coordination, result aggregation
+| [writing-plans-pro](/skills/writing-plans-pro/) | Detailed planning — task breakdown, acceptance criteria |
+| [executing-plans-pro](/skills/executing-plans-pro/) | Plan execution — batch, checkpoints, adaptive replanning
+| [algorithm-pro](/skills/algorithm-pro/) | Modeling, correctness, complexity |
+| [brainstorming-pro](/skills/brainstorming-pro/) | Socratic brainstorming — assumption surfacing, convergence
+| [self-improve-agent-pro](/skills/self-improve-agent-pro/) | Agent quality loops |
+| [git-operations-pro](/skills/git-operations-pro/) | Git — PRs, branches |
+| [karpathy-coding-pro](/skills/karpathy-coding-pro/) | Karpathy principles — Think, Simplicity, Surgical, Goal-Driven |
+| [bug-discovery-pro](/skills/bug-discovery-pro/) | Defect discovery, GitNexus, telemetry |
+| [skills-self-review-pro](/skills/skills-self-review-pro/) | Audit this bundle |
+| [repo-tooling-pro](/skills/repo-tooling-pro/) | Repo scripts — KB, skill index |
+| [ai-integration-pro](/skills/ai-integration-pro/) | LLM apps — prompts, tools, RAG |
 
 ---
 
 ## Using with Cursor
 
-Copy or symlink a skill into **`.cursor/skills/<name>/`** — details in root [`AGENTS.md`](../AGENTS.md).
+Copy or symlink a skill into **`.cursor/skills/<name>/`** — details in root [`AGENTS.md`](/AGENTS.md).

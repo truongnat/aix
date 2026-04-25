@@ -63,145 +63,154 @@ Follow **Suggested response format (STRICT)** — eight sections with explicit *
 
 ## Workflow
 
-1. Confirm consistency target, freshness SLA, **write rate**, hot-key risk, and **layers** in use (L1/L2/edge).
-2. Apply summaries; open `references/`; **invalidate-before-storage mindset** — **`pattern-selection.md`**, **`invalidation-and-consistency.md`**.
-3. Respond using **Suggested response format (STRICT)**; pair **`security-pro`** when user-specific data at edge.
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** consistency target, freshness SLA, **write rate**, hot-key risk, **layers** → verify: [requirements documented].
+2. **State assumptions** about cache needs, data access patterns (**Think Before Coding**).
+3. **Apply** minimum caching first; add layers only when justified (**Simplicity First**).
+4. **Make surgical changes** — only modify caching code directly related to the request (**Surgical Changes**).
+5. **Define success criteria** (hit ratio, latency targets, consistency verification); loop until verified (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format (STRICT)**; pair **`security-pro`** when user-specific data at edge.
 
 ### Operating principles
 
-1. **Do not cache by default** — Remove obvious query/API inefficiencies first — **`sql-data-access-pro`**.
-2. **Design invalidation before storage** — Stale-data risk usually dominates miss cost.
-3. **Prefer deterministic keys** — Namespacing, versioning — reduces collision and aids migration.
-4. **Choose consistency intentionally** — Per read model; document **bounded staleness** — **`distributed-consistency-models.md`**.
-5. **Protect origin systems** — Coalescing, jittered TTL, backpressure, circuit breakers — **`failure-modes-and-resilience.md`**.
-6. **Instrument outcomes** — Hit ratio, latency, evictions, stale-serve rate, **invalidation job** health — **`performance-and-observability.md`**.
-7. **Secure shared caches** — Tenant/auth scope in keys — **`cache-security-and-isolation.md`**.
+1. **Think Before Coding** — State assumptions: cache needs, data patterns, consistency requirements. Ask when uncertain.
+2. **Simplicity First** — Start without caching; add only when profiling justifies.
+3. **Surgical Changes** — Only touch caching code related to the request. Don't refactor unrelated data access.
+4. **Goal-Driven Execution** — Define hit ratio, latency targets, consistency verification upfront.
+5. **Do not cache by default** — Remove obvious query/API inefficiencies first — **`sql-data-access-pro`**.
+6. **Design invalidation before storage** — Stale-data risk usually dominates miss cost.
+7. **Prefer deterministic keys** — Namespacing, versioning — reduces collision and aids migration.
+8. **Choose consistency intentionally** — Per read model; document **bounded staleness** — **`distributed-consistency-models.md`**.
+9. **Protect origin systems** — Coalescing, jittered TTL, backpressure, circuit breakers — **`failure-modes-and-resilience.md`**.
+10. **Instrument outcomes** — Hit ratio, latency, evictions, stale-serve rate, **invalidation job** health — **`performance-and-observability.md`**.
+11. **Secure shared caches** — Tenant/auth scope in keys — **`cache-security-and-isolation.md`**.
 
 ### Cache layers and consistency (system model) (summary)
 
 Layer stack, read/write paths, consistency class, degradation — **`cache-consistency-layer-system-model.md`**.
 
-Details: [references/cache-consistency-layer-system-model.md](references/cache-consistency-layer-system-model.md)
+Details: [references/cache-consistency-layer-system-model.md](/skills/caching-pro/references/cache-consistency-layer-system-model.md)
 
 ### Failure modes — detection and mitigation (summary)
 
 Symptom→check mapping; deep resilience in **`failure-modes-and-resilience.md`** — **`failure-modes-detection-mitigation.md`**.
 
-Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+Details: [references/failure-modes-detection-mitigation.md](/skills/caching-pro/references/failure-modes-detection-mitigation.md)
 
 ### Decision framework and trade-offs (summary)
 
 Cache vs origin fix, TTL vs active invalidation, edge vs origin — **`decision-framework-and-trade-offs.md`**.
 
-Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+Details: [references/decision-framework-and-trade-offs.md](/skills/caching-pro/references/decision-framework-and-trade-offs.md)
 
 ### Quality validation and guardrails (summary)
 
 Measured hit rates; PII boundaries — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](/skills/caching-pro/references/quality-validation-and-guardrails.md)
 
 ### Cache architecture and data flows (summary)
 
 Client → edge → app → L1/L2 → origin — **read**, **write**, **invalidate**, **warm** paths.
 
-Details: [references/cache-architecture-and-data-flows.md](references/cache-architecture-and-data-flows.md)
+Details: [references/cache-architecture-and-data-flows.md](/skills/caching-pro/references/cache-architecture-and-data-flows.md)
 
 ### Distributed consistency models (summary)
 
 Read-after-write, bounded staleness, eventual, session/monotonic hints — paired with **`invalidation-and-consistency.md`**.
 
-Details: [references/distributed-consistency-models.md](references/distributed-consistency-models.md)
+Details: [references/distributed-consistency-models.md](/skills/caching-pro/references/distributed-consistency-models.md)
 
 ### Write path and coherence (summary)
 
 Dual-write ordering, write-through cost, write-behind loss, txn boundaries — **`write-path-and-coherence.md`**.
 
-Details: [references/write-path-and-coherence.md](references/write-path-and-coherence.md)
+Details: [references/write-path-and-coherence.md](/skills/caching-pro/references/write-path-and-coherence.md)
 
 ### Multi-layer cache (summary)
 
 L1 / L2 / CDN — propagation, coherence, effective staleness — **`multi-layer-cache.md`**.
 
-Details: [references/multi-layer-cache.md](references/multi-layer-cache.md)
+Details: [references/multi-layer-cache.md](/skills/caching-pro/references/multi-layer-cache.md)
 
 ### Failure modes and resilience (summary)
 
 Outage, partition hints, eviction storm, circuit breaker, fallback — **`failure-modes-and-resilience.md`**.
 
-Details: [references/failure-modes-and-resilience.md](references/failure-modes-and-resilience.md)
+Details: [references/failure-modes-and-resilience.md](/skills/caching-pro/references/failure-modes-and-resilience.md)
 
 ### Cost and capacity modeling (summary)
 
 Memory, network, serialization, cache vs fixing origin — **`cost-and-capacity-modeling.md`**.
 
-Details: [references/cost-and-capacity-modeling.md](references/cost-and-capacity-modeling.md)
+Details: [references/cost-and-capacity-modeling.md](/skills/caching-pro/references/cost-and-capacity-modeling.md)
 
 ### Cache security and isolation (summary)
 
 Poisoning, key scope, auth-aware keys, tenant isolation — **`cache-security-and-isolation.md`**.
 
-Details: [references/cache-security-and-isolation.md](references/cache-security-and-isolation.md)
+Details: [references/cache-security-and-isolation.md](/skills/caching-pro/references/cache-security-and-isolation.md)
 
 ### Cache lifecycle (summary)
 
 Cold → warm → active → refresh → expire/evict → rebuild — **`cache-lifecycle.md`**.
 
-Details: [references/cache-lifecycle.md](references/cache-lifecycle.md)
+Details: [references/cache-lifecycle.md](/skills/caching-pro/references/cache-lifecycle.md)
 
 ### Cache pattern selection (summary)
 
 cache-aside, read-through, write-through/behind, HTTP/CDN fit — **`pattern-selection.md`**.
 
-Details: [references/pattern-selection.md](references/pattern-selection.md)
+Details: [references/pattern-selection.md](/skills/caching-pro/references/pattern-selection.md)
 
 ### Invalidation and consistency (summary)
 
 Authoritative source, TTL, jitter, fallback on cache outage — **`invalidation-and-consistency.md`**.
 
-Details: [references/invalidation-and-consistency.md](references/invalidation-and-consistency.md)
+Details: [references/invalidation-and-consistency.md](/skills/caching-pro/references/invalidation-and-consistency.md)
 
 ### Performance and observability (summary)
 
 Hit/miss, p95, hot keys, eviction rate — **`performance-and-observability.md`**.
 
-Details: [references/performance-and-observability.md](references/performance-and-observability.md)
+Details: [references/performance-and-observability.md](/skills/caching-pro/references/performance-and-observability.md)
 
 ### Tips and tricks (summary)
 
 Key format, jitter, warming, rollout — **`tips-and-tricks.md`**.
 
-Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
+Details: [references/tips-and-tricks.md](/skills/caching-pro/references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
 Consistency, write-path, distributed, perf, security edge cases — expanded — **`edge-cases.md`**.
 
-Details: [references/edge-cases.md](references/edge-cases.md)
+Details: [references/edge-cases.md](/skills/caching-pro/references/edge-cases.md)
 
 ### Decision trees (summary)
 
 Workload, layers, consistency strictness, failure — **`decision-tree.md`**.
 
-Details: [references/decision-tree.md](references/decision-tree.md)
+Details: [references/decision-tree.md](/skills/caching-pro/references/decision-tree.md)
 
 ### Anti-patterns (summary)
 
 Cache before query fix, stampede, caching errors — **`anti-patterns.md`**.
 
-Details: [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/anti-patterns.md](/skills/caching-pro/references/anti-patterns.md)
 
 ### Cross-skill handoffs (summary)
 
 **`deployment-pro`**, **`network-infra-pro`**, **`nextjs-pro`**, **`postgresql-pro`**, **`security-pro`**, **`api-design-pro`**, **`performance-tuning-pro`**.
 
-Details: [references/integration-map.md](references/integration-map.md)
+Details: [references/integration-map.md](/skills/caching-pro/references/integration-map.md)
 
 ### Versions (summary)
 
 CDN features, Redis/Memcached majors — **`versions.md`**.
 
-Details: [references/versions.md](references/versions.md)
+Details: [references/versions.md](/skills/caching-pro/references/versions.md)
 
 ## Suggested response format (STRICT — implement / review)
 
@@ -218,27 +227,27 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
-| **Cache & consistency model** | [references/cache-consistency-layer-system-model.md](references/cache-consistency-layer-system-model.md) |
-| Failure modes (quick map) | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
-| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
-| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
-| Architecture & data flows | [references/cache-architecture-and-data-flows.md](references/cache-architecture-and-data-flows.md) |
-| Distributed consistency models | [references/distributed-consistency-models.md](references/distributed-consistency-models.md) |
-| Write path & coherence | [references/write-path-and-coherence.md](references/write-path-and-coherence.md) |
-| Multi-layer cache | [references/multi-layer-cache.md](references/multi-layer-cache.md) |
-| Failure modes & resilience | [references/failure-modes-and-resilience.md](references/failure-modes-and-resilience.md) |
-| Cost & capacity | [references/cost-and-capacity-modeling.md](references/cost-and-capacity-modeling.md) |
-| Security & isolation | [references/cache-security-and-isolation.md](references/cache-security-and-isolation.md) |
-| Lifecycle | [references/cache-lifecycle.md](references/cache-lifecycle.md) |
-| Pattern selection | [references/pattern-selection.md](references/pattern-selection.md) |
-| Invalidation & consistency | [references/invalidation-and-consistency.md](references/invalidation-and-consistency.md) |
-| Performance & observability | [references/performance-and-observability.md](references/performance-and-observability.md) |
-| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Decision trees | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Versions | [references/versions.md](references/versions.md) |
+| **Cache & consistency model** | [references/cache-consistency-layer-system-model.md](/skills/caching-pro/references/cache-consistency-layer-system-model.md) |
+| Failure modes (quick map) | [references/failure-modes-detection-mitigation.md](/skills/caching-pro/references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](/skills/caching-pro/references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](/skills/caching-pro/references/quality-validation-and-guardrails.md) |
+| Architecture & data flows | [references/cache-architecture-and-data-flows.md](/skills/caching-pro/references/cache-architecture-and-data-flows.md) |
+| Distributed consistency models | [references/distributed-consistency-models.md](/skills/caching-pro/references/distributed-consistency-models.md) |
+| Write path & coherence | [references/write-path-and-coherence.md](/skills/caching-pro/references/write-path-and-coherence.md) |
+| Multi-layer cache | [references/multi-layer-cache.md](/skills/caching-pro/references/multi-layer-cache.md) |
+| Failure modes & resilience | [references/failure-modes-and-resilience.md](/skills/caching-pro/references/failure-modes-and-resilience.md) |
+| Cost & capacity | [references/cost-and-capacity-modeling.md](/skills/caching-pro/references/cost-and-capacity-modeling.md) |
+| Security & isolation | [references/cache-security-and-isolation.md](/skills/caching-pro/references/cache-security-and-isolation.md) |
+| Lifecycle | [references/cache-lifecycle.md](/skills/caching-pro/references/cache-lifecycle.md) |
+| Pattern selection | [references/pattern-selection.md](/skills/caching-pro/references/pattern-selection.md) |
+| Invalidation & consistency | [references/invalidation-and-consistency.md](/skills/caching-pro/references/invalidation-and-consistency.md) |
+| Performance & observability | [references/performance-and-observability.md](/skills/caching-pro/references/performance-and-observability.md) |
+| Tips | [references/tips-and-tricks.md](/skills/caching-pro/references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](/skills/caching-pro/references/edge-cases.md) |
+| Decision trees | [references/decision-tree.md](/skills/caching-pro/references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](/skills/caching-pro/references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](/skills/caching-pro/references/integration-map.md) |
+| Versions | [references/versions.md](/skills/caching-pro/references/versions.md) |
 
 ## Quick example
 

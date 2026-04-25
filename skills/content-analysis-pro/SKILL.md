@@ -58,102 +58,111 @@ Follow **Suggested response format** strictly — pipeline through residual risk
 
 ## Workflow
 
-1. Confirm goal, modality, sensitivity, and required **evidence granularity** (audit vs informal).
-2. Apply summaries; open `references/`; enforce **grounding** — **`quality-validation-and-guardrails.md`**.
-3. Respond using **Suggested response format**; delegate BRD packaging to **`business-analysis-pro`** when appropriate.
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** goal, modality, sensitivity, **evidence granularity** → verify: [scope defined].
+2. **State assumptions** about content type, analysis depth, evidence needs (**Think Before Coding**).
+3. **Apply** minimum analysis first; add depth only when justified (**Simplicity First**).
+4. **Make surgical changes** — only analyze content directly related to the request (**Surgical Changes**).
+5. **Define success criteria** (evidence quality, coverage, accuracy); loop until verified (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; delegate BRD packaging to **`business-analysis-pro`** when appropriate.
 
 ### Operating principles
 
-1. **Ground in the source** — Cite page, timestamp, or visible region; separate **quote** from **interpretation** — **`evidence-and-provenance-rules.md`**.
-2. **No fabricated facts** — Unclear → say so; **inference** labeled — **`failure-modes-detection-mitigation.md`**.
-3. **Structured output** — Headings, bullets, tables; executive + detail when useful — **`reporting-and-limitations.md`**.
-4. **Modality-aware** — Scanned PDF, charts, video sampling — **`analysis-methods-and-frames.md`**.
-5. **Safety and privacy** — Minimize secret reproduction — **`security-pro`**.
-6. **Human-in-the-loop** for **high-stakes** domains — assist only — **`reporting-and-limitations.md`**.
+1. **Think Before Coding** — State assumptions: content type, analysis depth, evidence needs. Ask when uncertain.
+2. **Simplicity First** — Start with basic analysis; add depth only when justified.
+3. **Surgical Changes** — Only analyze content directly related to the request.
+4. **Goal-Driven Execution** — Define evidence quality, coverage, accuracy targets upfront.
+5. **Ground in the source** — Cite page, timestamp, or visible region; separate **quote** from **interpretation** — **`evidence-and-provenance-rules.md`**.
+6. **No fabricated facts** — Unclear → say so; **inference** labeled — **`failure-modes-detection-mitigation.md`**.
+7. **Structured output** — Headings, bullets, tables; executive + detail when useful — **`reporting-and-limitations.md`**.
+8. **Modality-aware** — Scanned PDF, charts, video sampling — **`analysis-methods-and-frames.md`**.
+9. **Safety and privacy** — Minimize secret reproduction — **`security-pro`**.
+10. **Human-in-the-loop** for **high-stakes** domains — assist only — **`reporting-and-limitations.md`**.
 
 ### Analysis pipeline — system model (summary)
 
 Stages from input to evidence-backed report — **`analysis-pipeline-system-model.md`**.
 
-Details: [references/analysis-pipeline-system-model.md](references/analysis-pipeline-system-model.md)
+Details: [references/analysis-pipeline-system-model.md](/skills/content-analysis-pro/references/analysis-pipeline-system-model.md)
 
 ### Failure modes — detection and mitigation (summary)
 
 OCR, sampling gaps, hallucinated labels, DRM lock — **`failure-modes-detection-mitigation.md`**.
 
-Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+Details: [references/failure-modes-detection-mitigation.md](/skills/content-analysis-pro/references/failure-modes-detection-mitigation.md)
 
 ### Decision framework and trade-offs (summary)
 
 Coverage vs depth; human review domains — **`decision-framework-and-tradeoffs.md`**.
 
-Details: [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md)
+Details: [references/decision-framework-and-tradeoffs.md](/skills/content-analysis-pro/references/decision-framework-and-tradeoffs.md)
 
 ### Evidence and provenance rules (summary)
 
 Anchors per modality; quote discipline — **`evidence-and-provenance-rules.md`**.
 
-Details: [references/evidence-and-provenance-rules.md](references/evidence-and-provenance-rules.md)
+Details: [references/evidence-and-provenance-rules.md](/skills/content-analysis-pro/references/evidence-and-provenance-rules.md)
 
 ### Quality validation and grounding guardrails (summary)
 
 Anti-hallucination checklist — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](/skills/content-analysis-pro/references/quality-validation-and-guardrails.md)
 
 ### Analysis methods and frames (summary)
 
 Per-modality angles; video paths — **`analysis-methods-and-frames.md`**.
 
-Details: [references/analysis-methods-and-frames.md](references/analysis-methods-and-frames.md)
+Details: [references/analysis-methods-and-frames.md](/skills/content-analysis-pro/references/analysis-methods-and-frames.md)
 
 ### Reporting and limitations (summary)
 
 Report sections, fidelity, confidence — **`reporting-and-limitations.md`**.
 
-Details: [references/reporting-and-limitations.md](references/reporting-and-limitations.md)
+Details: [references/reporting-and-limitations.md](/skills/content-analysis-pro/references/reporting-and-limitations.md)
 
 ### Tips and tricks (summary)
 
 Goal-first, sampling, scans — **`tips-and-tricks.md`**.
 
-Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
+Details: [references/tips-and-tricks.md](/skills/content-analysis-pro/references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
 DRM, tables, RTL, litigation sampling — **`edge-cases.md`**.
 
-Details: [references/edge-cases.md](references/edge-cases.md)
+Details: [references/edge-cases.md](/skills/content-analysis-pro/references/edge-cases.md)
 
 ### Scope and file-format dispatch (summary)
 
 Routing formats — **`file-formats-dispatch-and-scope.md`**.
 
-Details: [references/file-formats-dispatch-and-scope.md](references/file-formats-dispatch-and-scope.md)
+Details: [references/file-formats-dispatch-and-scope.md](/skills/content-analysis-pro/references/file-formats-dispatch-and-scope.md)
 
 ### Decision trees (summary)
 
 Input type, goal, scale, risk — **`decision-tree.md`**.
 
-Details: [references/decision-tree.md](references/decision-tree.md)
+Details: [references/decision-tree.md](/skills/content-analysis-pro/references/decision-tree.md)
 
 ### Anti-patterns (summary)
 
 No sampling frame, OCR blindness — **`anti-patterns.md`**.
 
-Details: [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/anti-patterns.md](/skills/content-analysis-pro/references/anti-patterns.md)
 
 ### Integration map (summary)
 
 **`business-analysis-pro`**, **`security-pro`**, **`data-analysis-pro`**, **`web-research-pro`** — **`integration-map.md`**.
 
-Details: [references/integration-map.md](references/integration-map.md)
+Details: [references/integration-map.md](/skills/content-analysis-pro/references/integration-map.md)
 
 ### Versions and tooling (summary)
 
 Tool/docs drift — **`versions.md`**.
 
-Details: [references/versions.md](references/versions.md)
+Details: [references/versions.md](/skills/content-analysis-pro/references/versions.md)
 
 ## Suggested response format (STRICT — implement / review)
 
@@ -170,20 +179,20 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
-| Analysis pipeline (system model) | [references/analysis-pipeline-system-model.md](references/analysis-pipeline-system-model.md) |
-| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
-| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md) |
-| Evidence & provenance rules | [references/evidence-and-provenance-rules.md](references/evidence-and-provenance-rules.md) |
-| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
-| Methods & frames | [references/analysis-methods-and-frames.md](references/analysis-methods-and-frames.md) |
-| Reporting & limitations | [references/reporting-and-limitations.md](references/reporting-and-limitations.md) |
-| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Scope & format dispatch | [references/file-formats-dispatch-and-scope.md](references/file-formats-dispatch-and-scope.md) |
-| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Versions & tooling | [references/versions.md](references/versions.md) |
+| Analysis pipeline (system model) | [references/analysis-pipeline-system-model.md](/skills/content-analysis-pro/references/analysis-pipeline-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](/skills/content-analysis-pro/references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](/skills/content-analysis-pro/references/decision-framework-and-tradeoffs.md) |
+| Evidence & provenance rules | [references/evidence-and-provenance-rules.md](/skills/content-analysis-pro/references/evidence-and-provenance-rules.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](/skills/content-analysis-pro/references/quality-validation-and-guardrails.md) |
+| Methods & frames | [references/analysis-methods-and-frames.md](/skills/content-analysis-pro/references/analysis-methods-and-frames.md) |
+| Reporting & limitations | [references/reporting-and-limitations.md](/skills/content-analysis-pro/references/reporting-and-limitations.md) |
+| Tips | [references/tips-and-tricks.md](/skills/content-analysis-pro/references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](/skills/content-analysis-pro/references/edge-cases.md) |
+| Scope & format dispatch | [references/file-formats-dispatch-and-scope.md](/skills/content-analysis-pro/references/file-formats-dispatch-and-scope.md) |
+| Decision tree | [references/decision-tree.md](/skills/content-analysis-pro/references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](/skills/content-analysis-pro/references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](/skills/content-analysis-pro/references/integration-map.md) |
+| Versions & tooling | [references/versions.md](/skills/content-analysis-pro/references/versions.md) |
 
 ## Quick examples
 

@@ -37,7 +37,10 @@
     "generate-wiki": "node dist/tools.js generate-wiki",
     "query-kb": "node dist/tools.js query-kb",
     "query-kb-batch": "node dist/tools.js query-kb-batch",
-    "verify-kb": "node dist/tools.js verify-kb"
+    "verify-kb": "node dist/tools.js verify-kb",
+    "build-graph": "node dist/tools.js build-graph",
+    "query-graph": "node dist/tools.js query-graph",
+    "impact-analysis": "node dist/tools.js impact-analysis"
   },
   "dependencies": {
     "chalk": "^5.3.0",

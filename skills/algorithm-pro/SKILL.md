@@ -59,100 +59,109 @@ Follow **Suggested response format (STRICT)** — eight sections including **com
 
 ## Workflow
 
-1. Confirm formal statement, constraints, objective, resource limits, and **execution shape** (batch/stream/distributed sketch).
-2. Apply principles and summaries; open `references/`; keep **proof sketch** and **complexity** explicit.
-3. Respond using **Suggested response format (STRICT)**; cite **debugging** path if symptom-driven (WA/TLE/MLE).
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** formal statement, constraints, objective, resource limits, **execution shape** → verify: [problem classified].
+2. **State assumptions** about input ranges, performance requirements (**Think Before Coding**).
+3. **Apply** minimum algorithm first; optimize only when justified (**Simplicity First**).
+4. **Make surgical changes** — only modify algorithm code directly related to the request (**Surgical Changes**).
+5. **Define success criteria** (complexity bounds, test coverage, benchmark targets); loop until verified (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format (STRICT)**; cite **debugging** path if symptom-driven (WA/TLE/MLE).
 
 ### Operating principles
 
-1. **Model before coding** — states, transitions, objectives.
-2. **Classify problem type** — taxonomy in **`decision-tree.md`**.
-3. **Pick strategy by structure** — map signals to families; use **`pattern-catalog.md`**.
-4. **Prove early** — invariants, exchange argument, or counterexample search for greedy.
-5. **Optimize in stages** — asymptotic → DS → constants; **systems** layer when relevant (**`algorithms-in-systems.md`**).
-6. **Test adversarially** — boundaries, overflow, degenerate (**`edge-cases.md`**).
+1. **Think Before Coding** — State assumptions: input constraints, performance bounds, edge cases. Ask when uncertain.
+2. **Simplicity First** — Start with brute force; optimize only when complexity justified.
+3. **Surgical Changes** — Only touch algorithm code related to the request. Don't refactor unrelated data structures.
+4. **Goal-Driven Execution** — Define complexity bounds, test coverage, benchmark targets upfront.
+5. **Model before coding** — states, transitions, objectives.
+6. **Classify problem type** — taxonomy in **`decision-tree.md`**.
+7. **Pick strategy by structure** — map signals to families; use **`pattern-catalog.md`**.
+8. **Prove early** — invariants, exchange argument, or counterexample search for greedy.
+9. **Optimize in stages** — asymptotic → DS → constants; **systems** layer when relevant (**`algorithms-in-systems.md`**).
+10. **Test adversarially** — boundaries, overflow, degenerate (**`edge-cases.md`**).
 
 ### Algorithm constraints and proof (system model) (summary)
 
 Formal object, resource envelope, proof obligations, systems coupling — **`algorithm-constraints-and-proof-system-model.md`**.
 
-Details: [references/algorithm-constraints-and-proof-system-model.md](references/algorithm-constraints-and-proof-system-model.md)
+Details: [references/algorithm-constraints-and-proof-system-model.md](/skills/algorithm-pro/references/algorithm-constraints-and-proof-system-model.md)
 
 ### Failure modes — detection and mitigation (summary)
 
 WA/TLE/MLE, overflow — **`failure-modes-detection-mitigation.md`**.
 
-Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+Details: [references/failure-modes-detection-mitigation.md](/skills/algorithm-pro/references/failure-modes-detection-mitigation.md)
 
 ### Decision framework and trade-offs (summary)
 
 Exact vs approximate, DS vs heuristic, streaming — **`decision-framework-and-trade-offs.md`** (see also **`optimization-and-trade-offs.md`**).
 
-Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+Details: [references/decision-framework-and-trade-offs.md](/skills/algorithm-pro/references/decision-framework-and-trade-offs.md)
 
 ### Quality validation and guardrails (summary)
 
 Evidence on complexity and benchmarks — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](/skills/algorithm-pro/references/quality-validation-and-guardrails.md)
 
 ### Problem modeling and strategy selection (summary)
 
-Details: [references/modeling-and-strategy-selection.md](references/modeling-and-strategy-selection.md)
+Details: [references/modeling-and-strategy-selection.md](/skills/algorithm-pro/references/modeling-and-strategy-selection.md)
 
 ### Decision tree and taxonomy (summary)
 
 Problem types + signals → algorithm families.
 
-Details: [references/decision-tree.md](references/decision-tree.md)
+Details: [references/decision-tree.md](/skills/algorithm-pro/references/decision-tree.md)
 
 ### Pattern catalog (summary)
 
 Explicit map: prefix sums, sliding window, graphs, segtree/BIT, DP families.
 
-Details: [references/pattern-catalog.md](references/pattern-catalog.md)
+Details: [references/pattern-catalog.md](/skills/algorithm-pro/references/pattern-catalog.md)
 
 ### Correctness and complexity analysis (summary)
 
-Details: [references/correctness-and-complexity.md](references/correctness-and-complexity.md)
+Details: [references/correctness-and-complexity.md](/skills/algorithm-pro/references/correctness-and-complexity.md)
 
 ### Optimization and trade-offs (summary)
 
-Details: [references/optimization-and-trade-offs.md](references/optimization-and-trade-offs.md)
+Details: [references/optimization-and-trade-offs.md](/skills/algorithm-pro/references/optimization-and-trade-offs.md)
 
 ### Algorithms in systems (summary)
 
 Batch vs streaming, memory/IO, concurrency hints, failure — not only Big-O.
 
-Details: [references/algorithms-in-systems.md](references/algorithms-in-systems.md)
+Details: [references/algorithms-in-systems.md](/skills/algorithm-pro/references/algorithms-in-systems.md)
 
 ### Debugging WA / TLE / MLE (summary)
 
 Structured triage and checklist.
 
-Details: [references/algorithm-debugging.md](references/algorithm-debugging.md)
+Details: [references/algorithm-debugging.md](/skills/algorithm-pro/references/algorithm-debugging.md)
 
 ### Tips and tricks (summary)
 
-Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
+Details: [references/tips-and-tricks.md](/skills/algorithm-pro/references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
 Expanded catalog: indices, modulo, graphs, DP init.
 
-Details: [references/edge-cases.md](references/edge-cases.md)
+Details: [references/edge-cases.md](/skills/algorithm-pro/references/edge-cases.md)
 
 ### Anti-patterns (summary)
 
-Details: [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/anti-patterns.md](/skills/algorithm-pro/references/anti-patterns.md)
 
 ### Integration map (summary)
 
-Details: [references/integration-map.md](references/integration-map.md)
+Details: [references/integration-map.md](/skills/algorithm-pro/references/integration-map.md)
 
 ### Implementation environment (summary)
 
-Details: [references/versions.md](references/versions.md)
+Details: [references/versions.md](/skills/algorithm-pro/references/versions.md)
 
 ## Suggested response format (STRICT — implement / review)
 
@@ -169,18 +178,18 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
-| Modeling and strategy | [references/modeling-and-strategy-selection.md](references/modeling-and-strategy-selection.md) |
-| Decision tree & taxonomy | [references/decision-tree.md](references/decision-tree.md) |
-| Pattern catalog | [references/pattern-catalog.md](references/pattern-catalog.md) |
-| Correctness and complexity | [references/correctness-and-complexity.md](references/correctness-and-complexity.md) |
-| Optimization and trade-offs | [references/optimization-and-trade-offs.md](references/optimization-and-trade-offs.md) |
-| Algorithms in systems | [references/algorithms-in-systems.md](references/algorithms-in-systems.md) |
-| Debugging WA/TLE/MLE | [references/algorithm-debugging.md](references/algorithm-debugging.md) |
-| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Implementation environment | [references/versions.md](references/versions.md) |
+| Modeling and strategy | [references/modeling-and-strategy-selection.md](/skills/algorithm-pro/references/modeling-and-strategy-selection.md) |
+| Decision tree & taxonomy | [references/decision-tree.md](/skills/algorithm-pro/references/decision-tree.md) |
+| Pattern catalog | [references/pattern-catalog.md](/skills/algorithm-pro/references/pattern-catalog.md) |
+| Correctness and complexity | [references/correctness-and-complexity.md](/skills/algorithm-pro/references/correctness-and-complexity.md) |
+| Optimization and trade-offs | [references/optimization-and-trade-offs.md](/skills/algorithm-pro/references/optimization-and-trade-offs.md) |
+| Algorithms in systems | [references/algorithms-in-systems.md](/skills/algorithm-pro/references/algorithms-in-systems.md) |
+| Debugging WA/TLE/MLE | [references/algorithm-debugging.md](/skills/algorithm-pro/references/algorithm-debugging.md) |
+| Tips | [references/tips-and-tricks.md](/skills/algorithm-pro/references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](/skills/algorithm-pro/references/edge-cases.md) |
+| Anti-patterns | [references/anti-patterns.md](/skills/algorithm-pro/references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](/skills/algorithm-pro/references/integration-map.md) |
+| Implementation environment | [references/versions.md](/skills/algorithm-pro/references/versions.md) |
 
 ## Quick example
 

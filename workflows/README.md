@@ -13,25 +13,25 @@ This repo does **not** require an automated engine: an agent (or you) reads the 
 
 | Command | Document | Purpose |
 |---------|----------|---------|
-| **`/route`** | [`workflows/dev/route.md`](workflows/dev/route.md) | Request routing & skill orchestration |
-| **`/ticket`** | [`workflows/dev/ticket.md`](workflows/dev/ticket.md) | Ticket / Kanban |
-| **`/release`** | [`workflows/dev/release.md`](workflows/dev/release.md) | Release notes → work |
-| **`//hotfix`** | [`workflows/dev/hotfix.md`](workflows/dev/hotfix.md) | Urgent production fix |
-| **`/code-review`** | [`workflows/dev/code-review.md`](workflows/dev/code-review.md) | Structured review |
-| **`/debug`** | [`workflows/dev/debug.md`](workflows/dev/debug.md) | Systematic debugging |
-| **`/security-audit`** | [`workflows/dev/security-audit.md`](workflows/dev/security-audit.md) | Security review |
-| **`/arch-review`** | [`workflows/dev/arch-review.md`](workflows/dev/arch-review.md) | Architecture review |
-| **`/perf-investigation`** | [`workflows/dev/perf-investigation.md`](workflows/dev/perf-investigation.md) | Performance |
-| **`/refactor`** | [`workflows/dev/refactor.md`](workflows/dev/refactor.md) | Safe refactor |
-| **`/incident`** | [`workflows/dev/incident.md`](workflows/dev/incident.md) | Incident response |
-| **`/data-migration`** | [`workflows/dev/data-migration.md`](workflows/dev/data-migration.md) | Data / DB migration |
-| **`/onboarding`** | [`workflows/dev/onboarding.md`](workflows/dev/onboarding.md) | Onboarding |
-| **`/api-design`** | [`workflows/dev/api-design.md`](workflows/dev/api-design.md) | API design |
-| **`/test-strategy`** | [`workflows/dev/test-strategy.md`](workflows/dev/test-strategy.md) | Test strategy |
-| **`/dep-audit`** | [`workflows/dev/dep-audit.md`](workflows/dev/dep-audit.md) | Dependencies |
-| **`/index-project`** | [`workflows/dev/index-project.md`](workflows/dev/index-project.md) | Index any repo |
+| **`/route`** | [`dev/route.md`](./dev/route.md) | Request routing & skill orchestration |
+| **`/ticket`** | [`dev/ticket.md`](./dev/ticket.md) | Ticket / Kanban |
+| **`/release`** | [`dev/release.md`](./dev/release.md) | Release notes → work |
+| **`/hotfix`** | [`dev/hotfix.md`](./dev/hotfix.md) | Urgent production fix |
+| **`/code-review`** | [`dev/code-review.md`](./dev/code-review.md) | Structured review |
+| **`/debug`** | [`dev/debug.md`](./dev/debug.md) | Systematic debugging |
+| **`/security-audit`** | [`dev/security-audit.md`](./dev/security-audit.md) | Security review |
+| **`/arch-review`** | [`dev/arch-review.md`](./dev/arch-review.md) | Architecture review |
+| **`/perf-investigation`** | [`dev/perf-investigation.md`](./dev/perf-investigation.md) | Performance |
+| **`/refactor`** | [`dev/refactor.md`](./dev/refactor.md) | Safe refactor |
+| **`/incident`** | [`dev/incident.md`](./dev/incident.md) | Incident response |
+| **`/data-migration`** | [`dev/data-migration.md`](./dev/data-migration.md) | Data / DB migration |
+| **`/onboarding`** | [`dev/onboarding.md`](./dev/onboarding.md) | Onboarding |
+| **`/api-design`** | [`dev/api-design.md`](./dev/api-design.md) | API design |
+| **`/test-strategy`** | [`dev/test-strategy.md`](./dev/test-strategy.md) | Test strategy |
+| **`/dep-audit`** | [`dev/dep-audit.md`](./dev/dep-audit.md) | Dependencies |
+| **`/index-project`** | [`dev/index-project.md`](./dev/index-project.md) | Index any repo |
 
-Slash commands are authored once under **`commands/`** (see [`commands/README.md`](../commands/README.md)). **`*.md`** stubs include **`targets: [cursor, claude]`** by default. Routing helpers (`route`, `optimize`, `find-skill`, `run-workflow`) use **`targets: [claude]`** only. **`.cursor/commands/`** and **`.claude/commands/`** in this repo are symlinks into **`commands/`** for IDE discovery.
+Slash commands are authored once under **`commands/`**. **`*.md`** stubs include **`targets: [cursor, claude]`** by default. Routing helpers (`route`, `optimize`, `find-skill`, `run-workflow`) use **`targets: [claude]`** only. **`.cursor/commands/`** and **`.claude/commands/`** in this repo are symlinks into **`commands/`** for IDE discovery.
 
 ## Parallel execution
 

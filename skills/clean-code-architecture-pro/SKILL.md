@@ -61,84 +61,93 @@ Follow **Suggested response format** strictly — architecture through residual 
 
 ## Workflow
 
-1. Confirm stack, domain complexity, current **dependency graph** (mental or tool-assisted).
-2. Apply summaries; open `references/`; avoid **generic** Clean Architecture lectures — **`quality-validation-and-guardrails.md`**.
-3. Respond using **Suggested response format**; prefer **incremental** strangler over big-bang — **`bounded-context-and-strangler-patterns.md`**.
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** stack, domain complexity, **dependency graph** → verify: [context captured].
+2. **State assumptions** about architectural needs, refactoring scope (**Think Before Coding**).
+3. **Apply** minimum architectural change first; add complexity only when justified (**Simplicity First**).
+4. **Make surgical changes** — only touch modules directly related to the request (**Surgical Changes**).
+5. **Define success criteria** (test coverage, coupling metrics, build time); loop until verified (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; prefer **incremental** strangler over big-bang — **`bounded-context-and-strangler-patterns.md`**.
 
 ### Operating principles
 
-1. **Depend inward** — Domain and application policies do not depend on UI, DB drivers, or HTTP stacks — **`dependency-rule-system-model.md`**.
-2. **One reason to change per module** — cohesion over clever DRY across unrelated features.
-3. **Clear boundaries over shortcuts** — optimize for the **next reader** and safe evolution.
-4. **Refactor in verified steps** — behavior preserved first — **`testing-pro`**.
-5. **Architecture visible** — structure and names expose intent; enforce with **lint/import rules** where valuable.
-6. **Right-sized ceremony** — **`decision-framework-and-tradeoffs.md`** picks depth for CRUD vs complex domain.
+1. **Think Before Coding** — State assumptions: domain complexity, team size, evolution needs. Ask when uncertain.
+2. **Simplicity First** — Start with simple module structure; add architectural layers only when justified.
+3. **Surgical Changes** — Only touch modules directly related to the request. Don't refactor unrelated code.
+4. **Goal-Driven Execution** — Define coupling metrics, test coverage, build time targets upfront.
+5. **Depend inward** — Domain and application policies do not depend on UI, DB drivers, or HTTP stacks — **`dependency-rule-system-model.md`**.
+6. **One reason to change per module** — cohesion over clever DRY across unrelated features.
+7. **Clear boundaries over shortcuts** — optimize for the **next reader** and safe evolution.
+8. **Refactor in verified steps** — behavior preserved first — **`testing-pro`**.
+9. **Architecture visible** — structure and names expose intent; enforce with **lint/import rules** where valuable.
+10. **Right-sized ceremony** — **`decision-framework-and-tradeoffs.md`** picks depth for CRUD vs complex domain.
 
 ### Dependency rule and system model (summary)
 
 Ports/adapters; dependency vs control flow; inward stability — **`dependency-rule-system-model.md`**.
 
-Details: [references/dependency-rule-system-model.md](references/dependency-rule-system-model.md)
+Details: [references/dependency-rule-system-model.md](/skills/clean-code-architecture-pro/references/dependency-rule-system-model.md)
 
 ### Failure modes — detection and mitigation (summary)
 
 Leaky domain, cycles, anemic model, god module — **`failure-modes-detection-mitigation.md`**.
 
-Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+Details: [references/failure-modes-detection-mitigation.md](/skills/clean-code-architecture-pro/references/failure-modes-detection-mitigation.md)
 
 ### Decision framework and trade-offs (summary)
 
 Strict vs pragmatic layering; monolith vs split — **`decision-framework-and-tradeoffs.md`**.
 
-Details: [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md)
+Details: [references/decision-framework-and-tradeoffs.md](/skills/clean-code-architecture-pro/references/decision-framework-and-tradeoffs.md)
 
 ### Bounded context, ACL, strangler (summary)
 
 DDD-lite boundaries; incremental migration — **`bounded-context-and-strangler-patterns.md`**.
 
-Details: [references/bounded-context-and-strangler-patterns.md](references/bounded-context-and-strangler-patterns.md)
+Details: [references/bounded-context-and-strangler-patterns.md](/skills/clean-code-architecture-pro/references/bounded-context-and-strangler-patterns.md)
 
 ### Quality validation and guardrails (summary)
 
 Anti-over-engineering; stack honesty — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](/skills/clean-code-architecture-pro/references/quality-validation-and-guardrails.md)
 
 ### Versions and stack dialects (summary)
 
 Java/TS/Nest/Spring packaging notes — **`versions-and-stack-dialects.md`**.
 
-Details: [references/versions-and-stack-dialects.md](references/versions-and-stack-dialects.md)
+Details: [references/versions-and-stack-dialects.md](/skills/clean-code-architecture-pro/references/versions-and-stack-dialects.md)
 
 ### Clean code tips and tricks (summary)
 
 Naming, seams, readability — **`tips-and-tricks.md`**.
 
-Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
+Details: [references/tips-and-tricks.md](/skills/clean-code-architecture-pro/references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
 Premature layers, microservices mud, ORM, events — **`edge-cases.md`**.
 
-Details: [references/edge-cases.md](references/edge-cases.md)
+Details: [references/edge-cases.md](/skills/clean-code-architecture-pro/references/edge-cases.md)
 
 ### Anti-patterns (summary)
 
 God module, leaky domain, premature layering — **`anti-patterns.md`**.
 
-Details: [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/anti-patterns.md](/skills/clean-code-architecture-pro/references/anti-patterns.md)
 
 ### Decision trees (summary)
 
 Placement of logic, refactor timing, strict vs pragmatic — **`decision-tree.md`**.
 
-Details: [references/decision-tree.md](references/decision-tree.md)
+Details: [references/decision-tree.md](/skills/clean-code-architecture-pro/references/decision-tree.md)
 
 ### Integration map (summary)
 
 **`testing-pro`**, **`typescript-pro`**, **`api-design-pro`**, frameworks — **`integration-map.md`**.
 
-Details: [references/integration-map.md](references/integration-map.md)
+Details: [references/integration-map.md](/skills/clean-code-architecture-pro/references/integration-map.md)
 
 ## Suggested response format (STRICT — implement / review)
 
@@ -155,17 +164,17 @@ Details: [references/integration-map.md](references/integration-map.md)
 
 | Topic | File |
 |-------|------|
-| Dependency rule & system model | [references/dependency-rule-system-model.md](references/dependency-rule-system-model.md) |
-| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
-| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md) |
-| Bounded context & strangler | [references/bounded-context-and-strangler-patterns.md](references/bounded-context-and-strangler-patterns.md) |
-| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
-| Versions & stack dialects | [references/versions-and-stack-dialects.md](references/versions-and-stack-dialects.md) |
-| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Decision trees | [references/decision-tree.md](references/decision-tree.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Dependency rule & system model | [references/dependency-rule-system-model.md](/skills/clean-code-architecture-pro/references/dependency-rule-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](/skills/clean-code-architecture-pro/references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](/skills/clean-code-architecture-pro/references/decision-framework-and-tradeoffs.md) |
+| Bounded context & strangler | [references/bounded-context-and-strangler-patterns.md](/skills/clean-code-architecture-pro/references/bounded-context-and-strangler-patterns.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](/skills/clean-code-architecture-pro/references/quality-validation-and-guardrails.md) |
+| Versions & stack dialects | [references/versions-and-stack-dialects.md](/skills/clean-code-architecture-pro/references/versions-and-stack-dialects.md) |
+| Tips | [references/tips-and-tricks.md](/skills/clean-code-architecture-pro/references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](/skills/clean-code-architecture-pro/references/edge-cases.md) |
+| Anti-patterns | [references/anti-patterns.md](/skills/clean-code-architecture-pro/references/anti-patterns.md) |
+| Decision trees | [references/decision-tree.md](/skills/clean-code-architecture-pro/references/decision-tree.md) |
+| Integration map | [references/integration-map.md](/skills/clean-code-architecture-pro/references/integration-map.md) |
 
 ## Quick examples
 

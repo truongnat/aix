@@ -6,4 +6,4 @@
 - **Tests & repro:** **`testing-pro`**
 - **Security flaws:** **`security-pro`**
 - **GitNexus CLI / index:** Cursor skill **`gitnexus-cli`**
-- **Deep dives:** [references/](references/)
+- **Deep dives:** [references/](/skills/bug-discovery-pro/references/)

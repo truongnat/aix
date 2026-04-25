@@ -9,6 +9,6 @@ Professional **testing and test automation** skill: test pyramid, unit/integrati
 - **With Flutter:** skill **`flutter-pro`**
 - **With React Native:** skill **`react-native-pro`**
 - **With PostgreSQL in tests:** skill **`postgresql-pro`**
-- **Deep dives:** [references/](references/)
+- **Deep dives:** [references/](/skills/testing-pro/references/)
 
 *Tip:* Fork and extend `references/` with your org’s CI templates (GitHub Actions, Jenkins, etc.).

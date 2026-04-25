@@ -11,4 +11,4 @@
 | Skill gap report | `node dist/tools.js analyze-skills --markdown` | Pair with **`skills-self-review-pro`** |
 | List skills JSON | `node dist/tools.js list-skills --json` | Agent inventory |
 
-Canonical flags: **[`scripts/README.md`](../../scripts/README.md)**.
+Canonical flags: **[`scripts/README.md`](/scripts/README.md)**.

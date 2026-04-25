@@ -71,42 +71,51 @@ Follow **Suggested response format (STRICT)** — eight sections from context th
 
 ## Workflow
 
-1. Confirm actors, trust boundaries, client types, data sensitivity, and required assurance level.
-2. Apply operating principles and summaries below; open `references/` for depth; keep authn method and authz enforcement boundaries explicit.
-3. Respond using **Suggested response format (STRICT)**; note token leakage, privilege escalation, and revocation gaps.
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** actors, trust boundaries, client types, data sensitivity, assurance level → verify: [boundaries documented].
+2. **State assumptions** about IdP, threat model, compliance needs (**Think Before Coding**).
+3. **Apply** minimum auth solution first; add complexity (SSO, MFA, audit) only when justified (**Simplicity First**).
+4. **Make surgical changes** — only touch auth code directly related to the request (**Surgical Changes**).
+5. **Define success criteria** (auth test cases, penetration test results, compliance checklist); loop until verified (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format (STRICT)**; note token leakage, privilege escalation, and revocation gaps.
 
 ### Operating principles
 
-1. **Identity proofing before access** — authn strength must match risk level.
-2. **Authz is server-side truth** — never trust client role claims without verification.
-3. **Least privilege by default** — deny-first policy and scoped permissions.
-4. **Short-lived credentials** — minimize token/session lifetime and rotate secrets.
-5. **Explicit lifecycle controls** — issuance, refresh, revocation, and auditability are mandatory.
-6. **Method follows context** — choose protocols by actor, trust, and operational constraints.
+1. **Think Before Coding** — State assumptions: threat model, IdP constraints, compliance requirements. Ask when uncertain.
+2. **Simplicity First** — Start with basic auth (session/JWT); add SSO/MFA/audit only when justified.
+3. **Surgical Changes** — Only touch auth code related to the request. Don't refactor unrelated user management.
+4. **Goal-Driven Execution** — Define auth test cases, penetration test scope, compliance checklist upfront.
+5. **Identity proofing before access** — authn strength must match risk level.
+6. **Authz is server-side truth** — never trust client role claims without verification.
+7. **Least privilege by default** — deny-first policy and scoped permissions.
+8. **Short-lived credentials** — minimize token/session lifetime and rotate secrets.
+9. **Explicit lifecycle controls** — issuance, refresh, revocation, and auditability are mandatory.
+10. **Method follows context** — choose protocols by actor, trust, and operational constraints.
 
 ### Identity, trust, and session (system model) (summary)
 
 Actors, credential classes, authz surface, lifecycle — **`identity-trust-session-system-model.md`**.
 
-Details: [references/identity-trust-session-system-model.md](references/identity-trust-session-system-model.md)
+Details: [references/identity-trust-session-system-model.md](/skills/auth-pro/references/identity-trust-session-system-model.md)
 
 ### Failure modes — detection and mitigation (summary)
 
 Leakage, weak authz, CSRF, refresh reuse — **`failure-modes-detection-mitigation.md`**.
 
-Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+Details: [references/failure-modes-detection-mitigation.md](/skills/auth-pro/references/failure-modes-detection-mitigation.md)
 
 ### Decision framework and trade-offs (summary)
 
 Session vs bearer, BFF, RBAC vs ABAC, MFA friction — **`decision-framework-and-trade-offs.md`**.
 
-Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+Details: [references/decision-framework-and-trade-offs.md](/skills/auth-pro/references/decision-framework-and-trade-offs.md)
 
 ### Quality validation and guardrails (summary)
 
 RFC/OIDC evidence; no invented portal steps — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](/skills/auth-pro/references/quality-validation-and-guardrails.md)
 
 ## Default recommendations by scenario
 
@@ -121,61 +130,61 @@ Use when the ask is underspecified; override when constraints conflict.
 | Service-to-service (internal) | **mTLS** or **signed** service tokens + network allowlists; avoid long-lived shared secrets |
 | B2B / multi-tenant SaaS | **OIDC** (or SAML for enterprise) + **RBAC/ABAC** + **tenant isolation** enforced server-side (and often RLS) |
 
-Cross-check [references/decision-tree.md](references/decision-tree.md) and [references/authentication-methods-and-selection.md](references/authentication-methods-and-selection.md).
+Cross-check [references/decision-tree.md](/skills/auth-pro/references/decision-tree.md) and [references/authentication-methods-and-selection.md](/skills/auth-pro/references/authentication-methods-and-selection.md).
 
 ## Decision trees
 
 **Session vs JWT vs opaque token**, **OAuth/OIDC vs custom**, **RBAC vs ABAC vs ReBAC**, **mTLS vs API key**, **MFA depth**, **SPA token channel** — structured trees in reference.
 
-Details: [references/decision-tree.md](references/decision-tree.md)
+Details: [references/decision-tree.md](/skills/auth-pro/references/decision-tree.md)
 
 ## Anti-patterns
 
 Examples: trusting client **role** claims in JWT, long-lived access tokens, refresh in `localStorage`, missing **CSRF** on cookie sessions, auth only in the client.
 
-Details: [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/anti-patterns.md](/skills/auth-pro/references/anti-patterns.md)
 
 ### Authentication methods and selection (summary)
 
 - Session, JWT, OAuth/OIDC, SAML, API key, mTLS, WebAuthn/passkeys, BFF vs bearer SPA, workload identity — when each fits.
 
-Details: [references/authentication-methods-and-selection.md](references/authentication-methods-and-selection.md)
+Details: [references/authentication-methods-and-selection.md](/skills/auth-pro/references/authentication-methods-and-selection.md)
 
 ### OAuth / OIDC patterns (summary)
 
 - Authorization code + PKCE, client types, redirect/state/nonce, scopes vs API authz, device flow — architecture checklist.
 
-Details: [references/oauth-oidc-patterns.md](references/oauth-oidc-patterns.md)
+Details: [references/oauth-oidc-patterns.md](/skills/auth-pro/references/oauth-oidc-patterns.md)
 
 ### MFA, step-up, and assurance (summary)
 
 - Factor strength, phishing resistance, step-up vs session MFA, passkeys/magic links at architecture level.
 
-Details: [references/mfa-and-assurance.md](references/mfa-and-assurance.md)
+Details: [references/mfa-and-assurance.md](/skills/auth-pro/references/mfa-and-assurance.md)
 
 ### Authorization models and policy design (summary)
 
 - RBAC/ABAC/ReBAC, OAuth scopes vs app permissions, tenant isolation, impersonation guardrails.
 
-Details: [references/authorization-models-and-policy.md](references/authorization-models-and-policy.md)
+Details: [references/authorization-models-and-policy.md](/skills/auth-pro/references/authorization-models-and-policy.md)
 
 ### Token/session lifecycle and hardening (summary)
 
 - Issuance, validation, **jti**/replay considerations, rotation, revocation, observability categories.
 
-Details: [references/token-session-lifecycle.md](references/token-session-lifecycle.md)
+Details: [references/token-session-lifecycle.md](/skills/auth-pro/references/token-session-lifecycle.md)
 
 ### Tips and tricks (summary)
 
 - Cookies, refresh reuse, rate limits, SameSite, permission naming — operational defaults.
 
-Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
+Details: [references/tips-and-tricks.md](/skills/auth-pro/references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
 - Expanded catalog: tokens, browser, MFA/recovery, tenant, federation, M2M — see reference.
 
-Details: [references/edge-cases.md](references/edge-cases.md)
+Details: [references/edge-cases.md](/skills/auth-pro/references/edge-cases.md)
 
 ### Extended domain — lifecycle and operations
 
@@ -183,24 +192,24 @@ Use when the task goes beyond method/token selection into **full auth domain** r
 
 | Focus | References |
 |-------|------------|
-| Identity & accounts | [identity-account-lifecycle.md](references/identity-account-lifecycle.md), [account-recovery-breakglass.md](references/account-recovery-breakglass.md) |
-| Authenticators & passwords | [authenticators-lifecycle.md](references/authenticators-lifecycle.md), [passwords-and-verifiers.md](references/passwords-and-verifiers.md) |
-| Web sessions & clients | [session-management.md](references/session-management.md), [client-platform-matrix.md](references/client-platform-matrix.md) |
-| Authorization depth | [authorization-architecture-review.md](references/authorization-architecture-review.md) (+ [authorization-models-and-policy.md](references/authorization-models-and-policy.md)) |
-| Federation & M2M | [federation-enterprise-lifecycle.md](references/federation-enterprise-lifecycle.md), [workload-machine-auth.md](references/workload-machine-auth.md) |
-| Observability & threats | [auth-observability-detection.md](references/auth-observability-detection.md), [threat-controls-mapping.md](references/threat-controls-mapping.md) |
+| Identity & accounts | [identity-account-lifecycle.md](/skills/auth-pro/references/identity-account-lifecycle.md), [account-recovery-breakglass.md](/skills/auth-pro/references/account-recovery-breakglass.md) |
+| Authenticators & passwords | [authenticators-lifecycle.md](/skills/auth-pro/references/authenticators-lifecycle.md), [passwords-and-verifiers.md](/skills/auth-pro/references/passwords-and-verifiers.md) |
+| Web sessions & clients | [session-management.md](/skills/auth-pro/references/session-management.md), [client-platform-matrix.md](/skills/auth-pro/references/client-platform-matrix.md) |
+| Authorization depth | [authorization-architecture-review.md](/skills/auth-pro/references/authorization-architecture-review.md) (+ [authorization-models-and-policy.md](/skills/auth-pro/references/authorization-models-and-policy.md)) |
+| Federation & M2M | [federation-enterprise-lifecycle.md](/skills/auth-pro/references/federation-enterprise-lifecycle.md), [workload-machine-auth.md](/skills/auth-pro/references/workload-machine-auth.md) |
+| Observability & threats | [auth-observability-detection.md](/skills/auth-pro/references/auth-observability-detection.md), [threat-controls-mapping.md](/skills/auth-pro/references/threat-controls-mapping.md) |
 
 ### Versions (summary)
 
 - OAuth/OIDC drift (implicit vs PKCE), JWKS rotation, JWT library majors, Auth.js / NextAuth / Passport caveats.
 
-Details: [references/versions.md](references/versions.md)
+Details: [references/versions.md](/skills/auth-pro/references/versions.md)
 
 ## Cross-skill handoffs
 
 **`security-pro`** (threat model), **`nestjs-pro`** / **`nextjs-pro`** (wiring), **`postgresql-pro`** (RLS), **`deployment-pro`** (secrets/TLS posture), **`testing-pro`** (abuse tests).
 
-Details: [references/integration-map.md](references/integration-map.md)
+Details: [references/integration-map.md](/skills/auth-pro/references/integration-map.md)
 
 ## Suggested response format (STRICT — implement / review)
 
@@ -221,32 +230,32 @@ Skip sections only if clearly N/A; say why.
 
 | Topic | File |
 |-------|------|
-| **Identity & trust model** | [references/identity-trust-session-system-model.md](references/identity-trust-session-system-model.md) |
-| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
-| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
-| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
-| Authentication methods and selection | [references/authentication-methods-and-selection.md](references/authentication-methods-and-selection.md) |
-| OAuth / OIDC patterns | [references/oauth-oidc-patterns.md](references/oauth-oidc-patterns.md) |
-| MFA, step-up, assurance | [references/mfa-and-assurance.md](references/mfa-and-assurance.md) |
-| Authorization models and policy | [references/authorization-models-and-policy.md](references/authorization-models-and-policy.md) |
-| Authorization architecture review | [references/authorization-architecture-review.md](references/authorization-architecture-review.md) |
-| Identity / account lifecycle | [references/identity-account-lifecycle.md](references/identity-account-lifecycle.md) |
-| Authenticators lifecycle | [references/authenticators-lifecycle.md](references/authenticators-lifecycle.md) |
-| Passwords and verifiers | [references/passwords-and-verifiers.md](references/passwords-and-verifiers.md) |
-| Account recovery & break-glass | [references/account-recovery-breakglass.md](references/account-recovery-breakglass.md) |
-| Session management | [references/session-management.md](references/session-management.md) |
-| Client platform matrix | [references/client-platform-matrix.md](references/client-platform-matrix.md) |
-| Federation / enterprise | [references/federation-enterprise-lifecycle.md](references/federation-enterprise-lifecycle.md) |
-| Workload / machine auth | [references/workload-machine-auth.md](references/workload-machine-auth.md) |
-| Observability & detection | [references/auth-observability-detection.md](references/auth-observability-detection.md) |
-| Threat controls mapping | [references/threat-controls-mapping.md](references/threat-controls-mapping.md) |
-| Token/session lifecycle | [references/token-session-lifecycle.md](references/token-session-lifecycle.md) |
-| Tips | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Decision trees | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Versions | [references/versions.md](references/versions.md) |
+| **Identity & trust model** | [references/identity-trust-session-system-model.md](/skills/auth-pro/references/identity-trust-session-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](/skills/auth-pro/references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](/skills/auth-pro/references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](/skills/auth-pro/references/quality-validation-and-guardrails.md) |
+| Authentication methods and selection | [references/authentication-methods-and-selection.md](/skills/auth-pro/references/authentication-methods-and-selection.md) |
+| OAuth / OIDC patterns | [references/oauth-oidc-patterns.md](/skills/auth-pro/references/oauth-oidc-patterns.md) |
+| MFA, step-up, assurance | [references/mfa-and-assurance.md](/skills/auth-pro/references/mfa-and-assurance.md) |
+| Authorization models and policy | [references/authorization-models-and-policy.md](/skills/auth-pro/references/authorization-models-and-policy.md) |
+| Authorization architecture review | [references/authorization-architecture-review.md](/skills/auth-pro/references/authorization-architecture-review.md) |
+| Identity / account lifecycle | [references/identity-account-lifecycle.md](/skills/auth-pro/references/identity-account-lifecycle.md) |
+| Authenticators lifecycle | [references/authenticators-lifecycle.md](/skills/auth-pro/references/authenticators-lifecycle.md) |
+| Passwords and verifiers | [references/passwords-and-verifiers.md](/skills/auth-pro/references/passwords-and-verifiers.md) |
+| Account recovery & break-glass | [references/account-recovery-breakglass.md](/skills/auth-pro/references/account-recovery-breakglass.md) |
+| Session management | [references/session-management.md](/skills/auth-pro/references/session-management.md) |
+| Client platform matrix | [references/client-platform-matrix.md](/skills/auth-pro/references/client-platform-matrix.md) |
+| Federation / enterprise | [references/federation-enterprise-lifecycle.md](/skills/auth-pro/references/federation-enterprise-lifecycle.md) |
+| Workload / machine auth | [references/workload-machine-auth.md](/skills/auth-pro/references/workload-machine-auth.md) |
+| Observability & detection | [references/auth-observability-detection.md](/skills/auth-pro/references/auth-observability-detection.md) |
+| Threat controls mapping | [references/threat-controls-mapping.md](/skills/auth-pro/references/threat-controls-mapping.md) |
+| Token/session lifecycle | [references/token-session-lifecycle.md](/skills/auth-pro/references/token-session-lifecycle.md) |
+| Tips | [references/tips-and-tricks.md](/skills/auth-pro/references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](/skills/auth-pro/references/edge-cases.md) |
+| Decision trees | [references/decision-tree.md](/skills/auth-pro/references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](/skills/auth-pro/references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](/skills/auth-pro/references/integration-map.md) |
+| Versions | [references/versions.md](/skills/auth-pro/references/versions.md) |
 
 ## Quick example
 
@@ -258,7 +267,7 @@ Skip sections only if clearly N/A; say why.
 ### 2 — Tricky (edge case)
 
 **Input:** JWT access token includes `role: admin` claim; API trusts it for `/admin` routes.  
-**Expected output:** Reject pattern; authz server-side from DB/policy; JWT as identity carrier only; cite [anti-patterns.md](references/anti-patterns.md).
+**Expected output:** Reject pattern; authz server-side from DB/policy; JWT as identity carrier only; cite [anti-patterns.md](/skills/auth-pro/references/anti-patterns.md).
 
 ### 3 — Cross-skill
 

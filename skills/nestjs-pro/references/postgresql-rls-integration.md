@@ -2,7 +2,7 @@
 
 NestJS sits **above** the database: RLS policies still live in PostgreSQL. This file covers **how to set tenant / session context** from Nest so `USING` / `WITH CHECK` policies work, and how to avoid pooling bugs.
 
-**SQL policy design** (policies, `BYPASSRLS`, performance): use skill **`postgresql-pro`** — [row-level-security.md](../../postgresql-pro/references/row-level-security.md).
+**SQL policy design** (policies, `BYPASSRLS`, performance): use skill **`postgresql-pro`** — [`row-level-security.md`](/skills/postgresql-pro/references/row-level-security.md).
 
 ---
 

@@ -1,0 +1,1863 @@
+{
+  "nodes": [
+    {
+      "id": "scripts/batch-upgrade-karpathy.py#update_workflow",
+      "type": "function",
+      "name": "update_workflow",
+      "file": "scripts/batch-upgrade-karpathy.py",
+      "line": 23
+    },
+    {
+      "id": "scripts/batch-upgrade-karpathy.py#replacer",
+      "type": "function",
+      "name": "replacer",
+      "file": "scripts/batch-upgrade-karpathy.py",
+      "line": 28
+    },
+    {
+      "id": "scripts/batch-upgrade-karpathy.py#update_operating_principles",
+      "type": "function",
+      "name": "update_operating_principles",
+      "file": "scripts/batch-upgrade-karpathy.py",
+      "line": 52
+    },
+    {
+      "id": "scripts/batch-upgrade-karpathy.py#process_skill",
+      "type": "function",
+      "name": "process_skill",
+      "file": "scripts/batch-upgrade-karpathy.py",
+      "line": 61
+    },
+    {
+      "id": "scripts/batch-upgrade-karpathy.py#main",
+      "type": "function",
+      "name": "main",
+      "file": "scripts/batch-upgrade-karpathy.py",
+      "line": 86
+    },
+    {
+      "id": "scripts/tools.js#if",
+      "type": "function",
+      "name": "if",
+      "file": "scripts/tools.js",
+      "line": 27
+    },
+    {
+      "id": "scripts/tools.js#catch",
+      "type": "function",
+      "name": "catch",
+      "file": "scripts/tools.js",
+      "line": 47
+    },
+    {
+      "id": "src/commands/installSkill.ts#parseName",
+      "type": "function",
+      "name": "parseName",
+      "file": "src/commands/installSkill.ts",
+      "line": 23
+    },
+    {
+      "id": "src/commands/installSkill.ts#ensureExclude",
+      "type": "function",
+      "name": "ensureExclude",
+      "file": "src/commands/installSkill.ts",
+      "line": 30
+    },
+    {
+      "id": "src/commands/installSkill.ts#installSkill",
+      "type": "function",
+      "name": "installSkill",
+      "file": "src/commands/installSkill.ts",
+      "line": 40
+    },
+    {
+      "id": "src/commands/installSkill.ts#if",
+      "type": "function",
+      "name": "if",
+      "file": "src/commands/installSkill.ts",
+      "line": 60
+    },
+    {
+      "id": "src/lib/embeddings.ts#tokenize",
+      "type": "function",
+      "name": "tokenize",
+      "file": "src/lib/embeddings.ts",
+      "line": 1
+    },
+    {
+      "id": "src/lib/embeddings.ts#hashToken",
+      "type": "function",
+      "name": "hashToken",
+      "file": "src/lib/embeddings.ts",
+      "line": 9
+    },
+    {
+      "id": "src/lib/embeddings.ts#for",
+      "type": "function",
+      "name": "for",
+      "file": "src/lib/embeddings.ts",
+      "line": 11
+    },
+    {
+      "id": "src/lib/embeddings.ts#embedText",
+      "type": "function",
+      "name": "embedText",
+      "file": "src/lib/embeddings.ts",
+      "line": 18
+    },
+    {
+      "id": "src/lib/embeddings.ts#if",
+      "type": "function",
+      "name": "if",
+      "file": "src/lib/embeddings.ts",
+      "line": 28
+    },
+    {
+      "id": "src/lib/embeddings.ts#cosine",
+      "type": "function",
+      "name": "cosine",
+      "file": "src/lib/embeddings.ts",
+      "line": 34
+    },
+    {
+      "id": "src/lib/graph.ts#getFileExtension",
+      "type": "function",
+      "name": "getFileExtension",
+      "file": "src/lib/graph.ts",
+      "line": 75
+    },
+    {
+      "id": "src/lib/graph.ts#isCodeFile",
+      "type": "function",
+      "name": "isCodeFile",
+      "file": "src/lib/graph.ts",
+      "line": 79
+    },
+    {
+      "id": "src/lib/graph.ts#getLanguage",
+      "type": "function",
+      "name": "getLanguage",
+      "file": "src/lib/graph.ts",
+      "line": 83
+    },
+    {
+      "id": "src/lib/graph.ts#parseFile",
+      "type": "function",
+      "name": "parseFile",
+      "file": "src/lib/graph.ts",
+      "line": 99
+    },
+    {
+      "id": "src/lib/graph.ts#if",
+      "type": "function",
+      "name": "if",
+      "file": "src/lib/graph.ts",
+      "line": 119
+    },
+    {
+      "id": "src/lib/graph.ts#calls",
+      "type": "function",
+      "name": "calls",
+      "file": "src/lib/graph.ts",
+      "line": 199
+    },
+    {
+      "id": "src/lib/graph.ts#patterns",
+      "type": "function",
+      "name": "patterns",
+      "file": "src/lib/graph.ts",
+      "line": 206
+    },
+    {
+      "id": "src/lib/graph.ts#contains",
+      "type": "function",
+      "name": "contains",
+      "file": "src/lib/graph.ts",
+      "line": 212
+    },
+    {
+      "id": "src/lib/graph.ts#findContainingFunction",
+      "type": "function",
+      "name": "findContainingFunction",
+      "file": "src/lib/graph.ts",
+      "line": 230
+    },
+    {
+      "id": "src/lib/graph.ts#before",
+      "type": "function",
+      "name": "before",
+      "file": "src/lib/graph.ts",
+      "line": 231
+    },
+    {
+      "id": "src/lib/graph.ts#declaration",
+      "type": "function",
+      "name": "declaration",
+      "file": "src/lib/graph.ts",
+      "line": 235
+    },
+    {
+      "id": "src/lib/graph.ts#for",
+      "type": "function",
+      "name": "for",
+      "file": "src/lib/graph.ts",
+      "line": 236
+    },
+    {
+      "id": "src/lib/graph.ts#buildGraph",
+      "type": "function",
+      "name": "buildGraph",
+      "file": "src/lib/graph.ts",
+      "line": 249
+    },
+    {
+      "id": "src/lib/graph.ts#saveGraph",
+      "type": "function",
+      "name": "saveGraph",
+      "file": "src/lib/graph.ts",
+      "line": 280
+    },
+    {
+      "id": "src/lib/graph.ts#loadGraph",
+      "type": "function",
+      "name": "loadGraph",
+      "file": "src/lib/graph.ts",
+      "line": 284
+    },
+    {
+      "id": "src/lib/graph.ts#queryGraph",
+      "type": "function",
+      "name": "queryGraph",
+      "file": "src/lib/graph.ts",
+      "line": 291
+    },
+    {
+      "id": "src/lib/graph.ts#getCallers",
+      "type": "function",
+      "name": "getCallers",
+      "file": "src/lib/graph.ts",
+      "line": 299
+    },
+    {
+      "id": "src/lib/graph.ts#getCallees",
+      "type": "function",
+      "name": "getCallees",
+      "file": "src/lib/graph.ts",
+      "line": 314
+    },
+    {
+      "id": "src/lib/graph.ts#impactAnalysis",
+      "type": "function",
+      "name": "impactAnalysis",
+      "file": "src/lib/graph.ts",
+      "line": 329
+    },
+    {
+      "id": "src/lib/graph.ts#while",
+      "type": "function",
+      "name": "while",
+      "file": "src/lib/graph.ts",
+      "line": 346
+    },
+    {
+      "id": "src/lib/kbConfig.ts#extractBlock",
+      "type": "function",
+      "name": "extractBlock",
+      "file": "src/lib/kbConfig.ts",
+      "line": 29
+    },
+    {
+      "id": "src/lib/kbConfig.ts#loadKbConfig",
+      "type": "function",
+      "name": "loadKbConfig",
+      "file": "src/lib/kbConfig.ts",
+      "line": 36
+    },
+    {
+      "id": "src/lib/kbConfig.ts#switch",
+      "type": "function",
+      "name": "switch",
+      "file": "src/lib/kbConfig.ts",
+      "line": 53
+    },
+    {
+      "id": "src/lib/skills.ts#listSkillDirs",
+      "type": "function",
+      "name": "listSkillDirs",
+      "file": "src/lib/skills.ts",
+      "line": 14
+    },
+    {
+      "id": "src/lib/skills.ts#if",
+      "type": "function",
+      "name": "if",
+      "file": "src/lib/skills.ts",
+      "line": 24
+    },
+    {
+      "id": "src/lib/skills.ts#readSkillInfo",
+      "type": "function",
+      "name": "readSkillInfo",
+      "file": "src/lib/skills.ts",
+      "line": 31
+    },
+    {
+      "id": "src/skills.ts#bundlePath",
+      "type": "function",
+      "name": "bundlePath",
+      "file": "src/skills.ts",
+      "line": 44
+    },
+    {
+      "id": "src/skills.ts#legacyBundlePath",
+      "type": "function",
+      "name": "legacyBundlePath",
+      "file": "src/skills.ts",
+      "line": 48
+    },
+    {
+      "id": "src/skills.ts#parseCommandTargets",
+      "type": "function",
+      "name": "parseCommandTargets",
+      "file": "src/skills.ts",
+      "line": 52
+    },
+    {
+      "id": "src/skills.ts#collectCommandExcludePatterns",
+      "type": "function",
+      "name": "collectCommandExcludePatterns",
+      "file": "src/skills.ts",
+      "line": 64
+    },
+    {
+      "id": "src/skills.ts#printHelp",
+      "type": "function",
+      "name": "printHelp",
+      "file": "src/skills.ts",
+      "line": 79
+    },
+    {
+      "id": "src/skills.ts#normalizeRepo",
+      "type": "function",
+      "name": "normalizeRepo",
+      "file": "src/skills.ts",
+      "line": 99
+    },
+    {
+      "id": "src/skills.ts#httpsCloneUrl",
+      "type": "function",
+      "name": "httpsCloneUrl",
+      "file": "src/skills.ts",
+      "line": 108
+    },
+    {
+      "id": "src/skills.ts#fetchRepo",
+      "type": "function",
+      "name": "fetchRepo",
+      "file": "src/skills.ts",
+      "line": 112
+    },
+    {
+      "id": "src/skills.ts#if",
+      "type": "function",
+      "name": "if",
+      "file": "src/skills.ts",
+      "line": 130
+    },
+    {
+      "id": "src/skills.ts#shouldIgnore",
+      "type": "function",
+      "name": "shouldIgnore",
+      "file": "src/skills.ts",
+      "line": 140
+    },
+    {
+      "id": "src/skills.ts#syncBundle",
+      "type": "function",
+      "name": "syncBundle",
+      "file": "src/skills.ts",
+      "line": 154
+    },
+    {
+      "id": "src/skills.ts#for",
+      "type": "function",
+      "name": "for",
+      "file": "src/skills.ts",
+      "line": 169
+    },
+    {
+      "id": "src/skills.ts#linkRules",
+      "type": "function",
+      "name": "linkRules",
+      "file": "src/skills.ts",
+      "line": 208
+    },
+    {
+      "id": "src/skills.ts#loadInstallManifest",
+      "type": "function",
+      "name": "loadInstallManifest",
+      "file": "src/skills.ts",
+      "line": 232
+    },
+    {
+      "id": "src/skills.ts#saveInstallManifest",
+      "type": "function",
+      "name": "saveInstallManifest",
+      "file": "src/skills.ts",
+      "line": 243
+    },
+    {
+      "id": "src/skills.ts#registerCreatedPath",
+      "type": "function",
+      "name": "registerCreatedPath",
+      "file": "src/skills.ts",
+      "line": 255
+    },
+    {
+      "id": "src/skills.ts#installCommands",
+      "type": "function",
+      "name": "installCommands",
+      "file": "src/skills.ts",
+      "line": 260
+    },
+    {
+      "id": "src/skills.ts#installAllSkills",
+      "type": "function",
+      "name": "installAllSkills",
+      "file": "src/skills.ts",
+      "line": 284
+    },
+    {
+      "id": "src/skills.ts#getCustomSkills",
+      "type": "function",
+      "name": "getCustomSkills",
+      "file": "src/skills.ts",
+      "line": 367
+    },
+    {
+      "id": "src/skills.ts#ensureGitExcludeBlock",
+      "type": "function",
+      "name": "ensureGitExcludeBlock",
+      "file": "src/skills.ts",
+      "line": 396
+    },
+    {
+      "id": "src/skills.ts#cleanupGitExclude",
+      "type": "function",
+      "name": "cleanupGitExclude",
+      "file": "src/skills.ts",
+      "line": 415
+    },
+    {
+      "id": "src/skills.ts#uninstall",
+      "type": "function",
+      "name": "uninstall",
+      "file": "src/skills.ts",
+      "line": 431
+    },
+    {
+      "id": "src/skills.ts#tryCleanRules",
+      "type": "function",
+      "name": "tryCleanRules",
+      "file": "src/skills.ts",
+      "line": 449
+    },
+    {
+      "id": "src/skills.ts#main",
+      "type": "function",
+      "name": "main",
+      "file": "src/skills.ts",
+      "line": 483
+    },
+    {
+      "id": "src/tools.ts#readText",
+      "type": "function",
+      "name": "readText",
+      "file": "src/tools.ts",
+      "line": 31
+    },
+    {
+      "id": "src/tools.ts#collectMarkdownFiles",
+      "type": "function",
+      "name": "collectMarkdownFiles",
+      "file": "src/tools.ts",
+      "line": 35
+    },
+    {
+      "id": "src/tools.ts#chunkText",
+      "type": "function",
+      "name": "chunkText",
+      "file": "src/tools.ts",
+      "line": 39
+    },
+    {
+      "id": "src/tools.ts#while",
+      "type": "function",
+      "name": "while",
+      "file": "src/tools.ts",
+      "line": 45
+    },
+    {
+      "id": "src/tools.ts#isLikelyBinaryBuffer",
+      "type": "function",
+      "name": "isLikelyBinaryBuffer",
+      "file": "src/tools.ts",
+      "line": 70
+    },
+    {
+      "id": "src/tools.ts#cmdIndexProject",
+      "type": "function",
+      "name": "cmdIndexProject",
+      "file": "src/tools.ts",
+      "line": 76
+    },
+    {
+      "id": "src/tools.ts#for",
+      "type": "function",
+      "name": "for",
+      "file": "src/tools.ts",
+      "line": 88
+    },
+    {
+      "id": "src/tools.ts#if",
+      "type": "function",
+      "name": "if",
+      "file": "src/tools.ts",
+      "line": 108
+    },
+    {
+      "id": "src/tools.ts#escapeHtmlWiki",
+      "type": "function",
+      "name": "escapeHtmlWiki",
+      "file": "src/tools.ts",
+      "line": 165
+    },
+    {
+      "id": "src/tools.ts#normalizeWikiMdToHtmlHref",
+      "type": "function",
+      "name": "normalizeWikiMdToHtmlHref",
+      "file": "src/tools.ts",
+      "line": 174
+    },
+    {
+      "id": "src/tools.ts#safeWikiHref",
+      "type": "function",
+      "name": "safeWikiHref",
+      "file": "src/tools.ts",
+      "line": 181
+    },
+    {
+      "id": "src/tools.ts#parseMdLinkWiki",
+      "type": "function",
+      "name": "parseMdLinkWiki",
+      "file": "src/tools.ts",
+      "line": 188
+    },
+    {
+      "id": "src/tools.ts#inlineMdToHtmlWikiNoLinks",
+      "type": "function",
+      "name": "inlineMdToHtmlWikiNoLinks",
+      "file": "src/tools.ts",
+      "line": 212
+    },
+    {
+      "id": "src/tools.ts#inlineMdToHtmlWiki",
+      "type": "function",
+      "name": "inlineMdToHtmlWiki",
+      "file": "src/tools.ts",
+      "line": 246
+    },
+    {
+      "id": "src/tools.ts#splitMarkdownTableRow",
+      "type": "function",
+      "name": "splitMarkdownTableRow",
+      "file": "src/tools.ts",
+      "line": 294
+    },
+    {
+      "id": "src/tools.ts#isMarkdownTableSeparatorRow",
+      "type": "function",
+      "name": "isMarkdownTableSeparatorRow",
+      "file": "src/tools.ts",
+      "line": 301
+    },
+    {
+      "id": "src/tools.ts#tryParseMarkdownTable",
+      "type": "function",
+      "name": "tryParseMarkdownTable",
+      "file": "src/tools.ts",
+      "line": 311
+    },
+    {
+      "id": "src/tools.ts#mdBodyToHtmlWiki",
+      "type": "function",
+      "name": "mdBodyToHtmlWiki",
+      "file": "src/tools.ts",
+      "line": 344
+    },
+    {
+      "id": "src/tools.ts#flushPara",
+      "type": "function",
+      "name": "flushPara",
+      "file": "src/tools.ts",
+      "line": 350
+    },
+    {
+      "id": "src/tools.ts#raw",
+      "type": "function",
+      "name": "raw",
+      "file": "src/tools.ts",
+      "line": 401
+    },
+    {
+      "id": "src/tools.ts#wikiRelUrl",
+      "type": "function",
+      "name": "wikiRelUrl",
+      "file": "src/tools.ts",
+      "line": 426
+    },
+    {
+      "id": "src/tools.ts#wikiNavHtml",
+      "type": "function",
+      "name": "wikiNavHtml",
+      "file": "src/tools.ts",
+      "line": 434
+    },
+    {
+      "id": "src/tools.ts#toHtml",
+      "type": "function",
+      "name": "toHtml",
+      "file": "src/tools.ts",
+      "line": 435
+    },
+    {
+      "id": "src/tools.ts#media",
+      "type": "function",
+      "name": "media",
+      "file": "src/tools.ts",
+      "line": 474
+    },
+    {
+      "id": "src/tools.ts#wikiWrapPage",
+      "type": "function",
+      "name": "wikiWrapPage",
+      "file": "src/tools.ts",
+      "line": 491
+    },
+    {
+      "id": "src/tools.ts#wikiSearchExcerpt",
+      "type": "function",
+      "name": "wikiSearchExcerpt",
+      "file": "src/tools.ts",
+      "line": 513
+    },
+    {
+      "id": "src/tools.ts#jsonForHtmlScript",
+      "type": "function",
+      "name": "jsonForHtmlScript",
+      "file": "src/tools.ts",
+      "line": 523
+    },
+    {
+      "id": "src/tools.ts#wikiFooterSearchScript",
+      "type": "function",
+      "name": "wikiFooterSearchScript",
+      "file": "src/tools.ts",
+      "line": 527
+    },
+    {
+      "id": "src/tools.ts#function",
+      "type": "function",
+      "name": "function",
+      "file": "src/tools.ts",
+      "line": 535
+    },
+    {
+      "id": "src/tools.ts#run",
+      "type": "function",
+      "name": "run",
+      "file": "src/tools.ts",
+      "line": 540
+    },
+    {
+      "id": "src/tools.ts#wikiFingerprintDocs",
+      "type": "function",
+      "name": "wikiFingerprintDocs",
+      "file": "src/tools.ts",
+      "line": 562
+    },
+    {
+      "id": "src/tools.ts#openHtmlFileInBrowser",
+      "type": "function",
+      "name": "openHtmlFileInBrowser",
+      "file": "src/tools.ts",
+      "line": 572
+    },
+    {
+      "id": "src/tools.ts#runGenerateWiki",
+      "type": "function",
+      "name": "runGenerateWiki",
+      "file": "src/tools.ts",
+      "line": 584
+    },
+    {
+      "id": "src/tools.ts#toHtmlRel",
+      "type": "function",
+      "name": "toHtmlRel",
+      "file": "src/tools.ts",
+      "line": 589
+    },
+    {
+      "id": "src/tools.ts#cmdGenerateWiki",
+      "type": "function",
+      "name": "cmdGenerateWiki",
+      "file": "src/tools.ts",
+      "line": 641
+    },
+    {
+      "id": "src/tools.ts#build",
+      "type": "function",
+      "name": "build",
+      "file": "src/tools.ts",
+      "line": 648
+    },
+    {
+      "id": "src/tools.ts#refreshFingerprint",
+      "type": "function",
+      "name": "refreshFingerprint",
+      "file": "src/tools.ts",
+      "line": 651
+    },
+    {
+      "id": "src/tools.ts#catch",
+      "type": "function",
+      "name": "catch",
+      "file": "src/tools.ts",
+      "line": 670
+    },
+    {
+      "id": "src/tools.ts#cmdListSkills",
+      "type": "function",
+      "name": "cmdListSkills",
+      "file": "src/tools.ts",
+      "line": 679
+    },
+    {
+      "id": "src/tools.ts#cmdValidateSkills",
+      "type": "function",
+      "name": "cmdValidateSkills",
+      "file": "src/tools.ts",
+      "line": 699
+    },
+    {
+      "id": "src/tools.ts#extractTriggers",
+      "type": "function",
+      "name": "extractTriggers",
+      "file": "src/tools.ts",
+      "line": 722
+    },
+    {
+      "id": "src/tools.ts#extractWhenToUse",
+      "type": "function",
+      "name": "extractWhenToUse",
+      "file": "src/tools.ts",
+      "line": 731
+    },
+    {
+      "id": "src/tools.ts#extractReferences",
+      "type": "function",
+      "name": "extractReferences",
+      "file": "src/tools.ts",
+      "line": 740
+    },
+    {
+      "id": "src/tools.ts#cmdBuildSkillIndex",
+      "type": "function",
+      "name": "cmdBuildSkillIndex",
+      "file": "src/tools.ts",
+      "line": 746
+    },
+    {
+      "id": "src/tools.ts#cmdAnalyzeSkills",
+      "type": "function",
+      "name": "cmdAnalyzeSkills",
+      "file": "src/tools.ts",
+      "line": 780
+    },
+    {
+      "id": "src/tools.ts#score",
+      "type": "function",
+      "name": "score",
+      "file": "src/tools.ts",
+      "line": 792
+    },
+    {
+      "id": "src/tools.ts#cmdInstallSkill",
+      "type": "function",
+      "name": "cmdInstallSkill",
+      "file": "src/tools.ts",
+      "line": 822
+    },
+    {
+      "id": "src/tools.ts#resolveConsumerBundleDir",
+      "type": "function",
+      "name": "resolveConsumerBundleDir",
+      "file": "src/tools.ts",
+      "line": 841
+    },
+    {
+      "id": "src/tools.ts#symlinkResolvesUnder",
+      "type": "function",
+      "name": "symlinkResolvesUnder",
+      "file": "src/tools.ts",
+      "line": 849
+    },
+    {
+      "id": "src/tools.ts#strictBundleInstallWarnings",
+      "type": "function",
+      "name": "strictBundleInstallWarnings",
+      "file": "src/tools.ts",
+      "line": 862
+    },
+    {
+      "id": "src/tools.ts#cmdVerifyBundleInstall",
+      "type": "function",
+      "name": "cmdVerifyBundleInstall",
+      "file": "src/tools.ts",
+      "line": 918
+    },
+    {
+      "id": "src/tools.ts#buildKb",
+      "type": "function",
+      "name": "buildKb",
+      "file": "src/tools.ts",
+      "line": 971
+    },
+    {
+      "id": "src/tools.ts#loadKbData",
+      "type": "function",
+      "name": "loadKbData",
+      "file": "src/tools.ts",
+      "line": 1001
+    },
+    {
+      "id": "src/tools.ts#queryKb",
+      "type": "function",
+      "name": "queryKb",
+      "file": "src/tools.ts",
+      "line": 1025
+    },
+    {
+      "id": "src/tools.ts#cmdQueryKb",
+      "type": "function",
+      "name": "cmdQueryKb",
+      "file": "src/tools.ts",
+      "line": 1035
+    },
+    {
+      "id": "src/tools.ts#cmdQueryKbBatch",
+      "type": "function",
+      "name": "cmdQueryKbBatch",
+      "file": "src/tools.ts",
+      "line": 1047
+    },
+    {
+      "id": "src/tools.ts#cmdVerifyKb",
+      "type": "function",
+      "name": "cmdVerifyKb",
+      "file": "src/tools.ts",
+      "line": 1076
+    },
+    {
+      "id": "src/tools.ts#cmdBuildGraph",
+      "type": "function",
+      "name": "cmdBuildGraph",
+      "file": "src/tools.ts",
+      "line": 1096
+    },
+    {
+      "id": "src/tools.ts#cmdQueryGraph",
+      "type": "function",
+      "name": "cmdQueryGraph",
+      "file": "src/tools.ts",
+      "line": 1119
+    },
+    {
+      "id": "src/tools.ts#switch",
+      "type": "function",
+      "name": "switch",
+      "file": "src/tools.ts",
+      "line": 1141
+    },
+    {
+      "id": "src/tools.ts#cmdImpactAnalysis",
+      "type": "function",
+      "name": "cmdImpactAnalysis",
+      "file": "src/tools.ts",
+      "line": 1167
+    },
+    {
+      "id": "src/tools.ts#help",
+      "type": "function",
+      "name": "help",
+      "file": "src/tools.ts",
+      "line": 1193
+    },
+    {
+      "id": "src/tools.ts#main",
+      "type": "function",
+      "name": "main",
+      "file": "src/tools.ts",
+      "line": 1214
+    },
+    {
+      "id": "src/types/degit.d.ts#degit",
+      "type": "function",
+      "name": "degit",
+      "file": "src/types/degit.d.ts",
+      "line": 12
+    }
+  ],
+  "edges": [
+    {
+      "from": "scripts/batch-upgrade-karpathy.py",
+      "to": "os",
+      "type": "imports"
+    },
+    {
+      "from": "scripts/batch-upgrade-karpathy.py",
+      "to": "re",
+      "type": "imports"
+    },
+    {
+      "from": "scripts/batch-upgrade-karpathy.py",
+      "to": "glob",
+      "type": "imports"
+    },
+    {
+      "from": "scripts/batch-upgrade-karpathy.py#update_workflow",
+      "to": "scripts/batch-upgrade-karpathy.py#replacer",
+      "type": "calls"
+    },
+    {
+      "from": "scripts/batch-upgrade-karpathy.py#replacer",
+      "to": "scripts/batch-upgrade-karpathy.py#update_operating_principles",
+      "type": "calls"
+    },
+    {
+      "from": "scripts/batch-upgrade-karpathy.py#replacer",
+      "to": "scripts/batch-upgrade-karpathy.py#process_skill",
+      "type": "calls"
+    },
+    {
+      "from": "scripts/batch-upgrade-karpathy.py#process_skill",
+      "to": "scripts/batch-upgrade-karpathy.py#main",
+      "type": "calls"
+    },
+    {
+      "from": "src/commands/installSkill.ts",
+      "to": "existsSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/commands/installSkill.ts",
+      "to": "mkdirSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/commands/installSkill.ts",
+      "to": "readFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/commands/installSkill.ts",
+      "to": "rmSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/commands/installSkill.ts",
+      "to": "symlinkSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/commands/installSkill.ts",
+      "to": "writeFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/commands/installSkill.ts",
+      "to": "cpSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/commands/installSkill.ts",
+      "to": "join",
+      "type": "imports"
+    },
+    {
+      "from": "src/commands/installSkill.ts",
+      "to": "resolve",
+      "type": "imports"
+    },
+    {
+      "from": "src/commands/installSkill.ts",
+      "to": "matter",
+      "type": "imports"
+    },
+    {
+      "from": "src/commands/installSkill.ts#parseName",
+      "to": "src/commands/installSkill.ts#ensureExclude",
+      "type": "calls"
+    },
+    {
+      "from": "src/commands/installSkill.ts#ensureExclude",
+      "to": "src/commands/installSkill.ts#installSkill",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/embeddings.ts#tokenize",
+      "to": "src/lib/embeddings.ts#hashToken",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/embeddings.ts#hashToken",
+      "to": "src/lib/embeddings.ts#embedText",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/embeddings.ts#embedText",
+      "to": "src/lib/embeddings.ts#cosine",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts",
+      "to": "readFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/graph.ts",
+      "to": "existsSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/graph.ts",
+      "to": "writeFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/graph.ts",
+      "to": "resolve",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/graph.ts",
+      "to": "relative",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/graph.ts",
+      "to": "dirname",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/graph.ts",
+      "to": "join",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/graph.ts",
+      "to": "globSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/graph.ts",
+      "to": "X",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/graph.ts#getFileExtension",
+      "to": "src/lib/graph.ts#isCodeFile",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts#isCodeFile",
+      "to": "src/lib/graph.ts#getLanguage",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts#getLanguage",
+      "to": "src/lib/graph.ts#parseFile",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts#parseFile",
+      "to": "src/lib/graph.ts#calls",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts#contains",
+      "to": "src/lib/graph.ts#findContainingFunction",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts#declaration",
+      "to": "src/lib/graph.ts#buildGraph",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts#buildGraph",
+      "to": "src/lib/graph.ts#saveGraph",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts#saveGraph",
+      "to": "src/lib/graph.ts#loadGraph",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts#loadGraph",
+      "to": "src/lib/graph.ts#queryGraph",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts#queryGraph",
+      "to": "src/lib/graph.ts#getCallers",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts#getCallers",
+      "to": "src/lib/graph.ts#getCallees",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/graph.ts#getCallees",
+      "to": "src/lib/graph.ts#impactAnalysis",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/kbConfig.ts",
+      "to": "existsSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/kbConfig.ts",
+      "to": "readFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/kbConfig.ts",
+      "to": "resolve",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/kbConfig.ts#extractBlock",
+      "to": "src/lib/kbConfig.ts#loadKbConfig",
+      "type": "calls"
+    },
+    {
+      "from": "src/lib/skills.ts",
+      "to": "existsSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/skills.ts",
+      "to": "readFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/skills.ts",
+      "to": "readdirSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/skills.ts",
+      "to": "join",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/skills.ts",
+      "to": "resolve",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/skills.ts",
+      "to": "matter",
+      "type": "imports"
+    },
+    {
+      "from": "src/lib/skills.ts#listSkillDirs",
+      "to": "src/lib/skills.ts#readSkillInfo",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "cpSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "existsSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "lstatSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "mkdirSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "mkdtempSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "readdirSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "readFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "rmSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "symlinkSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "unlinkSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "writeFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "tmpdir",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "homedir",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "join",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "relative",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "resolve",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "dirname",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "fileURLToPath",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "chalk",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "degit",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "inquirer",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "matter",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "ora",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "minimist",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "execFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "spawnSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts",
+      "to": "installSkill",
+      "type": "imports"
+    },
+    {
+      "from": "src/skills.ts#bundlePath",
+      "to": "src/skills.ts#legacyBundlePath",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#legacyBundlePath",
+      "to": "src/skills.ts#parseCommandTargets",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#parseCommandTargets",
+      "to": "src/skills.ts#collectCommandExcludePatterns",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#collectCommandExcludePatterns",
+      "to": "src/skills.ts#printHelp",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#printHelp",
+      "to": "src/skills.ts#normalizeRepo",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#normalizeRepo",
+      "to": "src/skills.ts#httpsCloneUrl",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#httpsCloneUrl",
+      "to": "src/skills.ts#fetchRepo",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#fetchRepo",
+      "to": "src/skills.ts#shouldIgnore",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#shouldIgnore",
+      "to": "src/skills.ts#syncBundle",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#syncBundle",
+      "to": "src/skills.ts#linkRules",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#linkRules",
+      "to": "src/skills.ts#loadInstallManifest",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#loadInstallManifest",
+      "to": "src/skills.ts#saveInstallManifest",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#saveInstallManifest",
+      "to": "src/skills.ts#registerCreatedPath",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#registerCreatedPath",
+      "to": "src/skills.ts#installCommands",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#installCommands",
+      "to": "src/skills.ts#installAllSkills",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#installAllSkills",
+      "to": "src/skills.ts#getCustomSkills",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#getCustomSkills",
+      "to": "src/skills.ts#ensureGitExcludeBlock",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#ensureGitExcludeBlock",
+      "to": "src/skills.ts#cleanupGitExclude",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#cleanupGitExclude",
+      "to": "src/skills.ts#uninstall",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#uninstall",
+      "to": "src/skills.ts#tryCleanRules",
+      "type": "calls"
+    },
+    {
+      "from": "src/skills.ts#uninstall",
+      "to": "src/skills.ts#main",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "execFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "existsSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "lstatSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "mkdirSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "readFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "readlinkSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "readdirSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "statSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "writeFileSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "basename",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "dirname",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "relative",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "resolve",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "join",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "sep",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "minimist",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "matter",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "globSync",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "loadKbConfig",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "embedText",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "cosine",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "installSkill",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "listSkillDirs",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "readSkillInfo",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "buildGraph",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "saveGraph",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "loadGraph",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "queryGraph",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "getCallers",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "getCallees",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts",
+      "to": "impactAnalysis",
+      "type": "imports"
+    },
+    {
+      "from": "src/tools.ts#readText",
+      "to": "src/tools.ts#collectMarkdownFiles",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#collectMarkdownFiles",
+      "to": "src/tools.ts#chunkText",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#chunkText",
+      "to": "src/tools.ts#isLikelyBinaryBuffer",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#isLikelyBinaryBuffer",
+      "to": "src/tools.ts#cmdIndexProject",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdIndexProject",
+      "to": "src/tools.ts#escapeHtmlWiki",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#escapeHtmlWiki",
+      "to": "src/tools.ts#normalizeWikiMdToHtmlHref",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#normalizeWikiMdToHtmlHref",
+      "to": "src/tools.ts#safeWikiHref",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#safeWikiHref",
+      "to": "src/tools.ts#parseMdLinkWiki",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#parseMdLinkWiki",
+      "to": "src/tools.ts#inlineMdToHtmlWikiNoLinks",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#inlineMdToHtmlWikiNoLinks",
+      "to": "src/tools.ts#inlineMdToHtmlWiki",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#inlineMdToHtmlWiki",
+      "to": "src/tools.ts#splitMarkdownTableRow",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#splitMarkdownTableRow",
+      "to": "src/tools.ts#isMarkdownTableSeparatorRow",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#isMarkdownTableSeparatorRow",
+      "to": "src/tools.ts#tryParseMarkdownTable",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#tryParseMarkdownTable",
+      "to": "src/tools.ts#mdBodyToHtmlWiki",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#mdBodyToHtmlWiki",
+      "to": "src/tools.ts#flushPara",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#mdBodyToHtmlWiki",
+      "to": "src/tools.ts#wikiRelUrl",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#wikiRelUrl",
+      "to": "src/tools.ts#wikiNavHtml",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#wikiNavHtml",
+      "to": "src/tools.ts#toHtml",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#wikiNavHtml",
+      "to": "src/tools.ts#media",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#wikiNavHtml",
+      "to": "src/tools.ts#wikiWrapPage",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#wikiWrapPage",
+      "to": "src/tools.ts#wikiSearchExcerpt",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#wikiSearchExcerpt",
+      "to": "src/tools.ts#jsonForHtmlScript",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#jsonForHtmlScript",
+      "to": "src/tools.ts#wikiFooterSearchScript",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#wikiFooterSearchScript",
+      "to": "src/tools.ts#function",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#wikiFooterSearchScript",
+      "to": "src/tools.ts#run",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#run",
+      "to": "src/tools.ts#wikiFingerprintDocs",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#wikiFingerprintDocs",
+      "to": "src/tools.ts#openHtmlFileInBrowser",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#openHtmlFileInBrowser",
+      "to": "src/tools.ts#runGenerateWiki",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#runGenerateWiki",
+      "to": "src/tools.ts#toHtmlRel",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#runGenerateWiki",
+      "to": "src/tools.ts#cmdGenerateWiki",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdGenerateWiki",
+      "to": "src/tools.ts#build",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdGenerateWiki",
+      "to": "src/tools.ts#refreshFingerprint",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdGenerateWiki",
+      "to": "src/tools.ts#cmdListSkills",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdListSkills",
+      "to": "src/tools.ts#cmdValidateSkills",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdValidateSkills",
+      "to": "src/tools.ts#extractTriggers",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#extractTriggers",
+      "to": "src/tools.ts#extractWhenToUse",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#extractWhenToUse",
+      "to": "src/tools.ts#extractReferences",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#extractReferences",
+      "to": "src/tools.ts#cmdBuildSkillIndex",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdBuildSkillIndex",
+      "to": "src/tools.ts#cmdAnalyzeSkills",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdAnalyzeSkills",
+      "to": "src/tools.ts#cmdInstallSkill",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdInstallSkill",
+      "to": "src/tools.ts#resolveConsumerBundleDir",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#resolveConsumerBundleDir",
+      "to": "src/tools.ts#symlinkResolvesUnder",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#symlinkResolvesUnder",
+      "to": "src/tools.ts#strictBundleInstallWarnings",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#strictBundleInstallWarnings",
+      "to": "src/tools.ts#cmdVerifyBundleInstall",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdVerifyBundleInstall",
+      "to": "src/tools.ts#buildKb",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#buildKb",
+      "to": "src/tools.ts#loadKbData",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#loadKbData",
+      "to": "src/tools.ts#queryKb",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#queryKb",
+      "to": "src/tools.ts#cmdQueryKb",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdQueryKb",
+      "to": "src/tools.ts#cmdQueryKbBatch",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdQueryKbBatch",
+      "to": "src/tools.ts#cmdVerifyKb",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdVerifyKb",
+      "to": "src/tools.ts#cmdBuildGraph",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdBuildGraph",
+      "to": "src/tools.ts#cmdQueryGraph",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdQueryGraph",
+      "to": "src/tools.ts#cmdImpactAnalysis",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#cmdImpactAnalysis",
+      "to": "src/tools.ts#help",
+      "type": "calls"
+    },
+    {
+      "from": "src/tools.ts#help",
+      "to": "src/tools.ts#main",
+      "type": "calls"
+    }
+  ]
+}

@@ -7,4 +7,4 @@ Professional **Electron** skill: main/preload/renderer, secure IPC, packaging, a
 - **Security reviews:** skill **`security-pro`**
 - **Tests (E2E):** skill **`testing-pro`**
 - **Alternative desktop:** skill **`tauri-pro`**
-- **Deep dives:** [references/](references/)
+- **Deep dives:** [references/](/skills/electron-pro/references/)

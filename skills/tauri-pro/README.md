@@ -7,4 +7,4 @@ Professional **Tauri** skill: Rust `src-tauri`, commands/`invoke`, capabilities,
 - **Security:** skill **`security-pro`**
 - **Testing / CI:** skill **`testing-pro`**
 - **Alternative desktop (Node/Chromium):** skill **`electron-pro`**
-- **Deep dives:** [references/](references/)
+- **Deep dives:** [references/](/skills/tauri-pro/references/)

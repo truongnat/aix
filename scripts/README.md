@@ -26,6 +26,9 @@ All runtime tooling is now implemented in TypeScript and compiled to `dist/tools
 | `node dist/tools.js query-kb-batch -q "..." -q "..."` | Query KB for multiple prompts |
 | `node dist/tools.js query-kb-batch -q "a" -q "b" --index <dir>` | Batch query against a project index |
 | `node dist/tools.js verify-kb` | Verify KB artifacts |
+| `node dist/tools.js build-graph [--dir .] [--out .agents/devkit/project-graph]` | Build code graph (functions, classes, calls) |
+| `node dist/tools.js query-graph <symbol> [--mode search\|callers\|callees]` | Query graph for symbol or relationships |
+| `node dist/tools.js impact-analysis <file-path>` | Blast radius analysis for changes |
 
 ## npm aliases
 

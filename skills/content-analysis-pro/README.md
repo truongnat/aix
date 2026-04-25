@@ -5,4 +5,4 @@
 - **Entry point:** [SKILL.md](SKILL.md)
 - **Turn findings into BA artifacts:** **`business-analysis-pro`**
 - **Secrets / PII in screenshots:** **`security-pro`**
-- **Deep dives:** [references/](references/)
+- **Deep dives:** [references/](/skills/content-analysis-pro/references/)

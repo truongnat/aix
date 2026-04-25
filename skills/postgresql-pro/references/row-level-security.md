@@ -131,7 +131,7 @@ CREATE POLICY tenant_isolation_insert ON app.orders
 
 ## Application servers (NestJS)
 
-To set `set_config` / `SET LOCAL` from HTTP requests, Prisma/TypeORM transactions, and PgBouncer: see **`nestjs-pro`** — [postgresql-rls-integration.md](../../nestjs-pro/references/postgresql-rls-integration.md).
+To set `set_config` / `SET LOCAL` from HTTP requests, Prisma/TypeORM transactions, and PgBouncer: see **`nestjs-pro`** — [`postgresql-rls-integration.md`](/skills/nestjs-pro/references/postgresql-rls-integration.md).
 
 ---
 

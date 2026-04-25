@@ -63,121 +63,130 @@ Follow **Suggested response format (STRICT)** — eight sections from context th
 
 ## Workflow
 
-1. Confirm provider/model, SDK, context window, streaming vs batch, and **eval/budget** constraints.
-2. Apply principles and summaries below; open `references/` for depth; tie **conversation**, **tools**, **RAG**, and **safety** together explicitly.
-3. Respond using **Suggested response format (STRICT)**; flag injection, cost, latency, hallucination, and **parse/tool** failure risks.
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** provider/model, SDK, context window, streaming vs batch, **eval/budget** constraints → verify: [known values documented].
+2. **State assumptions** about use case, data sensitivity, latency requirements (**Think Before Coding**).
+3. **Apply** minimum LLM integration first; escalate only when justified (**Simplicity First**).
+4. **Make surgical changes** — only touch integration code directly related to the request (**Surgical Changes**).
+5. **Define success criteria** (eval metrics, cost target, latency SLA); loop until verified (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format (STRICT)**; flag injection, cost, latency, hallucination, and **parse/tool** failure risks.
 
 ### Operating principles
 
-1. **System prompt is the contract** — behavior, scope, format, refusals; version it like code.
-2. **Validate LLM output** — schema + **business rules**; never trust raw output in critical paths.
-3. **Stream for UX** — buffer for tools and structured output.
-4. **Token budgets** — input+output; cache static context; **trim/summarize** with policy (**`conversation-state-and-memory.md`**).
-5. **Prompt injection is real** — delimiters; never let user content override system instructions.
-6. **Fallback and retry** — backoff; **routing matrix** when primary model/provider fails (**`model-selection-and-routing.md`**).
-7. **Measure changes** — golden sets or metrics before prompt/model upgrades (**`evaluation-and-quality.md`**).
+1. **Think Before Coding** — State assumptions explicitly: provider limits, use case, data classification. Ask when uncertain.
+2. **Simplicity First** — Start with basic API calls; add streaming/tools/RAG only when justified.
+3. **Surgical Changes** — Only touch integration code related to the request. Don't refactor unrelated prompt handling.
+4. **Goal-Driven Execution** — Define eval metrics, cost targets, latency SLAs upfront; verify before declaring done.
+5. **System prompt is the contract** — behavior, scope, format, refusals; version it like code.
+6. **Validate LLM output** — schema + **business rules**; never trust raw output in critical paths.
+7. **Stream for UX** — buffer for tools and structured output.
+8. **Token budgets** — input+output; cache static context; **trim/summarize** with policy (**`conversation-state-and-memory.md`**).
+9. **Prompt injection is real** — delimiters; never let user content override system instructions.
+10. **Fallback and retry** — backoff; **routing matrix** when primary model/provider fails (**`model-selection-and-routing.md`**).
+11. **Measure changes** — golden sets or metrics before prompt/model upgrades (**`evaluation-and-quality.md`**).
 
 ### LLM integration and context (system model) (summary)
 
 Request path, context budget, tool/RAG injection, observability — **`llm-integration-and-context-system-model.md`**.
 
-Details: [references/llm-integration-and-context-system-model.md](references/llm-integration-and-context-system-model.md)
+Details: [references/llm-integration-and-context-system-model.md](/skills/ai-integration-pro/references/llm-integration-and-context-system-model.md)
 
 ### Failure modes — detection and mitigation (summary)
 
 Injection, parse failures, RAG leaks, cost/outage — **`failure-modes-detection-mitigation.md`**.
 
-Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+Details: [references/failure-modes-detection-mitigation.md](/skills/ai-integration-pro/references/failure-modes-detection-mitigation.md)
 
 ### Decision framework and trade-offs (summary)
 
 Routing, context vs RAG, streaming, client vs server inference — **`decision-framework-and-trade-offs.md`**.
 
-Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+Details: [references/decision-framework-and-trade-offs.md](/skills/ai-integration-pro/references/decision-framework-and-trade-offs.md)
 
 ### Quality validation and guardrails (summary)
 
 Evidence discipline, eval metrics, version truth — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](/skills/ai-integration-pro/references/quality-validation-and-guardrails.md)
 
 ### Prompt engineering (summary)
 
-Details: [references/prompt-engineering.md](references/prompt-engineering.md)
+Details: [references/prompt-engineering.md](/skills/ai-integration-pro/references/prompt-engineering.md)
 
 ### Tool use / function calling (summary)
 
-Details: [references/tool-use.md](references/tool-use.md)
+Details: [references/tool-use.md](/skills/ai-integration-pro/references/tool-use.md)
 
 ### Streaming responses (summary)
 
-Details: [references/streaming.md](references/streaming.md)
+Details: [references/streaming.md](/skills/ai-integration-pro/references/streaming.md)
 
 ### RAG and embeddings (summary)
 
-Details: [references/rag-embeddings.md](references/rag-embeddings.md)
+Details: [references/rag-embeddings.md](/skills/ai-integration-pro/references/rag-embeddings.md)
 
 ### Conversation state and memory (summary)
 
 History storage, trimming, summarization risk, isolation, tool-output length — see reference.
 
-Details: [references/conversation-state-and-memory.md](references/conversation-state-and-memory.md)
+Details: [references/conversation-state-and-memory.md](/skills/ai-integration-pro/references/conversation-state-and-memory.md)
 
 ### Evaluation and quality gates (summary)
 
 Golden sets, regression, offline/online metrics, tool success rates — see reference.
 
-Details: [references/evaluation-and-quality.md](references/evaluation-and-quality.md)
+Details: [references/evaluation-and-quality.md](/skills/ai-integration-pro/references/evaluation-and-quality.md)
 
 ### Model selection and routing (summary)
 
 Task routing, fallback matrix, outages, region routing, cost/latency governance — see reference.
 
-Details: [references/model-selection-and-routing.md](references/model-selection-and-routing.md)
+Details: [references/model-selection-and-routing.md](/skills/ai-integration-pro/references/model-selection-and-routing.md)
 
 ### Safety and policy enforcement (summary)
 
 Moderation, tool authz, output filtering, high-risk approvals — integration minimum; pair **`security-pro`**.
 
-Details: [references/safety-and-policy-enforcement.md](references/safety-and-policy-enforcement.md)
+Details: [references/safety-and-policy-enforcement.md](/skills/ai-integration-pro/references/safety-and-policy-enforcement.md)
 
 ### Observability and debugging (summary)
 
 Trace ids, prompt_version, chunk ids, parse failures, provider error taxonomy — see reference.
 
-Details: [references/observability-and-debugging.md](references/observability-and-debugging.md)
+Details: [references/observability-and-debugging.md](/skills/ai-integration-pro/references/observability-and-debugging.md)
 
 ### RAG ingestion and freshness (summary)
 
 Ingest pipeline, incremental index, ACL on metadata, staleness, hybrid retrieval — see reference.
 
-Details: [references/rag-ingestion-and-freshness.md](references/rag-ingestion-and-freshness.md)
+Details: [references/rag-ingestion-and-freshness.md](/skills/ai-integration-pro/references/rag-ingestion-and-freshness.md)
 
 ### Decision trees (summary)
 
-Details: [references/decision-tree.md](references/decision-tree.md)
+Details: [references/decision-tree.md](/skills/ai-integration-pro/references/decision-tree.md)
 
 ### Anti-patterns (summary)
 
-Details: [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/anti-patterns.md](/skills/ai-integration-pro/references/anti-patterns.md)
 
 ### Tips and tricks (summary)
 
-Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
+Details: [references/tips-and-tricks.md](/skills/ai-integration-pro/references/tips-and-tricks.md)
 
 ### Edge cases (summary)
 
 Expanded catalog: conversation, structured output, tools, streaming, RAG, operations.
 
-Details: [references/edge-cases.md](references/edge-cases.md)
+Details: [references/edge-cases.md](/skills/ai-integration-pro/references/edge-cases.md)
 
 ### Integration map (summary)
 
-Details: [references/integration-map.md](references/integration-map.md)
+Details: [references/integration-map.md](/skills/ai-integration-pro/references/integration-map.md)
 
 ### Version notes (summary)
 
-Details: [references/versions.md](references/versions.md)
+Details: [references/versions.md](/skills/ai-integration-pro/references/versions.md)
 
 ## Suggested response format (STRICT — implement / review)
 
@@ -194,45 +203,66 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
-| **LLM integration & context model** | [references/llm-integration-and-context-system-model.md](references/llm-integration-and-context-system-model.md) |
-| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
-| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
-| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
-| Prompt engineering | [references/prompt-engineering.md](references/prompt-engineering.md) |
-| Tool use | [references/tool-use.md](references/tool-use.md) |
-| Streaming | [references/streaming.md](references/streaming.md) |
-| RAG and embeddings | [references/rag-embeddings.md](references/rag-embeddings.md) |
-| RAG ingestion and freshness | [references/rag-ingestion-and-freshness.md](references/rag-ingestion-and-freshness.md) |
-| Conversation state and memory | [references/conversation-state-and-memory.md](references/conversation-state-and-memory.md) |
-| Evaluation and quality | [references/evaluation-and-quality.md](references/evaluation-and-quality.md) |
-| Model selection and routing | [references/model-selection-and-routing.md](references/model-selection-and-routing.md) |
-| Safety and policy enforcement | [references/safety-and-policy-enforcement.md](references/safety-and-policy-enforcement.md) |
-| Observability and debugging | [references/observability-and-debugging.md](references/observability-and-debugging.md) |
-| Decision trees | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Versions | [references/versions.md](references/versions.md) |
+| **LLM integration & context model** | [references/llm-integration-and-context-system-model.md](/skills/ai-integration-pro/references/llm-integration-and-context-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](/skills/ai-integration-pro/references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](/skills/ai-integration-pro/references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](/skills/ai-integration-pro/references/quality-validation-and-guardrails.md) |
+| Prompt engineering | [references/prompt-engineering.md](/skills/ai-integration-pro/references/prompt-engineering.md) |
+| Tool use | [references/tool-use.md](/skills/ai-integration-pro/references/tool-use.md) |
+| Streaming | [references/streaming.md](/skills/ai-integration-pro/references/streaming.md) |
+| RAG and embeddings | [references/rag-embeddings.md](/skills/ai-integration-pro/references/rag-embeddings.md) |
+| RAG ingestion and freshness | [references/rag-ingestion-and-freshness.md](/skills/ai-integration-pro/references/rag-ingestion-and-freshness.md) |
+| Conversation state and memory | [references/conversation-state-and-memory.md](/skills/ai-integration-pro/references/conversation-state-and-memory.md) |
+| Evaluation and quality | [references/evaluation-and-quality.md](/skills/ai-integration-pro/references/evaluation-and-quality.md) |
+| Model selection and routing | [references/model-selection-and-routing.md](/skills/ai-integration-pro/references/model-selection-and-routing.md) |
+| Safety and policy enforcement | [references/safety-and-policy-enforcement.md](/skills/ai-integration-pro/references/safety-and-policy-enforcement.md) |
+| Observability and debugging | [references/observability-and-debugging.md](/skills/ai-integration-pro/references/observability-and-debugging.md) |
+| Decision trees | [references/decision-tree.md](/skills/ai-integration-pro/references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](/skills/ai-integration-pro/references/anti-patterns.md) |
+| Tips and tricks | [references/tips-and-tricks.md](/skills/ai-integration-pro/references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](/skills/ai-integration-pro/references/edge-cases.md) |
+| Integration map | [references/integration-map.md](/skills/ai-integration-pro/references/integration-map.md) |
+| Versions | [references/versions.md](/skills/ai-integration-pro/references/versions.md) |
 
 ## Quick example
 
-### 1 — Simple (common)
+### 1 — Simple (Think Before Coding + Simplicity First)
 
 **Input:** Build a streaming Claude chat endpoint with a weather tool.  
-**Expected output:** Architecture, stream + tool loop, validation, injection notes, metrics — follow **Suggested response format (STRICT)**.
+**Expected output:** 
+- **Ask first:** Provider? Cost budget? Latency target? → get constraints
+- **Minimum first:** Basic chat endpoint without streaming → verify works
+- **Then escalate:** Add streaming + tool only if justified
+- Full **Suggested response format (STRICT)** with assumptions stated explicitly.
 
-### 2 — Tricky (edge case)
+### 2 — Tricky (Surgical Changes)
 
 **Input:** JSON mode returns markdown fences around JSON in production.  
-**Expected output:** Defensive parsing, tests, metrics for parse failures — **`testing-pro`**.
+**Expected output:** 
+- Only touch JSON parsing code related to this issue
+- Don't refactor unrelated prompt handling or streaming logic
+- Defensive parsing, tests, metrics for parse failures — **`testing-pro`**
+- Clean diff showing **only** changes for this specific parsing fix
 
-### 3 — Cross-skill
+### 3 — Cross-skill (Goal-Driven Execution)
 
-**Input:** RAG over internal wiki — must not leak other teams’ docs.  
-**Expected output:** ACL metadata + retrieval filter (**`ai-integration-pro`**); **`postgresql-pro`** RLS if vectors in Postgres; **`security-pro`** review.
+**Input:** RAG over internal wiki — must not leak other teams' docs.  
+**Expected output:** 
+- **Plan with verification:**
+  1. Design ACL metadata → verify: [can filter at retrieval time]
+  2. Implement retrieval filter → verify: [test with cross-team docs]
+  3. Add **`postgresql-pro`** RLS → verify: [DB-level enforcement works]
+  4. **`security-pro`** review → verify: [no bypass paths found]
+- Loop until each verification passes before next step
 
 ## Checklist before calling the skill done
+
+### Karpathy Principles Verification
+
+- [ ] **Think Before Coding:** Assumptions about provider/model, use case, cost budget stated explicitly.
+- [ ] **Simplicity First:** Started with basic solution; complexity (streaming/tools/RAG) added only when justified.
+- [ ] **Surgical Changes:** Only touched integration code directly related to the request; no drive-by refactoring.
+- [ ] **Goal-Driven Execution:** Success criteria (eval metrics, cost, latency) defined upfront and verified.
 
 ### Core
 

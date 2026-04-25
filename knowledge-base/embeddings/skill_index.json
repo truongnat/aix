@@ -141,6 +141,25 @@
     ]
   },
   {
+    "name": "brainstorming-pro",
+    "folder": "brainstorming-pro",
+    "description": "Production-grade Socratic brainstorming: structured ideation with question-driven refinement, assumption surfacing, alternative generation, constraint exploration, feasibility filtering, and convergence to actionable options — plus system model (raw ideas → structured exploration → convergence), failure modes (groupthink, premature convergence, solution-first thinking, analysis paralysis), decision trade-offs (breadth vs depth, speed vs quality, divergent vs convergent phases), and quality guardrails (no solution before problem, explicit assumptions, verifiable criteria).\n\nUse this skill when the user asks to brainstorm solutions, explore alternatives, generate ideas for a feature or problem, refine concepts through questioning, or structure ideation sessions.\n\nUse **with** **`planning-pro`** for detailed implementation plans, **`business-analysis-pro`** for requirements alignment, **`strategic-consulting-pro`** for portfolio-level options, and domain **`*-pro`** skills for technical feasibility.\n\nTriggers: \"brainstorm\", \"ideas\", \"alternatives\", \"explore options\", \"what if\", \"generate solutions\", \"ideation\", \"concept exploration\", \"solution space\", \"design alternatives\".",
+    "triggers": [],
+    "when_to_use": [
+      "Generating solution alternatives for a defined problem or opportunity.",
+      "Exploring \"what if\" scenarios and constraint variations.",
+      "Structuring ideation sessions with question-driven refinement.",
+      "Surfacing hidden assumptions and exploring their implications.",
+      "Converging from raw ideas to actionable, prioritized options.",
+      "Trigger keywords: `brainstorm`, `ideas`, `alternatives`, `explore options`, `what if`, `generate solutions`, `ideation`, `concept exploration`"
+    ],
+    "references": [
+      "failure-modes.md",
+      "ideation-system-model.md",
+      "socratic-techniques.md"
+    ]
+  },
+  {
     "name": "bug-discovery-pro",
     "folder": "bug-discovery-pro",
     "description": "Professional defect discovery and production-oriented debugging: full methodology (observe, reproduce, narrow, hypothesize, validate, handoff fix, regression prevention), bug taxonomy (logic, state, concurrency, data, integration, config, infra, performance, security), hypothesis-driven experiments, GitNexus graph-assisted exploration (query, context, impact, api_impact, shape_check, detect_changes), runtime signals (logs, traces, metrics, profiling, dumps), failure modes (timeout, partial failure, retry storm, cascade, stale cache, split-brain), state/concurrency and distributed-boundary debugging, observability correlation — always as triaged candidates with confidence, never false \"100%\" guarantees.\n\nUse this skill when hunting bugs, tracing regressions, triaging production incidents with telemetry, asking what else could break, or needing structured candidate lists with confidence when GitNexus MCP is available after indexing. Combine with tests, runtime evidence, and security-pro for vulns. Fixes delegate to domain *-pro skills.\n\nUse with testing-pro (repro, coverage), security-pro (abuse boundaries), content-analysis-pro (logs/dumps), api-design-pro (contracts), deployment-pro / network-infra-pro (infra rollouts). External Cursor skills: gitnexus-cli, gitnexus-debugging, gitnexus-exploring, gitnexus-impact-analysis.\n\nTriggers: \"bug\", \"bugs\", \"find bug\", \"regression\", \"root cause\", \"blast radius\", \"who calls\", \"impact\", \"GitNexus\", \"knowledge graph\", \"candidate defect\", \"hypothesis\", \"race condition\", \"deadlock\", \"memory leak\", \"distributed trace\", \"retry storm\", \"stale cache\", \"incident\", \"production bug\", \"flaky\", \"timeout\", \"span\", \"correlation id\", \"shape mismatch\", \"stale index\", \"git bisect\", \"false positive graph\".",
@@ -530,6 +549,34 @@
     ]
   },
   {
+    "name": "executing-plans-pro",
+    "folder": "executing-plans-pro",
+    "description": "Production-grade plan execution: batch execution with checkpoints, dependency-aware task execution, progress tracking, adaptive replanning, and completion verification — plus system model (plan → execute → checkpoint → adapt), failure modes (ignoring dependencies, skipping checkpoints, rigid adherence to outdated plans), decision trade-offs (speed vs quality, adherence vs adaptation, batch vs incremental), and quality guardrails (checkpoint gates, dependency respect, completion verification).\n\nUse this skill when the user asks to execute a detailed plan, run tasks in sequence, manage plan execution with checkpoints, or adapt execution based on progress.\n\nUse **with** **`writing-plans-pro`** for plan creation, **`planning-pro`** for high-level coordination, domain **`*-pro`** skills for technical execution, and **`feedback-pro`** for execution review.\n\nTriggers: \"execute plan\", \"run tasks\", \"implement plan\", \"batch execution\", \"checkpoint\", \"track progress\", \"adapt plan\".",
+    "triggers": [],
+    "when_to_use": [
+      "Executing a detailed implementation plan with multiple tasks.",
+      "Running tasks in sequence with dependency awareness.",
+      "Managing execution with checkpoints and progress tracking.",
+      "Adapting execution based on progress or blockers.",
+      "Verifying completion of planned work.",
+      "Trigger keywords: `execute plan`, `run tasks`, `implement plan`, `batch execution`, `checkpoint`, `track progress`, `adapt plan`"
+    ],
+    "references": [
+      "adaptive-replanning.md",
+      "anti-patterns.md",
+      "checkpoint-discipline.md",
+      "completion-verification.md",
+      "decision-framework.md",
+      "decision-tree.md",
+      "dependency-aware-execution.md",
+      "execution-cycle.md",
+      "execution-documentation.md",
+      "failure-modes.md",
+      "integration-map.md",
+      "progress-tracking.md"
+    ]
+  },
+  {
     "name": "feedback-pro",
     "folder": "feedback-pro",
     "description": "Production-grade deep feedback for engineering and product: evidence-based review framing, review lifecycle (artifact → finding → action → verification), issue severity calibration, actionable recommendations, communication tone, decision trade-offs (depth vs velocity, async vs sync, block vs follow-up), failure modes (severity inflation, nit avalanches, ping-pong reviews, silent debt), quality guardrails (confidence labels, no invented evidence), and closure tracking.\n\nUse this skill when the user asks to give detailed feedback on code/docs/design/process decisions, review quality gaps, prioritize improvements, or convert raw comments into structured, high-impact feedback plans.\n\nUse **with** **`testing-pro`**, **`security-pro`**, **`planning-pro`**, **`git-operations-pro`**, **`business-analysis-pro`**, domain `*-pro` skills for technical truth, and **`skills-self-review-pro`** for meta review of templates in this repo.\n\nTriggers: \"feedback\", \"review comments\", \"code feedback\", \"deep review\", \"improvement feedback\", \"critique\", \"quality review\", \"severity\", \"action items\", \"follow-up plan\".",
@@ -845,6 +892,61 @@
       "server-client-boundaries.md",
       "tips-and-tricks.md",
       "versions.md"
+    ]
+  },
+  {
+    "name": "ocr-pro",
+    "folder": "ocr-pro",
+    "description": "Professional OCR integration and troubleshooting: OCR service architecture, PaddleOCR/EasyOCR setup, Handz OCR integration, frame detection, text recognition, image rotation, configuration management, caching strategies, error handling, performance optimization, and production reliability patterns.\n\nUse this skill when the user integrates OCR services (PaddleOCR, EasyOCR, Handz OCR), sets up OCR infrastructure, debugs OCR failures, optimizes OCR performance, or designs OCR workflows for document processing applications.\n\nUse **with** **`docker-pro`** for container orchestration, **`nestjs-pro`** for backend integration, **`azure-pro`** for Azure Storage integration, **`testing-pro`** for OCR accuracy tests, **`network-infra-pro`** for OCR service networking.\n\nTriggers: \"OCR\", \"PaddleOCR\", \"EasyOCR\", \"Handz OCR\", \"text recognition\", \"frame detection\", \"image rotation\", \"bounding box\", \"OCR API\", \"OCR timeout\", \"OCR accuracy\", \"OCR configuration\", \"OCR docker\", \"Tesseract\", \"text extraction\", \"document processing\", \"OCR error\", \"OCR performance\", \"OCR cache\".",
+    "triggers": [],
+    "when_to_use": [
+      "Integrating OCR services (PaddleOCR, EasyOCR, Handz OCR) into applications.",
+      "Setting up OCR infrastructure for local development or production.",
+      "Debugging OCR failures (timeout, accuracy, configuration errors).",
+      "Optimizing OCR performance (caching, batch processing, GPU acceleration).",
+      "Designing OCR workflows for document processing applications.",
+      "Trigger keywords: `OCR`, `PaddleOCR`, `EasyOCR`, `frame detection`, `text recognition`, `OCR error`, `OCR timeout`"
+    ],
+    "references": [
+      "anti-patterns.md",
+      "decision-tree.md",
+      "edge-cases.md",
+      "integration-map.md",
+      "ocr-architecture.md",
+      "ocr-configuration.md",
+      "ocr-performance.md",
+      "ocr-service-comparison.md",
+      "ocr-setup.md",
+      "ocr-troubleshooting.md",
+      "tips-and-tricks.md"
+    ]
+  },
+  {
+    "name": "parallel-agents-pro",
+    "folder": "parallel-agents-pro",
+    "description": "Production-grade concurrent subagent workflows: dispatching parallel agents for independent tasks, coordinating dependencies across agents, aggregating results, handling agent failures, and managing shared state — plus system model (dispatch → parallel execution → coordination → aggregation), failure modes (race conditions, shared state conflicts, agent failures, coordination overhead), decision trade-offs (parallel vs sequential, agent count vs overhead, shared vs isolated state), and quality guardrails (dependency respect, state isolation, failure handling).\n\nUse this skill when the user asks to run multiple independent tasks in parallel, coordinate concurrent work, dispatch parallel agents, or manage parallel workflows.\n\nUse **with** **`executing-plans-pro`** for execution coordination, **`writing-plans-pro`** for dependency-aware task breakdown, domain **`*-pro`** skills for agent task execution, and **`planning-pro`** for workflow orchestration.\n\nTriggers: \"parallel\", \"concurrent\", \"multiple agents\", \"parallel execution\", \"dispatch tasks\", \"coordinate parallel work\", \"run in parallel\".",
+    "triggers": [],
+    "when_to_use": [
+      "Running multiple independent tasks concurrently.",
+      "Coordinating parallel workflows with dependencies.",
+      "Dispatching agents for parallel exploration or execution.",
+      "Aggregating results from multiple parallel tasks.",
+      "Managing shared state across concurrent work.",
+      "Trigger keywords: `parallel`, `concurrent`, `multiple agents`, `parallel execution`, `dispatch tasks`, `coordinate parallel work`, `run in parallel`"
+    ],
+    "references": [
+      "anti-patterns.md",
+      "coordination-strategies.md",
+      "decision-framework.md",
+      "decision-tree.md",
+      "dependency-aware-parallelization.md",
+      "dispatch-coordination-aggregation.md",
+      "failure-handling.md",
+      "failure-modes.md",
+      "integration-map.md",
+      "monitoring-and-adaptation.md",
+      "result-aggregation.md",
+      "state-isolation.md"
     ]
   },
   {
@@ -1214,6 +1316,42 @@
     ]
   },
   {
+    "name": "sync-custom-to-repo",
+    "folder": "sync-custom-to-repo",
+    "description": "Sync custom skills/workflows/templates from local devkit to upstream GitHub repository via automated PR workflow. Detects custom additions, creates feature branches with descriptive names, commits changes with dynamic messages, pushes to remote, and provides PR creation URL. Handles Windows environments with xcopy commands and provides comprehensive summary reporting.\n\nUse this skill when the user wants to sync local custom skills, workflows, or templates to the upstream skills repository. Handles the full sync workflow including detection, branching, committing, pushing, and PR creation guidance.\n\nUse **with** **`git-operations-pro`** for advanced Git workflows, **`cli-pro`** for command-line tool patterns, **`security-pro`** for credential handling and repository access security.\n\nTriggers: \"sync custom\", \"sync skills\", \"sync to repo\", \"push to upstream\", \"sync devkit\", \"sync changes\", \"PR creation\", \"branch sync\", \"custom skills sync\", \"workflow sync\", \"template sync\".",
+    "triggers": [],
+    "when_to_use": [
+      "Syncing custom skills from local devkit to upstream repository",
+      "Syncing custom workflows to the skills repository",
+      "Syncing custom templates to the skills repository",
+      "Creating feature branches with descriptive names based on content",
+      "Automating PR creation workflow for custom additions",
+      "Trigger keywords: `sync custom`, `sync skills`, `sync to repo`, `push to upstream`"
+    ],
+    "references": [
+      "workflow.md"
+    ]
+  },
+  {
+    "name": "systematic-debugging-pro",
+    "folder": "systematic-debugging-pro",
+    "description": "Production-grade systematic debugging: 4-phase root cause process (isolate → reproduce → analyze → verify), hypothesis-driven investigation, root cause tracing techniques, defense-in-depth verification, and condition-based waiting — plus system model (symptom → hypothesis → experiment → conclusion), failure modes (symptom chasing, confirmation bias, premature fixes, incomplete verification), decision trade-offs (speed vs thoroughness, logging vs breakpoints, repro vs production), and quality guardrails (verifiable fixes, no regression, documented learning).\n\nUse this skill when the user asks to debug an issue, find root cause, investigate a bug, trace an error, or systematically solve a technical problem.\n\nUse **with** **`bug-discovery-pro`** for defect discovery patterns, **`testing-pro`** for verification tests, domain **`*-pro`** skills for technical depth, and **`git-operations-pro`** for bisecting history.\n\nTriggers: \"debug\", \"debugging\", \"root cause\", \"investigate\", \"trace error\", \"find bug\", \"systematic debugging\", \"why is this failing\".",
+    "triggers": [],
+    "when_to_use": [
+      "Investigating a bug or error with unknown root cause.",
+      "Tracing the source of unexpected behavior.",
+      "Debugging complex or intermittent issues.",
+      "Establishing systematic debugging practices.",
+      "Teaching debugging methodology.",
+      "Trigger keywords: `debug`, `debugging`, `root cause`, `investigate`, `trace error`, `find bug`, `systematic debugging`, `why is this failing`"
+    ],
+    "references": [
+      "failure-modes.md",
+      "four-phase-process.md",
+      "hypothesis-driven.md"
+    ]
+  },
+  {
     "name": "tauri-pro",
     "folder": "tauri-pro",
     "description": "Production-grade Tauri desktop (and mobile): Rust core, invoke/commands, capabilities/permissions, webview integration, bundling, updater, and cross-platform edge cases — plus system model (Rust host + webview, IPC invoke/events, capabilities as ACL, threading), failure modes (over-broad capabilities, shell injection, path traversal, IPC payload jank, WebView2/CSP prod surprises), decision trade-offs (sidecar vs in-process, Tauri vs Electron, bundled vs remote UI, desktop vs mobile), and quality guardrails (Tauri 1 vs 2 config accuracy, safe errors, release-build parity).\n\nUse this skill for Tauri (`src-tauri`, `#[tauri::command]`, `invoke`, `tauri.conf`, plugins, updater, sidecars), Rust–frontend boundaries, or packaging for Windows/macOS/Linux (and mobile when applicable).\n\nCombine with **`react-pro`** (or Vue/Svelte) for webview UI, **`typescript-pro`** for typed invoke contracts, **`security-pro`** for capabilities/CSP/shell hardening, **`testing-pro`** for CI and E2E, **`deployment-pro`** for signing and updater pipelines, **`performance-tuning-pro`** for IPC/startup, and **`docker-pro`** for cross-compile CI.\n\nTriggers: \"Tauri\", \"tauri\", \"src-tauri\", \"tauri.conf\", \"invoke\", \"tauri::command\", \"WebView\", \"WebView2\", \"Rust desktop\", \"Tauri plugin\", \"Tauri updater\", \"capability\", \"Tauri 2\", \"v1\", \"v2\", \"sidecar\", \"Cargo.toml\".",
@@ -1236,6 +1374,25 @@
       "tauri-runtime-and-ipc-system-model.md",
       "tips-and-tricks.md",
       "versions.md"
+    ]
+  },
+  {
+    "name": "test-driven-development-pro",
+    "folder": "test-driven-development-pro",
+    "description": "Production-grade Test-Driven Development: RED-GREEN-REFACTOR cycle with test-first discipline, test design principles, refactoring safety, test quality standards, and integration with CI/CD — plus system model (requirement → failing test → passing implementation → refactoring), failure modes (test-first violations, brittle tests, test duplication, coverage theater), decision trade-offs (speed vs quality, unit vs integration, mock vs real), and quality guardrails (verifiable tests, no test duplication, meaningful failure messages).\n\nUse this skill when the user asks to implement features using TDD, write tests before code, refactor safely, improve test quality, or establish TDD practices.\n\nUse **with** **`testing-pro`** for test strategy and pyramid, **`bug-discovery-pro`** for defect discovery, **`ci-cd-pro`** for test automation in pipelines, and domain **`*-pro`** skills for testing patterns specific to the stack.\n\nTriggers: \"TDD\", \"test-driven development\", \"test first\", \"RED-GREEN-REFACTOR\", \"write test before code\", \"refactor safely\", \"test quality\", \"test design\".",
+    "triggers": [],
+    "when_to_use": [
+      "Implementing features using test-first discipline.",
+      "Refactoring existing code with test safety net.",
+      "Establishing or improving TDD practices in a team.",
+      "Writing tests that drive good design.",
+      "Improving test quality and reducing brittleness.",
+      "Trigger keywords: `TDD`, `test-driven development`, `test first`, `RED-GREEN-REFACTOR`, `write test before code`, `refactor safely`, `test quality`"
+    ],
+    "references": [
+      "failure-modes.md",
+      "red-green-refactor-cycle.md",
+      "test-design-principles.md"
     ]
   },
   {
@@ -1368,6 +1525,33 @@
       "tips-and-tricks.md",
       "versions.md",
       "websocket-connection-and-message-system-model.md"
+    ]
+  },
+  {
+    "name": "writing-plans-pro",
+    "folder": "writing-plans-pro",
+    "description": "Production-grade detailed implementation planning: converting goals into step-by-step execution plans with task breakdown, dependency mapping, acceptance criteria, risk identification, and verification checkpoints — plus system model (goal → tasks → dependencies → execution), failure modes (vague tasks, missing dependencies, unrealistic estimates, incomplete acceptance criteria), decision trade-offs (detail vs speed, granularity vs overhead, flexibility vs specificity), and quality guardrails (verifiable tasks, explicit dependencies, realistic estimates).\n\nUse this skill when the user asks to create a detailed implementation plan, break down a feature into tasks, define acceptance criteria for tasks, or create an execution roadmap.\n\nUse **with** **`planning-pro`** for high-level planning and sequencing, **`business-analysis-pro`** for requirements validation, domain **`*-pro`** skills for technical task breakdown, and **`feedback-pro`** for plan review.\n\nTriggers: \"write a plan\", \"implementation plan\", \"task breakdown\", \"detailed plan\", \"step-by-step\", \"execution plan\", \"task list\", \"acceptance criteria\".",
+    "triggers": [],
+    "when_to_use": [
+      "Converting a feature or goal into detailed implementation tasks.",
+      "Breaking down complex work into verifiable, executable steps.",
+      "Defining acceptance criteria for individual tasks.",
+      "Creating execution plans for developers or teams.",
+      "Preparing work for sprint planning or assignment.",
+      "Trigger keywords: `write a plan`, `implementation plan`, `task breakdown`, `detailed plan`, `step-by-step`, `execution plan`, `task list`, `acceptance criteria`"
+    ],
+    "references": [
+      "acceptance-criteria.md",
+      "anti-patterns.md",
+      "decision-framework.md",
+      "decision-tree.md",
+      "dependency-mapping.md",
+      "estimation-techniques.md",
+      "failure-modes.md",
+      "integration-map.md",
+      "risk-identification.md",
+      "task-breakdown-methodology.md",
+      "verification-checkpoints.md"
     ]
   }
 ]

@@ -24,6 +24,7 @@ skills/
   react-native-pro/
   flutter-pro/
   javascript-pro/
+  typescript-pro/
   performance-tuning-pro/
   clean-code-architecture-pro/
   cli-pro/
@@ -36,10 +37,14 @@ skills/
   postgresql-pro/
   sql-data-access-pro/
   testing-pro/
+  test-driven-development-pro/
   security-pro/
+  auth-pro/
   electron-pro/
   tauri-pro/
   deployment-pro/
+  docker-pro/
+  ci-cd-pro/
   seo-pro/
   design-system-pro/
   mobile-design-pro/
@@ -54,16 +59,22 @@ skills/
   caching-pro/
   network-infra-pro/
   planning-pro/
+  systematic-debugging-pro/
+  writing-plans-pro/
+  executing-plans-pro/
   algorithm-pro/
+  brainstorming-pro/
+  parallel-agents-pro/
   feedback-pro/
-  auth-pro/
   self-improve-agent-pro/
   git-operations-pro/
+  karpathy-coding-pro/
   bug-discovery-pro/
   skills-self-review-pro/
   repo-tooling-pro/
-  typescript-pro/
-  ci-cd-pro/
+  ai-integration-pro/
+  ocr-pro/
+  sync-custom-to-repo/
 ```
 
 Each skill requires **`SKILL.md`** with YAML frontmatter (`name`, `description`, optional `metadata.short-description`). Optional folders: `references/`, `scripts/`, `assets/`. Many bundles also ship a short **`README.md`** (entry point + links) for IDE or repo browsing — not required by validation, but preferred for Tier A polish.

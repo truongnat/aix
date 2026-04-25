@@ -6,4 +6,4 @@
 - **Design tokens & brand:** **`design-system-pro`**
 - **React Native / Expo:** **`react-native-pro`**
 - **Flutter:** **`flutter-pro`**
-- **Deep dives:** [references/](references/)
+- **Deep dives:** [references/](/skills/mobile-design-pro/references/)

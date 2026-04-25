@@ -24,7 +24,7 @@ Every bundled skill should cover these layers (some sections live in `SKILL.md`,
 
 ## 1. When you may add a new skill
 
-- The topic is **not** already covered by an existing bundled skill (`router-pro`, `react-pro`, `nextjs-pro`, `react-native-pro`, `flutter-pro`, `nestjs-pro`, `postgresql-pro`, `sql-data-access-pro`, `testing-pro`, `security-pro`, `electron-pro`, `tauri-pro`, `deployment-pro`, `seo-pro`, `design-system-pro`, `mobile-design-pro`, `business-analysis-pro`, `content-analysis-pro`, `data-analysis-pro`, `image-processing-pro`, `web-research-pro`, `market-research-pro`, `strategic-consulting-pro`, `code-packaging-pro`, `caching-pro`, `network-infra-pro`, `planning-pro`, `algorithm-pro`, `feedback-pro`, `auth-pro`, `self-improve-agent-pro`, `git-operations-pro`, `skills-self-review-pro`, `bug-discovery-pro`, `repo-tooling-pro`, `typescript-pro`, `docker-pro`, `ci-cd-pro`, `ai-integration-pro`).
+- The topic is **not** already covered by an existing bundled skill (`router-pro`, `react-pro`, `nextjs-pro`, `react-native-pro`, `flutter-pro`, `nestjs-pro`, `postgresql-pro`, `sql-data-access-pro`, `testing-pro`, `security-pro`, `electron-pro`, `tauri-pro`, `deployment-pro`, `seo-pro`, `design-system-pro`, `mobile-design-pro`, `business-analysis-pro`, `content-analysis-pro`, `data-analysis-pro`, `image-processing-pro`, `web-research-pro`, `market-research-pro`, `strategic-consulting-pro`, `code-packaging-pro`, `caching-pro`, `network-infra-pro`, `planning-pro`, `algorithm-pro`, `feedback-pro`, `auth-pro`, `self-improve-agent-pro`, `git-operations-pro`, `karpathy-coding-pro`, `skills-self-review-pro`, `bug-discovery-pro`, `repo-tooling-pro`, `typescript-pro`, `docker-pro`, `ci-cd-pro`, `ai-integration-pro`).
 - The topic is **distinct** enough that merging into an existing skill would blur scope (document the reason in the PR or commit message).
 - You have (or will add) at least `**SKILL.md`** and, for non-trivial domains, a `**references/**` folder — not a dump of all docs inside `SKILL.md`.
 - Determine if the skill is a **system skill** (routing/orchestration) or a **working skill** (domain-specific implementation). System skills should be rare and focused on coordination.
@@ -89,11 +89,16 @@ Use **exactly** these section headings and order for **new** skills and **refact
 - `**metadata.level**` (optional): `foundation`  `professional`  `advanced`.
 - **Intro** (after H1): Official docs (links); what the skill **encodes**; what to **confirm** from the project.
 
-## 4. Workflow — three fixed steps
+## 4. Workflow — goal-driven with verification
 
-1. **Confirm** versions / environment / stack / actors (skill-specific).
-2. **Apply the principles and summaries below; open `references/` when you need depth.**
-3. **Respond using Suggested response format;** note main risks (skill-specific).
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** versions / environment / stack / actors → verify: [specific checks].
+2. **State assumptions** explicitly; ask when uncertain (**Think Before Coding**).
+3. **Apply** minimum solution first; escalate only when justified (**Simplicity First**).
+4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
+5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
+6. **Respond** using Suggested response format with explicit verification.
 
 ## 5. Suggested response format
 
@@ -114,6 +119,38 @@ More blocks **only** if listed in `**## Suggested response format`** and `**## E
 - Prefer: `**tips-and-tricks.md**`, `**edge-cases.md**`, `**decision-tree.md**`, `**anti-patterns.md**`, `**integration-map.md**`, `**versions.md**`.
 - `SKILL.md` = summaries + `Details:` links.
 
+## 6.5. Karpathy principles (mandatory for all skills)
+
+All skills must encode **Andrej Karpathy's 4 coding principles** to reduce LLM coding pitfalls:
+
+### 1. Think Before Coding
+- State assumptions explicitly — if uncertain, ask rather than guess
+- Present multiple interpretations — don't pick silently when ambiguity exists
+- Push back when warranted — if a simpler approach exists, say so
+- Stop when confused — name what's unclear and ask for clarification
+
+### 2. Simplicity First
+- Minimum code that solves the problem. Nothing speculative.
+- No features beyond what was asked
+- No abstractions for single-use code
+- No "flexibility" or "configurability" that wasn't requested
+- If 200 lines could be 50, rewrite it
+
+### 3. Surgical Changes
+- Touch only what you must. Clean up only your own mess.
+- Don't "improve" adjacent code, comments, or formatting
+- Don't refactor things that aren't broken
+- Match existing style, even if you'd do it differently
+- Remove imports/variables/functions that YOUR changes made unused
+
+### 4. Goal-Driven Execution
+- Define success criteria. Loop until verified.
+- Transform imperative tasks into verifiable goals
+- State brief plan with verification: `Step → verify: [check]`
+- Strong success criteria let the agent loop independently
+
+**Integration:** These principles appear in `### Operating principles`, `## Workflow` verification steps, `## Quick examples`, and `## Checklist before calling the skill done`.
+
 ## 7. Copy procedure
 
 1. Copy `skills/examples/skill-template/` → `skills/<new-skill-name>/`.
@@ -128,7 +165,7 @@ More blocks **only** if listed in `**## Suggested response format`** and `**## E
 | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
 | **Add** bundled skill                                        | `skills/README.md`; root `**README.md`**; `**AGENTS.md``; **§1** skill list; `**knowledge-base/documents/repo/skills-layout.md`** |
 | **Remove/rename** skill                                      | Same; fix all mentions                                                                                                             |
-| **Add** workflow under `workflows/`                          | Root `**README.md`**; `<slug>.md` naming per `[workflows/README.md](../workflows/README.md#naming)`; domain `**README.md`** if new |
+| **Add** workflow under `workflows/`                          | Root `**README.md`**; `<slug>.md` naming per [`workflows/README.md`](/workflows/README.md#naming); domain `**README.md`** if new |
 | **Add** `knowledge-base/documents/`** file                   | `**knowledge-base/INDEX.md`**                                                                                                      |
 | **Substantive** `SKILL.md` / `references/` (routing meaning) | `**node dist/tools.js build-skill-index`**; if `name`/frontmatter changed: `**validate-skills`** first                             |
 
@@ -136,18 +173,18 @@ More blocks **only** if listed in `**## Suggested response format`** and `**## E
 
 ## 9. Review
 
-Section order §2 (or legacy); Workflow §4; **When not to use** for new/refactored skills; **Suggested response format** §5; **§8** updates; **§10** quality.
+Section order §2 (or legacy); Workflow §4 with Karpathy verification steps; **When not to use** for new/refactored skills; **Suggested response format** §5; Operating principles include 4 Karpathy principles; **§8** updates; **§10** quality.
 
 ## 10. Quality rubric
 
 
 | Dimension                | 1       | 3             | 5                                      |
 | ------------------------ | ------- | ------------- | -------------------------------------- |
-| **Operating principles** | Generic | Concrete      | Decision-forcing                       |
+| **Operating principles** | Generic | Concrete      | Decision-forcing; includes 4 Karpathy principles |
 | **Trigger coverage**     | Narrow  | Obvious terms | Slang, errors, adjacent concepts       |
 | **Reference depth**      | Thin    | 2–3 files     | 4+ files; anti-patterns; when NOT      |
-| **Quick examples**       | One     | Two           | **Three:** simple, tricky, cross-skill |
-| **Checklist**            | Vague   | 5–6 items     | Verifiable; scenario subsections       |
+| **Quick examples**       | One     | Two           | **Three:** simple (Think+Simplicity), tricky (Surgical), cross-skill (Goal-Driven) |
+| **Checklist**            | Vague   | 5–6 items     | Verifiable; includes Karpathy principle verification |
 
 
 ## 11. Prompt-engineering for consumers

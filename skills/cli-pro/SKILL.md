@@ -60,90 +60,99 @@ Follow **Suggested response format** strictly — contracts through residual ris
 
 ## Workflow
 
-1. Confirm runtime, OS, invocation path, and **machine vs human** output priority.
-2. Apply summaries; open `references/`; avoid inventing **tool-specific flags** — **`quality-validation-and-guardrails.md`**.
-3. Respond using **Suggested response format**; note **breaking argv** semver.
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** runtime, OS, invocation path, **machine vs human** output → verify: [context documented].
+2. **State assumptions** about CLI scope, UX needs, automation requirements (**Think Before Coding**).
+3. **Apply** minimum CLI first; add features only when justified (**Simplicity First**).
+4. **Make surgical changes** — only modify CLI code directly related to the request (**Surgical Changes**).
+5. **Define success criteria** (exit codes, help text, test coverage); loop until verified (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; note **breaking argv** semver.
 
 ### Operating principles
 
-1. **Errors to stderr; data to stdout** — Preserve `$(cmd)` and pipes — **`cli-runtime-system-model.md`**.
-2. **Meaningful exit codes** — Document **usage** vs **runtime** failure when feasible.
-3. **Idempotent `--help` / `--version`** — Fast, no network, exit `0`.
-4. **Destructive actions** — Explicit flags; **never** ambiguous prompts in non-TTY — **`decision-framework-and-tradeoffs.md`**.
-5. **Stable interface** — Additive flags; deprecate with timeline; semver argv for published tools — **`versions.md`**.
-6. **Signals** — Handle **pipe closure** without traceback spam — **`failure-modes-detection-mitigation.md`**.
+1. **Think Before Coding** — State assumptions: CLI scope, UX needs, automation requirements. Ask when uncertain.
+2. **Simplicity First** — Start with basic CLI; add features only when justified.
+3. **Surgical Changes** — Only touch CLI code related to the request. Don't refactor unrelated commands.
+4. **Goal-Driven Execution** — Define exit codes, help text, test coverage criteria upfront.
+5. **Errors to stderr; data to stdout** — Preserve `$(cmd)` and pipes — **`cli-runtime-system-model.md`**.
+6. **Meaningful exit codes** — Document **usage** vs **runtime** failure when feasible.
+7. **Idempotent `--help` / `--version`** — Fast, no network, exit `0`.
+8. **Destructive actions** — Explicit flags; **never** ambiguous prompts in non-TTY — **`decision-framework-and-tradeoffs.md`**.
+9. **Stable interface** — Additive flags; deprecate with timeline; semver argv for published tools — **`versions.md`**.
+10. **Signals** — Handle **pipe closure** without traceback spam — **`failure-modes-detection-mitigation.md`**.
 
 ### CLI runtime system model (summary)
 
 Stdin/stdout/stderr, exit code, TTY, signals — **`cli-runtime-system-model.md`**.
 
-Details: [references/cli-runtime-system-model.md](references/cli-runtime-system-model.md)
+Details: [references/cli-runtime-system-model.md](/skills/cli-pro/references/cli-runtime-system-model.md)
 
 ### Failure modes — detection and mitigation (summary)
 
 Hung CI, broken pipe noise, JSON pollution, completion drift — **`failure-modes-detection-mitigation.md`**.
 
-Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+Details: [references/failure-modes-detection-mitigation.md](/skills/cli-pro/references/failure-modes-detection-mitigation.md)
 
 ### Decision framework and trade-offs (summary)
 
 Subcommands vs flat flags; strict parsing; JSON policy — **`decision-framework-and-tradeoffs.md`**.
 
-Details: [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md)
+Details: [references/decision-framework-and-tradeoffs.md](/skills/cli-pro/references/decision-framework-and-tradeoffs.md)
 
 ### Configuration precedence and files (summary)
 
 Flags > env > files > defaults; config discovery rules — **`configuration-precedence-and-files.md`**.
 
-Details: [references/configuration-precedence-and-files.md](references/configuration-precedence-and-files.md)
+Details: [references/configuration-precedence-and-files.md](/skills/cli-pro/references/configuration-precedence-and-files.md)
 
 ### Quality validation and guardrails (summary)
 
 Anti-hallucination for flags and exit-code folklore — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](/skills/cli-pro/references/quality-validation-and-guardrails.md)
 
 ### Tips and CLI UX (summary)
 
 Help, naming, verbosity, deprecation — **`tips-and-tricks.md`**.
 
-Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
+Details: [references/tips-and-tricks.md](/skills/cli-pro/references/tips-and-tricks.md)
 
 ### Patterns by runtime (summary)
 
 Python / Node / Go / Rust / shell — **`patterns-by-runtime.md`**.
 
-Details: [references/patterns-by-runtime.md](references/patterns-by-runtime.md)
+Details: [references/patterns-by-runtime.md](/skills/cli-pro/references/patterns-by-runtime.md)
 
 ### Edge cases (summary)
 
 Windows, containers, sudo PATH, arg limits — **`edge-cases.md`**.
 
-Details: [references/edge-cases.md](references/edge-cases.md)
+Details: [references/edge-cases.md](/skills/cli-pro/references/edge-cases.md)
 
 ### Decision trees (summary)
 
 Output, destructive ops, parsing, platform — **`decision-tree.md`**.
 
-Details: [references/decision-tree.md](references/decision-tree.md)
+Details: [references/decision-tree.md](/skills/cli-pro/references/decision-tree.md)
 
 ### Anti-patterns (summary)
 
 stdout errors, secrets on argv, ambiguous prompts — **`anti-patterns.md`**.
 
-Details: [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/anti-patterns.md](/skills/cli-pro/references/anti-patterns.md)
 
 ### Integration map (summary)
 
 **`code-packaging-pro`**, **`security-pro`**, **`testing-pro`**, **`docker-pro`** — **`integration-map.md`**.
 
-Details: [references/integration-map.md](references/integration-map.md)
+Details: [references/integration-map.md](/skills/cli-pro/references/integration-map.md)
 
 ### Versions (summary)
 
 Semver argv API; OS differences — **`versions.md`**.
 
-Details: [references/versions.md](references/versions.md)
+Details: [references/versions.md](/skills/cli-pro/references/versions.md)
 
 ## Suggested response format (STRICT — implement / review)
 
@@ -160,18 +169,18 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
-| CLI runtime system model | [references/cli-runtime-system-model.md](references/cli-runtime-system-model.md) |
-| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
-| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](references/decision-framework-and-tradeoffs.md) |
-| Configuration precedence | [references/configuration-precedence-and-files.md](references/configuration-precedence-and-files.md) |
-| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
-| Tips & CLI UX | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Patterns by runtime | [references/patterns-by-runtime.md](references/patterns-by-runtime.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Decision trees | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Versions | [references/versions.md](references/versions.md) |
+| CLI runtime system model | [references/cli-runtime-system-model.md](/skills/cli-pro/references/cli-runtime-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](/skills/cli-pro/references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-tradeoffs.md](/skills/cli-pro/references/decision-framework-and-tradeoffs.md) |
+| Configuration precedence | [references/configuration-precedence-and-files.md](/skills/cli-pro/references/configuration-precedence-and-files.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](/skills/cli-pro/references/quality-validation-and-guardrails.md) |
+| Tips & CLI UX | [references/tips-and-tricks.md](/skills/cli-pro/references/tips-and-tricks.md) |
+| Patterns by runtime | [references/patterns-by-runtime.md](/skills/cli-pro/references/patterns-by-runtime.md) |
+| Edge cases | [references/edge-cases.md](/skills/cli-pro/references/edge-cases.md) |
+| Decision trees | [references/decision-tree.md](/skills/cli-pro/references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](/skills/cli-pro/references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](/skills/cli-pro/references/integration-map.md) |
+| Versions | [references/versions.md](/skills/cli-pro/references/versions.md) |
 
 ## Quick examples
 

@@ -1,6 +1,6 @@
 # KB tooling and repo commands (TypeScript / Node)
 
-Runtime commands are implemented in **TypeScript** and compiled to **`dist/tools.js`**. The canonical flag list is **[`scripts/README.md`](../../../scripts/README.md)** at repo root.
+Runtime commands are implemented in **TypeScript** and compiled to **`dist/tools.js`**. The canonical flag list is **[`scripts/README.md`](/scripts/README.md)** at repo root.
 
 ## Why batch query matters
 

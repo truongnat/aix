@@ -60,120 +60,129 @@ Follow **Suggested response format (STRICT)** — eight sections; include at lea
 
 ## Workflow
 
-1. **Confirm** versions / environment / stack (API style, transport, auth model, client expectations, compatibility window).
-2. **Apply** the principles and topic summaries below; open `references/` when you need depth.
-3. **Respond** using **Suggested response format (STRICT)**; note main risks (breaking changes, ambiguous contracts, insecure defaults, inconsistent errors, consistency model gaps).
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** versions / environment / stack (API style, transport, auth model, client expectations, compatibility window) → verify: [constraints documented].
+2. **State assumptions** about use case, scale, client needs (**Think Before Coding**).
+3. **Apply** minimum API design first; add complexity (versioning, pagination) only when justified (**Simplicity First**).
+4. **Make surgical changes** — only touch endpoints/resources directly related to the request (**Surgical Changes**).
+5. **Define success criteria** (contract clarity, backward compatibility, test coverage); loop until verified (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format (STRICT)**; note main risks (breaking changes, ambiguous contracts, insecure defaults, inconsistent errors, consistency model gaps).
 
 ### Operating principles
 
-1. **Contract clarity first** — every field and status code should have explicit meaning and stable behavior.
-2. **Model domain before verbs** — resources, aggregates, and explicit actions (**cancel**, **capture**) where CRUD obscures transitions.
-3. **Backward compatibility by default** — additive evolution preferred; breaking change must be intentional and managed.
-4. **Consistency over endpoint-by-endpoint style** — shared patterns for naming, errors, pagination, and filtering.
-5. **Idempotency where retry is expected** — safe retry semantics for network and client failures; scope **Idempotency-Key** correctly.
-6. **Observability-ready APIs** — traceability and actionable errors without leaking sensitive internals — **`observability-and-api-governance.md`**.
+1. **Think Before Coding** — State assumptions: use case, scale, client constraints. Ask when uncertain.
+2. **Simplicity First** — Start with minimal resource model; add fields/endpoints only when justified.
+3. **Surgical Changes** — Only touch API contracts related to the request. Don't refactor unrelated endpoints.
+4. **Goal-Driven Execution** — Define contract tests, compatibility checks, client validation upfront.
+5. **Contract clarity first** — every field and status code should have explicit meaning and stable behavior.
+6. **Model domain before verbs** — resources, aggregates, and explicit actions (**cancel**, **capture**) where CRUD obscures transitions.
+7. **Backward compatibility by default** — additive evolution preferred; breaking change must be intentional and managed.
+8. **Consistency over endpoint-by-endpoint style** — shared patterns for naming, errors, pagination, and filtering.
+9. **Idempotency where retry is expected** — safe retry semantics for network and client failures; scope **Idempotency-Key** correctly.
+10. **Observability-ready APIs** — traceability and actionable errors without leaking sensitive internals — **`observability-and-api-governance.md`**.
 
 ### API contract lifecycle (system model) (summary)
 
 Contract surfaces, mutation/read paths, evolution, governance — **`api-contract-lifecycle-system-model.md`**.
 
-Details: [references/api-contract-lifecycle-system-model.md](references/api-contract-lifecycle-system-model.md)
+Details: [references/api-contract-lifecycle-system-model.md](/skills/api-design-pro/references/api-contract-lifecycle-system-model.md)
 
 ### Failure modes — detection and mitigation (summary)
 
 Ambiguous PATCH, retry duplicates, cursor instability, webhooks — **`failure-modes-detection-mitigation.md`**.
 
-Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+Details: [references/failure-modes-detection-mitigation.md](/skills/api-design-pro/references/failure-modes-detection-mitigation.md)
 
 ### Decision framework and trade-offs (summary)
 
 REST vs RPC/events, pagination, errors, sync/async — **`decision-framework-and-trade-offs.md`**.
 
-Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+Details: [references/decision-framework-and-trade-offs.md](/skills/api-design-pro/references/decision-framework-and-trade-offs.md)
 
 ### Quality validation and guardrails (summary)
 
 RFC/spec alignment, no invented semantics — **`quality-validation-and-guardrails.md`**.
 
-Details: [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md)
+Details: [references/quality-validation-and-guardrails.md](/skills/api-design-pro/references/quality-validation-and-guardrails.md)
 
 ### Resource modeling and action design (summary)
 
 Aggregates, nesting, canonical URLs, public vs internal ids, bulk and long-running operations.
 
-Details: [references/resource-modeling-and-actions.md](references/resource-modeling-and-actions.md)
+Details: [references/resource-modeling-and-actions.md](/skills/api-design-pro/references/resource-modeling-and-actions.md)
 
 ### Mutation semantics and concurrency control (summary)
 
 POST/PUT/PATCH/DELETE semantics, upsert, soft delete, bulk, **ETag** / **If-Match**, replay and idempotency scope.
 
-Details: [references/mutation-semantics-and-concurrency.md](references/mutation-semantics-and-concurrency.md)
+Details: [references/mutation-semantics-and-concurrency.md](/skills/api-design-pro/references/mutation-semantics-and-concurrency.md)
 
 ### Workflow and state-transition APIs (summary)
 
 State machines, transition guards, action endpoints vs blind PATCH, auditability.
 
-Details: [references/workflow-and-state-transitions.md](references/workflow-and-state-transitions.md)
+Details: [references/workflow-and-state-transitions.md](/skills/api-design-pro/references/workflow-and-state-transitions.md)
 
 ### Query, filtering, and projection design (summary)
 
 Allow-listed filters/sorts, search endpoints, stable pagination tie-breakers, projection and expand cost bounds.
 
-Details: [references/query-filtering-and-projection.md](references/query-filtering-and-projection.md)
+Details: [references/query-filtering-and-projection.md](/skills/api-design-pro/references/query-filtering-and-projection.md)
 
 ### Async APIs, webhooks, and job patterns (summary)
 
 **202 Accepted**, operation resources, webhook signing, retries, deduplication, ordering guarantees.
 
-Details: [references/async-webhooks-and-jobs.md](references/async-webhooks-and-jobs.md)
+Details: [references/async-webhooks-and-jobs.md](/skills/api-design-pro/references/async-webhooks-and-jobs.md)
 
 ### Consistency and conflict handling (summary)
 
 Read-after-write, stale reads, **409**/**412**, eventual consistency documentation, event ordering.
 
-Details: [references/consistency-and-conflicts.md](references/consistency-and-conflicts.md)
+Details: [references/consistency-and-conflicts.md](/skills/api-design-pro/references/consistency-and-conflicts.md)
 
 ### Observability and API governance (summary)
 
 **requestId** / trace propagation, error code taxonomy, audit metadata, deprecation monitoring.
 
-Details: [references/observability-and-api-governance.md](references/observability-and-api-governance.md)
+Details: [references/observability-and-api-governance.md](/skills/api-design-pro/references/observability-and-api-governance.md)
 
 ### API design tips and tricks (summary)
 
 Model resources and actions using clear nouns/verbs; standardize error envelope; cursor pagination for large mutable sets; explicit **null** vs omitted.
 
-Details: [references/tips-and-tricks.md](references/tips-and-tricks.md)
+Details: [references/tips-and-tricks.md](/skills/api-design-pro/references/tips-and-tricks.md)
 
 ### API edge cases (summary)
 
 Retries, patch ambiguity, time zones, compatibility drift, pagination, security — plus mutation, query, async, and exposure edges.
 
-Details: [references/edge-cases.md](references/edge-cases.md)
+Details: [references/edge-cases.md](/skills/api-design-pro/references/edge-cases.md)
 
 ### Decision tree (summary)
 
 REST vs RPC vs events; pagination model; versioning; error envelope; resource vs action; sync vs async — see reference.
 
-Details: [references/decision-tree.md](references/decision-tree.md)
+Details: [references/decision-tree.md](/skills/api-design-pro/references/decision-tree.md)
 
 ### Anti-patterns (summary)
 
 Wrong status codes, ambiguous null semantics, missing idempotency on mutating POST.
 
-Details: [references/anti-patterns.md](references/anti-patterns.md)
+Details: [references/anti-patterns.md](/skills/api-design-pro/references/anti-patterns.md)
 
 ### Integration map (summary)
 
 Pair with **`security-pro`**, **`testing-pro`**, **`graphql-pro`**, stack skills for implementation.
 
-Details: [references/integration-map.md](references/integration-map.md)
+Details: [references/integration-map.md](/skills/api-design-pro/references/integration-map.md)
 
 ### Versioning (summary)
 
 URL vs header versioning; deprecation headers; OpenAPI per major version.
 
-Details: [references/versions.md](references/versions.md)
+Details: [references/versions.md](/skills/api-design-pro/references/versions.md)
 
 ## Suggested response format (STRICT — implement / review)
 
@@ -190,23 +199,23 @@ Details: [references/versions.md](references/versions.md)
 
 | Topic | File |
 |-------|------|
-| **API contract lifecycle model** | [references/api-contract-lifecycle-system-model.md](references/api-contract-lifecycle-system-model.md) |
-| Failure modes | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
-| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
-| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
-| Resource modeling and actions | [references/resource-modeling-and-actions.md](references/resource-modeling-and-actions.md) |
-| Mutation semantics and concurrency | [references/mutation-semantics-and-concurrency.md](references/mutation-semantics-and-concurrency.md) |
-| Workflow and state transitions | [references/workflow-and-state-transitions.md](references/workflow-and-state-transitions.md) |
-| Query, filtering, projection | [references/query-filtering-and-projection.md](references/query-filtering-and-projection.md) |
-| Async, webhooks, jobs | [references/async-webhooks-and-jobs.md](references/async-webhooks-and-jobs.md) |
-| Consistency and conflicts | [references/consistency-and-conflicts.md](references/consistency-and-conflicts.md) |
-| Observability and governance | [references/observability-and-api-governance.md](references/observability-and-api-governance.md) |
-| Practical patterns | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Versioning | [references/versions.md](references/versions.md) |
+| **API contract lifecycle model** | [references/api-contract-lifecycle-system-model.md](/skills/api-design-pro/references/api-contract-lifecycle-system-model.md) |
+| Failure modes | [references/failure-modes-detection-mitigation.md](/skills/api-design-pro/references/failure-modes-detection-mitigation.md) |
+| Decision framework & trade-offs | [references/decision-framework-and-trade-offs.md](/skills/api-design-pro/references/decision-framework-and-trade-offs.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](/skills/api-design-pro/references/quality-validation-and-guardrails.md) |
+| Resource modeling and actions | [references/resource-modeling-and-actions.md](/skills/api-design-pro/references/resource-modeling-and-actions.md) |
+| Mutation semantics and concurrency | [references/mutation-semantics-and-concurrency.md](/skills/api-design-pro/references/mutation-semantics-and-concurrency.md) |
+| Workflow and state transitions | [references/workflow-and-state-transitions.md](/skills/api-design-pro/references/workflow-and-state-transitions.md) |
+| Query, filtering, projection | [references/query-filtering-and-projection.md](/skills/api-design-pro/references/query-filtering-and-projection.md) |
+| Async, webhooks, jobs | [references/async-webhooks-and-jobs.md](/skills/api-design-pro/references/async-webhooks-and-jobs.md) |
+| Consistency and conflicts | [references/consistency-and-conflicts.md](/skills/api-design-pro/references/consistency-and-conflicts.md) |
+| Observability and governance | [references/observability-and-api-governance.md](/skills/api-design-pro/references/observability-and-api-governance.md) |
+| Practical patterns | [references/tips-and-tricks.md](/skills/api-design-pro/references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](/skills/api-design-pro/references/edge-cases.md) |
+| Decision tree | [references/decision-tree.md](/skills/api-design-pro/references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](/skills/api-design-pro/references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](/skills/api-design-pro/references/integration-map.md) |
+| Versioning | [references/versions.md](/skills/api-design-pro/references/versions.md) |
 
 ## Quick example
 

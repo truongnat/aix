@@ -8,4 +8,4 @@ Professional **deployment** skill: hosting options, **CI/CD flows**, release str
 - **Postgres migrations:** skill **`postgresql-pro`**
 - **Framework targets:** **`nextjs-pro`**, **`nestjs-pro`**, …
 - **Desktop releases:** **`electron-pro`**, **`tauri-pro`**
-- **Deep dives:** [references/](references/)
+- **Deep dives:** [references/](/skills/deployment-pro/references/)

@@ -73,23 +73,25 @@ Abridged tree:
 
 ```mermaid
 flowchart LR
-  subgraph Authoring
-    SKILLS[skills/*-pro]
-    WF[workflows/dev]
-    PROMPTS[prompts/]
+  subgraph Authoring["Authoring"]
+    SKILLS["skills/*-pro"]
+    WF["workflows/dev"]
+    PROMPTS["prompts/"]
   end
 
-  subgraph Knowledge
-    DOCS[knowledge-base/documents]
-    EMB[knowledge-base/embeddings]
+  subgraph Knowledge["Knowledge Base"]
+    DOCS["documents/"]
+    EMB["embeddings/"]
   end
 
-  subgraph CLI["node dist/tools.js"]
-    BUILD[build-kb]
-    QUERY[query-kb]
-    VALID[validate-skills]
-    ANALYZE[analyze-skills]
+  subgraph Tools["CLI Tools"]
+    BUILD["build-kb"]
+    QUERY["query-kb"]
+    VALID["validate-skills"]
+    ANALYZE["analyze-skills"]
   end
+
+  SKILL_INDEX["build-skill-index"]
 
   SKILLS --> DOCS
   WF --> DOCS
@@ -101,6 +103,7 @@ flowchart LR
 
   SKILLS --> VALID
   SKILLS --> ANALYZE
+  SKILLS --> SKILL_INDEX
 ```
 
 ---
@@ -183,41 +186,41 @@ node dist/tools.js analyze-skills --self-review
 
 ## Workflows
 
-Conventions (naming, parallel steps): [`workflows/README.md`](workflows/README.md).
+Conventions (naming, parallel steps): [`workflows/README.md`](/workflows/README.md).
 
 | Command | Document | Purpose |
 |---------|----------|---------|
-| **`/ticket`** | [`workflows/dev/ticket.md`](workflows/dev/ticket.md) | Ticket / Kanban |
-| **`/release`** | [`workflows/dev/release.md`](workflows/dev/release.md) | Release notes → work |
-| **`/hotfix`** | [`workflows/dev/hotfix.md`](workflows/dev/hotfix.md) | Urgent production fix |
-| **`/code-review`** | [`workflows/dev/code-review.md`](workflows/dev/code-review.md) | Structured review |
-| **`/debug`** | [`workflows/dev/debug.md`](workflows/dev/debug.md) | Systematic debugging |
-| **`/security-audit`** | [`workflows/dev/security-audit.md`](workflows/dev/security-audit.md) | Security review |
-| **`/arch-review`** | [`workflows/dev/arch-review.md`](workflows/dev/arch-review.md) | Architecture review |
-| **`/perf-investigation`** | [`workflows/dev/perf-investigation.md`](workflows/dev/perf-investigation.md) | Performance |
-| **`/refactor`** | [`workflows/dev/refactor.md`](workflows/dev/refactor.md) | Safe refactor |
-| **`/incident`** | [`workflows/dev/incident.md`](workflows/dev/incident.md) | Incident response |
-| **`/data-migration`** | [`workflows/dev/data-migration.md`](workflows/dev/data-migration.md) | Data / DB migration |
-| **`/onboarding`** | [`workflows/dev/onboarding.md`](workflows/dev/onboarding.md) | Onboarding |
-| **`/api-design`** | [`workflows/dev/api-design.md`](workflows/dev/api-design.md) | API design |
-| **`/test-strategy`** | [`workflows/dev/test-strategy.md`](workflows/dev/test-strategy.md) | Test strategy |
-| **`/dep-audit`** | [`workflows/dev/dep-audit.md`](workflows/dev/dep-audit.md) | Dependencies |
-| **`/index-project`** | [`workflows/dev/index-project.md`](workflows/dev/index-project.md) | Index any repo |
+| **`/ticket`** | [`workflows/dev/ticket.md`](/workflows/dev/ticket.md) | Ticket / Kanban |
+| **`/release`** | [`workflows/dev/release.md`](/workflows/dev/release.md) | Release notes → work |
+| **`/hotfix`** | [`workflows/dev/hotfix.md`](/workflows/dev/hotfix.md) | Urgent production fix |
+| **`/code-review`** | [`workflows/dev/code-review.md`](/workflows/dev/code-review.md) | Structured review |
+| **`/debug`** | [`workflows/dev/debug.md`](/workflows/dev/debug.md) | Systematic debugging |
+| **`/security-audit`** | [`workflows/dev/security-audit.md`](/workflows/dev/security-audit.md) | Security review |
+| **`/arch-review`** | [`workflows/dev/arch-review.md`](/workflows/dev/arch-review.md) | Architecture review |
+| **`/perf-investigation`** | [`workflows/dev/perf-investigation.md`](/workflows/dev/perf-investigation.md) | Performance |
+| **`/refactor`** | [`workflows/dev/refactor.md`](/workflows/dev/refactor.md) | Safe refactor |
+| **`/incident`** | [`workflows/dev/incident.md`](/workflows/dev/incident.md) | Incident response |
+| **`/data-migration`** | [`workflows/dev/data-migration.md`](/workflows/dev/data-migration.md) | Data / DB migration |
+| **`/onboarding`** | [`workflows/dev/onboarding.md`](/workflows/dev/onboarding.md) | Onboarding |
+| **`/api-design`** | [`workflows/dev/api-design.md`](/workflows/dev/api-design.md) | API design |
+| **`/test-strategy`** | [`workflows/dev/test-strategy.md`](/workflows/dev/test-strategy.md) | Test strategy |
+| **`/dep-audit`** | [`workflows/dev/dep-audit.md`](/workflows/dev/dep-audit.md) | Dependencies |
+| **`/index-project`** | [`workflows/dev/index-project.md`](/workflows/dev/index-project.md) | Index any repo |
 
 ---
 
 ## Prompt templates
 
-See [`templates/README.md`](templates/README.md) and the [`prompts/`](prompts/) directory.
+See [`templates/README.md`](/templates/README.md) and the [`prompts/`](/prompts/) directory.
 
 ---
 
 ## Cursor / agent
 
-[`AGENTS.md`](AGENTS.md) — skills paths, slash commands, KB usage, and how to point Cursor at this bundle.
+[`AGENTS.md`](/AGENTS.md) — skills paths, slash commands, KB usage, and how to point Cursor at this bundle.
 
 ---
 
 ## License
 
-[MIT](LICENSE)
+[MIT](/LICENSE)

@@ -8,7 +8,7 @@
 4. [Project index and wiki](#project-index-and-wiki)
 5. [Query execution model](#query-execution-model)
 
-Canonical flags live in **[`scripts/README.md`](../../../scripts/README.md)** at repo root — this file explains **relationships**, not every flag.
+Canonical flags live in **[`scripts/README.md`](/scripts/README.md)** at repo root — this file explains **relationships**, not every flag.
 
 ---
 
