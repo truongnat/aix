@@ -1,19 +1,25 @@
 ---
 name: platform-design-pro
-description: "Cross-platform design system expertise covering iOS Human Interface\
-  \ Guidelines (HIG), \nAndroid Material Design 3, and Web platform best practices.\n\
-  450+ rules for Apple platforms (iOS, iPadOS, macOS, watchOS, visionOS, tvOS), \n\
-  Android, and Web with WCAG 2.2 compliance.\n\nUse when building native mobile apps,\
-  \ cross-platform apps, or need platform-specific \ndesign guidance with accessibility\
-  \ compliance.\n"
+description: |
+  Cross-platform design system expertise covering iOS Human Interface Guidelines (HIG),
+  Android Material Design 3, and Web platform best practices.
+  450+ rules for Apple platforms (iOS, iPadOS, macOS, watchOS, visionOS, tvOS),
+  Android, and Web with WCAG 2.2 compliance.
+
+  Use when building native mobile apps, cross-platform apps, or need platform-specific
+  design guidance with accessibility compliance.
 metadata:
+  short-description: Platform UI — iOS HIG, Android Material Design 3, web WCAG 2.2, cross-platform patterns
   content-language: en
+  domain: platform-ui
   level: professional
 ---
 
+# Platform Design (professional)
+
 ## Boundary
 
-[Define boundary with related skills]
+**`platform-design-pro`** owns **platform-native design guidance** — iOS HIG rules, Android Material Design 3 components, watchOS/visionOS/tvOS conventions, and WCAG 2.2 web accessibility compliance. **`ui-ux-system-pro`** owns design system creation and token architecture for multi-platform products. **`frontend-design-pro`** owns web-only visual aesthetics when platform conventions are not the primary constraint. **`motion-design-pro`** owns animation specifics; platform-design-pro defers to it for GSAP/Framer Motion implementation details while retaining authority on haptic feedback and gesture conventions.
 
 ## When to use
 

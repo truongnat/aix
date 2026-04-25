@@ -1,18 +1,24 @@
 ---
 name: ui-design-brain-pro
-description: "Production-grade UI component knowledge from 60+ documented interface\
-  \ patterns.\nBest practices, layout guidance, and usage rules from component.gallery.\n\
-  Replaces generic AI output with real design-system knowledge.\n\nUse when building\
-  \ web interfaces, dashboards, forms, navigation, or any UI \nthat needs modern,\
-  \ minimal, SaaS-quality output grounded in conventions.\n"
+description: |
+  Production-grade UI component knowledge from 60+ documented interface patterns.
+  Best practices, layout guidance, and usage rules from component.gallery.
+  Replaces generic AI output with real design-system knowledge.
+
+  Use when building web interfaces, dashboards, forms, navigation, or any UI
+  that needs modern, minimal, SaaS-quality output grounded in conventions.
 metadata:
+  short-description: UI component patterns — 60+ documented components, layout, interaction states, SaaS conventions
   content-language: en
+  domain: ui-systems
   level: professional
 ---
 
+# UI Design Brain (professional)
+
 ## Boundary
 
-[Define boundary with related skills]
+**`ui-design-brain-pro`** owns **AI-assisted UI component selection and pattern guidance** — choosing the right component for each context, layout best practices, 5-state interaction rules, and conventions sourced from real design systems. **`ui-ux-system-pro`** owns the full design system architecture including token structure and comprehensive UX rule sets. **`shadcn-mastery-pro`** owns shadcn/ui-specific implementation when the stack is confirmed. **`platform-design-pro`** takes over for native mobile (iOS/Android) component decisions. **`frontend-design-pro`** applies when visual personality and aesthetics are the primary concern rather than pattern correctness.
 
 ## When to use
 

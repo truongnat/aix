@@ -1,17 +1,24 @@
 ---
 name: shadcn-mastery-pro
-description: "Deep expertise in shadcn/ui components, patterns, and best practices.\n\
-  Knows every primitive, block, and customization technique.\nGenerates accessible,\
-  \ composable, well-structured React components.\n\nUse when building with shadcn/ui,\
-  \ customizing themes, or creating \ncomponent libraries based on Radix primitives.\n"
+description: |
+  Deep expertise in shadcn/ui components, patterns, and best practices.
+  Knows every primitive, block, and customization technique.
+  Generates accessible, composable, well-structured React components.
+
+  Use when building with shadcn/ui, customizing themes, or creating
+  component libraries based on Radix primitives.
 metadata:
+  short-description: shadcn/ui — Radix primitives, cva variants, theming, composition, accessibility
   content-language: en
+  domain: ui-library
   level: professional
 ---
 
+# shadcn Mastery (professional)
+
 ## Boundary
 
-[Define boundary with related skills]
+**`shadcn-mastery-pro`** owns **shadcn/ui component patterns** — Radix UI primitives, cva-based variants, CSS variable theming, copy-paste component architecture, and Tailwind-driven styling. **`ui-stack-pro`** owns design token governance and the 8px grid/60-30-10 color rules that shadcn components should conform to. **`frontend-design-pro`** owns overall aesthetic direction and font/color choices layered on top of the component foundation. **`react-pro`** owns React-level concerns (hooks, performance, server components) when they interact with shadcn usage.
 
 ## When to use
 

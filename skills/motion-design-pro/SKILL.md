@@ -1,25 +1,24 @@
 ---
 name: motion-design-pro
-description: 'Expert in animation, micro-interactions, and choreographed motion.
-
+description: |
+  Expert in animation, micro-interactions, and choreographed motion.
   GSAP, Framer Motion, CSS animations with performance optimization.
-
   Creates delightful, purposeful animations that enhance UX.
 
-
   Use when adding motion to interfaces, creating page transitions,
-
   scroll animations, or complex choreographed sequences.
-
-  '
 metadata:
+  short-description: UI animation — GSAP, Framer Motion, CSS keyframes, scroll triggers, performance
   content-language: en
+  domain: ui-animation
   level: professional
 ---
 
+# Motion Design (professional)
+
 ## Boundary
 
-[Define boundary with related skills]
+**`motion-design-pro`** owns **animation implementation** — GSAP timelines, Framer Motion variants, CSS keyframes, ScrollTrigger, micro-interactions, and 60fps performance patterns. **`frontend-design-pro`** owns the broader visual aesthetic and decides when motion is warranted as part of design direction. **`platform-design-pro`** owns platform-specific gesture and haptic feedback on iOS/Android. Reduced-motion accessibility is a shared concern with any skill that produces interactive UI.
 
 ## When to use
 

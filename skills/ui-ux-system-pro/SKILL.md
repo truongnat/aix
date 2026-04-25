@@ -1,18 +1,24 @@
 ---
 name: ui-ux-system-pro
-description: "Comprehensive design system intelligence with searchable database of\
-  \ 50+ UI styles, \n97 color palettes, 57 font pairings, 99 UX guidelines, and 25\
-  \ chart types.\nGenerates complete design systems with rationale, best practices,\
-  \ and accessibility compliance.\n\nUse when building design systems, creating comprehensive\
-  \ style guides, or need \ndata-driven design decisions with professional rationale.\n"
+description: |
+  Comprehensive design system intelligence with searchable database of 50+ UI styles,
+  97 color palettes, 57 font pairings, 99 UX guidelines, and 25 chart types.
+  Generates complete design systems with rationale, best practices, and accessibility compliance.
+
+  Use when building design systems, creating comprehensive style guides, or need
+  data-driven design decisions with professional rationale.
 metadata:
+  short-description: UX system design — color palettes, font pairings, UX guidelines, component patterns, accessibility
   content-language: en
+  domain: ux-systems
   level: professional
 ---
 
+# UX System (professional)
+
 ## Boundary
 
-[Define boundary with related skills]
+**`ui-ux-system-pro`** owns **comprehensive UX system design** — building design systems from scratch with data-backed color palette selection (97 palettes), font pairings (57 options), UX rule prioritization (99 guidelines), chart type guidance (25 types), and industry-specific compliance rationale. **`ui-stack-pro`** owns ongoing enforcement of design system rules against generated components; `ui-ux-system-pro` establishes the system, `ui-stack-pro` polices it. **`platform-design-pro`** takes over when platform-native guidelines (HIG, Material Design 3) constrain the system. **`frontend-design-pro`** handles aesthetic direction for web-specific visual personality when the full system architecture is not needed.
 
 ## When to use
 

@@ -1,18 +1,24 @@
 ---
 name: frontend-design-pro
-description: "Anti-slop frontend design with distinctive aesthetics, motion, and spatial\
-  \ composition. \nBreaks AI-generated clich\xE9s (no Inter/Roboto, no purple-on-white)\
-  \ for memorable, \nprofessional interfaces with character and purpose.\n\nUse when\
-  \ building landing pages, marketing sites, portfolios, dashboards, or any \ninterface\
-  \ where visual personality matters.\n"
+description: |
+  Anti-slop frontend design with distinctive aesthetics, motion, and spatial composition.
+  Breaks AI-generated clichés (no Inter/Roboto, no purple-on-white) for memorable,
+  professional interfaces with character and purpose.
+
+  Use when building landing pages, marketing sites, portfolios, dashboards, or any
+  interface where visual personality matters.
 metadata:
+  short-description: Anti-slop frontend design — typography, color, spatial composition, motion
   content-language: en
+  domain: ui-design
   level: professional
 ---
 
+# Frontend Design (professional)
+
 ## Boundary
 
-[Define boundary with related skills]
+**`frontend-design-pro`** owns **anti-slop visual design patterns** — distinctive typography choices, intentional color systems, spatial composition, and motion choreography for web interfaces. **`motion-design-pro`** owns deep animation logic with GSAP/Framer Motion timelines when motion is the primary concern. **`ui-stack-pro`** owns design token enforcement and 8px grid/60-30-10 rules. **`shadcn-mastery-pro`** owns shadcn/ui component primitives and Radix-based composition.
 
 ## When to use
 
