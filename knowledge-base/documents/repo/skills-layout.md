@@ -47,6 +47,10 @@ skills/
   ci-cd-pro/
   seo-pro/
   design-system-pro/
+  frontend-design-pro/
+  ui-ux-system-pro/
+  shadcn-mastery-pro/
+  motion-design-pro/
   mobile-design-pro/
   business-analysis-pro/
   content-analysis-pro/

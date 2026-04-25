@@ -44,6 +44,10 @@ Domain-specific skills that perform actual work.
 - [ci-cd-pro](/skills/ci-cd-pro/) | Pipelines — Actions, reliability
 - [seo-pro](/skills/seo-pro/) | Organic search — technical + lifecycle
 - [design-system-pro](/skills/design-system-pro/) | Design systems — tokens, components
+- [frontend-design-pro](/skills/frontend-design-pro/) | Anti-slop aesthetics — distinctive, memorable UIs
+- [ui-ux-system-pro](/skills/ui-ux-system-pro/) | Comprehensive design system intelligence
+- [shadcn-mastery-pro](/skills/shadcn-mastery-pro/) | shadcn/ui components, patterns, theming
+- [motion-design-pro](/skills/motion-design-pro/) | GSAP, Framer Motion, CSS animations
 - [mobile-design-pro](/skills/mobile-design-pro/) | Mobile UX patterns
 - [business-analysis-pro](/skills/business-analysis-pro/) | Requirements, decisions, metrics
 - [content-analysis-pro](/skills/content-analysis-pro/) | Docs, images, video — structured analysis
@@ -144,6 +148,10 @@ Use skill **`skills-self-review-pro`** for how to read tiers and manual checklis
 | [ci-cd-pro](/skills/ci-cd-pro/) | Pipelines — Actions, reliability |
 | [seo-pro](/skills/seo-pro/) | Organic search — technical + lifecycle |
 | [design-system-pro](/skills/design-system-pro/) | Design systems — tokens, components |
+| [frontend-design-pro](/skills/frontend-design-pro/) | Anti-slop aesthetics — distinctive, memorable UIs |
+| [ui-ux-system-pro](/skills/ui-ux-system-pro/) | Comprehensive design system intelligence |
+| [shadcn-mastery-pro](/skills/shadcn-mastery-pro/) | shadcn/ui components, patterns, theming |
+| [motion-design-pro](/skills/motion-design-pro/) | GSAP, Framer Motion, CSS animations |
 | [mobile-design-pro](/skills/mobile-design-pro/) | Mobile UX patterns |
 | [business-analysis-pro](/skills/business-analysis-pro/) | Requirements, decisions, metrics |
 | [content-analysis-pro](/skills/content-analysis-pro/) | Docs, images, video — structured analysis |
