@@ -46,8 +46,12 @@ Domain-specific skills that perform actual work.
 - [design-system-pro](/skills/design-system-pro/) | Design systems — tokens, components
 - [frontend-design-pro](/skills/frontend-design-pro/) | Anti-slop aesthetics — distinctive, memorable UIs
 - [ui-ux-system-pro](/skills/ui-ux-system-pro/) | Comprehensive design system intelligence
+- [ui-design-brain-pro](/skills/ui-design-brain-pro/) | 60+ UI component patterns from component.gallery
+- [ui-stack-pro](/skills/ui-stack-pro/) | Design system enforcement — 8px grid, 60-30-10 color, 5 states
+- [platform-design-pro](/skills/platform-design-pro/) | iOS HIG + Android Material + Web + WCAG 2.2
 - [shadcn-mastery-pro](/skills/shadcn-mastery-pro/) | shadcn/ui components, patterns, theming
 - [motion-design-pro](/skills/motion-design-pro/) | GSAP, Framer Motion, CSS animations
+- [figma-mcp-pro](/skills/figma-mcp-pro/) | Figma-to-code workflow with MCP integration
 - [mobile-design-pro](/skills/mobile-design-pro/) | Mobile UX patterns
 - [business-analysis-pro](/skills/business-analysis-pro/) | Requirements, decisions, metrics
 - [content-analysis-pro](/skills/content-analysis-pro/) | Docs, images, video — structured analysis
@@ -150,8 +154,12 @@ Use skill **`skills-self-review-pro`** for how to read tiers and manual checklis
 | [design-system-pro](/skills/design-system-pro/) | Design systems — tokens, components |
 | [frontend-design-pro](/skills/frontend-design-pro/) | Anti-slop aesthetics — distinctive, memorable UIs |
 | [ui-ux-system-pro](/skills/ui-ux-system-pro/) | Comprehensive design system intelligence |
+| [ui-design-brain-pro](/skills/ui-design-brain-pro/) | 60+ UI component patterns from component.gallery |
+| [ui-stack-pro](/skills/ui-stack-pro/) | Design system enforcement — 8px grid, 60-30-10 color, 5 states |
+| [platform-design-pro](/skills/platform-design-pro/) | iOS HIG + Android Material + Web + WCAG 2.2 |
 | [shadcn-mastery-pro](/skills/shadcn-mastery-pro/) | shadcn/ui components, patterns, theming |
 | [motion-design-pro](/skills/motion-design-pro/) | GSAP, Framer Motion, CSS animations |
+| [figma-mcp-pro](/skills/figma-mcp-pro/) | Figma-to-code workflow with MCP integration |
 | [mobile-design-pro](/skills/mobile-design-pro/) | Mobile UX patterns |
 | [business-analysis-pro](/skills/business-analysis-pro/) | Requirements, decisions, metrics |
 | [content-analysis-pro](/skills/content-analysis-pro/) | Docs, images, video — structured analysis |

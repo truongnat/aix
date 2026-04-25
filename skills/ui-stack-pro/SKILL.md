@@ -1,0 +1,314 @@
+---
+name: ui-stack-pro
+description: |
+  Configuration-driven design system enforcement for all AI-generated UI.
+  8px grid, 60-30-10 color rule, typography scale, dark mode, 5-state interactions.
+  Prevents inconsistent padding, mismatched colors, and forgotten hover states.
+  
+  Use when generating any UI components to ensure design system consistency 
+  across the entire project.
+when_to_use:
+  - Generating any UI component
+  - Starting new project with design system
+  - Reviewing existing UI for consistency
+  - Creating design tokens
+  - Ensuring dark mode support
+  - Verifying accessibility compliance
+  - Onboarding new team members to design system
+when_not_to_use:
+  - Legacy projects without design system buy-in
+  - One-off prototypes without UI requirements
+  - Projects with established, different conventions
+inputs:
+  - component_type: Button, card, form, modal, etc.
+  - current_tokens: Existing design tokens (if any)
+  - platform: Web, iOS, Android
+outputs:
+  - compliant_component: Following 8px grid, 60-30-10 color
+  - token_spec: CSS variables or design tokens
+  - state_implementation: 5 interaction states
+  - dark_mode_mapping: Light/dark theme values
+---
+
+## Workflow
+
+Apply **Karpathy principles** throughout.
+
+1. **Confirm** component needs → verify: [type, existing tokens, platform].
+2. **State assumptions** about design system maturity, token availability, constraints.
+3. **Apply** minimum design system first (8px grid, base tokens); extend when justified.
+4. **Make surgical changes** — only touch design tokens, not component logic.
+5. **Define success criteria** (consistent, accessible, themed); verify.
+6. **Respond** with compliant component, token spec, state implementations.
+
+## Operating principles
+
+1. **Think Before Coding** — State assumptions: existing tokens, platform constraints, brand requirements.
+2. **Simplicity First** — Start with base tokens; extend only when justified.
+3. **Surgical Changes** — Only modify design tokens, not unrelated logic.
+4. **Goal-Driven Execution** — Consistent, accessible, themed; verify with checklist.
+
+### Design System Core
+
+**Spacing — 8px Grid:**
+```
+4px   — tight internal padding only
+8px   — inline gaps, icon spacing
+16px  — standard padding, card gaps
+24px  — section padding
+32px  — large section gaps
+48px  — page-level spacing
+64px  — major section breaks
+```
+
+**Color — 60-30-10 Rule:**
+- **60%** neutral/background (dominant)
+- **30%** primary brand color
+- **10%** accent for CTAs and highlights
+
+**Semantic colors:**
+- Success: green
+- Warning: amber/orange
+- Error: red
+- Info: blue
+
+**Dark mode:** Never pure black (`#000`)
+- Use `slate-950`, `gray-900`, or brand dark
+
+**Typography — 1.25 Ratio Scale:**
+```
+text-xs:   12px / 16px line-height
+text-sm:   14px / 20px
+text-base: 16px / 24px
+text-lg:   18px / 28px
+text-xl:   20px / 28px
+text-2xl:  24px / 32px
+text-3xl:  30px / 36px
+text-4xl:  36px / 40px
+```
+
+**Font weights:**
+- Headings: semibold (600) or bold (700)
+- Body: normal (400)
+- Emphasis: medium (500)
+
+### 5-State Interactions
+
+Every interactive element must have:
+
+1. **Default** — base appearance
+2. **Hover** — subtle color shift or shadow
+3. **Active/Pressed** — slightly darker or scaled down
+4. **Focus** — visible ring (3px, offset 2px)
+5. **Disabled** — reduced opacity, `cursor-not-allowed`
+
+**Example Button:**
+```css
+.btn {
+  /* Default */
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  
+  /* Hover */
+  &:hover {
+    background: var(--color-primary-hover);
+  }
+  
+  /* Active */
+  &:active {
+    transform: scale(0.98);
+  }
+  
+  /* Focus */
+  &:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  
+  /* Disabled */
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+```
+
+### Dark Mode Strategy
+
+**Token mapping:**
+```css
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --border: #e5e5e5;
+}
+
+[data-theme="dark"] {
+  --background: #0a0a0a;      /* Not pure black */
+  --foreground: #fafafa;
+  --muted: #171717;
+  --muted-foreground: #a3a3a3;
+  --border: #262626;
+}
+```
+
+### Z-Index Scale
+
+```
+dropdown:  z-10
+sticky:    z-20
+overlay:   z-30
+modal:     z-40
+toast:     z-50
+tooltip:   z-60
+```
+
+## Suggested response format
+
+```markdown
+## UI Component: [Name]
+
+### Design System Compliance
+**Spacing:** 8px grid ✓
+**Color:** 60-30-10 rule ✓
+**Typography:** 1.25 scale ✓
+**Dark mode:** Mapped ✓
+
+### Spacing Tokens
+```
+padding: var(--space-4);      /* 16px */
+gap: var(--space-3);          /* 12px */
+```
+
+### Color Tokens
+```
+background: var(--color-primary);      /* 30% */
+text: var(--color-on-primary);        /* Contrast */
+accent: var(--color-accent);           /* 10% */
+```
+
+### 5 States
+- Default: [spec]
+- Hover: [spec]
+- Active: [spec]
+- Focus: [spec]
+- Disabled: [spec]
+
+### Dark Mode
+```
+Light: #ffffff → Dark: #0a0a0a
+```
+
+### Implementation
+```tsx
+// Code with design tokens
+```
+```
+
+## Quick examples
+
+### Example 1: Enforce on New Button
+
+**User:** "Create a button component"
+
+**Agent workflow:**
+1. **Confirm:** Web, React, no existing tokens
+2. **State assumptions:** Primary action, needs all 5 states
+3. **Apply:** Base tokens (8px, 60-30-10, 1.25 type scale)
+4. **Surgical:** Button component only, CSS variables
+5. **Goal:** Consistent, accessible, themed
+
+**Output:**
+```tsx
+// tokens.ts
+export const tokens = {
+  space: {
+    1: '4px',
+    2: '8px',
+    3: '12px',
+    4: '16px',
+    6: '24px',
+  },
+  color: {
+    primary: '#3b82f6',      // 30%
+    'primary-hover': '#2563eb',
+    accent: '#f59e0b',       // 10%
+    background: '#ffffff',   // 60%
+  }
+}
+
+// Button.tsx with 5 states
+```
+
+### Example 2: Review Existing Component
+
+**User:** "Review this card component for design system compliance"
+
+**Agent:** Checklist audit:
+- Spacing on 8px grid? [ ]
+- Color follows 60-30-10? [ ]
+- All 5 states implemented? [ ]
+- Dark mode mapped? [ ]
+- Focus visible? [ ]
+
+**Output:** Fix list with token suggestions.
+
+### Example 3: Create Design Tokens File
+
+**User:** "Generate design tokens for our project"
+
+**Agent:** Full token set:
+- Spacing scale (4-64px)
+- Color system (60-30-10 + semantic)
+- Typography scale (12-36px)
+- Elevation (shadows)
+- Border radius
+- Z-index scale
+
+## References
+
+- `/skills/ui-stack-pro/references/spacing-scale.md` — 8px grid details
+- `/skills/ui-stack-pro/references/color-system.md` — 60-30-10 implementation
+- `/skills/ui-stack-pro/references/typography-scale.md` — 1.25 ratio scale
+- `/skills/ui-stack-pro/references/interaction-states.md` — 5-state model
+- `/skills/ui-stack-pro/references/dark-mode.md` — Token mapping strategies
+- `/skills/ui-stack-pro/references/accessibility.md` — Contrast, touch targets
+
+## Checklist
+
+### Design system application
+- [ ] **Karpathy Principles Verification:**
+  - [ ] Assumptions stated (tokens, platform, constraints)
+  - [ ] Minimum tokens applied (extend only when justified)
+  - [ ] Surgical changes only (tokens, not logic)
+  - [ ] Success criteria defined (consistent, accessible)
+- [ ] 8px grid spacing verified
+- [ ] 60-30-10 color ratio followed
+- [ ] 1.25 typography scale used
+
+### 5 states
+- [ ] Default state defined
+- [ ] Hover state implemented
+- [ ] Active/pressed state implemented
+- [ ] Focus visible (3px ring, 2px offset)
+- [ ] Disabled state (opacity + cursor)
+
+### Dark mode
+- [ ] Light tokens mapped
+- [ ] Dark tokens mapped (not pure black)
+- [ ] Smooth transition between modes
+
+### Accessibility
+- [ ] Contrast ratio ≥ 4.5:1 (text)
+- [ ] Touch targets ≥ 44×44px
+- [ ] Semantic HTML
+- [ ] Keyboard accessible
+- [ ] `prefers-reduced-motion` respected
+
+### Token structure
+- [ ] CSS variables or design tokens defined
+- [ ] Semantic naming (background, primary, accent)
+- [ ] Platform-appropriate values
+- [ ] Documented usage

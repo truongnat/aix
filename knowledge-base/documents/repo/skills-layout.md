@@ -49,8 +49,12 @@ skills/
   design-system-pro/
   frontend-design-pro/
   ui-ux-system-pro/
+  ui-design-brain-pro/
+  ui-stack-pro/
+  platform-design-pro/
   shadcn-mastery-pro/
   motion-design-pro/
+  figma-mcp-pro/
   mobile-design-pro/
   business-analysis-pro/
   content-analysis-pro/
