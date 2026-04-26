@@ -1,0 +1,27 @@
+[
+  {
+    "skill": "react-pro",
+    "required_sections": ["Context", "System model", "Root issue", "Solution", "Failure modes addressed", "Residual risks"],
+    "require_code_fence": true
+  },
+  {
+    "skill": "typescript-pro",
+    "required_sections": ["Context", "Type analysis", "Solution", "Trade-offs", "Residual risks"],
+    "require_code_fence": true
+  },
+  {
+    "skill": "nextjs-pro",
+    "required_sections": ["Context", "Rendering model", "Solution", "Cache impact", "Failure modes addressed", "Residual risks"],
+    "require_code_fence": true
+  },
+  {
+    "skill": "api-design-pro",
+    "required_sections": ["Context", "Problem / goal", "System design", "Decision reasoning", "Implementation sketch", "Trade-offs", "Failure modes", "Residual risks"],
+    "require_code_fence": true
+  },
+  {
+    "skill": "testing-pro",
+    "required_sections": ["Context", "Testing goal", "Recommended layer", "Implementation", "Verification", "Residual risks"],
+    "require_code_fence": true
+  }
+]

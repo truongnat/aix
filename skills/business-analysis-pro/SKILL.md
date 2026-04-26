@@ -235,7 +235,7 @@ Details: [references/versions.md](/skills/business-analysis-pro/references/versi
 | Integration map | [references/integration-map.md](/skills/business-analysis-pro/references/integration-map.md) |
 | Versions & templates | [references/versions.md](/skills/business-analysis-pro/references/versions.md) |
 
-## Quick examples
+## Quick example
 
 **Input:** “We need the app to be fast and secure.”  
 **Expected output:** **Measurable** NFRs; **metrics/guardrails**; **criteria** if build vs buy options; **`security-pro`** flag; assumptions list.

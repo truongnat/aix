@@ -176,7 +176,7 @@ Details: [references/integration-map.md](/skills/clean-code-architecture-pro/ref
 | Decision trees | [references/decision-tree.md](/skills/clean-code-architecture-pro/references/decision-tree.md) |
 | Integration map | [references/integration-map.md](/skills/clean-code-architecture-pro/references/integration-map.md) |
 
-## Quick examples
+## Quick example
 
 **Input:** “Refactor service to clean architecture without breaking behavior.”  
 **Expected output:** Full **Suggested response format**: target layers, strangler steps, characterization test hook, failure modes (duplicate logic).

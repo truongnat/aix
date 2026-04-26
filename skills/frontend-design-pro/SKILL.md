@@ -7,6 +7,8 @@ description: |
 
   Use when building landing pages, marketing sites, portfolios, dashboards, or any
   interface where visual personality matters.
+
+  Triggers: "frontend design", "landing page", "marketing site", "anti-slop", "visual personality", "typography", "spatial composition", "dashboard redesign", "AI slop", "frontend aesthetic".
 metadata:
   short-description: Anti-slop frontend design — typography, color, spatial composition, motion
   content-language: en
@@ -62,7 +64,7 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 5. **Define success criteria** (distinctive aesthetic, no AI slop); loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note visual hierarchy and motion strategy.
 
-## Operating principles
+### Operating principles
 
 1. **Think Before Coding** — State assumptions: target audience, brand personality, competitive landscape. Ask when uncertain.
 2. **Simplicity First** — Start with minimum viable aesthetic; add complexity only when justified.
@@ -192,7 +194,7 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 - [Performance impact of motion]
 ```
 
-## Quick examples
+## Quick example
 
 ### Example 1: Landing page for creative agency
 
@@ -237,7 +239,7 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 
 **Agent:** Run checklist against 5 dimensions, flag issues, suggest fixes.
 
-## References
+## Resources in this skill
 
 - `/skills/frontend-design-pro/references/typography-guide.md` — Curated font pairings
 - `/skills/frontend-design-pro/references/color-palettes.md` — Distinctive palettes
@@ -245,7 +247,7 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 - `/skills/frontend-design-pro/references/layout-principles.md` — Asymmetry, overlap, grid-breaking
 - `/skills/frontend-design-pro/references/anti-slop-checklist.md` — Review checklist
 
-## Checklist
+## Checklist before calling the skill done
 
 ### Before starting
 - [ ] Target audience and purpose defined

@@ -67,3 +67,118 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — Confirm the decision, market boundary, geography, and time horizon before sizing or comparing anything. Ask when the category itself is unstable or ambiguous.
+2. **Simplicity First** — Use the smallest defensible evidence set and sizing method that answers the decision. Do not fabricate precision or build heavyweight market models without need.
+3. **Surgical Changes** — Analyze only the relevant market slice, segment, or competitor frame. Do not expand into broad industry theory unless it changes the decision.
+4. **Goal-Driven Execution** — Done = the research supports a decision with explicit assumptions, source dates, and confidence.
+5. **Evidence quality is part of the result** — A weak source should weaken the claim, not be hidden behind polished prose.
+6. **Sizing is assumption math** — TAM/SAM/SOM outputs are only as good as the boundary and denominator logic behind them.
+7. **Competitors are contextual** — Substitute, adjacent, and direct competitors should not be flattened into one category.
+8. **Market research is not prophecy** — Uncertainty and outdated or conflicting signals should remain visible.
+
+## Default recommendations by scenario
+
+- **Exploratory market scan** — Start with category definition, key segments, and a small competitor map.
+- **Sizing request** — State the method and assumptions before quoting any market number.
+- **Expansion decision** — Compare geographies or verticals on the few criteria that drive the actual choice.
+- **Positioning question** — Clarify substitute and direct competitor sets before claiming differentiation.
+
+## Decision trees
+
+Summary: choose top-down, bottom-up, competitor-first, or segment-first research paths based on the decision and available evidence.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: single-source TAM, stale benchmark reuse, spurious precision, and competitor sets that do not match buyer reality.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Market signal and evidence system model (summary)
+
+How sources, market signals, and synthesis quality should interact so research stays decision-relevant.
+
+Details: [references/market-signal-and-evidence-system-model.md](references/market-signal-and-evidence-system-model.md)
+
+### Market sizing and assumptions (summary)
+
+How to bound TAM/SAM/SOM and keep assumption math visible instead of implied.
+
+Details: [references/market-sizing-and-assumptions.md](references/market-sizing-and-assumptions.md)
+
+### Competitor and positioning (summary)
+
+How to compare categories, substitutes, and direct players without collapsing them into shallow feature grids.
+
+Details: [references/competitor-and-positioning.md](references/competitor-and-positioning.md)
+
+### Segment prioritization and GTM (summary)
+
+How to reason about ICPs, wedges, and go-to-market sequencing from evidence rather than preference.
+
+Details: [references/segment-prioritization-and-gtm.md](references/segment-prioritization-and-gtm.md)
+
+### Reporting and evidence quality (summary)
+
+How to present findings with source/date/geo context and honest confidence levels.
+
+Details: [references/reporting-and-evidence-quality.md](references/reporting-and-evidence-quality.md)
+
+## Suggested response format (STRICT)
+
+1. **Context** — Decision, market boundary, geography, timeframe, and confidence needs.
+2. **Research model** — Explain the sizing or competitor frame and why it fits the decision.
+3. **Findings** — Evidence-backed market, segment, or competitor conclusions with assumptions visible.
+4. **Verification** — Source/date/geo anchors and what would need refreshing later.
+5. **Residual risks** — Weak evidence, category ambiguity, or stale-data exposure.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Market signal and evidence system model | [references/market-signal-and-evidence-system-model.md](references/market-signal-and-evidence-system-model.md) |
+| Market sizing and assumptions | [references/market-sizing-and-assumptions.md](references/market-sizing-and-assumptions.md) |
+| Competitor and positioning | [references/competitor-and-positioning.md](references/competitor-and-positioning.md) |
+| Segment prioritization and GTM | [references/segment-prioritization-and-gtm.md](references/segment-prioritization-and-gtm.md) |
+| Reporting and evidence quality | [references/reporting-and-evidence-quality.md](references/reporting-and-evidence-quality.md) |
+| Failure modes and mitigation | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework and trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
+| Quality validation and guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Version notes | [references/versions.md](references/versions.md) |
+
+## Quick example
+
+**Input:** "Estimate the market for a developer tool in Southeast Asia."
+- Define the category and geography before computing any size estimate.
+- Use transparent assumptions instead of quoting a single magic TAM number.
+- **Verify:** The output shows the method, source dates, and the assumption chain.
+
+**Input (tricky):** "This competitor report gives contradictory market sizes."
+- Compare source scope, year, and category definition before choosing a number.
+- Preserve uncertainty instead of reconciling by guesswork.
+- **Verify:** The report explains why the figures differ and which one is more decision-usable.
+
+**Input (cross-skill):** "Research the market, then turn it into a product wedge."
+- Pair **`web-research-pro`** for source gathering and **`business-analysis-pro`** or **`strategic-consulting-pro`** for decision conversion.
+- Keep evidence collection and strategy framing distinct.
+- **Verify:** The wedge recommendation is traceable back to segment evidence rather than intuition alone.
+
+## Checklist before calling the skill done
+
+- [ ] Decision, market boundary, geography, and timeframe confirmed first (Think Before Coding)
+- [ ] Minimum defensible research path chosen; no fake precision added (Simplicity First)
+- [ ] Only the relevant market slice or competitor set was analyzed (Surgical Changes)
+- [ ] Success criteria, assumptions, and evidence anchors are explicit (Goal-Driven Execution)
+- [ ] Sizing logic is transparent
+- [ ] Competitor framing matches the actual buyer/use case context
+- [ ] Source date and geography are stated where they matter
+- [ ] Residual uncertainty or stale-data risk is documented

@@ -72,3 +72,46 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+- Start from a **single small behavior** that can be expressed as a failing test.
+- Keep the RED-GREEN-REFACTOR loop tight; avoid designing a large solution before the first failing case.
+- Prefer **clear test intent and meaningful failure output** over broad coverage numbers.
+- Refactor only after the test is green and behavior is protected.
+- Use the **minimum production change** needed to satisfy the current test before generalizing.
+
+## Suggested response format
+
+Use this structure for TDD work:
+
+1. **Target behavior** — requirement slice being driven by the next test.
+2. **RED** — the first failing test and what it proves.
+3. **GREEN** — the minimal implementation to pass that test.
+4. **REFACTOR** — what can be safely cleaned up now and why.
+5. **Next test** — the next smallest behavior to drive.
+6. **Risks or blockers** — brittleness, missing harness, or legacy-code constraints.
+
+## Resources in this skill
+
+- `references/red-green-refactor-cycle.md` — canonical TDD loop and execution order.
+- `references/test-design-principles.md` — test quality, naming, and design heuristics.
+- `references/failure-modes.md` — common TDD breakdowns and how to avoid them.
+
+## Quick example
+
+User asks: "Implement rate-limit parsing with TDD."
+
+Response shape:
+- Start with one failing test for the simplest valid input.
+- Add only the minimal parser logic to make it pass.
+- Refactor duplication after green.
+- Identify the next test for invalid input or boundary handling.
+
+## Checklist before calling the skill done
+
+- The current behavior slice is explicit and small.
+- A failing test exists before implementation changes.
+- Production code added is minimal for the current green step.
+- Refactoring is justified by passing tests, not by speculation.
+- The next test or remaining gap is named.

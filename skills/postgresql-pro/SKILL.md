@@ -76,3 +76,116 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — Confirm Postgres major, workload shape, migration tooling, and pool mode before proposing changes. Ask whether the problem is schema, query, transaction, or operational.
+2. **Simplicity First** — Start with the smallest schema/query/policy change that solves the issue. Avoid premature partitioning, denormalization, or lock-heavy rewrites.
+3. **Surgical Changes** — Touch only the affected table, index, migration, role, or query path. No opportunistic redesign of unrelated data models.
+4. **Goal-Driven Execution** — Done = the change is verified with real query plans, locking behavior, or policy outcomes instead of intuition alone.
+5. **Plans before opinions** — Performance advice should be grounded in `EXPLAIN`/`EXPLAIN ANALYZE`, row counts, and workload characteristics.
+6. **MVCC is the default reality** — Snapshot visibility, vacuum, and concurrent writes are part of every correctness decision.
+7. **Least privilege is structural** — RLS, roles, and grants must be validated using the real application role, not superuser shortcuts.
+8. **Rollout safety matters** — Migration lock scope, replica lag, and pool behavior can turn a correct SQL change into an operational incident.
+
+## Default recommendations by scenario
+
+- **Slow query** — Inspect the real plan and row estimates before editing indexes or rewriting SQL.
+- **Migration risk** — Prefer expand/migrate/contract and low-lock operations before table rewrites.
+- **RLS bug** — Test with the actual app role and tenant context path before changing policies.
+- **Pool/replica issue** — Confirm session vs transaction pooling and read/write routing before changing application logic.
+
+## Decision trees
+
+Summary: determine whether the issue is schema design, query planning, transaction semantics, policy visibility, or rollout safety, then choose the smallest verifiable fix.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: indexing without plan evidence, superuser-only RLS testing, migration DDL that blocks production traffic, and using application conventions as a substitute for database guarantees.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### PostgreSQL MVCC, storage, and transaction model (summary)
+
+How tuple versions, snapshots, locks, and WAL shape correctness and performance decisions.
+
+Details: [references/postgresql-mvcc-storage-and-transaction-system-model.md](references/postgresql-mvcc-storage-and-transaction-system-model.md)
+
+### Schema and query design (summary)
+
+How to structure tables, constraints, indexes, and query patterns for maintainability and planner friendliness.
+
+Details: [references/schema-and-query-design.md](references/schema-and-query-design.md)
+
+### Row level security (summary)
+
+How policies, roles, and tenant context interact, and the mistakes that cause invisible rows or accidental exposure.
+
+Details: [references/row-level-security.md](references/row-level-security.md)
+
+### Failure modes and mitigation (summary)
+
+Migration locks, replica lag, deadlocks, pooler mismatches, and policy mistakes to detect before production impact.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Versions (summary)
+
+Version notes that affect planner behavior, DDL options, extensions, and operational guidance.
+
+Details: [references/versions.md](references/versions.md)
+
+## Suggested response format
+
+1. **Context** — Postgres version, workload, migration tool, pool mode, and app-role constraints.
+2. **System model** — Explain the relevant MVCC, locking, planner, replication, or RLS behavior.
+3. **Solution** — Minimum schema/query/policy/migration change with rationale.
+4. **Verification** — `EXPLAIN`, lock observation, policy test, or rollout check that proves the change.
+5. **Residual risks** — Remaining operational, compatibility, or workload caveats.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| PostgreSQL MVCC, storage, and transaction model | [references/postgresql-mvcc-storage-and-transaction-system-model.md](references/postgresql-mvcc-storage-and-transaction-system-model.md) |
+| Schema and query design | [references/schema-and-query-design.md](references/schema-and-query-design.md) |
+| Row level security | [references/row-level-security.md](references/row-level-security.md) |
+| Failure modes and mitigation | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework and trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
+| Quality validation and guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Version notes | [references/versions.md](references/versions.md) |
+
+## Quick example
+
+**Input:** "A query became slow after adding a new filter."
+- Check the real plan and row estimates before adding indexes blindly.
+- Add or adjust the narrowest useful index or query shape only if plan evidence supports it.
+- **Verify:** `EXPLAIN (ANALYZE, BUFFERS)` shows the intended access path and improved timing under representative data.
+
+**Input (tricky):** "RLS blocks valid rows only in production behind PgBouncer."
+- Confirm pool mode and how tenant/session state is set; transaction pooling changes what session-local assumptions are safe.
+- Test policy behavior with the real application role and the actual context propagation path.
+- **Verify:** The same tenant sees the correct rows under production-equivalent pooling, while cross-tenant access still fails.
+
+**Input (cross-skill):** "A NestJS deploy adds a column and backfill without downtime."
+- Pair **`deployment-pro`** for rollout order and **`nestjs-pro`** for app-read/write compatibility while the schema is in transition.
+- Use expand/migrate/contract instead of a one-shot lock-heavy migration.
+- **Verify:** Old and new app versions both work during rollout, and migration lock/replica impact stays within bounds.
+
+## Checklist before calling the skill done
+
+- [ ] Postgres version, workload shape, migration tool, and pool mode confirmed before proposing changes (Think Before Coding)
+- [ ] Minimum schema/query/policy change chosen; no speculative denormalization or partitioning (Simplicity First)
+- [ ] Only the affected table/query/migration/policy surface was changed (Surgical Changes)
+- [ ] Success criteria and verification path are explicit and based on real plans, locks, or policy behavior (Goal-Driven Execution)
+- [ ] Performance claims are backed by `EXPLAIN` or equivalent evidence
+- [ ] RLS and privilege behavior are validated with the real application role/context
+- [ ] Migration and rollout risk is addressed for lock scope, replicas, and poolers
+- [ ] Residual workload or operational caveats are documented clearly

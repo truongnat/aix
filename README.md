@@ -130,12 +130,14 @@ npx github:truongnat/skills update
 npm install
 npm run build
 node dist/tools.js validate-skills
+node dist/tools.js eval-skill-routing --strict
+node dist/tools.js eval-skill-output-format --strict
 node dist/tools.js build-skill-index
 node dist/tools.js build-kb
 node dist/tools.js query-kb "your question"
 ```
 
-Full CLI reference: **[`scripts/README.md`](scripts/README.md)**.
+Full CLI reference: **[`scripts/README.md`](scripts/README.md)**. Skill routing/output evals: **[`evals/README.md`](evals/README.md)**.
 
 ---
 

@@ -77,3 +77,89 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — Confirm whether the request really needs routing or whether a direct working skill is already obvious. Ask only when ambiguity would materially change ownership.
+2. **Simplicity First** — Route to the smallest sufficient set of skills or workflows. Do not create orchestration overhead for a one-skill task.
+3. **Surgical Changes** — Add only the routing, decomposition, or template selection needed for the current request. Do not broaden the scope into unnecessary meta-analysis.
+4. **Goal-Driven Execution** — Done = the request is mapped to clear owners, execution order is explicit, and the user can see why the route chosen is sufficient.
+5. **Delegate real work** — This system skill should coordinate and hand off, not masquerade as a domain expert when a working skill should own the answer.
+6. **Prefer explicit ownership** — When multiple skills apply, state who owns what rather than blending guidance into a vague combined response.
+7. **Optimize the prompt, not the goal away** — Clarify and compress the request without changing the user’s intent.
+8. **Templates are tools, not defaults** — Use a template only when structure improves execution or output quality.
+
+## Default recommendations by scenario
+
+- **Single clear domain task** — Route directly to one working skill with minimal overhead.
+- **Ambiguous multi-part request** — Decompose into subproblems and assign owners explicitly.
+- **Process-heavy request** — Prefer a matching workflow when one already exists instead of inventing a new sequence.
+- **Structured output need** — Add a template only when the output shape materially matters.
+
+## Anti-patterns
+
+Summary: routing simple tasks through too many skills, mixing ownership, over-optimizing prompts until intent drifts, and treating templates as mandatory.
+
+Details: [references/workflow-execution.md](references/workflow-execution.md)
+
+### Skill discovery (summary)
+
+How triggers, descriptions, and repo metadata should be used to find the smallest relevant set of working skills.
+
+Details: [references/skill-discovery.md](references/skill-discovery.md)
+
+### Workflow execution (summary)
+
+How to sequence skill and workflow handoffs so complex tasks stay coordinated instead of fragmented.
+
+Details: [references/workflow-execution.md](references/workflow-execution.md)
+
+### Template catalog (summary)
+
+What structured outputs are available and when they help execution rather than just adding ceremony.
+
+Details: [references/template-catalog.md](references/template-catalog.md)
+
+## Suggested response format (STRICT)
+
+1. **Intent** — What the user is actually asking for and any assumptions that affect routing.
+2. **Recommended route** — Skill(s), workflow(s), or template(s) to use, with explicit ownership.
+3. **Execution order** — The minimum sequence required to complete the request.
+4. **Why this route** — Short reasoning for why this is simpler or safer than alternatives.
+5. **Residual risks** — Ambiguities, missing context, or cases where routing may need adjustment.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Skill discovery algorithm and ranking | [references/skill-discovery.md](references/skill-discovery.md) |
+| Workflow execution and sequencing | [references/workflow-execution.md](references/workflow-execution.md) |
+| Template catalog | [references/template-catalog.md](references/template-catalog.md) |
+
+## Quick example
+
+**Input:** "Help me debug a flaky React test and propose the fix path."
+- Route to **`testing-pro`** for flake strategy and **`react-pro`** for component/runtime specifics.
+- Keep ownership explicit: testing owns signal quality, React owns framework behavior.
+- **Verify:** The route explains exactly which skill should answer which part.
+
+**Input (tricky):** "Write a release report and also tell me what workflow to use."
+- Use a release workflow for process guidance and a template only for the report output shape.
+- Avoid sending the request through unrelated product or engineering skills.
+- **Verify:** The output names one workflow and one template with a clear order.
+
+**Input (cross-skill):** "How should I approach adding auth to a Next.js app with API changes?"
+- Route to **`auth-pro`** plus **`nextjs-pro`**, and optionally **`api-design-pro`** if contract changes are substantial.
+- Clarify ownership before any implementation starts.
+- **Verify:** The decomposition is minimal and covers both app and API concerns without extra routing noise.
+
+## Checklist before calling the skill done
+
+- [ ] Confirmed that routing/orchestration is actually needed before invoking it (Think Before Coding)
+- [ ] Chose the minimum sufficient set of skills/workflows/templates (Simplicity First)
+- [ ] Only added routing logic directly relevant to the request (Surgical Changes)
+- [ ] Success criteria for the route are explicit: owners, order, and intended outcome (Goal-Driven Execution)
+- [ ] Working-skill ownership is explicit where multiple skills apply
+- [ ] Prompt optimization preserves the user’s original goal
+- [ ] Templates are used only when they add real structure
+- [ ] Residual ambiguities are called out rather than hidden

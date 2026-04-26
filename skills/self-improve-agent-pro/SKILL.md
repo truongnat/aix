@@ -72,3 +72,48 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+- Start from **observed failures and measurable drift**, not vague "make it better" goals.
+- Separate **diagnosis**, **intervention**, and **verification** so one change can be attributed.
+- Prefer the **smallest intervention** that can plausibly move the metric before adding automation layers.
+- Treat every improvement as reversible: define **rollback conditions** before rollout.
+- Harvest durable learnings into **skills, references, evals, or checklists** instead of leaving them in chat history.
+
+## Suggested response format
+
+Use this structure for self-improvement work:
+
+1. **Context and target** — agent scope, observed problem, constraints, success metric.
+2. **Failure model** — categories, likely root causes, what evidence supports them.
+3. **Improvement plan** — smallest interventions, ordering, and why this sequence is chosen.
+4. **Verification plan** — before/after metrics, eval set, rollback trigger, review cadence.
+5. **Harvest** — what should be codified into skills, references, scripts, or policy.
+6. **Residual risks** — confounders, unknowns, and what still needs manual review.
+
+## Resources in this skill
+
+- `references/agent-improvement-feedback-system-model.md` — closed-loop control model and feedback surfaces.
+- `references/improvement-loop-design.md` — intervention sequencing and loop construction.
+- `references/metrics-and-verification.md` — measurable success, eval framing, rollback logic.
+- `references/failure-diagnosis-and-patterns.md` — recurring failure classes and diagnosis cues.
+- `references/quality-validation-and-guardrails.md` — guardrails against Goodhart, leakage, and false wins.
+
+## Quick example
+
+User asks: "This agent keeps producing inconsistent PR reviews. Design a self-improvement loop."
+
+Response shape:
+- Define the failure classes: missed bugs, wrong severity, noisy comments.
+- Propose the minimum intervention set: tighten review checklist, add golden cases, add rollback threshold.
+- Specify verification: run the same evaluation set before/after and compare precision/recall-style signals.
+- Harvest the stable findings into the review skill and audit scripts.
+
+## Checklist before calling the skill done
+
+- Goals, failure classes, and constraints are explicit.
+- The plan separates diagnosis, intervention, and verification.
+- The intervention set is minimal and reversible.
+- Before/after measurement and rollback conditions are stated.
+- Durable learnings to codify are identified.

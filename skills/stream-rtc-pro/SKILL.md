@@ -72,3 +72,48 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+- Separate the **signaling plane** from the **media plane** before diagnosing failures.
+- Anchor every recommendation to **topology, client matrix, and network reality**.
+- Prefer the **simplest viable topology** that meets latency and scale needs.
+- Treat reconnect, ICE restarts, and degraded networks as first-class design cases, not edge cleanup.
+- Be explicit about what is **RTC-specific** versus what should move to WebSocket, infra, or security skills.
+
+## Suggested response format
+
+Use this structure for RTC work:
+
+1. **Context and topology** — participants, media types, target latency, device/network constraints.
+2. **System model** — signaling path, media path, session lifecycle, and adaptation logic.
+3. **Priority risks or bottlenecks** — ICE, TURN, renegotiation, bitrate collapse, auth, or scaling.
+4. **Recommended changes** — topology/config/flow fixes ordered by impact.
+5. **Verification plan** — logs, stats, network scenarios, and success thresholds.
+6. **Residual risks** — remaining edge cases or assumptions still unverified.
+
+## Resources in this skill
+
+- `references/rtc-signaling-and-media-plane-system-model.md` — signaling/media split and control loops.
+- `references/decision-framework-and-trade-offs.md` — mesh vs SFU vs MCU and transport trade-offs.
+- `references/failure-modes-detection-mitigation.md` — common RTC production failures and mitigations.
+- `references/edge-cases.md` — NAT/firewall, device, and renegotiation edge conditions.
+- `references/quality-validation-and-guardrails.md` — correctness and validation guardrails.
+
+## Quick example
+
+User asks: "Calls connect on home Wi‑Fi but fail for corporate users behind strict firewalls."
+
+Response shape:
+- Identify whether failure is in signaling, ICE gathering, or relay reachability.
+- Review TURN availability, TCP/TLS relay fallback, and firewall assumptions.
+- Propose the minimum operational fixes first: relay coverage, timeout tuning, join diagnostics.
+- Validate with corp-network test scenarios and connection-state telemetry.
+
+## Checklist before calling the skill done
+
+- Topology, scale, and latency goals are explicit.
+- Diagnosis separates signaling problems from media transport problems.
+- Proposed fixes are tied to concrete RTC failure modes.
+- Verification includes network-condition or device-matrix testing.
+- Residual assumptions about infra or security are called out.

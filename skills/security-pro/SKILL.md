@@ -83,3 +83,124 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — Confirm trust boundaries, data sensitivity, tenancy, and attacker model before proposing controls. Ask when the authorization truth or deployment surface is unclear.
+2. **Simplicity First** — Start with the narrowest effective control at the real boundary. Avoid stacking redundant controls that add complexity without risk reduction.
+3. **Surgical Changes** — Touch only the relevant trust boundary, secret path, auth surface, or logging rule. Do not broaden into unrelated security rewrites.
+4. **Goal-Driven Execution** — Done = the primary abuse path is blocked or reduced, and verification is defined with evidence, not vague reassurance.
+5. **Authorization is object-level** — Role checks alone are not enough; object ownership and tenant scope must be explicit.
+6. **Secrets never become convenience data** — Tokens, keys, and internal diagnostics should not leak into logs, clients, or build artifacts.
+7. **Network context changes app risk** — DNS, TLS, egress, and proxy behavior matter when evaluating SSRF, session, or service-to-service trust.
+8. **Authorized scope only** — Any offensive simulation must stay inside documented rules of engagement and defender-oriented outcomes.
+
+## Default recommendations by scenario
+
+- **Feature security review** — Map trust boundaries and primary abuse paths before suggesting controls.
+- **Auth/authz issue** — Verify where identity is established and where authorization decisions are enforced.
+- **CI/CD concern** — Check secret exposure, action provenance, and environment trust before broadening to app code.
+- **Multi-tenant risk** — Validate object-level and tenant-level isolation first, then supporting headers/tokens/logging.
+
+## Decision trees
+
+Summary: choose controls based on trust boundary, abuse path, and deployment context, not by copying generic checklists.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: role-only authZ, secrets in logs or clients, CSP or TLS “checkbox” hardening without threat fit, and broad exploit advice outside authorized defensive scope.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Security controls and trust boundaries system model (summary)
+
+How data classification, trust boundaries, and defense layers fit together so recommendations stay tied to real exposure.
+
+Details: [references/security-controls-and-trust-boundaries-system-model.md](references/security-controls-and-trust-boundaries-system-model.md)
+
+### Fundamentals and threat model (summary)
+
+How to frame assets, actors, trust transitions, and likely abuse cases before recommending controls.
+
+Details: [references/fundamentals-and-threat-model.md](references/fundamentals-and-threat-model.md)
+
+### OSI and networking (summary)
+
+How network path realities affect SSRF, TLS, segmentation, and service trust decisions.
+
+Details: [references/osi-and-networking.md](references/osi-and-networking.md)
+
+### Failure modes and mitigation (summary)
+
+BOLA, SSRF, token theft, secret leaks, tenant bleed, and control bypass patterns to check early.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Offensive simulation and self-assessment (summary)
+
+How authorized internal assessments should be scoped, constrained, and reported without drifting into unauthorized action.
+
+Details: [references/offensive-simulation-and-self-assessment.md](references/offensive-simulation-and-self-assessment.md)
+
+### Versions (summary)
+
+Version or standards notes that affect headers, protocols, platform hardening, and recommended defaults.
+
+Details: [references/versions.md](references/versions.md)
+
+## Suggested response format
+
+1. **Context** — Deployment surface, data sensitivity, tenancy, auth model, and trust boundaries in scope.
+2. **Threat analysis** — Primary abuse paths, impacted assets, and where the control should live.
+3. **Recommendation** — Minimum effective control changes with rationale.
+4. **Verification** — How to prove the control works and what evidence to collect.
+5. **Residual risks** — Remaining exposure, operational trade-offs, or handoffs to stack skills.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Security controls and trust boundaries system model | [references/security-controls-and-trust-boundaries-system-model.md](references/security-controls-and-trust-boundaries-system-model.md) |
+| Fundamentals and threat model | [references/fundamentals-and-threat-model.md](references/fundamentals-and-threat-model.md) |
+| OSI and networking | [references/osi-and-networking.md](references/osi-and-networking.md) |
+| Attack techniques and methods | [references/attack-techniques-and-methods.md](references/attack-techniques-and-methods.md) |
+| Failure modes and mitigation | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Offensive simulation and self-assessment | [references/offensive-simulation-and-self-assessment.md](references/offensive-simulation-and-self-assessment.md) |
+| Decision framework and trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
+| Quality validation and guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Version notes | [references/versions.md](references/versions.md) |
+
+## Quick example
+
+**Input:** "Review our order API for IDOR/BOLA risk."
+- Identify the object ownership rule, tenant boundary, and where authorization truth is enforced.
+- Recommend explicit object-level checks or RLS where appropriate instead of role-only guards.
+- **Verify:** Cross-user and cross-tenant access tests fail while valid owner access still succeeds.
+
+**Input (tricky):** "We want pentest-style guidance for a live third-party site."
+- Refuse unauthorized offensive help and redirect to authorized defensive assessment patterns.
+- Offer threat-modeling, hardening, and internal self-assessment guidance instead.
+- **Verify:** Scope remains inside approved systems and documented rules of engagement.
+
+**Input (cross-skill):** "Our CI pipeline might leak secrets on fork PRs."
+- Pair **`ci-cd-pro`** for workflow mechanics and use **`security-pro`** for trust-boundary and secret-exposure reasoning.
+- Restrict secret access and action trust paths rather than patching symptoms ad hoc.
+- **Verify:** Forked PR jobs cannot access protected secrets and logs stay redacted.
+
+## Checklist before calling the skill done
+
+- [ ] Trust boundaries, data sensitivity, tenancy, and attacker model confirmed first (Think Before Coding)
+- [ ] Minimum effective control chosen; no unnecessary security theater added (Simplicity First)
+- [ ] Only the relevant trust boundary or security surface was changed (Surgical Changes)
+- [ ] Success criteria and verification evidence are explicit and validated (Goal-Driven Execution)
+- [ ] Authorization decisions are object- or tenant-aware where relevant
+- [ ] Secrets, tokens, and sensitive diagnostics stay out of logs and client surfaces
+- [ ] Network/proxy/runtime context is considered for the threat being addressed
+- [ ] Any offensive simulation remains explicitly authorized and bounded

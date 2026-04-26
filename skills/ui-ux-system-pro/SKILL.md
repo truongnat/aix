@@ -7,6 +7,8 @@ description: |
 
   Use when building design systems, creating comprehensive style guides, or need
   data-driven design decisions with professional rationale.
+
+  Triggers: "UI/UX system", "design system", "accessible palette", "UX rules", "fintech design system", "healthcare design system", "component primitives", "typography system", "spacing system", "accessibility checklist".
 metadata:
   short-description: UX system design — color palettes, font pairings, UX guidelines, component patterns, accessibility
   content-language: en
@@ -66,7 +68,7 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 5. **Define success criteria** (accessible, consistent, scalable); loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format** with prioritized UX rationale.
 
-## Operating principles
+### Operating principles
 
 1. **Think Before Coding** — State assumptions: user personas, business goals, technical constraints. Ask when uncertain.
 2. **Simplicity First** — Start with core tokens (color, type, space); add complexity only when justified.
@@ -230,7 +232,7 @@ Border: Radius scale, widths
 [Prioritized by impact]
 ```
 
-## Quick examples
+## Quick example
 
 ### Example 1: SaaS dashboard design system
 
@@ -285,7 +287,7 @@ Border: Radius scale, widths
 
 **Agent:** Run accessibility check, HIPAA considerations, high contrast verification.
 
-## References
+## Resources in this skill
 
 - `/skills/ui-ux-system-pro/references/color-database.md` — 97 accessible palettes
 - `/skills/ui-ux-system-pro/references/typography-database.md` — 57 font pairings by industry
@@ -294,7 +296,7 @@ Border: Radius scale, widths
 - `/skills/ui-ux-system-pro/references/accessibility-checklist.md` — WCAG 2.1 AA/AAA compliance
 - `/skills/ui-ux-system-pro/references/data-visualization.md` — 25 chart types with best practices
 
-## Checklist
+## Checklist before calling the skill done
 
 ### Before starting
 - [ ] Product type defined (SaaS, e-commerce, etc.)

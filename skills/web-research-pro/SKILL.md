@@ -67,3 +67,116 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — Confirm product, version, freshness needs, and whether local KB should be checked first. Ask when citation or recency requirements materially change the answer.
+2. **Simplicity First** — Use the smallest trustworthy source set that answers the question. Do not over-research when one primary source is sufficient.
+3. **Surgical Changes** — Gather only the sources relevant to the user’s question. Do not sprawl into adjacent topics or citation dumps.
+4. **Goal-Driven Execution** — Done = claims are traceable to sources, confidence is clear, and stale or conflicting evidence is called out explicitly.
+5. **Primary sources first** — Official docs, standards, repos, and changelogs outrank blogs, SEO content, or forum summaries for factual claims.
+6. **Freshness is part of truth** — For unstable topics, publication date and version context are required, not optional.
+7. **Citations are evidence, not decoration** — Every critical claim should be attributable, especially when the answer could drift.
+8. **Local and web have different jobs** — In-repo KB answers project truth; the web answers external truth or freshness.
+
+## Default recommendations by scenario
+
+- **API or framework question** — Start with official docs and versioned changelogs.
+- **Project-specific + external question** — Check local KB first, then verify external facts on the web.
+- **Conflicting sources** — Prefer primary/official sources and explain the conflict explicitly.
+- **Moved or dead docs** — Use changelogs, repo history, or archive context before trusting SEO mirrors.
+
+## Decision trees
+
+Summary: decide when to stay local, when to browse externally, and how many sources are needed based on drift risk and claim criticality.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: trusting a single weak source, citing outdated SEO pages over official docs, and presenting unverified memory as current fact.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Web research verification system model (summary)
+
+How source hierarchy, triangulation, and confidence framing should work so research stays reliable under drift.
+
+Details: [references/web-research-verification-system-model.md](references/web-research-verification-system-model.md)
+
+### Workflow, sources, and evaluation (summary)
+
+How to search, compare, and evaluate sources without confusing authority, freshness, and relevance.
+
+Details: [references/workflow-sources-and-evaluation.md](references/workflow-sources-and-evaluation.md)
+
+### Citations and stale URLs (summary)
+
+How to handle moved docs, archives, stale links, and citation hygiene for answers that need traceability.
+
+Details: [references/citations-and-stale-urls.md](references/citations-and-stale-urls.md)
+
+### Failure modes and mitigation (summary)
+
+Single-source errors, version drift, broken links, and fabricated or stale citations to avoid.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Versions (summary)
+
+How version context changes the interpretation of docs, changelogs, and deprecations.
+
+Details: [references/versions.md](references/versions.md)
+
+## Suggested response format (STRICT)
+
+1. **Context** — Product/library, version, freshness needs, and whether local KB was relevant.
+2. **Source strategy** — Which source classes were used and why they were sufficient.
+3. **Findings** — Source-backed answer with clear attribution and confidence.
+4. **Conflicts or caveats** — Any source disagreement, stale docs, or version ambiguity.
+5. **Residual risks** — What may still drift or need deeper verification.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Web research verification system model | [references/web-research-verification-system-model.md](references/web-research-verification-system-model.md) |
+| Workflow, sources, and evaluation | [references/workflow-sources-and-evaluation.md](references/workflow-sources-and-evaluation.md) |
+| Citations and stale URLs | [references/citations-and-stale-urls.md](references/citations-and-stale-urls.md) |
+| Failure modes and mitigation | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework and trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
+| Quality validation and guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Version notes | [references/versions.md](references/versions.md) |
+
+## Quick example
+
+**Input:** "Is this React API still current in the latest docs?"
+- Confirm version sensitivity and go to the official docs or changelog first.
+- Do not answer from memory when the API could have shifted recently.
+- **Verify:** The response cites the current official source and notes any version boundary.
+
+**Input (tricky):** "This blog says a config flag exists, but the docs 404."
+- Prefer official repos/changelogs and note that the weak source may be stale or wrong.
+- Do not preserve the claim just because it is repeated across SEO pages.
+- **Verify:** The final answer states whether the flag exists and where that conclusion came from.
+
+**Input (cross-skill):** "Use local KB and official docs to verify our skill references are still current."
+- Pair **`repo-tooling-pro`** or **`skills-self-review-pro`** for local state, and use **`web-research-pro`** for external freshness.
+- Keep project truth and external truth clearly separated.
+- **Verify:** Each refreshed claim has both local context and external citation where needed.
+
+## Checklist before calling the skill done
+
+- [ ] Product, version, freshness needs, and local-KB relevance confirmed first (Think Before Coding)
+- [ ] Minimum trustworthy source set used; no unnecessary research sprawl (Simplicity First)
+- [ ] Only sources relevant to the current question were gathered (Surgical Changes)
+- [ ] Success criteria, source attribution, and confidence are explicit (Goal-Driven Execution)
+- [ ] Primary sources are preferred for critical claims
+- [ ] Version/date context is stated where drift matters
+- [ ] Conflicting or stale sources are called out explicitly
+- [ ] Residual uncertainty is documented rather than hidden

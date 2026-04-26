@@ -25,6 +25,12 @@ jobs:
       - name: Validate skills
         run: node dist/tools.js validate-skills
 
+      - name: Eval skill routing (strict)
+        run: node dist/tools.js eval-skill-routing --strict
+
+      - name: Eval skill output format — heuristic (strict)
+        run: node dist/tools.js eval-skill-output-format --strict
+
       - name: Build and verify knowledge base
         run: |
           node dist/tools.js build-kb

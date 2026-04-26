@@ -219,7 +219,7 @@ Details: [references/versions.md](/skills/ci-cd-pro/references/versions.md)
 | Edge cases | [references/edge-cases.md](/skills/ci-cd-pro/references/edge-cases.md) |
 | Versions | [references/versions.md](/skills/ci-cd-pro/references/versions.md) |
 
-## Quick examples
+## Quick example
 
 **Input:** 12-minute CI; `npm install` every run.  
 **Expected output:** Full **Suggested response format** — cache keying, job split, trade-off of cold vs warm, failure **rate limit/cache miss**, residual **fork** irrelevance.

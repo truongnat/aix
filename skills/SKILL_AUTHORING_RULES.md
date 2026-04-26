@@ -3,6 +3,31 @@
 **Do not create a new skill directory under `skills/` unless every mandatory rule below is satisfied.**  
 If a proposed skill cannot meet these rules, **stop** — extend an existing `*-pro` skill or update `references/` instead.
 
+---
+
+## §0. Karpathy Principles — blocking gate (check before writing any content)
+
+**A skill that does not integrate all 4 Karpathy principles is incomplete. Do not merge it.**
+
+Every skill MUST embed these principles in `## Workflow`, `### Operating principles`, and `## Checklist before calling the skill done`. No exceptions, including planning and meta skills.
+
+| Principle | Required integration |
+|-----------|---------------------|
+| **Think Before Coding** | `### Operating principles` — state assumptions; ask when uncertain |
+| **Simplicity First** | `## Workflow` step — minimum solution first; escalate only when justified |
+| **Surgical Changes** | `### Operating principles` — only touch what the request requires |
+| **Goal-Driven Execution** | `## Workflow` step — define success criteria; loop until verified |
+
+**Checklist gate:** `## Checklist` must include explicit Karpathy verification items:
+- `[ ]` Assumptions stated explicitly; asked when uncertain (Think Before Coding)
+- `[ ]` Started with minimum solution; no speculative complexity (Simplicity First)
+- `[ ]` Only touched code / content directly related to the request (Surgical Changes)
+- `[ ]` Success criteria defined and verified before marking done (Goal-Driven Execution)
+
+Full reference: [`skills/karpathy-coding-pro/SKILL.md`](karpathy-coding-pro/SKILL.md) and [`skills/karpathy-coding-pro/references/applying-principles-in-practice.md`](karpathy-coding-pro/references/applying-principles-in-practice.md).
+
+---
+
 ## Reference architecture — six layers
 
 Every bundled skill should cover these layers (some sections live in `SKILL.md`, depth in `references/`):
@@ -119,38 +144,6 @@ More blocks **only** if listed in `**## Suggested response format`** and `**## E
 - Prefer: `**tips-and-tricks.md**`, `**edge-cases.md**`, `**decision-tree.md**`, `**anti-patterns.md**`, `**integration-map.md**`, `**versions.md**`.
 - `SKILL.md` = summaries + `Details:` links.
 
-## 6.5. Karpathy principles (mandatory for all skills)
-
-All skills must encode **Andrej Karpathy's 4 coding principles** to reduce LLM coding pitfalls:
-
-### 1. Think Before Coding
-- State assumptions explicitly — if uncertain, ask rather than guess
-- Present multiple interpretations — don't pick silently when ambiguity exists
-- Push back when warranted — if a simpler approach exists, say so
-- Stop when confused — name what's unclear and ask for clarification
-
-### 2. Simplicity First
-- Minimum code that solves the problem. Nothing speculative.
-- No features beyond what was asked
-- No abstractions for single-use code
-- No "flexibility" or "configurability" that wasn't requested
-- If 200 lines could be 50, rewrite it
-
-### 3. Surgical Changes
-- Touch only what you must. Clean up only your own mess.
-- Don't "improve" adjacent code, comments, or formatting
-- Don't refactor things that aren't broken
-- Match existing style, even if you'd do it differently
-- Remove imports/variables/functions that YOUR changes made unused
-
-### 4. Goal-Driven Execution
-- Define success criteria. Loop until verified.
-- Transform imperative tasks into verifiable goals
-- State brief plan with verification: `Step → verify: [check]`
-- Strong success criteria let the agent loop independently
-
-**Integration:** These principles appear in `### Operating principles`, `## Workflow` verification steps, `## Quick examples`, and `## Checklist before calling the skill done`.
-
 ## 7. Copy procedure
 
 1. Copy `skills/examples/skill-template/` → `skills/<new-skill-name>/`.
@@ -173,7 +166,7 @@ All skills must encode **Andrej Karpathy's 4 coding principles** to reduce LLM c
 
 ## 9. Review
 
-Section order §2 (or legacy); Workflow §4 with Karpathy verification steps; **When not to use** for new/refactored skills; **Suggested response format** §5; Operating principles include 4 Karpathy principles; **§8** updates; **§10** quality.
+**§0 gate first** — confirm all 4 Karpathy principles integrated in Workflow, Operating principles, and Checklist. Then: section order §2 (or legacy); Workflow §4 with Karpathy verification steps; **When not to use** for new/refactored skills; **Suggested response format** §5; **§8** updates; **§10** quality.
 
 ## 10. Quality rubric
 

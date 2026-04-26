@@ -244,7 +244,7 @@ Details: [references/versions.md](/skills/bug-discovery-pro/references/versions.
 | Integration map | [references/integration-map.md](/skills/bug-discovery-pro/references/integration-map.md) |
 | Versions | [references/versions.md](/skills/bug-discovery-pro/references/versions.md) |
 
-## Quick examples
+## Quick example
 
 **Input:** Intermittent 500 on `/api/orders` after deploy — find related risk.  
 **Expected output:** Taxonomy hint (**integration**/**failure mode**); **`api_impact`** / **`shape_check`** if indexed; **trace** correlation suggestion; **candidates** table with confidence; **no** “all bugs found.”

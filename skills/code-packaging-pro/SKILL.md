@@ -195,7 +195,7 @@ Details: [references/versions.md](/skills/code-packaging-pro/references/versions
 | Integration map | [references/integration-map.md](/skills/code-packaging-pro/references/integration-map.md) |
 | Versions | [references/versions.md](/skills/code-packaging-pro/references/versions.md) |
 
-## Quick examples
+## Quick example
 
 **Input:** Multi-stage Dockerfile for FastAPI, non-root.  
 **Expected output:** Full **Suggested response format** — stages, `.dockerignore`, USER; **`deployment-pro`** for orchestration; failure **secret-in-layer**.

@@ -187,7 +187,7 @@ Details: [references/integration-map.md](/skills/brainstorming-pro/references/in
 | Edge cases | [references/edge-cases.md](/skills/brainstorming-pro/references/edge-cases.md) |
 | Integration map | [references/integration-map.md](/skills/brainstorming-pro/references/integration-map.md) |
 
-## Quick examples
+## Quick example
 
 ### 1 — Simple (common)
 

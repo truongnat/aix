@@ -71,3 +71,108 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — Confirm service boundary intent, team ownership, data stores, and SLOs before proposing distribution. Ask whether a split is solving a real problem or creating one.
+2. **Simplicity First** — Prefer the smallest topology that satisfies ownership and scaling needs. Do not split services, add buses, or introduce sagas without clear pressure.
+3. **Surgical Changes** — Touch only the relevant service boundary, integration path, or resilience control. Avoid broad distributed-architecture rewrites.
+4. **Goal-Driven Execution** — Done = boundaries, contracts, failure handling, and operational implications are explicit and verifiable.
+5. **Boundaries beat buzzwords** — Service count matters less than clear ownership, data responsibility, and change isolation.
+6. **Network is part of correctness** — Retries, timeouts, duplication, and partial failure are default realities, not edge cases.
+7. **Data ownership is a hard rule** — Dual writes and hidden shared-db coupling should be treated as design liabilities.
+8. **Operability is part of design** — A service is not “done” if tracing, alerting, and rollout implications are undefined.
+
+## Default recommendations by scenario
+
+- **Considering a split** — Validate bounded context and team ownership first; keep the monolith if pressure is weak.
+- **Cross-service workflow** — Decide sync vs async and idempotency behavior before implementation details.
+- **Resilience issue** — Fix timeout/retry/backpressure contracts before adding more infrastructure layers.
+- **Event-driven design** — Clarify ordering, dedupe, and outbox strategy before praising decoupling.
+
+## Decision trees
+
+Summary: decide whether to stay monolithic, split, message, or orchestrate based on ownership, consistency, latency, and failure tolerance.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: premature service splits, shared databases posing as autonomy, retry storms, and event-driven complexity without ownership clarity.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Distributed services system model (summary)
+
+How ownership planes, network hops, contracts, and state transitions interact in a real microservice system.
+
+Details: [references/distributed-services-system-model.md](references/distributed-services-system-model.md)
+
+### Failure modes and mitigation (summary)
+
+Dual writes, contract skew, partial failure, split brain, retries, and observability gaps to address before scale amplifies them.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+How to choose between monolith vs split, sync vs async, and stronger consistency vs looser coupling.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+### Versions (summary)
+
+Version notes that affect platform integrations, service-mesh assumptions, and stack compatibility in distributed deployments.
+
+Details: [references/versions.md](references/versions.md)
+
+## Suggested response format
+
+1. **Context** — Platform, ownership, traffic/SLO, data stores, and consistency needs.
+2. **Distributed model** — Explain the relevant boundary, interaction, and failure-handling logic.
+3. **Recommendation** — Minimum topology or resilience change with rationale.
+4. **Verification** — How to prove contracts, failure handling, and operability are correct.
+5. **Residual risks** — Remaining coupling, latency, or organizational caveats.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Distributed services system model | [references/distributed-services-system-model.md](references/distributed-services-system-model.md) |
+| Failure modes and mitigation | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework and trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
+| Quality validation and guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Version notes | [references/versions.md](references/versions.md) |
+
+## Quick example
+
+**Input:** "Should we split billing out of the monolith?"
+- Check ownership, release friction, and consistency needs before assuming a microservice is the answer.
+- Prefer the smallest boundary that reduces real pain.
+- **Verify:** The recommendation names which coupling pressure justifies the split or why it does not.
+
+**Input (tricky):** "Retries fixed our failures, but now traffic spikes collapse the system."
+- Treat retry storms as a design bug, not a resilience success.
+- Fix timeout, backpressure, and idempotency contracts before adding more replicas blindly.
+- **Verify:** Failure load no longer amplifies through retries under the same scenario.
+
+**Input (cross-skill):** "Design async events between services with DB ownership."
+- Pair **`api-design-pro`** for contracts and **`postgresql-pro`** for data-boundary implications.
+- Keep ownership and outbox behavior explicit.
+- **Verify:** Event flow, dedupe, and data consistency expectations are stated and testable.
+
+## Checklist before calling the skill done
+
+- [ ] Service boundaries, ownership, data stores, and SLOs confirmed first (Think Before Coding)
+- [ ] Minimum topology or resilience change chosen; no unnecessary distributed complexity added (Simplicity First)
+- [ ] Only the relevant boundary or interaction path was changed (Surgical Changes)
+- [ ] Success criteria and failure-handling verification are explicit (Goal-Driven Execution)
+- [ ] Data ownership and consistency expectations are stated
+- [ ] Retry/timeout/backpressure behavior is addressed where relevant
+- [ ] Operability requirements are included
+- [ ] Residual organizational or coupling risks are documented

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "react-out-001",
+    "skill": "react-pro",
+    "prompt": "Fix a React effect that loops in Strict Mode.",
+    "response": "## Context\nReact 18 on Next.js App Router, client component, dev Strict Mode enabled.\n\n## System model\nThe effect runs after commit, and Strict Mode intentionally replays mount effects in development to expose non-idempotent logic.\n\n## Root issue\nThe effect updates state derived from a value already captured in its own dependency loop, so each replay schedules another render.\n\n## Solution\nMove the derived value into render and keep the effect only for external synchronization.\n\n```tsx\nuseEffect(() => {\n  const sub = source.subscribe(setValue)\n  return () => sub.unsubscribe()\n}, [source])\n```\n\n## Failure modes addressed\nThis removes the self-triggering update path and keeps cleanup explicit for Strict Mode replays.\n\n## Residual risks\nIf `source` identity is unstable, the subscription will still churn and should be stabilized at the call site."
+  },
+  {
+    "id": "react-out-002",
+    "skill": "react-pro",
+    "prompt": "Resolve a hydration mismatch in a React page.",
+    "response": "## Context\nReact 18 with SSR on Vite SSR, browser-only code currently runs during render.\n\n## System model\nServer render must produce the same initial markup as the client hydration pass before effects run.\n\n## Root issue\nThe component reads `window.localStorage` during render, so the server and client produce different first-pass output.\n\n## Solution\nRender a stable fallback first and move the browser read into an effect.\n\n```tsx\nconst [theme, setTheme] = useState('light')\nuseEffect(() => {\n  setTheme(window.localStorage.getItem('theme') ?? 'light')\n}, [])\n```\n\n## Failure modes addressed\nThis removes mismatched text during hydration and avoids branching on `window` inside render.\n\n## Residual risks\nA flash of default UI can remain unless the app also injects the initial theme from the server."
+  },
+  {
+    "id": "ts-out-001",
+    "skill": "typescript-pro",
+    "prompt": "Fix TS2322 for a possibly undefined string.",
+    "response": "## Context\nTypeScript 5.x, `strictNullChecks` enabled, ESM project.\n\n## Type analysis\nThe value is `string | undefined`, but the target property requires a definite `string`, so assignment fails under strict null checking.\n\n## Solution\nNarrow before assignment instead of asserting.\n\n```ts\nconst label = value ?? ''\nrenderLabel(label)\n```\n\n## Trade-offs\nUsing a default keeps runtime behavior explicit, while `as string` would silence the compiler without proving the value exists.\n\n## Residual risks\nIf the empty-string fallback is not acceptable product behavior, the caller still needs a real missing-value branch."
+  },
+  {
+    "id": "ts-out-002",
+    "skill": "typescript-pro",
+    "prompt": "Preserve generic inference in a helper function.",
+    "response": "## Context\nTypeScript 5.x with `strict` mode on and `moduleResolution` set to `NodeNext`.\n\n## Type analysis\nThe helper loses inference because the unconstrained generic gives the checker no structural information to carry through the return type.\n\n## Solution\nConstrain the generic and return the same parameterized shape.\n\n```ts\nfunction cloneRecord<T extends Record<string, unknown>>(input: T): T {\n  return { ...input }\n}\n```\n\n## Trade-offs\nThe constraint improves inference for object-like values, but it intentionally excludes primitive inputs that never matched the helper's real purpose.\n\n## Residual risks\nIf callers depend on methods or prototype identity, object spread still changes runtime semantics even though the type now looks correct."
+  },
+  {
+    "id": "next-out-001",
+    "skill": "nextjs-pro",
+    "prompt": "Refresh stale data after a Server Action mutation.",
+    "response": "## Context\nNext.js App Router on Vercel, Server Action mutates data backing a statically cached route.\n\n## Rendering model\nThe mutation runs on the server, but the Data Cache for the affected route remains stale until it is explicitly invalidated.\n\n## Solution\nInvalidate only the affected path inside the Server Action.\n\n```ts\n'use server'\nimport { revalidatePath } from 'next/cache'\n\nexport async function updateProfile() {\n  await saveProfile()\n  revalidatePath('/settings/profile')\n}\n```\n\n## Cache impact\nThe Router Cache will pick up a fresh RSC payload for `/settings/profile` after the mutation instead of serving stale cached data.\n\n## Failure modes addressed\nThis avoids broad invalidation and reduces the stale-read window after a write.\n\n## Residual risks\nIf related views depend on the same data through tags rather than path-bound fetches, `revalidateTag` may still be the better primitive."
+  },
+  {
+    "id": "next-out-002",
+    "skill": "nextjs-pro",
+    "prompt": "Fix a request-scope error from `cookies()`.",
+    "response": "## Context\nNext.js App Router on self-hosted Node, route segment currently treated as static.\n\n## Rendering model\n`cookies()` is only legal inside a request-scoped dynamic render or handler, not during static evaluation.\n\n## Solution\nMove the cookie read into a request-scoped path and mark the segment dynamic if needed.\n\n```ts\nexport const dynamic = 'force-dynamic'\n\nexport default async function Page() {\n  const theme = (await cookies()).get('theme')?.value ?? 'light'\n  return <View theme={theme} />\n}\n```\n\n## Cache impact\nThis segment will no longer use static output, so each request gets fresh cookie-aware rendering.\n\n## Failure modes addressed\nThe request-scope runtime error goes away and cookie access no longer happens during static evaluation.\n\n## Residual risks\nForcing dynamic rendering increases request cost and may reduce cache hit rate if used too broadly."
+  },
+  {
+    "id": "api-out-001",
+    "skill": "api-design-pro",
+    "prompt": "Design a backward-compatible bulk update API.",
+    "response": "## Context\nInternal and mobile clients need a 12-month compatibility window, with authenticated write access and eventual-consistency search downstream.\n\n## Problem / goal\nWe need a bulk update surface that is idempotent, observable, and safe to evolve without breaking existing single-item clients.\n\n## System design\nKeep the single-resource contract stable and introduce a dedicated bulk job resource that tracks accepted operations asynchronously.\n\n## Decision reasoning\nA job-style REST endpoint is safer than synchronous RPC because bulk writes can be slow, partial, and retry-sensitive.\n\n## Implementation sketch\nExpose a job-creating endpoint plus a status resource.\n\n```yaml\nPOST /v1/user-updates:bulk\n202 Accepted\n{\n  \"jobId\": \"job_123\",\n  \"status\": \"queued\"\n}\n```\n\n## Trade-offs\nAsync jobs add polling complexity, but they avoid request timeouts and make retries safer than a huge synchronous mutation.\n\n## Failure modes\nWe still need deduplication keys, partial-failure reporting, and clear handling for replayed requests.\n\n## Residual risks\nSearch read models may lag the source of truth, so clients need explicit consistency expectations after job completion."
+  },
+  {
+    "id": "api-out-002",
+    "skill": "api-design-pro",
+    "prompt": "Review an API change that adds workflow transitions.",
+    "response": "## Context\nThird-party integrators consume this API, auth is token-based, and breaking changes must be avoided for at least one major version.\n\n## Problem / goal\nWe need to add approval and cancellation transitions without turning the resource into an ambiguous free-form PATCH surface.\n\n## System design\nModel transitions as explicit action endpoints on the existing resource rather than allowing arbitrary status mutation.\n\n## Decision reasoning\nAction endpoints communicate allowed state changes more clearly than generic PATCH and make auditing and authorization easier.\n\n## Implementation sketch\nKeep the resource read model stable and add explicit transition endpoints.\n\n```yaml\nPOST /v1/orders/{id}:approve\nPOST /v1/orders/{id}:cancel\n```\n\n## Trade-offs\nAction endpoints are more verbose than a single status field update, but they make workflow intent and guardrails explicit.\n\n## Failure modes\nWithout idempotency and transition guards, retries could double-apply side effects or allow invalid state jumps.\n\n## Residual risks\nClients that cache old workflow assumptions may still need versioned documentation and deprecation messaging."
+  },
+  {
+    "id": "test-out-001",
+    "skill": "testing-pro",
+    "prompt": "Add regression coverage for a checkout fix quickly.",
+    "response": "## Context\nReact web app, Vitest + RTL locally, GitHub Actions in CI, and the product harness already exists in `react-pro` territory.\n\n## Testing goal\nPrevent the checkout regression from returning while keeping the new test fast enough for PR feedback.\n\n## Recommended layer\nUse an integration-style component test because it covers the failing user path without the cost of full browser E2E.\n\n## Implementation\nMock only the payment edge, keep real form interactions, and assert the visible success state.\n\n```tsx\nit('submits checkout after valid cart confirmation', async () => {\n  render(<CheckoutPage />)\n  await user.click(screen.getByRole('button', { name: /pay now/i }))\n  expect(await screen.findByText(/order confirmed/i)).toBeVisible()\n})\n```\n\n## Verification\nRun the targeted test file locally and in the GitHub Actions PR job; passing evidence is the reproduced path turning green without snapshot churn.\n\n## Residual risks\nThis still will not catch provider-specific browser issues or timezone-sensitive payment flows outside the component boundary."
+  },
+  {
+    "id": "test-out-002",
+    "skill": "testing-pro",
+    "prompt": "Stabilize a flaky Playwright test in CI.",
+    "response": "## Context\nNext.js app, Playwright in CI, failures appear only on the nightly shard and not on developer machines.\n\n## Testing goal\nReduce CI-only flakiness by isolating the environment dependency instead of masking it with retries.\n\n## Recommended layer\nKeep this at the E2E layer because the failure only appears in the browser-plus-CI environment where the real bug exists.\n\n## Implementation\nFreeze time, seed deterministic data, and capture artifacts around the midnight boundary.\n\n```ts\nawait page.clock.setFixedTime(new Date('2026-01-01T23:59:50Z'))\nawait expect(page.getByText(/invoice ready/i)).toBeVisible()\n```\n\n## Verification\nRun the same Playwright shard repeatedly in CI and confirm traces/screenshots stop showing intermittent midnight failures.\n\n## Residual risks\nIf the flake is actually infrastructure-related, the test may still pass locally while failing under remote resource contention."
+  }
+]

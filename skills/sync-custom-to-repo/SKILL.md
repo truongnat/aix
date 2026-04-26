@@ -179,3 +179,43 @@ Uses `xcopy` command for directory copying:
 **Issue:** Branch push fails
 - **Cause:** Authentication failure or permission denied
 - **Fix:** Check Git credentials and repository permissions
+
+### Operating principles
+
+- Detect and report the **actual custom content set** before creating any branch.
+- Keep the workflow **deterministic and minimal**: copy only the intended custom directories.
+- Prefer **descriptive branch and commit naming** so review scope is obvious upstream.
+- Treat push/PR creation as **separate verification points**; do not blur local sync success with remote success.
+- Surface platform assumptions clearly when the script is Windows-specific or environment-specific.
+
+## Suggested response format
+
+Use this structure for sync work:
+
+1. **Context** — target repo, content types, local source, platform assumptions.
+2. **Detected changes** — counts and names of skills/workflows/templates to sync.
+3. **Sync plan or result** — branch name, commit message pattern, push/PR status.
+4. **Verification** — what was copied, what remote state was confirmed, what remains manual.
+5. **Residual risks** — auth, conflicts, platform limits, or upstream review dependencies.
+
+## Resources in this skill
+
+- `references/workflow.md` — canonical sync workflow, branch/commit behavior, and reporting expectations.
+
+## Quick example
+
+User asks: "Sync my custom OCR skill and template to the upstream skills repo."
+
+Response shape:
+- Detect the exact custom skill/template directories present.
+- Generate a descriptive branch and commit scope from those directories.
+- Report whether clone, copy, commit, push, and PR-link generation each succeeded.
+- Call out any manual GitHub step if PR creation is not automatic.
+
+## Checklist before calling the skill done
+
+- The exact content selected for sync is listed.
+- Branch and commit naming are descriptive and reproducible.
+- Local sync success and remote push/PR success are reported separately.
+- Platform-specific assumptions or limitations are explicit.
+- Remaining manual steps are clearly called out.

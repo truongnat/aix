@@ -68,3 +68,48 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+- Start with the **connection lifecycle** and delivery guarantees before discussing libraries.
+- Be explicit about **proxy/load balancer behavior**, because many production failures come from the network edge.
+- Prefer the **simplest transport** that satisfies the product need; do not force WebSocket where SSE is enough.
+- Treat **heartbeat, reconnect, duplicate handling, and backpressure** as core design concerns.
+- Keep transport concerns separate from application command semantics and authorization depth.
+
+## Suggested response format
+
+Use this structure for WebSocket work:
+
+1. **Context** — runtime, scale, topology, latency/reliability requirements.
+2. **Connection model** — handshake, auth, heartbeat, reconnect, message flow.
+3. **Primary risks** — idle timeout, reconnect storms, duplicate delivery, auth leakage, fan-out bottlenecks.
+4. **Recommended changes** — transport, protocol, or infra adjustments in priority order.
+5. **Verification plan** — what to test under disconnects, retries, proxies, and load.
+6. **Residual risks** — remaining assumptions or behaviors still not proven.
+
+## Resources in this skill
+
+- `references/websocket-connection-and-message-system-model.md` — connection and message lifecycle model.
+- `references/decision-framework-and-trade-offs.md` — WebSocket vs SSE/long-poll and scaling choices.
+- `references/failure-modes-detection-mitigation.md` — common production failure modes and mitigations.
+- `references/edge-cases.md` — timeout, reconnection, and deployment edge conditions.
+- `references/quality-validation-and-guardrails.md` — validation and correctness guardrails.
+
+## Quick example
+
+User asks: "Our clients reconnect in a loop every few minutes behind the CDN."
+
+Response shape:
+- Inspect heartbeat cadence, proxy idle timeout, and reconnect policy separately.
+- Determine whether the problem is edge timeout, auth refresh, or client retry behavior.
+- Recommend the smallest transport and infra changes first.
+- Validate with controlled disconnect tests and production telemetry.
+
+## Checklist before calling the skill done
+
+- Topology, scale, and network-edge assumptions are explicit.
+- The answer distinguishes transport issues from app-level semantics.
+- Retry, duplicate, and backpressure behavior are covered when relevant.
+- Verification includes adverse network or proxy scenarios.
+- Remaining assumptions are stated.

@@ -8,6 +8,8 @@ description: |
 
   Use when building native mobile apps, cross-platform apps, or need platform-specific
   design guidance with accessibility compliance.
+
+  Triggers: "iOS HIG", "Human Interface Guidelines", "Material Design", "cross-platform design", "platform patterns", "native feel", "platform conventions", "Android design", "iOS design", "platform UX".
 metadata:
   short-description: Platform UI — iOS HIG, Android Material Design 3, web WCAG 2.2, cross-platform patterns
   content-language: en
@@ -64,7 +66,7 @@ Apply **Karpathy principles** throughout.
 5. **Define success criteria** (native feel, accessible, performant); verify.
 6. **Respond** with platform guidelines, component patterns, gesture specs.
 
-## Operating principles
+### Operating principles
 
 1. **Think Before Coding** — State assumptions: platform conventions, user expectations, device constraints.
 2. **Simplicity First** — Native pattern first; custom only when justified.
@@ -148,7 +150,7 @@ Apply **Karpathy principles** throughout.
 - **TalkBack:** Content description, focus
 ```
 
-## Quick examples
+## Quick example
 
 ### Example 1: iOS Tab Bar
 
@@ -210,7 +212,7 @@ ModalNavigationDrawer(
 - Android: Drawer or bottom nav (both acceptable)
 - Cross-platform: Bottom nav with platform styling
 
-## References
+## Resources in this skill
 
 - `/skills/platform-design-pro/references/ios-hig.md` — iPhone, iPad guidelines
 - `/skills/platform-design-pro/references/android-material.md` — Material Design 3
@@ -220,7 +222,7 @@ ModalNavigationDrawer(
 - `/skills/platform-design-pro/references/web-wcag.md` — Accessibility guidelines
 - `/skills/platform-design-pro/references/cross-platform.md` — React Native, Flutter patterns
 
-## Checklist
+## Checklist before calling the skill done
 
 ### Platform verification
 - [ ] Correct platform identified (iOS/Android/Web)

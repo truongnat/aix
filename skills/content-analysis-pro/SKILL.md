@@ -194,7 +194,7 @@ Details: [references/versions.md](/skills/content-analysis-pro/references/versio
 | Integration map | [references/integration-map.md](/skills/content-analysis-pro/references/integration-map.md) |
 | Versions & tooling | [references/versions.md](/skills/content-analysis-pro/references/versions.md) |
 
-## Quick examples
+## Quick example
 
 **Input:** Dashboard screenshot — “Is revenue growing?”  
 **Expected output:** Chart read from **visible** axes; **confidence**; no invented numbers; **failure modes** if unreadable.

@@ -11,6 +11,7 @@
   },
   "files": [
     "dist",
+    "evals",
     "skills",
     "commands",
     "workflows",
@@ -28,6 +29,9 @@
     "tool": "tsx src/tools.ts",
     "list-skills": "node dist/tools.js list-skills",
     "validate-skills": "node dist/tools.js validate-skills",
+    "audit-skill-structure": "node dist/tools.js audit-skill-structure",
+    "eval-skill-routing": "node dist/tools.js eval-skill-routing",
+    "eval-skill-output-format": "node dist/tools.js eval-skill-output-format",
     "analyze-skills": "node dist/tools.js analyze-skills",
     "build-skill-index": "node dist/tools.js build-skill-index",
     "install-skill": "node dist/tools.js install-skill",
@@ -40,7 +44,8 @@
     "verify-kb": "node dist/tools.js verify-kb",
     "build-graph": "node dist/tools.js build-graph",
     "query-graph": "node dist/tools.js query-graph",
-    "impact-analysis": "node dist/tools.js impact-analysis"
+    "impact-analysis": "node dist/tools.js impact-analysis",
+    "generate-gap-analysis": "node dist/tools.js generate-gap-analysis"
   },
   "dependencies": {
     "chalk": "^5.3.0",

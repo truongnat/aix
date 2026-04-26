@@ -68,3 +68,47 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+- Start from **indexing, crawl, and intent** problems before prescribing content volume.
+- Prefer **technical correctness and clean information architecture** over speculative ranking hacks.
+- Separate **discoverability**, **relevance**, and **measurement** so recommendations stay testable.
+- Cite platform assumptions when discussing Google/Bing behavior; do not claim ranking guarantees.
+- Recommend the **smallest set of fixes** that removes the main bottleneck first.
+
+## Suggested response format
+
+Use this structure for SEO work:
+
+1. **Context and goal** — site type, market/locales, stack, traffic objective.
+2. **Failure surface** — indexing, crawl, rendering, duplication, content-intent, or measurement gaps.
+3. **Priority fixes** — highest-impact changes first, with rationale and implementation owner.
+4. **Verification plan** — what to check in source, rendered HTML, Search Console, logs, or analytics.
+5. **Risks and trade-offs** — rollout cost, maintenance burden, or uncertain impact.
+
+## Resources in this skill
+
+- `references/organic-search-lifecycle-system-model.md` — organic search lifecycle and operating model.
+- `references/technical-seo-and-crawl.md` — crawlability, rendering, canonicalization, and indexing mechanics.
+- `references/seo-flow-and-lifecycle.md` — end-to-end audit and iteration flow.
+- `references/failure-modes-detection-mitigation.md` — common SEO failure patterns and mitigation.
+- `references/quality-validation-and-guardrails.md` — measurement discipline and anti-overclaim guardrails.
+
+## Quick example
+
+User asks: "Why are our product pages not getting indexed even though they exist in the sitemap?"
+
+Response shape:
+- Check whether the pages are crawlable, canonicalized correctly, and return stable 200 HTML.
+- Distinguish rendering issues from duplication or weak quality signals.
+- Prioritize a short fix list: canonical cleanup, robots review, rendered HTML verification, internal link strengthening.
+- Define validation via URL Inspection, crawl checks, and post-change coverage tracking.
+
+## Checklist before calling the skill done
+
+- Search objective, stack, and market context are explicit.
+- Diagnosis distinguishes technical SEO from content/relevance issues.
+- Recommendations are prioritized by likely bottleneck, not by SEO folklore.
+- Verification steps are concrete and source-based.
+- No ranking guarantees or unsupported claims are made.

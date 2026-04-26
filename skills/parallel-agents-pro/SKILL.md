@@ -74,3 +74,110 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — Confirm which tasks are actually independent, what dependencies exist, and whether subagents are justified at all. Ask before parallelizing blocking work.
+2. **Simplicity First** — Use the smallest number of agents that materially reduces time without increasing coordination cost too much.
+3. **Surgical Changes** — Parallelize only disjoint or clearly coordinated work. Do not split tightly coupled tasks across agents just because parallelism sounds faster.
+4. **Goal-Driven Execution** — Done = ownership, dependency order, and aggregation criteria are explicit and the parallel plan can be verified.
+5. **Dependency truth first** — Critical-path work should stay local or serialized when waiting on it would block everything anyway.
+6. **State isolation beats hero coordination** — Shared write surfaces and implicit coupling should be reduced before dispatching agents.
+7. **Aggregation is part of the job** — Parallel outputs are only useful if the integration contract is clear.
+8. **Failure handling must be planned** — Timeouts, partial completion, and inconsistent agent results should have a defined response.
+
+## Default recommendations by scenario
+
+- **Independent research slices** — Dispatch in parallel and aggregate after all return.
+- **Code changes with disjoint files** — Split by ownership boundary, not by arbitrary task count.
+- **Blocking critical-path work** — Keep local unless a subagent can run truly in parallel with non-overlapping work.
+- **Shared-state tasks** — Avoid parallelism unless the integration contract is explicit and low-risk.
+
+## Decision trees
+
+Summary: choose sequential vs parallel execution based on dependency tightness, shared state, and integration cost.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: parallelizing blocking work, overlapping write ownership, and creating more coordination overhead than actual speedup.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Dispatch, coordination, and aggregation (summary)
+
+How work should move from dispatch through execution to result merging without losing ownership clarity.
+
+Details: [references/dispatch-coordination-aggregation.md](references/dispatch-coordination-aggregation.md)
+
+### Dependency-aware parallelization (summary)
+
+How to separate truly parallel work from tasks that only appear independent.
+
+Details: [references/dependency-aware-parallelization.md](references/dependency-aware-parallelization.md)
+
+### State isolation and failure handling (summary)
+
+How to prevent shared-state conflicts and recover cleanly from partial or failed agent runs.
+
+Details: [references/state-isolation.md](references/state-isolation.md)
+
+### Monitoring and adaptation (summary)
+
+How to watch progress, detect blocked agents, and adapt the plan when coordination assumptions break.
+
+Details: [references/monitoring-and-adaptation.md](references/monitoring-and-adaptation.md)
+
+## Suggested response format
+
+1. **Context** — Tasks, dependencies, ownership boundaries, and why parallelism is or is not justified.
+2. **Parallelization model** — Explain dispatch, coordination, and aggregation plan.
+3. **Execution plan** — Which agent handles what and in what order dependencies resolve.
+4. **Verification** — How to confirm ownership, result quality, and integration success.
+5. **Residual risks** — Remaining shared-state, coordination, or failure-handling caveats.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Dispatch, coordination, and aggregation | [references/dispatch-coordination-aggregation.md](references/dispatch-coordination-aggregation.md) |
+| Dependency-aware parallelization | [references/dependency-aware-parallelization.md](references/dependency-aware-parallelization.md) |
+| Coordination strategies | [references/coordination-strategies.md](references/coordination-strategies.md) |
+| State isolation | [references/state-isolation.md](references/state-isolation.md) |
+| Failure handling | [references/failure-handling.md](references/failure-handling.md) |
+| Monitoring and adaptation | [references/monitoring-and-adaptation.md](references/monitoring-and-adaptation.md) |
+| Result aggregation | [references/result-aggregation.md](references/result-aggregation.md) |
+| Decision framework | [references/decision-framework.md](references/decision-framework.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Failure modes | [references/failure-modes.md](references/failure-modes.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+
+## Quick example
+
+**Input:** "Research three independent libraries and summarize the trade-offs."
+- Dispatch three independent research slices in parallel and define a common comparison template.
+- Aggregate only after each slice returns its evidence.
+- **Verify:** The final synthesis preserves ownership and comparable outputs across all three threads.
+
+**Input (tricky):** "Split one refactor across agents that all touch the same files."
+- Call out that this is not good parallel work unless ownership can be cleanly separated.
+- Prefer sequential or boundary-based decomposition instead of collision-heavy dispatch.
+- **Verify:** No overlapping write set remains before agents are launched.
+
+**Input (cross-skill):** "Run implementation and validation in parallel."
+- Pair **`executing-plans-pro`** for checkpoint discipline and let **`parallel-agents-pro`** define safe concurrency boundaries.
+- Keep one track from invalidating the other’s assumptions mid-run.
+- **Verify:** Verification results can still be trusted against the implementation state they were meant to test.
+
+## Checklist before calling the skill done
+
+- [ ] True task independence, dependencies, and ownership boundaries confirmed first (Think Before Coding)
+- [ ] Minimum useful number of agents chosen; no unnecessary orchestration overhead (Simplicity First)
+- [ ] Only disjoint or safely coordinated work was parallelized (Surgical Changes)
+- [ ] Success criteria, aggregation plan, and dependency handling are explicit (Goal-Driven Execution)
+- [ ] Shared state and write conflicts are addressed
+- [ ] Failure/timeout handling is defined
+- [ ] Critical-path tasks are not parallelized naively
+- [ ] Residual coordination risks are documented

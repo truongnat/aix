@@ -14,6 +14,9 @@ All runtime tooling is now implemented in TypeScript and compiled to `dist/tools
 |---|---|
 | `node dist/tools.js list-skills [--json]` | Inventory bundled skills |
 | `node dist/tools.js validate-skills` | Validate SKILL frontmatter `name` vs folder |
+| `node dist/tools.js audit-skill-structure [--markdown --only-actionable --strict]` | Check required behavioral-contract sections across skills |
+| `node dist/tools.js eval-skill-routing [--file evals/routing/skill-routing-cases.json --markdown --strict]` | Run trigger-based routing evals. Cases support `expected_skill`, `expected_any_of` (overlap), and `hard_negative_skills` |
+| `node dist/tools.js eval-skill-output-format [--spec … --file … --mode heuristic OR ai-judge --markdown --strict]` | Check golden responses against `skill-output-format-specs.json`. `ai-judge` uses the same spec via OpenAI-compatible API (`SKILL_EVAL_JUDGE_API_KEY` or `OPENAI_API_KEY`; optional `SKILL_EVAL_JUDGE_BASE_URL`, `SKILL_EVAL_JUDGE_MODEL`) |
 | `node dist/tools.js analyze-skills [--markdown --only-actionable]` | Skill gap heuristics report |
 | `node dist/tools.js build-skill-index [--with-embeddings]` | Build `skill_index.json` (+ optional embeddings) |
 | `node dist/tools.js install-skill <path> [--project-dir ...] [--all-ides]` | Install one skill into target project |
@@ -36,6 +39,9 @@ All runtime tooling is now implemented in TypeScript and compiled to `dist/tools
 
 - `npm run list-skills`
 - `npm run validate-skills`
+- `npm run audit-skill-structure`
+- `npm run eval-skill-routing`
+- `npm run eval-skill-output-format`
 - `npm run analyze-skills`
 - `npm run build-skill-index`
 - `npm run install-skill`

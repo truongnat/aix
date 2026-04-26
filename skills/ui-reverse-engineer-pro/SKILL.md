@@ -1,6 +1,11 @@
 ---
 name: ui-reverse-engineer-pro
-description: Professional skill for reverse-engineering UI from images, screenshots, mockups, or reference UIs into clean, maintainable, system-based code without blind pixel cloning
+description: |
+  Professional skill for reverse-engineering UI from images, screenshots, mockups, or reference UIs into clean, maintainable, system-based code without blind pixel cloning.
+
+  Use when rebuilding UI from a screenshot or mockup without a proper design file, extracting layout structure from a reference image, or translating a visual into maintainable system-based code.
+
+  Triggers: "image to code", "screenshot to UI", "mockup implementation", "reverse engineer UI", "clone UI", "design from reference", "visual to code", "layout extraction", "reference UI", "screenshot rebuild".
 metadata:
   short-description: UI reverse engineering from images to system-based code
   content-language: en
@@ -88,3 +93,47 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+- Rebuild the UI as a **system**, not a blind pixel clone.
+- Extract **layout, spacing, typography, and components** separately before coding.
+- Normalize to **reusable scales and primitives** instead of preserving arbitrary measurements.
+- Match the **reference intent** while adapting to the target platform’s constraints and conventions.
+- Prefer the **smallest component structure** that can reproduce the main visual hierarchy cleanly.
+
+## Suggested response format
+
+Use this structure for UI reverse-engineering work:
+
+1. **Reference read** — what the image is communicating and which parts are layout vs style cues.
+2. **System breakdown** — layout tree, spacing scale, typography levels, reusable components.
+3. **Implementation approach** — target framework structure and any platform adjustments.
+4. **Main risks** — ambiguities, missing states, responsiveness, or inaccessible patterns in the reference.
+5. **Verification** — how to compare the rebuilt UI against the reference without pixel-clone drift.
+
+## Resources in this skill
+
+- `references/core-methodology.md` — overall reverse-engineering approach.
+- `references/lastc-framework.md` — layout, alignment, spacing, typography, component analysis.
+- `references/7-step-process.md` — practical execution flow from reference to code.
+- `references/quality-rubric.md` — scoring rubric for output quality.
+- `references/anti-patterns.md` — common mistakes such as pixel cloning or arbitrary spacing.
+
+## Quick example
+
+User asks: "Turn this dashboard screenshot into a clean React implementation."
+
+Response shape:
+- Identify the main regions, dominant spacing rhythm, and typography hierarchy.
+- Convert visual observations into a tokenized layout and a short component list.
+- Explain where the code should intentionally diverge from the screenshot for responsiveness or accessibility.
+- Verify by checking structural fidelity and hierarchy rather than copying every pixel.
+
+## Checklist before calling the skill done
+
+- The reference has been decomposed into layout, spacing, typography, and components.
+- Arbitrary visual measurements were normalized into a reusable system.
+- Platform-specific adjustments are explicit.
+- Risks from missing states or unclear behaviors are called out.
+- Verification focuses on hierarchy and intent, not blind cloning.

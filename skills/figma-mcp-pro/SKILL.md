@@ -8,6 +8,8 @@ description: |
   Use when implementing Figma designs in code, connecting design system components,
   or building screens section-by-section from design files.
 
+  Triggers: "Figma", "MCP", "Figma MCP", "design to code", "component mapping", "token extraction", "responsive strategy", "implement this Figma", "Figma file", "Figma node".
+
 metadata:
   short-description: Figma → Code — MCP integration, token extraction, component mapping
   content-language: en
@@ -65,7 +67,7 @@ Apply **Karpathy principles** throughout.
 5. **Define success criteria** (pixel-perfect, responsive, maintainable); verify.
 6. **Respond** with implementation plan, component mapping, generated code.
 
-## Operating principles
+### Operating principles
 
 1. **Think Before Coding** — State assumptions: responsive strategy, component reuse, tech constraints.
 2. **Simplicity First** — One section at a time; full page only when justified.
@@ -219,7 +221,7 @@ Figma Component → Code Component
 - [ ] Accessibility compliant
 ```
 
-## Quick examples
+## Quick example
 
 ### Example 1: Landing Page from Figma
 
@@ -280,7 +282,7 @@ Figma Component → Code Component
 | Responsive Strategy | [references/responsive-strategy.md](references/responsive-strategy.md) |
 | Verification Checklist | [references/verification.md](references/verification.md) |
 
-## Checklist
+## Checklist before calling the skill done
 
 ### Pre-implementation
 - [ ] Figma file access confirmed

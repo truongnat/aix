@@ -182,7 +182,7 @@ Details: [references/versions.md](/skills/cli-pro/references/versions.md)
 | Integration map | [references/integration-map.md](/skills/cli-pro/references/integration-map.md) |
 | Versions | [references/versions.md](/skills/cli-pro/references/versions.md) |
 
-## Quick examples
+## Quick example
 
 **Input (simple):** Users pipe output to `head`; traceback on broken pipe.  
 **Expected output:** Full **Suggested response format** — EPIPE/SIGPIPE handling; quiet stderr; exit convention documented.

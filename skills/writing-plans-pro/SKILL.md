@@ -74,3 +74,48 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+- Break work into the **smallest executable tasks** that still have clear acceptance criteria.
+- Keep dependencies explicit so sequencing can be verified instead of assumed.
+- Prefer **execution-ready tasks** over broad categories or documentation-shaped bullets.
+- State assumptions, blockers, and unknowns rather than hiding them inside estimates.
+- Plan only to the level of detail needed for the next decision or execution window.
+
+## Suggested response format
+
+Use this structure for plan-writing work:
+
+1. **Goal and scope** — what the plan covers and what it does not.
+2. **Assumptions and constraints** — inputs, dependencies, capacity, or deadlines affecting the plan.
+3. **Task breakdown** — ordered tasks with clear outputs.
+4. **Dependencies and sequencing** — what blocks what and what can run in parallel.
+5. **Acceptance criteria** — how each major step is verified.
+6. **Risks and open questions** — uncertainty that may change the plan.
+
+## Resources in this skill
+
+- `references/task-breakdown-methodology.md` — how to decompose work into executable tasks.
+- `references/dependency-mapping.md` — dependency identification and sequencing.
+- `references/acceptance-criteria.md` — writing verifiable completion conditions.
+- `references/verification-checkpoints.md` — checkpoints for execution readiness.
+- `references/failure-modes.md` — common planning breakdowns to avoid.
+
+## Quick example
+
+User asks: "Write a detailed implementation plan for migrating auth from Django to FastAPI."
+
+Response shape:
+- Define the migration scope, constraints, and non-goals.
+- Break the work into API contract audit, compatibility layer, rollout, and verification tasks.
+- Call out dependencies such as client updates, token compatibility, and deployment sequencing.
+- Attach acceptance criteria and residual risks to each major phase.
+
+## Checklist before calling the skill done
+
+- Scope and non-goals are explicit.
+- Tasks are execution-ready rather than vague themes.
+- Dependencies and parallelizable work are identified.
+- Acceptance criteria are concrete and testable.
+- Risks and open questions that could alter the plan are surfaced.

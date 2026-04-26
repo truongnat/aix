@@ -7,6 +7,8 @@ description: |
 
   Use when building web interfaces, dashboards, forms, navigation, or any UI
   that needs modern, minimal, SaaS-quality output grounded in conventions.
+
+  Triggers: "UI pattern", "component pattern", "onboarding modal", "interaction states", "choose component", "UI flow", "pattern library", "component archetype", "dashboard pattern", "form pattern".
 metadata:
   short-description: UI component patterns — 60+ documented components, layout, interaction states, SaaS conventions
   content-language: en
@@ -62,7 +64,7 @@ Apply **Karpathy principles** throughout.
 5. **Define success criteria** (consistent, accessible, scalable); verify.
 6. **Respond** with component pattern, layout guidance, code structure.
 
-## Operating principles
+### Operating principles
 
 1. **Think Before Coding** — State assumptions: user flow, data density, platform.
 2. **Simplicity First** — Standard pattern first; custom variant only when justified.
@@ -132,7 +134,7 @@ Apply **Karpathy principles** throughout.
 - [List common mistakes]
 ```
 
-## Quick examples
+## Quick example
 
 ### Example 1: Dashboard Data Table
 
@@ -176,14 +178,14 @@ Apply **Karpathy principles** throughout.
 
 **Agent:** Apply real-time validation pattern, error placement, success indicators.
 
-## References
+## Resources in this skill
 
 - `/skills/ui-design-brain-pro/references/components-catalog.md` — 60+ components
 - `/skills/ui-design-brain-pro/references/layout-patterns.md` — Grid, spacing, responsive
 - `/skills/ui-design-brain-pro/references/interaction-states.md` — 5-state model
 - `/skills/ui-design-brain-pro/references/anti-patterns.md` — Common mistakes
 
-## Checklist
+## Checklist before calling the skill done
 
 ### Component selection
 - [ ] Right component for the job (not reinventing)

@@ -73,3 +73,48 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+- Start by confirming **Tauri major version** and platform, because config and capabilities differ materially.
+- Keep the **Rust host / webview boundary** explicit; do not smear app logic across IPC casually.
+- Prefer the **least-privileged capability and plugin** setup that still solves the requirement.
+- Optimize for **release-build correctness** over dev-mode convenience.
+- Escalate to sidecars, shell access, or filesystem breadth only when the simpler in-process path is insufficient.
+
+## Suggested response format
+
+Use this structure for Tauri work:
+
+1. **Context and version** — Tauri major, frontend stack, target OS, packaging/updater scope.
+2. **System model** — Rust host, commands/events, capabilities, plugin or sidecar boundaries.
+3. **Priority risks** — capability sprawl, unsafe shell/fs access, IPC shape, packaging drift.
+4. **Recommended changes** — minimal code/config updates ordered by safety and impact.
+5. **Verification plan** — dev vs release checks, platform-specific validation, signing/updater tests if relevant.
+6. **Residual risks** — remaining platform gaps or version-sensitive assumptions.
+
+## Resources in this skill
+
+- `references/tauri-runtime-and-ipc-system-model.md` — host/webview runtime and IPC architecture.
+- `references/rust-core-and-commands.md` — Rust command patterns and command-boundary design.
+- `references/failure-modes-detection-mitigation.md` — common Tauri production failures.
+- `references/edge-cases.md` — platform-specific behavior and release surprises.
+- `references/quality-validation-and-guardrails.md` — least-privilege and release-parity guardrails.
+
+## Quick example
+
+User asks: "Our Tauri app works in dev but the file-open command fails in packaged Windows builds."
+
+Response shape:
+- Confirm Tauri major, capability model, and packaged build behavior.
+- Inspect whether the failure is permission/capability related, path related, or shell/plugin related.
+- Propose the smallest safe config/code changes first.
+- Verify in a packaged build rather than stopping at dev-mode success.
+
+## Checklist before calling the skill done
+
+- Tauri version and platform assumptions are explicit.
+- Rust/webview responsibilities are clearly separated.
+- Capability and plugin recommendations follow least privilege.
+- Verification covers packaged/release behavior, not only dev mode.
+- Version-sensitive assumptions are called out.

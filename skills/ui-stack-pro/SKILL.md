@@ -7,6 +7,8 @@ description: |
 
   Use when generating any UI components to ensure design system consistency
   across the entire project.
+
+  Triggers: "8px grid", "spacing scale", "60-30-10", "interaction states", "design tokens", "dark mode mapping", "typography scale", "color system", "component consistency", "UI stack".
 metadata:
   short-description: Design system enforcement — 8px grid, 60-30-10 color, typography scale, dark mode, tokens
   content-language: en
@@ -61,7 +63,7 @@ Apply **Karpathy principles** throughout.
 5. **Define success criteria** (consistent, accessible, themed); verify.
 6. **Respond** with compliant component, token spec, state implementations.
 
-## Operating principles
+### Operating principles
 
 1. **Think Before Coding** — State assumptions: existing tokens, platform constraints, brand requirements.
 2. **Simplicity First** — Start with base tokens; extend only when justified.
@@ -227,7 +229,7 @@ Light: #ffffff → Dark: #0a0a0a
 ```
 ```
 
-## Quick examples
+## Quick example
 
 ### Example 1: Enforce on New Button
 
@@ -287,7 +289,7 @@ export const tokens = {
 - Border radius
 - Z-index scale
 
-## References
+## Resources in this skill
 
 - `/skills/ui-stack-pro/references/spacing-scale.md` — 8px grid details
 - `/skills/ui-stack-pro/references/color-system.md` — 60-30-10 implementation
@@ -296,7 +298,7 @@ export const tokens = {
 - `/skills/ui-stack-pro/references/dark-mode.md` — Token mapping strategies
 - `/skills/ui-stack-pro/references/accessibility.md` — Contrast, touch targets
 
-## Checklist
+## Checklist before calling the skill done
 
 ### Design system application
 - [ ] **Karpathy Principles Verification:**

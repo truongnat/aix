@@ -7,6 +7,8 @@ description: |
 
   Use when adding motion to interfaces, creating page transitions,
   scroll animations, or complex choreographed sequences.
+
+  Triggers: "motion design", "Framer Motion", "GSAP", "page transition", "scroll animation", "micro-interaction", "hover animation", "choreographed motion", "CSS animation", "animation timing".
 metadata:
   short-description: UI animation — GSAP, Framer Motion, CSS keyframes, scroll triggers, performance
   content-language: en
@@ -63,7 +65,7 @@ Apply **Karpathy principles** throughout.
 5. **Define success criteria** (60fps, purposeful, accessible); verify.
 6. **Respond** with animation code, timing spec, performance notes.
 
-## Operating principles
+### Operating principles
 
 1. **Think Before Coding** — State assumptions: device capability, motion preference, purpose.
 2. **Simplicity First** — Start with CSS; escalate to GSAP/Framer only when needed.
@@ -142,7 +144,7 @@ Apply **Karpathy principles** throughout.
 - prefers-reduced-motion: [implementation]
 ```
 
-## Quick examples
+## Quick example
 
 ### Example 1: Page Load Stagger (Framer Motion)
 
@@ -246,7 +248,7 @@ const handleMouseMove = (e) => {
 }
 ```
 
-## References
+## Resources in this skill
 
 - `/skills/motion-design-pro/references/gsap-patterns.md` — Timelines, ScrollTrigger
 - `/skills/motion-design-pro/references/framer-patterns.md` — Gestures, AnimatePresence
@@ -254,7 +256,7 @@ const handleMouseMove = (e) => {
 - `/skills/motion-design-pro/references/easing-guide.md` — Cubic-bezier values
 - `/skills/motion-design-pro/references/performance.md` — 60fps optimization
 
-## Checklist
+## Checklist before calling the skill done
 
 ### Before implementing
 - [ ] Animation purpose defined

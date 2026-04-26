@@ -7,6 +7,8 @@ description: |
 
   Use when building with shadcn/ui, customizing themes, or creating
   component libraries based on Radix primitives.
+
+  Triggers: "shadcn", "shadcn/ui", "Radix", "Tailwind component", "component variant", "cva", "theme tokens", "compose dialog", "button primitive", "asChild".
 metadata:
   short-description: shadcn/ui — Radix primitives, cva variants, theming, composition, accessibility
   content-language: en
@@ -61,7 +63,7 @@ Apply **Karpathy principles** throughout.
 5. **Define success criteria** (accessible, composable, themed); verify.
 6. **Respond** with component code, theme tokens, and composition examples.
 
-## Operating principles
+### Operating principles
 
 1. **Think Before Coding** — State assumptions: theme context, size needs, composition pattern.
 2. **Simplicity First** — Start with primitive; add composition only when needed.
@@ -200,7 +202,7 @@ export function Component({ className, variant, size, ...props }: Props) {
 [ARIA labels, roles, keyboard behavior]
 ```
 
-## Quick examples
+## Quick example
 
 ### Example 1: Custom Button with Icon
 
@@ -267,14 +269,14 @@ export { Button, buttonVariants }
 </Card>
 ```
 
-## References
+## Resources in this skill
 
 - `/skills/shadcn-mastery-pro/references/primitives-catalog.md` — All Radix primitives
 - `/skills/shadcn-mastery-pro/references/component-patterns.md` — Common compositions
 - `/skills/shadcn-mastery-pro/references/theming-guide.md` — CSS variables, dark mode
 - `/skills/shadcn-mastery-pro/references/blocks-catalog.md` — Pre-built sections
 
-## Checklist
+## Checklist before calling the skill done
 
 ### Component creation
 - [ ] Uses Radix primitive (if interactive)

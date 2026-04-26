@@ -1,5 +1,40 @@
 # AGENTS — hints for Cursor / agent tools
 
+## Karpathy Coding Principles — mandatory for every response
+
+**These 4 principles apply to ALL coding tasks, ALL skills, ALL workflows — without exception.**  
+Derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls. Non-compliance is a defect, not a style choice.
+
+### 1. Think Before Coding
+- State assumptions explicitly. If uncertain, **ask** rather than guess.
+- Present multiple interpretations when ambiguity exists — never pick silently.
+- Push back when a simpler approach exists.
+- Stop when confused: name what is unclear and ask for clarification.
+
+### 2. Simplicity First
+- Minimum code that solves the problem. Nothing speculative.
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that was not requested.
+- If 200 lines could be 50, write 50.
+
+### 3. Surgical Changes
+- Touch only what you must. Clean up only your own mess.
+- Do not "improve" adjacent code, comments, or formatting.
+- Do not refactor things that are not broken.
+- Match existing style, even if you would do it differently.
+- Remove imports / variables / functions that **your** changes made unused — nothing else.
+
+### 4. Goal-Driven Execution
+- Define success criteria before starting. Loop until verified.
+- Transform imperative tasks into verifiable goals.
+- State a brief plan with verification: `Step → verify: [check]`.
+- Strong success criteria let the agent loop independently without human intervention.
+
+> **Enforcement:** Every skill's `## Workflow` section, `### Operating principles`, and `## Checklist` must reference and apply these principles. See [`skills/SKILL_AUTHORING_RULES.md`](skills/SKILL_AUTHORING_RULES.md) §0 for the gate. See [`skills/karpathy-coding-pro/`](skills/karpathy-coding-pro/) for the full reference skill.
+
+---
+
 ## Skills
 
 Cursor loads skills from your IDE config (often `.cursor/skills` or project rules). You can:

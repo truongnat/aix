@@ -74,3 +74,133 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — Confirm brand constraints, platform targets, density, and use case before proposing system rules. Ask when visual ambition conflicts with accessibility or product context.
+2. **Simplicity First** — Start with the smallest token/pattern set that creates consistency. Do not add ornamental complexity, extra themes, or component variants without clear need.
+3. **Surgical Changes** — Touch only the token layer, pattern, or UX rule directly involved. Do not redesign unrelated surfaces under the banner of “system cleanup.”
+4. **Goal-Driven Execution** — Done = the visual/system recommendation is implementable, consistent across target surfaces, and has explicit success criteria.
+5. **Tokens express intent** — Semantic mapping matters more than raw color names or one-off visual choices.
+6. **Accessibility is baseline, not polish** — Contrast, focus, hierarchy, and density choices must hold before style experiments.
+7. **Platform fit beats visual uniformity** — Web, mobile, and desktop can share language without becoming pixel-identical clones.
+8. **Design systems serve product use** — Data-heavy, marketing, and copilot surfaces need different defaults; one visual grammar does not fit all equally.
+
+## Default recommendations by scenario
+
+- **New design system** — Define foundations and token semantics before component-level polish.
+- **Inconsistent UI** — Audit semantic token drift and pattern duplication before inventing new styles.
+- **Dense application UI** — Optimize readability, hierarchy, and action clarity before visual flourishes.
+- **AI/copilot UI** — Prioritize streaming states, citations, and tool-use clarity before novelty.
+
+## Decision trees
+
+Summary: choose system depth, token structure, and platform adaptation based on product density, team maturity, and target surfaces.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: token drift, inaccessible dark themes, generic trend copying, and treating design systems as visual decoration instead of product infrastructure.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Token pipeline and source of truth (summary)
+
+How primitive, semantic, and component tokens should relate so system changes remain controlled.
+
+Details: [references/token-pipeline-and-source-of-truth.md](references/token-pipeline-and-source-of-truth.md)
+
+### Foundations, baseline, and data UI (summary)
+
+How typography, spacing, color roles, and density support usable product interfaces, especially data-heavy ones.
+
+Details: [references/foundations-baseline-and-data-ui.md](references/foundations-baseline-and-data-ui.md)
+
+### Design system guidelines and consistency (summary)
+
+How governance, pattern reuse, and documentation keep UI systems coherent over time.
+
+Details: [references/design-system-guidelines-and-consistency.md](references/design-system-guidelines-and-consistency.md)
+
+### Platforms: web, app, desktop (summary)
+
+How shared design language should adapt across platform interaction models and constraints.
+
+Details: [references/platforms-web-app-desktop.md](references/platforms-web-app-desktop.md)
+
+### AI/copilot UI patterns (summary)
+
+How streaming, citations, tool states, and assistant surfaces affect system-level component choices.
+
+Details: [references/ai-copilot-ui-patterns-deep-dive.md](references/ai-copilot-ui-patterns-deep-dive.md)
+
+### Failure modes and mitigation (summary)
+
+Contrast regressions, token entropy, misleading charts, and cross-platform mismatch patterns to catch early.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Versions (summary)
+
+Version notes for design-token tooling, platform baselines, and implementation constraints that affect DS recommendations.
+
+Details: [references/versions.md](references/versions.md)
+
+## Suggested response format
+
+1. **Context** — Brand, platforms, use case, density, and implementation stack.
+2. **System model** — Explain the token, pattern, and platform-adaptation logic behind the recommendation.
+3. **Recommendation** — Minimum system change or rule set with rationale.
+4. **Verification** — How to validate consistency, accessibility, and implementation fit.
+5. **Residual risks** — Remaining platform, governance, or accessibility caveats.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Token pipeline and source of truth | [references/token-pipeline-and-source-of-truth.md](references/token-pipeline-and-source-of-truth.md) |
+| Foundations, baseline, and data UI | [references/foundations-baseline-and-data-ui.md](references/foundations-baseline-and-data-ui.md) |
+| Design system guidelines and consistency | [references/design-system-guidelines-and-consistency.md](references/design-system-guidelines-and-consistency.md) |
+| Platforms: web, app, desktop | [references/platforms-web-app-desktop.md](references/platforms-web-app-desktop.md) |
+| AI/copilot UI patterns | [references/ai-copilot-ui-patterns-deep-dive.md](references/ai-copilot-ui-patterns-deep-dive.md) |
+| A11y, responsive, and web typography | [references/a11y-responsive-and-web-typography.md](references/a11y-responsive-and-web-typography.md) |
+| Dark mode and semantic theming | [references/dark-mode-and-semantic-theming-deep-dive.md](references/dark-mode-and-semantic-theming-deep-dive.md) |
+| Trends, themes, and visual language | [references/trends-themes-and-visual-language.md](references/trends-themes-and-visual-language.md) |
+| Failure modes and mitigation | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework and trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
+| Quality validation and guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Version notes | [references/versions.md](references/versions.md) |
+
+## Quick example
+
+**Input:** "Define tokens for a new analytics dashboard."
+- Start with semantic color, spacing, and typography roles tuned for dense data UI.
+- Avoid component proliferation before foundations are stable.
+- **Verify:** The token set maps cleanly to repeated dashboard patterns and passes baseline contrast checks.
+
+**Input (tricky):** "Make our app look more modern by adding glassmorphism everywhere."
+- Check product fit, readability, and interaction cost before copying a trend.
+- Use trend language only where it improves the specific surface.
+- **Verify:** The visual direction still supports hierarchy and accessibility on target devices.
+
+**Input (cross-skill):** "We need a design system for a copilot interface implemented in Next.js."
+- Pair **`nextjs-pro`** for implementation mechanics and let **`design-system-pro`** define streaming, citation, and tool-state patterns.
+- Keep system language and framework wiring clearly separated.
+- **Verify:** The system spec can be translated into components without inventing new UX rules mid-build.
+
+## Checklist before calling the skill done
+
+- [ ] Brand, platforms, density, and product use case confirmed first (Think Before Coding)
+- [ ] Minimum viable token/pattern system chosen; no unnecessary design sprawl (Simplicity First)
+- [ ] Only the relevant design-system layer or pattern was changed (Surgical Changes)
+- [ ] Success criteria for consistency, accessibility, and implementation fit are explicit (Goal-Driven Execution)
+- [ ] Semantic token intent is clear
+- [ ] Accessibility baseline is preserved
+- [ ] Platform differences are handled intentionally
+- [ ] Residual governance or theming risks are documented

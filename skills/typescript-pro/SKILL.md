@@ -68,3 +68,91 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — State TS version, `strict` flags, and module system before any type solution. Ask when unknown.
+2. **Simplicity First** — Minimum type change that resolves the error; avoid overfitting generics or utility type chains.
+3. **Surgical Changes** — Only modify types directly related to the request. No wholesale `any` removal campaigns or unrelated `tsconfig` changes.
+4. **Goal-Driven Execution** — Done = `tsc --noEmit` passes with existing strict flags; no `as` assertions introduced as workarounds.
+5. **Narrow at boundaries** — Use `unknown` at trust boundaries; narrow explicitly with guards. Never widen to `any` as a fix.
+6. **Prefer inference** — Let TypeScript infer what it can; annotate only where inference fails or where clarity requires it.
+7. **No invented `compilerOptions`** — Never suggest flags that don't exist in the target TS version; cite TS docs.
+8. **Version-gated features** — `satisfies`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax` have minimum TS versions; state the requirement.
+
+### Type system model (summary)
+
+Structural typing, widening/narrowing, contextual typing, declaration merging, conditional and mapped types, infer keyword — how the type checker flows through an expression.
+
+Details: [references/type-system.md](references/type-system.md)
+
+### Typechecking and boundary model (summary)
+
+How TypeScript checks across module boundaries, declaration files, module resolution (`NodeNext`, `bundler`), and why editor TS ≠ `tsc` causes drift.
+
+Details: [references/typescript-typechecking-and-boundaries-system-model.md](references/typescript-typechecking-and-boundaries-system-model.md)
+
+### Failure modes and mitigation (summary)
+
+`any` creep, resolution drift, build vs editor TS version mismatch, `strictNullChecks` bypass patterns.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### tsconfig deep-dive (summary)
+
+`strict`, `moduleResolution`, `paths`, `verbatimModuleSyntax`, `isolatedModules`, `exactOptionalPropertyTypes` — when and why to enable each flag.
+
+Details: [references/tsconfig.md](references/tsconfig.md)
+
+## Suggested response format
+
+1. **Context** — TypeScript version, `strict` flags in effect, module system (`ESM`/`CJS`/`NodeNext`).
+2. **Type analysis** — Why the error occurs: widening, narrowing failure, inference gap, or declaration mismatch.
+3. **Solution** — Minimum type change with before/after showing the narrowing or annotation.
+4. **Trade-offs** — Runtime guarantees vs compile-time only; when a type assertion is unavoidable and why.
+5. **Residual risks** — Version-specific behavior, `strict` flag dependencies, module resolution caveats.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Type system model | [references/type-system.md](references/type-system.md) |
+| Typechecking and boundary model | [references/typescript-typechecking-and-boundaries-system-model.md](references/typescript-typechecking-and-boundaries-system-model.md) |
+| tsconfig deep-dive | [references/tsconfig.md](references/tsconfig.md) |
+| Failure modes and mitigation | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework and trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Version notes | [references/versions.md](references/versions.md) |
+
+## Quick example
+
+**Input:** "TS2322: Type 'string | undefined' is not assignable to type 'string'."
+- `strictNullChecks` is on; the value may be `undefined` at this call site.
+- **Fix:** Narrow with a guard (`if (value !== undefined)`) or provide a default (`value ?? ''`). Do not use `as string` unless you have runtime proof.
+- **Verify:** `tsc --noEmit` passes; no `as` assertion hides the undefined path.
+
+**Input (tricky):** "My generic function loses type information — returns `unknown` instead of the expected type."
+- Root cause: Inference context is insufficient; TypeScript widens to `unknown` or `{}` when it can't infer the type argument.
+- **Fix:** Add an explicit type parameter at the call site, or add a constraint (`T extends Record<string, unknown>`) that gives the checker enough to work with.
+- **Verify:** Hover type in editor matches expected; no `as` needed at the call site.
+
+**Input (cross-skill):** "I need strict typing for React props with optional and required fields."
+- Use `interface` with required fields and `?` for optional; avoid `Partial<T>` on the whole props type (hides required intent).
+- Pair **`react-pro`** for component patterns; **`javascript-pro`** when the bug has a runtime (not type) dimension.
+- **Verify:** TS errors at the JSX call site for missing required props; optional props accept `undefined`.
+
+## Checklist before calling the skill done
+
+- [ ] TypeScript version and `strict` flags confirmed before writing types (Think Before Coding)
+- [ ] Minimum type change applied — no over-engineered generics (Simplicity First)
+- [ ] Only types related to the request modified — no unrelated `tsconfig` changes (Surgical Changes)
+- [ ] `tsc --noEmit` passes with existing strict config (Goal-Driven Execution)
+- [ ] No `any` introduced; no `as` assertion without documented justification
+- [ ] `unknown` used at trust boundaries, narrowed explicitly
+- [ ] No invented `compilerOptions`; feature availability verified for target TS version
+- [ ] Module resolution (`NodeNext`, `bundler`) alignment confirmed if relevant

@@ -70,3 +70,86 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — State React version, SSR/RSC context, and framework before proposing any solution. Ask when unknown.
+2. **Simplicity First** — Minimum hook or component that solves the problem; no premature abstraction (HOCs, context, portals) unless justified.
+3. **Surgical Changes** — Only change the component or hook directly related to the request. No opportunistic refactors of unrelated effects or memoization.
+4. **Goal-Driven Execution** — Done = no infinite update loops, no Rules of Hooks violations, no hydration mismatches in the changed subtree.
+5. **Rules of Hooks always** — Verify call-count consistency first; hooks called conditionally or in loops are bugs regardless of the apparent behavior.
+6. **Effect as external sync** — `useEffect` is for synchronizing with external systems; state derivation and event handling are not effects.
+7. **Keys as stable identity** — List keys must be stable, unique, and content-derived — never array index for mutable lists.
+8. **Accessibility by default** — Every interactive element gets role + keyboard + focus management; a11y is not a post-implementation task.
+
+### Rendering and effects system model (summary)
+
+Render phase (pure) → commit phase (DOM mutations) → layout effects → passive effects. Strict Mode double-invokes both to surface side effects in render. Concurrent rendering may suspend and resume; effects only run after commit.
+
+Details: [references/react-rendering-and-effects-system-model.md](references/react-rendering-and-effects-system-model.md)
+
+### Failure modes and mitigation (summary)
+
+Infinite update loops, stale closures in effects, hydration mismatches, list identity (index keys), unsafe JSX spread — detection and fixes.
+
+Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+
+### Decision framework and trade-offs (summary)
+
+Derived vs stored state, server vs client state, controlled inputs, transitions, state colocation vs store.
+
+Details: [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md)
+
+## Suggested response format
+
+1. **Context** — React version, framework (Vite/Next/Remix), SSR vs SPA.
+2. **System model** — Which render/effect phase applies; concurrent vs legacy mode relevance.
+3. **Root issue** — What's broken and why (stale closure, Rules of Hooks violation, hydration mismatch, etc.).
+4. **Solution** — Minimum code change; annotate why each hook or pattern is correct.
+5. **Failure modes addressed** — What this fix prevents and what it doesn't.
+6. **Residual risks** — Edge cases remaining (Strict Mode double-fire, RSC boundary, memoization trap).
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Rendering and effects system model | [references/react-rendering-and-effects-system-model.md](references/react-rendering-and-effects-system-model.md) |
+| Components and JSX patterns | [references/components-and-jsx.md](references/components-and-jsx.md) |
+| Failure modes and mitigation | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
+| Decision framework and trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| UI/UX design integration | [references/ui-ux-design.md](references/ui-ux-design.md) |
+| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
+| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
+| Quality guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Version notes | [references/versions.md](references/versions.md) |
+
+## Quick example
+
+**Input:** "My useEffect runs twice in development."
+- React Strict Mode intentionally double-invokes effects to surface missing cleanup. This is expected in dev, not a bug.
+- **Fix:** Add cleanup function if the effect has side effects; verify the behavior is idempotent.
+- **Verify:** Effect cleanup correctly cancels subscriptions, timers, or requests.
+
+**Input (tricky):** "I get a hydration mismatch — client renders different content than server."
+- Root cause: Server and client render produce different HTML (Date.now(), Math.random(), window checks, missing `suppressHydrationWarning`).
+- **Fix:** Guard browser-only code with `typeof window !== 'undefined'` inside `useEffect`, not in render. Use `suppressHydrationWarning` only for intentionally dynamic attributes (timestamps, ad slots).
+- **Verify:** No `Warning: Text content did not match` in browser console.
+
+**Input (cross-skill):** "Server Component fetches data but I need client interactivity."
+- **Boundary:** Keep data fetching in the Server Component; pass data as props to a `"use client"` child that owns the interactive state.
+- Pair **`nextjs-pro`** for RSC/Actions specifics, **`typescript-pro`** for typed props across the boundary.
+- **Verify:** RSC payload in Network tab, no unnecessary client bundle increase.
+
+## Checklist before calling the skill done
+
+- [ ] React version and framework confirmed before writing any code (Think Before Coding)
+- [ ] Rules of Hooks satisfied — no conditional or loop hook calls (Simplicity First)
+- [ ] Only the requested component/hook modified — no unrelated refactors (Surgical Changes)
+- [ ] No infinite update loop risk in the changed code (Goal-Driven Execution)
+- [ ] Keys are stable and content-derived for any lists
+- [ ] Hydration mismatch risk addressed for SSR/RSC code
+- [ ] Accessibility preserved (roles, keyboard, focus) for interactive elements
+- [ ] Stale closure sources identified and cleaned up in useEffect
