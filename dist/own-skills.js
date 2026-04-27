@@ -462,7 +462,7 @@ async function main() {
                     ...cmdExcludes,
                     ...rulesExcludes,
                 ]);
-                console.log(chalk.cyan('Verify: node .agents/devkit/dist/tools.js verify-bundle-install --project-dir .'));
+                console.log(chalk.cyan('Verify: node .agents/devkit/dist/tools.js verify-bundle-install --project-dir . (or node dist/tools.js verify-bundle-install --project-dir . in source repo)'));
             }
         }
         finally {

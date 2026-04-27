@@ -464,6 +464,12 @@ function runToolsCmd(toolsJs, bundleDir, ...args) {
     const res = spawnSync(process.execPath, [toolsJs, ...args], { cwd: bundleDir, stdio: 'pipe' });
     return res.status === 0;
 }
+function manualToolsCmdHint(projectDir, ...args) {
+    const localTools = join(projectDir, 'dist', 'tools.js');
+    if (existsSync(localTools))
+        return `node dist/tools.js ${args.join(' ')}`;
+    return `node .agents/devkit/dist/tools.js ${args.join(' ')}`;
+}
 function uninstall(projectDir, nuclear) {
     const cursorSkills = join(projectDir, '.cursor', 'skills');
     const skills = existsSync(cursorSkills)
@@ -611,13 +617,13 @@ async function main() {
             const indexOk = runToolsCmd(toolsJs, bundle, 'build-skill-index');
             if (!indexOk && existsSync(toolsJs)) {
                 console.log(chalk.yellow('  Skill index rebuild failed — run manually:'));
-                console.log(chalk.dim('  node .agents/devkit/dist/tools.js build-skill-index'));
+                console.log(chalk.dim(`  ${manualToolsCmdHint(projectDir, 'build-skill-index')}`));
             }
             // Verify
             const verifyOk = runToolsCmd(toolsJs, bundle, 'verify-bundle-install', '--project-dir', projectDir, '--skip-validate-skills');
             if (!verifyOk && existsSync(toolsJs)) {
                 console.log(chalk.yellow('\n  Bundle verification failed — run for details:'));
-                console.log(chalk.dim('  node .agents/devkit/dist/tools.js verify-bundle-install --project-dir .'));
+                console.log(chalk.dim(`  ${manualToolsCmdHint(projectDir, 'verify-bundle-install', '--project-dir', '.')}`));
             }
             // Summary
             const ideList = allIdes ? 'cursor · claude · codex · antigravity' : 'cursor';
@@ -699,7 +705,7 @@ ${verifyOk ? `  ${chalk.green('✔')} Install verified` : ''}
                 if (ok)
                     indexSpin.succeed('Skill index rebuilt');
                 else
-                    indexSpin.warn(chalk.yellow('Index rebuild failed — run: node .agents/devkit/dist/tools.js build-skill-index'));
+                    indexSpin.warn(chalk.yellow(`Index rebuild failed — run: ${manualToolsCmdHint(projectDir, 'build-skill-index')}`));
             }
         }
         finally {

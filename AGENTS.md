@@ -33,6 +33,20 @@ Derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015
 
 > **Enforcement:** Every skill's `## Workflow` section, `### Operating principles`, and `## Checklist` must reference and apply these principles. See [`skills/SKILL_AUTHORING_RULES.md`](skills/SKILL_AUTHORING_RULES.md) §0 for the gate. See [`skills/karpathy-coding-pro/`](skills/karpathy-coding-pro/) for the full reference skill.
 
+## Mandatory Completion Gate (All Agents/Skills/Workflows)
+
+Before marking any task as complete, every agent execution must pass this final gate:
+
+1. **Scope check** — confirm output matches the user request exactly (no missing requested items, no unrequested extras).
+2. **Quality check** — self-review for correctness, edge cases, consistency, and maintainability.
+3. **Verification check** — run relevant validations for the changed artifact:
+   - Code/config: targeted tests, lint, type-check, build/runtime sanity as applicable.
+   - Docs/content/analysis outputs: factual consistency and internal coherence checks.
+4. **Regression check** — confirm no obvious breakage to adjacent existing behavior impacted by the change.
+5. **Transparent report** — in the final response, state what was verified, what passed/failed, and any remaining risks or assumptions.
+
+If any gate item fails, the task is **not done**. Continue iterating until the gate passes or explicitly report a blocker.
+
 ---
 
 ## Skills
