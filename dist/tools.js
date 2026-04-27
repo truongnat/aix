@@ -2,9 +2,49 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, lstatSync, mkdirSync, readFileSync, readlinkSync, readdirSync, statSync, writeFileSync, } from 'node:fs';
 import { basename, dirname, relative, resolve, join, sep } from 'node:path';
-import minimist from 'minimist';
 import matter from 'gray-matter';
 import { globSync } from 'glob';
+// Simple CLI argument parser (replaces minimist)
+function parseArgs(argv, options = {}) {
+    const args = {};
+    const positional = [];
+    for (let i = 0; i < argv.length; i++) {
+        const arg = argv[i];
+        if (arg.startsWith('--')) {
+            const key = arg.slice(2);
+            const isBoolean = options.boolean?.includes(key);
+            const isString = options.string?.includes(key);
+            if (isBoolean) {
+                args[key] = true;
+            }
+            else if (isString || i + 1 < argv.length && !argv[i + 1].startsWith('-')) {
+                args[key] = argv[++i];
+            }
+            else {
+                args[key] = true;
+            }
+        }
+        else if (arg.startsWith('-')) {
+            const key = arg.slice(1);
+            const isBoolean = options.boolean?.includes(key);
+            const isString = options.string?.includes(key);
+            if (isBoolean) {
+                args[key] = true;
+            }
+            else if (isString || i + 1 < argv.length && !argv[i + 1].startsWith('-')) {
+                args[key] = argv[++i];
+            }
+            else {
+                args[key] = true;
+            }
+        }
+        else {
+            positional.push(arg);
+        }
+    }
+    args._ = positional;
+    return args;
+}
 import { loadKbConfig } from './lib/kbConfig.js';
 import { embedText, cosine } from './lib/embeddings.js';
 import { installSkill } from './commands/installSkill.js';
@@ -1439,7 +1479,7 @@ function cmdAuditSkillStructure(args, repoRoot) {
         process.exit(2);
 }
 function cmdInstallSkill(args, _repoRoot) {
-    const skillPath = args._[1] ? String(args._[1]) : String(args['skill-dir'] || '.');
+    const skillPath = args._?.[1] ? String(args._[1]) : String(args['skill-dir'] || '.');
     const ides = String(args.ides || 'cursor')
         .split(',')
         .map((x) => x.trim())
@@ -1655,7 +1695,7 @@ function queryKb(repoRoot, q, topK, indexDir) {
     return scored.map(({ i, score }) => ({ score, item: manifest[i] }));
 }
 function cmdQueryKb(args, repoRoot) {
-    const q = String(args._[1] || '');
+    const q = String(args._?.[1] || '');
     if (!q)
         throw new Error('query-kb requires query text');
     const topK = Number(args.k || args['top-k'] || 5);
@@ -1741,7 +1781,7 @@ function cmdBuildGraph(args) {
 function cmdQueryGraph(args) {
     const targetDir = resolve(String(args.dir || args.d || '.'));
     const graphPath = resolve(String(args.graph || join(targetDir, '.agents', 'devkit', 'project-graph', 'graph.json')));
-    const query = String(args._[1] || '');
+    const query = String(args._?.[1] || '');
     const mode = String(args.mode || 'search'); // search, callers, callees
     if (!existsSync(graphPath)) {
         console.error(`Graph not found: ${graphPath}. Run build-graph first.`);
@@ -1780,7 +1820,7 @@ function cmdQueryGraph(args) {
 function cmdImpactAnalysis(args) {
     const targetDir = resolve(String(args.dir || args.d || '.'));
     const graphPath = resolve(String(args.graph || join(targetDir, '.agents', 'devkit', 'project-graph', 'graph.json')));
-    const filePath = String(args._[1] || '');
+    const filePath = String(args._?.[1] || '');
     if (!existsSync(graphPath)) {
         console.error(`Graph not found: ${graphPath}. Run build-graph first.`);
         process.exit(1);
@@ -1996,7 +2036,7 @@ ${chalk.bold('EXAMPLES')}
 `);
 }
 async function main() {
-    const args = minimist(process.argv.slice(2), {
+    const args = parseArgs(process.argv.slice(2), {
         boolean: [
             'json',
             'markdown',
@@ -2036,7 +2076,7 @@ async function main() {
             'graph',
         ],
     });
-    const cmd = String(args._[0] || '');
+    const cmd = String(args._?.[0] || '');
     const root = process.cwd();
     switch (cmd) {
         case 'list-skills':

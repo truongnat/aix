@@ -8,9 +8,49 @@ import degit from 'degit';
 import inquirer from 'inquirer';
 import matter from 'gray-matter';
 import ora from 'ora';
-import minimist from 'minimist';
 import { spawnSync } from 'node:child_process';
 import { installSkill } from './commands/installSkill.js';
+// Simple CLI argument parser (replaces minimist)
+function parseArgs(argv, options = {}) {
+    const args = {};
+    const positional = [];
+    for (let i = 0; i < argv.length; i++) {
+        const arg = argv[i];
+        if (arg.startsWith('--')) {
+            const key = arg.slice(2);
+            const isBoolean = options.boolean?.includes(key);
+            const isString = options.string?.includes(key);
+            if (isBoolean) {
+                args[key] = true;
+            }
+            else if (isString || i + 1 < argv.length && !argv[i + 1].startsWith('-')) {
+                args[key] = argv[++i];
+            }
+            else {
+                args[key] = true;
+            }
+        }
+        else if (arg.startsWith('-')) {
+            const key = arg.slice(1);
+            const isBoolean = options.boolean?.includes(key);
+            const isString = options.string?.includes(key);
+            if (isBoolean) {
+                args[key] = true;
+            }
+            else if (isString || i + 1 < argv.length && !argv[i + 1].startsWith('-')) {
+                args[key] = argv[++i];
+            }
+            else {
+                args[key] = true;
+            }
+        }
+        else {
+            positional.push(arg);
+        }
+    }
+    args._ = positional;
+    return args;
+}
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const PKG_ROOT = resolve(__dirname, '..');
@@ -479,11 +519,15 @@ function uninstall(projectDir, nuclear) {
 // ─── main ────────────────────────────────────────────────────────────────────
 async function main() {
     const pkg = JSON.parse(readFileSync(join(PKG_ROOT, 'package.json'), 'utf8'));
-    const argv = minimist(process.argv.slice(2), {
+    const argv = parseArgs(process.argv.slice(2), {
         boolean: ['full', 'skills-only', 'cursor-only', 'yes', 'force', 'nuclear', 'help', 'all-ides'],
         string: ['repo', 'project-dir'],
-        alias: { h: 'help', y: 'yes' },
     });
+    // Handle aliases manually
+    if (argv.h)
+        argv.help = argv.h;
+    if (argv.y)
+        argv.yes = argv.y;
     if (argv.help) {
         printHelp();
         return;

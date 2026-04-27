@@ -11,9 +11,51 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { basename, dirname, relative, resolve, join, sep } from 'node:path';
-import minimist from 'minimist';
 import matter from 'gray-matter';
 import { globSync } from 'glob';
+
+// Simple CLI argument parser (replaces minimist)
+function parseArgs(argv: string[], options: { boolean?: string[]; string?: string[] } = {}) {
+  const args: Record<string, any> = {};
+  const positional: string[] = [];
+  
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    
+    if (arg.startsWith('--')) {
+      const key = arg.slice(2);
+      const isBoolean = options.boolean?.includes(key);
+      const isString = options.string?.includes(key);
+      
+      if (isBoolean) {
+        args[key] = true;
+      } else if (isString || i + 1 < argv.length && !argv[i + 1].startsWith('-')) {
+        args[key] = argv[++i];
+      } else {
+        args[key] = true;
+      }
+    } else if (arg.startsWith('-')) {
+      const key = arg.slice(1);
+      const isBoolean = options.boolean?.includes(key);
+      const isString = options.string?.includes(key);
+      
+      if (isBoolean) {
+        args[key] = true;
+      } else if (isString || i + 1 < argv.length && !argv[i + 1].startsWith('-')) {
+        args[key] = argv[++i];
+      } else {
+        args[key] = true;
+      }
+    } else {
+      positional.push(arg);
+    }
+  }
+  
+  args._ = positional;
+  return args;
+}
+
+type ParsedArgs = Record<string, any> & { _?: string[] };
 import { loadKbConfig } from './lib/kbConfig.js';
 import { embedText, cosine } from './lib/embeddings.js';
 import { installSkill } from './commands/installSkill.js';
@@ -73,7 +115,7 @@ function isLikelyBinaryBuffer(buf: Buffer): boolean {
   return false;
 }
 
-function cmdIndexProject(args: minimist.ParsedArgs) {
+function cmdIndexProject(args: ParsedArgs) {
   const targetDir = resolve(String(args.dir || args.d || '.'));
   const outDir = resolve(String(args.out || join(targetDir, '.agents', 'devkit', 'project-index')));
   const includes = String(args.include || INDEX_PROJECT_DEFAULT_INCLUDE)
@@ -638,7 +680,7 @@ function runGenerateWiki(docsDir: string, outDir: string): { mdCount: number } {
   return { mdCount: mdFiles.length };
 }
 
-function cmdGenerateWiki(args: minimist.ParsedArgs) {
+function cmdGenerateWiki(args: ParsedArgs) {
   const cwd = process.cwd();
   const docsDir = resolve(String(args.docs || join(cwd, '.agents', 'devkit', 'project-index', 'docs')));
   const outDir = resolve(String(args.out || join(docsDir, '..', 'wiki')));
@@ -678,7 +720,7 @@ function cmdGenerateWiki(args: minimist.ParsedArgs) {
 
 import chalk from 'chalk';
 
-function cmdListSkills(args: minimist.ParsedArgs, repoRoot: string) {
+function cmdListSkills(args: ParsedArgs, repoRoot: string) {
   const includeTemplate = Boolean(args['include-template']);
   const asJson = Boolean(args.json);
   const dirs = listSkillDirs(repoRoot, includeTemplate);
@@ -694,7 +736,7 @@ function cmdListSkills(args: minimist.ParsedArgs, repoRoot: string) {
   console.log(chalk.dim(`\n  ${rows.length} skills`));
 }
 
-function cmdValidateSkills(args: minimist.ParsedArgs, repoRoot: string) {
+function cmdValidateSkills(args: ParsedArgs, repoRoot: string) {
   const includeTemplate = Boolean(args['include-template']);
   const dirs = listSkillDirs(repoRoot, includeTemplate);
   const errs: { folder: string; reason: string }[] = [];
@@ -864,7 +906,7 @@ function routingCasePrimaryExpected(testCase: RoutingEvalCase): string {
   return '';
 }
 
-function cmdEvalSkillRouting(args: minimist.ParsedArgs, repoRoot: string) {
+function cmdEvalSkillRouting(args: ParsedArgs, repoRoot: string) {
   const datasetPath = resolve(repoRoot, String(args.file || join('evals', 'routing', 'skill-routing-cases.json')));
   const asJson = Boolean(args.json);
   const asMarkdown = Boolean(args.markdown);
@@ -1204,7 +1246,7 @@ ${params.response}
   return { ok: true, judge: parsed };
 }
 
-async function cmdEvalSkillOutputFormat(args: minimist.ParsedArgs, repoRoot: string) {
+async function cmdEvalSkillOutputFormat(args: ParsedArgs, repoRoot: string) {
   const specPath = resolve(repoRoot, String(args.spec || join('evals', 'output', 'skill-output-format-specs.json')));
   const casesPath = resolve(repoRoot, String(args.file || join('evals', 'output', 'skill-output-format-cases.json')));
   const asJson = Boolean(args.json);
@@ -1420,7 +1462,7 @@ async function cmdEvalSkillOutputFormat(args: minimist.ParsedArgs, repoRoot: str
   if (strict && summary.fail > 0) process.exit(2);
 }
 
-function cmdBuildSkillIndex(args: minimist.ParsedArgs, repoRoot: string) {
+function cmdBuildSkillIndex(args: ParsedArgs, repoRoot: string) {
   const cfg = loadKbConfig(repoRoot);
   const output = resolve(repoRoot, String(args.output || cfg.skillIndexPath));
   const withEmbeddings = Boolean(args['with-embeddings']);
@@ -1459,7 +1501,7 @@ function cmdBuildSkillIndex(args: minimist.ParsedArgs, repoRoot: string) {
   }
 }
 
-function cmdAnalyzeSkills(args: minimist.ParsedArgs, repoRoot: string) {
+function cmdAnalyzeSkills(args: ParsedArgs, repoRoot: string) {
   const withRefs = Boolean(args['with-references']);
   const json = Boolean(args.json);
   const md = Boolean(args.markdown || args['self-review']);
@@ -1528,7 +1570,7 @@ const STRUCTURAL_SECTION_CHECKS: StructuralSectionCheck[] = [
   { key: 'checklist', label: 'Checklist before calling the skill done', pattern: /^## Checklist before calling the skill done$/m },
 ];
 
-function cmdAuditSkillStructure(args: minimist.ParsedArgs, repoRoot: string) {
+function cmdAuditSkillStructure(args: ParsedArgs, repoRoot: string) {
   const includeTemplate = Boolean(args['include-template']);
   const asJson = Boolean(args.json);
   const asMarkdown = Boolean(args.markdown);
@@ -1619,8 +1661,8 @@ function cmdAuditSkillStructure(args: minimist.ParsedArgs, repoRoot: string) {
   if (strict && incompleteCount > 0) process.exit(2);
 }
 
-function cmdInstallSkill(args: minimist.ParsedArgs, _repoRoot: string) {
-  const skillPath = args._[1] ? String(args._[1]) : String(args['skill-dir'] || '.');
+function cmdInstallSkill(args: ParsedArgs, _repoRoot: string) {
+  const skillPath = args._?.[1] ? String(args._[1]) : String(args['skill-dir'] || '.');
   const ides = String(args.ides || 'cursor')
     .split(',')
     .map((x) => x.trim())
@@ -1715,7 +1757,7 @@ function strictBundleInstallWarnings(projectDir: string, bundleDir: string): str
   return warnings;
 }
 
-function cmdVerifyBundleInstall(args: minimist.ParsedArgs, _repoRoot: string) {
+function cmdVerifyBundleInstall(args: ParsedArgs, _repoRoot: string) {
   const projectDir = resolve(String(args['project-dir'] || '.'));
   const resolved = resolveConsumerBundleDir(projectDir);
   const errs: string[] = [];
@@ -1832,8 +1874,8 @@ function queryKb(repoRoot: string, q: string, topK: number, indexDir?: string) {
   return scored.map(({ i, score }) => ({ score, item: manifest[i] }));
 }
 
-function cmdQueryKb(args: minimist.ParsedArgs, repoRoot: string) {
-  const q = String(args._[1] || '');
+function cmdQueryKb(args: ParsedArgs, repoRoot: string) {
+  const q = String(args._?.[1] || '');
   if (!q) throw new Error('query-kb requires query text');
   const topK = Number(args.k || args['top-k'] || 5);
   const indexDir = args.index ? String(args.index) : undefined;
@@ -1844,7 +1886,7 @@ function cmdQueryKb(args: minimist.ParsedArgs, repoRoot: string) {
   });
 }
 
-function cmdQueryKbBatch(args: minimist.ParsedArgs, repoRoot: string) {
+function cmdQueryKbBatch(args: ParsedArgs, repoRoot: string) {
   const topK = Number(args.k || args['top-k'] || 5);
   const queries: string[] = [];
   const qArg = args.q ?? args.query;
@@ -1873,7 +1915,7 @@ function cmdQueryKbBatch(args: minimist.ParsedArgs, repoRoot: string) {
   });
 }
 
-function cmdVerifyKb(_args: minimist.ParsedArgs, repoRoot: string) {
+function cmdVerifyKb(_args: ParsedArgs, repoRoot: string) {
   const cfg = loadKbConfig(repoRoot);
   const embPath = resolve(repoRoot, cfg.embeddingsPath);
   const manifestPath = resolve(repoRoot, cfg.manifestPath);
@@ -1893,7 +1935,7 @@ function cmdVerifyKb(_args: minimist.ParsedArgs, repoRoot: string) {
   console.log('KB verification: OK');
 }
 
-function cmdBuildGraph(args: minimist.ParsedArgs) {
+function cmdBuildGraph(args: ParsedArgs) {
   const targetDir = resolve(String(args.dir || args.d || '.'));
   const outDir = resolve(String(args.out || join(targetDir, '.agents', 'devkit', 'project-graph')));
   const dry = Boolean(args['dry-run']);
@@ -1916,10 +1958,10 @@ function cmdBuildGraph(args: minimist.ParsedArgs) {
   console.log(`Saved to: ${graphPath}`);
 }
 
-function cmdQueryGraph(args: minimist.ParsedArgs) {
+function cmdQueryGraph(args: ParsedArgs) {
   const targetDir = resolve(String(args.dir || args.d || '.'));
   const graphPath = resolve(String(args.graph || join(targetDir, '.agents', 'devkit', 'project-graph', 'graph.json')));
-  const query = String(args._[1] || '');
+  const query = String(args._?.[1] || '');
   const mode = String(args.mode || 'search'); // search, callers, callees
 
   if (!existsSync(graphPath)) {
@@ -1964,10 +2006,10 @@ function cmdQueryGraph(args: minimist.ParsedArgs) {
   });
 }
 
-function cmdImpactAnalysis(args: minimist.ParsedArgs) {
+function cmdImpactAnalysis(args: ParsedArgs) {
   const targetDir = resolve(String(args.dir || args.d || '.'));
   const graphPath = resolve(String(args.graph || join(targetDir, '.agents', 'devkit', 'project-graph', 'graph.json')));
-  const filePath = String(args._[1] || '');
+  const filePath = String(args._?.[1] || '');
 
   if (!existsSync(graphPath)) {
     console.error(`Graph not found: ${graphPath}. Run build-graph first.`);
@@ -2007,7 +2049,7 @@ const DOMAIN_TAXONOMY: Record<string, string[]> = {
   'auth':            ['auth-pro'],
 };
 
-function cmdGenerateGapAnalysis(args: minimist.ParsedArgs, repoRoot: string) {
+function cmdGenerateGapAnalysis(args: ParsedArgs, repoRoot: string) {
   const outPath = resolve(repoRoot, 'knowledge-base', 'documents', 'repo', 'PROJECT_GAP_ANALYSIS.md');
   const dirs = listSkillDirs(repoRoot, false);
   const today = new Date().toISOString().slice(0, 10);
@@ -2193,7 +2235,7 @@ ${chalk.bold('EXAMPLES')}
 }
 
 async function main() {
-  const args = minimist(process.argv.slice(2), {
+  const args = parseArgs(process.argv.slice(2), {
     boolean: [
       'json',
       'markdown',
@@ -2233,7 +2275,7 @@ async function main() {
       'graph',
     ],
   });
-  const cmd = String(args._[0] || '');
+  const cmd = String(args._?.[0] || '');
   const root = process.cwd();
   switch (cmd) {
     case 'list-skills':
