@@ -5,7 +5,7 @@ description: |
 
   Use this skill when the user provides a general request that needs automatic decomposition, when the prompt needs optimization for better AI understanding, when appropriate skills or workflows need to be identified and executed, or when a template is needed for reports, issues, or other structured outputs.
 
-  This is a **system skill** - it does not perform domain-specific work but routes to and coordinates **working skills** (auth-pro, react-pro, docker-pro, etc.), **workflows** (/ticket, /debug, /release, etc.), and **templates** (reports, issues, prompts, etc.).
+  This is a **system skill** - it does not perform domain-specific work but routes to and coordinates **working skills** (chosen using **stack context** — see Stack context resolution; e.g. flutter-pro vs react-pro), **workflows** (/ticket, /debug, /release, etc.), and **templates** (reports, issues, prompts, etc.).
 
   Triggers: "route", "analyze", "plan", "break down", "how should I", "what skills", "optimize prompt", "orchestrate", "help me with", "template", "report format", "issue template".
 
@@ -78,6 +78,31 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format**; note main risks.
 
+### Stack context resolution (mandatory before naming domain skills)
+
+Router output must reflect **actual workspace / task stack**, not defaults from examples.
+
+1. **Infer stack first** (use whatever evidence exists; order is flexible):
+   - **Explicit**: user or rules say Flutter, Next.js, Nest, RN, etc.
+   - **Workspace markers**: `pubspec.yaml` + `lib/**/*.dart` → **Flutter/Dart**; `package.json` + `next.config.*` → **Next.js**; `package.json` + `react` (no Next) → **React web**; `nest-cli.json` / `@nestjs` → **NestJS**; `Cargo.toml` + `src-tauri` → **Tauri**; `.kts` / `android/` + Kotlin → Android-native patterns (no `flutter-pro`).
+   - **Open / attached paths**: e.g. `lib/foo.dart` → Dart/Flutter; `app/**/*.tsx` with Next imports → Next.
+2. **Map UI / app-layer work to the matching skill**:
+   - Flutter widgets, Riverpod, Dart async → **`flutter-pro`** (not `react-pro`).
+   - React web (SPA/Vite/webpack) → **`react-pro`**.
+   - Next App Router / RSC → **`nextjs-pro`**.
+   - React Native / Expo → **`react-native-pro`**.
+3. **Cross-cutting** skills stay stack-agnostic: **`testing-pro`**, **`auth-pro`**, **`security-pro`**, **`api-design-pro`**, **`postgresql-pro`**, **`docker-pro`**, etc., combined with the **correct** stack skill.
+4. **Forbidden**: recommending **`react-pro`** or **`nextjs-pro`** for a **Flutter/Dart-only** task (and the reverse). If uncertain, say so and list **both** hypotheses with what evidence would decide.
+
+**Quick reference**
+
+| Signals | Prefer (app layer) |
+|--------|---------------------|
+| `pubspec.yaml`, `.dart`, Flutter/Riverpod | **`flutter-pro`** |
+| Next.js routes, `next/font`, middleware | **`nextjs-pro`** |
+| `*.tsx` in CRA/Vite, no Next | **`react-pro`** |
+| `expo`, `react-native` | **`react-native-pro`** |
+
 ### Operating principles
 
 1. **Think Before Coding** — Confirm whether the request really needs routing or whether a direct working skill is already obvious. Ask only when ambiguity would materially change ownership.
@@ -138,10 +163,15 @@ Details: [references/template-catalog.md](references/template-catalog.md)
 
 ## Quick example
 
-**Input:** "Help me debug a flaky React test and propose the fix path."
+**Input:** "Help me debug a flaky React test and propose the fix path." *(repo is React/Vite or test paths are `*.test.tsx` without Next)*
 - Route to **`testing-pro`** for flake strategy and **`react-pro`** for component/runtime specifics.
 - Keep ownership explicit: testing owns signal quality, React owns framework behavior.
 - **Verify:** The route explains exactly which skill should answer which part.
+
+**Input:** "Carousel on calendar home loses items after second create." *(workspace has `pubspec.yaml` / `lachonglvn/lib/...dart`)*
+- Route to **`flutter-pro`** for Riverpod/notifier/widget flow; **`bug-discovery-pro`** or **`systematic-debugging-pro`** for trace; **`testing-pro`** if adding regression tests.
+- Do **not** route app-layer work to **`react-pro`**.
+- **Verify:** Recommended route names at least one **Dart/Flutter** skill for implementation.
 
 **Input (tricky):** "Write a release report and also tell me what workflow to use."
 - Use a release workflow for process guidance and a template only for the report output shape.
@@ -156,6 +186,7 @@ Details: [references/template-catalog.md](references/template-catalog.md)
 ## Checklist before calling the skill done
 
 - [ ] Confirmed that routing/orchestration is actually needed before invoking it (Think Before Coding)
+- [ ] **Stack context** identified (markers or user); **domain/app skill matches stack** (e.g. Flutter → `flutter-pro`, not `react-pro`)
 - [ ] Chose the minimum sufficient set of skills/workflows/templates (Simplicity First)
 - [ ] Only added routing logic directly relevant to the request (Surgical Changes)
 - [ ] Success criteria for the route are explicit: owners, order, and intended outcome (Goal-Driven Execution)
