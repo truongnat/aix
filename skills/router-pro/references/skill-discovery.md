@@ -33,9 +33,23 @@ npm run build-skill-index
 
 Run after adding, renaming, or substantially editing any skill's frontmatter or trigger list.
 
+## Stack-aware routing (router-pro)
+
+Before scoring or naming **framework** skills, resolve **stack context** (see `SKILL.md` — Stack context resolution).
+
+1. **Collect signals**: `pubspec.yaml` / `.dart` → Flutter; `next.config.*` → Next; `package.json` with Vite/CRA and no Next → React web; user-stated stack.
+2. **Filter ineligible skills**: for a Flutter task, do not output `react-pro` or `nextjs-pro` for the **app/UI** layer. For a React SPA task, do not output `flutter-pro` for UI.
+3. **Optional scoring tweak** (when building a ranked list): add a **stack match bonus** to the domain skill that matches the resolved stack, and **down-rank** skills that are known-wrong stack for the same layer (e.g. `react-pro` when `pubspec.yaml` is present and the task is `lib/**` UI).
+
+**Example (correct):** "Fix Riverpod provider in `lib/features/calendar/...`" + `pubspec.yaml` in repo → top app skill **`flutter-pro`**, plus `testing-pro` if tests are in `test/**`.
+
+**Example (wrong):** Same query but recommended route lists **`react-pro`** for the UI — **reject**; replace with **`flutter-pro`**.
+
 ## Multi-skill routing
 
-When a query spans multiple domains (e.g. "secure the React login form"):
-- Return the top skill per relevant domain: `react-pro` (UI layer) + `auth-pro` (session/token layer) + `security-pro` (XSS/CSP layer).
-- State ownership boundaries so skills don't overlap in the response.
-- Prefer 2–3 skills max; more creates noise.
+When a query spans multiple domains, pick the **right** app-layer skill for the stack, then add cross-cutting skills.
+
+- **Web React (non-Next) example:** "secure the React login form" → `react-pro` (UI) + `auth-pro` (session/token) + `security-pro` (XSS/CSP).
+- **Flutter example:** "secure login form in Flutter" → `flutter-pro` + `auth-pro` + `security-pro`.
+
+State ownership boundaries so skills don't overlap in the response. Prefer 2–3 skills max; more creates noise.
