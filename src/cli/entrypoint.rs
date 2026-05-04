@@ -28,13 +28,13 @@ pub(super) async fn run_impl() -> Result<()> {
     let mut role_request: Option<RoleRunRequest> = None;
     let mut chat_thread_request: Option<ChatThreadRequest> = None;
     let mut thread_flow_request: Option<ThreadFlowRequest> = None;
-    if let Some(command) = cli.command.clone() {
+    if let Some(ref command) = cli.command {
         let state_store = WorkflowStateStore::new(&project_root)?;
         match handle_workflow_control_command(
             &state_store,
             &thread_session_store,
             &project_layout,
-            command,
+            *command.clone(),
         )? {
             WorkflowLaunchAction::Noop => return Ok(()),
             WorkflowLaunchAction::Resume { id } => resume_instance_id = Some(id),

@@ -2569,6 +2569,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg(unix)]
     async fn untrusted_skill_runs_in_subprocess() {
         let mut registry = DomainRegistry::new();
         registry.register_domain("demo");
@@ -2605,6 +2606,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg(unix)]
     async fn subprocess_crash_does_not_crash_executor() {
         let mut registry = DomainRegistry::new();
         registry.register_domain("demo");
@@ -2657,6 +2659,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg(unix)]
     async fn subprocess_memory_limit_exceeded_is_killed() {
         let mut registry = DomainRegistry::new();
         registry.register_domain("demo");
@@ -2698,6 +2701,7 @@ mod tests {
     }
 
     #[tokio::test]
+    #[cfg(unix)]
     async fn subprocess_timeout_is_killed() {
         let mut registry = DomainRegistry::new();
         registry.register_domain("demo");

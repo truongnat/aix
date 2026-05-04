@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::fs::OpenOptions;
 use std::io::{ErrorKind, Write};
 use std::path::{Path, PathBuf};
+#[cfg(unix)]
 use std::process::{Command, Stdio};
 
 const DEFAULT_STALE_LOCK_TIMEOUT_MS: u64 = 30 * 60 * 1000;
@@ -47,14 +48,38 @@ fn process_is_alive(pid: u32) -> bool {
     if pid == 0 {
         return false;
     }
-    Command::new("kill")
-        .arg("-0")
-        .arg(pid.to_string())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .map(|status| status.success())
-        .unwrap_or(false)
+    #[cfg(unix)]
+    {
+        Command::new("kill")
+            .arg("-0")
+            .arg(pid.to_string())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .status()
+            .map(|status| status.success())
+            .unwrap_or(false)
+    }
+    #[cfg(windows)]
+    {
+        // On Windows, check if it's the current process or use OpenProcess
+        if pid == std::process::id() {
+            return true;
+        }
+        // Try to open process with query information rights
+        // SAFETY: Windows API call with valid PID
+        unsafe {
+            use windows_sys::Win32::System::Threading::OpenProcess;
+            use windows_sys::Win32::System::Threading::PROCESS_QUERY_INFORMATION;
+            use windows_sys::Win32::Foundation::CloseHandle;
+            let handle = OpenProcess(PROCESS_QUERY_INFORMATION, 0, pid);
+            if handle == 0 {
+                false
+            } else {
+                CloseHandle(handle);
+                true
+            }
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

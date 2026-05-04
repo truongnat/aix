@@ -1357,7 +1357,7 @@ fn graph_index_builder_writes_nodes_payload() {
     let root_str = root.to_string_lossy().to_string();
     let layout = AgentProjectLayout::discover(&root_str).expect("discover layout");
 
-    let report = build_graph_index(&layout, 100).expect("build graph index");
+    let report = build_graph_index(&layout, 100, false).expect("build graph index");
     assert!(report.nodes >= 2);
     assert!(report.edges >= 1);
     assert!(layout.memory_dir.join("graph_index.json").exists());

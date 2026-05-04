@@ -685,7 +685,9 @@ pub(super) fn infer_workflow_ref_from_template(template_ref: &str) -> String {
             }
         }
     }
-    if path.is_absolute() {
+    // Treat Unix-style absolute paths (starting with /) as absolute on all platforms
+    let is_unix_absolute = template_ref.starts_with('/');
+    if path.is_absolute() || is_unix_absolute {
         return normalized_stem;
     }
     let parent = path.parent().and_then(|v| {

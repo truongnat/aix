@@ -1,0 +1,114 @@
+{
+  "name": "Phase 3 Verification & Feedback Loops",
+  "cases": [
+    {
+      "id": "test_coverage_90",
+      "report": {
+        "summary": "Test suite generated for new feature branch. Coverage analysis shows 94% line coverage with 534 tests passing, 0 failures, 3 ignored. Edge cases covered: null inputs, boundary conditions, concurrent access.",
+        "actions": [
+          "Generated 12 new unit tests for feature X",
+          "Added property-based tests for edge cases",
+          "Updated CI gate to enforce 90% coverage threshold",
+          "Documented test patterns in TESTING.md"
+        ],
+        "risks": [
+          "Risk: Integration tests may be flaky on Windows due to file locking",
+          "Coverage drops to 87% when excluding integration tests"
+        ]
+      },
+      "min_summary_chars": 80,
+      "min_actions": 2,
+      "min_risks": 1,
+      "required_summary_keywords": ["coverage", "test"],
+      "required_action_keywords": ["test", "coverage"],
+      "required_risk_keywords": ["risk", "flaky", "coverage"]
+    },
+    {
+      "id": "multi_agent_review_pass",
+      "report": {
+        "summary": "Multi-agent review completed for PR #142. Reviewer agent flagged 3 issues: unsafe unwrap in line 45, missing error propagation in async block, magic number 42 without constant. Resolver agent addressed all issues with targeted fixes. Final review score: 9.2/10.",
+        "actions": [
+          "Replaced unwrap with proper error handling",
+          "Added ? operator for error propagation",
+          "Extracted magic number to named constant MAX_RETRIES",
+          "Re-ran clippy and tests post-fix"
+        ],
+        "risks": [
+          "None - all review items resolved"
+        ]
+      },
+      "min_summary_chars": 80,
+      "min_actions": 2,
+      "min_risks": 0,
+      "required_summary_keywords": ["review", "agent"],
+      "required_action_keywords": ["unwrap", "error", "constant"],
+      "required_risk_keywords": ["resolved"]
+    },
+    {
+      "id": "retry_loop_95",
+      "report": {
+        "summary": "Closed-loop retry executed for flaky integration test. Initial pass rate: 82%. After 3 retry iterations with incremental fixes (increased timeout, added retry logic, stabilized temp dir cleanup), pass rate reached 96%. Loop terminated successfully.",
+        "actions": [
+          "Iteration 1: Increased test timeout from 30s to 60s",
+          "Iteration 2: Added exponential backoff retry for network calls",
+          "Iteration 3: Fixed race condition in temp directory cleanup",
+          "Updated CI config to allow 3 retry attempts"
+        ],
+        "risks": [
+          "Retry masking underlying instability - root cause not fully addressed",
+          "CI time increased by 15% due to retry overhead"
+        ]
+      },
+      "min_summary_chars": 80,
+      "min_actions": 2,
+      "min_risks": 1,
+      "required_summary_keywords": ["retry", "pass rate"],
+      "required_action_keywords": ["timeout", "retry", "cleanup"],
+      "required_risk_keywords": ["instability", "masking"]
+    },
+    {
+      "id": "regression_test_blocker",
+      "report": {
+        "summary": "Regression test suite detected breaking change in workflow engine. State store serialization format changed without backward compatibility. 4 tests failing in backward-compat module.",
+        "actions": [
+          "Identified breaking change in WorkflowInstance schema v2",
+          "Added migration path from v1 to v2 format",
+          "Created backward-compat shim for legacy state files",
+          "Added regression test to prevent future breaks"
+        ],
+        "risks": [
+          "Migration may fail for corrupted state files",
+          "Backward-compat shim adds 5% runtime overhead"
+        ]
+      },
+      "min_summary_chars": 80,
+      "min_actions": 2,
+      "min_risks": 1,
+      "required_summary_keywords": ["regression", "breaking"],
+      "required_action_keywords": ["migration", "compat"],
+      "required_risk_keywords": ["migration", "overhead"]
+    },
+    {
+      "id": "eval_loop_automation",
+      "report": {
+        "summary": "Eval loop automation configured for release pipeline. Dataset: .agents/evals/release_eval.json. Target: 95% pass rate. Current: 94.2% after latest changes. Gap: 0.8% due to 2 failing tests on Windows platform.",
+        "actions": [
+          "Automated eval loop runs on every PR merge",
+          "Windows-specific test failures isolated to path separators",
+          "Added cross-platform normalization for path comparisons",
+          "Gate configured: block merge if eval < 95%"
+        ],
+        "risks": [
+          "Timeout risk: Windows CI runner occasionally times out on eval loop",
+          "0.8% gap may require test adjustments rather than code fixes"
+        ]
+      },
+      "min_summary_chars": 80,
+      "min_actions": 2,
+      "min_risks": 1,
+      "required_summary_keywords": ["eval", "pass rate"],
+      "required_action_keywords": ["automated", "cross-platform"],
+      "required_risk_keywords": ["timeout", "gap"]
+    }
+  ]
+}
