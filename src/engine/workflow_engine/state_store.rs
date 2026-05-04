@@ -313,7 +313,7 @@ impl WorkflowStateStore {
             };
             out.push(parsed);
         }
-        out.sort_by(|a, b| b.updated_at_ms.cmp(&a.updated_at_ms));
+        out.sort_by_key(|instance| std::cmp::Reverse(instance.updated_at_ms));
         Ok(out)
     }
 

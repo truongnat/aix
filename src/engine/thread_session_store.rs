@@ -199,7 +199,7 @@ impl ThreadSessionStore {
 
     pub fn list_threads(&self) -> Result<Vec<ThreadSessionRecord>> {
         let mut threads = self.load_index()?.threads;
-        threads.sort_by(|a, b| b.updated_at_ms.cmp(&a.updated_at_ms));
+        threads.sort_by_key(|thread| std::cmp::Reverse(thread.updated_at_ms));
         Ok(threads)
     }
 

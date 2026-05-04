@@ -298,7 +298,7 @@ impl ContextRetrievalService for HybridContextRetrievalService {
             .graph
             .retrieve(query, limit.saturating_mul(2).max(limit))?;
         let mut merged = HashMap::<String, RetrievedContextItem>::new();
-        for item in vector_items.into_iter().chain(graph_items.into_iter()) {
+        for item in vector_items.into_iter().chain(graph_items) {
             match merged.get(&item.id) {
                 Some(existing) if existing.score >= item.score => {}
                 _ => {

@@ -171,7 +171,8 @@ impl ProductBacklog {
     }
 
     pub fn sort_by_priority(&mut self) {
-        self.stories.sort_by(|a, b| b.priority.cmp(&a.priority));
+        self.stories
+            .sort_by_key(|story| std::cmp::Reverse(story.priority));
     }
 
     pub fn top_n(&self, n: usize) -> Vec<&UserStory> {

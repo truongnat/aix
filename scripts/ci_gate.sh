@@ -29,23 +29,64 @@ log "Running clean clone smoke test..."
 ./scripts/smoke_clean_clone.sh
 
 log "Verifying package check has zero warnings..."
-summary_line="$(cargo run --quiet -- workflow check | head -n 1)"
-printf '[ci-gate] %s\n' "$summary_line"
+# We use || true because we want to capture JSON even if there are errors.
+# Compilation errors or other system errors will still go to stderr.
+check_output="$(cargo run --quiet -- workflow check --json || true)"
 
-errors_count="$(printf '%s' "$summary_line" | sed -E 's/.*errors=([0-9]+).*/\1/')"
-warnings_count="$(printf '%s' "$summary_line" | sed -E 's/.*warnings=([0-9]+).*/\1/')"
+if [[ -z "$check_output" ]]; then
+  fail "workflow check failed to produce output (check for compilation errors above)"
+fi
+
+if ! echo "$check_output" | jq . >/dev/null 2>&1; then
+  fail "workflow check produced invalid JSON: $check_output"
+fi
+
+errors_count="$(echo "$check_output" | jq '.errors | length')"
+warnings_count="$(echo "$check_output" | jq '.warnings | length')"
+
+log "Package Check: errors=$errors_count warnings=$warnings_count"
 
 if [[ "$errors_count" != "0" ]]; then
-  fail "workflow check reported errors=$errors_count"
+  echo "$check_output" | jq -r '.errors[] | "\(.path): \(.message)"' | while read -r err; do
+    printf '[ci-gate][error] %s\n' "$err" >&2
+  done
+  fail "workflow check reported $errors_count error(s)"
 fi
+
 if [[ "$warnings_count" != "0" ]]; then
-  fail "workflow check reported warnings=$warnings_count"
+  echo "$check_output" | jq -r '.warnings[] | "\(.path): \(.message)"' | while read -r warn; do
+    printf '[ci-gate][warn] %s\n' "$warn" >&2
+  done
+  fail "workflow check reported $warnings_count warning(s)"
 fi
 
 log "Running strict skill quality gate..."
-cargo run --quiet -- workflow quality-skills --strict --json >/dev/null
+quality_output="$(cargo run --quiet -- workflow quality-skills --strict --json || true)"
+
+if [[ -z "$quality_output" ]]; then
+  fail "quality-skills failed to produce output"
+fi
+
+if ! echo "$quality_output" | jq . >/dev/null 2>&1; then
+  fail "quality-skills produced invalid JSON: $quality_output"
+fi
+
+q_errors="$(echo "$quality_output" | jq '.errors')"
+q_warnings="$(echo "$quality_output" | jq '.warnings')"
+
+log "Skill Quality: errors=$q_errors warnings=$q_warnings"
+
+if [[ "$q_errors" != "0" ]] || [[ "$q_warnings" != "0" ]]; then
+  echo "$quality_output" | jq -r '.entries[] | select(.findings | length > 0) | .path as $path | .findings[] | "[\(.level)] \($path): \(.message)"' | while read -r finding; do
+    printf '[ci-gate][quality] %s\n' "$finding" >&2
+  done
+  fail "skill quality check failed (strict=true)"
+fi
 
 log "Rebuilding catalog + lock artifacts..."
-cargo run --quiet -- workflow build-catalog --json >/dev/null
+if ! cargo run --quiet -- workflow build-catalog --json; then
+  fail "build-catalog failed"
+fi
+
 
 log "CI gate passed."
