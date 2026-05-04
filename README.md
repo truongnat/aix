@@ -1,8 +1,76 @@
 # agentic-sdlc
 
 [![CI](https://github.com/truongnat/agentic-sdlc/actions/workflows/ci.yml/badge.svg)](https://github.com/truongnat/agentic-sdlc/actions/workflows/ci.yml)
+[![Harness](https://img.shields.io/badge/Harness-Production%20Ready-2ea44f)](https://github.com/truongnat/agentic-sdlc)
 
-Deterministic local execution runtime for agentic software workflows.
+> **Deterministic agentic SDLC harness — from spec to production with 95% autonomy.**
+
+## What is this?
+
+A **production-grade harness** for agentic software development. It orchestrates the full lifecycle: context retrieval, constraint enforcement, verification loops, and GitHub/CI automation.
+
+| Phase | Feature | Status |
+|-------|---------|--------|
+| P1 | **Context** — indexed skills, workflows, memory packs | Ready |
+| P2 | **Constraints** — lint, arch, security gates | Ready |
+| P3 | **Verification** — eval loops, auto-retry, 95% pass | Ready |
+| P4 | **Orchestration** — PR/CI/merge, human-in-loop | Ready |
+
+## Quick Start
+
+```bash
+# 1. Clone & build
+git clone https://github.com/truongnat/agentic-sdlc
+cd agentic-sdlc
+cargo build --release
+
+# 2. Verify harness
+cargo run -- workflow eval-loop --min-pass 0.9 --max-iterations 3
+
+# 3. Run full SDLC cycle
+cargo run -- workflow git-pr-flow --validate "cargo test" --no-merge
+```
+
+## Commands
+
+```bash
+# Evaluation
+$ cargo run -- workflow eval-loop              # auto-retry until 90% pass
+$ cargo run -- workflow eval dataset.json      # single eval run
+
+# Constraints
+$ cargo run -- workflow constraints-check      # lint + arch + security
+$ cargo run -- workflow lint-gate              # clippy + fmt
+
+# Orchestration
+$ cargo run -- workflow git-pr-flow            # branch -> validate -> PR -> merge
+$ cargo run -- workflow status                 # show active workflows
+
+# Catalog
+$ cargo run -- workflow build-catalog          # index skills/workflows
+$ cargo run -- workflow bundles                # list shareable bundles
+```
+
+## Architecture
+
+```
+spec ──> context ──> constraints ──> verify ──> orchestrate ──> merge
+  ^                                              v
+  └──────────── human-in-loop (Slack/PR) ───────┘
+```
+
+## Environment
+
+```bash
+# For PR automation (optional)
+export GITHUB_TOKEN=ghp_xxx
+export GIT_OWNER=truongnat
+export GIT_REPO=agentic-sdlc
+```
+
+## License
+
+MIT — see [LICENSE](LICENSE)
 
 ## ✨ Production Ready (March 2026)
 
