@@ -5,7 +5,7 @@
 //! - Feature isolation
 //! - Repository pattern enforcement
 
-use crate::engine::constraints::{ArchRule, ArchConstraints, RuleSeverity, Violation};
+use crate::engine::constraints::{ArchConstraints, ArchRule, RuleSeverity, Violation};
 use anyhow::Result;
 use regex::Regex;
 use std::collections::HashSet;
@@ -57,13 +57,14 @@ impl ArchEnforcer {
     async fn enforce_rule(&self, rule: &ArchRule) -> Result<Vec<Violation>> {
         let mut violations = Vec::new();
         let pattern = Regex::new(&rule.pattern)?;
-        
+
         let src_path = Path::new(&self.project_root).join("src");
         if !src_path.exists() {
             return Ok(violations);
         }
 
-        self.scan_directory(&src_path, rule, &pattern, &mut violations).await?;
+        self.scan_directory(&src_path, rule, &pattern, &mut violations)
+            .await?;
 
         Ok(violations)
     }
@@ -82,19 +83,21 @@ impl ArchEnforcer {
         for entry in std::fs::read_dir(dir)? {
             let entry = entry?;
             let path = entry.path();
-            
+
             if path.is_dir() {
                 Box::pin(self.scan_directory(&path, rule, pattern, violations)).await?;
             } else if path.extension().map(|e| e == "rs").unwrap_or(false) {
                 let content = std::fs::read_to_string(&path)?;
-                let relative_path = path.strip_prefix(&self.project_root)
+                let relative_path = path
+                    .strip_prefix(&self.project_root)
                     .unwrap_or(&path)
                     .to_string_lossy();
 
                 if pattern.is_match(&content) {
-                    let is_allowed = rule.allowed_paths.iter()
-                        .any(|p| relative_path.contains(p));
-                    let is_forbidden = rule.forbidden_paths.iter()
+                    let is_allowed = rule.allowed_paths.iter().any(|p| relative_path.contains(p));
+                    let is_forbidden = rule
+                        .forbidden_paths
+                        .iter()
                         .any(|p| relative_path.contains(p));
 
                     if !is_allowed || is_forbidden {
@@ -109,9 +112,8 @@ impl ArchEnforcer {
                             file: relative_path.to_string(),
                             message: Some(rule.description.clone()),
                             fix: Some(format!(
-                                "Review usage in {} - {}", 
-                                relative_path, 
-                                rule.description
+                                "Review usage in {} - {}",
+                                relative_path, rule.description
                             )),
                         });
                     }
@@ -125,10 +127,10 @@ impl ArchEnforcer {
     /// Enforce no direct DB access in API layer (Rule 3.2)
     async fn enforce_no_db_in_api(&self) -> Result<Vec<Violation>> {
         let mut violations = Vec::new();
-        
+
         let api_paths = [
             "src/api",
-            "src/handlers", 
+            "src/handlers",
             "src/controllers",
             "src/routes",
             "src/endpoint",
@@ -155,7 +157,8 @@ impl ArchEnforcer {
             {
                 if entry.file_type().is_file() && entry.path().extension() == Some("rs".as_ref()) {
                     let content = std::fs::read_to_string(entry.path())?;
-                    let relative_path = entry.path()
+                    let relative_path = entry
+                        .path()
                         .strip_prefix(&self.project_root)
                         .unwrap_or(entry.path())
                         .to_string_lossy();
@@ -186,7 +189,7 @@ impl ArchEnforcer {
     /// Enforce feature module isolation
     async fn enforce_feature_isolation(&self) -> Result<Vec<Violation>> {
         let mut violations = Vec::new();
-        
+
         let features_path = Path::new(&self.project_root).join("src/feature");
         if !features_path.exists() {
             return Ok(violations);
@@ -207,7 +210,8 @@ impl ArchEnforcer {
         {
             if entry.file_type().is_file() && entry.path().extension() == Some("rs".as_ref()) {
                 let content = std::fs::read_to_string(entry.path())?;
-                let relative_path = entry.path()
+                let relative_path = entry
+                    .path()
                     .strip_prefix(&self.project_root)
                     .unwrap_or(entry.path())
                     .to_string_lossy();
@@ -215,7 +219,8 @@ impl ArchEnforcer {
                 for cap in import_re.captures_iter(&content) {
                     if let Some(feature_name) = cap.get(1) {
                         let imported_feature = feature_name.as_str();
-                        let current_feature = entry.path()
+                        let current_feature = entry
+                            .path()
                             .parent()
                             .and_then(|p| p.file_name())
                             .and_then(|n| n.to_str())
@@ -245,12 +250,12 @@ impl ArchEnforcer {
     /// Enforce repository pattern usage
     async fn enforce_repository_pattern(&self) -> Result<Vec<Violation>> {
         let mut violations = Vec::new();
-        
+
         let src_path = Path::new(&self.project_root).join("src");
-        
+
         // Look for direct DB usage outside repository/ modules
         let db_usage_pattern = Regex::new(
-            r"(rusqlite::|tokio_postgres::|sqlx::|\.execute\(|\.query\(|\.query_row\()"
+            r"(rusqlite::|tokio_postgres::|sqlx::|\.execute\(|\.query\(|\.query_row\()",
         )?;
 
         for entry in walkdir::WalkDir::new(&src_path)
@@ -258,20 +263,22 @@ impl ArchEnforcer {
             .filter_map(|e| e.ok())
         {
             if entry.file_type().is_file() && entry.path().extension() == Some("rs".as_ref()) {
-                let relative_path = entry.path()
+                let relative_path = entry
+                    .path()
                     .strip_prefix(&self.project_root)
                     .unwrap_or(entry.path())
                     .to_string_lossy();
 
                 // Skip if already in repository layer
-                if relative_path.contains("/repository/") 
+                if relative_path.contains("/repository/")
                     || relative_path.contains("/db/")
-                    || relative_path.contains("/data/") {
+                    || relative_path.contains("/data/")
+                {
                     continue;
                 }
 
                 let content = std::fs::read_to_string(entry.path())?;
-                
+
                 if db_usage_pattern.is_match(&content) {
                     violations.push(Violation {
                         rule: "ARCH-RP [WARNING]".to_string(),
@@ -353,8 +360,9 @@ mod tests {
         std::fs::create_dir_all(&api_dir).unwrap();
         std::fs::write(
             api_dir.join("handler.rs"),
-            "use rusqlite::Connection; fn query() { let conn = Connection::open(\"test.db\"); }"
-        ).unwrap();
+            "use rusqlite::Connection; fn query() { let conn = Connection::open(\"test.db\"); }",
+        )
+        .unwrap();
 
         let enforcer = ArchEnforcer::new(project_root);
         let violations = enforcer.enforce_no_db_in_api().await.unwrap();
@@ -377,13 +385,18 @@ mod tests {
         // Feature A imports from Feature B - violation
         std::fs::write(
             feature_a.join("mod.rs"),
-            "use crate::feature::feature_b::something;"
-        ).unwrap();
+            "use crate::feature::feature_b::something;",
+        )
+        .unwrap();
 
         let enforcer = ArchEnforcer::new(project_root);
         let violations = enforcer.enforce_feature_isolation().await.unwrap();
 
         assert_eq!(violations.len(), 1);
-        assert!(violations[0].message.as_ref().unwrap().contains("feature_a"));
+        assert!(violations[0]
+            .message
+            .as_ref()
+            .unwrap()
+            .contains("feature_a"));
     }
 }

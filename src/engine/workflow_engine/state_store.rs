@@ -68,9 +68,9 @@ fn process_is_alive(pid: u32) -> bool {
         // Try to open process with query information rights
         // SAFETY: Windows API call with valid PID
         unsafe {
+            use windows_sys::Win32::Foundation::CloseHandle;
             use windows_sys::Win32::System::Threading::OpenProcess;
             use windows_sys::Win32::System::Threading::PROCESS_QUERY_INFORMATION;
-            use windows_sys::Win32::Foundation::CloseHandle;
             let handle = OpenProcess(PROCESS_QUERY_INFORMATION, 0, pid);
             if handle == 0 {
                 false

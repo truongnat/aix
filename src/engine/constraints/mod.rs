@@ -193,7 +193,7 @@ impl ConstraintsEngine {
         let content = std::fs::read_to_string(&arch_path)?;
         let constraints: ArchConstraints = serde_yaml::from_str(&content)
             .map_err(|e| anyhow!("Failed to parse arch.yaml: {}", e))?;
-        
+
         self.constraints = Some(constraints);
         Ok(())
     }
@@ -231,7 +231,11 @@ impl ConstraintsEngine {
             ConstraintStatus::Violation
         };
 
-        let gate_result = if violations.is_empty() { GateResult::Approve } else { GateResult::Reject };
+        let gate_result = if violations.is_empty() {
+            GateResult::Approve
+        } else {
+            GateResult::Reject
+        };
 
         Ok(ConstraintResult {
             status,
@@ -251,7 +255,7 @@ impl ConstraintsEngine {
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
             let violations = parse_clippy_output(&stderr);
-            
+
             return Ok(ConstraintResult {
                 status: ConstraintStatus::Violation,
                 violations,
@@ -287,7 +291,11 @@ impl ConstraintsEngine {
             ConstraintStatus::Violation
         };
 
-        let gate_result = if violations.is_empty() { GateResult::Approve } else { GateResult::Reject };
+        let gate_result = if violations.is_empty() {
+            GateResult::Approve
+        } else {
+            GateResult::Reject
+        };
 
         Ok(ConstraintResult {
             status,
@@ -303,7 +311,7 @@ impl ConstraintsEngine {
 
     fn check_arch_rule(&self, rule: &ArchRule) -> Result<Vec<Violation>> {
         let mut violations = Vec::new();
-        
+
         let output = Command::new("rg")
             .args(["--type", "rust", "-n", &rule.pattern, &self.project_root])
             .output();
@@ -313,11 +321,14 @@ impl ConstraintsEngine {
             for line in stdout.lines() {
                 if let Some((file, _)) = line.split_once(':') {
                     let relative_path = file.trim_start_matches(&self.project_root);
-                    
+
                     // Check if path is allowed
                     let is_allowed = rule.allowed_paths.iter().any(|p| relative_path.contains(p));
-                    let is_forbidden = rule.forbidden_paths.iter().any(|p| relative_path.contains(p));
-                    
+                    let is_forbidden = rule
+                        .forbidden_paths
+                        .iter()
+                        .any(|p| relative_path.contains(p));
+
                     if !is_allowed || is_forbidden {
                         violations.push(Violation {
                             rule: rule.id.clone(),
@@ -335,14 +346,19 @@ impl ConstraintsEngine {
 
     fn check_db_isolation(&self) -> Result<Vec<Violation>> {
         let mut violations = Vec::new();
-        
+
         // Pattern: Database access in API layer
         let db_patterns = ["rusqlite", "tokio_postgres", "sqlx", "Connection", "Pool"];
-        
+
         for pattern in &db_patterns {
             let output = Command::new("rg")
-                .args(["--type", "rust", "-n", pattern,
-                       &format!("{}/src/api", self.project_root)])
+                .args([
+                    "--type",
+                    "rust",
+                    "-n",
+                    pattern,
+                    &format!("{}/src/api", self.project_root),
+                ])
                 .output();
 
             if let Ok(output) = output {
@@ -374,13 +390,13 @@ impl ConstraintsEngine {
                 let path = entry.path();
                 if path.extension().map(|e| e == "rs").unwrap_or(false) {
                     let content = std::fs::read_to_string(&path)?;
-                    
+
                     // Check for network calls without proper gates
                     if content.contains("reqwest") || content.contains("http") {
-                        let has_security_gate = content.contains("SecurityGate") 
+                        let has_security_gate = content.contains("SecurityGate")
                             || content.contains("security_policy")
                             || content.contains("require_network");
-                        
+
                         if !has_security_gate {
                             violations.push(Violation {
                                 rule: "SEC-001".to_string(),
@@ -400,7 +416,11 @@ impl ConstraintsEngine {
             ConstraintStatus::Violation
         };
 
-        let gate_result = if violations.is_empty() { GateResult::Approve } else { GateResult::Reject };
+        let gate_result = if violations.is_empty() {
+            GateResult::Approve
+        } else {
+            GateResult::Reject
+        };
 
         Ok(ConstraintResult {
             status,
@@ -414,7 +434,7 @@ impl ConstraintsEngine {
 
 fn parse_clippy_output(stderr: &str) -> Vec<Violation> {
     let mut violations = Vec::new();
-    
+
     for line in stderr.lines() {
         if line.contains("error:") || line.contains("warning:") {
             if let Some((location, message)) = line.split_once("error:") {
@@ -428,7 +448,7 @@ fn parse_clippy_output(stderr: &str) -> Vec<Violation> {
             }
         }
     }
-    
+
     violations
 }
 

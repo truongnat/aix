@@ -1346,15 +1346,21 @@ fn write_context_sqlite(
             if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
                 if let Some(threads) = json.get("threads").and_then(|v| v.as_array()) {
                     for thread in threads {
-                        let thread_id = thread.get("thread_id").and_then(|v| v.as_str()).unwrap_or("unknown");
+                        let thread_id = thread
+                            .get("thread_id")
+                            .and_then(|v| v.as_str())
+                            .unwrap_or("unknown");
                         let default_history = serde_json::Value::Array(vec![]);
                         let history = thread.get("history").unwrap_or(&default_history);
-                        let phase = thread.get("lifecycle_state").and_then(|v| v.as_str()).unwrap_or("active");
+                        let phase = thread
+                            .get("lifecycle_state")
+                            .and_then(|v| v.as_str())
+                            .unwrap_or("active");
                         let now = std::time::SystemTime::now()
                             .duration_since(std::time::UNIX_EPOCH)
                             .unwrap_or_default()
                             .as_millis() as u64;
-                        
+
                         let _ = tx.execute(
                             "INSERT OR REPLACE INTO session_memory (thread_id, context_history_json, phase_state, updated_at_ms) 
                              VALUES (?1, ?2, ?3, ?4)",

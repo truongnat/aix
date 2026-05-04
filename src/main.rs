@@ -20,9 +20,9 @@ fn main() -> Result<()> {
                 .enable_all()
                 .build()
                 .unwrap();
-            rt.block_on(async {
-                cli::run().await
-            })
+            rt.block_on(async { cli::run().await })
         })?;
-    child.join().map_err(|_| anyhow::anyhow!("Main thread panicked"))?
+    child
+        .join()
+        .map_err(|_| anyhow::anyhow!("Main thread panicked"))?
 }

@@ -178,7 +178,10 @@ pub(super) fn handle_workflow_control_command(
                     if iteration > max_iterations && max_iterations > 0 {
                         break;
                     }
-                    println!("\n=== Eval Loop Iteration {}/{} ===", iteration, max_iterations);
+                    println!(
+                        "\n=== Eval Loop Iteration {}/{} ===",
+                        iteration, max_iterations
+                    );
                     let report = run_workflow_eval(&dataset, min_pass)?;
                     last_report = Some(report.clone());
                     if json {
@@ -191,7 +194,10 @@ pub(super) fn handle_workflow_control_command(
                         return Ok(WorkflowLaunchAction::Noop);
                     }
                     if iteration < max_iterations || max_iterations == 0 {
-                        println!("⚠️  Eval failed (pass_rate={:.2} < {:.2}). Retrying...", report.pass_rate, min_pass);
+                        println!(
+                            "⚠️  Eval failed (pass_rate={:.2} < {:.2}). Retrying...",
+                            report.pass_rate, min_pass
+                        );
                         // Run tests to surface issues
                         println!("Running cargo test to diagnose...");
                         let _ = std::process::Command::new("cargo")
@@ -230,11 +236,26 @@ pub(super) fn handle_workflow_control_command(
                         report.error.unwrap_or_default()
                     ));
                 }
-                println!("✅ Git PR flow complete: {}", report.pr_url.unwrap_or_default());
+                println!(
+                    "✅ Git PR flow complete: {}",
+                    report.pr_url.unwrap_or_default()
+                );
                 Ok(WorkflowLaunchAction::Noop)
             }
-            WorkflowCommand::ConstraintsCheck { fix, arch_only, security_only, lint_only, json } => {
-                let report = run_constraints_check(project_layout, fix, arch_only, security_only, lint_only)?;
+            WorkflowCommand::ConstraintsCheck {
+                fix,
+                arch_only,
+                security_only,
+                lint_only,
+                json,
+            } => {
+                let report = run_constraints_check(
+                    project_layout,
+                    fix,
+                    arch_only,
+                    security_only,
+                    lint_only,
+                )?;
                 if json {
                     println!("{}", serde_json::to_string_pretty(&report)?);
                 } else {
@@ -248,7 +269,10 @@ pub(super) fn handle_workflow_control_command(
                 }
                 Ok(WorkflowLaunchAction::Noop)
             }
-            WorkflowCommand::LintGate { strict, feature_branch } => {
+            WorkflowCommand::LintGate {
+                strict,
+                feature_branch,
+            } => {
                 run_lint_gate(project_layout, strict, feature_branch)?;
                 Ok(WorkflowLaunchAction::Noop)
             }
@@ -1875,13 +1899,11 @@ fn run_constraints_check(
     _security_only: bool,
     _lint_only: bool,
 ) -> Result<ConstraintCheckReport> {
-    use crate::engine::constraints::{
-        ConstraintsEngine, ConstraintStatus, GateResult
-    };
+    use crate::engine::constraints::{ConstraintStatus, ConstraintsEngine, GateResult};
 
     let project_root = &project_layout.project_root;
     let mut engine = ConstraintsEngine::new(project_root);
-    
+
     // Load constraints
     if let Err(e) = engine.load_constraints() {
         return Ok(ConstraintCheckReport {
@@ -1947,7 +1969,7 @@ fn print_constraints_check_report(report: &ConstraintCheckReport) {
     println!("\n=== Constraints & Guardrails Check ===\n");
     println!("Status: {}", report.status);
     println!("Gate Result: {}", report.gate_result);
-    
+
     if !report.violations.is_empty() {
         println!("\nViolations ({}):", report.violations.len());
         for (i, v) in report.violations.iter().enumerate() {
@@ -1976,14 +1998,12 @@ fn run_lint_gate(
     strict: bool,
     feature_branch: bool,
 ) -> Result<()> {
-    use crate::engine::constraints::{
-        ConstraintsEngine, GateResult
-    };
     use crate::engine::constraints::arch_enforcer::ArchEnforcer;
+    use crate::engine::constraints::{ConstraintsEngine, GateResult};
 
     let project_root = &project_layout.project_root;
     let mut engine = ConstraintsEngine::new(project_root);
-    
+
     // Load constraints
     if let Err(e) = engine.load_constraints() {
         println!("{{\"status\":\"blocked\",\"violations\":[],\"gate_result\":\"reject\",\"error\":\"{}\"}}", e);
@@ -2003,13 +2023,13 @@ fn run_lint_gate(
     }
 
     // Combine violations
-    let all_violations: Vec<_> = result.violations.into_iter()
-        .chain(fb_violations)
-        .collect();
+    let all_violations: Vec<_> = result.violations.into_iter().chain(fb_violations).collect();
 
     // Determine gate result
     let has_errors = all_violations.iter().any(|v| v.rule.contains("[ERROR]"));
-    let has_warnings = all_violations.iter().any(|v| v.rule.contains("[WARNING]") || (!v.rule.contains("[ERROR]") && !v.rule.contains("[INFO]")));
+    let has_warnings = all_violations.iter().any(|v| {
+        v.rule.contains("[WARNING]") || (!v.rule.contains("[ERROR]") && !v.rule.contains("[INFO]"))
+    });
 
     let gate_result = if has_errors || (strict && has_warnings) {
         GateResult::Reject
@@ -2018,23 +2038,49 @@ fn run_lint_gate(
     };
 
     // Output JSON
-    let violations_json: Vec<_> = all_violations.iter().map(|v| {
-        format!(
-            "{{\"rule\":\"{}\",\"file\":\"{}\",\"message\":\"{}\"}}",
-            v.rule.replace('"', "\\\""),
-            v.file.replace('"', "\\\""),
-            v.message.as_ref().unwrap_or(&"".to_string()).replace('"', "\\\"")
-        )
-    }).collect();
+    let violations_json: Vec<_> = all_violations
+        .iter()
+        .map(|v| {
+            format!(
+                "{{\"rule\":\"{}\",\"file\":\"{}\",\"message\":\"{}\"}}",
+                v.rule.replace('"', "\\\""),
+                v.file.replace('"', "\\\""),
+                v.message
+                    .as_ref()
+                    .unwrap_or(&"".to_string())
+                    .replace('"', "\\\"")
+            )
+        })
+        .collect();
 
     println!("{{");
-    println!("  \"status\": \"{}\",", if gate_result == GateResult::Approve { "pass" } else { "fail" });
+    println!(
+        "  \"status\": \"{}\",",
+        if gate_result == GateResult::Approve {
+            "pass"
+        } else {
+            "fail"
+        }
+    );
     println!("  \"violations\": [{}],", violations_json.join(","));
-    println!("  \"gate_result\": \"{}\",", match gate_result { GateResult::Approve => "approve", GateResult::Reject => "reject" });
+    println!(
+        "  \"gate_result\": \"{}\",",
+        match gate_result {
+            GateResult::Approve => "approve",
+            GateResult::Reject => "reject",
+        }
+    );
     println!("  \"strict\": {},", strict);
     println!("  \"feature_branch\": {},", feature_branch);
     println!("  \"total_violations\": {},", all_violations.len());
-    println!("  \"next_step\": \"{}\"", if gate_result == GateResult::Approve { "merge" } else { "fix_violations" });
+    println!(
+        "  \"next_step\": \"{}\"",
+        if gate_result == GateResult::Approve {
+            "merge"
+        } else {
+            "fix_violations"
+        }
+    );
     println!("}}");
 
     if gate_result == GateResult::Reject {
@@ -2310,6 +2356,7 @@ mod tests {
     }
 }
 
+#[allow(clippy::items_after_test_module)]
 /// Phase 4: Orchestrate full Git PR flow
 fn run_git_pr_flow(
     branch: Option<String>,
@@ -2357,7 +2404,10 @@ fn run_git_pr_flow(
         anyhow!("validation failed: {}", e)
     })?;
     if !status.success() {
-        report.error = Some(format!("validation command exited with code {:?}", status.code()));
+        report.error = Some(format!(
+            "validation command exited with code {:?}",
+            status.code()
+        ));
         return Ok(report);
     }
     println!("✅ Validation passed");
@@ -2403,7 +2453,11 @@ fn run_git_pr_flow(
 
     // Create branch if needed and push
     let branch_check = std::process::Command::new("git")
-        .args(["show-ref", "--verify", &format!("refs/heads/{}", branch_name)])
+        .args([
+            "show-ref",
+            "--verify",
+            &format!("refs/heads/{}", branch_name),
+        ])
         .current_dir(&git_root)
         .status()?;
     if !branch_check.success() {
@@ -2470,7 +2524,10 @@ fn run_git_pr_flow(
                     use crate::engine::git::MergeStrategy;
 
                     let auto_merge = AutoMerge::from_env().map_err(|e| e.to_string())?;
-                    auto_merge.merge(&pr_info, MergeStrategy::Squash).await.map_err(|e| e.to_string())
+                    auto_merge
+                        .merge(&pr_info, MergeStrategy::Squash)
+                        .await
+                        .map_err(|e| e.to_string())
                 })
             })
             .join()

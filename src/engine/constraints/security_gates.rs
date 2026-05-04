@@ -2,7 +2,9 @@
 //!
 //! Security gates for internet skills and sensitive operations.
 
-use crate::engine::constraints::{ConstraintResult, ConstraintStatus, FixCommand, GateResult, Violation, SecurityConstraints};
+use crate::engine::constraints::{
+    ConstraintResult, ConstraintStatus, FixCommand, GateResult, SecurityConstraints, Violation,
+};
 use anyhow::Result;
 use regex::Regex;
 use std::path::Path;
@@ -48,7 +50,11 @@ impl SecurityGateChecker {
             ConstraintStatus::Pass
         };
 
-        let gate_result = if has_violations { GateResult::Reject } else { GateResult::Approve };
+        let gate_result = if has_violations {
+            GateResult::Reject
+        } else {
+            GateResult::Approve
+        };
 
         Ok(ConstraintResult {
             status,
@@ -69,7 +75,7 @@ impl SecurityGateChecker {
     /// Check internet skills have proper security gates
     async fn check_internet_skills(&self) -> Result<Vec<Violation>> {
         let mut violations = Vec::new();
-        
+
         if !self.constraints.internet_skills.require_approval {
             return Ok(violations);
         }
@@ -94,14 +100,15 @@ impl SecurityGateChecker {
         {
             if entry.file_type().is_file() && entry.path().extension() == Some("rs".as_ref()) {
                 let content = std::fs::read_to_string(entry.path())?;
-                let relative_path = entry.path()
+                let relative_path = entry
+                    .path()
                     .strip_prefix(&self.project_root)
                     .unwrap_or(entry.path())
                     .to_string_lossy();
 
                 // Check for network usage
                 let has_network = network_patterns.iter().any(|p| p.is_match(&content));
-                
+
                 if has_network {
                     // Check for security annotations
                     let has_security_annotation = content.contains("#[security_gate]")
@@ -110,19 +117,21 @@ impl SecurityGateChecker {
                         || content.contains("// SECURITY: network");
 
                     // Check for domain allowlist
-                    let has_allowlist = !self.constraints.internet_skills.allowed_domains.is_empty();
-                    let checks_domains = content.contains("allowed_domains")
-                        || content.contains("domain_whitelist");
+                    let has_allowlist =
+                        !self.constraints.internet_skills.allowed_domains.is_empty();
+                    let checks_domains =
+                        content.contains("allowed_domains") || content.contains("domain_whitelist");
 
                     if !has_security_annotation {
                         violations.push(Violation {
                             rule: "SEC-INET-001 [ERROR]".to_string(),
                             file: relative_path.to_string(),
                             message: Some(
-                                "Internet skill missing #[security_gate] annotation".to_string()
+                                "Internet skill missing #[security_gate] annotation".to_string(),
                             ),
                             fix: Some(
-                                "Add #[security_gate] attribute or implement require_network()".to_string()
+                                "Add #[security_gate] attribute or implement require_network()"
+                                    .to_string(),
                             ),
                         });
                     }
@@ -132,10 +141,11 @@ impl SecurityGateChecker {
                             rule: "SEC-INET-002 [WARNING]".to_string(),
                             file: relative_path.to_string(),
                             message: Some(
-                                "Skill should validate against allowed_domains list".to_string()
+                                "Skill should validate against allowed_domains list".to_string(),
                             ),
                             fix: Some(
-                                "Add domain validation against arch.yaml allowed_domains".to_string()
+                                "Add domain validation against arch.yaml allowed_domains"
+                                    .to_string(),
                             ),
                         });
                     }
@@ -150,9 +160,7 @@ impl SecurityGateChecker {
                                     "Access to blocked domain '{}' detected",
                                     blocked
                                 )),
-                                fix: Some(
-                                    "Remove access to blocked domain".to_string()
-                                ),
+                                fix: Some("Remove access to blocked domain".to_string()),
                             });
                         }
                     }
@@ -166,24 +174,40 @@ impl SecurityGateChecker {
     /// Check for hardcoded secrets/tokens
     async fn check_hardcoded_secrets(&self) -> Result<Vec<Violation>> {
         let mut violations = Vec::new();
-        
+
         let secret_patterns = [
-            (Regex::new(r#"(?i)api[_-]?key\s*[=:].*?["'][^"']{16,}["']"#)?, "API key"),
-            (Regex::new(r#"(?i)token\s*[=:].*?["'][^"']{16,}["']"#)?, "token"),
-            (Regex::new(r#"(?i)password\s*[=:].*?["'][^"']{8,}["']"#)?, "password"),
-            (Regex::new(r#"(?i)secret\s*[=:].*?["'][^"']{8,}["']"#)?, "secret"),
-            (Regex::new(r#"BEGIN\s+(RSA|EC|DSA|OPENSSH)\s+PRIVATE\s+KEY"#)?, "private key"),
+            (
+                Regex::new(r#"(?i)api[_-]?key\s*[=:].*?["'][^"']{16,}["']"#)?,
+                "API key",
+            ),
+            (
+                Regex::new(r#"(?i)token\s*[=:].*?["'][^"']{16,}["']"#)?,
+                "token",
+            ),
+            (
+                Regex::new(r#"(?i)password\s*[=:].*?["'][^"']{8,}["']"#)?,
+                "password",
+            ),
+            (
+                Regex::new(r#"(?i)secret\s*[=:].*?["'][^"']{8,}["']"#)?,
+                "secret",
+            ),
+            (
+                Regex::new(r#"BEGIN\s+(RSA|EC|DSA|OPENSSH)\s+PRIVATE\s+KEY"#)?,
+                "private key",
+            ),
         ];
 
         let src_path = Path::new(&self.project_root).join("src");
-        
+
         for entry in walkdir::WalkDir::new(&src_path)
             .into_iter()
             .filter_map(|e| e.ok())
         {
             if entry.file_type().is_file() && entry.path().extension() == Some("rs".as_ref()) {
                 let content = std::fs::read_to_string(entry.path())?;
-                let relative_path = entry.path()
+                let relative_path = entry
+                    .path()
                     .strip_prefix(&self.project_root)
                     .unwrap_or(entry.path())
                     .to_string_lossy();
@@ -193,12 +217,9 @@ impl SecurityGateChecker {
                         violations.push(Violation {
                             rule: "SEC-SECRET [CRITICAL]".to_string(),
                             file: relative_path.to_string(),
-                            message: Some(format!(
-                                "Potential hardcoded {} detected",
-                                secret_type
-                            )),
+                            message: Some(format!("Potential hardcoded {} detected", secret_type)),
                             fix: Some(
-                                "Use environment variables or secure secret storage".to_string()
+                                "Use environment variables or secure secret storage".to_string(),
                             ),
                         });
                     }
@@ -212,16 +233,17 @@ impl SecurityGateChecker {
     /// Check for unsafe code usage
     async fn check_unsafe_code(&self) -> Result<Vec<Violation>> {
         let mut violations = Vec::new();
-        
+
         let src_path = Path::new(&self.project_root).join("src");
-        
+
         for entry in walkdir::WalkDir::new(&src_path)
             .into_iter()
             .filter_map(|e| e.ok())
         {
             if entry.file_type().is_file() && entry.path().extension() == Some("rs".as_ref()) {
                 let content = std::fs::read_to_string(entry.path())?;
-                let relative_path = entry.path()
+                let relative_path = entry
+                    .path()
                     .strip_prefix(&self.project_root)
                     .unwrap_or(entry.path())
                     .to_string_lossy();
@@ -237,11 +259,10 @@ impl SecurityGateChecker {
                         violations.push(Violation {
                             rule: "SEC-UNSAFE [WARNING]".to_string(),
                             file: relative_path.to_string(),
-                            message: Some(
-                                "Unsafe code without SAFETY comment".to_string()
-                            ),
+                            message: Some("Unsafe code without SAFETY comment".to_string()),
                             fix: Some(
-                                "Add // SAFETY: comment explaining why unsafe is necessary".to_string()
+                                "Add // SAFETY: comment explaining why unsafe is necessary"
+                                    .to_string(),
                             ),
                         });
                     }
@@ -255,16 +276,17 @@ impl SecurityGateChecker {
     /// Check for proper error handling
     async fn check_error_handling(&self) -> Result<Vec<Violation>> {
         let mut violations = Vec::new();
-        
+
         let src_path = Path::new(&self.project_root).join("src");
-        
+
         for entry in walkdir::WalkDir::new(&src_path)
             .into_iter()
             .filter_map(|e| e.ok())
         {
             if entry.file_type().is_file() && entry.path().extension() == Some("rs".as_ref()) {
                 let content = std::fs::read_to_string(entry.path())?;
-                let relative_path = entry.path()
+                let relative_path = entry
+                    .path()
                     .strip_prefix(&self.project_root)
                     .unwrap_or(entry.path())
                     .to_string_lossy();
@@ -273,7 +295,7 @@ impl SecurityGateChecker {
                 if !relative_path.contains("test") && !relative_path.contains("tests") {
                     let unwrap_count = content.matches(".unwrap()").count();
                     let _expect_count = content.matches(".expect(").count();
-                    
+
                     if unwrap_count > 5 {
                         violations.push(Violation {
                             rule: "SEC-ERR-001 [WARNING]".to_string(),
@@ -283,7 +305,8 @@ impl SecurityGateChecker {
                                 unwrap_count
                             )),
                             fix: Some(
-                                "Replace unwrap() with ? operator or proper error handling".to_string()
+                                "Replace unwrap() with ? operator or proper error handling"
+                                    .to_string(),
                             ),
                         });
                     }
@@ -294,11 +317,9 @@ impl SecurityGateChecker {
                             rule: "SEC-ERR-002 [WARNING]".to_string(),
                             file: relative_path.to_string(),
                             message: Some(
-                                "Empty or placeholder expect() message found".to_string()
+                                "Empty or placeholder expect() message found".to_string(),
                             ),
-                            fix: Some(
-                                "Add descriptive error message to expect()".to_string()
-                            ),
+                            fix: Some("Add descriptive error message to expect()".to_string()),
                         });
                     }
                 }
@@ -311,7 +332,7 @@ impl SecurityGateChecker {
     /// Validate a specific skill's security posture
     pub async fn validate_skill(&self, skill_path: &Path) -> Result<Vec<Violation>> {
         let mut violations = Vec::new();
-        
+
         if !skill_path.exists() {
             return Ok(violations);
         }
@@ -323,9 +344,8 @@ impl SecurityGateChecker {
             .to_string_lossy();
 
         // Check if it's an internet skill
-        let is_internet_skill = content.contains("reqwest") 
-            || content.contains("http")
-            || content.contains("network");
+        let is_internet_skill =
+            content.contains("reqwest") || content.contains("http") || content.contains("network");
 
         if is_internet_skill {
             // Required security elements
@@ -340,10 +360,7 @@ impl SecurityGateChecker {
                     violations.push(Violation {
                         rule: "SEC-SKILL [ERROR]".to_string(),
                         file: relative_path.to_string(),
-                        message: Some(format!(
-                            "Internet skill missing required: {}",
-                            check
-                        )),
+                        message: Some(format!("Internet skill missing required: {}", check)),
                         fix: Some(format!("Add {} to skill implementation", check)),
                     });
                 }
@@ -370,8 +387,9 @@ mod tests {
         // Create skill without security gate
         std::fs::write(
             skills_dir.join("http_skill.rs"),
-            "use reqwest::Client; fn fetch() { Client::new().get(\"http://api.example.com\"); }"
-        ).unwrap();
+            "use reqwest::Client; fn fetch() { Client::new().get(\"http://api.example.com\"); }",
+        )
+        .unwrap();
 
         let constraints = SecurityConstraints {
             internet_skills: crate::engine::constraints::InternetSkillConstraints {
@@ -400,8 +418,9 @@ mod tests {
         // File with hardcoded API key
         std::fs::write(
             src_dir.join("config.rs"),
-            r#"const API_KEY: &str = "sk-1234567890abcdef";"#
-        ).unwrap();
+            r#"const API_KEY: &str = "sk-1234567890abcdef";"#,
+        )
+        .unwrap();
 
         let constraints = SecurityConstraints::default();
         let checker = SecurityGateChecker::new(project_root, constraints);

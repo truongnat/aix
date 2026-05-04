@@ -2,10 +2,12 @@
 //!
 //! Integrates clippy, custom SDLC linters, and provides fix commands.
 
-use crate::engine::constraints::{ConstraintResult, ConstraintStatus, FixCommand, GateResult, Violation};
+use crate::engine::constraints::{
+    ConstraintResult, ConstraintStatus, FixCommand, GateResult, Violation,
+};
 use anyhow::{anyhow, Result};
-use std::process::Command;
 use std::path::Path;
+use std::process::Command;
 
 /// Lint runner for running various linters
 pub struct LintRunner {
@@ -83,7 +85,11 @@ impl LintRunner {
             ConstraintStatus::Violation
         };
 
-        let gate_result = if all_violations.is_empty() { GateResult::Approve } else { GateResult::Reject };
+        let gate_result = if all_violations.is_empty() {
+            GateResult::Approve
+        } else {
+            GateResult::Reject
+        };
 
         Ok(ConstraintResult {
             status,
@@ -102,9 +108,12 @@ impl LintRunner {
                 "--all-targets",
                 "--all-features",
                 "--",
-                "-D", "warnings",
-                "-D", "clippy::all",
-                "-W", "clippy::pedantic",
+                "-D",
+                "warnings",
+                "-D",
+                "clippy::all",
+                "-W",
+                "clippy::pedantic",
             ])
             .current_dir(&self.project_root)
             .output()
@@ -114,7 +123,7 @@ impl LintRunner {
         let stderr = String::from_utf8_lossy(&output.stderr);
 
         let violations = parse_clippy_output(&stderr);
-        
+
         let commands = if !violations.is_empty() {
             vec![FixCommand {
                 step: "lint".to_string(),
@@ -138,7 +147,11 @@ impl LintRunner {
             for entry in std::fs::read_dir(&workflow_dir)? {
                 let entry = entry?;
                 let path = entry.path();
-                if path.extension().map(|e| e == "yaml" || e == "yml").unwrap_or(false) {
+                if path
+                    .extension()
+                    .map(|e| e == "yaml" || e == "yml")
+                    .unwrap_or(false)
+                {
                     if let Ok(content) = std::fs::read_to_string(&path) {
                         if let Err(e) = serde_yaml::from_str::<serde_yaml::Value>(&content) {
                             violations.push(Violation {
@@ -161,7 +174,7 @@ impl LintRunner {
                 let path = entry.path();
                 if path.extension().map(|e| e == "rs").unwrap_or(false) {
                     let content = std::fs::read_to_string(&path)?;
-                    
+
                     // Check if skill implements required methods
                     if content.contains("impl Skill for") {
                         if !content.contains("fn capability") {
@@ -169,10 +182,12 @@ impl LintRunner {
                                 rule: "sdlc.skill.capability".to_string(),
                                 file: path.to_string_lossy().to_string(),
                                 message: Some("Skill missing capability() method".to_string()),
-                                fix: Some("Add capability() method returning SkillCapability".to_string()),
+                                fix: Some(
+                                    "Add capability() method returning SkillCapability".to_string(),
+                                ),
                             });
                         }
-                        
+
                         if !content.contains("fn name") {
                             violations.push(Violation {
                                 rule: "sdlc.skill.name".to_string(),
@@ -253,14 +268,14 @@ impl LintRunner {
 fn parse_clippy_output(output: &str) -> Vec<Violation> {
     let mut violations = Vec::new();
     let mut current_file: String;
-    
+
     for line in output.lines() {
         // Parse clippy output format: file.rs:line:col: severity: message
         if let Some(pos) = line.find(": error:") {
             let file_part = &line[..pos];
             let message = &line[pos + 8..];
             current_file = file_part.split(':').next().unwrap_or("").to_string();
-            
+
             violations.push(Violation {
                 rule: "clippy".to_string(),
                 file: current_file.clone(),
@@ -271,7 +286,7 @@ fn parse_clippy_output(output: &str) -> Vec<Violation> {
             let file_part = &line[..pos];
             let message = &line[pos + 10..];
             current_file = file_part.split(':').next().unwrap_or("").to_string();
-            
+
             violations.push(Violation {
                 rule: "clippy.warning".to_string(),
                 file: current_file.clone(),
@@ -280,7 +295,7 @@ fn parse_clippy_output(output: &str) -> Vec<Violation> {
             });
         }
     }
-    
+
     violations
 }
 
