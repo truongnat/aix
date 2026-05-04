@@ -1,0 +1,8 @@
+﻿{
+    "phase":  "release",
+    "files":  [
+                  ".agents/rules/merge_rules.md",
+                  ".agents/context/sdlc/release/pipeline.md"
+              ],
+    "injected_prompt":  "SDLC_PHASE=release; ENFORCE_RULES=.agents/rules/merge_rules.md; MODE=ci_cd;"
+}

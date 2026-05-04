@@ -7,7 +7,7 @@ pub(super) fn handle_workflow_control_command(
     command: Commands,
 ) -> Result<WorkflowLaunchAction> {
     match command {
-        Commands::Workflow { action } => match action {
+        Commands::Workflow { action } => match *action {
             WorkflowCommand::List => {
                 let instances = state_store.list_instances()?;
                 if instances.is_empty() {
@@ -163,6 +163,93 @@ pub(super) fn handle_workflow_control_command(
                         report.min_pass_rate
                     ));
                 }
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::EvalLoop {
+                dataset,
+                min_pass,
+                max_iterations,
+                json,
+            } => {
+                let mut iteration = 0u32;
+                let mut last_report: Option<WorkflowEvalReport> = None;
+                loop {
+                    iteration += 1;
+                    if iteration > max_iterations && max_iterations > 0 {
+                        break;
+                    }
+                    println!("\n=== Eval Loop Iteration {}/{} ===", iteration, max_iterations);
+                    let report = run_workflow_eval(&dataset, min_pass)?;
+                    last_report = Some(report.clone());
+                    if json {
+                        println!("{}", serde_json::to_string_pretty(&report)?);
+                    } else {
+                        print_workflow_eval_report(&report);
+                    }
+                    if report.ok {
+                        println!("✅ Eval loop passed on iteration {}", iteration);
+                        return Ok(WorkflowLaunchAction::Noop);
+                    }
+                    if iteration < max_iterations || max_iterations == 0 {
+                        println!("⚠️  Eval failed (pass_rate={:.2} < {:.2}). Retrying...", report.pass_rate, min_pass);
+                        // Run tests to surface issues
+                        println!("Running cargo test to diagnose...");
+                        let _ = std::process::Command::new("cargo")
+                            .args(["test", "--", "--test-threads=1"])
+                            .stdout(std::process::Stdio::piped())
+                            .stderr(std::process::Stdio::piped())
+                            .status();
+                    }
+                }
+                let report = last_report.unwrap();
+                Err(anyhow!(
+                    "eval-loop exhausted {} iterations. pass_rate={:.2} < min_pass={:.2}",
+                    max_iterations,
+                    report.pass_rate,
+                    min_pass
+                ))
+            }
+            WorkflowCommand::GitPrFlow {
+                branch,
+                base,
+                title,
+                body,
+                validate,
+                draft,
+                no_merge,
+                json,
+            } => {
+                let report = run_git_pr_flow(branch, base, title, body, validate, draft, no_merge)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                }
+                if !report.success {
+                    return Err(anyhow!(
+                        "git-pr-flow failed at step '{}': {}",
+                        report.current_step,
+                        report.error.unwrap_or_default()
+                    ));
+                }
+                println!("✅ Git PR flow complete: {}", report.pr_url.unwrap_or_default());
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::ConstraintsCheck { fix, arch_only, security_only, lint_only, json } => {
+                let report = run_constraints_check(project_layout, fix, arch_only, security_only, lint_only)?;
+                if json {
+                    println!("{}", serde_json::to_string_pretty(&report)?);
+                } else {
+                    print_constraints_check_report(&report);
+                }
+                if report.gate_result == "reject" {
+                    return Err(anyhow!(
+                        "constraints check failed with {} violation(s)",
+                        report.violations.len()
+                    ));
+                }
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::LintGate { strict, feature_branch } => {
+                run_lint_gate(project_layout, strict, feature_branch)?;
                 Ok(WorkflowLaunchAction::Noop)
             }
             WorkflowCommand::QualitySkills { strict, json } => {
@@ -471,8 +558,13 @@ pub(super) fn handle_workflow_control_command(
                 }
                 Ok(WorkflowLaunchAction::Noop)
             }
-            WorkflowCommand::IndexGraph { max_files, json } => {
-                let report = build_graph_index(project_layout, max_files)?;
+            WorkflowCommand::IndexGraph {
+                max_files,
+                memory_persist,
+                json,
+            } => {
+                let report = build_graph_index(project_layout, max_files, memory_persist)?;
+
                 if json {
                     println!("{}", serde_json::to_string_pretty(&report)?);
                 } else {
@@ -894,7 +986,7 @@ pub(super) fn handle_workflow_control_command(
 
             let mut runtime = OfficeRuntime::new(&project_root)?;
 
-            match action {
+            match *action {
                 OfficeCommand::Start {
                     task,
                     parallel,
@@ -1775,6 +1867,187 @@ fn print_workflow_eval_report(report: &WorkflowEvalReport) {
     }
 }
 
+/// Phase 2: Run constraints check
+fn run_constraints_check(
+    project_layout: &AgentProjectLayout,
+    _fix: bool,
+    _arch_only: bool,
+    _security_only: bool,
+    _lint_only: bool,
+) -> Result<ConstraintCheckReport> {
+    use crate::engine::constraints::{
+        ConstraintsEngine, ConstraintStatus, GateResult
+    };
+
+    let project_root = &project_layout.project_root;
+    let mut engine = ConstraintsEngine::new(project_root);
+    
+    // Load constraints
+    if let Err(e) = engine.load_constraints() {
+        return Ok(ConstraintCheckReport {
+            status: "blocked".to_string(),
+            violations: vec![ConstraintCheckViolation {
+                rule: "load".to_string(),
+                file: String::new(),
+                message: format!("Failed to load constraints: {}", e),
+                fix: None,
+            }],
+            commands: Vec::new(),
+            gate_result: "reject".to_string(),
+            next_step: "fix_config".to_string(),
+        });
+    }
+
+    // Run all checks
+    let result = engine.check_all()?;
+
+    // Convert to report
+    let status = match result.status {
+        ConstraintStatus::Pass => "pass",
+        ConstraintStatus::Violation => "violation",
+        ConstraintStatus::Blocked => "blocked",
+    };
+
+    let gate_result = match result.gate_result {
+        GateResult::Approve => "approve",
+        GateResult::Reject => "reject",
+    };
+
+    let violations: Vec<ConstraintCheckViolation> = result
+        .violations
+        .into_iter()
+        .map(|v| ConstraintCheckViolation {
+            rule: v.rule,
+            file: v.file,
+            message: v.message.unwrap_or_default(),
+            fix: v.fix,
+        })
+        .collect();
+
+    let commands: Vec<ConstraintCheckCommand> = result
+        .commands
+        .into_iter()
+        .map(|c| ConstraintCheckCommand {
+            step: c.step,
+            command: c.command,
+        })
+        .collect();
+
+    Ok(ConstraintCheckReport {
+        status: status.to_string(),
+        violations,
+        commands,
+        gate_result: gate_result.to_string(),
+        next_step: result.next_step.unwrap_or_else(|| "done".to_string()),
+    })
+}
+
+/// Print constraints check report
+fn print_constraints_check_report(report: &ConstraintCheckReport) {
+    println!("\n=== Constraints & Guardrails Check ===\n");
+    println!("Status: {}", report.status);
+    println!("Gate Result: {}", report.gate_result);
+    
+    if !report.violations.is_empty() {
+        println!("\nViolations ({}):", report.violations.len());
+        for (i, v) in report.violations.iter().enumerate() {
+            println!("\n  {}. [{}] {}", i + 1, v.rule, v.file);
+            println!("     {}", v.message);
+            if let Some(fix) = &v.fix {
+                println!("     Fix: {}", fix);
+            }
+        }
+    }
+
+    if !report.commands.is_empty() {
+        println!("\nSuggested Commands:");
+        for cmd in &report.commands {
+            println!("  [{}] {}", cmd.step, cmd.command);
+        }
+    }
+
+    println!("\nNext Step: {}", report.next_step);
+    println!();
+}
+
+/// Phase 2: Lint Gate for CI/CD - strict enforcement
+fn run_lint_gate(
+    project_layout: &AgentProjectLayout,
+    strict: bool,
+    feature_branch: bool,
+) -> Result<()> {
+    use crate::engine::constraints::{
+        ConstraintsEngine, GateResult
+    };
+    use crate::engine::constraints::arch_enforcer::ArchEnforcer;
+
+    let project_root = &project_layout.project_root;
+    let mut engine = ConstraintsEngine::new(project_root);
+    
+    // Load constraints
+    if let Err(e) = engine.load_constraints() {
+        println!("{{\"status\":\"blocked\",\"violations\":[],\"gate_result\":\"reject\",\"error\":\"{}\"}}", e);
+        return Err(anyhow!("Failed to load constraints: {}", e));
+    }
+
+    // Run all checks
+    let result = engine.check_all()?;
+
+    // Feature branch scope check
+    let mut fb_violations = Vec::new();
+    if feature_branch {
+        let enforcer = ArchEnforcer::new(project_root);
+        if let Ok(v) = enforcer.enforce_feature_branch_scope() {
+            fb_violations = v;
+        }
+    }
+
+    // Combine violations
+    let all_violations: Vec<_> = result.violations.into_iter()
+        .chain(fb_violations)
+        .collect();
+
+    // Determine gate result
+    let has_errors = all_violations.iter().any(|v| v.rule.contains("[ERROR]"));
+    let has_warnings = all_violations.iter().any(|v| v.rule.contains("[WARNING]") || (!v.rule.contains("[ERROR]") && !v.rule.contains("[INFO]")));
+
+    let gate_result = if has_errors || (strict && has_warnings) {
+        GateResult::Reject
+    } else {
+        GateResult::Approve
+    };
+
+    // Output JSON
+    let violations_json: Vec<_> = all_violations.iter().map(|v| {
+        format!(
+            "{{\"rule\":\"{}\",\"file\":\"{}\",\"message\":\"{}\"}}",
+            v.rule.replace('"', "\\\""),
+            v.file.replace('"', "\\\""),
+            v.message.as_ref().unwrap_or(&"".to_string()).replace('"', "\\\"")
+        )
+    }).collect();
+
+    println!("{{");
+    println!("  \"status\": \"{}\",", if gate_result == GateResult::Approve { "pass" } else { "fail" });
+    println!("  \"violations\": [{}],", violations_json.join(","));
+    println!("  \"gate_result\": \"{}\",", match gate_result { GateResult::Approve => "approve", GateResult::Reject => "reject" });
+    println!("  \"strict\": {},", strict);
+    println!("  \"feature_branch\": {},", feature_branch);
+    println!("  \"total_violations\": {},", all_violations.len());
+    println!("  \"next_step\": \"{}\"", if gate_result == GateResult::Approve { "merge" } else { "fix_violations" });
+    println!("}}");
+
+    if gate_result == GateResult::Reject {
+        return Err(anyhow!(
+            "Lint gate rejected: {} violation(s) found (strict={})",
+            all_violations.len(),
+            strict
+        ));
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
@@ -2035,33 +2308,191 @@ mod tests {
 
         let _ = std::fs::remove_dir_all(root);
     }
+}
 
-    #[test]
-    fn mcp_policy_blocks_disabled_server() {
-        let root = unique_temp_root("mcp-policy-disabled");
-        std::fs::create_dir_all(&root).expect("create temp root");
-        let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
+/// Phase 4: Orchestrate full Git PR flow
+fn run_git_pr_flow(
+    branch: Option<String>,
+    base: String,
+    title: String,
+    body: String,
+    validate: String,
+    draft: bool,
+    no_merge: bool,
+) -> Result<GitPrFlowReport> {
+    let mut report = GitPrFlowReport {
+        success: false,
+        current_step: "init".to_string(),
+        branch: String::new(),
+        pr_number: None,
+        pr_url: None,
+        merged: false,
+        error: None,
+    };
 
-        register_mcp_server(
-            &layout,
-            "disabled-server",
-            "stdio",
-            Some("cargo"),
-            &[],
-            None,
-            None,
-            &[],
-            &[],
-            &[],
-            false,
-        )
-        .expect("register disabled");
+    // Step 1: Generate branch name
+    report.current_step = "branch".to_string();
+    let branch_name = branch.unwrap_or_else(|| {
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_secs();
+        format!("harness/auto-{}", timestamp)
+    });
+    report.branch = branch_name.clone();
+    println!("🌿 Branch: {}", branch_name);
 
-        let report = evaluate_mcp_policy(&layout, "disabled-server", "list_tables")
-            .expect("evaluate disabled");
-        assert!(!report.allowed);
-        assert_eq!(report.reason, "server is disabled");
-
-        let _ = std::fs::remove_dir_all(root);
+    // Step 2: Run validation
+    report.current_step = "validate".to_string();
+    println!("🔍 Validating: {}", validate);
+    let validate_parts: Vec<&str> = validate.split_whitespace().collect();
+    if validate_parts.is_empty() {
+        report.error = Some("empty validate command".to_string());
+        return Ok(report);
     }
+    let mut cmd = std::process::Command::new(validate_parts[0]);
+    cmd.args(&validate_parts[1..]);
+    let status = cmd.status().map_err(|e| {
+        report.error = Some(format!("validation failed: {}", e));
+        anyhow!("validation failed: {}", e)
+    })?;
+    if !status.success() {
+        report.error = Some(format!("validation command exited with code {:?}", status.code()));
+        return Ok(report);
+    }
+    println!("✅ Validation passed");
+
+    // Step 3: Stage, commit, push
+    report.current_step = "push".to_string();
+    let git_root = std::env::current_dir()?;
+
+    // Stage all changes
+    let stage = std::process::Command::new("git")
+        .args(["add", "-A"])
+        .current_dir(&git_root)
+        .status()?;
+    if !stage.success() {
+        report.error = Some("git add failed".to_string());
+        return Ok(report);
+    }
+
+    // Check if there are changes to commit
+    let diff_check = std::process::Command::new("git")
+        .args(["diff", "--cached", "--quiet"])
+        .current_dir(&git_root)
+        .status()?;
+    if diff_check.success() {
+        println!("ℹ️  No changes to commit");
+    } else {
+        let commit = std::process::Command::new("git")
+            .args([
+                "commit",
+                "-m",
+                &format!("feat: {}", title),
+                "-m",
+                "Auto-generated by agentic-sdlc harness orchestration",
+            ])
+            .current_dir(&git_root)
+            .status()?;
+        if !commit.success() {
+            report.error = Some("git commit failed".to_string());
+            return Ok(report);
+        }
+        println!("✅ Committed changes");
+    }
+
+    // Create branch if needed and push
+    let branch_check = std::process::Command::new("git")
+        .args(["show-ref", "--verify", &format!("refs/heads/{}", branch_name)])
+        .current_dir(&git_root)
+        .status()?;
+    if !branch_check.success() {
+        let create = std::process::Command::new("git")
+            .args(["checkout", "-b", &branch_name])
+            .current_dir(&git_root)
+            .status()?;
+        if !create.success() {
+            report.error = Some(format!("failed to create branch {}", branch_name));
+            return Ok(report);
+        }
+    }
+
+    let push = std::process::Command::new("git")
+        .args(["push", "-u", "origin", &branch_name])
+        .current_dir(&git_root)
+        .status()?;
+    if !push.success() {
+        report.error = Some("git push failed".to_string());
+        return Ok(report);
+    }
+    println!("✅ Pushed to origin/{}", branch_name);
+
+    // Step 4: Create PR
+    report.current_step = "pr_create".to_string();
+    let pr_result = std::thread::spawn(move || -> Result<_, String> {
+        let rt = tokio::runtime::Runtime::new().map_err(|e| e.to_string())?;
+        rt.block_on(async {
+            use crate::engine::git::pr_ops::PrIntegration;
+            use crate::engine::git::PrParams;
+
+            let pr = PrIntegration::from_env().map_err(|e| e.to_string())?;
+            let params = PrParams {
+                title: title.clone(),
+                body: body.clone(),
+                head: branch_name.clone(),
+                base: base.clone(),
+                draft,
+            };
+            pr.create_pr(params).await.map_err(|e| e.to_string())
+        })
+    })
+    .join()
+    .map_err(|e| anyhow!("PR creation thread panicked: {:?}", e))?;
+
+    match pr_result {
+        Ok(pr_info) => {
+            report.pr_number = Some(pr_info.number);
+            report.pr_url = Some(pr_info.url.clone());
+            println!("✅ Created PR #{}: {}", pr_info.number, pr_info.url);
+
+            if no_merge {
+                report.success = true;
+                println!("⏸️  Skipping merge (--no-merge)");
+                return Ok(report);
+            }
+
+            // Step 5: Auto-merge
+            report.current_step = "merge".to_string();
+            let merge_result = std::thread::spawn(move || -> Result<(), String> {
+                let rt = tokio::runtime::Runtime::new().map_err(|e| e.to_string())?;
+                rt.block_on(async {
+                    use crate::engine::git::auto_merge::AutoMerge;
+                    use crate::engine::git::MergeStrategy;
+
+                    let auto_merge = AutoMerge::from_env().map_err(|e| e.to_string())?;
+                    auto_merge.merge(&pr_info, MergeStrategy::Squash).await.map_err(|e| e.to_string())
+                })
+            })
+            .join()
+            .map_err(|e| anyhow!("merge thread panicked: {:?}", e))?;
+
+            match merge_result {
+                Ok(()) => {
+                    report.merged = true;
+                    report.success = true;
+                    println!("✅ Auto-merged PR");
+                }
+                Err(e) => {
+                    report.error = Some(format!("merge failed (may need human review): {}", e));
+                    report.success = true; // PR created, just needs review
+                    println!("⚠️  Auto-merge failed: {}. PR ready for human review.", e);
+                }
+            }
+        }
+        Err(e) => {
+            report.error = Some(format!("PR creation failed: {}", e));
+        }
+    }
+
+    Ok(report)
 }

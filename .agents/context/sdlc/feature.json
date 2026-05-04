@@ -1,0 +1,9 @@
+﻿{
+    "phase":  "feature",
+    "files":  [
+                  ".agents/constraints/arch.yaml",
+                  ".agents/context/sdlc/feature/requirements.md",
+                  ".agents/context/sdlc/feature/design.md"
+              ],
+    "injected_prompt":  "SDLC_PHASE=feature; ENFORCE_CONSTRAINTS=.agents/constraints/arch.yaml; CONTEXT=[requirements.md, design.md]; MODE=implement;"
+}

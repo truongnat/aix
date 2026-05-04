@@ -1113,15 +1113,30 @@ pub(super) fn walk_directory_files(root: &Path, visit: &mut impl FnMut(&Path)) -
     if !root.exists() {
         return Ok(());
     }
-    for entry in fs::read_dir(root)? {
-        let entry = entry?;
-        let path = entry.path();
-        if path.is_dir() {
-            walk_directory_files(&path, visit)?;
-            continue;
-        }
-        if path.is_file() {
-            visit(&path);
+    let mut stack = vec![root.to_path_buf()];
+    while let Some(current) = stack.pop() {
+        let entries = match fs::read_dir(current) {
+            Ok(e) => e,
+            Err(_) => continue,
+        };
+        for entry in entries {
+            let entry = match entry {
+                Ok(e) => e,
+                Err(_) => continue,
+            };
+            let path = entry.path();
+            if path.is_dir() {
+                if let Some(name) = path.file_name().and_then(|s| s.to_str()) {
+                    if name == ".git" || name == "node_modules" || name == "target" {
+                        continue;
+                    }
+                }
+                stack.push(path);
+                continue;
+            }
+            if path.is_file() {
+                visit(&path);
+            }
         }
     }
     Ok(())
@@ -1135,6 +1150,7 @@ const CONTEXT_VECTOR_DIM: usize = 32;
 pub(super) fn build_graph_index(
     layout: &AgentProjectLayout,
     max_files: usize,
+    memory_persist: bool,
 ) -> Result<GraphIndexBuildReport> {
     let capped_max_files = max_files.clamp(1, 2_000);
     let project_root = Path::new(&layout.project_root);
@@ -1205,7 +1221,7 @@ pub(super) fn build_graph_index(
     let index_path = layout.memory_dir.join("graph_index.json");
     std::fs::create_dir_all(&layout.memory_dir)?;
     std::fs::write(&index_path, serde_json::to_string_pretty(&payload)?)?;
-    let sqlite_report = write_context_sqlite(layout, &payload)?;
+    let sqlite_report = write_context_sqlite(layout, &payload, memory_persist)?;
 
     Ok(GraphIndexBuildReport {
         index_path: index_path.display().to_string(),
@@ -1277,6 +1293,7 @@ fn embed_for_context(text: &str) -> Vec<f32> {
 fn write_context_sqlite(
     layout: &AgentProjectLayout,
     payload: &GraphIndexPayloadDoc,
+    _memory_persist: bool,
 ) -> Result<ContextSqliteWriteReport> {
     let db_path = resolve_context_db_path(layout);
     if let Some(parent) = db_path.parent() {
@@ -1306,9 +1323,48 @@ fn write_context_sqlite(
     );
     conn.execute(&create_graph_sql, [])?;
 
+    // Phase 1 Context: Add session memory table for long SDLC cycles
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS session_memory (
+            thread_id TEXT PRIMARY KEY,
+            context_history_json TEXT NOT NULL,
+            phase_state TEXT NOT NULL,
+            updated_at_ms INTEGER NOT NULL
+        )",
+        [],
+    )?;
+
     let tx = conn.unchecked_transaction()?;
     tx.execute(&format!("DELETE FROM {vector_table}"), [])?;
     tx.execute(&format!("DELETE FROM {graph_table}"), [])?;
+
+    // Migrate session history if thread_sessions.json exists
+    let state_dir = layout.agents_root.join("state");
+    let session_file = state_dir.join("thread_sessions.json");
+    if session_file.exists() {
+        if let Ok(content) = std::fs::read_to_string(&session_file) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                if let Some(threads) = json.get("threads").and_then(|v| v.as_array()) {
+                    for thread in threads {
+                        let thread_id = thread.get("thread_id").and_then(|v| v.as_str()).unwrap_or("unknown");
+                        let default_history = serde_json::Value::Array(vec![]);
+                        let history = thread.get("history").unwrap_or(&default_history);
+                        let phase = thread.get("lifecycle_state").and_then(|v| v.as_str()).unwrap_or("active");
+                        let now = std::time::SystemTime::now()
+                            .duration_since(std::time::UNIX_EPOCH)
+                            .unwrap_or_default()
+                            .as_millis() as u64;
+                        
+                        let _ = tx.execute(
+                            "INSERT OR REPLACE INTO session_memory (thread_id, context_history_json, phase_state, updated_at_ms) 
+                             VALUES (?1, ?2, ?3, ?4)",
+                            params![thread_id, serde_json::to_string(history)?, phase, now],
+                        );
+                    }
+                }
+            }
+        }
+    }
 
     let insert_graph_sql = format!(
         "INSERT INTO {graph_table} (id, text, tags_json, links_json) VALUES (?1, ?2, ?3, ?4)"

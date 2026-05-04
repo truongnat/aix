@@ -258,15 +258,30 @@ fn walk_directory_files(root: &Path, visit: &mut impl FnMut(&Path)) -> Result<()
     if !root.exists() {
         return Ok(());
     }
-    for entry in fs::read_dir(root)? {
-        let entry = entry?;
-        let path = entry.path();
-        if path.is_dir() {
-            walk_directory_files(&path, visit)?;
-            continue;
-        }
-        if path.is_file() {
-            visit(&path);
+    let mut stack = vec![root.to_path_buf()];
+    while let Some(current) = stack.pop() {
+        let entries = match fs::read_dir(current) {
+            Ok(e) => e,
+            Err(_) => continue,
+        };
+        for entry in entries {
+            let entry = match entry {
+                Ok(e) => e,
+                Err(_) => continue,
+            };
+            let path = entry.path();
+            if path.is_dir() {
+                if let Some(name) = path.file_name().and_then(|s| s.to_str()) {
+                    if name == ".git" || name == "node_modules" || name == "target" {
+                        continue;
+                    }
+                }
+                stack.push(path);
+                continue;
+            }
+            if path.is_file() {
+                visit(&path);
+            }
         }
     }
     Ok(())

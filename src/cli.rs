@@ -45,7 +45,7 @@ use types::*;
 #[command(about = "AI Workflow Engine for Solo Developers")]
 pub struct Cli {
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Option<Box<Commands>>,
 
     #[arg(short, long)]
     workflow: Option<String>,
@@ -431,8 +431,9 @@ fn walk_directory_files(root: &Path, visit: &mut impl FnMut(&Path)) -> Result<()
 fn build_graph_index(
     layout: &AgentProjectLayout,
     max_files: usize,
+    memory_persist: bool,
 ) -> Result<GraphIndexBuildReport> {
-    ops::build_graph_index(layout, max_files)
+    ops::build_graph_index(layout, max_files, memory_persist)
 }
 
 fn relative_unix_path(project_root: &Path, path: &Path) -> Result<String> {

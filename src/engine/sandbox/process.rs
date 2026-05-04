@@ -301,7 +301,12 @@ mod tests {
     #[test]
     fn test_process_sandbox_creation() {
         let sandbox = ProcessSandbox::default();
-        assert!(sandbox.is_available());
+        // Process sandbox is only available on Unix systems
+        if cfg!(unix) {
+            assert!(sandbox.is_available());
+        } else {
+            assert!(!sandbox.is_available());
+        }
         assert_eq!(sandbox.sandbox_type(), SandboxType::Process);
     }
 

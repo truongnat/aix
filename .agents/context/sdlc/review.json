@@ -1,0 +1,8 @@
+﻿{
+    "phase":  "review",
+    "files":  [
+                  ".agents/rules/coding_rules.md",
+                  ".agents/context/sdlc/review/audit.md"
+              ],
+    "injected_prompt":  "SDLC_PHASE=review; ENFORCE_RULES=.agents/rules/coding_rules.md; MODE=audit;"
+}
