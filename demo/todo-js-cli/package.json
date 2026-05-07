@@ -1,0 +1,29 @@
+{
+  "name": "todo-js-cli",
+  "version": "1.0.0",
+  "description": "Beautiful Todo app with CLI, TUI, local storage, and sync - demonstrating Skills Devkit capabilities",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "todo",
+    "cli",
+    "tui",
+    "sqlite"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "commander": "^12.0.0",
+    "chalk": "^5.3.0",
+    "express": "^4.18.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}

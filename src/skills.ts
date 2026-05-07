@@ -20,10 +20,11 @@ import degit from 'degit';
 import inquirer from 'inquirer';
 import matter from 'gray-matter';
 import ora from 'ora';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { installSkill } from './commands/installSkill.js';
 
 // Simple CLI argument parser (replaces minimist)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseArgs(argv: string[], options: { boolean?: string[]; string?: string[] } = {}) {
   const args: Record<string, any> = {};
   const positional: string[] = [];
@@ -552,7 +553,7 @@ async function main() {
   if (cmd === 'install' || cmd === 'update') {
     printLogo(pkg.version);
 
-    let repo = normalizeRepo(String(argv.repo || DEFAULT_REPO));
+    const repo = normalizeRepo(String(argv.repo || DEFAULT_REPO));
     let projectDir = resolve(String(argv['project-dir'] || process.cwd()));
     const allIdes = true;
     const t0 = Date.now();

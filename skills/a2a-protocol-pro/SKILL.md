@@ -1,0 +1,193 @@
+---
+name: a2a-protocol-pro
+description: |
+  Design and implement multi-agent systems using the Agent-to-Agent (A2A) protocol: agent discovery, task delegation, lifecycle management, and security.
+
+  Use this skill when building systems with multiple collaborating agents, designing agent discovery (Agent Cards), implementing task delegation flows, or choosing between Gateway, Pipeline, and Mesh patterns.
+
+  Do not use for single-agent tool access (use mcp-server-pro) or for general API design (use api-design-pro).
+
+  Triggers: "multi-agent", "A2A", "agent communication", "agent discovery", "delegate to agent", "agent orchestration", "agent mesh", "agent pipeline", "Agent Card", "task lifecycle", "agent collaboration", "swarm of agents".
+
+metadata:
+  short-description: A2A protocol — multi-agent discovery, delegation, patterns, security
+  content-language: en
+  domain: orchestration
+  level: professional
+---
+
+# A2A protocol and multi-agent systems (professional)
+
+Skill text is **English**; match the user's response language from Cursor User Rules / project rules when applicable.
+
+Use the official [A2A specification](https://github.com/google/A2A) and AAIF documentation as authority. This skill encodes **agent discovery** (Agent Cards), **task lifecycle**, **orchestration patterns** (Gateway, Pipeline, Mesh), and **security** for multi-agent systems. Confirm **number of agents**, **communication pattern**, **trust model**, and **deployment environment** before proposing an architecture.
+
+## Boundary
+
+**`a2a-protocol-pro`** owns **agent discovery** (Agent Cards), **task delegation**, **task lifecycle**, **orchestration patterns**, and **A2A security**. It does **not** own single-agent tool access (MCP), general API design, or the agent implementation itself — combine with **`mcp-server-pro`**, **`api-design-pro`**, and **`ai-integration-pro`** as needed.
+
+| Skill | When to combine with **`a2a-protocol-pro`** |
+|-------|---------------------------------------------|
+| **`mcp-server-pro`** | When each agent needs MCP tool access |
+| **`api-design-pro`** | When A2A interacts with broader HTTP APIs |
+| **`ai-integration-pro`** | When designing the LLM and reasoning inside each agent |
+| **`security-pro`** | When threat modeling the multi-agent attack surface |
+| **`docker-pro`** / **`deployment-pro`** | When deploying agent clusters |
+
+## When to use
+
+- Designing a multi-agent system where specialized agents collaborate.
+- Implementing Agent Cards for agent discovery and capability advertisement.
+- Choosing between Gateway, Pipeline, and Mesh orchestration patterns.
+- Managing task lifecycle: create, update, complete, cancel, error handling.
+- Securing agent-to-agent communication (mutual TLS, capability scoping).
+- Debugging agent coordination failures, deadlocks, or task loops.
+- Trigger keywords: `multi-agent`, `A2A`, `agent communication`, `agent discovery`, `delegate`, `agent orchestration`, `Agent Card`
+
+## When not to use
+
+- **Single-agent tool access** — use **`mcp-server-pro`**.
+- **General API design** (REST, GraphQL) without agent context — use **`api-design-pro`**.
+- **Building a single agent** (prompts, tools, RAG) — use **`ai-integration-pro`**.
+- **Client-side UI for agents** — use **`ag-ui-pro`**.
+
+## Required inputs
+
+- **Number of agents** — 2, 3, or N (dynamic).
+- **Communication pattern** — Gateway, Pipeline, Mesh, or hybrid.
+- **Trust model** — all trusted, partially trusted, or untrusted.
+- **Deployment environment** — local, cloud, Kubernetes, or serverless.
+
+## Expected output
+
+Follow **Suggested response format (STRICT)**.
+
+## Workflow
+
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** number of agents, pattern, trust model, and environment → verify: [scope documented].
+2. **State assumptions** about agent capabilities, failure modes, and scaling needs (**Think Before Coding**).
+3. **Apply** minimum pattern first (Gateway for 2-3 agents; Pipeline for sequential); escalate only when justified (**Simplicity First**).
+4. **Make surgical changes** — only add coordination complexity the request requires (**Surgical Changes**).
+5. **Define success criteria**; loop until verified with task execution test (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — Confirm the task truly needs multiple agents. A single well-designed agent with MCP tools is often simpler and more reliable.
+2. **Simplicity First** — Start with Gateway pattern (one coordinator). Add Pipeline or Mesh only when work distribution genuinely requires it.
+3. **Surgical Changes** — Add only the agents and coordination the request needs. Don't design a swarm for a 2-agent handoff.
+4. **Goal-Driven Execution** — Done = agents discover each other, delegate tasks, and complete end-to-end workflows under test.
+5. **Agent Cards are contracts** — Each agent's Card must accurately describe capabilities, limitations, and auth requirements. False advertising breaks discovery.
+6. **Never trust peer agents blindly** — Even internal agents should authenticate and authorize. Compromised agents are a lateral movement risk.
+7. **Task lifecycle is observable** — Every task must be trackable: created, assigned, in-progress, completed, failed. Without observability, debugging multi-agent systems is impossible.
+
+## Default recommendations by scenario
+
+| Scenario | Default |
+|----------|---------|
+| 2-3 specialized agents | **Gateway** pattern with explicit handoff rules |
+| Document processing pipeline | **Pipeline** pattern (extract → classify → summarize) |
+| Dynamic research team | **Mesh** pattern with task auction / bidding |
+| Enterprise with governance | **Gateway** + audit logging + human approval gates |
+| High-throughput automation | **Pipeline** with parallel stages where safe |
+
+## Decision trees
+
+Summary: agent count → pattern → discovery → auth → lifecycle.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: premature multi-agent architecture, missing Agent Cards, no task observability, trusting all peers, tight coupling to a single LLM vendor.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Agent Cards and discovery (summary)
+
+- Agent Card: JSON document describing agent name, capabilities, endpoint, auth requirements, limitations.
+- Discovery: registry (static file, API, or decentralized gossip).
+- Update: Cards must be versioned and refreshed when capabilities change.
+
+Details: [references/agent-cards-and-discovery.md](references/agent-cards-and-discovery.md)
+
+### Task lifecycle (summary)
+
+- States: `submitted` → `assigned` → `in-progress` → `completed` / `failed` / `cancelled`.
+- Sub-tasks: parent tasks can spawn child tasks; all must be trackable.
+- Error handling: retry with backoff, escalation to human, or fallback agent.
+
+Details: [references/task-lifecycle.md](references/task-lifecycle.md)
+
+### Orchestration patterns (summary)
+
+- **Gateway**: One coordinator delegates to specialists. Simplest, best for most cases.
+- **Pipeline**: Sequential stages, each agent processes and passes forward. Good for workflows.
+- **Mesh**: Peer-to-peer dynamic collaboration. Complex, use only when unpredictable.
+
+Details: [references/orchestration-patterns.md](references/orchestration-patterns.md)
+
+## Cross-skill handoffs
+
+- **`mcp-server-pro`** — when each agent needs MCP tool access.
+- **`api-design-pro`** — when A2A interacts with broader HTTP APIs.
+- **`ai-integration-pro`** — when designing the LLM and reasoning inside each agent.
+- **`security-pro`** — when threat modeling the multi-agent attack surface.
+- **`ag-ui-pro`** — when building a frontend that interacts with the multi-agent system.
+
+Details: [references/integration-map.md](references/integration-map.md)
+
+## Suggested response format (implement / review)
+
+1. **Issue or goal** — What the multi-agent system needs to achieve.
+2. **Recommendation** — Pattern, discovery mechanism, auth model, and task flow.
+3. **Code** — Agent Card examples, task lifecycle implementation, and orchestration sketch.
+4. **Residual risks** — Coordination failures, scaling limits, security gaps, observability holes.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Agent Cards and discovery | [references/agent-cards-and-discovery.md](references/agent-cards-and-discovery.md) |
+| Task lifecycle | [references/task-lifecycle.md](references/task-lifecycle.md) |
+| Orchestration patterns | [references/orchestration-patterns.md](references/orchestration-patterns.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+
+## Quick example
+
+**Input:** "Build a system where a research agent finds papers and a summary agent writes abstracts."
+- Pattern: **Gateway** (coordinator receives query → delegates research → delegates summary → returns result).
+- Discovery: Static Agent Cards in a JSON registry.
+- Task lifecycle: Coordinator creates parent task; research agent creates child task; summary agent creates child task.
+- Auth: API keys (internal service); mTLS if cross-organization.
+- **Verify:** End-to-end test: query → 2 delegated tasks → combined result.
+
+**Input (tricky):** "Our mesh agents sometimes deadlock when waiting for each other."
+- Add timeouts to every task: if no progress in N seconds, fail or reassign.
+- Use a task DAG: detect cycles before execution.
+- Consider switching to **Gateway** or **Pipeline** if Mesh is overkill.
+- **Verify:** Deadlock reproduced and resolved under test.
+
+**Input (cross-skill):** "Deploy a multi-agent customer support system with tools and a web UI."
+- **`a2a-protocol-pro`**: Design Gateway pattern with triage → knowledge → escalation agents.
+- **`mcp-server-pro`**: Build MCP servers for CRM, ticket system, and knowledge base.
+- **`ag-ui-pro`**: Design the frontend with streaming, human-in-the-loop, and shared state.
+- **`security-pro`**: Threat model the support data access boundaries.
+- **Verify:** Each skill owns a clear slice; no duplicated auth or UI logic.
+
+## Checklist before calling the skill done
+
+- [ ] Assumptions stated explicitly; asked when uncertain (Think Before Coding)
+- [ ] Started with minimum pattern (Gateway); escalated only when justified (Simplicity First)
+- [ ] Only added coordination complexity directly related to the request (Surgical Changes)
+- [ ] Success criteria defined and verified with end-to-end task execution (Goal-Driven Execution)
+- [ ] Agent Cards are accurate and versioned for every agent
+- [ ] Task lifecycle is observable (submitted → assigned → in-progress → completed/failed)
+- [ ] Auth model matches trust model (none / API key / OAuth 2.1 / mTLS)
+- [ ] Peer agents authenticate and authorize each other
+- [ ] Error handling includes retry, escalation, and fallback
+- [ ] Residual risks called out: deadlock, scaling, vendor lock-in

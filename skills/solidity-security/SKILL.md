@@ -1,6 +1,95 @@
 ---
 name: solidity-security
 description: Master smart contract security best practices to prevent common vulnerabilities and implement secure Solidity patterns. Use when writing smart contracts, auditing existing contracts, or implementing security measures for blockchain applications.
+metadata:
+  short-description: "Smart Contracts — Solidity security, vulnerability prevention"
+---
+
+## Boundary
+
+This skill provides smart contract security best practices for Solidity development. It focuses on preventing common vulnerabilities (reentrancy, overflow, access control), implementing secure patterns, and preparing for professional audits. It does NOT cover general blockchain development (use blockchain-specific skills), general Web3 integration (use web3-specific skills), or non-Solidity smart contracts.
+
+## When to use
+
+Use this skill when:
+- Writing secure smart contracts
+- Auditing existing contracts for vulnerabilities
+- Implementing secure DeFi protocols
+- Preventing reentrancy, overflow, and access control issues
+- Optimizing gas usage while maintaining security
+- Preparing contracts for professional audits
+- Understanding common attack vectors
+
+DO NOT use this skill for:
+- General blockchain development (use blockchain-specific skills)
+- Web3 integration (use web3-specific skills)
+- Non-Solidity smart contracts (use those specific skills)
+- Backend infrastructure security (use security-pro skill)
+
+## Workflow
+
+1. **Understand the contract requirements** (functionality, security requirements)
+2. **Identify potential vulnerabilities** (reentrancy, overflow, access control)
+3. **Implement secure patterns** (checks-effects-interactions, access control)
+4. **Use security libraries** (OpenZeppelin, Safe)
+5. **Optimize gas usage** without compromising security
+6. **Test thoroughly** (unit tests, fuzzing, formal verification)
+7. **Conduct internal audit** before professional audit
+8. **Document security decisions**
+
+### Operating principles
+
+- **Checks-Effects-Interactions**: Prevent reentrancy by following CEI pattern
+- **Access Control**: Implement proper role-based access control
+- **Input Validation**: Validate all inputs and external calls
+- **Overflow Protection**: Use Solidity 0.8+ built-in overflow checks
+- **Gas Optimization**: Optimize without compromising security
+- **Upgradability**: Design for safe contract upgrades
+- **Emergency Stop**: Implement pause/stop mechanisms
+- **Audit Preparation**: Prepare thoroughly for professional audits
+
+## Suggested response format
+
+```
+Contract: [contract name]
+Vulnerabilities Found: [count]
+Critical: [count], High: [count], Medium: [count], Low: [count]
+Status: [success/failed]
+Details: [vulnerability summary, mitigations, gas optimization]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **Vulnerability Patterns**: Reentrancy, overflow, access control, front-running
+- **Secure Patterns**: Checks-effects-interactions, access control, upgradability
+- **Security Libraries**: OpenZeppelin, Safe, Slither
+- **Gas Optimization**: Techniques for gas-efficient secure code
+- **Audit Preparation**: Pre-audit checklists and best practices
+
+## Quick example
+
+**Prevent reentrancy:**
+
+```
+1. Identify external calls
+2. Apply checks-effects-interactions pattern
+3. Use ReentrancyGuard from OpenZeppelin
+4. Update state before external calls
+5. Test with reentrancy attacks
+```
+
+## Checklist before calling the skill done
+
+- [ ] Contract requirements are clearly defined
+- [ ] Security requirements are understood
+- [ ] Gas optimization targets are defined
+- [ ] Audit requirements are known
+- [ ] Security libraries are available (OpenZeppelin, Safe)
+- [ ] Testing strategy is planned (unit tests, fuzzing)
+- [ ] Professional audit is scheduled (if applicable)
+- [ ] Upgradability strategy is defined
+
 ---
 
 # Solidity Security

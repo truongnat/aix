@@ -1,5 +1,5 @@
 ---
-name: system-design-overview
+name: system-design
 version: 3.5.0
 last_updated: 2026-03
 notes: Full-stack architect coverage including SRE, SaaS, Migration, ADR, Diagrams, Edge Cases, Tech Selection.
@@ -16,6 +16,105 @@ description: >
   "which is better X or Y", "best practice for Z", "edge case in X", 
   "how to handle X at scale", "is X deprecated". Always follow the user's
   preferred language for communication while referencing English knowledge.
+metadata:
+  short-description: "System Design — architecture, SRE, SaaS, ADR, diagrams, trade-offs"
+---
+
+## Boundary
+
+This skill provides comprehensive system design reference across UI design systems, frontend, mobile, backend HLD, low-level design, SRE, SaaS, and migration. It focuses on architecture decisions, scaling, database selection, RAG, agents, observability, and cost optimization. It does NOT cover implementation details (use framework-specific skills) or infrastructure deployment (use devops-specific skills).
+
+## When to use
+
+Use this skill when:
+- Designing system architecture
+- Making architecture decisions (X vs Y)
+- Designing for scale
+- Selecting databases or technologies
+- Designing RAG systems
+- Designing AI agent systems
+- Implementing observability
+- Optimizing costs
+- Handling edge cases
+- Designing migrations
+
+DO NOT use this skill for:
+- Implementation details (use framework-specific skills: react-pro, nestjs-pro, etc.)
+- Infrastructure deployment (use ci-cd-pro, docker-pro skills)
+- Database schema design (use database-specific skills)
+- API endpoint design (use api-design-pro skill)
+
+## Workflow
+
+1. **Understand requirements** (functional, non-functional, constraints)
+2. **Identify key design decisions** (architecture, scale, databases)
+3. **Evaluate trade-offs** (performance, cost, complexity)
+4. **Create architecture diagrams** for visualization
+5. **Design for scale** (horizontal scaling, caching, sharding)
+6. **Design observability** (metrics, logging, tracing)
+7. **Document decisions** with ADRs (Architecture Decision Records)
+8. **Review and iterate** with stakeholders
+
+### Operating principles
+
+- **Scalability First**: Design for horizontal scaling and growth
+- **Trade-off Analysis**: Explicitly evaluate and document trade-offs
+- **Observability**: Design metrics, logging, and tracing from the start
+- **Cost Optimization**: Consider cost implications of architectural decisions
+- **Edge Cases**: Plan for failure modes and edge cases
+- **Technology Fit**: Choose technologies based on requirements, not trends
+- **Documentation**: Maintain ADRs and architecture diagrams
+- **Migration Strategy**: Design for smooth migrations when needed
+
+## Suggested response format
+
+```
+System: [system name]
+Architecture: [monolith / microservices / serverless / hybrid]
+Scale: [horizontal / vertical / hybrid]
+Status: [success/failed]
+Details: [architecture decisions, trade-offs, diagrams]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **UI Design Systems**: Design system architecture
+- **Frontend**: Frontend architecture and patterns
+- **Mobile**: Mobile app architecture (iOS, Android)
+- **Backend HLD**: High-level backend design
+- **Low-level Design**: Detailed component design
+- **SRE**: Site Reliability Engineering practices
+- **SaaS**: SaaS architecture patterns
+- **Migration**: Migration strategies and patterns
+- **RAG**: RAG system design
+- **Agents**: AI agent system design
+
+## Quick example
+
+**Design a scalable web API:**
+
+```
+1. Define requirements and scale targets
+2. Choose architecture (microservices vs monolith)
+3. Design data layer (databases, caching)
+4. Design API layer (REST, GraphQL, gRPC)
+5. Design observability (metrics, logging, tracing)
+6. Create architecture diagrams
+7. Document trade-offs and decisions
+```
+
+## Checklist before calling the skill done
+
+- [ ] Requirements are clearly defined (functional, non-functional)
+- [ ] Scale targets are understood (QPS, data volume, users)
+- [ ] Constraints are identified (budget, timeline, team skills)
+- [ ] Technology preferences are known
+- [ ] Migration requirements are defined (if applicable)
+- [ ] Observability requirements are identified
+- [ ] Cost constraints are understood
+- [ ] Stakeholders are identified
+
 ---
 
 # System Design Overview — Reference Skill

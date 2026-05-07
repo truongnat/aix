@@ -11,6 +11,7 @@ import ora from 'ora';
 import { spawnSync } from 'node:child_process';
 import { installSkill } from './commands/installSkill.js';
 // Simple CLI argument parser (replaces minimist)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseArgs(argv, options = {}) {
     const args = {};
     const positional = [];
@@ -547,7 +548,7 @@ async function main() {
     // ── install / update ──────────────────────────────────────────────────────
     if (cmd === 'install' || cmd === 'update') {
         printLogo(pkg.version);
-        let repo = normalizeRepo(String(argv.repo || DEFAULT_REPO));
+        const repo = normalizeRepo(String(argv.repo || DEFAULT_REPO));
         let projectDir = resolve(String(argv['project-dir'] || process.cwd()));
         const allIdes = true;
         const t0 = Date.now();

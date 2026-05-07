@@ -1,0 +1,26 @@
+[
+  {
+    "id": 3,
+    "title": "Task",
+    "description": "Details",
+    "completed": 1,
+    "priority": "high",
+    "due_date": null,
+    "created_at": "2026-05-06 18:19:10",
+    "updated_at": "2026-05-06 18:19:40",
+    "synced": 0,
+    "sync_id": null
+  },
+  {
+    "id": 2,
+    "title": "Test todo",
+    "description": "This is a test todo",
+    "completed": 1,
+    "priority": "high",
+    "due_date": null,
+    "created_at": "2026-05-06 18:18:26",
+    "updated_at": "2026-05-06 18:19:33",
+    "synced": 0,
+    "sync_id": null
+  }
+]

@@ -2,6 +2,96 @@
 name: clean-architecture
 description: Provides implementation patterns for Clean Architecture, Domain-Driven Design (DDD), and Hexagonal Architecture (Ports & Adapters) in NestJS/TypeScript applications. Use when structuring complex backend systems, designing domain layers with entities/value objects/aggregates, implementing ports and adapters, creating use cases, or refactoring from anemic models to rich domain models with dependency inversion.
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
+metadata:
+  short-description: "Architecture — Clean Architecture, DDD, Hexagonal, NestJS/TypeScript"
+---
+
+## Boundary
+
+This skill provides implementation patterns for Clean Architecture, Domain-Driven Design (DDD), and Hexagonal Architecture in NestJS/TypeScript applications. It focuses on architectural layering, domain modeling, and dependency inversion. It does NOT cover basic NestJS setup, database migrations, or deployment (those have dedicated skills).
+
+## When to use
+
+Use this skill when:
+- Architecting complex NestJS applications requiring long-term maintainability
+- Refactoring from tightly-coupled MVC to layered architecture
+- Implementing rich domain models with encapsulated business logic
+- Designing testable systems with swappable infrastructure
+- Creating microservices with clear bounded contexts
+- Separating business rules from framework code
+- Implementing event-driven architectures with domain events
+
+DO NOT use this skill for:
+- Basic NestJS CRUD operations (use nestjs-pro skill)
+- Database schema design (use database-specific skills)
+- API endpoint design (use api-design-pro skill)
+- Simple applications where Clean Architecture would be over-engineering
+
+## Workflow
+
+1. **Analyze the application complexity** - determine if Clean Architecture is warranted
+2. **Define the domain model** - identify entities, value objects, aggregates
+3. **Design the layer structure** - domain, application, infrastructure, adapters
+4. **Implement the domain layer** - entities, value objects, repository ports
+5. **Implement the application layer** - use cases, input/output DTOs
+6. **Implement adapters** - controllers, repository implementations
+7. **Configure dependency injection** - wire everything together in NestJS modules
+8. **Write tests** - domain layer tests should be pure unit tests
+
+### Operating principles
+
+- **Dependency Rule**: Dependencies only point inward - domain knows nothing about NestJS, TypeORM, or HTTP
+- **Rich Domain Models**: Put business logic in entities, not services - avoid anemic domain models
+- **Immutability**: Value objects must be immutable - use private constructors with static factory methods
+- **Interface Segregation**: Keep repository interfaces small and focused - one repository per aggregate
+- **Constructor Injection**: Use NestJS DI in outer layers only - domain entities use plain constructors
+- **Validation at Boundaries**: Validate DTOs at API boundary and enforce invariants in domain entities
+- **Pure Domain Tests**: Domain layer tests require no NestJS testing module - fast pure unit tests
+- **Transactions in Application**: Keep transaction management in application layer, not domain
+- **Symbol Tokens**: Use Symbol() for DI tokens to avoid string coupling in NestJS modules
+- **Aggregate Roots**: Protect invariants through aggregate roots - access entities only through aggregates
+
+## Suggested response format
+
+```
+Architecture Pattern: [Clean Architecture / DDD / Hexagonal]
+Layer: [Domain / Application / Infrastructure / Adapter]
+Component: [Entity / Use Case / Repository / Controller]
+Status: [success/failed]
+Details: [implementation details, code snippets, file paths]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **Architecture Patterns**: Clean Architecture, DDD, Hexagonal Architecture
+- **Code Examples**: Value objects, entities, aggregates, use cases, adapters
+- **Best Practices**: Dependency inversion, immutability, interface segregation
+- **Reference Documentation**: TypeScript-specific patterns, NestJS integration details
+
+## Quick example
+
+**Implement a Value Object:**
+
+```
+1. Create domain/value-objects/email.vo.ts
+2. Implement private constructor with static factory method
+3. Add validation in the factory method
+4. Implement equals() and getValue() methods
+5. Use in entities instead of raw strings
+```
+
+## Checklist before calling the skill done
+
+- [ ] Application complexity warrants Clean Architecture overhead
+- [ ] Team understands DDD concepts (entities, value objects, aggregates)
+- [ ] NestJS project structure is established
+- [ ] Domain model can be clearly defined
+- [ ] Time is available for initial architecture setup
+- [ ] Team is committed to maintaining architectural boundaries
+- [ ] Testing strategy includes pure domain unit tests
+- [ ] Dependency injection strategy is defined
+
 ---
 
 # Clean Architecture, DDD & Hexagonal Architecture for NestJS

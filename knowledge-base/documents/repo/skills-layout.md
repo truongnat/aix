@@ -13,76 +13,98 @@ All skills live directly under **`skills/`**. There is no `public/` vs `private/
 
 ```
 skills/
-  README.md
-  SKILL_AUTHORING_RULES.md
-  examples/
-    skill-template/
-  router-pro/
-  ui-reverse-engineer-pro/
-  react-pro/
-  nextjs-pro/
-  react-native-pro/
-  flutter-pro/
-  javascript-pro/
-  typescript-pro/
-  performance-tuning-pro/
+  a2a-protocol-pro/
+  ag-ui-pro/
+  agent-evaluation-pro/
+  ai-integration-pro/
+  algorithm-pro/
+  api-design-pro/
+  auth-pro/
+  azure-storage/
+  brainstorming-pro/
+  bug-discovery-pro/
+  business-analysis-pro/
+  caching-pro/
+  ci-cd-pro/
+  clean-architecture/
   clean-code-architecture-pro/
   cli-pro/
-  api-design-pro/
-  graphql-pro/
-  websocket-pro/
-  microservices-pro/
-  stream-rtc-pro/
-  nestjs-pro/
-  postgresql-pro/
-  sql-data-access-pro/
-  testing-pro/
-  test-driven-development-pro/
-  security-pro/
-  auth-pro/
-  electron-pro/
-  tauri-pro/
-  deployment-pro/
-  docker-pro/
-  ci-cd-pro/
-  seo-pro/
-  design-system-pro/
-  frontend-design-pro/
-  ui-ux-system-pro/
-  ui-design-brain-pro/
-  ui-stack-pro/
-  platform-design-pro/
-  shadcn-mastery-pro/
-  motion-design-pro/
-  figma-mcp-pro/
-  mobile-design-pro/
-  business-analysis-pro/
+  cloud-native-agent-pro/
+  code-packaging-pro/
   content-analysis-pro/
   data-analysis-pro/
-  image-processing-pro/
-  web-research-pro/
-  market-research-pro/
-  strategic-consulting-pro/
-  code-packaging-pro/
-  caching-pro/
-  network-infra-pro/
-  planning-pro/
-  systematic-debugging-pro/
-  writing-plans-pro/
+  deployment-pro/
+  design-system-pro/
+  docker-pro/
+  electron-pro/
   executing-plans-pro/
-  algorithm-pro/
-  brainstorming-pro/
-  parallel-agents-pro/
   feedback-pro/
-  self-improve-agent-pro/
+  figma-mcp-pro/
+  flutter-pro/
+  frontend-design-pro/
+  frontend-patterns/
+  gemini-api-dev/
   git-operations-pro/
+  graphql-pro/
+  grill-me-pro/
+  image-processing-pro/
+  infrastructure-as-code-pro/
+  javascript-pro/
   karpathy-coding-pro/
-  bug-discovery-pro/
-  skills-self-review-pro/
-  repo-tooling-pro/
-  ai-integration-pro/
+  market-research-pro/
+  mcp-server-pro/
+  microservices-pro/
+  mobile-design-pro/
+  motion-design-pro/
+  nestjs-pro/
+  network-infra-pro/
+  nextjs-pro/
+  nextjs-security-scan/
   ocr-pro/
+  parallel-agents-pro/
+  pdf/
+  performance-tuning-pro/
+  planning-pro/
+  platform-design-pro/
+  postgres-patterns/
+  postgresql-pro/
+  prisma-postgres/
+  prompt-engineering-pro/
+  react-native-pro/
+  react-pro/
+  repo-tooling-pro/
+  router-pro/
+  security-pro/
+  security-review/
+  self-improve-agent-pro/
+  senior-architect/
+  senior-backend/
+  senior-frontend/
+  senior-security/
+  seo-pro/
+  shadcn-mastery-pro/
+  skill-creator-pro/
+  skills-self-review-pro/
+  solidity-security/
+  sql-data-access-pro/
+  strategic-consulting-pro/
+  stream-rtc-pro/
   sync-custom-to-repo/
+  system-design/
+  systematic-debugging-pro/
+  tauri-pro/
+  test-driven-development-pro/
+  testing-pro/
+  to-issues-pro/
+  to-prd-pro/
+  typescript-pro/
+  ui-design-brain-pro/
+  ui-reverse-engineer-pro/
+  ui-stack-pro/
+  ui-ux-system-pro/
+  web-research-pro/
+  websocket-pro/
+  writing-plans-pro/
 ```
 
 Each skill requires **`SKILL.md`** with YAML frontmatter (`name`, `description`, optional `metadata.short-description`). Optional folders: `references/`, `scripts/`, `assets/`. Many bundles also ship a short **`README.md`** (entry point + links) for IDE or repo browsing — not required by validation, but preferred for Tier A polish.

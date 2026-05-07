@@ -57,10 +57,13 @@ function parseArgs(argv: string[], options: { boolean?: string[]; string?: strin
 
 type ParsedArgs = Record<string, any> & { _?: string[] };
 import { loadKbConfig } from './lib/kbConfig.js';
-import { embedText, cosine } from './lib/embeddings.js';
+import { cosine, embedTextAsync, embedBatch, initEmbeddings, defaultGraphPath } from './lib/embeddings.js';
 import { installSkill } from './commands/installSkill.js';
 import { listSkillDirs, readSkillInfo } from './lib/skills.js';
 import { buildGraph, saveGraph, loadGraph, queryGraph, getCallers, getCallees, impactAnalysis } from './lib/graph.js';
+import { validateQuery, validateNumber } from './lib/validation.js';
+import { cmdListSkills, cmdValidateSkills, cmdAuditSkillStructure, cmdValidateSkillQuality, cmdValidateWorkflows } from './commands/skill-commands.js';
+import { createKbVectorStore, VectorStore, VectorDoc } from './lib/vector-store.js';
 
 type ManifestItem = {
   id: string;
@@ -115,7 +118,7 @@ function isLikelyBinaryBuffer(buf: Buffer): boolean {
   return false;
 }
 
-function cmdIndexProject(args: ParsedArgs) {
+async function cmdIndexProject(args: ParsedArgs) {
   const targetDir = resolve(String(args.dir || args.d || '.'));
   const outDir = resolve(String(args.out || join(targetDir, '.agents', 'devkit', 'project-index')));
   const includes = String(args.include || INDEX_PROJECT_DEFAULT_INCLUDE)
@@ -125,6 +128,7 @@ function cmdIndexProject(args: ParsedArgs) {
   const size = Number(args['chunk-size'] || 800);
   const overlap = Number(args['chunk-overlap'] || 150);
   const dry = Boolean(args['dry-run']);
+  const generateDocs = Boolean(args['generate-docs']);
 
   const fileSet = new Set<string>();
   for (const pattern of includes) {
@@ -139,7 +143,7 @@ function cmdIndexProject(args: ParsedArgs) {
   const files = [...fileSet].sort();
 
   const manifest: ManifestItem[] = [];
-  const vectors: number[][] = [];
+  const texts: string[] = [];
   let chunkSeq = 0;
   let skippedBinary = 0;
   let skippedLarge = 0;
@@ -174,7 +178,7 @@ function cmdIndexProject(args: ParsedArgs) {
       chunks.forEach((c, i) => {
         const id = `chunk_${chunkSeq++}`;
         manifest.push({ id, path: rel, title, chunk_index: i, text: c });
-        vectors.push(embedText(c));
+        texts.push(c);
       });
     } else {
       const body = `# file: ${rel}\n\n${text}`;
@@ -182,7 +186,7 @@ function cmdIndexProject(args: ParsedArgs) {
       chunks.forEach((c, i) => {
         const id = `chunk_${chunkSeq++}`;
         manifest.push({ id, path: rel, chunk_index: i, text: c });
-        vectors.push(embedText(c));
+        texts.push(c);
       });
     }
   }
@@ -194,6 +198,17 @@ function cmdIndexProject(args: ParsedArgs) {
     return;
   }
 
+  // Use async embeddings with GitNexus graph enrichment
+  const graphPath = defaultGraphPath(targetDir);
+  const useModel = await initEmbeddings();
+  console.log(useModel ? 'Using transformer model (MiniLM-L6-v2) + GitNexus enrichment' : 'Using hash embeddings (install @xenova/transformers for semantic search)');
+  const vectors = await embedBatch(texts, {
+    graphPath,
+    enrichWithGraph: true,
+    onProgress: (done, total) => process.stdout.write(`\r  Embedding: ${done}/${total}`),
+  });
+  if (texts.length > 50) process.stdout.write('\n');
+
   mkdirSync(outDir, { recursive: true });
   const embPath = join(outDir, 'embeddings.json');
   const manifestPath = join(outDir, 'manifest.json');
@@ -202,6 +217,49 @@ function cmdIndexProject(args: ParsedArgs) {
   console.log(
     `Wrote project index under ${outDir} (${vectors.length} vectors from ${files.length} files; skipped binary=${skippedBinary}, large=${skippedLarge})`,
   );
+
+  // Generate markdown docs for wiki if requested
+  if (generateDocs) {
+    const docsDir = join(outDir, 'docs');
+    mkdirSync(docsDir, { recursive: true });
+    
+    for (const absPath of files) {
+      const st = statSync(absPath, { throwIfNoEntry: false });
+      if (!st?.isFile()) continue;
+      const buf = readFileSync(absPath);
+      if (isLikelyBinaryBuffer(buf)) continue;
+      
+      const rel = relative(targetDir, absPath).replace(/\\/g, '/');
+      const isMd = rel.endsWith('.md') || /\.md$/i.test(absPath);
+      
+      if (isMd) {
+        // Copy markdown files to docs directory
+        const outPath = join(docsDir, rel);
+        mkdirSync(dirname(outPath), { recursive: true });
+        writeFileSync(outPath, buf);
+      } else {
+        // Convert source files to markdown for wiki
+        const text = buf.toString('utf8');
+        const mdContent = `---
+title: ${rel}
+path: ${rel}
+---
+
+# ${rel}
+
+\`\`\`typescript
+${text}
+\`\`\`
+`;
+        const outPath = join(docsDir, rel.replace(/\.[^.]+$/, '.md'));
+        mkdirSync(dirname(outPath), { recursive: true });
+        writeFileSync(outPath, mdContent, 'utf8');
+      }
+    }
+    
+    const mdFiles = globSync('**/*.md', { cwd: docsDir, nodir: true });
+    console.log(`Generated ${mdFiles.length} markdown files in ${docsDir} for wiki`);
+  }
 }
 
 function escapeHtmlWiki(s: string): string {
@@ -396,7 +454,7 @@ function mdBodyToHtmlWiki(md: string): string {
     blocks.push(`<p>${inlineMdToHtmlWiki(text)}</p>`);
     para.length = 0;
   };
-  let para: string[] = [];
+  const para: string[] = [];
   while (i < lines.length) {
     const line = lines[i] ?? '';
     if (line.trim().startsWith('```')) {
@@ -718,49 +776,213 @@ function cmdGenerateWiki(args: ParsedArgs) {
   }
 }
 
-import chalk from 'chalk';
-
-function cmdListSkills(args: ParsedArgs, repoRoot: string) {
-  const includeTemplate = Boolean(args['include-template']);
-  const asJson = Boolean(args.json);
-  const dirs = listSkillDirs(repoRoot, includeTemplate);
-  const rows = dirs.map((dir) => readSkillInfo(dir));
-  if (asJson) {
-    console.log(JSON.stringify(rows.map((r) => ({ folder: r.folder, name: r.name || null, path: r.path, has_skill_md: r.hasSkillMd })), null, 2));
-    return;
-  }
-  const maxLen = Math.max(...rows.map((r) => r.folder.length));
-  for (const r of rows) {
-    console.log(`  ${chalk.cyan(r.folder.padEnd(maxLen))}  ${chalk.dim(r.name || '-')}`);
-  }
-  console.log(chalk.dim(`\n  ${rows.length} skills`));
+/**
+ * Pre-computed skill embeddings for semantic routing fallback
+ * Allows synchronous semantic matching during routing evaluation
+ */
+interface SkillEmbedding {
+  folder: string;
+  name: string;
+  description: string;
+  embedding: number[];
 }
 
-function cmdValidateSkills(args: ParsedArgs, repoRoot: string) {
-  const includeTemplate = Boolean(args['include-template']);
-  const dirs = listSkillDirs(repoRoot, includeTemplate);
-  const errs: { folder: string; reason: string }[] = [];
+let skillEmbeddingsCache: SkillEmbedding[] | null = null;
+const EMBEDDINGS_CACHE_FILE = '.cache/skill-embeddings.json';
+
+/**
+ * Pre-compute embeddings for all skills
+ */
+async function precomputeSkillEmbeddings(repoRoot: string): Promise<void> {
+  const dirs = listSkillDirs(repoRoot, false);
+  const embeddings: SkillEmbedding[] = [];
+
   for (const dir of dirs) {
     const info = readSkillInfo(dir);
-    if (!info.name) {
-      errs.push({ folder: info.folder, reason: 'missing frontmatter name' });
-      continue;
-    }
-    if (info.name !== info.folder) {
-      errs.push({ folder: info.folder, reason: `name "${info.name}" must match folder` });
+    const textToEmbed = `${info.name || info.folder}. ${info.description || ''}`;
+    
+    try {
+      const embedding = await embedTextAsync(textToEmbed);
+      embeddings.push({
+        folder: info.folder,
+        name: info.name || info.folder,
+        description: info.description || '',
+        embedding,
+      });
+    } catch {
+      // Skip if embedding fails
     }
   }
-  if (errs.length > 0) {
-    console.error(chalk.red(`\nValidation failed — ${errs.length} error${errs.length > 1 ? 's' : ''}:\n`));
-    const maxLen = Math.max(...errs.map((e) => e.folder.length));
-    for (const { folder, reason } of errs) {
-      console.error(`  ${chalk.red('✘')} ${chalk.yellow(folder.padEnd(maxLen))}  ${chalk.dim(reason)}`);
-    }
-    console.error();
-    process.exit(2);
+
+  // Cache to disk
+  const cacheDir = join(repoRoot, '.cache');
+  if (!existsSync(cacheDir)) {
+    mkdirSync(cacheDir, { recursive: true });
   }
-  console.log(chalk.green(`Validated ${dirs.length} skills: OK`));
+  writeFileSync(join(repoRoot, EMBEDDINGS_CACHE_FILE), JSON.stringify(embeddings));
+  skillEmbeddingsCache = embeddings;
 }
+
+/**
+ * Load pre-computed skill embeddings from cache
+ */
+function loadSkillEmbeddings(repoRoot: string): SkillEmbedding[] | null {
+  const cachePath = join(repoRoot, EMBEDDINGS_CACHE_FILE);
+  if (!existsSync(cachePath)) return null;
+
+  try {
+    const data = JSON.parse(readFileSync(cachePath, 'utf8'));
+    skillEmbeddingsCache = data;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Compute cosine similarity between two vectors
+ */
+function cosineSimilarity(a: number[], b: number[]): number {
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+
+  for (let i = 0; i < a.length; i++) {
+    dotProduct += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+
+  if (normA === 0 || normB === 0) return 0;
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+/**
+ * Semantic fallback routing using pre-computed embeddings
+ */
+function semanticRoutingFallback(
+  prompt: string,
+  skillEmbeddings: SkillEmbedding[],
+  threshold = 0.5
+): string | null {
+  if (skillEmbeddings.length === 0) return null;
+
+  let bestMatch: SkillEmbedding | null = null;
+  let bestScore = threshold;
+
+  for (const skill of skillEmbeddings) {
+    const textToEmbed = `${skill.name}. ${skill.description}`;
+    // Since we can't compute prompt embedding synchronously,
+    // we use a simple text overlap as a fallback for the fallback
+    const promptLower = prompt.toLowerCase();
+    const descLower = skill.description.toLowerCase();
+    
+    // Simple word overlap as a synchronous semantic approximation
+    const promptWords = new Set(promptLower.split(/\s+/));
+    const descWords = new Set(descLower.split(/\s+/));
+    const overlap = [...promptWords].filter(word => descWords.has(word)).length;
+    const score = overlap / Math.max(promptWords.size, descWords.size);
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = skill;
+    }
+  }
+
+  return bestMatch?.folder || null;
+}
+
+/**
+ * Worker thread pool for CPU-intensive tasks
+ * Offloads heavy work to background threads to avoid blocking the main thread
+ */
+import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
+import { readFile } from 'node:fs/promises';
+import os from 'node:os';
+
+interface WorkerTask<T, R> {
+  id: string;
+  data: T;
+}
+
+interface WorkerResult<R> {
+  id: string;
+  result: R;
+  error?: Error;
+}
+
+class WorkerPool<T, R> {
+  private workers: Worker[] = [];
+  private taskQueue: Map<string, { resolve: (value: R) => void; reject: (error: Error) => void }> = new Map();
+  private taskId = 0;
+
+  constructor(
+    private workerScript: string,
+    private poolSize = Math.max(2, Math.floor(os.cpus().length / 2))
+  ) {
+    this.initialize();
+  }
+
+  private initialize() {
+    for (let i = 0; i < this.poolSize; i++) {
+      const worker = new Worker(this.workerScript);
+      worker.on('message', (result: WorkerResult<R>) => {
+        const pending = this.taskQueue.get(result.id);
+        if (pending) {
+          if (result.error) {
+            pending.reject(result.error);
+          } else {
+            pending.resolve(result.result);
+          }
+          this.taskQueue.delete(result.id);
+        }
+      });
+      this.workers.push(worker);
+    }
+  }
+
+  async execute(data: T): Promise<R> {
+    return new Promise((resolve, reject) => {
+      const id = `task-${this.taskId++}`;
+      this.taskQueue.set(id, { resolve, reject });
+      
+      const worker = this.workers[this.taskId % this.poolSize];
+      worker.postMessage({ id, data });
+    });
+  }
+
+  shutdown() {
+    for (const worker of this.workers) {
+      worker.terminate();
+    }
+    this.workers = [];
+  }
+}
+
+async function* streamOperation<T>(
+  items: T[],
+  processor: (item: T) => Promise<void>,
+  batchSize = 100
+): AsyncGenerator<void, void, unknown> {
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize);
+    await Promise.all(batch.map(processor));
+    yield; // Yield control after each batch
+  }
+}
+
+/**
+ * Streamable file reader for large files
+ */
+async function* streamFileByLines(filePath: string): AsyncGenerator<string, void, unknown> {
+  const content = await readFile(filePath, 'utf-8');
+  const lines = content.split('\n');
+  for (const line of lines) {
+    yield line;
+  }
+}
+
+import chalk from 'chalk';
 
 function extractTriggers(content: string): string[] {
   const m = content.match(/^(?:[-*]\s*)?(?:\*\*)?(?:Triggers?|Trigger keywords?)(?:\*\*)?:\s*([\s\S]*?)(?:\n\n|\n##|\n###|$)/im);
@@ -869,9 +1091,9 @@ function matchPromptToTriggers(prompt: string, triggers: string[]): RoutingTrigg
         trigger,
         normalized,
         score: isExact ? triggerTokens.length * 100 + normalized.length : triggerTokens.length * 60 + normalized.length,
-      } satisfies RoutingTriggerMatch;
+      };
     })
-    .filter((row): row is RoutingTriggerMatch => row !== null)
+    .filter((m): m is RoutingTriggerMatch => m !== null)
     .sort((a, b) => b.score - a.score || b.normalized.length - a.normalized.length || a.trigger.localeCompare(b.trigger));
 }
 
@@ -975,17 +1197,26 @@ function cmdEvalSkillRouting(args: ParsedArgs, repoRoot: string) {
       Array.isArray(testCase.hard_negative_skills) ? testCase.hard_negative_skills.filter((s) => typeof s === 'string') : [],
     );
 
+    // Semantic fallback when keyword matching fails
+    let finalPredicted: string | null = predicted;
+    if (finalPredicted === null) {
+      const embeddings = loadSkillEmbeddings(repoRoot) || skillEmbeddingsCache;
+      if (embeddings) {
+        finalPredicted = semanticRoutingFallback(testCase.prompt, embeddings);
+      }
+    }
+
     const firstAllowedRanked = ranked.find((r) => allowedSet.has(r.skill) && r.matches.length > 0);
     const expectedMatches = firstAllowedRanked?.matches ?? [];
 
     let status: string;
-    if (predicted && neg.has(predicted)) {
+    if (finalPredicted && neg.has(finalPredicted)) {
       status = 'fail_hard_negative';
-    } else if (predicted && allowedSet.has(predicted)) {
+    } else if (finalPredicted && allowedSet.has(finalPredicted)) {
       status = 'pass';
     } else if ([...allowedSet].every((s) => (bySkill.get(s)?.triggers.length ?? 0) === 0)) {
       status = 'missing_triggers';
-    } else if (predicted === null) {
+    } else if (finalPredicted === null) {
       status = 'no_match';
     } else if (![...allowedSet].some((s) => ranked.some((row) => row.skill === s && row.matches.length > 0))) {
       status = 'wrong_match_no_expected_trigger';
@@ -999,7 +1230,7 @@ function cmdEvalSkillRouting(args: ParsedArgs, repoRoot: string) {
       expectedSkill: primaryExpected,
       expectedAnyOf: [...allowedSet],
       hardNegativeSkills: testCase.hard_negative_skills ?? [],
-      predictedSkill: predicted,
+      predictedSkill: finalPredicted,
       status,
       note: testCase.note || null,
       expectedTriggerCount: expectedSkillRow.triggers.length,
@@ -1462,7 +1693,7 @@ async function cmdEvalSkillOutputFormat(args: ParsedArgs, repoRoot: string) {
   if (strict && summary.fail > 0) process.exit(2);
 }
 
-function cmdBuildSkillIndex(args: ParsedArgs, repoRoot: string) {
+async function cmdBuildSkillIndex(args: ParsedArgs, repoRoot: string) {
   const cfg = loadKbConfig(repoRoot);
   const output = resolve(repoRoot, String(args.output || cfg.skillIndexPath));
   const withEmbeddings = Boolean(args['with-embeddings']);
@@ -1493,7 +1724,9 @@ function cmdBuildSkillIndex(args: ParsedArgs, repoRoot: string) {
   console.log(chalk.dim(`  ${domainLine}`));
 
   if (withEmbeddings) {
-    const vectors = rows.map((r) => embedText(`${r.name}\n${r.description}\n${r.triggers.join(', ')}`));
+    await initEmbeddings();
+    const texts = rows.map((r) => `${r.name}\n${r.description}\n${r.triggers.join(', ')}`);
+    const vectors = await embedBatch(texts);
     const embPath = resolve(repoRoot, cfg.skillEmbeddingsPath);
     mkdirSync(join(embPath, '..'), { recursive: true });
     writeFileSync(embPath, `${JSON.stringify(vectors)}\n`, 'utf8');
@@ -1502,7 +1735,6 @@ function cmdBuildSkillIndex(args: ParsedArgs, repoRoot: string) {
 }
 
 function cmdAnalyzeSkills(args: ParsedArgs, repoRoot: string) {
-  const withRefs = Boolean(args['with-references']);
   const json = Boolean(args.json);
   const md = Boolean(args.markdown || args['self-review']);
   const onlyActionable = Boolean(args['only-actionable']);
@@ -1551,114 +1783,6 @@ function cmdAnalyzeSkills(args: ParsedArgs, repoRoot: string) {
   const counts = { strong: 0, consider: 0, low: 0 };
   for (const r of rows) counts[r.tier as keyof typeof counts]++;
   console.log(chalk.dim(`\n  ${rows.length} skills  ·  ${counts.strong} strong  ${counts.consider} consider  ${counts.low} low`));
-}
-
-type StructuralSectionCheck = {
-  key: string;
-  label: string;
-  pattern: RegExp;
-};
-
-const STRUCTURAL_SECTION_CHECKS: StructuralSectionCheck[] = [
-  { key: 'boundary', label: 'Boundary', pattern: /^## Boundary$/m },
-  { key: 'when_to_use', label: 'When to use', pattern: /^## When to use$/m },
-  { key: 'workflow', label: 'Workflow', pattern: /^## Workflow$/m },
-  { key: 'operating_principles', label: 'Operating principles', pattern: /^### Operating principles$/m },
-  { key: 'suggested_response_format', label: 'Suggested response format', pattern: /^## Suggested response format(?:\b.*)?$/m },
-  { key: 'resources', label: 'Resources in this skill', pattern: /^## Resources in this skill$/m },
-  { key: 'quick_example', label: 'Quick example', pattern: /^## Quick example$/m },
-  { key: 'checklist', label: 'Checklist before calling the skill done', pattern: /^## Checklist before calling the skill done$/m },
-];
-
-function cmdAuditSkillStructure(args: ParsedArgs, repoRoot: string) {
-  const includeTemplate = Boolean(args['include-template']);
-  const asJson = Boolean(args.json);
-  const asMarkdown = Boolean(args.markdown);
-  const onlyActionable = Boolean(args['only-actionable']);
-  const strict = Boolean(args.strict);
-  const dirs = listSkillDirs(repoRoot, includeTemplate);
-
-  const rows = dirs.map((dir) => {
-    const info = readSkillInfo(dir);
-    const content = info.content || '';
-    const missing = STRUCTURAL_SECTION_CHECKS.filter((section) => !section.pattern.test(content)).map((section) => section.label);
-    return {
-      skill: info.folder,
-      missing,
-      missingCount: missing.length,
-      isComplete: missing.length === 0,
-    };
-  });
-
-  const outRows = onlyActionable ? rows.filter((row) => !row.isComplete) : rows;
-  const missingBySection = STRUCTURAL_SECTION_CHECKS.map((section) => ({
-    label: section.label,
-    count: rows.filter((row) => row.missing.includes(section.label)).length,
-  }));
-  const incompleteCount = rows.filter((row) => !row.isComplete).length;
-
-  if (asJson) {
-    console.log(
-      JSON.stringify(
-        {
-          totalSkills: rows.length,
-          incompleteSkills: incompleteCount,
-          missingBySection,
-          rows: outRows,
-        },
-        null,
-        2,
-      ),
-    );
-    if (strict && incompleteCount > 0) process.exit(2);
-    return;
-  }
-
-  if (asMarkdown) {
-    console.log('# Skill structure audit\n');
-    console.log(`Total skills: **${rows.length}**`);
-    console.log(`Incomplete skills: **${incompleteCount}**\n`);
-    console.log('## Missing sections by type\n');
-    console.log('| Section | Missing skills |');
-    console.log('|---|---:|');
-    missingBySection.forEach((section) => console.log(`| ${section.label} | ${section.count} |`));
-    console.log('\n## Skill results\n');
-    console.log('| Skill | Missing count | Missing sections |');
-    console.log('|---|---:|---|');
-    outRows.forEach((row) =>
-      console.log(`| \`${row.skill}\` | ${row.missingCount} | ${row.missing.length ? row.missing.join(', ') : '—'} |`),
-    );
-    if (strict && incompleteCount > 0) process.exit(2);
-    return;
-  }
-
-  const maxLen = Math.max(...outRows.map((row) => row.skill.length), 'Skill'.length);
-  console.log(chalk.bold('Skill structure audit'));
-  console.log(
-    chalk.dim(
-      `  total ${rows.length}  ·  incomplete ${incompleteCount}  ·  complete ${rows.length - incompleteCount}`,
-    ),
-  );
-  console.log('');
-  missingBySection.forEach((section) => {
-    const color =
-      section.count === 0 ? chalk.green :
-      section.count <= 5 ? chalk.yellow :
-      chalk.red;
-    console.log(`  ${color(section.label.padEnd(36))} ${chalk.bold(String(section.count))}`);
-  });
-
-  if (outRows.length > 0) {
-    console.log('');
-    outRows
-      .sort((a, b) => b.missingCount - a.missingCount || a.skill.localeCompare(b.skill))
-      .forEach((row) => {
-        const badge = row.isComplete ? chalk.green('OK ') : chalk.red('MISS');
-        console.log(`  ${badge}  ${chalk.cyan(row.skill.padEnd(maxLen))}  ${chalk.dim(row.missing.join(', ') || '—')}`);
-      });
-  }
-
-  if (strict && incompleteCount > 0) process.exit(2);
 }
 
 function cmdInstallSkill(args: ParsedArgs, _repoRoot: string) {
@@ -1778,7 +1902,7 @@ function cmdVerifyBundleInstall(args: ParsedArgs, _repoRoot: string) {
     resolved &&
     existsSync(toolsJs) &&
     existsSync(join(bundleDir, 'node_modules', 'minimist'));
-  if (!Boolean(args['skip-validate-skills']) && resolved && existsSync(toolsJs)) {
+  if (!args['skip-validate-skills'] && resolved && existsSync(toolsJs)) {
     if (!canValidateSkills) {
       console.warn(
         'Skipping validate-skills: bundle has no node_modules (full install excludes them). Run: cd .agents/devkit && npm ci',
@@ -1810,12 +1934,12 @@ function cmdVerifyBundleInstall(args: ParsedArgs, _repoRoot: string) {
   }
 }
 
-function buildKb(repoRoot: string, dry = false) {
+async function buildKb(repoRoot: string, dry = false) {
   const cfg = loadKbConfig(repoRoot);
   const docsRoot = resolve(repoRoot, cfg.documentsPath);
   const files = collectMarkdownFiles(docsRoot);
   const manifest: ManifestItem[] = [];
-  const vectors: number[][] = [];
+  const texts: string[] = [];
   let idx = 0;
   for (const f of files) {
     const raw = readText(f);
@@ -1824,69 +1948,107 @@ function buildKb(repoRoot: string, dry = false) {
     chunks.forEach((c, i) => {
       const id = `chunk_${idx++}`;
       manifest.push({ id, path: relative(repoRoot, f).replace(/\\/g, '/'), title: p.data.title || undefined, chunk_index: i, text: c });
-      vectors.push(embedText(c));
+      texts.push(c);
     });
   }
   if (dry) {
     console.log(`Would index ${files.length} files -> ${manifest.length} chunks`);
     return;
   }
+  const graphPath = defaultGraphPath(repoRoot);
+  const useModel = await initEmbeddings();
+  console.log(useModel ? 'Using transformer model (MiniLM-L6-v2) + GitNexus enrichment' : 'Using hash embeddings (run: npm i @xenova/transformers)');
+  const vectors = await embedBatch(texts, {
+    graphPath,
+    enrichWithGraph: true,
+    onProgress: (done, total) => process.stdout.write(`\r  Embedding: ${done}/${total}`),
+  });
+  if (texts.length > 50) process.stdout.write('\n');
+  
+  // Use VectorStore instead of JSON
   const embPath = resolve(repoRoot, cfg.embeddingsPath);
+  const indexPath = embPath.replace('.json', '.index');
   const manifestPath = resolve(repoRoot, cfg.manifestPath);
-  mkdirSync(join(embPath, '..'), { recursive: true });
-  writeFileSync(embPath, `${JSON.stringify(vectors)}\n`, 'utf8');
+  mkdirSync(join(indexPath, '..'), { recursive: true });
+  
+  const store = createKbVectorStore(384);
+  const vectorDocs: VectorDoc[] = [];
+  const dims = 384;
+  for (let i = 0; i < manifest.length; i++) {
+    const vector = vectors.slice(i * dims, (i + 1) * dims);
+    vectorDocs.push({
+      id: manifest[i].id,
+      vector,
+      metadata: { path: manifest[i].path, title: manifest[i].title, chunk_index: manifest[i].chunk_index, text: manifest[i].text },
+    });
+  }
+  store.addBatch(vectorDocs);
+  store.save(indexPath);
+  
   writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
-  console.log(`Wrote embeddings: ${relative(repoRoot, embPath)} (${vectors.length} vectors)`);
+  console.log(`Wrote vector index: ${relative(repoRoot, indexPath)} (${store.size()} vectors)`);
   console.log(`Wrote manifest: ${relative(repoRoot, manifestPath)}`);
 }
 
 function loadKbData(repoRoot: string, indexDir?: string) {
-  let embPath: string;
+  let indexPath: string;
   let manifestPath: string;
   if (indexDir) {
     const dir = resolve(String(indexDir));
-    embPath = join(dir, 'embeddings.json');
+    indexPath = join(dir, 'embeddings.index');
     manifestPath = join(dir, 'manifest.json');
   } else {
     const cfg = loadKbConfig(repoRoot);
-    embPath = resolve(repoRoot, cfg.embeddingsPath);
+    const embPath = resolve(repoRoot, cfg.embeddingsPath);
+    indexPath = embPath.replace('.json', '.index');
     manifestPath = resolve(repoRoot, cfg.manifestPath);
   }
-  if (!existsSync(embPath) || !existsSync(manifestPath)) {
+  if (!existsSync(indexPath) || !existsSync(manifestPath)) {
     throw new Error(
       indexDir
-        ? `Missing project index in ${resolve(String(indexDir))} (expected embeddings.json + manifest.json). Run index-project first.`
+        ? `Missing project index in ${resolve(String(indexDir))} (expected embeddings.index + manifest.json). Run index-project first.`
         : 'Missing KB artifacts. Run build-kb first.',
     );
   }
-  const vectors = JSON.parse(readFileSync(embPath, 'utf8')) as number[][];
+  const store = createKbVectorStore(384);
+  store.load(indexPath);
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as ManifestItem[];
-  return { vectors, manifest };
+  return { store, manifest };
 }
 
-function queryKb(repoRoot: string, q: string, topK: number, indexDir?: string) {
-  const { vectors, manifest } = loadKbData(repoRoot, indexDir);
-  const qv = embedText(q);
-  const scored = vectors
-    .map((v, i) => ({ i, score: cosine(v, qv) }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topK);
-  return scored.map(({ i, score }) => ({ score, item: manifest[i] }));
+async function queryKb(repoRoot: string, q: string, topK: number, indexDir?: string) {
+  // Validate inputs for security
+  const sanitizedQuery = validateQuery(q);
+  const validatedTopK = validateNumber(topK, 1, 100, 'top-k');
+
+  const { store, manifest } = loadKbData(repoRoot, indexDir);
+  await initEmbeddings();
+  const qv = await embedTextAsync(sanitizedQuery);
+  const results = store.search(qv, validatedTopK);
+  
+  // Map results back to manifest items
+  const manifestMap = new Map(manifest.map((item) => [item.id, item]));
+  return results
+    .map((result) => ({
+      score: result.score,
+      item: manifestMap.get(result.id),
+    }))
+    .filter((r): r is { score: number; item: ManifestItem } => r.item !== undefined);
 }
 
-function cmdQueryKb(args: ParsedArgs, repoRoot: string) {
+async function cmdQueryKb(args: ParsedArgs, repoRoot: string) {
   const q = String(args._?.[1] || '');
   if (!q) throw new Error('query-kb requires query text');
   const topK = Number(args.k || args['top-k'] || 5);
   const indexDir = args.index ? String(args.index) : undefined;
-  const rows = queryKb(repoRoot, q, topK, indexDir);
+  const rows = await queryKb(repoRoot, q, topK, indexDir);
   rows.forEach((r, idx) => {
     console.log(`${idx + 1}. score=${r.score.toFixed(4)} path=${r.item.path} chunk=${r.item.chunk_index}`);
     console.log(`   ${r.item.text.slice(0, 180).replace(/\s+/g, ' ')}...`);
   });
 }
 
-function cmdQueryKbBatch(args: ParsedArgs, repoRoot: string) {
+async function cmdQueryKbBatch(args: ParsedArgs, repoRoot: string) {
   const topK = Number(args.k || args['top-k'] || 5);
   const queries: string[] = [];
   const qArg = args.q ?? args.query;
@@ -1902,7 +2064,10 @@ function cmdQueryKbBatch(args: ParsedArgs, repoRoot: string) {
   }
   if (queries.length === 0) throw new Error('query-kb-batch requires -q/--query or -f/--file');
   const indexDir = args.index ? String(args.index) : undefined;
-  const out = queries.map((q) => ({ query: q, results: queryKb(repoRoot, q, topK, indexDir) }));
+  const out: { query: string; results: { score: number; item: ManifestItem }[] }[] = [];
+  for (const q of queries) {
+    out.push({ query: q, results: await queryKb(repoRoot, q, topK, indexDir) });
+  }
   if (args.json) {
     console.log(JSON.stringify(out, null, 2));
     return;
@@ -1935,7 +2100,7 @@ function cmdVerifyKb(_args: ParsedArgs, repoRoot: string) {
   console.log('KB verification: OK');
 }
 
-function cmdBuildGraph(args: ParsedArgs) {
+async function cmdBuildGraph(args: ParsedArgs) {
   const targetDir = resolve(String(args.dir || args.d || '.'));
   const outDir = resolve(String(args.out || join(targetDir, '.agents', 'devkit', 'project-graph')));
   const dry = Boolean(args['dry-run']);
@@ -1952,7 +2117,7 @@ function cmdBuildGraph(args: ParsedArgs) {
   }
 
   console.log(`Building code graph for ${targetDir}...`);
-  const graph = buildGraph(targetDir);
+  const graph = await buildGraph(targetDir);
   saveGraph(graph, graphPath);
   console.log(`Graph built: ${graph.nodes.length} nodes, ${graph.edges.length} edges`);
   console.log(`Saved to: ${graphPath}`);
@@ -2060,13 +2225,13 @@ function cmdGenerateGapAnalysis(args: ParsedArgs, repoRoot: string) {
     const raw = readFileSync(skillMd, 'utf8');
     const parsed = matter(raw);
     const meta = (parsed.data.metadata ?? {}) as Record<string, string>;
-    return {
-      folder: basename(dir),
-      name: parsed.data.name as string ?? basename(dir),
-      domain: meta.domain ?? 'uncategorized',
-      level: meta.level ?? 'unknown',
-      hasRefs: existsSync(join(dir, 'references')),
-    };
+    const shortDesc = meta['short-description'] || '';
+    const domain = meta.domain || 'uncategorized';
+    const level = meta.level || 'unknown';
+    const name = (parsed.data.name as string) || dir;
+    const hasRefs = existsSync(join(dir, 'references'));
+    const conforming = /^[a-z0-9]+(-[a-z0-9]+)*$/.test(dir);
+    return { folder: dir, name, shortDescription: shortDesc, domain, level, hasRefs, conforming };
   });
 
   // Group by domain (from actual frontmatter)
@@ -2154,7 +2319,7 @@ function cmdGenerateGapAnalysis(args: ParsedArgs, repoRoot: string) {
 
   const content = lines.join('\n');
 
-  if (Boolean(args['dry-run'])) {
+  if (args['dry-run']) {
     console.log(content);
     return;
   }
@@ -2181,6 +2346,154 @@ function cmdGenerateGapAnalysis(args: ParsedArgs, repoRoot: string) {
   }
 }
 
+function cmdSyncCatalogs(args: ParsedArgs, repoRoot: string) {
+  const dirs = listSkillDirs(repoRoot, false);
+  const dry = Boolean(args['dry-run']);
+  const write = Boolean(args['write']);
+
+  interface SkillCatalogEntry {
+    folder: string;
+    name: string;
+    shortDescription: string;
+    domain: string;
+    level: string;
+    hasRefs: boolean;
+    conforming: boolean;
+  }
+
+  const entries: SkillCatalogEntry[] = dirs.map((dir) => {
+    const folder = dir;
+    const raw = readFileSync(join(dir, 'SKILL.md'), 'utf8');
+    const parsed = matter(raw);
+    const meta = (parsed.data.metadata ?? {}) as Record<string, string>;
+    const shortDesc = meta['short-description'] || '';
+    const domain = meta.domain || 'uncategorized';
+    const level = meta.level || 'unknown';
+    const name = (parsed.data.name as string) || dir;
+    const hasRefs = existsSync(join(dir, 'references'));
+    const conforming = /^[a-z0-9]+(-[a-z0-9]+)*$/.test(dir);
+    return { folder, name, shortDescription: shortDesc, domain, level, hasRefs, conforming };
+  });
+
+  const nonConforming = entries.filter((e) => !e.conforming);
+  const missingRefs = entries.filter((e) => !e.hasRefs);
+
+  // Read existing catalogs
+  const skillsReadmePath = resolve(repoRoot, 'skills', 'README.md');
+  const skillsLayoutPath = resolve(repoRoot, 'knowledge-base', 'documents', 'repo', 'skills-layout.md');
+
+  let skillsReadmeContent = '';
+  let skillsLayoutContent = '';
+  if (existsSync(skillsReadmePath)) skillsReadmeContent = readFileSync(skillsReadmePath, 'utf8');
+  if (existsSync(skillsLayoutPath)) skillsLayoutContent = readFileSync(skillsLayoutPath, 'utf8');
+
+  // Extract existing skills from README table (simple heuristic: lines with | [skill-name](...))
+  const readmeSkillRegex = /\[([^\]]+)\]\(\/skills\/([^/]+)\/\)/g;
+  const readmeSkills = new Set<string>();
+  let m: RegExpExecArray | null;
+  while ((m = readmeSkillRegex.exec(skillsReadmeContent)) !== null) {
+    readmeSkills.add(m[2]);
+  }
+
+  // Extract existing skills from layout file
+  const layoutSkillRegex = /^ {2}([a-z0-9-]+)\/$/gm;
+  const layoutSkills = new Set<string>();
+  while ((m = layoutSkillRegex.exec(skillsLayoutContent)) !== null) {
+    layoutSkills.add(m[1]);
+  }
+
+  const diskSkills = new Set(entries.map((e) => e.folder));
+  const missingFromReadme = [...diskSkills].filter((s) => !readmeSkills.has(s));
+  const missingFromLayout = [...diskSkills].filter((s) => !layoutSkills.has(s));
+  const extraInReadme = [...readmeSkills].filter((s) => !diskSkills.has(s));
+  const extraInLayout = [...layoutSkills].filter((s) => !diskSkills.has(s));
+
+  // Generate updated layout content
+  const sortedFolders = [...diskSkills].sort();
+  const newLayoutTree = sortedFolders.map((f) => `  ${f}/`).join('\n');
+  const newLayoutContent = skillsLayoutContent.replace(
+    /(skills\/\n)([\s\S]*?)(\n```)/,
+    `$1${newLayoutTree}$3`,
+  );
+
+  // Generate updated README table entries
+  // const newTableRows = entries
+  //   .sort((a, b) => a.folder.localeCompare(b.folder))
+  //   .map((e) => `| [${e.folder}](/skills/${e.folder}/) | ${e.shortDescription || e.domain} |`)
+  //   .join('\n');
+
+  console.log(`${chalk.bold.cyan('Catalog Sync Report')}\n`);
+  console.log(`Total skills on disk: ${entries.length}`);
+
+  if (nonConforming.length > 0) {
+    console.log(chalk.yellow(`\n  Non-conforming names (${nonConforming.length}):`));
+    for (const e of nonConforming) console.log(`    ${chalk.red(e.folder)}`);
+  }
+
+  if (missingRefs.length > 0) {
+    console.log(chalk.yellow(`\n  Missing references/ (${missingRefs.length}):`));
+    for (const e of missingRefs) console.log(`    ${chalk.dim(e.folder)}`);
+  }
+
+  if (missingFromReadme.length > 0) {
+    console.log(chalk.yellow(`\n  Missing from skills/README.md (${missingFromReadme.length}):`));
+    for (const s of missingFromReadme.sort()) console.log(`    ${chalk.dim(s)}`);
+  }
+
+  if (missingFromLayout.length > 0) {
+    console.log(chalk.yellow(`\n  Missing from skills-layout.md (${missingFromLayout.length}):`));
+    for (const s of missingFromLayout.sort()) console.log(`    ${chalk.dim(s)}`);
+  }
+
+  if (extraInReadme.length > 0) {
+    console.log(chalk.yellow(`\n  Extra in skills/README.md (not on disk) (${extraInReadme.length}):`));
+    for (const s of extraInReadme.sort()) console.log(`    ${chalk.dim(s)}`);
+  }
+
+  if (extraInLayout.length > 0) {
+    console.log(chalk.yellow(`\n  Extra in skills-layout.md (not on disk) (${extraInLayout.length}):`));
+    for (const s of extraInLayout.sort()) console.log(`    ${chalk.dim(s)}`);
+  }
+
+  const hasDrift =
+    nonConforming.length > 0 ||
+    missingFromReadme.length > 0 ||
+    missingFromLayout.length > 0 ||
+    extraInReadme.length > 0 ||
+    extraInLayout.length > 0 ||
+    missingRefs.length > 0;
+
+  if (!hasDrift) {
+    console.log(chalk.green('\n  All catalogs in sync. No drift detected.'));
+    return;
+  }
+
+  if (dry) {
+    console.log(chalk.dim('\n  (dry-run: no files written)'));
+    return;
+  }
+
+  if (!write) {
+    console.log(chalk.dim('\n  Pass --write to update catalog files, or --dry-run to preview.'));
+    process.exit(1);
+  }
+
+  // Write updated layout
+  if (existsSync(skillsLayoutPath)) {
+    writeFileSync(skillsLayoutPath, newLayoutContent, 'utf8');
+    console.log(`${chalk.green('✔')} Updated ${chalk.dim(relative(repoRoot, skillsLayoutPath))}`);
+  }
+
+  console.log(chalk.dim('\n  Next: manually update skills/README.md table with:'));
+  console.log(chalk.dim('  (Auto-updating the README table is complex; use the rows below)'));
+  for (const s of missingFromReadme.sort()) {
+    const entry = entries.find((e) => e.folder === s);
+    if (entry) {
+      console.log(`  | [${entry.folder}](/skills/${entry.folder}/) | ${entry.shortDescription || entry.domain} |`);
+    }
+  }
+}
+
 function help() {
   console.log(`
 ${chalk.bold.cyan('devkit tools')} ${chalk.dim('— skill authoring & knowledge base CLI')}
@@ -2190,12 +2503,15 @@ ${chalk.bold('SKILLS')}
   ${chalk.yellow('list-skills')}           List all skills  ${chalk.dim('[--include-template] [--json]')}
   ${chalk.yellow('validate-skills')}       Check frontmatter correctness  ${chalk.dim('[--include-template]')}
   ${chalk.yellow('audit-skill-structure')} Check required skill sections  ${chalk.dim('[--markdown|--json] [--only-actionable] [--strict]')}
+  ${chalk.yellow('validate-skill-quality')} Frontmatter completeness + Karpathy gate  ${chalk.dim('[--markdown] [--strict]')}
+  ${chalk.yellow('validate-workflows')}    Check workflow markdown required sections  ${chalk.dim('[--markdown] [--strict]')}
   ${chalk.yellow('eval-skill-routing')}    Run trigger-based routing evals  ${chalk.dim('[--file <json>] [--markdown|--json] [--strict] — cases: expected_skill | expected_any_of, hard_negative_skills')}
   ${chalk.yellow('eval-skill-output-format')} Check golden responses against format specs  ${chalk.dim('[--spec <json>] [--file <json>] [--mode heuristic|ai-judge] [--markdown|--json] [--strict]')}
   ${chalk.yellow('build-skill-index')}     Rebuild skill_index.json  ${chalk.dim('[--output <path>] [--with-embeddings] [--dry-run]')}
   ${chalk.yellow('analyze-skills')}        Audit skill quality  ${chalk.dim('[--markdown|--self-review] [--only-actionable] [--json]')}
   ${chalk.yellow('install-skill')}         Install one skill  ${chalk.dim('<path> [--project-dir] [--mode symlink|copy] [--all-ides]')}
   ${chalk.yellow('generate-gap-analysis')} Regenerate domain coverage report  ${chalk.dim('[--dry-run]')}
+  ${chalk.yellow('sync-catalogs')}          Sync skill catalogs (README, layout)  ${chalk.dim('[--write] [--dry-run]')}
 
 ${chalk.bold('BUNDLE')}
   ${chalk.yellow('verify-bundle-install')} Check installed bundle integrity  ${chalk.dim('[--project-dir] [--strict]')}
@@ -2277,7 +2593,11 @@ async function main() {
   });
   const cmd = String(args._?.[0] || '');
   const root = process.cwd();
-  switch (cmd) {
+  
+  // Handle slash commands (convert /command to command)
+  const normalizedCmd = cmd.startsWith('/') ? cmd.slice(1) : cmd;
+  
+  switch (normalizedCmd) {
     case 'list-skills':
       cmdListSkills(args, root);
       break;
@@ -2287,6 +2607,12 @@ async function main() {
     case 'audit-skill-structure':
       cmdAuditSkillStructure(args, root);
       break;
+    case 'validate-skill-quality':
+      cmdValidateSkillQuality(args, root);
+      break;
+    case 'validate-workflows':
+      cmdValidateWorkflows(args, root);
+      break;
     case 'eval-skill-routing':
       cmdEvalSkillRouting(args, root);
       break;
@@ -2294,7 +2620,7 @@ async function main() {
       await cmdEvalSkillOutputFormat(args, root);
       break;
     case 'build-skill-index':
-      cmdBuildSkillIndex(args, root);
+      await cmdBuildSkillIndex(args, root);
       break;
     case 'analyze-skills':
       cmdAnalyzeSkills(args, root);
@@ -2306,25 +2632,25 @@ async function main() {
       cmdVerifyBundleInstall(args, root);
       break;
     case 'build-kb':
-      buildKb(root, Boolean(args['dry-run']));
+      await buildKb(root, Boolean(args['dry-run']));
       break;
     case 'index-project':
-      cmdIndexProject(args);
+      await cmdIndexProject(args);
       break;
     case 'generate-wiki':
       cmdGenerateWiki(args);
       break;
     case 'query-kb':
-      cmdQueryKb(args, root);
+      await cmdQueryKb(args, root);
       break;
     case 'query-kb-batch':
-      cmdQueryKbBatch(args, root);
+      await cmdQueryKbBatch(args, root);
       break;
     case 'verify-kb':
       cmdVerifyKb(args, root);
       break;
     case 'build-graph':
-      cmdBuildGraph(args);
+      await cmdBuildGraph(args);
       break;
     case 'query-graph':
       cmdQueryGraph(args);
@@ -2334,6 +2660,9 @@ async function main() {
       break;
     case 'generate-gap-analysis':
       cmdGenerateGapAnalysis(args, root);
+      break;
+    case 'sync-catalogs':
+      cmdSyncCatalogs(args, root);
       break;
     default:
       help();

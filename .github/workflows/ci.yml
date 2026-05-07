@@ -22,8 +22,30 @@ jobs:
           npm ci
           npm run build
 
-      - name: Validate skills
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx eslint src/
+
+      - name: Run tests
+        run: npm test
+
+      - name: Validate skills (frontmatter)
         run: node dist/tools.js validate-skills
+
+      - name: Audit skill sections (strict)
+        run: node dist/tools.js audit-skill-structure --strict
+
+      - name: Validate skill quality (strict)
+        run: node dist/tools.js validate-skill-quality --strict
+
+      - name: Validate skill quality warnings
+        run: node dist/tools.js validate-skill-quality --markdown
+        continue-on-error: true
+
+      - name: Validate workflows (strict)
+        run: node dist/tools.js validate-workflows --strict
 
       - name: Eval skill routing (strict)
         run: node dist/tools.js eval-skill-routing --strict

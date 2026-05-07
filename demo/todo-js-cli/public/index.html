@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo App - Beautiful UI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📋 Todo App</h1>
+      <p class="subtitle">Skills Devkit Demo</p>
+    </header>
+
+    <div class="add-todo">
+      <input type="text" id="todoTitle" placeholder="What needs to be done?" />
+      <input type="text" id="todoDescription" placeholder="Description (optional)" />
+      <select id="todoPriority">
+        <option value="low">Low Priority</option>
+        <option value="medium" selected>Medium Priority</option>
+        <option value="high">High Priority</option>
+      </select>
+      <input type="date" id="todoDueDate" />
+      <button onclick="addTodo()">Add Todo</button>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterTodos('all')">All</button>
+      <button class="filter-btn" onclick="filterTodos('pending')">Pending</button>
+      <button class="filter-btn" onclick="filterTodos('completed')">Completed</button>
+    </div>
+
+    <div id="todoList" class="todo-list"></div>
+
+    <div class="actions">
+      <button onclick="exportTodos()">Export JSON</button>
+      <button onclick="importTodos()">Import JSON</button>
+      <input type="file" id="importFile" style="display: none" onchange="handleImport(event)" />
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

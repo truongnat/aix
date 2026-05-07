@@ -1,37 +1,100 @@
 # Workflows
 
-A workflow is a **Markdown contract** (`.md` file) describing a sequence of steps: each step invokes a **skill** (by `name` in `SKILL.md`) or references a **prompt template** in `prompts/` / [templates/PROMPT_TEMPLATES.md](../templates/PROMPT_TEMPLATES.md).
+Workflows are organized by domain to support scalable addition of new skills and workflows across different business areas.
+
+## Domain Structure
+
+```
+workflows/
+├── dev/              # Development workflows (coding, architecture, API)
+├── ops/              # Operations workflows (deployment, monitoring, incident)
+├── qa/               # Quality Assurance workflows (testing, code review, audit)
+├── pm/               # Project Management workflows (ticket, planning, release)
+├── data/             # Data workflows (migration, analytics, database)
+├── security/         # Security workflows (audit, compliance, threat modeling)
+├── hr/               # HR/Onboarding workflows
+├── finance/          # Finance workflows (future)
+├── trading/          # Trading workflows (future)
+├── marketing/        # Marketing workflows (future)
+└── [future-domains]/ # Extensible for new domains
+```
+
+## Workflow Naming Convention
+
+- Use kebab-case: `/feature-dev`, `/api-test`, `/load-test`
+- Domain prefix optional: `/dev/feature-dev`, `/ops/deploy`
+- Short forms preferred: `/ticket` instead of `/pm/ticket`
+
+## Adding New Domains
+
+To add a new domain:
+
+1. Create directory: `workflows/<domain>/`
+2. Create `README.md` with domain overview
+3. Add workflows following existing patterns
+4. Update this README with new domain
+5. Register domain skills in `skills/` directory
+
+## Current Workflows by Domain
+
+### dev/ (Development)
+- `/ticket` - Ticket/feature development
+- `/refactor` - Safe refactoring
+- `/api-design` - API design
+- `/route` - Request routing optimization
+
+### ops/ (Operations)
+- `/release` - Release management
+- `/hotfix` - Urgent production fix
+- `/incident` - Incident response
+- `/index-project` - Codebase indexing
+- `/sync-kb` - Knowledge base sync
+
+### qa/ (Quality Assurance)
+- `/code-review` - Structured code review
+- `/test-strategy` - Test strategy
+- `/debug` - Systematic debugging
+- `/security-audit` - Security review
+- `/arch-review` - Architecture review
+- `/perf-investigation` - Performance investigation
+
+### pm/ (Project Management)
+- (Ticket workflow covers PM needs)
+
+### data/ (Data)
+- `/data-migration` - Data/database migration
+
+### security/ (Security)
+- (Security-audit covers most security needs)
+
+### hr/ (Human Resources)
+- `/onboarding` - Team onboarding
+
+## Proposed Future Domains
+
+### finance/
+- `/financial-audit` - Financial statement audit
+- `/budget-planning` - Budget allocation
+- `/revenue-forecast` - Revenue projection
+- `/expense-tracking` - Expense monitoring
+
+### trading/
+- `/trade-execution` - Trade execution workflow
+- `/risk-analysis` - Trading risk assessment
+- `/portfolio-rebalance` - Portfolio adjustment
+- `/market-analysis` - Market data analysis
+
+### marketing/
+- `/campaign-plan` - Marketing campaign
+- `/content-strategy` - Content planning
+- `/seo-audit` - SEO optimization
+- `/analytics-review` - Marketing analytics
+
+## Workflow Conventions
+
+See [conventions.md](./conventions.md) for detailed workflow authoring guidelines.
 
 This repo does **not** require an automated engine: an agent (or you) reads the file and executes steps in order; you can add a dedicated runner later.
-
-## Naming
-
-- **Runnable workflow files** use a **slug** name: pattern **`<slug>.md`** (e.g. `ticket.md`, `hotfix.md`, `release.md`). This matches slash commands **`/<slug>`** via a single stub in **`commands/<slug>.md`** (deployed to **`.cursor/commands/`** and **`.claude/commands/`** by the installer, or symlinked in this repo for dev).
-- **Index files** only: `README.md` in `workflows/` or `workflows/<domain>/` — no prefix.
-
-## Bundled workflows (by domain)
-
-| Command | Document | Purpose |
-|---------|----------|---------|
-| **`/route`** | [`dev/route.md`](./dev/route.md) | Request routing & skill orchestration |
-| **`/ticket`** | [`dev/ticket.md`](./dev/ticket.md) | Ticket / Kanban |
-| **`/release`** | [`dev/release.md`](./dev/release.md) | Release notes → work |
-| **`/hotfix`** | [`dev/hotfix.md`](./dev/hotfix.md) | Urgent production fix |
-| **`/code-review`** | [`dev/code-review.md`](./dev/code-review.md) | Structured review |
-| **`/debug`** | [`dev/debug.md`](./dev/debug.md) | Systematic debugging |
-| **`/security-audit`** | [`dev/security-audit.md`](./dev/security-audit.md) | Security review |
-| **`/arch-review`** | [`dev/arch-review.md`](./dev/arch-review.md) | Architecture review |
-| **`/perf-investigation`** | [`dev/perf-investigation.md`](./dev/perf-investigation.md) | Performance |
-| **`/refactor`** | [`dev/refactor.md`](./dev/refactor.md) | Safe refactor |
-| **`/incident`** | [`dev/incident.md`](./dev/incident.md) | Incident response |
-| **`/data-migration`** | [`dev/data-migration.md`](./dev/data-migration.md) | Data / DB migration |
-| **`/onboarding`** | [`dev/onboarding.md`](./dev/onboarding.md) | Onboarding |
-| **`/api-design`** | [`dev/api-design.md`](./dev/api-design.md) | API design |
-| **`/test-strategy`** | [`dev/test-strategy.md`](./dev/test-strategy.md) | Test strategy |
-| **`/dep-audit`** | [`dev/dep-audit.md`](./dev/dep-audit.md) | Dependencies |
-| **`/index-project`** | [`dev/index-project.md`](./dev/index-project.md) | Index any repo |
-
-Slash commands are authored once under **`commands/`**. **`*.md`** stubs include **`targets: [cursor, claude]`** by default. Routing helpers (`route`, `optimize`, `find-skill`, `run-workflow`) use **`targets: [claude]`** only. **`.cursor/commands/`** and **`.claude/commands/`** in this repo are symlinks into **`commands/`** for IDE discovery.
 
 ## Parallel execution
 

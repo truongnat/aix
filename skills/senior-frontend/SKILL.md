@@ -1,6 +1,98 @@
 ---
 name: "senior-frontend"
 description: Frontend development skill for React, Next.js, TypeScript, and Tailwind CSS applications. Use when building React components, optimizing Next.js performance, analyzing bundle sizes, scaffolding frontend projects, implementing accessibility, or reviewing frontend code quality.
+metadata:
+  short-description: "Frontend — React, Next.js, TypeScript, Tailwind CSS"
+---
+
+## Boundary
+
+This skill provides frontend development guidance for React, Next.js, TypeScript, and Tailwind CSS applications. It focuses on component generation, performance optimization, bundle analysis, and accessibility. It does NOT cover backend development (use nestjs-pro, backend skills), database operations (use database-specific skills), or mobile development (use react-native-pro, flutter-pro).
+
+## When to use
+
+Use this skill when:
+- Building React components
+- Optimizing Next.js performance
+- Analyzing bundle sizes
+- Scaffolding frontend projects
+- Implementing accessibility
+- Reviewing frontend code quality
+- Configuring TypeScript and Tailwind
+
+DO NOT use this skill for:
+- Backend development (use nestjs-pro, backend skills)
+- Database operations (use database-specific skills)
+- Mobile development (use react-native-pro, flutter-pro)
+- CSS/styling system design (use design-system-pro, ui-stack-pro)
+
+## Workflow
+
+1. **Understand requirements** (component, performance, accessibility)
+2. **Select appropriate tools** (scaffolder, component generator, bundle analyzer)
+3. **Generate or implement** components or projects
+4. **Optimize performance** (code splitting, lazy loading, caching)
+5. **Implement accessibility** (ARIA, keyboard navigation, focus management)
+6. **Analyze bundle size** and optimize
+7. **Test and validate** implementation
+8. **Document and review**
+
+### Operating principles
+
+- **Component First**: Build reusable, composable components
+- **Performance**: Optimize bundle size, use code splitting, lazy load
+- **Accessibility**: Implement ARIA labels, keyboard navigation, focus management
+- **Type Safety**: Use TypeScript for all components
+- **Styling**: Use Tailwind CSS for consistent styling
+- **Testing**: Write unit and integration tests
+- **Documentation**: Document component props and usage
+- **Best Practices**: Follow React and Next.js best practices
+
+## Suggested response format
+
+```
+Framework: [React / Next.js]
+TypeScript: [yes/no]
+Tailwind: [yes/no]
+Component/Project: [name]
+Status: [success/failed]
+Details: [implementation details, performance metrics, accessibility features]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **Frontend Scaffolder**: Project scaffolding automation
+- **Component Generator**: Component generation templates
+- **Bundle Analyzer**: Bundle size analysis and optimization
+- **React Patterns**: Best practices and patterns
+- **Next.js Optimization**: Performance optimization techniques
+- **Accessibility**: ARIA, keyboard navigation, focus management
+
+## Quick example
+
+**Scaffold a Next.js project:**
+
+```
+1. Run scaffolder: python scripts/frontend_scaffolder.py my-app --template nextjs
+2. Configure TypeScript and Tailwind
+3. Generate components
+4. Implement accessibility features
+5. Optimize bundle size
+6. Test and validate
+```
+
+## Checklist before calling the skill done
+
+- [ ] Frontend requirements are clearly defined
+- [ ] Framework is selected (React, Next.js)
+- [ ] TypeScript requirements are understood
+- [ ] Styling approach is defined (Tailwind CSS)
+- [ ] Performance requirements are identified
+- [ ] Accessibility requirements are defined
+- [ ] Testing strategy is planned
+- [ ] Bundle size targets are defined
+
 ---
 
 # Senior Frontend

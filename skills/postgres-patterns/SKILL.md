@@ -1,6 +1,91 @@
 ---
 name: postgres-patterns
 description: PostgreSQL database patterns for query optimization, schema design, indexing, and security. Based on Supabase best practices.
+metadata:
+  short-description: "PostgreSQL — query optimization, schema design, indexing, Supabase"
+---
+
+## Boundary
+
+This skill provides PostgreSQL database patterns for query optimization, schema design, indexing, and security. It focuses on PostgreSQL best practices, Supabase patterns, and performance optimization. It does NOT cover other databases (MySQL, MongoDB, etc.) or general database theory (those have dedicated skills).
+
+## When to use
+
+Use this skill when:
+- Writing SQL queries or migrations
+- Designing database schemas
+- Troubleshooting slow queries
+- Implementing Row Level Security (RLS)
+- Configuring connection pooling
+- Creating indexes for performance
+- Optimizing PostgreSQL queries
+
+DO NOT use this skill for:
+- Other database systems (MySQL, MongoDB, etc.) - use database-specific skills
+- General database theory - use algorithm-pro or data-analysis-pro skills
+- ORM-specific patterns - use those specific skills (prisma-postgres, typeorm, etc.)
+
+## Workflow
+
+1. **Analyze the database operation** (query, schema, index, security)
+2. **Select the appropriate pattern** from the quick reference
+3. **Implement the pattern** following PostgreSQL best practices
+4. **Test the implementation** for performance
+5. **Optimize if needed** using EXPLAIN ANALYZE
+6. **Document the pattern** for future reference
+
+### Operating principles
+
+- **Use appropriate index types**: B-tree (default), GIN (jsonb, text search), BRIN (time series)
+- **Optimize queries**: Use EXPLAIN ANALYZE, avoid N+1 queries, use proper JOINs
+- **Design schemas**: Normalize appropriately, use constraints, define relationships
+- **Implement RLS**: Use Row Level Security for multi-tenant applications
+- **Connection pooling**: Configure pool size and timeouts appropriately
+- **Security**: Use prepared statements, validate inputs, limit permissions
+- **Performance**: Monitor slow queries, use materialized views for complex queries
+
+## Suggested response format
+
+```
+Pattern: [query / schema / index / security / performance]
+PostgreSQL Version: [version]
+Operation: [specific operation]
+Status: [success/failed]
+Details: [implementation details, SQL, performance metrics]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **Index Patterns**: B-tree, GIN, BRIN, composite indexes
+- **Query Optimization**: EXPLAIN ANALYZE, JOIN strategies, subqueries
+- **Schema Design**: Normalization, constraints, relationships
+- **Security**: Row Level Security, prepared statements, permissions
+- **Performance**: Connection pooling, materialized views, query caching
+- **Supabase**: Supabase-specific patterns and best practices
+
+## Quick example
+
+**Create a GIN index for jsonb:**
+
+```
+1. Identify jsonb column query pattern
+2. Create GIN index: CREATE INDEX idx ON t USING gin (col)
+3. Test query performance with EXPLAIN ANALYZE
+4. Compare before/after execution time
+```
+
+## Checklist before calling the skill done
+
+- [ ] PostgreSQL version is known
+- [ ] Database schema is available
+- [ ] Query or operation is clearly defined
+- [ ] Performance requirements are understood
+- [ ] Security requirements are identified
+- [ ] Indexing strategy is planned
+- [ ] Testing approach is defined
+- [ ] Backup strategy is in place (for schema changes)
+
 ---
 
 # PostgreSQL パターン

@@ -67,7 +67,6 @@ function parseFile(filePath, baseDir) {
     if (!lang)
         return { nodes, edges };
     const patterns = PATTERNS[lang];
-    const lines = content.split('\n');
     // Track defined symbols in this file for call resolution
     const localSymbols = new Set();
     // Parse functions
@@ -126,7 +125,7 @@ function parseFile(filePath, baseDir) {
         const importRegex = new RegExp(importPattern.source, 'g');
         let match;
         while ((match = importRegex.exec(content)) !== null) {
-            const line = content.substring(0, match.index).split('\n').length;
+            // const line = content.substring(0, match.index).split('\n').length;
             // Handle different import formats
             if (match[1]) {
                 // from X import { a, b }
@@ -164,7 +163,7 @@ function parseFile(filePath, baseDir) {
                 seenCalls.add(callName);
                 // Find which function contains this call
                 const pos = match.index;
-                const lineNum = content.substring(0, pos).split('\n').length;
+                // const lineNum = content.substring(0, pos).split('\n').length;
                 const containingFunc = findContainingFunction(content, pos, nodes);
                 if (containingFunc) {
                     edges.push({
@@ -195,7 +194,7 @@ function findContainingFunction(content, pos, nodes) {
     }
     return null;
 }
-export function buildGraph(baseDir, includePatterns = ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.py', '**/*.go', '**/*.rs'], ignorePatterns = ['**/node_modules/**', '**/.git/**', '**/dist/**', '**/build/**', '**/.venv/**']) {
+export async function buildGraph(baseDir, includePatterns = ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.py', '**/*.go', '**/*.rs'], ignorePatterns = ['**/node_modules/**', '**/.git/**', '**/dist/**', '**/build/**', '**/.venv/**']) {
     const graph = { nodes: [], edges: [] };
     const fileSet = new Set();
     for (const pattern of includePatterns) {
@@ -208,12 +207,42 @@ export function buildGraph(baseDir, includePatterns = ['**/*.ts', '**/*.tsx', '*
         matches.forEach(f => fileSet.add(f));
     }
     const files = [...fileSet].sort();
-    for (const file of files) {
-        if (!isCodeFile(file))
-            continue;
-        const { nodes, edges } = parseFile(file, baseDir);
-        graph.nodes.push(...nodes);
-        graph.edges.push(...edges);
+    // Try tree-sitter first
+    let treeSitterOk = false;
+    try {
+        const ts = await import('./tree-sitter-graph.js');
+        if (await ts.initTreeSitter()) {
+            treeSitterOk = true;
+            console.log('Using tree-sitter for accurate AST parsing');
+            for (const file of files) {
+                if (!isCodeFile(file))
+                    continue;
+                const result = await ts.parseFileWithTreeSitter(file, baseDir);
+                if (result) {
+                    graph.nodes.push(...result.nodes);
+                    graph.edges.push(...result.edges);
+                }
+                else {
+                    // Tree-sitter failed for this file, fall back to regex
+                    const { nodes, edges } = parseFile(file, baseDir);
+                    graph.nodes.push(...nodes);
+                    graph.edges.push(...edges);
+                }
+            }
+        }
+    }
+    catch {
+        // Tree-sitter not available, fall back to regex
+    }
+    if (!treeSitterOk) {
+        console.log('Using regex-based parsing (install @vscode/tree-sitter-wasm for AST accuracy)');
+        for (const file of files) {
+            if (!isCodeFile(file))
+                continue;
+            const { nodes, edges } = parseFile(file, baseDir);
+            graph.nodes.push(...nodes);
+            graph.edges.push(...edges);
+        }
     }
     return graph;
 }

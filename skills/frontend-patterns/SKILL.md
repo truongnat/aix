@@ -2,6 +2,94 @@
 name: frontend-patterns
 description: Frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices.
 origin: ECC
+metadata:
+  short-description: "Frontend — React/Next.js patterns, state management, performance"
+---
+
+## Boundary
+
+This skill provides frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices. It focuses on component patterns, custom hooks, state management, and performance optimization. It does NOT cover backend development, database design, or deployment (those have dedicated skills).
+
+## When to use
+
+Use this skill when:
+- Building React components with proper composition patterns
+- Implementing state management (useState, useReducer, Zustand, Context)
+- Creating custom hooks for reusable logic
+- Optimizing performance (memoization, virtualization, code splitting)
+- Working with forms (validation, controlled inputs, Zod schemas)
+- Implementing accessibility patterns (keyboard navigation, focus management)
+- Adding animations (Framer Motion, CSS transitions)
+
+DO NOT use this skill for:
+- Backend API development (use nestjs-pro, api-design-pro skills)
+- Database schema design (use database-specific skills)
+- CSS/styling system design (use design-system-pro, ui-stack-pro skills)
+- Mobile-specific development (use react-native-pro, flutter-pro skills)
+
+## Workflow
+
+1. **Identify the frontend pattern** needed (component, hook, state, performance, form, accessibility)
+2. **Select the appropriate pattern** from the examples provided
+3. **Adapt the pattern** to your specific use case
+4. **Implement the pattern** following TypeScript best practices
+5. **Test the implementation** for edge cases and performance
+6. **Optimize if needed** using performance patterns (memoization, virtualization)
+
+### Operating principles
+
+- **Composition Over Inheritance**: Build components through composition, not inheritance
+- **Single Responsibility**: Each component/hook should have one clear purpose
+- **Immutability**: Prefer immutable state updates (spread operator, immer)
+- **Performance First**: Use memoization, virtualization, and code splitting proactively
+- **Accessibility by Default**: Implement ARIA labels, keyboard navigation, focus management
+- **Type Safety**: Use TypeScript interfaces and types for all props and state
+- **Error Boundaries**: Wrap components in error boundaries for graceful error handling
+- **Custom Hooks**: Extract reusable logic into custom hooks for composition
+
+## Suggested response format
+
+```
+Pattern: [Component / Hook / State / Performance / Form / Accessibility]
+Implementation: [code snippet or file path]
+Status: [success/failed]
+Details: [implementation details, props, usage examples]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **Component Patterns**: Composition, compound components, render props
+- **Custom Hooks**: State management, data fetching, debounce, toggle
+- **State Management**: Context + reducer, Zustand, Redux patterns
+- **Performance**: Memoization, code splitting, virtualization
+- **Form Handling**: Controlled inputs, validation, Zod schemas
+- **Accessibility**: Keyboard navigation, focus management, ARIA
+- **Animation**: Framer Motion patterns, CSS transitions
+
+## Quick example
+
+**Create a Custom Hook:**
+
+```
+1. Define hook interface and state
+2. Implement logic with useState/useEffect
+3. Add useCallback for memoization
+4. Return state and functions
+5. Use in component
+```
+
+## Checklist before calling the skill done
+
+- [ ] React/Next.js project is set up
+- [ ] TypeScript is configured
+- [ ] Required libraries are installed (framer-motion, @tanstack/react-virtual, etc.)
+- [ ] Component structure is planned
+- [ ] State management strategy is defined
+- [ ] Performance requirements are understood
+- [ ] Accessibility requirements are identified
+- [ ] Testing approach is defined
+
 ---
 
 # Frontend Development Patterns

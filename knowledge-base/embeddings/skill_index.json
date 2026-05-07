@@ -1,5 +1,116 @@
 [
   {
+    "name": "a2a-protocol-pro",
+    "folder": "a2a-protocol-pro",
+    "description": "Design and implement multi-agent systems using the Agent-to-Agent (A2A) protocol: agent discovery, task delegation, lifecycle management, and security.\n\nUse this skill when building systems with multiple collaborating agents, designing agent discovery (Agent Cards), implementing task delegation flows, or choosing between Gateway, Pipeline, and Mesh patterns.\n\nDo not use for single-agent tool access (use mcp-server-pro) or for general API design (use api-design-pro).\n\nTriggers: \"multi-agent\", \"A2A\", \"agent communication\", \"agent discovery\", \"delegate to agent\", \"agent orchestration\", \"agent mesh\", \"agent pipeline\", \"Agent Card\", \"task lifecycle\", \"agent collaboration\", \"swarm of agents\".",
+    "triggers": [
+      "multi-agent",
+      "a2a",
+      "agent communication",
+      "agent discovery",
+      "delegate to agent",
+      "agent orchestration",
+      "agent mesh",
+      "agent pipeline",
+      "agent card",
+      "task lifecycle",
+      "agent collaboration",
+      "swarm of agents."
+    ],
+    "when_to_use": [
+      "Designing a multi-agent system where specialized agents collaborate.",
+      "Implementing Agent Cards for agent discovery and capability advertisement.",
+      "Choosing between Gateway, Pipeline, and Mesh orchestration patterns.",
+      "Managing task lifecycle: create, update, complete, cancel, error handling.",
+      "Securing agent-to-agent communication (mutual TLS, capability scoping).",
+      "Debugging agent coordination failures, deadlocks, or task loops.",
+      "Trigger keywords: `multi-agent`, `A2A`, `agent communication`, `agent discovery`, `delegate`, `agent orchestration`, `Agent Card`"
+    ],
+    "references": [
+      "agent-cards-and-discovery.md",
+      "anti-patterns.md",
+      "decision-tree.md",
+      "integration-map.md",
+      "orchestration-patterns.md",
+      "task-lifecycle.md"
+    ]
+  },
+  {
+    "name": "ag-ui-pro",
+    "folder": "ag-ui-pro",
+    "description": "Build interactive user interfaces for AI agents using the AG-UI protocol: streaming chat, human-in-the-loop, generative UI, shared state, and frontend tool calling.\n\nUse this skill when designing agent-interactive frontends, implementing streaming chat UIs, adding human approval gates, building generative UI components, or connecting a React/Vue/Svelte frontend to an agentic backend.\n\nDo not use for backend agent logic (use ai-integration-pro) or for general frontend design (use frontend-design-pro).\n\nTriggers: \"agent UI\", \"copilot interface\", \"AG-UI\", \"agent frontend\", \"human in the loop\", \"streaming chat\", \"generative UI\", \"CopilotKit\", \"agent component\", \"shared state agent\", \"frontend tool calling\", \"agent user interaction\".",
+    "triggers": [
+      "agent ui",
+      "copilot interface",
+      "ag-ui",
+      "agent frontend",
+      "human in the loop",
+      "streaming chat",
+      "generative ui",
+      "copilotkit",
+      "agent component",
+      "shared state agent",
+      "frontend tool calling",
+      "agent user interaction."
+    ],
+    "when_to_use": [
+      "Designing a chat interface where users interact with an AI agent.",
+      "Adding human-in-the-loop approval gates (e.g., \"Approve this action?\").",
+      "Building generative UI components that render dynamically based on agent output.",
+      "Managing shared state between the frontend and agent backend.",
+      "Implementing frontend tool calling (the UI invokes tools on behalf of the agent).",
+      "Connecting a React, Vue, or Svelte frontend to an agentic backend via AG-UI or CopilotKit.",
+      "Trigger keywords: `agent UI`, `copilot interface`, `AG-UI`, `agent frontend`, `human in the loop`, `streaming chat`, `generative UI`"
+    ],
+    "references": [
+      "anti-patterns.md",
+      "decision-tree.md",
+      "generative-ui.md",
+      "human-in-the-loop.md",
+      "integration-map.md",
+      "streaming-and-realtime.md"
+    ]
+  },
+  {
+    "name": "agent-evaluation-pro",
+    "folder": "agent-evaluation-pro",
+    "description": "Evaluate, observe, and improve AI agent / LLM output quality with structured metrics, regression testing, red-teaming, and CI/CD integration.\n\nUse this skill when measuring agent correctness, setting up prompt regression tests, debugging agent failures at scale, or building an evaluation pipeline for production agents.\n\nDo not use for general software testing (use testing-pro) or for building the agent itself (use ai-integration-pro).\n\nTriggers: \"evaluate agent\", \"LLM testing\", \"prompt regression\", \"agent observability\", \"trace agent\", \"red team LLM\", \"agent quality\", \"eval pipeline\", \"golden dataset\", \"output scoring\", \"LLM benchmark\", \"compare prompts\", \"A/B test agent\".",
+    "triggers": [
+      "evaluate agent",
+      "llm testing",
+      "prompt regression",
+      "agent observability",
+      "trace agent",
+      "red team llm",
+      "agent quality",
+      "eval pipeline",
+      "golden dataset",
+      "output scoring",
+      "llm benchmark",
+      "compare prompts",
+      "a/b test agent."
+    ],
+    "when_to_use": [
+      "Designing evaluation metrics for an agent (correctness, hallucination, latency, cost, safety).",
+      "Building a golden dataset or benchmark for regression testing.",
+      "Comparing two prompts, models, or agent versions with A/B or statistical testing.",
+      "Setting up tracing and observability (LangSmith, Langfuse, Arize Phoenix, Braintrust).",
+      "Red-teaming an agent for safety, jailbreaks, or prompt injection.",
+      "Integrating evals into CI/CD so bad outputs block deploy.",
+      "Debugging why an agent fails on specific inputs via trace analysis.",
+      "Trigger keywords: `evaluate agent`, `LLM testing`, `prompt regression`, `red team`, `agent observability`, `eval pipeline`"
+    ],
+    "references": [
+      "anti-patterns.md",
+      "dataset-curation.md",
+      "decision-tree.md",
+      "integration-map.md",
+      "metrics-and-scoring.md",
+      "observability-and-tracing.md",
+      "red-teaming-and-safety.md"
+    ]
+  },
+  {
     "name": "ai-integration-pro",
     "folder": "ai-integration-pro",
     "description": "Professional AI/LLM integration: Claude API, OpenAI API, prompt engineering, streaming, tool use/function calling, multi-turn conversations, RAG, embeddings, conversation state, evaluation, routing, observability, and production reliability patterns.\n\nUse this skill when the user integrates LLMs (Claude, GPT, Gemini, Llama), uses Anthropic or OpenAI SDKs, designs prompts, implements streaming, tool use, RAG, memory/trim policies, eval gates, or builds production AI features.\n\nUse **with** **`security-pro`** for threat modeling and data classification, **`caching-pro`** for prompt/embedding caches, **`testing-pro`** for eval and mocks, **`postgresql-pro`** for pgvector, **`api-design-pro`** for AI HTTP APIs.\n\nTriggers: \"Claude\", \"Anthropic\", \"OpenAI\", \"GPT\", \"LLM\", \"prompt\", \"system prompt\", \"prompt injection\", \"jailbreak\", \"streaming\", \"SSE\", \"tool use\", \"function calling\", \"embeddings\", \"RAG\", \"retrieval\", \"vector\", \"semantic search\", \"tokens\", \"context window\", \"temperature\", \"top_p\", \"rate limit\", \"429\", \"completion\", \"chat completion\", \"anthropic SDK\", \"openai SDK\", \"messages API\", \"Gemini\", \"multi-turn\", \"conversation history\", \"memory\", \"truncation\", \"golden set\", \"eval\", \"Langfuse\", \"observability\", \"AI agent\", \"agentic\".",
@@ -270,6 +381,32 @@
       "token-session-lifecycle.md",
       "versions.md",
       "workload-machine-auth.md"
+    ]
+  },
+  {
+    "name": "azure-storage",
+    "folder": "azure-storage",
+    "description": "Azure Storage Services including Blob Storage, File Shares, Queue Storage, Table Storage, and Data Lake. Provides object storage, SMB file shares, async messaging, NoSQL key-value, and big data analytics capabilities. Includes access tiers (hot, cool, archive) and lifecycle management. USE FOR: blob storage, file shares, queue storage, table storage, data lake, upload files, download blobs, storage accounts, access tiers, lifecycle management. DO NOT USE FOR: SQL databases, Cosmos DB (use azure-prepare), messaging with Event Hubs or Service Bus (use azure-messaging).",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Working with Azure Blob Storage for object storage",
+      "Managing Azure File Shares for SMB file sharing",
+      "Using Queue Storage for async messaging",
+      "Interacting with Table Storage for NoSQL key-value data",
+      "Managing Data Lake Storage Gen2 for big data analytics",
+      "Configuring storage account tiers and redundancy",
+      "Implementing lifecycle management policies",
+      "Uploading/downloading files to/from Azure Storage",
+      "DO NOT use this skill for:",
+      "Azure SQL Database or PostgreSQL (use database-specific skills)",
+      "Cosmos DB operations (use azure-prepare or cosmos-db skills)",
+      "Event Hubs or Service Bus messaging (use azure-messaging skill)",
+      "Azure Functions or App Service deployment"
+    ],
+    "references": [
+      "auth-best-practices.md",
+      "sdk-usage.md"
     ]
   },
   {
@@ -574,6 +711,31 @@
     ]
   },
   {
+    "name": "clean-architecture",
+    "folder": "clean-architecture",
+    "description": "Provides implementation patterns for Clean Architecture, Domain-Driven Design (DDD), and Hexagonal Architecture (Ports & Adapters) in NestJS/TypeScript applications. Use when structuring complex backend systems, designing domain layers with entities/value objects/aggregates, implementing ports and adapters, creating use cases, or refactoring from anemic models to rich domain models with dependency inversion.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Architecting complex NestJS applications requiring long-term maintainability",
+      "Refactoring from tightly-coupled MVC to layered architecture",
+      "Implementing rich domain models with encapsulated business logic",
+      "Designing testable systems with swappable infrastructure",
+      "Creating microservices with clear bounded contexts",
+      "Separating business rules from framework code",
+      "Implementing event-driven architectures with domain events",
+      "DO NOT use this skill for:",
+      "Basic NestJS CRUD operations (use nestjs-pro skill)",
+      "Database schema design (use database-specific skills)",
+      "API endpoint design (use api-design-pro skill)",
+      "Simple applications where Clean Architecture would be over-engineering"
+    ],
+    "references": [
+      "nestjs-implementation.md",
+      "typescript-clean-architecture.md"
+    ]
+  },
+  {
     "name": "clean-code-architecture-pro",
     "folder": "clean-code-architecture-pro",
     "description": "Production-grade clean code and Clean Architecture: dependency rule as a system model (inward stability, ports/adapters, dependency vs control flow), bounded contexts and anti-corruption layers, strangler and incremental migration, failure modes (leaky domain, cycles, anemic model, god modules, distributed mud), decision frameworks and trade-offs (strict vs pragmatic layering, monolith vs services), stack dialects (TS/Java/Nest/Spring), boundary testing strategy, quality guardrails against over-engineering and diagram-only architecture, SOLID-informed boundaries, refactoring sequencing, and integration with tests and framework skills.\n\nUse when designing module boundaries, reviewing maintainability, inverting dependencies, breaking cycles, refactoring legacy toward clearer layers, or deciding how much architecture ceremony a codebase earns.\n\nCombine with testing-pro, git-operations-pro, nestjs-pro, react-pro, typescript-pro, api-design-pro as needed.\n\nTriggers: \"clean code\", \"clean architecture\", \"hexagonal\", \"ports and adapters\", \"onion\", \"refactor\", \"SOLID\", \"SRP\", \"DIP\", \"OCP\", \"dependency inversion\", \"layering\", \"module boundary\", \"bounded context\", \"ACL anti-corruption\", \"strangler fig\", \"circular dependency\", \"god object\", \"anemic domain\", \"use case\", \"application service\", \"maintainability\", \"tech debt\", \"code smell\", \"feature envy\", \"dependency rule\", \"aggregate\", \"repository pattern\".",
@@ -688,6 +850,45 @@
       "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "versions.md"
+    ]
+  },
+  {
+    "name": "cloud-native-agent-pro",
+    "folder": "cloud-native-agent-pro",
+    "description": "Deploy, scale, and operate AI agents on Kubernetes and cloud-native infrastructure: agent CRDs, MCP server deployment, eBPF observability, Wasm edge inference, and agent scaling patterns.\n\nUse this skill when deploying agents to Kubernetes, designing agent infrastructure as code, scaling agent workloads, or integrating agents with cloud-native platforms (Kagent, AgentCube, Volcano).\n\nDo not use for local agent development (use ai-integration-pro) or for general Kubernetes ops (use docker-pro or infrastructure-as-code-pro).\n\nTriggers: \"deploy agent\", \"kubernetes agent\", \"agent infrastructure\", \"agent at scale\", \"K8s agent\", \"agent CRD\", \"agent scaling\", \"Wasm agent\", \"edge inference\", \"eBPF agent\", \"cloud native AI\", \"agent orchestration K8s\", \"AgentCube\", \"kagent\".",
+    "triggers": [
+      "deploy agent",
+      "kubernetes agent",
+      "agent infrastructure",
+      "agent at scale",
+      "k8s agent",
+      "agent crd",
+      "agent scaling",
+      "wasm agent",
+      "edge inference",
+      "ebpf agent",
+      "cloud native ai",
+      "agent orchestration k8s",
+      "agentcube",
+      "kagent."
+    ],
+    "when_to_use": [
+      "Deploying AI agents to Kubernetes (Kagent, AgentCube, or custom).",
+      "Designing agent Custom Resources (CRDs) for K8s.",
+      "Scaling agent workloads horizontally or vertically.",
+      "Deploying MCP servers as K8s services with service discovery.",
+      "Running Wasm-based agents for edge inference.",
+      "Adding eBPF-based observability for agent performance and security.",
+      "Designing agent infrastructure for multi-tenant SaaS.",
+      "Trigger keywords: `deploy agent`, `kubernetes agent`, `agent infrastructure`, `agent at scale`, `K8s agent`, `agent CRD`, `Wasm agent`"
+    ],
+    "references": [
+      "agent-deployment-patterns.md",
+      "anti-patterns.md",
+      "decision-tree.md",
+      "integration-map.md",
+      "scaling-and-scheduling.md",
+      "wasm-edge-inference.md"
     ]
   },
   {
@@ -1298,6 +1499,50 @@
     ]
   },
   {
+    "name": "frontend-patterns",
+    "folder": "frontend-patterns",
+    "description": "Frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Building React components with proper composition patterns",
+      "Implementing state management (useState, useReducer, Zustand, Context)",
+      "Creating custom hooks for reusable logic",
+      "Optimizing performance (memoization, virtualization, code splitting)",
+      "Working with forms (validation, controlled inputs, Zod schemas)",
+      "Implementing accessibility patterns (keyboard navigation, focus management)",
+      "Adding animations (Framer Motion, CSS transitions)",
+      "DO NOT use this skill for:",
+      "Backend API development (use nestjs-pro, api-design-pro skills)",
+      "Database schema design (use database-specific skills)",
+      "CSS/styling system design (use design-system-pro, ui-stack-pro skills)",
+      "Mobile-specific development (use react-native-pro, flutter-pro skills)"
+    ],
+    "references": []
+  },
+  {
+    "name": "gemini-api-dev",
+    "folder": "gemini-api-dev",
+    "description": "Use this skill when building applications with Gemini models, Gemini API, working with multimodal content (text, images, audio, video), implementing function calling, using structured outputs, or needing current model specifications. Covers SDK usage (google-genai for Python, @google/genai for JavaScript/TypeScript, com.google.genai:google-genai for Java, google.golang.org/genai for Go), model selection, and API capabilities.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Building applications with Gemini models (text, images, audio, video)",
+      "Implementing function calling with Gemini",
+      "Using structured outputs (JSON generation)",
+      "Working with multimodal content",
+      "Using context caching for efficiency",
+      "Generating embeddings for semantic search",
+      "Selecting appropriate Gemini models for your use case",
+      "DO NOT use this skill for:",
+      "OpenAI, Anthropic, or other AI model APIs (use ai-integration-pro skill)",
+      "General ML model development (use data-analysis-pro or algorithm-pro skills)",
+      "Prompt engineering for non-Gemini models (use prompt-engineering-pro skill)",
+      "RAG systems with non-Gemini embeddings (use those specific skills)"
+    ],
+    "references": []
+  },
+  {
     "name": "git-operations-pro",
     "folder": "git-operations-pro",
     "description": "Production-grade Git workflow: conventional commits, branch strategies, merge vs rebase vs squash discipline, PR hygiene, inspection (log, blame, bisect), recovery (revert vs reset) — plus repository/history/ref model (DAG, three trees), failure modes (force-push, leaked secrets, submodule drift, merge-queue conflicts), decision trade-offs (squash vs merge commit, velocity vs safety), quality guardrails (no fabricated SHAs; rotate secrets not only rewrite history).\n\nUse this skill when the user asks about **commit conventions**, **branch naming**, **feature vs trunk flow**, **resolving conflicts**, **review hygiene**, **git log** interpretation, **revert vs reset**, or **what not to commit**.\n\nUse **with** **`testing-pro`** for CI gates; **`security-pro`** for secrets and signing; **`deployment-pro`** for tags/releases; **`ci-cd-pro`** for workflow triggers; **`feedback-pro`** for review policy; **`planning-pro`** for release trains. This skill owns **VCS** mechanics; **`code-packaging-pro`** owns workflow **file** authoring when the task is YAML syntax, not merge strategy.\n\nTriggers: \"git\", \"commit\", \"conventional commits\", \"branch\", \"merge\", \"rebase\", \"pull request\", \"PR\", \"conflict\", \"git log\", \"bisect\", \"revert\", \"cherry-pick\", \"stash\", \"force push\", \"trunk\", \"Git Flow\", \"CODEOWNERS\".",
@@ -1624,6 +1869,46 @@
     ]
   },
   {
+    "name": "mcp-server-pro",
+    "folder": "mcp-server-pro",
+    "description": "Build, secure, and deploy Model Context Protocol (MCP) servers — the standard way to expose tools, resources, and prompts to AI agents.\n\nUse this skill when designing or implementing an MCP server, choosing transport (stdio / SSE / streamable HTTP), defining tool/resource/prompt primitives, adding authentication, or troubleshooting MCP integration failures.\n\nDo not use for general API design (use api-design-pro) or for consuming MCP as a client (use figma-mcp-pro or the client framework's docs).\n\nTriggers: \"MCP server\", \"Model Context Protocol\", \"build MCP\", \"MCP tool\", \"MCP resource\", \"MCP prompt\", \"MCP transport\", \"MCP auth\", \"expose API to agents\", \"agent tooling\", \"MCP inspector\", \"MCP SDK\", \"server-sent events MCP\", \"stdio MCP\".",
+    "triggers": [
+      "mcp server",
+      "model context protocol",
+      "build mcp",
+      "mcp tool",
+      "mcp resource",
+      "mcp prompt",
+      "mcp transport",
+      "mcp auth",
+      "expose api to agents",
+      "agent tooling",
+      "mcp inspector",
+      "mcp sdk",
+      "server-sent events mcp",
+      "stdio mcp."
+    ],
+    "when_to_use": [
+      "Building a new MCP server to expose internal APIs, databases, or services to agents.",
+      "Choosing between stdio, SSE, and streamable HTTP transport.",
+      "Designing tools (functions agents can call), resources (data agents can read), or prompts (reusable templates).",
+      "Adding OAuth 2.1, API-key, or mTLS authentication to an MCP server.",
+      "Hardening MCP server sandboxing (permission scopes, input validation, rate limiting).",
+      "Testing an MCP server with the MCP Inspector or programmatic client tests.",
+      "Debugging MCP connection failures, transport mismatches, or tool execution errors.",
+      "Trigger keywords: `MCP server`, `Model Context Protocol`, `build MCP`, `MCP tool`, `MCP resource`, `MCP transport`, `MCP auth`, `agent tooling`"
+    ],
+    "references": [
+      "anti-patterns.md",
+      "architecture-and-transport.md",
+      "decision-tree.md",
+      "integration-map.md",
+      "security-and-auth.md",
+      "testing-and-inspector.md",
+      "tool-resource-prompt-patterns.md"
+    ]
+  },
+  {
     "name": "microservices-pro",
     "folder": "microservices-pro",
     "description": "Production-grade microservices: bounded contexts, service boundaries, sync/async integration (RPC, events), data ownership, resilience (timeouts, circuit breakers, idempotency, outbox), observability, and operations — plus distributed system model (ownership planes, network hops), failure modes (retry storms, dual writes, contract skew, trust boundaries), decision trade-offs (monolith vs split, mesh vs gateway, consistency), quality guardrails (no fake ARNs, honest SLO/mesh claims).\n\nUse this skill when designing or reviewing microservices architecture, decomposition, data ownership, integration patterns, and production operations.\n\nCombine with **`api-design-pro`**, **`performance-tuning-pro`**, **`deployment-pro`**, **`security-pro`**, **`network-infra-pro`**, **`postgresql-pro`**, **`testing-pro`**, **`ci-cd-pro`**, **`nestjs-pro`**, and other stack skills as needed.\n\nTriggers: \"microservices\", \"service boundary\", \"bounded context\", \"distributed system\", \"CAP\", \"eventual consistency\", \"saga\", \"choreography\", \"orchestration\", \"event-driven\", \"outbox\", \"idempotency\", \"service mesh\", \"Istio\", \"Linkerd\", \"api gateway\", \"Kong\", \"resilience\", \"circuit breaker\", \"bulkhead\", \"retry storm\", \"observability\", \"distributed tracing\", \"correlation id\", \"split brain\", \"backpressure\", \"edge case\".",
@@ -1940,6 +2225,34 @@
     ]
   },
   {
+    "name": "nextjs-security-scan",
+    "folder": "nextjs-security-scan",
+    "description": "Comprehensive security vulnerability scanner for Next.js and TypeScript/JavaScript projects. Detects OWASP Top 10 vulnerabilities, XSS, injection flaws, authentication issues, hardcoded secrets, and Next.js-specific security problems. Audits dependencies for known CVEs and generates actionable security reports.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Performing security audits of Next.js applications",
+      "Conducting code reviews for security vulnerabilities",
+      "Running pre-deployment security checks",
+      "Assessing dependency vulnerabilities",
+      "Detecting hardcoded secrets and credentials",
+      "Scanning for XSS and injection flaws",
+      "Checking Server Actions authentication",
+      "DO NOT use this skill for:",
+      "Backend infrastructure security (use security-pro skill)",
+      "DevSecOps pipeline configuration (use ci-cd-pro skill)",
+      "General security architecture reviews (use security-review skill)",
+      "Network security or firewall configuration (use network-infra-pro skill)"
+    ],
+    "references": [
+      "auth-vulnerabilities.md",
+      "injection-patterns.md",
+      "nextjs-specific.md",
+      "owasp-top-10.md",
+      "xss-patterns.md"
+    ]
+  },
+  {
     "name": "ocr-pro",
     "folder": "ocr-pro",
     "description": "Professional OCR integration and troubleshooting: OCR service architecture, PaddleOCR/EasyOCR setup, Handz OCR integration, frame detection, text recognition, image rotation, configuration management, caching strategies, error handling, performance optimization, and production reliability patterns.\n\nUse this skill when the user integrates OCR services (PaddleOCR, EasyOCR, Handz OCR), sets up OCR infrastructure, debugs OCR failures, optimizes OCR performance, or designs OCR workflows for document processing applications.\n\nUse **with** **`docker-pro`** for container orchestration, **`nestjs-pro`** for backend integration, **`azure-pro`** for Azure Storage integration, **`testing-pro`** for OCR accuracy tests, **`network-infra-pro`** for OCR service networking.\n\nTriggers: \"OCR\", \"PaddleOCR\", \"EasyOCR\", \"Handz OCR\", \"text recognition\", \"frame detection\", \"image rotation\", \"bounding box\", \"OCR API\", \"OCR timeout\", \"OCR accuracy\", \"OCR configuration\", \"OCR docker\", \"Tesseract\", \"text extraction\", \"document processing\", \"OCR error\", \"OCR performance\", \"OCR cache\".",
@@ -2021,6 +2334,31 @@
       "result-aggregation.md",
       "state-isolation.md"
     ]
+  },
+  {
+    "name": "pdf",
+    "folder": "pdf",
+    "description": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Reading or extracting text/tables from PDFs",
+      "Combining or merging multiple PDFs",
+      "Splitting PDFs into separate files",
+      "Rotating PDF pages",
+      "Adding watermarks to PDFs",
+      "Creating new PDFs from scratch",
+      "Filling PDF forms",
+      "Encrypting or decrypting PDFs",
+      "Extracting images from PDFs",
+      "Performing OCR on scanned PDFs",
+      "DO NOT use this skill for:",
+      "DOCX to PDF conversion (use document-specific tools)",
+      "Complex document generation with layouts (use report generation skills)",
+      "Non-PDF file format processing (use appropriate format skills)",
+      "PDF editing with complex layouts (use specialized PDF editors)"
+    ],
+    "references": []
   },
   {
     "name": "performance-tuning-pro",
@@ -2155,6 +2493,27 @@
     ]
   },
   {
+    "name": "postgres-patterns",
+    "folder": "postgres-patterns",
+    "description": "PostgreSQL database patterns for query optimization, schema design, indexing, and security. Based on Supabase best practices.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Writing SQL queries or migrations",
+      "Designing database schemas",
+      "Troubleshooting slow queries",
+      "Implementing Row Level Security (RLS)",
+      "Configuring connection pooling",
+      "Creating indexes for performance",
+      "Optimizing PostgreSQL queries",
+      "DO NOT use this skill for:",
+      "Other database systems (MySQL, MongoDB, etc.) - use database-specific skills",
+      "General database theory - use algorithm-pro or data-analysis-pro skills",
+      "ORM-specific patterns - use those specific skills (prisma-postgres, typeorm, etc.)"
+    ],
+    "references": []
+  },
+  {
     "name": "postgresql-pro",
     "folder": "postgresql-pro",
     "description": "Production-grade PostgreSQL: schema design, SQL performance, migrations, MVCC and vacuum awareness, replication and pooling edge cases, and Row Level Security (RLS) — plus system model (snapshots, tuple versions, isolation, WAL at a glance), failure modes (migration locks, RLS visibility, replica lag, PgBouncer prepared statements), decision trade-offs (normalize vs denorm, RLS vs app-only, partition vs index, isolation vs retries), and quality guardrails (version-accurate docs, EXPLAIN discipline, least privilege, RLS tested as app role).\n\nUse this skill when the user works on PostgreSQL, SQL, migrations (Flyway, Prisma, TypeORM, knex, raw SQL), indexing, EXPLAIN ANALYZE, transactions, isolation levels, replication, vacuum, connection pooling, partitioning, full-text search, JSONB, LISTEN/NOTIFY, or asks for DB review, slow query tuning, or deadlock investigation.\n\nRLS-focused: row-level security, policies (USING / WITH CHECK), ENABLE ROW LEVEL SECURITY, FORCE ROW LEVEL SECURITY, BYPASSRLS, multi-tenant isolation, tenant_id policies, Supabase RLS, JWT claims in policies, session variables for tenant context, restrictive policies, or debugging \"no rows\" / wrong visibility after enabling RLS.\n\nCombine with **`nestjs-pro`** / **`nextjs-pro`** for ORM integration, **`deployment-pro`** for migration rollout, **`security-pro`** / **`auth-pro`** for identity boundaries, **`caching-pro`** for cache invalidation, **`testing-pro`** for CI databases, **`performance-tuning-pro`** for end-to-end latency, and **`sql-data-access-pro`** when SQLite portability matters.\n\nTriggers: \"PostgreSQL\", \"Postgres\", \"SQL\", \"migration\", \"EXPLAIN\", \"ANALYZE\", \"index\", \"bloat\", \"VACUUM\", \"MVCC\", \"transaction\", \"isolation\", \"deadlock\", \"lock\", \"replication\", \"read replica\", \"JSONB\", \"CTE\", \"partition\", \"pg_stat\", \"autovacuum\", \"connection pool\", \"RLS\", \"row level security\", \"policy\", \"USING\", \"WITH CHECK\", \"BYPASSRLS\", \"tenant\", \"multi-tenant\", \"Supabase RLS\", \"listen notify\", \"serialization failure\", \"40P01\".",
@@ -2214,6 +2573,70 @@
       "schema-and-query-design.md",
       "tips-and-tricks.md",
       "versions.md"
+    ]
+  },
+  {
+    "name": "prisma-postgres",
+    "folder": "prisma-postgres",
+    "description": "Prisma Postgres setup and operations guidance across Console, create-db CLI, Management API, and Management API SDK. Use when creating Prisma Postgres databases, working in Prisma Console, provisioning with create-db/create-pg/create-postgres, or integrating programmatic provisioning with service tokens or OAuth.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Setting up Prisma Postgres from Prisma Console",
+      "Provisioning instant temporary databases with `create-db`",
+      "Managing Prisma Postgres resources via Management API",
+      "Using `@prisma/management-api-sdk` in TypeScript/JavaScript",
+      "Handling claim URLs, connection strings, regions, and auth flows",
+      "Integrating programmatic provisioning with service tokens or OAuth",
+      "DO NOT use this skill for:",
+      "General PostgreSQL patterns (use postgres-patterns skill)",
+      "General Prisma ORM usage (use database-specific skills)",
+      "Other database systems (MySQL, MongoDB, etc.)",
+      "Non-Prisma database operations"
+    ],
+    "references": [
+      "console-and-connections.md",
+      "create-db-cli.md",
+      "management-api-sdk.md",
+      "management-api.md"
+    ]
+  },
+  {
+    "name": "prompt-engineering-pro",
+    "folder": "prompt-engineering-pro",
+    "description": "Design, optimize, and version prompts for LLM applications: system prompts, few-shot patterns, chain-of-thought, structured outputs, prompt caching, and A/B testing.\n\nUse this skill when designing prompts for an LLM application, optimizing token usage, comparing prompt variants, implementing structured output (JSON mode), or building a prompt versioning system.\n\nDo not use for building the full agent pipeline (use ai-integration-pro) or for evaluating prompt quality (use agent-evaluation-pro).\n\nTriggers: \"prompt design\", \"system prompt\", \"chain of thought\", \"few-shot\", \"structured output\", \"JSON mode\", \"prompt template\", \"prompt versioning\", \"prompt caching\", \"optimize tokens\", \"prompt engineering\", \"prompt comparison\", \"prompt A/B test\".",
+    "triggers": [
+      "prompt design",
+      "system prompt",
+      "chain of thought",
+      "few-shot",
+      "structured output",
+      "json mode",
+      "prompt template",
+      "prompt versioning",
+      "prompt caching",
+      "optimize tokens",
+      "prompt engineering",
+      "prompt comparison",
+      "prompt a/b test."
+    ],
+    "when_to_use": [
+      "Designing system prompts, user prompts, or assistant prompts for an LLM application.",
+      "Implementing few-shot examples, chain-of-thought, or ReAct patterns.",
+      "Enabling structured outputs (JSON mode, function calling, schema enforcement).",
+      "Optimizing token usage (prompt compression, caching, context window management).",
+      "Comparing prompt variants with A/B testing or statistical significance.",
+      "Building a prompt versioning system (Git-based, registry, or prompt management tool).",
+      "Trigger keywords: `prompt design`, `system prompt`, `chain of thought`, `few-shot`, `structured output`, `JSON mode`, `prompt template`, `prompt caching`"
+    ],
+    "references": [
+      "anti-patterns.md",
+      "decision-tree.md",
+      "few-shot-and-cot-patterns.md",
+      "integration-map.md",
+      "structured-output-and-json-mode.md",
+      "system-prompt-architecture.md",
+      "token-optimization-and-caching.md"
     ]
   },
   {
@@ -2382,7 +2805,7 @@
   {
     "name": "router-pro",
     "folder": "router-pro",
-    "description": "System skill for automatic request analysis, prompt optimization, and intelligent routing to skills, workflows, or templates. Instead of calling skills individually, this skill analyzes user input, researches and improves the prompt for clarity and accuracy, identifies relevant skills, workflows, or templates, and coordinates execution.\n\nUse this skill when the user provides a general request that needs automatic decomposition, when the prompt needs optimization for better AI understanding, when appropriate skills or workflows need to be identified and executed, or when a template is needed for reports, issues, or other structured outputs.\n\nThis is a **system skill** - it does not perform domain-specific work but routes to and coordinates **working skills** (auth-pro, react-pro, docker-pro, etc.), **workflows** (/ticket, /debug, /release, etc.), and **templates** (reports, issues, prompts, etc.).\n\nTriggers: \"route\", \"analyze\", \"plan\", \"break down\", \"how should I\", \"what skills\", \"optimize prompt\", \"orchestrate\", \"help me with\", \"template\", \"report format\", \"issue template\".",
+    "description": "System skill for automatic request analysis, prompt optimization, and intelligent routing to skills, workflows, or templates. Instead of calling skills individually, this skill analyzes user input, researches and improves the prompt for clarity and accuracy, identifies relevant skills, workflows, or templates, and coordinates execution.\n\nUse this skill when the user provides a general request that needs automatic decomposition, when the prompt needs optimization for better AI understanding, when appropriate skills or workflows need to be identified and executed, or when a template is needed for reports, issues, or other structured outputs.\n\nThis is a **system skill** - it does not perform domain-specific work but routes to and coordinates **working skills** (chosen using **stack context** — see Stack context resolution; e.g. flutter-pro vs react-pro), **workflows** (/ticket, /debug, /release, etc.), and **templates** (reports, issues, prompts, etc.).\n\nTriggers: \"route\", \"analyze\", \"plan\", \"break down\", \"how should I\", \"what skills\", \"optimize prompt\", \"orchestrate\", \"help me with\", \"template\", \"report format\", \"issue template\".",
     "triggers": [
       "route",
       "analyze",
@@ -2495,6 +2918,27 @@
     ]
   },
   {
+    "name": "security-review",
+    "folder": "security-review",
+    "description": "Run a comprehensive security review on code",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Requesting a security review or security audit",
+      "After writing code that handles user input",
+      "After adding new API endpoints",
+      "After modifying authentication/authorization logic",
+      "Before deploying to production",
+      "After adding external dependencies",
+      "DO NOT use this skill for:",
+      "Infrastructure security (use security-pro skill)",
+      "DevSecOps pipeline configuration (use ci-cd-pro skill)",
+      "Framework-specific security (use nextjs-security-scan for Next.js)",
+      "Network security or firewall configuration (use network-infra-pro skill)"
+    ],
+    "references": []
+  },
+  {
     "name": "self-improve-agent-pro",
     "folder": "self-improve-agent-pro",
     "description": "Production-grade self-improving agent workflows: evidence-driven failure diagnosis, closed-loop improvement design (observe → diagnose → intervene → verify), measurable verification, and knowledge harvest back into skills — plus system model (feedback sources, control loop, attribution), failure modes (Goodhart, confounded changes, eval leakage, reviewer drift, delayed regression, token bloat), decision trade-offs (automation vs human gate, eval breadth vs depth, prompt vs skills), and quality guardrails (reproducible metrics, ethical scope, no fabricated win rates).\n\nUse this skill when the user asks to make an agent improve itself, analyze repeated mistakes, design reflection loops, define learning checkpoints, reduce quality drift, or run structured PDCA-style uplift with before/after metrics.\n\nCombine with **`feedback-pro`** for review signals, **`planning-pro`** for roadmaps, **`testing-pro`** for regression and eval harnesses, **`repo-tooling-pro`** / **`skills-self-review-pro`** for bundle audits, **`git-operations-pro`** for contribution hygiene, **`security-pro`** for high-stakes gates, and **`bug-discovery-pro`** for hard repros.\n\nTriggers: \"self improve agent\", \"agent improvement\", \"reflection loop\", \"learning loop\", \"improve accuracy\", \"reduce failures\", \"retrospective\", \"continuous improvement\", \"quality iteration\", \"eval harness\", \"quality drift\", \"PDCA\", \"before after metrics\", \"rollback prompt\", \"experiment table\".",
@@ -2536,6 +2980,114 @@
       "quality-validation-and-guardrails.md",
       "tips-and-tricks.md",
       "versions.md"
+    ]
+  },
+  {
+    "name": "senior-architect",
+    "folder": "senior-architect",
+    "description": "Comprehensive software architecture skill for designing scalable, maintainable systems using ReactJS, NextJS, NodeJS, Express, React Native, Swift, Kotlin, Flutter, Postgres, GraphQL, Go, Python. Includes architecture diagram generation, system design patterns, tech stack decision frameworks, and dependency analysis. Use when designing system architecture, making technical decisions, creating architecture diagrams, evaluating trade-offs, or defining integration patterns.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Designing system architecture",
+      "Making technical decisions",
+      "Creating architecture diagrams",
+      "Evaluating trade-offs",
+      "Defining integration patterns",
+      "Analyzing dependencies",
+      "Selecting tech stacks",
+      "DO NOT use this skill for:",
+      "Implementation details (use framework-specific skills: react-pro, nextjs-pro, nestjs-pro, etc.)",
+      "Infrastructure deployment (use ci-cd-pro, docker-pro skills)",
+      "Database schema design (use database-specific skills)",
+      "API endpoint design (use api-design-pro skill)"
+    ],
+    "references": [
+      "architecture_patterns.md",
+      "system_design_workflows.md",
+      "tech_decision_guide.md"
+    ]
+  },
+  {
+    "name": "senior-backend",
+    "folder": "senior-backend",
+    "description": "Comprehensive backend development skill for building scalable backend systems using NodeJS, Express, Go, Python, Postgres, GraphQL, REST APIs. Includes API scaffolding, database optimization, security implementation, and performance tuning. Use when designing APIs, optimizing database queries, implementing business logic, handling authentication/authorization, or reviewing backend code.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Designing APIs (REST, GraphQL)",
+      "Optimizing database queries",
+      "Implementing business logic",
+      "Handling authentication/authorization",
+      "Reviewing backend code",
+      "Performance tuning",
+      "API scaffolding",
+      "DO NOT use this skill for:",
+      "Frontend development (use react-pro, nextjs-pro skills)",
+      "Database schema design (use database-specific skills)",
+      "Infrastructure deployment (use ci-cd-pro, docker-pro skills)",
+      "Mobile backend (use mobile-specific skills)"
+    ],
+    "references": [
+      "api_design_patterns.md",
+      "backend_security_practices.md",
+      "database_optimization_guide.md"
+    ]
+  },
+  {
+    "name": "senior-frontend",
+    "folder": "senior-frontend",
+    "description": "Frontend development skill for React, Next.js, TypeScript, and Tailwind CSS applications. Use when building React components, optimizing Next.js performance, analyzing bundle sizes, scaffolding frontend projects, implementing accessibility, or reviewing frontend code quality.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Building React components",
+      "Optimizing Next.js performance",
+      "Analyzing bundle sizes",
+      "Scaffolding frontend projects",
+      "Implementing accessibility",
+      "Reviewing frontend code quality",
+      "Configuring TypeScript and Tailwind",
+      "DO NOT use this skill for:",
+      "Backend development (use nestjs-pro, backend skills)",
+      "Database operations (use database-specific skills)",
+      "Mobile development (use react-native-pro, flutter-pro)",
+      "CSS/styling system design (use design-system-pro, ui-stack-pro)"
+    ],
+    "references": [
+      "frontend_best_practices.md",
+      "nextjs_optimization_guide.md",
+      "react_patterns.md"
+    ]
+  },
+  {
+    "name": "senior-security",
+    "folder": "senior-security",
+    "description": "Security engineering toolkit for threat modeling, vulnerability analysis, secure architecture, and penetration testing. Includes STRIDE analysis, OWASP guidance, cryptography patterns, and security scanning tools.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Performing threat modeling",
+      "Conducting STRIDE analysis",
+      "Designing secure architecture",
+      "Performing penetration testing",
+      "Conducting vulnerability assessment",
+      "Implementing secure coding practices",
+      "Applying OWASP guidelines",
+      "Implementing cryptography",
+      "Scanning for secrets",
+      "Conducting security audits",
+      "Implementing zero trust",
+      "DO NOT use this skill for:",
+      "Infrastructure security (use security-pro skill)",
+      "DevSecOps pipeline configuration (use ci-cd-pro skill)",
+      "Application-specific security (use nextjs-security-scan for Next.js)",
+      "Network security or firewall configuration (use network-infra-pro skill)"
+    ],
+    "references": [
+      "cryptography-implementation.md",
+      "security-architecture-patterns.md",
+      "threat-modeling-guide.md"
     ]
   },
   {
@@ -2694,6 +3246,28 @@
       "tips-and-tricks.md",
       "versions.md"
     ]
+  },
+  {
+    "name": "solidity-security",
+    "folder": "solidity-security",
+    "description": "Master smart contract security best practices to prevent common vulnerabilities and implement secure Solidity patterns. Use when writing smart contracts, auditing existing contracts, or implementing security measures for blockchain applications.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Writing secure smart contracts",
+      "Auditing existing contracts for vulnerabilities",
+      "Implementing secure DeFi protocols",
+      "Preventing reentrancy, overflow, and access control issues",
+      "Optimizing gas usage while maintaining security",
+      "Preparing contracts for professional audits",
+      "Understanding common attack vectors",
+      "DO NOT use this skill for:",
+      "General blockchain development (use blockchain-specific skills)",
+      "Web3 integration (use web3-specific skills)",
+      "Non-Solidity smart contracts (use those specific skills)",
+      "Backend infrastructure security (use security-pro skill)"
+    ],
+    "references": []
   },
   {
     "name": "sql-data-access-pro",
@@ -2857,6 +3431,31 @@
     "references": [
       "workflow.md"
     ]
+  },
+  {
+    "name": "system-design",
+    "folder": "system-design",
+    "description": "Comprehensive reference for system design across UI design systems, frontend, mobile, backend HLD, low-level design, SRE, SaaS, and migration. Use this skill for architecture decisions, scaling, database selection, RAG, agents,  observability, and cost optimization. Trigger on: \"how should I design X\",  \"which is better X or Y\", \"best practice for Z\", \"edge case in X\",  \"how to handle X at scale\", \"is X deprecated\". Always follow the user's preferred language for communication while referencing English knowledge.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Designing system architecture",
+      "Making architecture decisions (X vs Y)",
+      "Designing for scale",
+      "Selecting databases or technologies",
+      "Designing RAG systems",
+      "Designing AI agent systems",
+      "Implementing observability",
+      "Optimizing costs",
+      "Handling edge cases",
+      "Designing migrations",
+      "DO NOT use this skill for:",
+      "Implementation details (use framework-specific skills: react-pro, nestjs-pro, etc.)",
+      "Infrastructure deployment (use ci-cd-pro, docker-pro skills)",
+      "Database schema design (use database-specific skills)",
+      "API endpoint design (use api-design-pro skill)"
+    ],
+    "references": []
   },
   {
     "name": "systematic-debugging-pro",

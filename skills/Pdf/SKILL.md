@@ -2,6 +2,98 @@
 name: pdf
 description: Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.
 license: Proprietary. LICENSE.txt has complete terms
+metadata:
+  short-description: "PDF — read, extract, merge, split, generate, OCR workflows"
+---
+
+## Boundary
+
+This skill handles PDF file operations including reading, extracting text/tables, merging, splitting, rotating, adding watermarks, creating new PDFs, filling forms, encrypting/decrypting, extracting images, and OCR on scanned PDFs. It focuses on PDF processing using Python libraries (pypdf, pdfplumber, PyPDF2, pdf2image, pytesseract) and command-line tools. It does NOT cover document conversion (DOCX to PDF), complex document generation, or non-PDF file formats.
+
+## When to use
+
+Use this skill when:
+- Reading or extracting text/tables from PDFs
+- Combining or merging multiple PDFs
+- Splitting PDFs into separate files
+- Rotating PDF pages
+- Adding watermarks to PDFs
+- Creating new PDFs from scratch
+- Filling PDF forms
+- Encrypting or decrypting PDFs
+- Extracting images from PDFs
+- Performing OCR on scanned PDFs
+
+DO NOT use this skill for:
+- DOCX to PDF conversion (use document-specific tools)
+- Complex document generation with layouts (use report generation skills)
+- Non-PDF file format processing (use appropriate format skills)
+- PDF editing with complex layouts (use specialized PDF editors)
+
+## Workflow
+
+1. **Identify the PDF operation** needed (read, merge, split, rotate, watermark, create, form fill, encrypt, OCR)
+2. **Select the appropriate library** (pypdf, pdfplumber, PyPDF2, pdf2image, pytesseract)
+3. **Install required dependencies** for the operation
+4. **Implement the PDF operation** following library documentation
+5. **Handle errors** (corrupted PDFs, password-protected files)
+6. **Validate output** (check file integrity, content extraction)
+7. **Clean up temporary files** if created
+
+### Operating principles
+
+- **Use pypdf** for basic operations (merge, split, rotate, encrypt)
+- **Use pdfplumber** for text and table extraction
+- **Use pdf2image** for converting PDF pages to images
+- **Use pytesseract** for OCR on scanned PDFs
+- **Handle password-protected PDFs** appropriately
+- **Validate PDF integrity** before processing
+- **Clean up temporary files** after operations
+- **Optimize for large files** (stream processing, memory management)
+
+## Suggested response format
+
+```
+PDF Operation: [read / merge / split / rotate / watermark / create / form-fill / encrypt / OCR]
+Library: [pypdf / pdfplumber / PyPDF2 / pdf2image / pytesseract]
+Input: [input file path]
+Output: [output file path or extracted content]
+Status: [success/failed]
+Details: [operation details, page counts, extracted content summary]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **Python Libraries**: pypdf, pdfplumber, PyPDF2, pdf2image, pytesseract
+- **Operations**: Text extraction, table extraction, merge, split, rotate, watermark, create, form fill, encrypt, OCR
+- **Reference Documentation**: REFERENCE.md for advanced features, FORMS.md for form filling
+- **Code Examples**: Quick start examples for common operations
+
+## Quick example
+
+**Extract text from a PDF:**
+
+```
+1. Install pypdf: pip install pypdf
+2. Import PdfReader
+3. Open PDF file
+4. Iterate through pages
+5. Extract text from each page
+6. Combine and return text
+```
+
+## Checklist before calling the skill done
+
+- [ ] PDF file is accessible and readable
+- [ ] Required libraries are installed (pypdf, pdfplumber, etc.)
+- [ ] PDF operation is clearly identified
+- [ ] Output format is specified (text, file, images)
+- [ ] Password is available if PDF is encrypted
+- [ ] OCR requirements are identified (for scanned PDFs)
+- [ ] File size is manageable (consider memory limits)
+- [ ] Temporary directory is available if needed
+
 ---
 
 # PDF Processing Guide

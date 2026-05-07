@@ -1,6 +1,97 @@
 ---
 name: senior-backend
 description: Comprehensive backend development skill for building scalable backend systems using NodeJS, Express, Go, Python, Postgres, GraphQL, REST APIs. Includes API scaffolding, database optimization, security implementation, and performance tuning. Use when designing APIs, optimizing database queries, implementing business logic, handling authentication/authorization, or reviewing backend code.
+metadata:
+  short-description: "Backend — APIs, databases, security, Node.js/Go/Python"
+---
+
+## Boundary
+
+This skill provides comprehensive backend development guidance for building scalable backend systems using NodeJS, Express, Go, Python, Postgres, GraphQL, REST APIs. It focuses on API scaffolding, database optimization, security implementation, and performance tuning. It does NOT cover frontend development (use react-pro, nextjs-pro), database schema design (use database-specific skills), or infrastructure (use devops-specific skills).
+
+## When to use
+
+Use this skill when:
+- Designing APIs (REST, GraphQL)
+- Optimizing database queries
+- Implementing business logic
+- Handling authentication/authorization
+- Reviewing backend code
+- Performance tuning
+- API scaffolding
+
+DO NOT use this skill for:
+- Frontend development (use react-pro, nextjs-pro skills)
+- Database schema design (use database-specific skills)
+- Infrastructure deployment (use ci-cd-pro, docker-pro skills)
+- Mobile backend (use mobile-specific skills)
+
+## Workflow
+
+1. **Understand requirements** (API contract, performance, security)
+2. **Select appropriate tools** (API scaffolder, migration tool, load tester)
+3. **Design the API** (endpoints, data models, authentication)
+4. **Implement business logic** following best practices
+5. **Optimize database queries** and indexing
+6. **Implement security** (auth, validation, rate limiting)
+7. **Test performance** with load testing
+8. **Document and review**
+
+### Operating principles
+
+- **API First**: Design API contracts before implementation
+- **Security by Default**: Implement authentication, validation, rate limiting
+- **Performance**: Optimize queries, use caching, implement pagination
+- **Scalability**: Design for horizontal scaling
+- **Error Handling**: Consistent error responses and logging
+- **Testing**: Unit tests, integration tests, load tests
+- **Documentation**: Keep API docs up to date
+- **Monitoring**: Implement logging and metrics
+
+## Suggested response format
+
+```
+API Type: [REST / GraphQL]
+Language/Framework: [NodeJS/Express, Go, Python]
+Database: [Postgres, etc.]
+Status: [success/failed]
+Details: [implementation details, endpoints, performance metrics]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **API Scaffolder**: Automated API endpoint generation
+- **Database Migration Tool**: Database schema migrations
+- **API Load Tester**: Performance and load testing
+- **Security Patterns**: Authentication, authorization, validation
+- **Performance Optimization**: Query optimization, caching, indexing
+
+## Quick example
+
+**Scaffold a REST API:**
+
+```
+1. Define API contract (endpoints, models)
+2. Run API scaffolder
+3. Implement business logic
+4. Add authentication/authorization
+5. Optimize database queries
+6. Run load tests
+7. Document API
+```
+
+## Checklist before calling the skill done
+
+- [ ] API requirements are clearly defined
+- [ ] Technology stack is selected (NodeJS, Go, Python)
+- [ ] Database is chosen (Postgres, etc.)
+- [ ] Authentication requirements are understood
+- [ ] Performance requirements are identified
+- [ ] Security requirements are defined
+- [ ] Testing strategy is planned
+- [ ] Documentation requirements are known
+
 ---
 
 # Senior Backend

@@ -201,4 +201,14 @@ New topic
 - **Chat replies:** User Rules, project rules, or explicit chat instruction.
 - **Behavior:** Apply skill as written; answer in the user’s preferred language when set; keep identifiers and protocol names conventional.
 
+## 14. Scripting language — JavaScript/Node.js only (blocking rule)
+
+**Any script file added under `skills/<name>/scripts/` must be JavaScript (`.js`, `.mjs`) or TypeScript (`.ts`). Python is not allowed.**
+
+- Existing `.py` files in legacy skills are grandfathered but must not be extended or copied.
+- If a skill’s reference material shows Python examples (e.g. `data-analysis-pro`, `image-processing-pro`), keep the documentation in `references/*.md` — do not add `.py` script files to the skill directory.
+- Shell scripts (`.sh`) are acceptable only for OS-level hooks; all automation logic goes in Node.js.
+
+**Rationale:** one runtime (Node.js) across all tooling, scripts, and CI. No Python dependency, no language-switching overhead.
+
 Optional line in a skill: *Skill text is English; match response language from Cursor/project rules when applicable.*

@@ -1,6 +1,93 @@
 ---
 name: gemini-api-dev
 description: Use this skill when building applications with Gemini models, Gemini API, working with multimodal content (text, images, audio, video), implementing function calling, using structured outputs, or needing current model specifications. Covers SDK usage (google-genai for Python, @google/genai for JavaScript/TypeScript, com.google.genai:google-genai for Java, google.golang.org/genai for Go), model selection, and API capabilities.
+metadata:
+  short-description: "Gemini API — multimodal apps, function calling, structured outputs"
+---
+
+## Boundary
+
+This skill provides guidance for building applications with Gemini models, Gemini API, multimodal content processing, function calling, and structured outputs. It focuses on SDK usage (Python, JavaScript/TypeScript, Java, Go), model selection, and API capabilities. It does NOT cover other AI models (OpenAI, Anthropic, etc.) or general ML/LLM development (those have dedicated skills).
+
+## When to use
+
+Use this skill when:
+- Building applications with Gemini models (text, images, audio, video)
+- Implementing function calling with Gemini
+- Using structured outputs (JSON generation)
+- Working with multimodal content
+- Using context caching for efficiency
+- Generating embeddings for semantic search
+- Selecting appropriate Gemini models for your use case
+
+DO NOT use this skill for:
+- OpenAI, Anthropic, or other AI model APIs (use ai-integration-pro skill)
+- General ML model development (use data-analysis-pro or algorithm-pro skills)
+- Prompt engineering for non-Gemini models (use prompt-engineering-pro skill)
+- RAG systems with non-Gemini embeddings (use those specific skills)
+
+## Workflow
+
+1. **Select the appropriate Gemini model** (gemini-3-pro-preview, gemini-3-flash-preview, gemini-3-pro-image-preview)
+2. **Install the SDK** for your language (Python, JavaScript/TypeScript, Java, Go)
+3. **Configure API authentication** (API key or OAuth)
+4. **Implement the API call** with appropriate parameters
+5. **Handle responses** (text generation, structured output, function calls)
+6. **Implement error handling** and rate limiting
+7. **Test and validate** outputs
+
+### Operating principles
+
+- **Use current models**: gemini-3-pro-preview, gemini-3-flash-preview, gemini-3-pro-image-preview (legacy models deprecated)
+- **Choose model based on task**: pro-preview for complex reasoning, flash-preview for speed, image-preview for images
+- **Implement function calling** for structured interactions with your code
+- **Use context caching** for large contexts to improve efficiency
+- **Handle multimodal content** appropriately (images, audio, video)
+- **Validate structured outputs** against your schema
+- **Implement rate limiting** and retry logic
+- **Secure API keys** properly (environment variables, secret management)
+
+## Suggested response format
+
+```
+Gemini Model: [model name]
+Task: [text generation / function calling / multimodal / structured output]
+Language: [Python / JavaScript / Java / Go]
+Status: [success/failed]
+Details: [implementation details, API parameters, response handling]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **SDK Documentation**: Python (google-genai), JavaScript/TypeScript (@google/genai), Java (com.google.genai:google-genai), Go (google.golang.org/genai)
+- **Model Specifications**: gemini-3-pro-preview, gemini-3-flash-preview, gemini-3-pro-image-preview
+- **API Capabilities**: Text generation, multimodal, function calling, structured output, code execution, context caching, embeddings
+- **Code Examples**: SDK usage patterns for all supported languages
+
+## Quick example
+
+**Generate text with Gemini:**
+
+```
+1. Install SDK: npm install @google/genai
+2. Import and initialize client with API key
+3. Call generateContent with prompt
+4. Handle response text
+5. Implement error handling
+```
+
+## Checklist before calling the skill done
+
+- [ ] Gemini API key is configured (GEMINI_API_KEY environment variable)
+- [ ] Appropriate Gemini model is selected for the task
+- [ ] SDK is installed for target language
+- [ ] API authentication is set up
+- [ ] Rate limiting strategy is defined
+- [ ] Error handling is implemented
+- [ ] Response validation is planned
+- [ ] Multimodal requirements are identified (if applicable)
+
 ---
 
 # Gemini API Development Skill

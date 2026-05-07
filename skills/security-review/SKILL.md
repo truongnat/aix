@@ -1,6 +1,97 @@
 ---
 name: security-review
 description: Run a comprehensive security review on code
+metadata:
+  short-description: "Security — comprehensive code security review"
+---
+
+## Boundary
+
+This skill conducts comprehensive security reviews on code, checking for OWASP Top 10 vulnerabilities, hardcoded secrets, and unsafe patterns. It focuses on security auditing, vulnerability assessment, and security best practices. It does NOT cover infrastructure security (use security-pro), DevSecOps pipelines (use ci-cd-pro), or specific framework security (use nextjs-security-scan for Next.js).
+
+## When to use
+
+Use this skill when:
+- Requesting a security review or security audit
+- After writing code that handles user input
+- After adding new API endpoints
+- After modifying authentication/authorization logic
+- Before deploying to production
+- After adding external dependencies
+
+DO NOT use this skill for:
+- Infrastructure security (use security-pro skill)
+- DevSecOps pipeline configuration (use ci-cd-pro skill)
+- Framework-specific security (use nextjs-security-scan for Next.js)
+- Network security or firewall configuration (use network-infra-pro skill)
+
+## Workflow
+
+1. **Identify the scope** of the security review (files, modules, entire codebase)
+2. **Check for OWASP Top 10** vulnerabilities (injection, broken auth, XSS, etc.)
+3. **Scan for hardcoded secrets** (API keys, credentials, tokens)
+4. **Review unsafe patterns** (dangerous functions, insecure configurations)
+5. **Assess authentication/authorization** logic
+6. **Review external dependencies** for known vulnerabilities
+7. **Generate security report** with findings and remediation steps
+8. **Verify fixes** after remediation
+
+### Operating principles
+
+- **OWASP Top 10**: Prioritize vulnerabilities based on OWASP guidelines
+- **Zero False Positives**: Verify findings before reporting
+- **Evidence-Based**: Provide clear evidence for each finding
+- **Actionable Reports**: Include remediation steps for each vulnerability
+- **Severity-Based**: Prioritize findings by severity (Critical, High, Medium, Low)
+- **Comprehensive Coverage**: Check all security aspects (code, config, dependencies)
+- **Context-Aware**: Consider the application context when assessing risk
+- **Follow-Up**: Verify fixes after remediation
+
+## Suggested response format
+
+```
+Security Review: [scope]
+Vulnerabilities Found: [count]
+Critical: [count], High: [count], Medium: [count], Low: [count]
+Status: [success/failed]
+Details: [vulnerability summary, file locations, remediation steps]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **OWASP Top 10**: 2025 vulnerability categories
+- **Static Analysis**: Pattern matching for security issues
+- **Secret Detection**: Pattern-based credential scanning
+- **Dependency Scanning**: Known CVE assessment
+- **Security Best Practices**: Industry-standard security guidelines
+- **Delegation**: Uses `security-reviewer` agent for deep analysis
+
+## Quick example
+
+**Run a security review:**
+
+```
+1. Define scope (files, directories)
+2. Scan for OWASP Top 10 vulnerabilities
+3. Check for hardcoded secrets
+4. Review unsafe patterns
+5. Assess authentication/authorization
+6. Generate security report with findings
+7. Provide remediation steps
+```
+
+## Checklist before calling the skill done
+
+- [ ] Code or codebase is available for review
+- [ ] Scope is clearly defined (files, modules, entire codebase)
+- [ ] Security requirements are understood
+- [ ] Authentication/authorization logic is identified
+- [ ] External dependencies are listed
+- [ ] Deployment environment is known
+- [ ] Remediation strategy is planned
+- [ ] Review frequency is defined (one-time, periodic, pre-deployment)
+
 ---
 
 # Security Review Skill

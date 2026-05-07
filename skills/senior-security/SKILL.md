@@ -14,6 +14,102 @@ triggers:
   - secret scanning
   - security audit
   - zero trust
+metadata:
+  short-description: "Security — threat modeling, OWASP, cryptography, pen testing"
+---
+
+## Boundary
+
+This skill provides security engineering guidance for threat modeling, vulnerability analysis, secure architecture, and penetration testing. It focuses on STRIDE analysis, OWASP guidance, cryptography patterns, and security scanning tools. It does NOT cover infrastructure security (use security-pro), DevSecOps pipelines (use ci-cd-pro), or application-specific security (use nextjs-security-scan for Next.js).
+
+## When to use
+
+Use this skill when:
+- Performing threat modeling
+- Conducting STRIDE analysis
+- Designing secure architecture
+- Performing penetration testing
+- Conducting vulnerability assessment
+- Implementing secure coding practices
+- Applying OWASP guidelines
+- Implementing cryptography
+- Scanning for secrets
+- Conducting security audits
+- Implementing zero trust
+
+DO NOT use this skill for:
+- Infrastructure security (use security-pro skill)
+- DevSecOps pipeline configuration (use ci-cd-pro skill)
+- Application-specific security (use nextjs-security-scan for Next.js)
+- Network security or firewall configuration (use network-infra-pro skill)
+
+## Workflow
+
+1. **Identify the security task** (threat modeling, vulnerability assessment, penetration test)
+2. **Select appropriate methodology** (STRIDE, OWASP, custom)
+3. **Analyze the system** (architecture, code, configuration)
+4. **Identify threats or vulnerabilities**
+5. **Assess risk** (impact, likelihood, severity)
+6. **Recommend mitigations**
+7. **Document findings**
+8. **Verify fixes**
+
+### Operating principles
+
+- **Defense in Depth**: Layered security controls
+- **Least Privilege**: Minimum necessary permissions
+- **Zero Trust**: Verify every request, trust nothing
+- **OWASP Top 10**: Prioritize based on OWASP guidelines
+- **STRIDE**: Systematic threat modeling
+- **Secure by Default**: Secure configurations out of the box
+- **Cryptography**: Use standard, vetted cryptographic primitives
+- **Evidence-Based**: Document all findings with evidence
+
+## Suggested response format
+
+```
+Security Task: [threat modeling / vulnerability assessment / penetration test]
+Methodology: [STRIDE / OWASP / custom]
+System/Scope: [system name or scope]
+Vulnerabilities Found: [count]
+Critical: [count], High: [count], Medium: [count], Low: [count]
+Status: [success/failed]
+Details: [findings, recommendations, remediation steps]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **STRIDE Analysis**: Threat modeling methodology
+- **OWASP Guidance**: OWASP Top 10 and security best practices
+- **Cryptography Patterns**: Secure cryptographic implementations
+- **Security Scanning Tools**: Automated vulnerability scanning
+- **Penetration Testing**: Security testing methodologies
+- **Zero Trust**: Zero trust architecture principles
+
+## Quick example
+
+**Perform STRIDE threat modeling:**
+
+```
+1. Identify system components and data flows
+2. Apply STRIDE to each component (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege)
+3. Document threats and mitigations
+4. Assess risk and prioritize
+5. Recommend security controls
+```
+
+## Checklist before calling the skill done
+
+- [ ] System or application is available for analysis
+- [ ] Security task is clearly defined
+- [ ] Scope is identified (components, data flows, attack surface)
+- [ ] Threat model or assessment methodology is selected
+- [ ] Security requirements are understood
+- [ ] Risk tolerance is defined
+- [ ] Stakeholders are identified
+- [ ] Remediation strategy is planned
+
 ---
 
 # Senior Security Engineer

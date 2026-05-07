@@ -78,6 +78,12 @@ Domain-specific skills that perform actual work.
 - [skills-self-review-pro](/skills/skills-self-review-pro/) | Audit this bundle
 - [repo-tooling-pro](/skills/repo-tooling-pro/) | Repo scripts — KB, skill index
 - [ai-integration-pro](/skills/ai-integration-pro/) | LLM apps — prompts, tools, RAG
+- [mcp-server-pro](/skills/mcp-server-pro/) | MCP — build servers, tools, resources, prompts, transport, security
+- [agent-evaluation-pro](/skills/agent-evaluation-pro/) | Agent eval — metrics, regression, red-teaming, observability, CI pipelines
+- [prompt-engineering-pro](/skills/prompt-engineering-pro/) | Prompt engineering — design, optimization, versioning, structured output
+- [a2a-protocol-pro](/skills/a2a-protocol-pro/) | A2A protocol — multi-agent discovery, delegation, patterns, security
+- [ag-ui-pro](/skills/ag-ui-pro/) | AG-UI — agent-interactive frontend, streaming, HITL, generative UI
+- [cloud-native-agent-pro](/skills/cloud-native-agent-pro/) | Cloud-native agents — K8s deployment, scaling, Wasm, eBPF, infrastructure
 
 ---
 
@@ -183,6 +189,34 @@ Use skill **`skills-self-review-pro`** for how to read tiers and manual checklis
 | [skills-self-review-pro](/skills/skills-self-review-pro/) | Audit this bundle |
 | [repo-tooling-pro](/skills/repo-tooling-pro/) | Repo scripts — KB, skill index |
 | [ai-integration-pro](/skills/ai-integration-pro/) | LLM apps — prompts, tools, RAG |
+| [mcp-server-pro](/skills/mcp-server-pro/) | MCP — build servers, tools, resources, prompts, transport, security |
+| [agent-evaluation-pro](/skills/agent-evaluation-pro/) | Agent eval — metrics, regression, red-teaming, observability, CI pipelines |
+| [prompt-engineering-pro](/skills/prompt-engineering-pro/) | Prompt engineering — design, optimization, versioning, structured output |
+| [a2a-protocol-pro](/skills/a2a-protocol-pro/) | A2A protocol — multi-agent discovery, delegation, patterns, security |
+| [ag-ui-pro](/skills/ag-ui-pro/) | AG-UI — agent-interactive frontend, streaming, HITL, generative UI |
+| [cloud-native-agent-pro](/skills/cloud-native-agent-pro/) | Cloud-native agents — K8s deployment, scaling, Wasm, eBPF, infrastructure |
+| [azure-storage](/skills/azure-storage/) | Azure Storage — blobs, tables, queues, files |
+| [clean-architecture](/skills/clean-architecture/) | Clean Architecture — boundaries, dependencies, testing |
+| [frontend-patterns](/skills/frontend-patterns/) | Frontend patterns — component design, state management |
+| [gemini-api-dev](/skills/gemini-api-dev/) | Gemini API — prompts, function calling, multimodal |
+| [grill-me-pro](/skills/grill-me-pro/) | Interview prep — system design, coding, behavioral |
+| [infrastructure-as-code-pro](/skills/infrastructure-as-code-pro/) | IaC — Terraform, Pulumi, CloudFormation |
+| [nextjs-security-scan](/skills/nextjs-security-scan/) | Next.js Security Scan — vulnerabilities, hardening |
+| [ocr-pro](/skills/ocr-pro/) | OCR — text extraction from images and documents |
+| [pdf](/skills/pdf/) | PDF processing — extraction, forms, OCR, tables |
+| [postgres-patterns](/skills/postgres-patterns/) | PostgreSQL patterns — query optimization, indexing |
+| [prisma-postgres](/skills/prisma-postgres/) | Prisma + PostgreSQL — ORM, migrations, type safety |
+| [security-review](/skills/security-review/) | Security review — audit, remediation, compliance |
+| [senior-architect](/skills/senior-architect/) | Senior architect — system design, trade-offs, roadmaps |
+| [senior-backend](/skills/senior-backend/) | Senior backend — APIs, databases, distributed systems |
+| [senior-frontend](/skills/senior-frontend/) | Senior frontend — performance, architecture, DX |
+| [senior-security](/skills/senior-security/) | Senior security — threat modeling, hardening, response |
+| [skill-creator-pro](/skills/skill-creator-pro/) | Skill authoring — templates, validation, publishing |
+| [solidity-security](/skills/solidity-security/) | Solidity security — smart contract audits, vulnerabilities |
+| [sync-custom-to-repo](/skills/sync-custom-to-repo/) | Sync custom skills to repo |
+| [system-design](/skills/system-design/) | System design — architecture, scalability, reliability |
+| [to-issues-pro](/skills/to-issues-pro/) | Issue triage — prioritization, labeling, assignment |
+| [to-prd-pro](/skills/to-prd-pro/) | PRD authoring — requirements, acceptance criteria |
 
 ---
 

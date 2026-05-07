@@ -1,6 +1,96 @@
 ---
 name: senior-architect
 description: Comprehensive software architecture skill for designing scalable, maintainable systems using ReactJS, NextJS, NodeJS, Express, React Native, Swift, Kotlin, Flutter, Postgres, GraphQL, Go, Python. Includes architecture diagram generation, system design patterns, tech stack decision frameworks, and dependency analysis. Use when designing system architecture, making technical decisions, creating architecture diagrams, evaluating trade-offs, or defining integration patterns.
+metadata:
+  short-description: "Architecture — scalable system design, diagrams, tech stack decisions"
+---
+
+## Boundary
+
+This skill provides comprehensive software architecture guidance for designing scalable, maintainable systems using ReactJS, NextJS, NodeJS, Express, React Native, Swift, Kotlin, Flutter, Postgres, GraphQL, Go, Python. It focuses on architecture diagram generation, system design patterns, tech stack decision frameworks, and dependency analysis. It does NOT cover implementation details (use framework-specific skills) or infrastructure deployment (use devops-specific skills).
+
+## When to use
+
+Use this skill when:
+- Designing system architecture
+- Making technical decisions
+- Creating architecture diagrams
+- Evaluating trade-offs
+- Defining integration patterns
+- Analyzing dependencies
+- Selecting tech stacks
+
+DO NOT use this skill for:
+- Implementation details (use framework-specific skills: react-pro, nextjs-pro, nestjs-pro, etc.)
+- Infrastructure deployment (use ci-cd-pro, docker-pro skills)
+- Database schema design (use database-specific skills)
+- API endpoint design (use api-design-pro skill)
+
+## Workflow
+
+1. **Understand requirements** (functional, non-functional, constraints)
+2. **Select appropriate tools** (diagram generator, project architect, dependency analyzer)
+3. **Design the architecture** (components, layers, patterns)
+4. **Generate architecture diagrams** for visualization
+5. **Evaluate trade-offs** (performance, scalability, maintainability)
+6. **Document decisions** and rationale
+7. **Review and iterate** with stakeholders
+
+### Operating principles
+
+- **Scalability First**: Design for horizontal scaling and growth
+- **Separation of Concerns**: Clear boundaries between layers and components
+- **SOLID Principles**: Apply SOLID principles to architecture design
+- **Trade-off Analysis**: Explicitly evaluate and document trade-offs
+- **Documentation**: Maintain up-to-date architecture diagrams
+- **Dependency Management**: Minimize coupling, maximize cohesion
+- **Technology Fit**: Choose technologies based on requirements, not trends
+- **Evolutionary Architecture**: Design for change and evolution
+
+## Suggested response format
+
+```
+Architecture Type: [monolith / microservices / serverless / hybrid]
+Tech Stack: [languages, frameworks, databases]
+Diagram: [architecture diagram or file path]
+Status: [success/failed]
+Details: [architecture decisions, trade-offs, patterns used]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **Architecture Diagram Generator**: Automated diagram creation
+- **Project Architect**: Project structure and organization
+- **Dependency Analyzer**: Dependency analysis and visualization
+- **Design Patterns**: System design patterns and best practices
+- **Tech Stack Decision Frameworks**: Frameworks for technology selection
+- **Integration Patterns**: Integration patterns and approaches
+
+## Quick example
+
+**Design a microservices architecture:**
+
+```
+1. Analyze requirements and constraints
+2. Define service boundaries
+3. Select communication patterns (REST, GraphQL, gRPC)
+4. Design data architecture (databases per service vs shared)
+5. Generate architecture diagram
+6. Document trade-offs and decisions
+```
+
+## Checklist before calling the skill done
+
+- [ ] Requirements are clearly defined
+- [ ] Non-functional requirements are identified (performance, scalability, availability)
+- [ ] Constraints are understood (budget, timeline, team skills)
+- [ ] Technology preferences are known
+- [ ] Integration requirements are defined
+- [ ] Deployment environment is understood
+- [ ] Stakeholders are identified
+- [ ] Documentation requirements are defined
+
 ---
 
 # Senior Architect

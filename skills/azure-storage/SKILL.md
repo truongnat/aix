@@ -5,6 +5,100 @@ license: MIT
 metadata:
   author: Microsoft
   version: "1.0.0"
+  short-description: "Azure Storage — Blob, Files, Queues, Tables, Data Lake"
+---
+
+## Boundary
+
+This skill handles Azure Storage operations including blob storage, file shares, queue storage, table storage, and Data Lake. It focuses on storage account management, container/file operations, and data transfer. It does NOT cover Azure SQL Database, Cosmos DB, Event Hubs, or Service Bus (those have dedicated skills).
+
+## When to use
+
+Use this skill when:
+- Working with Azure Blob Storage for object storage
+- Managing Azure File Shares for SMB file sharing
+- Using Queue Storage for async messaging
+- Interacting with Table Storage for NoSQL key-value data
+- Managing Data Lake Storage Gen2 for big data analytics
+- Configuring storage account tiers and redundancy
+- Implementing lifecycle management policies
+- Uploading/downloading files to/from Azure Storage
+
+DO NOT use this skill for:
+- Azure SQL Database or PostgreSQL (use database-specific skills)
+- Cosmos DB operations (use azure-prepare or cosmos-db skills)
+- Event Hubs or Service Bus messaging (use azure-messaging skill)
+- Azure Functions or App Service deployment
+
+## Workflow
+
+1. **Identify the Azure Storage service** needed (Blob, File, Queue, Table, Data Lake)
+2. **Check MCP availability** - if Azure MCP is enabled, prefer MCP tools
+3. **Authenticate** to Azure (ensure credentials are configured)
+4. **Perform storage operations**:
+   - List storage accounts/containers/blobs
+   - Upload/download files
+   - Manage access tiers and lifecycle policies
+5. **Handle errors** gracefully (e.g., 404 not found, authentication failures)
+6. **Clean up** temporary resources if needed
+
+### Operating principles
+
+- **Prefer MCP tools** when available over CLI commands
+- **Use appropriate access tiers** (Hot, Cool, Cold, Archive) based on access patterns
+- **Implement lifecycle management** for cost optimization
+- **Choose redundancy options** based on durability requirements (LRS, ZRS, GRS, GZRS)
+- **Validate inputs** before storage operations (file names, paths, sizes)
+- **Handle large files** with chunked uploads/downloads
+- **Use SAS tokens** for temporary, scoped access when possible
+- **Monitor storage metrics** for performance and cost optimization
+
+## Suggested response format
+
+```
+Storage Operation: [operation type]
+Service: [Blob/File/Queue/Table/Data Lake]
+Account: [storage account name]
+Container/Share: [container or share name]
+Status: [success/failed]
+Details: [operation details, file counts, sizes, etc.]
+Next steps: [follow-up actions if any]
+```
+
+## Resources in this skill
+
+- **MCP Tools**: `azure__storage` (when Azure MCP is enabled)
+- **Azure CLI**: `az storage` commands for all storage services
+- **Azure Portal**: Storage account configuration and monitoring
+- **SDK References**: Python, TypeScript, Java, Rust SDK guides in references/sdk/
+- **Documentation**: Azure Storage documentation links in Service Details section
+
+## Quick example
+
+**Upload a file to Blob Storage:**
+
+```
+1. Check MCP availability
+2. List containers: azure__storage storage_container_list
+3. Upload blob: azure__storage storage_blob_put
+   - account-name: mystorageaccount
+   - container-name: mycontainer
+   - name: myfile.txt
+   - file: ./local/path/myfile.txt
+4. Verify upload: azure__storage storage_blob_list
+```
+
+## Checklist before calling the skill done
+
+- [ ] Azure credentials are configured (AZURE_CREDENTIALS or az login)
+- [ ] Storage account name is known or can be listed
+- [ ] Container/share name is specified (if not creating new)
+- [ ] File paths are valid and accessible
+- [ ] Required Azure MCP server is enabled (or CLI is available)
+- [ ] Storage account has sufficient capacity and appropriate permissions
+- [ ] Access tier and redundancy requirements are understood
+- [ ] Large file handling strategy is defined (if > 256MB)
+
 ---
 
 # Azure Storage Services
