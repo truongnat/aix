@@ -1,415 +1,187 @@
 ---
 name: 3d-motion-pro
-description: Use this skill whenever the user wants to work with 3D objects, motion graphics, animation, or interactive 3D experiences. This includes creating 3D models, motion graphics, animations, interactive 3D web experiences, AR/VR content, 3D UI components, and animated visualizations. If the user mentions 3D design, motion graphics, animation, Three.js, Blender, or AR/VR, use this skill.
-license: MIT
+description: |
+  3D design and motion graphics for the web: Three.js scenes, WebGL shaders, GLTF model loading, particle systems, physics simulations, AR/VR with WebXR, and GSAP animation pipelines.
+
+  Use this skill when building interactive 3D web experiences, loading and optimizing 3D models for browsers, implementing motion graphics and animations, creating WebXR (VR/AR) experiences, or building animated data visualizations in 3D.
+
+  Do not use for 2D UI animations (use motion-design-pro), static UI design (use ui-design-brain-pro), or non-web 3D production pipelines.
+
+  Triggers: "Three.js", "WebGL", "3D web", "GLTF", "GLB", "3D model", "particle system", "shader", "WebXR", "VR", "AR", "Babylon.js", "React Three Fiber", "3D animation", "motion graphics web", "Spline", "3D visualization".
+
 metadata:
-  short-description: "3D Motion — 3D models, motion graphics, animation, Three.js, AR/VR"
+  short-description: "3D Motion — Three.js, WebGL, GLTF, shaders, WebXR, AR/VR, motion graphics"
+  content-language: en
+  domain: frontend-engineering
+  level: professional
 ---
+
+# 3D Motion Design (professional)
+
+Skill text is **English**; match the user's response language when applicable.
+
+Use [Three.js docs](https://threejs.org/docs/), [React Three Fiber](https://docs.pmnd.rs/react-three-fiber), [WebXR API](https://www.w3.org/TR/webxr/), [GSAP docs](https://gsap.com/docs/), and [glTF spec](https://registry.khronos.org/glTF/) as authority. This skill encodes **Three.js scene architecture**, **GLTF model loading and optimization**, **custom shaders (GLSL)**, **particle systems**, **WebXR VR/AR**, and **performance optimization for 60fps**. Confirm **target platform**, **performance budget**, **asset pipeline**, and **interactivity requirements** before architecting.
 
 ## Boundary
 
-This skill handles 3D design and motion graphics tasks including 3D modeling, motion graphics, animations, interactive 3D web experiences, AR/VR content, 3D UI components, and animated visualizations. It focuses on using 3D tools (Three.js, Blender, Maya, Cinema 4D, Spline, Framer Motion) and animation libraries. It does NOT cover 2D graphic design, static UI design, or traditional web development.
+**`3d-motion-pro`** owns **Three.js/WebGL scenes**, **3D model loading and optimization**, **GLSL shaders**, **particle systems**, **WebXR VR/AR experiences**, and **3D animation pipelines**. It does **not** own 2D CSS/JS animations, static UI design, or DCC tool production workflows (Blender/Maya) beyond web export.
+
+| Skill | When to combine with **`3d-motion-pro`** |
+|-------|------------------------------------------|
+| **`motion-design-pro`** | When 3D scene includes 2D overlay animations |
+| **`react-pro`** | When using React Three Fiber (R3F) for React integration |
+| **`performance-tuning-pro`** | When scene has sustained FPS drops or memory issues |
+| **`ai-design-pro`** | When AI-generated textures or reference images feed into 3D assets |
+| **`frontend-design-pro`** | When 3D canvas lives inside a larger UI layout |
 
 ## When to use
 
-Use this skill when:
-- Creating 3D models and assets
-- Building motion graphics and animations
-- Developing interactive 3D web experiences
-- Implementing AR/VR content
-- Creating 3D UI components and interfaces
-- Building animated visualizations
-- Working with 3D libraries (Three.js, WebGL, Babylon.js)
-- Using 3D modeling tools (Blender, Maya, Cinema 4D)
-- Creating particle effects and shaders
-- Implementing physics simulations in 3D
+- Building interactive 3D product showcases, hero sections, or landing pages.
+- Loading and rendering GLTF/GLB models in the browser.
+- Creating particle systems, shader-based effects, or post-processing pipelines.
+- Implementing WebXR VR/AR experiences.
+- Building 3D data visualizations or scientific simulations.
+- Animating 3D objects with GSAP, Framer Motion, or Three.js AnimationMixer.
+- Trigger keywords: `Three.js`, `WebGL`, `3D web`, `GLTF`, `WebXR`, `VR`, `AR`, `shader`, `particle`, `React Three Fiber`
 
-DO NOT use this skill for:
-- 2D graphic design (use design-system-pro)
-- Static UI design (use ui-design-brain-pro)
-- Traditional web development (use react-pro, nextjs-pro)
-- Basic animations (use motion-design-pro)
+## When not to use
+
+- **2D CSS/JS animations** — use **`motion-design-pro`**.
+- **Static UI design** — use **`ui-design-brain-pro`**.
+- **Blender/Maya production workflows** without web export target — outside scope.
+
+## Required inputs
+
+- **Target platform** — desktop web, mobile web, VR headset (Quest), AR (WebXR).
+- **Performance budget** — target FPS (60 web, 72/90 VR), max draw calls, max texture memory.
+- **Asset pipeline** — are GLTF models provided, or must they be sourced/created?
+- **Interactivity** — mouse hover, click raycasting, physics, user locomotion?
+- **Framework** — vanilla Three.js, React Three Fiber, Babylon.js, or A-Frame?
+
+## Expected output
+
+Follow **Suggested response format (STRICT)**.
 
 ## Workflow
 
-1. **Identify the 3D/motion task** (modeling, animation, web 3D, AR/VR)
-2. **Select appropriate tools** (Three.js, Blender, Maya, Spline, Framer Motion)
-3. **Create or import 3D assets** (models, textures, materials)
-4. **Implement animations** using keyframes or procedural animation
-5. **Optimize for performance** (LOD, compression, culling)
-6. **Add interactivity** (user input, physics, collision detection)
-7. **Test across devices** (desktop, mobile, VR headsets)
-8. **Export and integrate** with target platform
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** platform, performance budget, asset pipeline, and interactivity → verify: [inputs documented].
+2. **State assumptions** about device capabilities and fallbacks for no-WebGL (**Think Before Coding**).
+3. **Start with a static scene** (geometry, lights, camera); add animation and shaders only when needed (**Simplicity First**).
+4. **Profile before optimizing** — use `renderer.info`; touch only the bottleneck (**Surgical Changes**).
+5. **Define done** as: scene runs at target FPS on lowest-spec target device (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; note performance and compatibility risks.
 
 ### Operating principles
 
-- **Optimize for performance** (use LOD, compression, efficient rendering)
-- **Maintain consistent frame rates** (60fps for web, 90fps for VR)
-- **Use appropriate file formats** (GLTF/GLB for web, FBX for modeling)
-- **Test across devices** and performance levels
-- **Implement smooth animations** with proper easing
-- **Handle loading states** for 3D assets
-- **Provide fallbacks** for devices without 3D support
-- **Consider accessibility** in 3D interactions
+1. **Think Before Coding** — A scene that runs at 60fps on desktop may drop to 10fps on mid-range mobile. Confirm device target first.
+2. **Simplicity First** — Start with `MeshStandardMaterial`. Add custom shaders only when standard materials can't achieve the look.
+3. **Surgical Changes** — Profile with `renderer.info` before optimizing. Don't guess the bottleneck.
+4. **Goal-Driven Execution** — Done = target FPS on target device, not "works on my machine."
+5. **GLTF/GLB is the web format** — Always export to GLB for production. Run `gltf-transform optimize` before shipping.
+6. **Instancing over duplication** — 1000 identical objects → one `InstancedMesh`, not 1000 `Mesh` objects.
+7. **Dispose everything** — Three.js leaks memory if geometry, materials, and textures aren't disposed on unmount.
 
-## Suggested response format
+## Default recommendations by scenario
 
-```
-3D Motion Task: [modeling / animation / web 3D / AR/VR]
-Tools Used: [Three.js / Blender / Maya / Spline / Framer Motion]
-Assets Created: [3D models, animations, textures]
-Performance: [frame rate, load time, optimization techniques]
-Interactivity: [user interactions, physics, collision detection]
-Device Support: [desktop, mobile, VR headsets]
-Export Format: [GLTF/GLB, FBX, USDZ]
-Integration: [how to integrate with target platform]
-```
+| Scenario | Default | Notes |
+|----------|---------|-------|
+| Product 3D viewer | Three.js + GLTFLoader + OrbitControls | Lightweight, no framework needed |
+| React app with 3D | React Three Fiber (R3F) + Drei | Declarative, hooks-based |
+| VR experience | Three.js + WebXR + VRButton | Works in Quest browser |
+| AR on mobile | WebXR hit-testing or AR.js | AR.js needs no permissions |
+| Particle effects | Three.js `Points` + `ShaderMaterial` | Custom GLSL for best performance |
+| Data visualization | R3F + drei `<Text>` + instancing | Easier axis/label handling |
+
+## Decision trees
+
+Summary: use case → library → asset format → performance strategy.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: no disposal of geometry/materials, too many draw calls, uncompressed GLTF, updating geometry every frame, missing LOD, blocking main thread with physics.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Performance optimization (summary)
+
+- Draw calls: merge geometries or use `InstancedMesh`.
+- Textures: compress with KTX2/Basis; use power-of-two dimensions.
+- GLTF: run `gltf-transform optimize` + Draco compression before shipping.
+- FPS: `renderer.info.render.calls` must be < 100 for mobile.
+
+Details: [references/performance.md](references/performance.md)
+
+### Shaders and effects (summary)
+
+- `ShaderMaterial` for custom GLSL; `uniforms` for animatable values.
+- Post-processing via `EffectComposer` (UnrealBloom, FXAA, SSR).
+- Avoid `discard` in fragment shaders on mobile — expensive.
+
+Details: [references/shaders-effects.md](references/shaders-effects.md)
+
+## Cross-skill handoffs
+
+- **`motion-design-pro`** — when the 3D scene needs 2D UI overlay animations.
+- **`react-pro`** — when using React Three Fiber; R3F is idiomatic React.
+- **`performance-tuning-pro`** — when scene has sustained FPS drops below budget.
+- **`frontend-design-pro`** — when 3D canvas is embedded in a full-page UI.
+
+Details: [references/integration-map.md](references/integration-map.md)
+
+## Suggested response format (implement / review)
+
+1. **Scene architecture** — Scene graph, camera, renderer settings, lighting setup.
+2. **Assets** — Model sources, format, compression, loading strategy.
+3. **Code** — Scene setup, animation loop, interactivity, disposal.
+4. **Performance** — Draw call count, FPS target, profiling approach.
+5. **Residual risks** — Mobile support, WebXR browser compatibility, asset load time.
 
 ## Resources in this skill
 
-- **3D Libraries**: Three.js, WebGL, Babylon.js, React Three Fiber
-- **Modeling Tools**: Blender, Maya, Cinema 4D, Spline
-- **Animation Tools**: Framer Motion, GSAP, Blender Animation
-- **AR/VR Tools**: A-Frame, WebXR, AR.js, React 360
-- **Reference Documentation**: REFERENCE.md for advanced 3D techniques
+| Topic | File |
+|-------|------|
+| Performance optimization | [references/performance.md](references/performance.md) |
+| Shaders and effects | [references/shaders-effects.md](references/shaders-effects.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Advanced techniques | [REFERENCE.md](REFERENCE.md) |
+| Scripts | [Scripts/](Scripts/) |
 
 ## Quick example
 
-**Create 3D web experience with Three.js:**
+**Input:** "Add a rotating 3D product viewer for our e-commerce product page."
+- Three.js GLTFLoader + OrbitControls; render to a `<canvas>` element.
+- Compress GLB with `gltf-transform`: Draco geometry + WebP textures.
+- Add loading progress indicator; dispose scene on component unmount.
+- **Verify:** GLB < 2MB; renders at 60fps on iPhone 12; OrbitControls work on touch.
 
-```
-1. Set up Three.js scene, camera, renderer
-2. Add 3D objects (geometry, materials, lights)
-3. Implement animations (rotation, position, scale)
-4. Add interactivity (mouse events, keyboard controls)
-5. Optimize for performance (geometry compression, texture optimization)
-6. Handle window resize and device orientation
-7. Test across browsers and devices
-```
+**Input (tricky):** "The 3D scene is running at 15fps on mobile."
+- Profile: check `renderer.info.render.calls` — likely too many draw calls.
+- Merge static geometries with `BufferGeometryUtils.mergeGeometries`.
+- Downscale textures to 512px; compress with KTX2.
+- **Verify:** Draw calls < 50; FPS ≥ 30 on mid-range Android (Pixel 4a benchmark).
+
+**Input (cross-skill):** "Build a WebXR VR product configurator in a React app."
+- **`3d-motion-pro`**: Three.js scene, WebXR session, controller raycasting.
+- **`react-pro`**: React Three Fiber; `useFrame`, `useThree` hooks.
+- **`performance-tuning-pro`**: 72fps budget for Quest 2; 100 draw call limit.
+- **Verify:** Runs at 72fps in Quest 2 browser; controller selects variants correctly.
 
 ## Checklist before calling the skill done
 
-- [ ] 3D/motion task is clearly defined
-- [ ] Appropriate tools are selected
-- [ ] Performance requirements are understood
-- [ ] Device support requirements are known
-- [ ] 3D assets are available or can be created
-- [ ] Animation requirements are specified
-- [ ] Export format is determined
-- [ ] Integration workflow is defined
+- [ ] Assumptions stated: target device, FPS budget, asset pipeline (**Think Before Coding**)
+- [ ] Started with static scene; added complexity only as needed (**Simplicity First**)
+- [ ] Profiled before optimizing; only bottleneck was touched (**Surgical Changes**)
+- [ ] Target FPS achieved on lowest-spec target device (**Goal-Driven Execution**)
+- [ ] GLTF/GLB compressed (Draco/Meshopt + WebP textures)
+- [ ] Geometry, materials, textures disposed on unmount
+- [ ] Draw calls counted and within budget
+- [ ] Loading states handled; fallback for no-WebGL browsers
+- [ ] Mobile/touch interactivity tested
+- [ ] Residual risks called out: mobile perf, WebXR browser support, asset load time
 
----
-
-# 3D Motion Design Guide
-
-## Overview
-
-This guide covers essential 3D design and motion graphics techniques using 3D libraries and tools. For advanced 3D techniques and real-world examples, see REFERENCE.md.
-
-## Quick Start
-
-```javascript
-import * as THREE from 'three';
-
-// Create scene
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// Add cube
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
-
-camera.position.z = 5;
-
-// Animate
-function animate() {
-  requestAnimationFrame(animate);
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
-  renderer.render(scene, camera);
-}
-animate();
-```
-
-## Three.js Basics
-
-### Scene Setup
-```javascript
-import * as THREE from 'three';
-
-// Scene
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x000000);
-
-// Camera
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-camera.position.z = 5;
-
-// Renderer
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-document.body.appendChild(renderer.domElement);
-```
-
-### Lighting
-```javascript
-// Ambient light
-const ambientLight = new THREE.AmbientLight(0x404040);
-scene.add(ambientLight);
-
-// Directional light
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(1, 1, 1);
-scene.add(directionalLight);
-
-// Point light
-const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-pointLight.position.set(10, 10, 10);
-scene.add(pointLight);
-```
-
-### Materials
-```javascript
-// Basic material
-const basicMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-
-// Lambert material (responds to light)
-const lambertMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
-
-// Phong material (shiny)
-const phongMaterial = new THREE.MeshPhongMaterial({ 
-  color: 0x00ff00,
-  shininess: 100 
-});
-
-// Standard material (physically based)
-const standardMaterial = new THREE.MeshStandardMaterial({
-  color: 0x00ff00,
-  metalness: 0.5,
-  roughness: 0.5
-});
-```
-
-## Animation
-
-### Basic Animation
-```javascript
-function animate() {
-  requestAnimationFrame(animate);
-  
-  // Rotate object
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
-  
-  renderer.render(scene, camera);
-}
-animate();
-```
-
-### GSAP Animation
-```javascript
-import gsap from 'gsap';
-
-// Animate position
-gsap.to(cube.position, {
-  x: 2,
-  duration: 1,
-  ease: 'power2.inOut'
-});
-
-// Animate rotation
-gsap.to(cube.rotation, {
-  y: Math.PI * 2,
-  duration: 2,
-  repeat: -1,
-  ease: 'none'
-});
-```
-
-### Framer Motion (React)
-```javascript
-import { motion } from 'framer-motion';
-
-<motion.div
-  animate={{ x: 100, opacity: 1 }}
-  transition={{ duration: 1 }}
-/>
-```
-
-## 3D Models
-
-### Loading GLTF Models
-```javascript
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
-const loader = new GLTFLoader();
-loader.load('model.glb', (gltf) => {
-  scene.add(gltf.scene);
-}, undefined, (error) => {
-  console.error(error);
-});
-```
-
-### Creating Primitives
-```javascript
-// Box
-const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
-const box = new THREE.Mesh(boxGeometry, material);
-
-// Sphere
-const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
-const sphere = new THREE.Mesh(sphereGeometry, material);
-
-// Cylinder
-const cylinderGeometry = new THREE.CylinderGeometry(1, 1, 2, 32);
-const cylinder = new THREE.Mesh(cylinderGeometry, material);
-```
-
-## Interactivity
-
-### Mouse Interaction
-```javascript
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
-function onMouseMove(event) {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-}
-
-function onClick() {
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(scene.children);
-  
-  if (intersects.length > 0) {
-    const object = intersects[0].object;
-    object.material.color.set(0xff0000);
-  }
-}
-
-window.addEventListener('mousemove', onMouseMove);
-window.addEventListener('click', onClick);
-```
-
-### Keyboard Controls
-```javascript
-const keys = {};
-
-window.addEventListener('keydown', (e) => keys[e.key] = true);
-window.addEventListener('keyup', (e) => keys[e.key] = false);
-
-function handleKeyboard() {
-  if (keys['w']) camera.position.z -= 0.1;
-  if (keys['s']) camera.position.z += 0.1;
-  if (keys['a']) camera.position.x -= 0.1;
-  if (keys['d']) camera.position.x += 0.1;
-}
-```
-
-## Performance Optimization
-
-### Geometry Compression
-```javascript
-// Use indexed geometry
-const geometry = new THREE.BoxGeometry(1, 1, 1, 1, 1, 1);
-
-// Merge geometries
-const mergedGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries([
-  geometry1,
-  geometry2
-]);
-```
-
-### Texture Optimization
-```javascript
-// Compress textures
-const textureLoader = new THREE.TextureLoader();
-const texture = textureLoader.load('texture.jpg');
-texture.encoding = THREE.sRGBEncoding;
-texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-```
-
-### Level of Detail (LOD)
-```javascript
-import { LOD } from 'three';
-
-const lod = new LOD();
-
-// High detail
-const highDetail = new THREE.Mesh(geometryHigh, material);
-lod.addLevel(highDetail, 0);
-
-// Medium detail
-const mediumDetail = new THREE.Mesh(geometryMedium, material);
-lod.addLevel(mediumDetail, 50);
-
-// Low detail
-const lowDetail = new THREE.Mesh(geometryLow, material);
-lod.addLevel(lowDetail, 100);
-
-scene.add(lod);
-```
-
-## AR/VR
-
-### WebXR (VR)
-```javascript
-import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
-
-renderer.xr.enabled = true;
-document.body.appendChild(VRButton.createButton(renderer));
-
-function onXRSessionStart() {
-  // VR session started
-}
-
-renderer.xr.addEventListener('sessionstart', onXRSessionStart);
-```
-
-### AR.js (AR)
-```javascript
-import * as AR from 'ar.js';
-
-const arToolkitSource = new AR.ArToolkitSource({
-  sourceType: 'webcam'
-});
-
-arToolkitSource.init(() => {
-  setTimeout(() => {
-    onResize();
-  }, 2000);
-});
-
-const arToolkitContext = new AR.ArToolkitContext({
-  cameraParametersUrl: 'camera_para.dat',
-  detectionMode: 'mono'
-});
-```
-
-## Quick Reference
-
-| Task | Best Tool | Key Feature |
-|------|-----------|-------------|
-| Web 3D | Three.js | WebGL abstraction |
-| Modeling | Blender | Open-source, powerful |
-| Animation | Framer Motion | React animations |
-| VR | WebXR | Browser-based VR |
-| AR | AR.js | Web-based AR |
-| Motion Graphics | GSAP | Powerful animation |
-
-## Next Steps
-
-- For advanced 3D techniques, see REFERENCE.md
-- For 3D modeling, explore Blender documentation
-- For WebXR, consult WebXR API documentation

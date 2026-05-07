@@ -1,356 +1,185 @@
 ---
 name: a11y-design-pro
-description: Use this skill whenever the user wants to work with accessible and inclusive design, WCAG compliance, accessibility testing, or inclusive design practices. This includes implementing accessible UI components, WCAG 2.1/2.2 compliance, accessibility testing with screen readers, keyboard navigation, color contrast optimization, ARIA attributes, semantic HTML, and inclusive design for diverse users. If the user mentions accessibility, WCAG, inclusive design, or accessible UI components, use this skill.
-license: MIT
+description: |
+  Accessible and inclusive design: WCAG 2.1/2.2 compliance, ARIA patterns, keyboard navigation, screen reader optimization, color contrast, semantic HTML, and automated accessibility testing pipelines.
+
+  Use this skill when auditing or implementing accessibility for web UIs, adding ARIA to dynamic components, setting up axe/Lighthouse CI gates, designing for diverse users (visual, motor, cognitive, hearing), or ensuring legal compliance (ADA, EN 301 549, EAA).
+
+  Do not use for general UI/UX design aesthetics (use design-system-pro) or responsive layout (use frontend-design-pro).
+
+  Triggers: "accessibility", "a11y", "WCAG", "ARIA", "screen reader", "keyboard navigation", "color contrast", "axe", "WAVE", "Lighthouse accessibility", "inclusive design", "ADA compliance", "focus management".
+
 metadata:
-  short-description: "Accessibility — WCAG compliance, inclusive design, ARIA, keyboard navigation, screen readers"
+  short-description: "Accessibility — WCAG 2.1/2.2, ARIA, keyboard nav, screen readers, automated testing"
+  content-language: en
+  domain: frontend-engineering
+  level: professional
 ---
+
+# Accessibility Design (professional)
+
+Skill text is **English**; match the user's response language when applicable.
+
+Use [WCAG 2.2](https://www.w3.org/WAI/WCAG22/quickref/), [ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/), and [axe-core](https://github.com/dequelabs/axe-core) as authority. This skill encodes **WCAG compliance auditing**, **ARIA widget patterns**, **keyboard navigation**, **focus management**, **color contrast**, and **automated accessibility CI/CD**. Confirm **WCAG target level**, **legal requirements**, **target assistive technologies**, and **existing violation count** before proposing fixes.
 
 ## Boundary
 
-This skill handles accessibility and inclusive design tasks including WCAG compliance, accessibility testing, keyboard navigation, screen reader optimization, color contrast, ARIA attributes, semantic HTML, and inclusive design for diverse users. It focuses on using accessibility tools (axe, WAVE, Lighthouse, screen readers, accessibility APIs) and WCAG guidelines. It does NOT cover general UI/UX design principles or visual design aesthetics.
+**`a11y-design-pro`** owns **WCAG compliance**, **ARIA implementation**, **keyboard navigation**, **focus management**, **screen reader testing**, **color contrast**, and **automated a11y pipelines**. It does **not** own general design aesthetics, responsive layout, or design system components — combine with other skills as needed.
+
+| Skill | When to combine with **`a11y-design-pro`** |
+|-------|---------------------------------------------|
+| **`design-system-pro`** | When fixing contrast requires updating design tokens |
+| **`react-pro`** / **`nextjs-pro`** | When implementing ARIA in React components |
+| **`ai-design-pro`** | When AI-generated color palettes must pass WCAG contrast |
+| **`testing-pro`** | When integrating axe-core into a test suite |
+| **`frontend-design-pro`** | When accessibility fixes affect responsive layout |
 
 ## When to use
 
-Use this skill when:
-- Implementing WCAG 2.1/2.2 compliant UI components
-- Testing accessibility with screen readers (NVDA, JAWS, VoiceOver)
-- Optimizing keyboard navigation and focus management
-- Checking color contrast ratios for accessibility
-- Adding ARIA attributes to dynamic content
-- Creating semantic HTML structures
-- Designing for diverse user needs (visual, motor, cognitive)
-- Implementing accessible forms and interactive elements
-- Testing with accessibility tools (axe, WAVE, Lighthouse)
+- Auditing an existing UI for WCAG 2.1/2.2 compliance (Level A, AA, AAA).
+- Implementing ARIA roles, states, and properties for dynamic widgets (tabs, modals, accordions, carousels).
+- Setting up automated accessibility testing in CI (axe-core, Playwright, pa11y).
+- Fixing keyboard navigation and focus trap issues.
+- Validating color contrast ratios (4.5:1 AA, 7:1 AAA).
+- Testing with screen readers: NVDA, JAWS, VoiceOver, TalkBack.
+- Ensuring legal compliance: ADA (US), EN 301 549 (EU), EAA 2025.
+- Trigger keywords: `accessibility`, `a11y`, `WCAG`, `ARIA`, `screen reader`, `keyboard nav`, `color contrast`, `focus trap`, `ADA`
 
-DO NOT use this skill for:
-- General UI/UX design principles (use ui-design-brain-pro)
-- Visual design aesthetics (use design-system-pro)
-- Responsive design (use frontend-design-pro)
-- Design system components (use design-system-pro)
+## When not to use
+
+- **Visual design aesthetics** (color choices, typography) — use **`design-system-pro`**.
+- **Responsive layout** — use **`frontend-design-pro`**.
+- **General test automation** (non-a11y) — use **`testing-pro`**.
+
+## Required inputs
+
+- **WCAG target level** — A, AA (most common), or AAA.
+- **Legal/compliance context** — ADA, EN 301 549, CVAA, or internal policy.
+- **Target assistive technologies** — screen readers (NVDA/JAWS/VoiceOver), switch access, voice control.
+- **Current violation count** — axe report, Lighthouse score, or manual audit output.
+- **Framework** — React, Vue, plain HTML; determines ARIA implementation approach.
+
+## Expected output
+
+Follow **Suggested response format (STRICT)**.
 
 ## Workflow
 
-1. **Identify accessibility requirements** (WCAG level, user needs, legal requirements)
-2. **Audit current accessibility** using automated tools and manual testing
-3. **Implement semantic HTML** structure and landmarks
-4. **Add ARIA attributes** for dynamic content and widgets
-5. **Optimize keyboard navigation** (focus order, visible focus, skip links)
-6. **Ensure color contrast** meets WCAG AA/AAA standards
-7. **Test with screen readers** (NVDA, JAWS, VoiceOver)
-8. **Validate with accessibility tools** (axe, WAVE, Lighthouse)
-9. **Document accessibility features** and testing results
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** WCAG level, legal context, assistive tech targets → verify: [requirements documented].
+2. **Audit first** — run automated scan (axe, Lighthouse); categorize violations by impact (**Think Before Coding**).
+3. **Fix highest-impact violations first** (critical > serious > moderate > minor) (**Simplicity First**).
+4. **Surgical changes** — fix only the element/component with the violation; don't refactor adjacent code (**Surgical Changes**).
+5. **Define done** as: zero critical/serious violations on automated scan + manual screen reader walkthrough passes (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; note residual risks.
 
 ### Operating principles
 
-- **Follow WCAG 2.1/2.2 guidelines** for compliance
-- **Test with real assistive technologies**, not just automated tools
-- **Design for keyboard-first** navigation
-- **Provide alternative text** for all non-text content
-- **Ensure sufficient color contrast** (4.5:1 for AA, 7:1 for AAA)
-- **Use semantic HTML** for proper structure
-- **Add ARIA attributes** only when necessary
-- **Test with diverse users** including those with disabilities
+1. **Think Before Coding** — Read the axe/Lighthouse report before touching code. Understand the user impact of each violation.
+2. **Simplicity First** — Use semantic HTML first. Add ARIA only when semantic HTML is insufficient.
+3. **Surgical Changes** — Touch only the component with the violation. Don't add `aria-label` everywhere preemptively.
+4. **Goal-Driven Execution** — Done = zero critical/serious axe violations + screen reader walkthrough passes core flows.
+5. **Semantic HTML beats ARIA** — A `<button>` is better than `<div role="button">`. Always prefer native elements.
+6. **Test with real assistive tech** — Automated tools catch ~30–50% of issues. Screen reader testing is mandatory for high-traffic flows.
+7. **Don't over-ARIA** — Adding wrong ARIA is worse than no ARIA. Redundant roles on semantic elements create confusion.
 
-## Suggested response format
+## Default recommendations by scenario
 
-```
-Accessibility Task: [WCAG compliance / testing / implementation]
-WCAG Level: [A / AA / AAA]
-Target Users: [visual / motor / cognitive / hearing impairments]
-Tools Used: [axe, WAVE, Lighthouse, screen readers]
-Audit Results: [accessibility issues found]
-Implementation: [accessibility features implemented]
-Testing Results: [screen reader, keyboard navigation test results]
-Compliance Status: [compliant / needs improvement]
-Recommendations: [next steps for accessibility improvements]
-```
+| Scenario | Default approach |
+|----------|-----------------|
+| First audit | Lighthouse in CI + axe DevTools browser extension |
+| WCAG AA compliance | Fix all axe critical + serious; validate contrast with Scripts/check-color-contrast.js |
+| Keyboard navigation | Skip links + visible :focus-visible + focus trap in modals |
+| Screen reader support | NVDA+Firefox (Windows), VoiceOver+Safari (macOS/iOS) |
+| Dynamic content | aria-live regions for status messages; aria-expanded for toggles |
+| Legal compliance (EU) | EN 301 549 = WCAG 2.1 AA + additional functional criteria |
+
+## Decision trees
+
+Summary: violation type → ARIA pattern → testing approach → CI gate.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: using ARIA instead of semantic HTML, missing focus management on modals, empty alt text on informative images, aria-hidden on focusable elements, relying solely on automated tools.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### ARIA patterns (summary)
+
+- Tabs, accordions, modals, carousels — each has a specific APG pattern.
+- `aria-live` for dynamic content; `aria-atomic` controls announcement granularity.
+- Focus trap is required for modal dialogs; restore focus on close.
+
+Details: [references/aria-patterns.md](references/aria-patterns.md)
+
+### Automated testing (summary)
+
+- axe-core: most comprehensive rule set; integrates with Jest, Playwright, Cypress.
+- Lighthouse: CI-friendly, produces scores; good for tracking over time.
+- Pa11y: CLI tool; easy to add to CI without code changes.
+
+Details: [references/automated-testing.md](references/automated-testing.md)
+
+## Cross-skill handoffs
+
+- **`design-system-pro`** — when contrast violations require updating color design tokens.
+- **`react-pro`** — when implementing ARIA patterns in React hooks and components.
+- **`testing-pro`** — when setting up axe-core in Jest/Playwright test suites.
+- **`ai-design-pro`** — when AI-generated palettes need contrast validation.
+
+Details: [references/integration-map.md](references/integration-map.md)
+
+## Suggested response format (implement / review)
+
+1. **Violations found** — List by impact level (critical, serious, moderate, minor) with WCAG criterion.
+2. **Fix** — Minimal code change targeting the root cause (semantic HTML or ARIA).
+3. **Verification** — How to confirm the fix (axe re-scan, screen reader test command).
+4. **Residual risks** — What automated tools won't catch; manual testing needed.
 
 ## Resources in this skill
 
-- **WCAG Guidelines**: WCAG 2.1, WCAG 2.2
-- **Accessibility Tools**: axe, WAVE, Lighthouse, Pa11y
-- **Screen Readers**: NVDA, JAWS, VoiceOver, TalkBack
-- **Accessibility APIs**: ARIA, Accessible Rich Internet Applications
-- **Reference Documentation**: REFERENCE.md for advanced accessibility techniques
+| Topic | File |
+|-------|------|
+| ARIA widget patterns | [references/aria-patterns.md](references/aria-patterns.md) |
+| Automated testing setup | [references/automated-testing.md](references/automated-testing.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Advanced techniques | [REFERENCE.md](REFERENCE.md) |
+| Scripts | [Scripts/](Scripts/) |
 
 ## Quick example
 
-**Check color contrast:**
+**Input:** "Our modal dialog fails axe with 'aria-hidden-body' and keyboard focus leaves the modal."
+- Add `aria-modal="true"` to the dialog; set `inert` on background content.
+- Implement focus trap: capture Tab/Shift+Tab, keep focus within modal.
+- On close: restore focus to the trigger button.
+- **Verify:** `axe.run()` returns zero violations; NVDA can navigate modal content; Escape closes and returns focus.
 
-```
-1. Use axe DevTools or WAVE to test color contrast
-2. Check all text and interactive elements
-3. Verify contrast ratios meet WCAG AA (4.5:1) or AAA (7:1)
-4. Identify failing elements
-5. Adjust colors to meet requirements
-6. Re-test to verify compliance
-```
+**Input (tricky):** "We have 247 axe violations. Where do we start?"
+- Filter to `impact: critical` and `impact: serious` — fix these first.
+- Group by rule ID (e.g., `color-contrast` often accounts for 50%+ of violations).
+- Use `Scripts/check-color-contrast.js` to batch-check all color pairs.
+- **Verify:** Each sprint, critical violations = 0; track serious violations on a dashboard.
+
+**Input (cross-skill):** "Build an accessible design system with color tokens and component library."
+- **`a11y-design-pro`**: Define WCAG AA contrast ratios for all token pairs; ARIA for each component type.
+- **`design-system-pro`**: Encode validated colors as tokens; document a11y usage per component.
+- **`testing-pro`**: Add axe-core to Storybook; fail CI if any story has violations.
+- **Verify:** All token pairs pass 4.5:1; all components pass axe in Storybook; design system docs include a11y notes.
 
 ## Checklist before calling the skill done
 
-- [ ] WCAG compliance level is specified
-- [ ] Target user disabilities are identified
-- [ ] Accessibility tools are available
-- [ ] Screen readers are installed for testing
-- [ ] Color contrast requirements are understood
-- [ ] ARIA attributes are documented
-- [ ] Keyboard navigation requirements are defined
-- [ ] Testing plan is established
-
----
-
-# Accessibility Design Guide
-
-## Overview
-
-This guide covers essential accessibility and inclusive design techniques using WCAG guidelines and accessibility tools. For advanced accessibility techniques and real-world examples, see REFERENCE.md.
-
-## Quick Start
-
-```javascript
-// Check color contrast
-const contrastRatio = getContrastRatio(foregroundColor, backgroundColor);
-const wcagAA = contrastRatio >= 4.5;
-const wcagAAA = contrastRatio >= 7.0;
-
-// Add ARIA attribute
-button.setAttribute('aria-expanded', 'false');
-button.setAttribute('aria-controls', 'menu-id');
-```
-
-## WCAG Compliance
-
-### WCAG 2.1 Principles (POUR)
-- **Perceivable**: Information must be presented in ways users can perceive
-- **Operable**: Interface components must be operable by users
-- **Understandable**: Information and operation must be understandable
-- **Robust**: Content must be robust enough to be interpreted by assistive technologies
-
-### WCAG 2.2 New Success Criteria
-- **Focus Not Obscured**: Ensure focus is not obscured by other content
-- **Focus Appearance**: Ensure focus indicator is visible
-- **Dragging Movements**: Provide alternatives to dragging
-- **Target Size**: Ensure touch targets are at least 44x44 pixels
-
-## Semantic HTML
-
-### Landmarks
-```html
-<header role="banner">
-  <nav role="navigation" aria-label="Main navigation">
-    <!-- Navigation links -->
-  </nav>
-</header>
-
-<main role="main">
-  <!-- Main content -->
-</main>
-
-<aside role="complementary">
-  <!-- Sidebar content -->
-</aside>
-
-<footer role="contentinfo">
-  <!-- Footer content -->
-</footer>
-```
-
-### Headings Structure
-```html
-<h1>Main page title</h1>
-  <h2>Section title</h2>
-    <h3>Subsection title</h3>
-  <h2>Another section</h2>
-```
-
-## ARIA Attributes
-
-### ARIA Roles
-```html
-<!-- Navigation menu -->
-<nav role="navigation" aria-label="Main menu">
-  <ul>
-    <li><a href="/">Home</a></li>
-    <li><a href="/about">About</a></li>
-  </ul>
-</nav>
-
-<!-- Modal dialog -->
-<div role="dialog" aria-modal="true" aria-labelledby="dialog-title">
-  <h2 id="dialog-title">Dialog title</h2>
-  <p>Dialog content</p>
-</div>
-```
-
-### ARIA States and Properties
-```html
-<!-- Expandable menu -->
-<button aria-expanded="false" aria-controls="menu-id">
-  Menu
-</button>
-<ul id="menu-id" hidden>
-  <li><a href="/">Home</a></li>
-  <li><a href="/about">About</a></li>
-</ul>
-
-<!-- Progress indicator -->
-<div role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
-  50% complete
-</div>
-```
-
-## Keyboard Navigation
-
-### Focus Management
-```javascript
-// Set focus to element
-element.focus();
-
-// Trap focus in modal
-function trapFocus(element) {
-  const focusableElements = element.querySelectorAll(
-    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-  );
-  const firstFocusable = focusableElements[0];
-  const lastFocusable = focusableElements[focusableElements.length - 1];
-
-  element.addEventListener('keydown', (e) => {
-    if (e.key === 'Tab') {
-      if (e.shiftKey && document.activeElement === firstFocusable) {
-        e.preventDefault();
-        lastFocusable.focus();
-      } else if (!e.shiftKey && document.activeElement === lastFocusable) {
-        e.preventDefault();
-        firstFocusable.focus();
-      }
-    }
-  });
-}
-```
-
-### Skip Links
-```html
-<a href="#main-content" class="skip-link">
-  Skip to main content
-</a>
-
-<main id="main-content">
-  <!-- Main content -->
-</main>
-```
-
-## Color Contrast
-
-### Calculate Contrast Ratio
-```javascript
-function getLuminance(r, g, b) {
-  const [rs, gs, bs] = [r, g, b].map(c => {
-    c = c / 255;
-    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-  });
-  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
-}
-
-function getContrastRatio(color1, color2) {
-  const lum1 = getLuminance(color1.r, color1.g, color1.b);
-  const lum2 = getLuminance(color2.r, color2.g, color2.b);
-  const brightest = Math.max(lum1, lum2);
-  const darkest = Math.min(lum1, lum2);
-  return (brightest + 0.05) / (darkest + 0.05);
-}
-```
-
-### Check WCAG Compliance
-```javascript
-function checkWCAGCompliance(contrastRatio, level = 'AA') {
-  const thresholds = {
-    A: 3.0,
-    AA: 4.5,
-    AAA: 7.0
-  };
-  return contrastRatio >= thresholds[level];
-}
-```
-
-## Screen Reader Testing
-
-### NVDA (Windows)
-- Download NVDA from nvaccess.org
-- Test with NVDA + Firefox
-- Use NVDA + Chrome for web testing
-- Test keyboard navigation with NVDA
-
-### VoiceOver (macOS/iOS)
-- Enable VoiceOver: Cmd + F5
-- Test with Safari on macOS
-- Test with Safari on iOS
-- Use rotor for navigation (Cmd + U)
-
-### JAWS (Windows)
-- Download JAWS from Freedom Scientific
-- Test with JAWS + IE/Edge
-- Test with JAWS + Firefox
-
-## Accessibility Tools
-
-### axe DevTools
-```javascript
-// Run axe-core programmatically
-import axe from 'axe-core';
-
-const results = await axe.run(document.body);
-console.log(results.violations);
-```
-
-### Lighthouse
-```bash
-# Run Lighthouse accessibility audit
-lighthouse https://example.com --view --only-categories=accessibility
-```
-
-### WAVE
-- Use WAVE browser extension
-- Test with WAVE online tool
-- Review WAVE errors and alerts
-
-## Accessible Forms
-
-### Form Labels
-```html
-<label for="name">Name:</label>
-<input type="text" id="name" name="name" required>
-
-<!-- Radio buttons -->
-<fieldset>
-  <legend>Choose an option:</legend>
-  <input type="radio" id="option1" name="options" value="1">
-  <label for="option1">Option 1</label>
-  
-  <input type="radio" id="option2" name="options" value="2">
-  <label for="option2">Option 2</label>
-</fieldset>
-```
-
-### Error Messages
-```html
-<div role="alert" aria-live="polite">
-  Please fill in all required fields
-</div>
-```
-
-## Quick Reference
-
-| Task | Best Tool | Key Feature |
-|------|-----------|-------------|
-| Automated Testing | axe, Lighthouse | Fast, comprehensive |
-| Visual Testing | WAVE | Visual feedback |
-| Screen Reader Testing | NVDA, VoiceOver | Real-world testing |
-| Color Contrast | WebAIM Contrast Checker | WCAG compliance |
-| Keyboard Testing | Manual | Focus management |
-
-## Next Steps
-
-- For advanced accessibility techniques, see REFERENCE.md
-- For WCAG 2.2 guidelines, consult W3C documentation
-- For accessibility testing, explore screen reader documentation
+- [ ] Assumptions stated explicitly; WCAG level and legal context confirmed (**Think Before Coding**)
+- [ ] Automated scan run; violations categorized by impact before coding (**Think Before Coding**)
+- [ ] Semantic HTML used first; ARIA added only where needed (**Simplicity First**)
+- [ ] Only the violating component was modified (**Surgical Changes**)
+- [ ] Zero critical/serious axe violations; screen reader walkthrough passes (**Goal-Driven Execution**)
+- [ ] Color contrast ratios verified for all text/background pairs
+- [ ] Keyboard navigation tested: Tab order logical, focus visible, Escape works
+- [ ] Focus management correct: modals trap focus, focus restores on close
+- [ ] `aria-live` regions announce dynamic changes to screen readers
+- [ ] Residual risks called out: what automated tools won't catch

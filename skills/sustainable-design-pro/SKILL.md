@@ -1,370 +1,185 @@
 ---
 name: sustainable-design-pro
-description: Use this skill whenever the user wants to implement sustainable design practices, zero-waste design, eco-friendly design, or green design principles. This includes reducing digital waste, optimizing for energy efficiency, sustainable color palettes, eco-friendly typography, minimal resource usage, carbon footprint reduction, and environmentally conscious design decisions. If the user mentions sustainable design, eco-friendly design, zero-waste design, or green design principles, use this skill.
-license: MIT
+description: |
+  Sustainable web design: carbon footprint measurement, green hosting selection, asset optimization (images, fonts, video), energy-efficient design patterns (dark mode, lazy loading, code splitting), and performance budgets that reduce CO2 per page view.
+
+  Use this skill when measuring and reducing a website's environmental impact, choosing green hosting, optimizing assets for minimal data transfer, implementing energy-efficient UX patterns, or reporting on digital sustainability metrics.
+
+  Do not use for general performance optimization without sustainability framing (use performance-tuning-pro) or for accessibility (use a11y-design-pro).
+
+  Triggers: "sustainable design", "green web", "carbon footprint", "eco-friendly website", "energy efficiency", "website carbon", "digital sustainability", "green hosting", "zero-waste design", "low-carbon UI".
+
 metadata:
-  short-description: "Sustainable Design — zero-waste, eco-friendly, energy efficiency, carbon footprint reduction"
+  short-description: "Sustainable Design — carbon footprint, green hosting, asset optimization, energy-efficient UX"
+  content-language: en
+  domain: design-engineering
+  level: professional
 ---
+
+# Sustainable Design (professional)
+
+Skill text is **English**; match the user's response language when applicable.
+
+Use [Website Carbon Calculator](https://www.websitecarbon.com/), [Sustainable Web Design](https://sustainablewebdesign.org/), [Green Web Foundation](https://www.thegreenwebfoundation.org/), and [Core Web Vitals](https://web.dev/vitals/) as authority. This skill encodes **carbon measurement**, **green infrastructure selection**, **asset optimization pipelines**, **energy-efficient UX patterns**, and **sustainability reporting**. Confirm **current carbon rating**, **hosting provider**, **performance baseline**, and **sustainability goals** before recommending changes.
 
 ## Boundary
 
-This skill handles sustainable design tasks including zero-waste design, eco-friendly design practices, energy efficiency optimization, sustainable color palettes, eco-friendly typography, minimal resource usage, carbon footprint reduction, and environmentally conscious design decisions. It focuses on using sustainable design principles and tools (carbon calculators, performance optimization tools, sustainable design frameworks). It does NOT cover general design principles or traditional design aesthetics.
+**`sustainable-design-pro`** owns **digital carbon measurement**, **green hosting decisions**, **asset optimization for minimal data transfer**, **energy-efficient UX patterns**, and **sustainability reporting**. It does **not** own general performance tuning without sustainability framing, accessibility, or design aesthetics.
+
+| Skill | When to combine with **`sustainable-design-pro`** |
+|-------|---------------------------------------------------|
+| **`performance-tuning-pro`** | When performance work also targets carbon reduction |
+| **`a11y-design-pro`** | When low-carbon design must also meet accessibility standards |
+| **`design-system-pro`** | When sustainable color and typography choices become design tokens |
+| **`ai-design-pro`** | When AI-generated assets need optimization before deployment |
+| **`deployment-pro`** | When choosing green hosting or CDN infrastructure |
 
 ## When to use
 
-Use this skill when:
-- Implementing zero-waste design practices
-- Optimizing for energy efficiency and performance
-- Creating sustainable color palettes and typography
-- Reducing digital waste and carbon footprint
-- Implementing eco-friendly design decisions
-- Optimizing assets for minimal resource usage
-- Choosing sustainable hosting and infrastructure
-- Measuring and reducing environmental impact
+- Measuring current carbon footprint (websitecarbon.com, Ecograder, Lighthouse).
+- Reducing page weight through image/font/video optimization.
+- Choosing green hosting providers (100% renewable energy certified).
+- Implementing lazy loading, code splitting, and caching to reduce energy per visit.
+- Adopting dark mode or minimal-color palettes to reduce screen energy on OLED.
+- Reporting sustainability metrics to stakeholders (CO2/page view, energy per visit).
+- Trigger keywords: `sustainable design`, `carbon footprint`, `green web`, `eco-friendly`, `website carbon`, `digital sustainability`, `green hosting`, `energy efficiency`
 
-DO NOT use this skill for:
-- General design principles (use design-system-pro)
-- Traditional design aesthetics (use design-system-pro)
-- Performance optimization only (use performance-tuning-pro)
-- Accessibility (use a11y-design-pro)
+## When not to use
+
+- **General performance optimization** (non-sustainability context) — use **`performance-tuning-pro`**.
+- **Accessibility** — use **`a11y-design-pro`**.
+- **Design aesthetics** — use **`design-system-pro`**.
+
+## Required inputs
+
+- **Current carbon rating** — websitecarbon.com result or Lighthouse performance score.
+- **Hosting provider** — current host; whether renewable energy certified.
+- **Performance baseline** — page size (KB), TTFB, LCP, total requests.
+- **Sustainability goals** — target CO2/view, rating target (A/B/C), timeline.
+- **Asset inventory** — image formats in use, video presence, font loading strategy.
+
+## Expected output
+
+Follow **Suggested response format (STRICT)**.
 
 ## Workflow
 
-1. **Identify sustainability goals** (zero-waste, energy efficiency, carbon reduction)
-2. **Audit current environmental impact** (carbon footprint, resource usage)
-3. **Implement sustainable design practices** (minimal assets, efficient code)
-4. **Optimize for energy efficiency** (performance, lazy loading, caching)
-5. **Choose sustainable resources** (green hosting, eco-friendly fonts)
-6. **Measure and track** environmental impact
-7. **Iterate and improve** based on measurements
-8. **Document sustainable decisions** and their impact
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** current carbon rating, hosting, and performance baseline → verify: [baseline documented].
+2. **Measure before optimizing** — run websitecarbon.com and Lighthouse; identify highest-impact assets (**Think Before Coding**).
+3. **Highest impact first** — images > video > fonts > JS > hosting; fix the largest byte savings first (**Simplicity First**).
+4. **Surgical changes** — optimize only the assets/patterns causing the largest CO2 contribution (**Surgical Changes**).
+5. **Define done** as: measurable CO2/view reduction; carbon rating improved by at least one grade (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; note trade-offs between UX and sustainability.
 
 ### Operating principles
 
-- **Minimize resource usage** (smaller assets, efficient code)
-- **Optimize for energy efficiency** (performance, caching, lazy loading)
-- **Choose sustainable infrastructure** (green hosting, renewable energy)
-- **Reduce carbon footprint** through efficient design
-- **Implement zero-waste practices** (reusable components, minimal dependencies)
-- **Measure and track** environmental impact
-- **Educate stakeholders** on sustainable design benefits
-- **Balance sustainability** with user experience
+1. **Think Before Coding** — Measure first. The biggest wins are almost always image optimization and hosting, not code changes.
+2. **Simplicity First** — Every byte not transferred saves energy. The most sustainable page is the one that loads less.
+3. **Surgical Changes** — Don't refactor the whole codebase. Fix the 3 assets that account for 80% of page weight.
+4. **Goal-Driven Execution** — Done = CO2/view reduced to target; green hosting confirmed; Lighthouse performance ≥ 90.
+5. **Data transfer = energy** — 1GB of data ≈ 0.44g CO2. Every KB saved multiplies across all page views.
+6. **Green hosting is the single biggest lever** — Switching to a 100% renewable host can reduce carbon by 50–80% instantly.
+7. **Sustainable ≠ ugly** — Lean pages are faster, cheaper, and more accessible. Sustainability and UX quality align.
 
-## Suggested response format
+## Default recommendations by scenario
 
-```
-Sustainability Goal: [zero-waste / energy efficiency / carbon reduction]
-Current Impact: [carbon footprint, resource usage]
-Implemented Practices: [sustainable design techniques]
-Optimizations: [performance, asset optimization, infrastructure]
-Measured Results: [carbon reduction, energy savings]
-Recommendations: [further sustainability improvements]
-```
+| Scenario | Default action | Expected impact |
+|----------|---------------|-----------------|
+| Large images | Convert to AVIF/WebP + lazy load | 60–80% size reduction |
+| No green hosting | Migrate to Cloudflare Pages / Vercel / Netlify (all renewable) | 50–80% CO2 reduction |
+| Heavy fonts | Use `font-display: swap` + subsetting | 50–90% font size reduction |
+| Video autoplay | Replace with poster image + user-triggered play | 90%+ data reduction |
+| Third-party scripts | Audit and remove unused trackers | 10–30% request reduction |
+| Dark mode | Implement prefers-color-scheme | 20–40% OLED energy saving |
+
+## Decision trees
+
+Summary: current rating → highest-impact fix → implementation → re-measure.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: uncompressed images, video autoplay, blocking fonts, no caching headers, grey hosting, unused JS bundles, tracking scripts without audit.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Asset optimization (summary)
+
+- Images: AVIF > WebP > JPEG; use `<picture>` for format negotiation; `loading="lazy"` on all below-fold images.
+- Fonts: subset to used characters; `font-display: swap`; self-host over Google Fonts.
+- Video: never autoplay; use `<video>` with poster; compress with FFmpeg (H.265/AV1).
+
+Details: [references/asset-optimization.md](references/asset-optimization.md)
+
+### Green hosting (summary)
+
+- Check hosting at [thegreenwebfoundation.org](https://www.thegreenwebfoundation.org/).
+- Top green options: Cloudflare Pages, Vercel, Netlify, Hetzner (renewable), Infomaniak.
+- CDN caching reduces origin server requests → direct energy savings.
+
+Details: [references/green-hosting.md](references/green-hosting.md)
+
+## Cross-skill handoffs
+
+- **`performance-tuning-pro`** — when carbon reduction and Core Web Vitals improvement overlap.
+- **`deployment-pro`** — when migrating to green hosting or configuring CDN caching headers.
+- **`design-system-pro`** — when sustainable color/typography choices need to become design tokens.
+- **`a11y-design-pro`** — when dark mode and low-contrast palettes need accessibility validation.
+
+Details: [references/integration-map.md](references/integration-map.md)
+
+## Suggested response format (implement / review)
+
+1. **Baseline** — Current carbon rating, page weight, hosting provider.
+2. **Highest-impact fixes** — Ordered by CO2 savings (assets → hosting → patterns).
+3. **Implementation** — Code/config changes for each fix.
+4. **Verification** — Re-run websitecarbon.com; Lighthouse score; bytes saved.
+5. **Residual risks** — UX trade-offs, browser support for AVIF/AV1, migration complexity.
 
 ## Resources in this skill
 
-- **Carbon Calculators**: Carbon API, Website Carbon Calculator
-- **Performance Tools**: Lighthouse, WebPageTest, GTmetrix
-- **Sustainable Frameworks**: Sustainable Web Design, Green Web Foundation
-- **Green Hosting**: GreenGeeks, AWS Green Regions, Google Cloud Carbon
-- **Reference Documentation**: REFERENCE.md for advanced sustainable techniques
+| Topic | File |
+|-------|------|
+| Asset optimization guide | [references/asset-optimization.md](references/asset-optimization.md) |
+| Green hosting guide | [references/green-hosting.md](references/green-hosting.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Advanced techniques | [REFERENCE.md](REFERENCE.md) |
+| Scripts | [Scripts/](Scripts/) |
 
 ## Quick example
 
-**Optimize for energy efficiency:**
+**Input:** "Our product landing page scores F on websitecarbon.com."
+- Run Lighthouse; identify top 3 assets by byte size.
+- Convert hero image to AVIF + add `loading="lazy"` to all below-fold images.
+- Check hosting at thegreenwebfoundation.org; migrate to Cloudflare Pages if grey.
+- **Verify:** Re-run websitecarbon.com; target C rating or better; Lighthouse performance ≥ 85.
 
-```
-1. Measure current carbon footprint using carbon calculator
-2. Identify high-impact areas (large assets, inefficient code)
-3. Optimize images and assets (compression, modern formats)
-4. Implement lazy loading and code splitting
-5. Add caching and CDN for faster delivery
-6. Choose green hosting provider
-7. Re-measure and track improvements
-```
+**Input (tricky):** "Our marketing team insists on a 4K video hero section."
+- Propose: replace autoplay video with a static poster image + "Watch" button.
+- If video is non-negotiable: compress with AV1 (FFmpeg), serve via CDN, lazy-load.
+- Quantify trade-off: autoplay 4K video ≈ 50MB/visit vs. poster image ≈ 80KB/visit.
+- **Verify:** Page weight < 500KB without video; video < 2MB compressed; user triggers play.
+
+**Input (cross-skill):** "Build a carbon-neutral e-commerce site from scratch."
+- **`sustainable-design-pro`**: Asset pipeline (AVIF, font subsetting), green hosting on Cloudflare.
+- **`performance-tuning-pro`**: LCP < 2.5s; TBT < 200ms; service worker caching.
+- **`a11y-design-pro`**: Dark mode palette passes WCAG AA contrast.
+- **Verify:** websitecarbon.com rating A or B; Lighthouse 90+ all categories.
 
 ## Checklist before calling the skill done
 
-- [ ] Sustainability goals are defined
-- [ ] Current environmental impact is measured
-- [ ] Sustainable design practices are identified
-- [ ] Performance requirements are understood
-- [ ] Green infrastructure options are available
-- [ ] Carbon measurement tools are accessible
-- [ ] Stakeholder buy-in is secured
-- [ ] Tracking and reporting plan is established
-
----
-
-# Sustainable Design Guide
-
-## Overview
-
-This guide covers essential sustainable design techniques for reducing environmental impact through design decisions. For advanced sustainable techniques and real-world examples, see REFERENCE.md.
-
-## Quick Start
-
-```javascript
-// Calculate carbon footprint
-import { calculateCarbon } from '@carbon/api';
-
-const carbon = await calculateCarbon({
-  url: 'https://example.com',
-  green: true
-});
-console.log(`Carbon footprint: ${carbon.co2}g CO2`);
-```
-
-## Zero-Waste Design
-
-### Minimal Assets
-```javascript
-// Use modern image formats
-const imageFormats = ['webp', 'avif'];
-
-// Lazy load images
-<img loading="lazy" src="image.webp" alt="Description">
-
-// Responsive images
-<picture>
-  <source srcset="image-avif.avif" type="image/avif">
-  <source srcset="image-webp.webp" type="image/webp">
-  <img src="image.jpg" alt="Description">
-</picture>
-```
-
-### Reusable Components
-```javascript
-// Create reusable components
-const Button = ({ children, variant = 'primary' }) => {
-  return <button className={`btn btn-${variant}`}>{children}</button>;
-};
-
-// Use throughout application
-<Button variant="primary">Click me</Button>
-```
-
-### Minimal Dependencies
-```javascript
-// Use tree shaking
-import { debounce } from 'lodash-es';
-
-// Use smaller alternatives
-// Instead of moment.js (67KB)
-import { format } from 'date-fns'; // (2KB)
-```
-
-## Energy Efficiency
-
-### Performance Optimization
-```javascript
-// Code splitting
-const LazyComponent = React.lazy(() => import('./LazyComponent'));
-
-// Lazy loading routes
-const Home = React.lazy(() => import('./Home'));
-const About = React.lazy(() => import('./About'));
-```
-
-### Caching Strategies
-```javascript
-// Service worker for caching
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open('v1').then((cache) => {
-      return cache.addAll([
-        '/',
-        '/styles/main.css',
-        '/scripts/main.js'
-      ]);
-    })
-  );
-});
-```
-
-### Efficient Animations
-```javascript
-// Use CSS animations instead of JavaScript
-.animated {
-  animation: slideIn 0.3s ease-in-out;
-}
-
-@keyframes slideIn {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
-}
-```
-
-## Sustainable Color Palettes
-
-### Dark Mode
-```css
-/* Dark mode reduces energy on OLED screens */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #000000;
-    --text: #ffffff;
-  }
-}
-```
-
-### Energy-Efficient Colors
-```javascript
-// Use darker colors on OLED screens
-const energyEfficientColors = {
-  background: '#000000',  // 0 energy on OLED
-  text: '#ffffff',
-  accent: '#00ff00'
-};
-```
-
-## Carbon Footprint Measurement
-
-### Website Carbon Calculator
-```javascript
-async function measureCarbonFootprint(url) {
-  const response = await fetch(`https://api.websitecarbon.com/site?url=${url}`);
-  const data = await response.json();
-  
-  return {
-    co2: data.c,
-    rating: data.rating,
-    green: data.green
-  };
-}
-```
-
-### Carbon API
-```javascript
-import { calculateCarbon } from '@carbon/api';
-
-const carbon = await calculateCarbon({
-  bytes: 1024000,
-  green: true,
-  duration: 1000
-});
-```
-
-## Green Infrastructure
-
-### Sustainable Hosting
-```javascript
-// Choose green hosting providers
-const greenHosts = [
-  'GreenGeeks',      // 300% renewable energy
-  'Kinsta',          // Google Cloud green regions
-  'Netlify',         // Carbon neutral
-  'Vercel',          // Carbon neutral
-  'AWS',             // Green regions available
-  'Google Cloud'     // Carbon neutral since 2017
-];
-```
-
-### Green CDNs
-```javascript
-// Use green CDNs
-const greenCDNs = [
-  'Cloudflare',      // Renewable energy commitment
-  'Fastly',          // Carbon neutral
-  'Akamai',          // Green initiatives
-  'KeyCDN'           // Green hosting
-];
-```
-
-## Typography Optimization
-
-### System Fonts
-```css
-/* Use system fonts to avoid loading web fonts */
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-```
-
-### Variable Fonts
-```css
-/* Use variable fonts for flexibility and smaller file size */
-@font-face {
-  font-family: 'Inter';
-  font-weight: 100 900;
-  font-style: normal;
-  src: url('inter-variable.woff2') format('woff2-variations');
-}
-```
-
-### Font Subsetting
-```javascript
-// Subset fonts to include only needed characters
-const fontSubset = new FontSubset('Inter', 'Latin');
-fontSubset.generate('inter-subset.woff2');
-```
-
-## Asset Optimization
-
-### Image Optimization
-```javascript
-// Use sharp for image optimization
-import sharp from 'sharp';
-
-await sharp('input.jpg')
-  .resize(800, 600)
-  .webp({ quality: 80 })
-  .toFile('output.webp');
-```
-
-### Video Optimization
-```javascript
-// Use efficient video formats
-const videoFormats = ['webm', 'mp4'];
-
-// Lazy load videos
-<video loading="lazy" controls>
-  <source src="video.webm" type="video/webm">
-  <source src="video.mp4" type="video/mp4">
-</video>
-```
-
-## Sustainable Design Metrics
-
-### Key Metrics to Track
-- Carbon footprint (CO2 emissions)
-- Page size (total bytes transferred)
-- Load time (time to interactive)
-- Energy consumption (device energy use)
-- Green hosting usage (percentage of green infrastructure)
-
-### Measurement Tools
-```javascript
-// Lighthouse for performance
-const lighthouse = require('lighthouse');
-
-const results = await lighthouse('https://example.com', {
-  onlyCategories: ['performance']
-});
-
-// Website Carbon Calculator
-const carbon = await measureCarbonFootprint('https://example.com');
-
-// Custom tracking
-const metrics = {
-  pageLoadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
-  totalBytes: performance.getEntriesByType('resource')
-    .reduce((total, entry) => total + entry.transferSize, 0)
-};
-```
-
-## Quick Reference
-
-| Task | Best Tool | Key Benefit |
-|------|-----------|-------------|
-| Carbon Measurement | Website Carbon Calculator | Easy carbon footprint tracking |
-| Performance | Lighthouse | Performance optimization |
-| Image Optimization | Sharp | Efficient image compression |
-| Green Hosting | GreenGeeks | Renewable energy |
-| Font Optimization | Variable Fonts | Smaller file sizes |
-
-## Next Steps
-
-- For advanced sustainable techniques, see REFERENCE.md
-- For carbon tracking, explore Carbon API documentation
-- For sustainable hosting, consult green hosting providers
+- [ ] Baseline measured: carbon rating, page weight, hosting provider (**Think Before Coding**)
+- [ ] Highest-impact assets identified before coding (**Think Before Coding**)
+- [ ] Largest byte savings targeted first; no speculative refactoring (**Simplicity First**)
+- [ ] Only the high-impact assets/patterns were touched (**Surgical Changes**)
+- [ ] CO2/view reduced to target; carbon rating improved (**Goal-Driven Execution**)
+- [ ] Images converted to AVIF/WebP with lazy loading
+- [ ] Fonts subsetted and using font-display: swap
+- [ ] Hosting verified as renewable energy certified
+- [ ] Caching headers set (Cache-Control, CDN)
+- [ ] Residual risks called out: UX trade-offs, browser support, migration complexity
