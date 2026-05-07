@@ -47,11 +47,65 @@ npx github:truongnat/skills
 
 ---
 
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Skills Devkit                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+│  │   Skills     │  │  Workflows   │  │   Knowledge Base    │  │
+│  │              │  │              │  │                      │  │
+│  │ • 92 skills  │  │ • 20 flows   │  │ • Documents          │  │
+│  │ • SKILL.md   │  │ • Domain-    │  │ • Embeddings (.index) │  │
+│  │ • Scripts/   │  │   organized  │  │ • Manifest (.json)   │  │
+│  │ • Reference  │  │ • Step-by-   │  │ • RAG Search         │  │
+│  │              │  │   step       │  │                      │  │
+│  └──────┬───────┘  └──────┬───────┘  └──────────┬───────────┘  │
+│         │                  │                     │               │
+│         └──────────────────┴─────────────────────┘               │
+│                            │                                     │
+│                            ▼                                     │
+│                  ┌───────────────┐                               │
+│                  │  CLI Tools    │                               │
+│                  │               │                               │
+│                  │ • validate-   │                               │
+│                  │   skills      │                               │
+│                  │ • build-kb    │                               │
+│                  │ • query-kb    │                               │
+│                  │ • index-      │                               │
+│                  │   project     │                               │
+│                  └───────┬───────┘                               │
+│                          │                                       │
+│                          ▼                                       │
+│                  ┌───────────────┐                               │
+│                  │  Agent Layer  │                               │
+│                  │               │                               │
+│                  │ • Skill       │                               │
+│                  │   Routing     │                               │
+│                  │ • Workflow    │                               │
+│                  │   Execution   │                               │
+│                  └───────────────┘                               │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Component Overview
+
+- **Skills**: Domain-specific capabilities (React, Docker, TypeScript, Security, Finance, etc.)
+- **Workflows**: Structured procedures organized by domain (dev, ops, qa, data, hr, finance)
+- **Knowledge Base**: RAG-powered documentation search with embeddings and manifest
+- **CLI Tools**: Command-line interface for validation, indexing, and querying
+- **Agent Layer**: Skill routing and workflow execution for AI agents
+
+---
+
 ## Structure
 
 ```
 skills/          # 92 skill packs
-workflows/        # Domain-organized workflows (dev, ops, qa, data, hr)
+workflows/        # Domain-organized workflows (dev, ops, qa, data, hr, finance)
 knowledge-base/   # Documents + embeddings
 src/              # TypeScript source
 dist/             # Compiled JS
