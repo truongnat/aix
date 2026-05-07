@@ -2089,15 +2089,17 @@ async function cmdQueryKbBatch(args: ParsedArgs, repoRoot: string) {
 function cmdVerifyKb(_args: ParsedArgs, repoRoot: string) {
   const cfg = loadKbConfig(repoRoot);
   const embPath = resolve(repoRoot, cfg.embeddingsPath);
+  const indexPath = embPath.replace('.json', '.index');
   const manifestPath = resolve(repoRoot, cfg.manifestPath);
   const errors: string[] = [];
-  if (!existsSync(embPath)) errors.push(`Missing embeddings: ${embPath}`);
+  if (!existsSync(indexPath)) errors.push(`Missing embeddings index: ${indexPath}`);
   if (!existsSync(manifestPath)) errors.push(`Missing manifest: ${manifestPath}`);
   if (errors.length === 0) {
-    const v = JSON.parse(readFileSync(embPath, 'utf8')) as number[][];
+    const store = createKbVectorStore(384);
+    store.load(indexPath);
     const m = JSON.parse(readFileSync(manifestPath, 'utf8')) as ManifestItem[];
-    if (!Array.isArray(v) || !Array.isArray(m)) errors.push('Embeddings/manifest format invalid');
-    if (v.length !== m.length) errors.push(`Vector count (${v.length}) != manifest count (${m.length})`);
+    if (!Array.isArray(m)) errors.push('Manifest format invalid');
+    if (store.size() !== m.length) errors.push(`Vector count (${store.size()}) != manifest count (${m.length})`);
   }
   if (errors.length > 0) {
     errors.forEach((e) => console.error(`- ${e}`));
