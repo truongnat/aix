@@ -100,3 +100,15 @@ This workflow guides you through comprehensive financial planning including goal
 - Set up automatic savings
 - Review plan quarterly
 - Adjust as needed based on progress
+
+## Output Format
+
+Financial plan document including:
+- Current financial situation analysis
+- Defined financial goals with timelines
+- Budget breakdown
+- Investment strategy and asset allocation
+- Risk management plan
+- Implementation timeline
+- Progress tracking metrics
+

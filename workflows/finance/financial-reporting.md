@@ -203,3 +203,16 @@ Net Income
 - Establish regular review schedule
 - Train stakeholders on reading reports
 - Continuously improve reporting process
+
+## Output Format
+
+Financial report package including:
+- Balance sheet
+- Income statement
+- Cash flow statement
+- Key financial ratios
+- Executive summary
+- Comparative analysis
+- Visualizations and charts
+- Actionable insights and recommendations
+

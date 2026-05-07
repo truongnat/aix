@@ -131,3 +131,13 @@ This workflow guides you through creating, implementing, and monitoring a budget
 - Adjust categories as needed
 - Set up automatic savings
 - Build emergency fund to 3-6 months expenses
+
+## Output Format
+
+Budget report including:
+- Income breakdown by source
+- Expense breakdown by category
+- Budget vs actual comparison
+- Variance analysis
+- Recommendations for adjustments
+
