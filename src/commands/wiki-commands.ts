@@ -2,8 +2,7 @@
  * Wiki-related commands
  */
 
-import chalk from 'chalk';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { globSync } from 'glob';
 
@@ -54,7 +53,7 @@ function resolve(...paths: string[]): string {
   return join(...paths);
 }
 
-function runGenerateWiki(docsDir: string, outDir: string) {
+function runGenerateWiki(docsDir: string, _outDir: string) {
   const files = collectMarkdownFiles(docsDir);
   return { mdCount: files.length };
 }

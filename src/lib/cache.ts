@@ -138,7 +138,7 @@ export class Cache<T> {
 }
 
 // Singleton caches for common use cases
-const graphCache = new Cache<{ nodes: any[]; edges: any[] }>({ 
+const graphCache = new Cache<{ nodes: unknown[]; edges: unknown[] }>({ 
   maxSize: 100, 
   defaultTTL: 10 * 60 * 1000, // 10 minutes
   persistPath: '.cache/graph.json'

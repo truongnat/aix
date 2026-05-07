@@ -10,6 +10,7 @@ export interface VectorDoc {
   id: string;
   vector: number[];
   metadata?: Record<string, unknown>;
+  norm?: number; // Precomputed norm for faster similarity search
 }
 
 export interface SearchResult {
@@ -63,7 +64,7 @@ export class VectorStore {
     // Precompute norms for all vectors
     for (const doc of this.docs) {
       const norm = Math.sqrt(doc.vector.reduce((s, x) => s + x * x, 0));
-      (doc as any).norm = norm;
+      doc.norm = norm;
     }
     this.indexReady = true;
   }
@@ -83,7 +84,7 @@ export class VectorStore {
     
     // Calculate similarities
     const scored = this.docs.map((doc) => {
-      const docNorm = (doc as any).norm || Math.sqrt(doc.vector.reduce((s, x) => s + x * x, 0));
+      const docNorm = doc.norm || Math.sqrt(doc.vector.reduce((s, x) => s + x * x, 0));
       const similarity = cosine(vector, doc.vector) / (queryNorm * docNorm);
       return {
         id: doc.id,

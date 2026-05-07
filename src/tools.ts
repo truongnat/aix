@@ -16,7 +16,7 @@ import { globSync } from 'glob';
 
 // Simple CLI argument parser (replaces minimist)
 function parseArgs(argv: string[], options: { boolean?: string[]; string?: string[] } = {}) {
-  const args: Record<string, any> = {};
+  const args: Record<string, unknown> = {};
   const positional: string[] = [];
   
   for (let i = 0; i < argv.length; i++) {
@@ -55,15 +55,15 @@ function parseArgs(argv: string[], options: { boolean?: string[]; string?: strin
   return args;
 }
 
-type ParsedArgs = Record<string, any> & { _?: string[] };
+type ParsedArgs = Record<string, unknown> & { _?: string[] };
 import { loadKbConfig } from './lib/kbConfig.js';
-import { cosine, embedTextAsync, embedBatch, initEmbeddings, defaultGraphPath } from './lib/embeddings.js';
+import { embedTextAsync, embedBatch, initEmbeddings, defaultGraphPath } from './lib/embeddings.js';
 import { installSkill } from './commands/installSkill.js';
 import { listSkillDirs, readSkillInfo } from './lib/skills.js';
 import { buildGraph, saveGraph, loadGraph, queryGraph, getCallers, getCallees, impactAnalysis } from './lib/graph.js';
 import { validateQuery, validateNumber } from './lib/validation.js';
 import { cmdListSkills, cmdValidateSkills, cmdAuditSkillStructure, cmdValidateSkillQuality, cmdValidateWorkflows } from './commands/skill-commands.js';
-import { createKbVectorStore, VectorStore, VectorDoc } from './lib/vector-store.js';
+import { createKbVectorStore, VectorDoc } from './lib/vector-store.js';
 
 type ManifestItem = {
   id: string;
@@ -793,7 +793,8 @@ const EMBEDDINGS_CACHE_FILE = '.cache/skill-embeddings.json';
 /**
  * Pre-compute embeddings for all skills
  */
-async function precomputeSkillEmbeddings(repoRoot: string): Promise<void> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function _precomputeSkillEmbeddings(repoRoot: string): Promise<void> {
   const dirs = listSkillDirs(repoRoot, false);
   const embeddings: SkillEmbedding[] = [];
 
@@ -842,7 +843,8 @@ function loadSkillEmbeddings(repoRoot: string): SkillEmbedding[] | null {
 /**
  * Compute cosine similarity between two vectors
  */
-function cosineSimilarity(a: number[], b: number[]): number {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function _cosineSimilarity(a: number[], b: number[]): number {
   let dotProduct = 0;
   let normA = 0;
   let normB = 0;
@@ -871,7 +873,6 @@ function semanticRoutingFallback(
   let bestScore = threshold;
 
   for (const skill of skillEmbeddings) {
-    const textToEmbed = `${skill.name}. ${skill.description}`;
     // Since we can't compute prompt embedding synchronously,
     // we use a simple text overlap as a fallback for the fallback
     const promptLower = prompt.toLowerCase();
@@ -896,24 +897,27 @@ function semanticRoutingFallback(
  * Worker thread pool for CPU-intensive tasks
  * Offloads heavy work to background threads to avoid blocking the main thread
  */
-import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
+import { Worker } from 'node:worker_threads';
 import { readFile } from 'node:fs/promises';
 import os from 'node:os';
 
-interface WorkerTask<T, R> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface _WorkerTask<T, _R> {
   id: string;
   data: T;
 }
 
-interface WorkerResult<R> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface WorkerResult<_R> {
   id: string;
-  result: R;
+  result: _R;
   error?: Error;
 }
 
-class WorkerPool<T, R> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+class _WorkerPool<T, _R> {
   private workers: Worker[] = [];
-  private taskQueue: Map<string, { resolve: (value: R) => void; reject: (error: Error) => void }> = new Map();
+  private taskQueue: Map<string, { resolve: (value: _R) => void; reject: (error: Error) => void }> = new Map();
   private taskId = 0;
 
   constructor(
@@ -926,7 +930,7 @@ class WorkerPool<T, R> {
   private initialize() {
     for (let i = 0; i < this.poolSize; i++) {
       const worker = new Worker(this.workerScript);
-      worker.on('message', (result: WorkerResult<R>) => {
+      worker.on('message', (result: WorkerResult<_R>) => {
         const pending = this.taskQueue.get(result.id);
         if (pending) {
           if (result.error) {
@@ -941,7 +945,7 @@ class WorkerPool<T, R> {
     }
   }
 
-  async execute(data: T): Promise<R> {
+  async execute(data: T): Promise<_R> {
     return new Promise((resolve, reject) => {
       const id = `task-${this.taskId++}`;
       this.taskQueue.set(id, { resolve, reject });
@@ -959,7 +963,8 @@ class WorkerPool<T, R> {
   }
 }
 
-async function* streamOperation<T>(
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function* _streamOperation<T>(
   items: T[],
   processor: (item: T) => Promise<void>,
   batchSize = 100
@@ -974,7 +979,8 @@ async function* streamOperation<T>(
 /**
  * Streamable file reader for large files
  */
-async function* streamFileByLines(filePath: string): AsyncGenerator<string, void, unknown> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function* _streamFileByLines(filePath: string): AsyncGenerator<string, void, unknown> {
   const content = await readFile(filePath, 'utf-8');
   const lines = content.split('\n');
   for (const line of lines) {
@@ -2591,7 +2597,7 @@ async function main() {
       'graph',
     ],
   });
-  const cmd = String(args._?.[0] || '');
+  const cmd = String((args._ as string[] | undefined)?.[0] || '');
   const root = process.cwd();
   
   // Handle slash commands (convert /command to command)

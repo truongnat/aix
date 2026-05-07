@@ -26,7 +26,7 @@ import { installSkill } from './commands/installSkill.js';
 // Simple CLI argument parser (replaces minimist)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseArgs(argv: string[], options: { boolean?: string[]; string?: string[] } = {}) {
-  const args: Record<string, any> = {};
+  const args: Record<string, unknown> = {};
   const positional: string[] = [];
   
   for (let i = 0; i < argv.length; i++) {
@@ -541,7 +541,7 @@ async function main() {
 
   if (argv.help) { printHelp(); return; }
 
-  const rawCmd = argv._[0] as string | undefined;
+  const rawCmd = (argv._ as string[])[0];
   const cmd = rawCmd === 'uninstall' ? 'uninstall'
     : rawCmd === 'update'    ? 'update'
     : rawCmd === 'add'       ? 'add'
@@ -655,7 +655,7 @@ ${verifyOk ? `  ${chalk.green('✔')} Install verified` : ''}
 
   // ── add ───────────────────────────────────────────────────────────────────
   } else if (cmd === 'add') {
-    const skillName = argv._[1] as string | undefined;
+    const skillName = (argv._ as string[])[1];
     if (!skillName) {
       console.error(chalk.red('Error: skill name required'));
       console.error(chalk.dim(`Usage: npx github:${DEFAULT_REPO} add <skill-name>`));
