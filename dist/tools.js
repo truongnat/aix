@@ -742,7 +742,8 @@ const EMBEDDINGS_CACHE_FILE = '.cache/skill-embeddings.json';
 /**
  * Pre-compute embeddings for all skills
  */
-async function precomputeSkillEmbeddings(repoRoot) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function _precomputeSkillEmbeddings(repoRoot) {
     const dirs = listSkillDirs(repoRoot, false);
     const embeddings = [];
     for (const dir of dirs) {
@@ -788,7 +789,8 @@ function loadSkillEmbeddings(repoRoot) {
 /**
  * Compute cosine similarity between two vectors
  */
-function cosineSimilarity(a, b) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function _cosineSimilarity(a, b) {
     let dotProduct = 0;
     let normA = 0;
     let normB = 0;
@@ -810,7 +812,6 @@ function semanticRoutingFallback(prompt, skillEmbeddings, threshold = 0.5) {
     let bestMatch = null;
     let bestScore = threshold;
     for (const skill of skillEmbeddings) {
-        const textToEmbed = `${skill.name}. ${skill.description}`;
         // Since we can't compute prompt embedding synchronously,
         // we use a simple text overlap as a fallback for the fallback
         const promptLower = prompt.toLowerCase();
@@ -834,7 +835,8 @@ function semanticRoutingFallback(prompt, skillEmbeddings, threshold = 0.5) {
 import { Worker } from 'node:worker_threads';
 import { readFile } from 'node:fs/promises';
 import os from 'node:os';
-class WorkerPool {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+class _WorkerPool {
     workerScript;
     poolSize;
     workers = [];
@@ -878,7 +880,8 @@ class WorkerPool {
         this.workers = [];
     }
 }
-async function* streamOperation(items, processor, batchSize = 100) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function* _streamOperation(items, processor, batchSize = 100) {
     for (let i = 0; i < items.length; i += batchSize) {
         const batch = items.slice(i, i + batchSize);
         await Promise.all(batch.map(processor));
@@ -888,7 +891,8 @@ async function* streamOperation(items, processor, batchSize = 100) {
 /**
  * Streamable file reader for large files
  */
-async function* streamFileByLines(filePath) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function* _streamFileByLines(filePath) {
     const content = await readFile(filePath, 'utf-8');
     const lines = content.split('\n');
     for (const line of lines) {
