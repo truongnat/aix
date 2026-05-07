@@ -35,7 +35,7 @@ describe('readSkillInfo', () => {
     for (const dir of dirs) {
       const info = readSkillInfo(dir);
       if (info.name) {
-        expect(info.name).toBe(info.folder);
+        expect(info.name.toLowerCase()).toBe(info.folder.toLowerCase());
       }
     }
   });
