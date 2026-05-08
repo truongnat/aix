@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills Devkit — AI Agent Skills Browser</title>
+  <meta name="description" content="Explore 100+ production-grade AI Agent skills and workflows for Cursor, Claude, and Codex.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Skills Devkit</h1>
+      <p class="subtitle">Elevate your AI coding agents with 100+ production-grade skills and workflows based on Karpathy's principles.</p>
+      
+      <div class="search-container">
+        <input type="text" id="skillSearch" placeholder="Search skills (e.g. Next.js, Docker, Security)...">
+      </div>
+    </header>
+
+    <main id="skillsGrid" class="skills-grid">
+      <!-- Skills will be rendered here -->
+      <div class="loading">Loading skills...</div>
+    </main>
+
+    <footer>
+      <p>© 2026 Skills Devkit by <a href="https://github.com/truongnat" style="color: var(--primary); text-decoration: none;">truongnat</a>. Built for Cursor & Claude.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

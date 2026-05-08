@@ -57,3 +57,6 @@ jobs:
         run: |
           node dist/tools.js build-kb
           node dist/tools.js verify-kb
+
+      - name: Verify package artifacts
+        run: npm pack --dry-run

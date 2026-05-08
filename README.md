@@ -1,127 +1,97 @@
-# Skills Devkit
+<div align="center">
+  <h1>🚀 Skills Devkit</h1>
+  <p><strong>Production-grade AI Agent Skills, Workflows & Knowledge Base</strong></p>
+  
+  [![npm version](https://img.shields.io/npm/v/@truongnat/devkit.svg)](https://npmjs.org/package/@truongnat/devkit)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![CI](https://github.com/truongnat/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/truongnat/skills/actions)
+  [![Skills: 101](https://img.shields.io/badge/Skills-101-blue.svg)](#)
+  [![Workflows: 20](https://img.shields.io/badge/Workflows-20-purple.svg)](#)
 
-Production-grade agent skills, workflows, and knowledge base for AI-assisted development.
+  <p>Turn your Claude, Cursor, and Codex into a 10x engineering team with curated, battle-tested agent capabilities.</p>
+</div>
 
 ---
 
-## Quick Start
+## ✨ Features at a Glance
 
-**Install into your project:**
+| Feature | Description |
+|---------|-------------|
+| 🎯 **101+ Skills** | Curated system prompts and tools for Fullstack, DevOps, Data, and more. |
+| 🔄 **20+ Workflows** | End-to-end SDLC workflows (Ticket -> Plan -> Code -> PR -> Release). |
+| 🧠 **Knowledge Base**| Native RAG capabilities to index and query your entire codebase. |
+| 🛡️ **Strict Rules** | Built on Andrej Karpathy's coding principles to prevent AI hallucinations and "slop". |
+| 🔌 **Extensible** | Easy to add custom skills or sync directly into your repo's `.agents/` folder. |
+| 🛠️ **CLI Tools** | Built-in CLI for skill validation, KB indexing, and gap analysis. |
+
+## 🚀 Quick Start
+
+Initialize the Skills Devkit in any project folder:
+
 ```bash
-npx github:truongnat/skills
+npx @truongnat/devkit@latest
 ```
 
----
+*This will automatically sync the devkit bundle (skills, workflows, rules, commands) to your local project.*
 
-## What You Get
+## 📚 What's Included?
 
-- **92 Skills** - Domain-specific capabilities (React, Docker, TypeScript, Security, etc.)
-- **20 Workflows** - Structured procedures organized by domain (dev, ops, qa, data, hr)
-- **Knowledge Base** - RAG-powered documentation search
-- **Project Indexing** - Index any codebase + generate wiki
+### 🎯 Agent Skills (101+)
+Domain-specific capabilities for specialized tasks:
 
----
+- **Frontend & UI**: `nextjs-pro`, `react-pro`, `shadcn-mastery-pro`, `ui-design-brain-pro`, `motion-design-pro`
+- **Backend & Cloud**: `nestjs-pro`, `prisma-postgres`, `microservices-pro`, `docker-pro`, `ci-cd-pro`
+- **Architecture**: `clean-code-architecture-pro`, `system-design`, `senior-architect`
+- **Planning & Execution**: `writing-plans-pro`, `executing-plans-pro`, `parallel-agents-pro`
+- **Quality & Security**: `systematic-debugging-pro`, `security-review`, `agent-evaluation-pro`
 
-## Key Commands
+### 🔄 Agent Workflows (20+)
+Structured, multi-step procedures (Use them via Slash commands):
+
+- `/ticket` — Kanban-style feature implementation
+- `/release` — Release management and changelog generation
+- `/code-review` — Deep, architectural code review
+- `/debug` — Systematic root-cause analysis
+- `/incident` — Live incident response protocol
+- `/index-project` — Full project RAG indexing and wiki generation
+
+### 🧠 Knowledge Base & Project Indexing
+Empower your agents with complete context:
 
 ```bash
-# Skills
-/list-skills
-/validate-skills
-/analyze-skills
+# Index your entire project into a vector database
+npx @truongnat/devkit index-project --dir . --out .project-index
 
-# Knowledge Base
-/build-kb
-/query-kb "your question"
+# Generate a project Wiki based on the codebase
+npx @truongnat/devkit generate-wiki --docs .project-index/docs
 
-# Project Indexing
-/index-project --dir . --out .project-index
-/generate-wiki --docs .project-index/docs
-
-# Workflows (in Cursor/Claude)
-/ticket
-/release
-/code-review
-/debug
+# Query the knowledge base
+npx @truongnat/devkit query-kb "How does the auth module work?"
 ```
 
----
+## 🧠 Karpathy Coding Principles
 
-## Architecture
+We strictly enforce 4 non-negotiable principles for all agent operations:
+1. **Think Before Coding**: No assumptions, no guessing.
+2. **Simplicity First**: Write 50 lines if 200 lines aren't needed.
+3. **Surgical Changes**: Touch only what is necessary.
+4. **Goal-Driven Execution**: Define success criteria before writing a single line.
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Skills Devkit                              │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
-│  │   Skills     │  │  Workflows   │  │   Knowledge Base    │  │
-│  │              │  │              │  │                      │  │
-│  │ • 92 skills  │  │ • 20 flows   │  │ • Documents          │  │
-│  │ • SKILL.md   │  │ • Domain-    │  │ • Embeddings (.index) │  │
-│  │ • Scripts/   │  │   organized  │  │ • Manifest (.json)   │  │
-│  │ • Reference  │  │ • Step-by-   │  │ • RAG Search         │  │
-│  │              │  │   step       │  │                      │  │
-│  └──────┬───────┘  └──────┬───────┘  └──────────┬───────────┘  │
-│         │                  │                     │               │
-│         └──────────────────┴─────────────────────┘               │
-│                            │                                     │
-│                            ▼                                     │
-│                  ┌───────────────┐                               │
-│                  │  CLI Tools    │                               │
-│                  │               │                               │
-│                  │ • validate-   │                               │
-│                  │   skills      │                               │
-│                  │ • build-kb    │                               │
-│                  │ • query-kb    │                               │
-│                  │ • index-      │                               │
-│                  │   project     │                               │
-│                  └───────┬───────┘                               │
-│                          │                                       │
-│                          ▼                                       │
-│                  ┌───────────────┐                               │
-│                  │  Agent Layer  │                               │
-│                  │               │                               │
-│                  │ • Skill       │                               │
-│                  │   Routing     │                               │
-│                  │ • Workflow    │                               │
-│                  │   Execution   │                               │
-│                  └───────────────┘                               │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+Read more about our [Skill Authoring Rules](skills/SKILL_AUTHORING_RULES.md).
+
+## 🛠️ CLI Reference
+
+The devkit includes powerful CLI tools for managing your agent environment:
+
+```bash
+npx @truongnat/devkit validate-skills   # Validate skill frontmatter & schemas
+npx @truongnat/devkit analyze-skills    # Run quality analysis on all skills
+npx @truongnat/devkit build-kb          # Build vector embeddings for the KB
+npx @truongnat/devkit sync-catalogs     # Sync updates across skill catalogs
 ```
 
-### Component Overview
+## 🤝 Contributing
+Want to add a new skill? See our [Agent Integration Guide](AGENTS.md) and [Skill Authoring Rules](skills/SKILL_AUTHORING_RULES.md).
 
-- **Skills**: Domain-specific capabilities (React, Docker, TypeScript, Security, Finance, etc.)
-- **Workflows**: Structured procedures organized by domain (dev, ops, qa, data, hr, finance)
-- **Knowledge Base**: RAG-powered documentation search with embeddings and manifest
-- **CLI Tools**: Command-line interface for validation, indexing, and querying
-- **Agent Layer**: Skill routing and workflow execution for AI agents
-
----
-
-## Structure
-
-```
-skills/          # 92 skill packs
-workflows/        # Domain-organized workflows (dev, ops, qa, data, hr, finance)
-knowledge-base/   # Documents + embeddings
-src/              # TypeScript source
-dist/             # Compiled JS
-```
-
----
-
-## Documentation
-
-- [Full CLI Reference](scripts/README.md)
-- [Workflow Guide](workflows/README.md)
-- [Skill Authoring Rules](skills/SKILL_AUTHORING_RULES.md)
-- [Agent Integration](AGENTS.md)
-
----
-
-## License
-
-MIT
+## 📄 License
+[MIT License](LICENSE) © 2026 Truong Nguyen
