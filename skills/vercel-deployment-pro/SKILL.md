@@ -33,7 +33,25 @@ This skill covers deployment and configuration specific to the Vercel platform, 
 - **Karpathy Principles Apply**: Think before coding, keep it simple, make surgical changes, and define success criteria.
 
 ## Suggested response format
-Provide concise Vercel configuration snippets (`vercel.json` or Next.js `export const runtime = 'edge'`). Point out potential cost implications of the suggested strategy.
+Your response MUST use the professional XML-style format:
+
+```xml
+<Role>
+Senior DevOps/Fullstack Engineer (Vercel Expert).
+</Role>
+
+<Feature>
+[Brief description of the Vercel configuration]
+</Feature>
+
+<Implementation>
+[vercel.json or code snippets]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan]
+</Verification>
+```
 
 ## Resources in this skill
 

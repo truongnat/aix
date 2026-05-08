@@ -25,26 +25,38 @@ Follow **`OUTPUT_CONVENTIONS.md`**. Ensure clear separation between frontend and
 
 ## Steps
 
-### Step 1 — `plan-architecture`
+### Step 1 — `planning`
 - **Type:** skill
-- **Skill:** `planning-pro` + `senior-architect`
+- **Skill:** `fullstack-pro` + `senior-architect`
 - **Input:** `feature_spec`
-- **Output:** Database schema updates, API route design, UI component tree.
+- **Output:** System Design, Database Schema, and Server Action definitions.
 
-### Step 2 — `backend-implementation`
+### Step 2 — `database-implementation`
 - **Type:** skill
-- **Skill:** `nextjs-15-pro` (Server Actions) or `nestjs-pro` + `prisma-postgres`
-- **Input:** API design from Step 1.
-- **Output:** Database migrations and backend handlers.
+- **Skill:** `prisma-postgres` or `sql-data-access-pro`
+- **Input:** Database Schema from Step 1.
+- **Output:** Migration files or updated schema models.
 
-### Step 3 — `frontend-implementation`
+### Step 3 — `backend-implementation`
 - **Type:** skill
-- **Skill:** `react-pro` + `shadcn-mastery-pro`
-- **Input:** UI component tree + created backend handlers.
-- **Output:** Interactive UI components connected to backend data.
+- **Skill:** `fullstack-pro` (Backend) + `nextjs-15-pro`
+- **Input:** Server Action definitions from Step 1.
+- **Output:** Server Actions with Zod validation and error handling.
 
-### Step 4 — `testing-and-deployment`
+### Step 4 — `frontend-implementation`
 - **Type:** skill
-- **Skill:** `testing-pro` + `vercel-deployment-pro`
+- **Skill:** `fullstack-pro` (Frontend) + `shadcn-mastery-pro`
+- **Input:** UI requirements + completed Server Actions.
+- **Output:** Responsive UI components using shadcn/ui.
+
+### Step 5 — `integration-and-polish`
+- **Type:** skill
+- **Skill:** `fullstack-pro` + `react-pro`
+- **Input:** UI + Backend components.
+- **Output:** Feature integrated with optimistic updates and loading states.
+
+### Step 6 — `review-and-verify`
+- **Type:** skill
+- **Skill:** `fullstack-pro` + `code-review`
 - **Input:** Completed feature code.
-- **Output:** Tests run, Edge/Node config optimized, deployment readiness check.
+- **Output:** Code audited for performance, security, and accessibility.

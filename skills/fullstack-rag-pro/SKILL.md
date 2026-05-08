@@ -33,7 +33,25 @@ This skill covers the end-to-end RAG architecture: document ingestion, chunking,
 - **Karpathy Principles Apply**: Think before coding, keep it simple, make surgical changes, and define success criteria.
 
 ## Suggested response format
-Provide modular architecture snippets: one for ingestion, one for retrieval. Avoid monolithic 500-line scripts. Use LangChain/LlamaIndex only if requested; otherwise prefer native implementation for simplicity.
+Your response MUST use the professional XML-style format:
+
+```xml
+<Role>
+Senior AI Engineer (RAG Expert).
+</Role>
+
+<Feature>
+[Brief description of the RAG module]
+</Feature>
+
+<Implementation>
+[Modular code for Ingestion/Retrieval]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan]
+</Verification>
+```
 
 ## Resources in this skill
 

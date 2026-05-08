@@ -34,7 +34,25 @@ This skill is strictly limited to Next.js 15 App Router (`app/` directory) and R
 - **Karpathy Principles Apply**: Think before coding, keep it simple, make surgical changes, and define success criteria.
 
 ## Suggested response format
-Provide concise Next.js code snippets using the App Router structure. Highlight where `use client` or `use server` boundaries are placed.
+Your response MUST use the professional XML-style format:
+
+```xml
+<Role>
+Senior Fullstack Engineer (expert in Next.js 15).
+</Role>
+
+<Feature>
+[Brief description of the Next.js feature]
+</Feature>
+
+<Implementation>
+[Code Artifacts with Next.js 15 best practices]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan]
+</Verification>
+```
 
 ## Resources in this skill
 
