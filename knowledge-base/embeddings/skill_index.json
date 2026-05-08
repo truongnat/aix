@@ -1,5 +1,82 @@
 [
   {
+    "name": "3d-motion-pro",
+    "folder": "3d-motion-pro",
+    "description": "3D design and motion graphics for the web: Three.js scenes, WebGL shaders, GLTF model loading, particle systems, physics simulations, AR/VR with WebXR, and GSAP animation pipelines.\n\nUse this skill when building interactive 3D web experiences, loading and optimizing 3D models for browsers, implementing motion graphics and animations, creating WebXR (VR/AR) experiences, or building animated data visualizations in 3D.\n\nDo not use for 2D UI animations (use motion-design-pro), static UI design (use ui-design-brain-pro), or non-web 3D production pipelines.\n\nTriggers: \"Three.js\", \"WebGL\", \"3D web\", \"GLTF\", \"GLB\", \"3D model\", \"particle system\", \"shader\", \"WebXR\", \"VR\", \"AR\", \"Babylon.js\", \"React Three Fiber\", \"3D animation\", \"motion graphics web\", \"Spline\", \"3D visualization\".",
+    "triggers": [
+      "three.js",
+      "webgl",
+      "3d web",
+      "gltf",
+      "glb",
+      "3d model",
+      "particle system",
+      "shader",
+      "webxr",
+      "vr",
+      "ar",
+      "babylon.js",
+      "react three fiber",
+      "3d animation",
+      "motion graphics web",
+      "spline",
+      "3d visualization."
+    ],
+    "when_to_use": [
+      "Building interactive 3D product showcases, hero sections, or landing pages.",
+      "Loading and rendering GLTF/GLB models in the browser.",
+      "Creating particle systems, shader-based effects, or post-processing pipelines.",
+      "Implementing WebXR VR/AR experiences.",
+      "Building 3D data visualizations or scientific simulations.",
+      "Animating 3D objects with GSAP, Framer Motion, or Three.js AnimationMixer.",
+      "Trigger keywords: `Three.js`, `WebGL`, `3D web`, `GLTF`, `WebXR`, `VR`, `AR`, `shader`, `particle`, `React Three Fiber`"
+    ],
+    "references": [
+      "anti-patterns.md",
+      "decision-tree.md",
+      "integration-map.md",
+      "performance.md",
+      "shaders-effects.md"
+    ]
+  },
+  {
+    "name": "a11y-design-pro",
+    "folder": "a11y-design-pro",
+    "description": "Accessible and inclusive design: WCAG 2.1/2.2 compliance, ARIA patterns, keyboard navigation, screen reader optimization, color contrast, semantic HTML, and automated accessibility testing pipelines.\n\nUse this skill when auditing or implementing accessibility for web UIs, adding ARIA to dynamic components, setting up axe/Lighthouse CI gates, designing for diverse users (visual, motor, cognitive, hearing), or ensuring legal compliance (ADA, EN 301 549, EAA).\n\nDo not use for general UI/UX design aesthetics (use design-system-pro) or responsive layout (use frontend-design-pro).\n\nTriggers: \"accessibility\", \"a11y\", \"WCAG\", \"ARIA\", \"screen reader\", \"keyboard navigation\", \"color contrast\", \"axe\", \"WAVE\", \"Lighthouse accessibility\", \"inclusive design\", \"ADA compliance\", \"focus management\".",
+    "triggers": [
+      "accessibility",
+      "a11y",
+      "wcag",
+      "aria",
+      "screen reader",
+      "keyboard navigation",
+      "color contrast",
+      "axe",
+      "wave",
+      "lighthouse accessibility",
+      "inclusive design",
+      "ada compliance",
+      "focus management."
+    ],
+    "when_to_use": [
+      "Auditing an existing UI for WCAG 2.1/2.2 compliance (Level A, AA, AAA).",
+      "Implementing ARIA roles, states, and properties for dynamic widgets (tabs, modals, accordions, carousels).",
+      "Setting up automated accessibility testing in CI (axe-core, Playwright, pa11y).",
+      "Fixing keyboard navigation and focus trap issues.",
+      "Validating color contrast ratios (4.5:1 AA, 7:1 AAA).",
+      "Testing with screen readers: NVDA, JAWS, VoiceOver, TalkBack.",
+      "Ensuring legal compliance: ADA (US), EN 301 549 (EU), EAA 2025.",
+      "Trigger keywords: `accessibility`, `a11y`, `WCAG`, `ARIA`, `screen reader`, `keyboard nav`, `color contrast`, `focus trap`, `ADA`"
+    ],
+    "references": [
+      "anti-patterns.md",
+      "aria-patterns.md",
+      "automated-testing.md",
+      "decision-tree.md",
+      "integration-map.md"
+    ]
+  },
+  {
     "name": "a2a-protocol-pro",
     "folder": "a2a-protocol-pro",
     "description": "Design and implement multi-agent systems using the Agent-to-Agent (A2A) protocol: agent discovery, task delegation, lifecycle management, and security.\n\nUse this skill when building systems with multiple collaborating agents, designing agent discovery (Agent Cards), implementing task delegation flows, or choosing between Gateway, Pipeline, and Mesh patterns.\n\nDo not use for single-agent tool access (use mcp-server-pro) or for general API design (use api-design-pro).\n\nTriggers: \"multi-agent\", \"A2A\", \"agent communication\", \"agent discovery\", \"delegate to agent\", \"agent orchestration\", \"agent mesh\", \"agent pipeline\", \"Agent Card\", \"task lifecycle\", \"agent collaboration\", \"swarm of agents\".",
@@ -34,6 +111,29 @@
       "orchestration-patterns.md",
       "task-lifecycle.md"
     ]
+  },
+  {
+    "name": "accounting-pro",
+    "folder": "accounting-pro",
+    "description": "Use this skill whenever the user wants to perform accounting tasks, bookkeeping, financial statement preparation, or work with accounting systems. This includes double-entry bookkeeping, financial statement preparation (balance sheet, income statement, cash flow statement), journal entries, account reconciliation, tax preparation basics, and working with accounting software. If the user mentions accounting, bookkeeping, financial statements, journal entries, or reconciliation, use this skill.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Performing double-entry bookkeeping",
+      "Preparing financial statements (balance sheet, income statement, cash flow)",
+      "Recording journal entries",
+      "Reconciling accounts (bank reconciliation, account reconciliation)",
+      "Managing accounts payable/receivable",
+      "Preparing basic tax calculations",
+      "Working with accounting software (QuickBooks, Xero, etc.)",
+      "Analyzing accounting data for errors",
+      "DO NOT use this skill for:",
+      "Investment analysis or valuation (use financial-analysis-pro)",
+      "Financial modeling or forecasting (use financial-analysis-pro)",
+      "Payment processing or fintech APIs (use fintech-specific skills)",
+      "Advanced tax compliance (use tax-specific skills)"
+    ],
+    "references": []
   },
   {
     "name": "ag-ui-pro",
@@ -108,6 +208,43 @@
       "metrics-and-scoring.md",
       "observability-and-tracing.md",
       "red-teaming-and-safety.md"
+    ]
+  },
+  {
+    "name": "ai-design-pro",
+    "folder": "ai-design-pro",
+    "description": "AI-enhanced design practices using generative tools, AI assistants, and automated workflows: image generation, rapid prototyping, AI-driven UX decisions, motion graphics, photorealistic visuals, and automated image processing.\n\nUse this skill when working with AI design tools (Midjourney, DALL-E, Stable Diffusion, Runway, Figma AI, Adobe Firefly), generating design assets from text prompts, automating image processing pipelines, or making data-driven design decisions with AI.\n\nDo not use for traditional design principles or manual design techniques (use design-system-pro), basic UI/UX layout (use ui-design-brain-pro), or accessibility (use a11y-design-pro).\n\nTriggers: \"AI design\", \"generative design\", \"AI image generation\", \"DALL-E\", \"Midjourney\", \"Stable Diffusion\", \"Runway\", \"Figma AI\", \"Adobe Firefly\", \"AI prototyping\", \"AI color palette\", \"AI design assistant\", \"AI motion graphics\", \"text to image\".",
+    "triggers": [
+      "ai design",
+      "generative design",
+      "ai image generation",
+      "dall-e",
+      "midjourney",
+      "stable diffusion",
+      "runway",
+      "figma ai",
+      "adobe firefly",
+      "ai prototyping",
+      "ai color palette",
+      "ai design assistant",
+      "ai motion graphics",
+      "text to image."
+    ],
+    "when_to_use": [
+      "Generating design assets (images, icons, illustrations) from text prompts.",
+      "Rapid prototyping with AI wireframe generators (Galileo AI, Uizard, Figma AI).",
+      "Automating repetitive image processing (resizing, background removal, format conversion).",
+      "Building AI-driven mood boards and style exploration pipelines.",
+      "Running data-driven A/B design decisions with AI analysis.",
+      "Generating motion graphics or short video clips from text (Runway, Pika Labs).",
+      "Trigger keywords: `AI design`, `generative design`, `DALL-E`, `Midjourney`, `Stable Diffusion`, `Runway`, `Figma AI`, `text to image`, `AI prototyping`"
+    ],
+    "references": [
+      "anti-patterns.md",
+      "decision-tree.md",
+      "integration-map.md",
+      "prompt-engineering.md",
+      "tool-comparison.md"
     ]
   },
   {
@@ -1397,6 +1534,52 @@
     ]
   },
   {
+    "name": "financial-analysis-pro",
+    "folder": "financial-analysis-pro",
+    "description": "Use this skill whenever the user wants to perform financial analysis, financial modeling, valuation, investment analysis, or work with financial data. This includes analyzing financial statements, calculating financial ratios, building financial models, performing company valuations, analyzing investment opportunities, creating financial reports, and working with time-series financial data. If the user mentions financial statements, financial metrics, investment analysis, company valuation, or financial modeling, use this skill.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Analyzing financial statements (balance sheet, income statement, cash flow)",
+      "Calculating financial ratios (liquidity, profitability, solvency, efficiency)",
+      "Building financial models (DCF, comparable companies, precedent transactions)",
+      "Performing company valuation",
+      "Analyzing investment opportunities",
+      "Creating financial reports and dashboards",
+      "Working with time-series financial data",
+      "Performing technical analysis on stock prices",
+      "DO NOT use this skill for:",
+      "Bookkeeping or accounting entries (use accounting-specific tools)",
+      "Tax compliance and filing (use tax-specific skills)",
+      "Payment processing or fintech APIs (use fintech-specific skills)",
+      "Legal or regulatory compliance (use compliance-specific skills)"
+    ],
+    "references": []
+  },
+  {
+    "name": "fintech-integration-pro",
+    "folder": "fintech-integration-pro",
+    "description": "Use this skill whenever the user wants to integrate with fintech services, payment processing, banking APIs, financial data providers, or work with financial technology systems. This includes payment gateway integration (Stripe, PayPal, Square), banking API integration (Plaid, Yodlee), financial data providers (Bloomberg, Alpha Vantage), cryptocurrency APIs, and financial platform integrations. If the user mentions payment processing, banking APIs, fintech integration, or financial APIs, use this skill.",
+    "triggers": [],
+    "when_to_use": [
+      "Use this skill when:",
+      "Integrating payment gateways (Stripe, PayPal, Square, Adyen)",
+      "Connecting to banking APIs (Plaid, Yodlee, MX)",
+      "Accessing financial data providers (Bloomberg, Alpha Vantage, IEX)",
+      "Building cryptocurrency integrations (Coinbase, Binance)",
+      "Implementing webhook handlers for fintech events",
+      "Working with financial platform APIs",
+      "Handling secure financial data transmission",
+      "Implementing payment flows",
+      "DO NOT use this skill for:",
+      "Accounting or bookkeeping (use accounting-pro)",
+      "Financial analysis or modeling (use financial-analysis-pro)",
+      "Investment analysis (use financial-analysis-pro)",
+      "Tax compliance (use tax-specific skills)"
+    ],
+    "references": []
+  },
+  {
     "name": "flutter-pro",
     "folder": "flutter-pro",
     "description": "Production-grade Flutter development: widgets (Element/RenderObject pipeline), Material 3 / UX, performance and frame budgets, multi-platform edge cases (web, desktop, channels), Dart patterns — plus framework/render pipeline model, failure modes (async gaps, overflow, jank, plugin skew, golden flake, CORS), decision trade-offs (platform scope, state routing, add-to-app), quality guardrails (SDK-accurate APIs, no fabricated pub versions).\n\nUse this skill when the user works on Flutter, Dart, widgets, Material / Cupertino, theming, navigation (go_router, Navigator 2), state management (Provider, Riverpod, Bloc, GetIt), animations, platform channels, web, desktop (Windows/macOS/Linux), iOS/Android builds, Impeller/Skia, accessibility, or asks for Flutter code review, layout, lists, isolates, or compile-size concerns.\n\nCombine with **`testing-pro`**, **`deployment-pro`**, **`security-pro`**, **`design-system-pro`**, **`sql-data-access-pro`**, **`ci-cd-pro`**, **`mobile-design-pro`** as needed.\n\nTriggers: \"Flutter\", \"Dart\", \"Widget\", \"StatelessWidget\", \"StatefulWidget\", \"State\", \"setState\", \"build method\", \"const widget\", \"Key\", \"ValueKey\", \"GlobalKey\", \"InheritedWidget\", \"Theme.of\", \"Material 3\", \"Cupertino\", \"go_router\", \"Navigator\", \"Riverpod\", \"Provider\", \"Bloc\", \"BuildContext\", \"mounted\", \"async gap\", \"Sliver\", \"ListView\", \"CustomScrollView\", \"RepaintBoundary\", \"Impeller\", \"Skia\", \"platform channel\", \"MethodChannel\", \"FFI\", \"web\", \"Flutter desktop\", \"semantics\", \"a11y\", \"Golden test\", \"integration_test\".",
@@ -1517,6 +1700,19 @@
       "Database schema design (use database-specific skills)",
       "CSS/styling system design (use design-system-pro, ui-stack-pro skills)",
       "Mobile-specific development (use react-native-pro, flutter-pro skills)"
+    ],
+    "references": []
+  },
+  {
+    "name": "fullstack-rag-pro",
+    "folder": "fullstack-rag-pro",
+    "description": "Building production-grade Retrieval-Augmented Generation (RAG) pipelines with Vector DBs and hybrid search.",
+    "triggers": [],
+    "when_to_use": [
+      "Building an AI chat application with custom knowledge.",
+      "Indexing documents (PDFs, markdown) into a Vector DB.",
+      "Implementing semantic search or hybrid search (semantic + keyword).",
+      "Optimizing RAG context windows and retrieval quality."
     ],
     "references": []
   },
@@ -2168,6 +2364,19 @@
     ]
   },
   {
+    "name": "nextjs-15-pro",
+    "folder": "nextjs-15-pro",
+    "description": "Expert-level implementation of Next.js 15 features including Server Actions, Partial Prerendering (PPR), React 19 hooks, and Turbopack.",
+    "triggers": [],
+    "when_to_use": [
+      "Building fullstack web applications using Next.js 15.",
+      "Implementing React 19 Server Actions for data mutations.",
+      "Configuring Partial Prerendering (PPR) or streaming UI.",
+      "Upgrading a Next.js 14 project to Next.js 15."
+    ],
+    "references": []
+  },
+  {
     "name": "nextjs-pro",
     "folder": "nextjs-pro",
     "description": "Production-grade Next.js: App Router, Server Components, rendering and caching model (RSC pipeline, fetch cache, revalidation), Route Handlers and Server Actions, middleware and Edge vs Node — plus system model (request → RSC payload → cache layers), failure modes (hydration, stale cache, dynamic surprises, secrets, middleware loops), decision trade-offs (Actions vs Route Handlers, static vs dynamic, BFF vs external API), and quality guardrails (version-accurate APIs, env boundaries).\n\nUse this skill when the user works on Next.js (Pages or App Router), `next.config`, `next/image`, `next/font`, `next/link`, layouts, `loading.tsx`, `error.tsx`, Server Actions, `fetch` caching and revalidation, `cookies()` / `headers()` in RSC, Middleware, Edge Runtime, Route Handlers, internationalization (next-intl / i18n), Turbopack, Vercel deployment, or asks for review of RSC boundaries, hydration, or API routes.\n\nCombine with **`react-pro`**, **`deployment-pro`**, **`security-pro`**, **`auth-pro`**, **`caching-pro`**, **`network-infra-pro`**, **`typescript-pro`**, **`nestjs-pro`** / **`api-design-pro`** when contracts and backends matter.\n\nTriggers: \"Next.js\", \"Nextjs\", \"App Router\", \"Pages Router\", \"Server Component\", \"RSC\", \"use client\", \"Server Action\", \"next/navigation\", \"next/image\", \"middleware.ts\", \"revalidate\", \"fetch cache\", \"Route Handler\", \"edge runtime\", \"Turbopack\", \"next.config\", \"Vercel\", \"parallel routes\", \"intercepting routes\", \"generateStaticParams\", \"dynamic route\", \"metadata API\", \"next/font\", \"notFound\", \"loading.tsx\", \"error.tsx\", \"dynamic = force-dynamic\".",
@@ -2336,8 +2545,8 @@
     ]
   },
   {
-    "name": "pdf",
-    "folder": "pdf",
+    "name": "pdf-pro",
+    "folder": "pdf-pro",
     "description": "Use this skill whenever the user wants to do anything with PDF files. This includes reading or extracting text/tables from PDFs, combining or merging multiple PDFs into one, splitting PDFs apart, rotating pages, adding watermarks, creating new PDFs, filling PDF forms, encrypting/decrypting PDFs, extracting images, and OCR on scanned PDFs to make them searchable. If the user mentions a .pdf file or asks to produce one, use this skill.",
     "triggers": [],
     "when_to_use": [
@@ -3404,6 +3613,39 @@
     ]
   },
   {
+    "name": "sustainable-design-pro",
+    "folder": "sustainable-design-pro",
+    "description": "Sustainable web design: carbon footprint measurement, green hosting selection, asset optimization (images, fonts, video), energy-efficient design patterns (dark mode, lazy loading, code splitting), and performance budgets that reduce CO2 per page view.\n\nUse this skill when measuring and reducing a website's environmental impact, choosing green hosting, optimizing assets for minimal data transfer, implementing energy-efficient UX patterns, or reporting on digital sustainability metrics.\n\nDo not use for general performance optimization without sustainability framing (use performance-tuning-pro) or for accessibility (use a11y-design-pro).\n\nTriggers: \"sustainable design\", \"green web\", \"carbon footprint\", \"eco-friendly website\", \"energy efficiency\", \"website carbon\", \"digital sustainability\", \"green hosting\", \"zero-waste design\", \"low-carbon UI\".",
+    "triggers": [
+      "sustainable design",
+      "green web",
+      "carbon footprint",
+      "eco-friendly website",
+      "energy efficiency",
+      "website carbon",
+      "digital sustainability",
+      "green hosting",
+      "zero-waste design",
+      "low-carbon ui."
+    ],
+    "when_to_use": [
+      "Measuring current carbon footprint (websitecarbon.com, Ecograder, Lighthouse).",
+      "Reducing page weight through image/font/video optimization.",
+      "Choosing green hosting providers (100% renewable energy certified).",
+      "Implementing lazy loading, code splitting, and caching to reduce energy per visit.",
+      "Adopting dark mode or minimal-color palettes to reduce screen energy on OLED.",
+      "Reporting sustainability metrics to stakeholders (CO2/page view, energy per visit).",
+      "Trigger keywords: `sustainable design`, `carbon footprint`, `green web`, `eco-friendly`, `website carbon`, `digital sustainability`, `green hosting`, `energy efficiency`"
+    ],
+    "references": [
+      "anti-patterns.md",
+      "asset-optimization.md",
+      "decision-tree.md",
+      "green-hosting.md",
+      "integration-map.md"
+    ]
+  },
+  {
     "name": "sync-custom-to-repo",
     "folder": "sync-custom-to-repo",
     "description": "Sync custom skills/workflows/templates from local devkit to upstream GitHub repository via automated PR workflow. Detects custom additions, creates feature branches with descriptive names, commits changes with dynamic messages, pushes to remote, and provides PR creation URL. Handles Windows environments with xcopy commands and provides comprehensive summary reporting.\n\nUse this skill when the user wants to sync local custom skills, workflows, or templates to the upstream skills repository. Handles the full sync workflow including detection, branching, committing, pushing, and PR creation guidance.\n\nUse **with** **`git-operations-pro`** for advanced Git workflows, **`cli-pro`** for command-line tool patterns, **`security-pro`** for credential handling and repository access security.\n\nTriggers: \"sync custom\", \"sync skills\", \"sync to repo\", \"push to upstream\", \"sync devkit\", \"sync changes\", \"PR creation\", \"branch sync\", \"custom skills sync\", \"workflow sync\", \"template sync\".",
@@ -3875,6 +4117,19 @@
       "quality-validation.md",
       "ux-rules.md"
     ]
+  },
+  {
+    "name": "vercel-deployment-pro",
+    "folder": "vercel-deployment-pro",
+    "description": "Best practices for deploying fullstack applications to Vercel, including Edge Functions, ISR/SSG strategies, and caching.",
+    "triggers": [],
+    "when_to_use": [
+      "Deploying a Next.js or React app to Vercel.",
+      "Optimizing Serverless Function execution times.",
+      "Configuring Edge Functions for middleware or fast data fetching.",
+      "Setting up Vercel Data products (KV, Postgres, Blob)."
+    ],
+    "references": []
   },
   {
     "name": "web-research-pro",
