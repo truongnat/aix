@@ -1,6 +1,11 @@
 ---
 name: fullstack-rag-pro
 description: Building production-grade Retrieval-Augmented Generation (RAG) pipelines with Vector DBs and hybrid search.
+metadata:
+  short-description: RAG — Ingestion, Chunking, Embeddings, Vector DBs, Hybrid Search
+  content-language: en
+  domain: ai-integration
+  level: professional
 ---
 
 # Fullstack RAG Pro
@@ -31,9 +36,12 @@ This skill covers the end-to-end RAG architecture: document ingestion, chunking,
 Provide modular architecture snippets: one for ingestion, one for retrieval. Avoid monolithic 500-line scripts. Use LangChain/LlamaIndex only if requested; otherwise prefer native implementation for simplicity.
 
 ## Resources in this skill
-- Vector Search Best Practices (pgvector)
-- OpenAI Cookbook for RAG
-- Chunking Strategies Reference
+
+| Topic | Reference |
+|-------|-----------|
+| pgvector Docs | [github.com/pgvector/pgvector](https://github.com/pgvector/pgvector) |
+| OpenAI RAG Guide | [platform.openai.com/docs/guides/embeddings](https://platform.openai.com/docs/guides/embeddings) |
+| Chunking Strategies | [pinecone.io/learn/chunking-strategies](https://www.pinecone.io/learn/chunking-strategies/) |
 
 ## Quick example
 ```typescript
@@ -62,7 +70,10 @@ export async function findRelevantContent(userQuery: string) {
 ```
 
 ## Checklist before calling the skill done
+- [ ] **Think Before Coding**: Data schema and chunking strategy defined before implementation.
+- [ ] **Simplicity First**: Native implementation preferred over heavy frameworks unless justified.
+- [ ] **Surgical Changes**: Only modify parts of the ingestion/retrieval pipeline that are affected.
+- [ ] **Goal-Driven Execution**: Retrieval quality verified with sample queries.
 - [ ] Is the chunking strategy documented and rationalized?
 - [ ] Is there metadata attached to chunks for filtering?
 - [ ] Is the LLM prompt protected against context overflow?
-- [ ] Does the solution adhere to the 4 Karpathy coding principles?

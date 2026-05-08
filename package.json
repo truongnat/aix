@@ -36,7 +36,7 @@
     "dev": "tsx src/skills.ts",
     "lint": "eslint src/",
     "lint:cli": "tsx --tsconfig tsconfig.json --no-warnings src/skills.ts --help",
-    "ci:all": "npm run build && npm run lint && npm run test && node dist/tools.js validate-skills && node dist/tools.js audit-skill-structure --strict",
+    "ci:all": "npm run build && npm run lint && npm run test && node dist/tools.js validate-skills && node dist/tools.js audit-skill-structure --strict && node dist/tools.js validate-skill-quality --strict && node dist/tools.js validate-workflows --strict",
     "tool": "tsx src/tools.ts",
     "list-skills": "node dist/tools.js list-skills",
     "validate-skills": "node dist/tools.js validate-skills",

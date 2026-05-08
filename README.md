@@ -34,6 +34,13 @@ npx @truongnat/devkit@latest
 
 *This will automatically sync the devkit bundle (skills, workflows, rules, commands) to your local project.*
 
+### 🤖 Claude Project Integration
+
+For the best experience with Claude, follow our [Claude Project Guide](CLAUDE.md) to set up:
+- **Custom Instructions**: Configure Claude as a Senior Fullstack Engineer.
+- **Prompt Templates**: Use battle-tested [Fullstack Prompts](prompts/fullstack-pro.md).
+- **Project Context**: Optimized file uploading and context management.
+
 ## 📚 What's Included?
 
 ### 🎯 Agent Skills (101+)

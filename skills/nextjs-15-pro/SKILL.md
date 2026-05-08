@@ -1,6 +1,11 @@
 ---
 name: nextjs-15-pro
 description: Expert-level implementation of Next.js 15 features including Server Actions, Partial Prerendering (PPR), React 19 hooks, and Turbopack.
+metadata:
+  short-description: Next.js 15 — Server Actions, PPR, React 19, Turbopack
+  content-language: en
+  domain: web-framework
+  level: professional
 ---
 
 # Next.js 15 Pro
@@ -32,9 +37,12 @@ This skill is strictly limited to Next.js 15 App Router (`app/` directory) and R
 Provide concise Next.js code snippets using the App Router structure. Highlight where `use client` or `use server` boundaries are placed.
 
 ## Resources in this skill
-- Next.js 15 App Router Documentation
-- React 19 Hooks (`use`, `useOptimistic`, `useFormStatus`)
-- Server Actions Best Practices
+
+| Topic | Reference |
+|-------|-----------|
+| Next.js 15 Docs | [nextjs.org/docs](https://nextjs.org/docs) |
+| React 19 Hooks | [react.dev/reference](https://react.dev/reference/react) |
+| Server Actions | [nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations) |
 
 ## Quick example
 ```tsx
@@ -60,8 +68,10 @@ export default function NewPostForm() {
 ```
 
 ## Checklist before calling the skill done
-- [ ] Are we using Server Components by default?
+- [ ] **Think Before Coding**: Server/Client boundary strategy defined before implementation.
+- [ ] **Simplicity First**: Minimized Client Components and bundle size.
+- [ ] **Surgical Changes**: Targeted cache invalidation and minimal file edits.
+- [ ] **Goal-Driven Execution**: Hydration verified and Server Actions tested.
 - [ ] Are Server Actions properly typed and secured?
 - [ ] Is there appropriate error handling and loading UI via `error.tsx` and `loading.tsx`?
 - [ ] Has PPR/streaming been considered for slow data fetches?
-- [ ] Does the solution adhere to the 4 Karpathy coding principles?

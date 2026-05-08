@@ -1,6 +1,11 @@
 ---
 name: vercel-deployment-pro
 description: Best practices for deploying fullstack applications to Vercel, including Edge Functions, ISR/SSG strategies, and caching.
+metadata:
+  short-description: Vercel — Edge Functions, Caching, ISR, Runtime optimization
+  content-language: en
+  domain: devops
+  level: professional
 ---
 
 # Vercel Deployment Pro
@@ -31,9 +36,12 @@ This skill covers deployment and configuration specific to the Vercel platform, 
 Provide concise Vercel configuration snippets (`vercel.json` or Next.js `export const runtime = 'edge'`). Point out potential cost implications of the suggested strategy.
 
 ## Resources in this skill
-- Vercel Documentation (Edge Network, Caching)
-- Next.js Caching Strategies on Vercel
-- Vercel CLI Reference
+
+| Topic | Reference |
+|-------|-----------|
+| Vercel Docs | [vercel.com/docs](https://vercel.com/docs) |
+| Caching in Next.js | [nextjs.org/docs/app/building-your-application/caching](https://nextjs.org/docs/app/building-your-application/caching) |
+| Vercel CLI | [vercel.com/docs/cli](https://vercel.com/docs/cli) |
 
 ## Quick example
 ```json
@@ -69,7 +77,10 @@ export async function GET() {
 ```
 
 ## Checklist before calling the skill done
+- [ ] **Think Before Coding**: Hosting target and runtime constraints confirmed.
+- [ ] **Simplicity First**: Optimized bundle size and minimized middleware overhead.
+- [ ] **Surgical Changes**: Minimal environment variable changes and targeted route updates.
+- [ ] **Goal-Driven Execution**: Cache behavior and Edge function execution verified.
 - [ ] Are environment variables correctly mapped for production vs. preview?
 - [ ] Is the correct runtime (Node vs Edge) used for API routes?
 - [ ] Are Cache-Control headers optimized?
-- [ ] Does the solution adhere to the 4 Karpathy coding principles?
