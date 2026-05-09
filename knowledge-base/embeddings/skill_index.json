@@ -406,6 +406,19 @@
     ]
   },
   {
+    "name": "android-pro",
+    "folder": "android-pro",
+    "description": "Expert Android development covering Kotlin, Jetpack Compose, Coroutines, Flow, and modern architecture patterns (MVVM, MVI).",
+    "triggers": [],
+    "when_to_use": [
+      "Building modern, high-performance Android apps using Jetpack Compose.",
+      "Implementing reactive data flows using Kotlin Flow and Coroutines.",
+      "Designing modular Android architectures (MVVM, MVI, Clean Architecture).",
+      "Integrating Android-specific features (Widgets, Notifications, CameraX)."
+    ],
+    "references": []
+  },
+  {
     "name": "angular-pro",
     "folder": "angular-pro",
     "description": "Expert Angular development covering Angular 18+, Standalone Components, Signals, RxJS, and enterprise-grade architecture.",
@@ -610,6 +623,19 @@
       "auth-best-practices.md",
       "sdk-usage.md"
     ]
+  },
+  {
+    "name": "blockchain-pro",
+    "folder": "blockchain-pro",
+    "description": "Expert Blockchain development covering Ethereum (Solidity), DeFi, L2 solutions, Smart Contract security, and Web3 integration.",
+    "triggers": [],
+    "when_to_use": [
+      "Building secure smart contracts for DeFi, NFTs, or DAOs.",
+      "Designing dApp frontends that interact with the blockchain.",
+      "Implementing L2 scaling strategies to reduce gas costs.",
+      "Auditing smart contracts for common vulnerabilities (Reentrancy, Integer Overflow)."
+    ],
+    "references": []
   },
   {
     "name": "brainstorming-pro",
@@ -1428,6 +1454,19 @@
     ]
   },
   {
+    "name": "devrel-pro",
+    "folder": "devrel-pro",
+    "description": "Expert Developer Relations (DevRel) covering community building, Developer Experience (DX), advocacy, and technical content strategy.",
+    "triggers": [],
+    "when_to_use": [
+      "Designing a strategy to grow a developer community for a new tool or API.",
+      "Auditing and improving the Developer Experience (DX) of a product.",
+      "Creating a technical content strategy (Blog posts, Tutorials, Videos).",
+      "Managing feedback loops between external developers and internal product teams."
+    ],
+    "references": []
+  },
+  {
     "name": "django-pro",
     "folder": "django-pro",
     "description": "Expert Django development covering the ORM, Admin interface, Django REST Framework (DRF), and enterprise application patterns.",
@@ -1555,6 +1594,19 @@
       "tips-and-tricks.md",
       "versions.md"
     ]
+  },
+  {
+    "name": "engineering-management-pro",
+    "folder": "engineering-management-pro",
+    "description": "Expert Engineering Management covering SDLC leadership, team building, mentorship, technical strategy, and Agile operations.",
+    "triggers": [],
+    "when_to_use": [
+      "Designing a high-performing engineering team structure.",
+      "Leading a technical strategy or refactoring roadmap.",
+      "Mentoring engineers and designing career progression frameworks.",
+      "Optimizing SDLC processes (Agile, DORA metrics)."
+    ],
+    "references": []
   },
   {
     "name": "executing-plans-pro",
@@ -1873,6 +1925,19 @@
     "references": []
   },
   {
+    "name": "game-dev-pro",
+    "folder": "game-dev-pro",
+    "description": "Expert game development covering Unity (C#), physics, shaders, optimization, and game architecture patterns (ECS, Singleton, State Machine).",
+    "triggers": [],
+    "when_to_use": [
+      "Building 2D or 3D games using the Unity Engine.",
+      "Implementing complex game mechanics and physics interactions.",
+      "Optimizing game performance for mobile or console platforms.",
+      "Architecting scalable game systems using State Machines or ECS."
+    ],
+    "references": []
+  },
+  {
     "name": "gemini-api-dev",
     "folder": "gemini-api-dev",
     "description": "Use this skill when building applications with Gemini models, Gemini API, working with multimodal content (text, images, audio, video), implementing function calling, using structured outputs, or needing current model specifications. Covers SDK usage (google-genai for Python, @google/genai for JavaScript/TypeScript, com.google.genai:google-genai for Java, google.golang.org/genai for Go), model selection, and API capabilities.",
@@ -2107,6 +2172,19 @@
       "terraform-vs-pulumi.md",
       "testing-iac.md"
     ]
+  },
+  {
+    "name": "ios-pro",
+    "folder": "ios-pro",
+    "description": "Expert iOS development covering Swift, SwiftUI, Swift Concurrency, Combine, and native architecture patterns (MVVM, Composable Architecture).",
+    "triggers": [],
+    "when_to_use": [
+      "Building high-performance, native iOS apps using SwiftUI.",
+      "Implementing complex, thread-safe logic using Swift Concurrency and Actors.",
+      "Designing modular iOS architectures (MVVM, TCA).",
+      "Integrating deep system features (Widgets, Push Notifications, App Intents)."
+    ],
+    "references": []
   },
   {
     "name": "java-pro",
@@ -4035,6 +4113,19 @@
       "tips-and-tricks.md",
       "versions.md"
     ]
+  },
+  {
+    "name": "technical-writing-pro",
+    "folder": "technical-writing-pro",
+    "description": "Expert Technical Writing covering docs-as-code, information architecture, style guides, API documentation, and user education.",
+    "triggers": [],
+    "when_to_use": [
+      "Designing the Information Architecture (IA) for a large documentation site.",
+      "Writing high-quality API reference documentation and tutorials.",
+      "Implementing a docs-as-code workflow integrated with GitHub/CI.",
+      "Auditing existing documentation for clarity, accuracy, and accessibility."
+    ],
+    "references": []
   },
   {
     "name": "test-driven-development-pro",

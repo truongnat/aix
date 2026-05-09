@@ -66,6 +66,12 @@
     "domain": "algorithms"
   },
   {
+    "id": "android-pro",
+    "name": "android-pro",
+    "description": "Expert Android development covering Kotlin, Jetpack Compose, Coroutines, Flow, and modern architecture patterns (MVVM, MVI).",
+    "domain": "mobile-framework"
+  },
+  {
     "id": "angular-pro",
     "name": "angular-pro",
     "description": "Expert Angular development covering Angular 18+, Standalone Components, Signals, RxJS, and enterprise-grade architecture.",
@@ -100,6 +106,12 @@
     "name": "azure-storage",
     "description": "Azure Storage Services including Blob Storage, File Shares, Queue Storage, Table Storage, and Data Lake. Provides object storage, SMB file shares, async messaging, NoSQL key-value, and big data analytics capabilities. Includes access tiers (hot, cool, archive) and lifecycle management. USE FOR: blob storage, file shares, queue storage, table storage, data lake, upload files, download blobs, storage accounts, access tiers, lifecycle management. DO NOT USE FOR: SQL databases, Cosmos DB (use azure-prepare), messaging with Event Hubs or Service Bus (use azure-messaging).",
     "domain": "General"
+  },
+  {
+    "id": "blockchain-pro",
+    "name": "blockchain-pro",
+    "description": "Expert Blockchain development covering Ethereum (Solidity), DeFi, L2 solutions, Smart Contract security, and Web3 integration.",
+    "domain": "blockchain"
   },
   {
     "id": "brainstorming-pro",
@@ -204,6 +216,12 @@
     "domain": "design-system"
   },
   {
+    "id": "devrel-pro",
+    "name": "devrel-pro",
+    "description": "Expert Developer Relations (DevRel) covering community building, Developer Experience (DX), advocacy, and technical content strategy.",
+    "domain": "developer-relations"
+  },
+  {
     "id": "django-pro",
     "name": "django-pro",
     "description": "Expert Django development covering the ORM, Admin interface, Django REST Framework (DRF), and enterprise application patterns.",
@@ -226,6 +244,12 @@
     "name": "electron-pro",
     "description": "Production-grade Electron desktop apps: main vs renderer, preload and contextBridge, secure IPC, trust boundaries, packaging, auto-update, and cross-platform edge cases — plus system model (processes, IPC as API surface), failure modes (XSS→IPC abuse, ABI mismatch, update/partials, signing trust), decision trade-offs (Electron vs Tauri/web, sandbox, builder vs Forge), quality guardrails (no invented signing IDs or API shapes across Electron majors).\n\nUse this skill when the user works on Electron (`BrowserWindow`, `ipcMain`/`ipcRenderer`, preload scripts, `contextIsolation`, `electron-builder`/`electron-forge`), desktop packaging, code signing, native Node addons in Electron, or asks about security boundaries between UI and Node.\n\nUse **with** **`react-pro`** for renderer UI, **`security-pro`** for threat modeling, **`testing-pro`** for Playwright Electron, **`deployment-pro`** / **`ci-cd-pro`** for signed artifacts and pipelines, **`design-system-pro`** for dense desktop UX. This skill owns **Electron process model and IPC**; web-framework skills own component-level UI.\n\nTriggers: \"Electron\", \"electron\", \"BrowserWindow\", \"ipcMain\", \"ipcRenderer\", \"preload\", \"contextBridge\", \"contextIsolation\", \"sandbox\", \"nodeIntegration\", \"remote module\", \"electron-builder\", \"electron-forge\", \"electron-updater\", \"Chromium\", \"desktop app\", \"main process\", \"renderer\", \"ASAR\", \"code signing\", \"notarization\".\n",
     "domain": "desktop"
+  },
+  {
+    "id": "engineering-management-pro",
+    "name": "engineering-management-pro",
+    "description": "Expert Engineering Management covering SDLC leadership, team building, mentorship, technical strategy, and Agile operations.",
+    "domain": "engineering-management"
   },
   {
     "id": "executing-plans-pro",
@@ -294,6 +318,12 @@
     "domain": "ai-integration"
   },
   {
+    "id": "game-dev-pro",
+    "name": "game-dev-pro",
+    "description": "Expert game development covering Unity (C#), physics, shaders, optimization, and game architecture patterns (ECS, Singleton, State Machine).",
+    "domain": "game-development"
+  },
+  {
     "id": "gemini-api-dev",
     "name": "gemini-api-dev",
     "description": "Use this skill when building applications with Gemini models, Gemini API, working with multimodal content (text, images, audio, video), implementing function calling, using structured outputs, or needing current model specifications. Covers SDK usage (google-genai for Python, @google/genai for JavaScript/TypeScript, com.google.genai:google-genai for Java, google.golang.org/genai for Go), model selection, and API capabilities.",
@@ -334,6 +364,12 @@
     "name": "infrastructure-as-code-pro",
     "description": "Infrastructure-as-Code: Terraform and Pulumi module design, state management, workspace strategy, drift detection, policy-as-code, and testing (Terratest, OPA). Covers AWS/GCP/Azure provider patterns, remote state backends (S3+DynamoDB, GCS, Terraform Cloud), secret injection, and CI/CD pipeline integration (GitHub Actions, GitLab CI).\n\nUse this skill when the user works on Terraform (.tf files, modules, workspaces, state), Pulumi (TypeScript/Python stacks, component resources), cloud provisioning (AWS, GCP, Azure), infrastructure testing, IaC CI/CD pipelines, policy-as-code (OPA, Sentinel), or asks about drift detection, state locking, or infra rollback.\n\nTriggers: \"Terraform\", \"Pulumi\", \"IaC\", \"infrastructure as code\", \"tf files\", \"tfstate\", \"terraform plan\", \"terraform apply\", \"terraform destroy\", \"modules\", \"workspaces\", \"remote state\", \"S3 backend\", \"DynamoDB lock\", \"drift\", \"OPA\", \"Sentinel\", \"Terratest\", \"CDK\", \"CloudFormation\", \"Bicep\", \"infra provisioning\", \"resource lifecycle\", \"state lock\", \"state migration\".\n\nCombine with **`ci-cd-pro`** for IaC pipelines, **`security-pro`** for secret injection and least-privilege IAM, **`docker-pro`** for containerised infra, and **`deployment-pro`** for release strategies.\n",
     "domain": "devops"
+  },
+  {
+    "id": "ios-pro",
+    "name": "ios-pro",
+    "description": "Expert iOS development covering Swift, SwiftUI, Swift Concurrency, Combine, and native architecture patterns (MVVM, Composable Architecture).",
+    "domain": "mobile-framework"
   },
   {
     "id": "java-pro",
@@ -658,6 +694,12 @@
     "name": "tauri-pro",
     "description": "Production-grade Tauri desktop (and mobile): Rust core, invoke/commands, capabilities/permissions, webview integration, bundling, updater, and cross-platform edge cases — plus system model (Rust host + webview, IPC invoke/events, capabilities as ACL, threading), failure modes (over-broad capabilities, shell injection, path traversal, IPC payload jank, WebView2/CSP prod surprises), decision trade-offs (sidecar vs in-process, Tauri vs Electron, bundled vs remote UI, desktop vs mobile), and quality guardrails (Tauri 1 vs 2 config accuracy, safe errors, release-build parity).\n\nUse this skill for Tauri (`src-tauri`, `#[tauri::command]`, `invoke`, `tauri.conf`, plugins, updater, sidecars), Rust–frontend boundaries, or packaging for Windows/macOS/Linux (and mobile when applicable).\n\nCombine with **`react-pro`** (or Vue/Svelte) for webview UI, **`typescript-pro`** for typed invoke contracts, **`security-pro`** for capabilities/CSP/shell hardening, **`testing-pro`** for CI and E2E, **`deployment-pro`** for signing and updater pipelines, **`performance-tuning-pro`** for IPC/startup, and **`docker-pro`** for cross-compile CI.\n\nTriggers: \"Tauri\", \"tauri\", \"src-tauri\", \"tauri.conf\", \"invoke\", \"tauri::command\", \"WebView\", \"WebView2\", \"Rust desktop\", \"Tauri plugin\", \"Tauri updater\", \"capability\", \"Tauri 2\", \"v1\", \"v2\", \"sidecar\", \"Cargo.toml\".\n",
     "domain": "cross-platform-desktop"
+  },
+  {
+    "id": "technical-writing-pro",
+    "name": "technical-writing-pro",
+    "description": "Expert Technical Writing covering docs-as-code, information architecture, style guides, API documentation, and user education.",
+    "domain": "content-analysis"
   },
   {
     "id": "test-driven-development-pro",
