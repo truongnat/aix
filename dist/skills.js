@@ -59,6 +59,31 @@ const DEFAULT_REPO = 'truongnat/skills';
 const BUNDLE_DIR_SEGMENTS = ['.agents', 'devkit'];
 const BUNDLE_MARKER = '.devkit-bundle';
 const LEGACY_VENDOR_SEGMENTS = ['vendor', 'skills'];
+const TOOL_COMMANDS = new Set([
+    'list-skills',
+    'validate-skills',
+    'audit-skill-structure',
+    'validate-skill-quality',
+    'validate-workflows',
+    'eval-skill-routing',
+    'eval-skill-output-format',
+    'build-skill-index',
+    'analyze-skills',
+    'install-skill',
+    'verify-bundle-install',
+    'analyze-doc',
+    'build-kb',
+    'index-project',
+    'generate-wiki',
+    'query-kb',
+    'query-kb-batch',
+    'verify-kb',
+    'build-graph',
+    'query-graph',
+    'impact-analysis',
+    'generate-gap-analysis',
+    'sync-catalogs',
+]);
 const COMMAND_IDE_DIRS = {
     cursor: ['.cursor', 'commands'],
     claude: ['.claude', 'commands'],
@@ -540,6 +565,14 @@ async function main() {
         return;
     }
     const rawCmd = argv._[0];
+    if (rawCmd && TOOL_COMMANDS.has(rawCmd.startsWith('/') ? rawCmd.slice(1) : rawCmd)) {
+        const toolsJs = join(PKG_ROOT, 'dist', 'tools.js');
+        const res = spawnSync(process.execPath, [toolsJs, ...process.argv.slice(2)], {
+            cwd: process.cwd(),
+            stdio: 'inherit',
+        });
+        process.exit(res.status ?? 1);
+    }
     const cmd = rawCmd === 'uninstall' ? 'uninstall'
         : rawCmd === 'update' ? 'update'
             : rawCmd === 'add' ? 'add'

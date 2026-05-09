@@ -75,6 +75,32 @@ const BUNDLE_DIR_SEGMENTS = ['.agents', 'devkit'] as const;
 const BUNDLE_MARKER = '.devkit-bundle';
 const LEGACY_VENDOR_SEGMENTS = ['vendor', 'skills'] as const;
 
+const TOOL_COMMANDS = new Set([
+  'list-skills',
+  'validate-skills',
+  'audit-skill-structure',
+  'validate-skill-quality',
+  'validate-workflows',
+  'eval-skill-routing',
+  'eval-skill-output-format',
+  'build-skill-index',
+  'analyze-skills',
+  'install-skill',
+  'verify-bundle-install',
+  'analyze-doc',
+  'build-kb',
+  'index-project',
+  'generate-wiki',
+  'query-kb',
+  'query-kb-batch',
+  'verify-kb',
+  'build-graph',
+  'query-graph',
+  'impact-analysis',
+  'generate-gap-analysis',
+  'sync-catalogs',
+]);
+
 const COMMAND_IDE_DIRS: Record<string, [string, string]> = {
   cursor: ['.cursor', 'commands'],
   claude: ['.claude', 'commands'],
@@ -542,6 +568,15 @@ async function main() {
   if (argv.help) { printHelp(); return; }
 
   const rawCmd = (argv._ as string[])[0];
+  if (rawCmd && TOOL_COMMANDS.has(rawCmd.startsWith('/') ? rawCmd.slice(1) : rawCmd)) {
+    const toolsJs = join(PKG_ROOT, 'dist', 'tools.js');
+    const res = spawnSync(process.execPath, [toolsJs, ...process.argv.slice(2)], {
+      cwd: process.cwd(),
+      stdio: 'inherit',
+    });
+    process.exit(res.status ?? 1);
+  }
+
   const cmd = rawCmd === 'uninstall' ? 'uninstall'
     : rawCmd === 'update'    ? 'update'
     : rawCmd === 'add'       ? 'add'

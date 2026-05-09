@@ -24,14 +24,22 @@ Automatically analyze a user request, research and optimize the prompt for clari
    - Identify intent and scope without requiring clarification
    - Determine complexity and whether multiple skills/workflows/templates are needed
 
-2. **Research and optimize the prompt**
+2. **Preprocess attached files or local paths**
+   - If file-processing intent is ambiguous, clarify the goal and file scope before starting
+   - If the request includes files, read text/code directly and optionally convert document formats with MarkItDown before optimizing
+   - MarkItDown is optional but recommended for PDF/Office extraction; use the bundled `node .agents/devkit/dist/tools.js analyze-doc <file...>` or `npx @truongnat/devkit analyze-doc <file...>`
+   - If MarkItDown is missing, notify the user and ask before installing it
+   - Capture provenance: filename, extraction method, relevant section/page/sheet, and uncertainty
+   - Keep only the minimum extracted context needed for routing and execution
+
+3. **Research and optimize the prompt**
    - Gather relevant context from project and environment
    - Clarify ambiguous terms by inferring from context
    - Add constraints and requirements based on best practices
    - Make the prompt clean, specific, and actionable
    - Specify expected output format and structure
 
-3. **Discover relevant skills, workflows, or templates**
+4. **Discover relevant skills, workflows, or templates**
    - **Skills**: Automatically discover from `skills/` or `skill_index.json` by matching triggers and descriptions
    - **Workflows**: Match procedure to structured workflow(s)
    - **Templates**: Match output format to appropriate template(s)
@@ -39,7 +47,7 @@ Automatically analyze a user request, research and optimize the prompt for clari
    - Consider dependencies between skills/workflows/templates
    - Check for conflicts or overlaps
 
-4. **Coordinate execution**
+5. **Coordinate execution**
    - Sequence skills/workflows/templates based on dependencies
    - Define handoff points between skills/workflows/templates
    - Specify clear execution order
@@ -49,9 +57,10 @@ Automatically analyze a user request, research and optimize the prompt for clari
 
 **Internal analysis (do not output to user):**
 1. Analyze the request - extract domain, action, constraints, output format
-2. Research and optimize the prompt - add context, clarify ambiguities, make actionable
-3. Discover relevant skills/workflows/templates - match triggers, descriptions, procedures
-4. Coordinate execution - sequence based on dependencies, define handoffs
+2. Preprocess attached/local files when present - extract minimum grounded context before optimization
+3. Research and optimize the prompt - add context, clarify ambiguities, make actionable
+4. Discover relevant skills/workflows/templates - match triggers, descriptions, procedures
+5. Coordinate execution - sequence based on dependencies, define handoffs
 
 **Output to user (concise):**
 - Brief summary of what will be done (1 sentence)

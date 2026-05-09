@@ -72,11 +72,26 @@ Follow **Suggested response format (STRICT)**.
 Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
 
 1. **Confirm** **Analyze** the user input to understand intent, scope, and complexity → verify: [context documented].
-2. **State assumptions** about requirements, constraints (**Think Before Coding**).
-3. **Apply** minimum solution first; escalate only when justified (**Simplicity First**).
-4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
-5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
-6. **Respond** using **Suggested response format**; note main risks.
+2. **Clarify file-processing intent when needed**, then preprocess attachments / local files before prompt optimization; use direct reads for text/code and optionally use MarkItDown for document formats → verify: [file context captured with provenance].
+3. **State assumptions** about requirements, constraints (**Think Before Coding**).
+4. **Apply** minimum solution first; escalate only when justified (**Simplicity First**).
+5. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
+6. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
+7. **Respond** using **Suggested response format**; note main risks.
+
+### Attachment preprocessing (mandatory when files are part of the prompt)
+
+When the user chat includes attached files or local file paths, do not optimize or route from filenames alone. First extract the minimum needed file context:
+
+1. If the user only mentions files vaguely, clarify the goal before processing: summarize, extract facts, optimize prompt context, or implement from the file.
+2. Plain text/code/Markdown/JSON/YAML: read directly with repo tools.
+3. PDF, DOCX, PPTX, XLSX, HTML, and similar document formats: MarkItDown is optional but recommended; prefer the bundled helper `node .agents/devkit/dist/tools.js analyze-doc <file...>` or `npx @truongnat/devkit analyze-doc <file...>`.
+4. If MarkItDown is missing, do not install automatically. Tell the user it is recommended for cleaner extraction and ask for permission before installing.
+5. Locked, unsupported, or very large files: state the limitation and request an accessible export only if the file content is required.
+
+Keep provenance in the optimized prompt: filename, extraction method, relevant section/page/sheet when available, and any uncertainty. For content-heavy tasks, route to `content-analysis-pro`; for implementation tasks, extract only the facts needed before selecting the working skill.
+
+Details: [references/attachment-preprocessing.md](references/attachment-preprocessing.md)
 
 ### Stack context resolution (mandatory before naming domain skills)
 
@@ -133,6 +148,12 @@ How triggers, descriptions, and repo metadata should be used to find the smalles
 
 Details: [references/skill-discovery.md](references/skill-discovery.md)
 
+### Attachment preprocessing (summary)
+
+How router-pro should convert attached/local files into grounded text before prompt analysis and optimization.
+
+Details: [references/attachment-preprocessing.md](references/attachment-preprocessing.md)
+
 ### Workflow execution (summary)
 
 How to sequence skill and workflow handoffs so complex tasks stay coordinated instead of fragmented.
@@ -158,6 +179,7 @@ Details: [references/template-catalog.md](references/template-catalog.md)
 | Topic | File |
 |-------|------|
 | Skill discovery algorithm and ranking | [references/skill-discovery.md](references/skill-discovery.md) |
+| Attachment preprocessing with MarkItDown | [references/attachment-preprocessing.md](references/attachment-preprocessing.md) |
 | Workflow execution and sequencing | [references/workflow-execution.md](references/workflow-execution.md) |
 | Template catalog | [references/template-catalog.md](references/template-catalog.md) |
 
@@ -186,6 +208,8 @@ Details: [references/template-catalog.md](references/template-catalog.md)
 ## Checklist before calling the skill done
 
 - [ ] Confirmed that routing/orchestration is actually needed before invoking it (Think Before Coding)
+- [ ] Clarified ambiguous file-processing intent before reading, converting, or installing optional tooling
+- [ ] Attached/local files were read or converted before prompt optimization when file content affects routing
 - [ ] **Stack context** identified (markers or user); **domain/app skill matches stack** (e.g. Flutter → `flutter-pro`, not `react-pro`)
 - [ ] Chose the minimum sufficient set of skills/workflows/templates (Simplicity First)
 - [ ] Only added routing logic directly relevant to the request (Surgical Changes)

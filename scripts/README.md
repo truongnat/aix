@@ -21,6 +21,7 @@ All runtime tooling is now implemented in TypeScript and compiled to `dist/tools
 | `node dist/tools.js build-skill-index [--with-embeddings]` | Build `skill_index.json` (+ optional embeddings) |
 | `node dist/tools.js install-skill <path> [--project-dir ...] [--all-ides]` | Install one skill into target project |
 | `node dist/tools.js verify-bundle-install [--project-dir ...]` | Verify full bundle installation |
+| `node dist/tools.js analyze-doc <file...>` | Convert document files to Markdown through the bundled CLI |
 | `node dist/tools.js build-kb` | Build KB embeddings + manifest |
 | `node dist/tools.js index-project [--dir .] [--out .agents/devkit/project-index] [--include globs] [--dry-run]` | Build **project** index (`embeddings.json` + `manifest.json`) for arbitrary trees |
 | `node dist/tools.js generate-wiki [--docs …/docs] [--out …/wiki] [--watch] [--open]` | Static **HTML wiki**: sidebar, pipe **tables**, **Search** (client-side), relative **`.md`→`.html`** links; **`--watch`** polls docs and rebuilds; **`--open`** opens `index.html` in the default browser |
@@ -32,6 +33,26 @@ All runtime tooling is now implemented in TypeScript and compiled to `dist/tools
 | `node dist/tools.js build-graph [--dir .] [--out .agents/devkit/project-graph]` | Build code graph (functions, classes, calls) |
 | `node dist/tools.js query-graph <symbol> [--mode search\|callers\|callees]` | Query graph for symbol or relationships |
 | `node dist/tools.js impact-analysis <file-path>` | Blast radius analysis for changes |
+
+## Document conversion helper
+
+For prompt routing or content analysis that includes document attachments, convert supported files to Markdown first:
+
+```bash
+node .agents/devkit/dist/tools.js analyze-doc path/to/file.pdf path/to/spec.docx
+```
+
+When using the npm package directly, the installer bin forwards tool commands into the bundled tools runner:
+
+```bash
+npx @truongnat/devkit analyze-doc path/to/file.pdf
+```
+
+This helper is bundled with devkit and wraps Microsoft's MarkItDown CLI when available. MarkItDown itself is optional but recommended for cleaner PDF/Office extraction; install it only after the user confirms optional tooling is allowed:
+
+```bash
+pip install "markitdown[all]"
+```
 
 ## npm aliases
 
@@ -46,6 +67,7 @@ All runtime tooling is now implemented in TypeScript and compiled to `dist/tools
 - `npm run build-skill-index`
 - `npm run install-skill`
 - `npm run verify-bundle-install`
+- `npm run analyze-doc`
 - `npm run build-kb`
 - `npm run generate-wiki`
 - `npm run query-kb`

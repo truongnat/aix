@@ -94,6 +94,7 @@ The devkit includes powerful CLI tools for managing your agent environment:
 npx @truongnat/devkit validate-skills   # Validate skill frontmatter & schemas
 npx @truongnat/devkit analyze-skills    # Run quality analysis on all skills
 npx @truongnat/devkit build-kb          # Build vector embeddings for the KB
+npx @truongnat/devkit analyze-doc file.pdf # Convert document attachments via bundled helper
 npx @truongnat/devkit sync-catalogs     # Sync updates across skill catalogs
 ```
 

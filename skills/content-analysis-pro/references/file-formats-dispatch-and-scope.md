@@ -22,7 +22,8 @@ This repo uses **one** multimodal skill — **`content-analysis-pro`** — for *
 | **Parquet** / **Feather** | Column stats, head, dtypes | `pandas`, `pyarrow` |
 | **Password-protected Office** (`.docx`, `.xlsx`, `.pptx`) | Do not guess passwords; ask user to unlock or export; analysis only **after** decryption |
 | **CSV** / TSV | Preview, dtypes, missingness | `pandas` — deep statistics → **`data-analysis-pro`** |
-| **PDF** | Text vs scan vs mixed; OCR limits | Same skill; choose extraction path per file (no separate “pdf-only” skill in this repo) |
+| **PDF** | Text vs scan vs mixed; OCR limits | Same skill; choose extraction path per file; MarkItDown is optional but recommended as a first-pass converter when available (no separate “pdf-only” skill in this repo) |
+| **Office docs** (`.docx`, `.xlsx`, `.pptx`) | Convert to Markdown before summary/extraction | Prefer bundled `analyze-doc` / MarkItDown when available; ask before installing optional tooling; hand structured tables to **`data-analysis-pro`** when math matters |
 | **Jupyter** (`.ipynb`) | JSON structure — cells, outputs; “what did this notebook do?” | Parse as JSON or `nbformat`; large outputs → **sample** cells; execution **order** matters |
 | **YAML** / **TOML** | Config / infra as text | Parse with `yaml` / `tomllib` (Py 3.11+) — **secrets** often here → **`security-pro`** |
 | **OCR** (pytesseract) | Image text extraction | **Python** `pytesseract` requires **system** Tesseract (`apt`/`brew` **install** `tesseract-ocr`) — **pip alone is not enough** |

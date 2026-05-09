@@ -56,6 +56,43 @@ import { createKbVectorStore } from './lib/vector-store.js';
 function readText(path) {
     return readFileSync(path, 'utf8');
 }
+function analyzeDocuments(filePaths) {
+    if (filePaths.length === 0) {
+        throw new Error('Usage: devkit analyze-doc <path-to-file> [more-files...]');
+    }
+    try {
+        execFileSync('markitdown', ['--version'], { stdio: 'ignore' });
+    }
+    catch {
+        throw new Error([
+            'MarkItDown is not installed or not in PATH.',
+            'It is optional but recommended for cleaner PDF/Office conversion.',
+            'Install it only after user confirmation: pip install "markitdown[all]"',
+        ].join('\n'));
+    }
+    for (const filePath of filePaths) {
+        const absolutePath = resolve(filePath);
+        if (!existsSync(absolutePath)) {
+            throw new Error(`File not found: ${absolutePath}`);
+        }
+        if (!statSync(absolutePath).isFile()) {
+            throw new Error(`Not a file: ${absolutePath}`);
+        }
+        console.log(`--- BEGIN FILE: ${absolutePath} ---`);
+        try {
+            const output = execFileSync('markitdown', [absolutePath], {
+                encoding: 'utf-8',
+                maxBuffer: 1024 * 1024 * 50,
+            });
+            console.log(output.trimEnd());
+        }
+        catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            throw new Error(`Failed to analyze document ${absolutePath}: ${message}`);
+        }
+        console.log(`--- END FILE: ${absolutePath} ---`);
+    }
+}
 function collectMarkdownFiles(base) {
     return globSync('**/*.md', { cwd: base, absolute: true, nodir: true }).sort();
 }
@@ -2266,6 +2303,7 @@ ${chalk.bold('SKILLS')}
 
 ${chalk.bold('BUNDLE')}
   ${chalk.yellow('verify-bundle-install')} Check installed bundle integrity  ${chalk.dim('[--project-dir] [--strict]')}
+  ${chalk.yellow('analyze-doc')}            Convert document files to Markdown  ${chalk.dim('<file...>')}
 
 ${chalk.bold('KNOWLEDGE BASE')}
   ${chalk.yellow('build-kb')}              Chunk & embed documents  ${chalk.dim('[--dry-run]')}
@@ -2378,6 +2416,9 @@ async function main() {
             break;
         case 'verify-bundle-install':
             cmdVerifyBundleInstall(args, root);
+            break;
+        case 'analyze-doc':
+            analyzeDocuments(args._.slice(1));
             break;
         case 'build-kb':
             await buildKb(root, Boolean(args['dry-run']));

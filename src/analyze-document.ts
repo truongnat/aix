@@ -1,47 +1,62 @@
-import { execSync } from 'child_process';
-import fs from 'fs';
-import path from 'path';
+import { execFileSync } from 'node:child_process';
+import { existsSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 /**
- * Analyzes a document (PDF, Word, Excel, PowerPoint, etc.) and converts it to Markdown
+ * Analyzes document files (PDF, Word, Excel, PowerPoint, etc.) and converts them to Markdown
  * using Microsoft's markitdown CLI.
- * 
- * Requirement: pip install 'markitdown[all]'
+ *
+ * Optional recommended dependency: pip install 'markitdown[all]'
  */
-function analyzeDocument(filePath: string) {
-  if (!filePath) {
-    console.error('Usage: npm run analyze-doc <path-to-file>');
-    process.exit(1);
+function analyzeDocuments(filePaths: string[]) {
+  if (filePaths.length === 0) {
+    throw new Error('Usage: devkit analyze-doc <path-to-file> [more-files...]');
   }
-
-  const absolutePath = path.resolve(filePath);
-
-  if (!fs.existsSync(absolutePath)) {
-    console.error(`Error: File not found at ${absolutePath}`);
-    process.exit(1);
-  }
-
-  // Check if markitdown is installed
-  try {
-    execSync('markitdown --version', { stdio: 'ignore' });
-  } catch (error) {
-    console.error('Error: "markitdown" CLI is not installed or not in PATH.');
-    console.error('Please install it using: pip install "markitdown[all]"');
-    process.exit(1);
-  }
-
-  console.log(`Analyzing document: ${absolutePath}...`);
-  console.log('---');
 
   try {
-    // Execute markitdown and capture standard output
-    const output = execSync(`markitdown "${absolutePath}"`, { encoding: 'utf-8', maxBuffer: 1024 * 1024 * 50 });
-    console.log(output);
-  } catch (error: any) {
-    console.error(`Failed to analyze document: ${error.message}`);
-    process.exit(1);
+    execFileSync('markitdown', ['--version'], { stdio: 'ignore' });
+  } catch {
+    throw new Error(
+      [
+        'MarkItDown is not installed or not in PATH.',
+        'It is optional but recommended for cleaner PDF/Office conversion.',
+        'Install it only after user confirmation: pip install "markitdown[all]"',
+      ].join('\n'),
+    );
+  }
+
+  for (const filePath of filePaths) {
+    const absolutePath = resolve(filePath);
+
+    if (!existsSync(absolutePath)) {
+      throw new Error(`File not found: ${absolutePath}`);
+    }
+
+    if (!statSync(absolutePath).isFile()) {
+      throw new Error(`Not a file: ${absolutePath}`);
+    }
+
+    console.log(`--- BEGIN FILE: ${absolutePath} ---`);
+
+    try {
+      const output = execFileSync('markitdown', [absolutePath], {
+        encoding: 'utf-8',
+        maxBuffer: 1024 * 1024 * 50,
+      });
+      console.log(output.trimEnd());
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to analyze document ${absolutePath}: ${message}`);
+    }
+
+    console.log(`--- END FILE: ${absolutePath} ---`);
   }
 }
 
 const args = process.argv.slice(2);
-analyzeDocument(args[0]);
+try {
+  analyzeDocuments(args);
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exit(1);
+}
