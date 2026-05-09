@@ -36,6 +36,12 @@
     "domain": "quality-engineering"
   },
   {
+    "id": "ai-agents-pro",
+    "name": "ai-agents-pro",
+    "description": "Expert design and orchestration of autonomous AI agents, multi-agent systems, tool use, and persistent memory.",
+    "domain": "data-ai"
+  },
+  {
     "id": "ai-design-pro",
     "name": "ai-design-pro",
     "description": "AI-enhanced design practices using generative tools, AI assistants, and automated workflows: image generation, rapid prototyping, AI-driven UX decisions, motion graphics, photorealistic visuals, and automated image processing.\n\nUse this skill when working with AI design tools (Midjourney, DALL-E, Stable Diffusion, Runway, Figma AI, Adobe Firefly), generating design assets from text prompts, automating image processing pipelines, or making data-driven design decisions with AI.\n\nDo not use for traditional design principles or manual design techniques (use design-system-pro), basic UI/UX layout (use ui-design-brain-pro), or accessibility (use a11y-design-pro).\n\nTriggers: \"AI design\", \"generative design\", \"AI image generation\", \"DALL-E\", \"Midjourney\", \"Stable Diffusion\", \"Runway\", \"Figma AI\", \"Adobe Firefly\", \"AI prototyping\", \"AI color palette\", \"AI design assistant\", \"AI motion graphics\", \"text to image\".\n",
@@ -76,6 +82,12 @@
     "name": "auth-pro",
     "description": "Professional authentication and authorization guidance across web/mobile/API systems: identity flows, credential and token lifecycle, session/JWT/OAuth/OIDC/API-key patterns, and policy enforcement models (RBAC/ABAC/ReBAC).\n\nUse this skill when the user asks to design or review auth architecture, compare auth methods, implement secure login/session/token flows, enforce authorization boundaries, or troubleshoot access-control failures and token misuse.\n\nDo not use as the only skill for framework-specific wiring, IdP portal configuration, deep pentesting, or full database schema design — combine with stack and security skills (see Boundary).\n\nUse **with** **`security-pro`** for broader threat modeling and hardening, **`nestjs-pro`** / **`nextjs-pro`** for framework wiring, **`postgresql-pro`** for data-layer policy/RLS boundaries, and **`testing-pro`** for auth regression and abuse-case tests.\n\nTriggers: \"authentication\", \"authorization\", \"auth\", \"login\", \"session\", \"session management\", \"JWT\", \"OAuth\", \"OIDC\", \"SAML\", \"API key\", \"mTLS\", \"RBAC\", \"ABAC\", \"ReBAC\", \"MFA\", \"WebAuthn\", \"passkeys\", \"PKCE\", \"refresh token\", \"SSO\", \"access control\", \"BFF\", \"OAuth scopes\", \"device flow\", \"magic link\", \"account lifecycle\", \"SCIM\", \"JIT provisioning\", \"password reset\", \"credential stuffing\", \"break-glass\", \"impersonation\".\n",
     "domain": "identity-access"
+  },
+  {
+    "id": "aws-pro",
+    "name": "aws-pro",
+    "description": "Expert AWS architecture and management covering core services (EC2, S3, RDS, Lambda), IAM security, and Infrastructure as Code (Terraform/CDK).",
+    "domain": "cloud"
   },
   {
     "id": "azure-storage",
@@ -258,6 +270,12 @@
     "domain": "version-control"
   },
   {
+    "id": "go-pro",
+    "name": "go-pro",
+    "description": "Expert Go (Golang) development covering concurrency, interface-driven design, testing, and cloud-native application patterns.",
+    "domain": "backend"
+  },
+  {
     "id": "graphql-pro",
     "name": "graphql-pro",
     "description": "Production-grade GraphQL: schema design, resolver architecture, execution model (parse → validate → execute), performance (N+1, DataLoader, complexity limits), security (field-level authZ, introspection, query abuse), federation/monolith trade-offs — plus failure modes (null propagation, DoS queries, federated skew, subscription overload), decision framework (pagination, persisted queries, REST coexistence), quality guardrails (server-accurate directives and resolver APIs).\n\nUse this skill when designing GraphQL schemas, implementing resolvers, reviewing query/mutation/subscription patterns, stabilizing GraphQL in production, or tuning Apollo/Mercurius/Yoga/other servers.\n\nCombine with **`api-design-pro`** for contract governance, **`security-pro`** for GraphQL-specific hardening, **`nestjs-pro`** / **`postgresql-pro`** / **`testing-pro`** / **`caching-pro`** per integration map.\n\nTriggers: \"graphql\", \"schema\", \"resolver\", \"query\", \"mutation\", \"subscription\", \"n+1\", \"dataloader\", \"federation\", \"persisted query\", \"graphql edge case\", \"Apollo\", \"Mercurius\", \"complexity limit\", \"introspection\", \"GraphQL Playground\".\n",
@@ -292,6 +310,12 @@
     "name": "karpathy-coding-pro",
     "description": "Andrej Karpathy's 4 principles for LLM-assisted coding: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution. Derived from Karpathy's observations on common LLM coding pitfalls.\n\nUse this skill when the user wants to improve LLM coding behavior, reduce unnecessary changes, get cleaner diffs, or explicitly apply Karpathy's philosophy to any coding task.\n\nUse **with** any domain skill (`react-pro`, `auth-pro`, etc.) to apply Karpathy principles in that domain.\n\nTriggers: \"Karpathy\", \"think before coding\", \"simplicity first\", \"surgical changes\", \"goal-driven\", \"fewer unnecessary changes\", \"cleaner diffs\", \"reduce overengineering\", \"stop guessing\", \"ask before assuming\".\n",
     "domain": "meta-coding"
+  },
+  {
+    "id": "kubernetes-pro",
+    "name": "kubernetes-pro",
+    "description": "Expert Kubernetes (K8s) orchestration covering manifests, Helm, Kustomize, security, networking, and cluster management.",
+    "domain": "cloud"
   },
   {
     "id": "market-research-pro",
@@ -414,10 +438,22 @@
     "domain": "General"
   },
   {
+    "id": "product-management-pro",
+    "name": "product-management-pro",
+    "description": "Expert Product Management covering discovery, roadmapping, PRD writing, user research, and Agile leadership.",
+    "domain": "business-analysis"
+  },
+  {
     "id": "prompt-engineering-pro",
     "name": "prompt-engineering-pro",
     "description": "Design, optimize, and version prompts for LLM applications: system prompts, few-shot patterns, chain-of-thought, structured outputs, prompt caching, and A/B testing.\n\nUse this skill when designing prompts for an LLM application, optimizing token usage, comparing prompt variants, implementing structured output (JSON mode), or building a prompt versioning system.\n\nDo not use for building the full agent pipeline (use ai-integration-pro) or for evaluating prompt quality (use agent-evaluation-pro).\n\nTriggers: \"prompt design\", \"system prompt\", \"chain of thought\", \"few-shot\", \"structured output\", \"JSON mode\", \"prompt template\", \"prompt versioning\", \"prompt caching\", \"optimize tokens\", \"prompt engineering\", \"prompt comparison\", \"prompt A/B test\".\n",
     "domain": "ai-integration"
+  },
+  {
+    "id": "python-pro",
+    "name": "python-pro",
+    "description": "Expert Python development covering modern Python 3.12+, type hinting, async, dependency management (Poetry/UV), and testing.",
+    "domain": "data-ai"
   },
   {
     "id": "react-native-pro",

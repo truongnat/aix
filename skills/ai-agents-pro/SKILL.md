@@ -1,0 +1,93 @@
+---
+name: ai-agents-pro
+description: Expert design and orchestration of autonomous AI agents, multi-agent systems, tool use, and persistent memory.
+metadata:
+  short-description: AI Agents — Autonomy, Multi-agent Systems, Tool Use, Memory, Orchestration
+  content-language: en
+  domain: data-ai
+  level: professional
+---
+
+# AI Agents Pro
+
+Expert-level orchestration of autonomous AI agents. Focuses on goal-driven reasoning, multi-agent collaboration, and reliable tool integration.
+
+## Boundary
+
+**`ai-agents-pro`** covers agent architectures (ReAct, Plan-and-Execute), multi-agent frameworks (LangGraph, CrewAI, AutoGen), tool-use (Function calling), and agentic memory (Short-term, Long-term/RAG). It does NOT cover training base models.
+
+## When to use
+
+- Building an autonomous agent to perform complex, multi-step tasks.
+- Designing a multi-agent system where agents collaborate or compete.
+- Implementing long-term memory and state management for an agent.
+- Integrating external tools (APIs, Databases, CLI) into an agent's reasoning loop.
+
+## Workflow
+
+1. **Agent Definition**: Define the agent's role, goals, and constraints.
+2. **Architecture Selection**: Choose between single-agent (ReAct) or multi-agent (State-machine/Graph).
+3. **Tool Design**: Define clear, typed interfaces for tools (JSON Schema).
+4. **Reasoning Loop**: Implement the loop for planning, execution, and reflection.
+5. **Memory Integration**: Set up persistent state and RAG for long-term context.
+6. **Evaluation**: Test agent reliability and safety against adversarial inputs.
+
+### Operating principles
+
+- **Agentic Loops**: Prefer iterative loops with reflection over linear execution.
+- **Tool Reliability**: Tools must be idempotent and handle errors gracefully.
+- **Safety First**: Implement guardrails for agent actions, especially for write operations.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior AI Agent Architect.
+</Role>
+
+<Architecture>
+[Agent/Multi-agent flow description]
+</Architecture>
+
+<Implementation>
+[Agentic logic Artifact: LangGraph code, Tool definitions, or Prompts]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan: Agentic trace or logs]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| AI Agents Roadmap | [roadmap.sh/ai-agents](https://roadmap.sh/ai-agents) |
+| LangGraph Docs | [langchain-ai.github.io/langgraph](https://langchain-ai.github.io/langgraph/) |
+| CrewAI Docs | [docs.crewai.com](https://docs.crewai.com) |
+| OpenAI Tool Use | [platform.openai.com/docs/guides/function-calling](https://platform.openai.com/docs/guides/function-calling) |
+
+## Quick example
+
+**Architecture:** A research agent that uses a search tool and then summarizes.
+
+```python
+# Conceptual LangGraph snippet
+workflow = StateGraph(AgentState)
+workflow.add_node("agent", call_model)
+workflow.add_node("action", call_tool)
+workflow.add_edge("agent", "action", should_continue)
+```
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Agent reasoning flow and tool dependencies planned.
+- [ ] **Simplicity First**: Simple ReAct loop used unless multi-agent complexity is required.
+- [ ] **Surgical Changes**: Only updated relevant agent nodes or tools.
+- [ ] **Goal-Driven Execution**: Agent successfully reached the goal in testing.
+- [ ] Reflection/Self-correction loops implemented.
+- [ ] Tool definitions have clear descriptions and schemas.
+- [ ] Safety guardrails and rate limiting for agentic actions included.

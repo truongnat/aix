@@ -211,6 +211,19 @@
     ]
   },
   {
+    "name": "ai-agents-pro",
+    "folder": "ai-agents-pro",
+    "description": "Expert design and orchestration of autonomous AI agents, multi-agent systems, tool use, and persistent memory.",
+    "triggers": [],
+    "when_to_use": [
+      "Building an autonomous agent to perform complex, multi-step tasks.",
+      "Designing a multi-agent system where agents collaborate or compete.",
+      "Implementing long-term memory and state management for an agent.",
+      "Integrating external tools (APIs, Databases, CLI) into an agent's reasoning loop."
+    ],
+    "references": []
+  },
+  {
     "name": "ai-design-pro",
     "folder": "ai-design-pro",
     "description": "AI-enhanced design practices using generative tools, AI assistants, and automated workflows: image generation, rapid prototyping, AI-driven UX decisions, motion graphics, photorealistic visuals, and automated image processing.\n\nUse this skill when working with AI design tools (Midjourney, DALL-E, Stable Diffusion, Runway, Figma AI, Adobe Firefly), generating design assets from text prompts, automating image processing pipelines, or making data-driven design decisions with AI.\n\nDo not use for traditional design principles or manual design techniques (use design-system-pro), basic UI/UX layout (use ui-design-brain-pro), or accessibility (use a11y-design-pro).\n\nTriggers: \"AI design\", \"generative design\", \"AI image generation\", \"DALL-E\", \"Midjourney\", \"Stable Diffusion\", \"Runway\", \"Figma AI\", \"Adobe Firefly\", \"AI prototyping\", \"AI color palette\", \"AI design assistant\", \"AI motion graphics\", \"text to image\".",
@@ -545,6 +558,19 @@
       "versions.md",
       "workload-machine-auth.md"
     ]
+  },
+  {
+    "name": "aws-pro",
+    "folder": "aws-pro",
+    "description": "Expert AWS architecture and management covering core services (EC2, S3, RDS, Lambda), IAM security, and Infrastructure as Code (Terraform/CDK).",
+    "triggers": [],
+    "when_to_use": [
+      "Designing a highly available, multi-region architecture on AWS.",
+      "Implementing least-privilege IAM policies.",
+      "Automating infrastructure deployment using Terraform or AWS CDK.",
+      "Optimizing AWS costs and performance for existing workloads."
+    ],
+    "references": []
   },
   {
     "name": "azure-storage",
@@ -1837,6 +1863,19 @@
     ]
   },
   {
+    "name": "go-pro",
+    "folder": "go-pro",
+    "description": "Expert Go (Golang) development covering concurrency, interface-driven design, testing, and cloud-native application patterns.",
+    "triggers": [],
+    "when_to_use": [
+      "Building high-performance microservices or infrastructure tools.",
+      "Implementing complex concurrent logic using goroutines and channels.",
+      "Refactoring Go code for better testability through interfaces.",
+      "Optimizing CPU/Memory usage through profiling (`pprof`)."
+    ],
+    "references": []
+  },
+  {
     "name": "graphql-pro",
     "folder": "graphql-pro",
     "description": "Production-grade GraphQL: schema design, resolver architecture, execution model (parse → validate → execute), performance (N+1, DataLoader, complexity limits), security (field-level authZ, introspection, query abuse), federation/monolith trade-offs — plus failure modes (null propagation, DoS queries, federated skew, subscription overload), decision framework (pagination, persisted queries, REST coexistence), quality guardrails (server-accurate directives and resolver APIs).\n\nUse this skill when designing GraphQL schemas, implementing resolvers, reviewing query/mutation/subscription patterns, stabilizing GraphQL in production, or tuning Apollo/Mercurius/Yoga/other servers.\n\nCombine with **`api-design-pro`** for contract governance, **`security-pro`** for GraphQL-specific hardening, **`nestjs-pro`** / **`postgresql-pro`** / **`testing-pro`** / **`caching-pro`** per integration map.\n\nTriggers: \"graphql\", \"schema\", \"resolver\", \"query\", \"mutation\", \"subscription\", \"n+1\", \"dataloader\", \"federation\", \"persisted query\", \"graphql edge case\", \"Apollo\", \"Mercurius\", \"complexity limit\", \"introspection\", \"GraphQL Playground\".",
@@ -2064,6 +2103,19 @@
     "references": [
       "applying-principles-in-practice.md"
     ]
+  },
+  {
+    "name": "kubernetes-pro",
+    "folder": "kubernetes-pro",
+    "description": "Expert Kubernetes (K8s) orchestration covering manifests, Helm, Kustomize, security, networking, and cluster management.",
+    "triggers": [],
+    "when_to_use": [
+      "Designing a scalable deployment strategy (Canary, Blue/Green) on K8s.",
+      "Writing Helm charts for complex applications.",
+      "Hardening K8s security through RBAC and Pod Security Standards.",
+      "Troubleshooting container connectivity or resource issues in a cluster."
+    ],
+    "references": []
   },
   {
     "name": "market-research-pro",
@@ -2876,6 +2928,19 @@
     ]
   },
   {
+    "name": "product-management-pro",
+    "folder": "product-management-pro",
+    "description": "Expert Product Management covering discovery, roadmapping, PRD writing, user research, and Agile leadership.",
+    "triggers": [],
+    "when_to_use": [
+      "Defining the vision and roadmap for a new product or feature.",
+      "Writing a comprehensive PRD to align engineering and design teams.",
+      "Conducting user interviews and synthesising feedback into actionable items.",
+      "Prioritizing backlogs using frameworks like RICE or MoSCoW."
+    ],
+    "references": []
+  },
+  {
     "name": "prompt-engineering-pro",
     "folder": "prompt-engineering-pro",
     "description": "Design, optimize, and version prompts for LLM applications: system prompts, few-shot patterns, chain-of-thought, structured outputs, prompt caching, and A/B testing.\n\nUse this skill when designing prompts for an LLM application, optimizing token usage, comparing prompt variants, implementing structured output (JSON mode), or building a prompt versioning system.\n\nDo not use for building the full agent pipeline (use ai-integration-pro) or for evaluating prompt quality (use agent-evaluation-pro).\n\nTriggers: \"prompt design\", \"system prompt\", \"chain of thought\", \"few-shot\", \"structured output\", \"JSON mode\", \"prompt template\", \"prompt versioning\", \"prompt caching\", \"optimize tokens\", \"prompt engineering\", \"prompt comparison\", \"prompt A/B test\".",
@@ -2912,6 +2977,19 @@
       "system-prompt-architecture.md",
       "token-optimization-and-caching.md"
     ]
+  },
+  {
+    "name": "python-pro",
+    "folder": "python-pro",
+    "description": "Expert Python development covering modern Python 3.12+, type hinting, async, dependency management (Poetry/UV), and testing.",
+    "triggers": [],
+    "when_to_use": [
+      "Building scalable backends or CLI tools in Python.",
+      "Writing type-safe, maintainable AI/ML scripts.",
+      "Refactoring legacy Python code to modern 3.12+ standards.",
+      "Optimizing performance through async or C-extensions (Cython)."
+    ],
+    "references": []
   },
   {
     "name": "react-native-pro",
