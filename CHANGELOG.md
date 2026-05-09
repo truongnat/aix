@@ -24,6 +24,7 @@
 * add 4 pro-level design skills - frontend-design-pro, ui-ux-system-pro, shadcn-mastery-pro, motion-design-pro ([ebf8b9f](https://github.com/truongnat/skills/commit/ebf8b9f69e3fff325a4419d13629cc77a1fbd749))
 * add comprehensive template suite for new skill development ([9b364d2](https://github.com/truongnat/skills/commit/9b364d2ed42a9d328ec4f2b2d3c2f26fef25eff1))
 * add deep domain-specific references for 4 design skills ([e8c8c9e](https://github.com/truongnat/skills/commit/e8c8c9e4df3a0c61b5c91b98616bb1c2d337194a))
+* add document analysis script using markitdown and update skill search filter syntax ([3323658](https://github.com/truongnat/skills/commit/3323658ae41f2889e78987cb4235f6539e6fe1dc))
 * add ESLint config, expand CI gates, update docs and gitignore ([2738637](https://github.com/truongnat/skills/commit/27386377145cd6afc3000eecef0a266013606aa1))
 * add git-operations-pro skill and enhance installation scripts; update README for improved usage instructions ([acc4d0c](https://github.com/truongnat/skills/commit/acc4d0c591ce7ab613e68339f00f33c0ffc7e18e))
 * add minimal example prompt to documentation, including system and user prompt templates; provide guidance on replacing placeholders with actual content ([dffe2ab](https://github.com/truongnat/skills/commit/dffe2ab5b3f2757eeef3949b96fd000ea9eb13e6))
