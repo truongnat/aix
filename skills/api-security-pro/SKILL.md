@@ -1,0 +1,100 @@
+---
+name: api-security-pro
+description: Expert-level API security based on OWASP API Top 10, including OAuth2, OIDC, Rate Limiting, and JWT hardening.
+metadata:
+  short-description: API Security — OWASP Top 10, OAuth2, JWT, Rate Limiting
+  content-language: en
+  domain: security
+  level: professional
+---
+
+# API Security Pro
+
+Expert-level defensive and offensive security for web APIs. Focuses on preventing unauthorized access, data leaks, and resource abuse.
+
+## Boundary
+
+**`api-security-pro`** covers Authentication (OAuth2, OIDC, API Keys), Authorization (RBAC, ABAC), Input Validation, Rate Limiting, and JWT security. It does NOT cover general network firewalling or frontend-only security.
+
+## When to use
+
+- Designing a secure authentication flow for a microservices architecture.
+- Implementing rate limiting and anti-DDoS measures for an API.
+- Hardening JWT implementation (algorithms, rotations, claims).
+- Auditing an API for OWASP API Top 10 vulnerabilities (BOLA, BFLA, etc.).
+
+## Workflow
+
+1. **Threat Modeling**: Identify API endpoints and potential attack vectors (Insecure direct object references, mass assignment).
+2. **AuthN/AuthZ Design**: Implement robust OAuth2 flows and granular permission checks.
+3. **Input Sanitization**: Enforce strict schemas (Zod/JSON Schema) for all requests.
+4. **Resiliency**: Set up rate limiting, timeouts, and circuit breakers.
+5. **Observability**: Implement security logging and real-time alerting for anomalies.
+6. **Compliance Check**: Ensure headers (CORS, CSP, HSTS) are strictly configured.
+
+### Operating principles
+
+- **Zero Trust**: Never assume a request is safe because it comes from a "trusted" client.
+- **Fail Closed**: Security checks must fail by denying access, not allowing it.
+- **Principle of Least Privilege**: Give users and systems only the permissions they absolutely need.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior API Security Architect.
+</Role>
+
+<Feature>
+[Security Component Description]
+</Feature>
+
+<Implementation>
+[Code Artifacts: Middleware, Auth config, or Schema validation]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| API Security Roadmap | [roadmap.sh/api-security](https://roadmap.sh/api-security) |
+| OWASP API Top 10 | [owasp.org/www-project-api-security](https://owasp.org/www-project-api-security/) |
+| Auth0 OAuth2 Guide | [auth0.com/docs/get-started/authentication-and-authorization-flow](https://auth0.com/docs/get-started/authentication-and-authorization-flow) |
+
+## Quick example
+
+**Feature:** Implement Zod-based Input Validation to prevent Mass Assignment.
+
+```typescript
+import { z } from 'zod';
+
+const UpdateUserSchema = z.object({
+  name: z.string().optional(),
+  bio: z.string().optional(),
+  // isAdmin is EXCLUDED here to prevent mass assignment
+});
+
+export async function PATCH(req: Request) {
+  const body = await req.json();
+  const validated = UpdateUserSchema.parse(body);
+  // ... update database with validated data only
+}
+```
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Potential BOLA/BFLA vectors identified in endpoints.
+- [ ] **Simplicity First**: Simple RBAC preferred over complex ABAC if sufficient.
+- [ ] **Surgical Changes**: Security middleware applied precisely to sensitive routes.
+- [ ] **Goal-Driven Execution**: Unauthorized access attempts correctly blocked.
+- [ ] OAuth2/OIDC flows correctly implemented.
+- [ ] JWT tokens secured with RS256/EdDSA and expiration.
+- [ ] Rate limiting and CORS policies configured.

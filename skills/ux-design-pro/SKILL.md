@@ -1,0 +1,91 @@
+---
+name: ux-design-pro
+description: Comprehensive User Experience (UX) design including research, information architecture, wireframing, and accessibility standards.
+metadata:
+  short-description: UX Design — Research, IA, Wireframing, Accessibility, Design Systems
+  content-language: en
+  domain: design
+  level: professional
+---
+
+# UX Design Pro
+
+Expert-level orchestration of user experience strategies. Focuses on creating products that are not only beautiful but usable, accessible, and aligned with user needs.
+
+## Boundary
+
+**`ux-design-pro`** covers User Research, Information Architecture (IA), Wireframing, User Flows, and Accessibility (WCAG). It coordinates with `ui-design-brain-pro` for visual execution. It does NOT cover frontend development or graphic design for marketing.
+
+## When to use
+
+- Designing a new product feature from the user's perspective.
+- Auditing an existing application for usability or accessibility issues.
+- Creating a comprehensive Design System and Information Architecture.
+- Mapping out complex user journeys and state transitions.
+
+## Workflow
+
+1. **Discovery**: Conduct user research and define personas/problems.
+2. **Definition**: Create user stories and define the core value proposition.
+3. **Ideation**: Map out User Flows and Information Architecture.
+4. **Prototyping**: Create low-fidelity wireframes and high-fidelity mockups.
+5. **Testing**: Plan and conduct usability testing to validate design decisions.
+6. **Hand-off**: Document design tokens, spacing, and accessibility requirements for developers.
+
+### Operating principles
+
+- **User-Centricity**: Every design decision must solve a real user problem.
+- **Accessibility is not Optional**: Design for everyone from day one (WCAG 2.2).
+- **Consistency over Novelty**: Use established patterns (Design Systems) to reduce cognitive load.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior UX Researcher & Designer.
+</Role>
+
+<Problem>
+[The user pain point or business goal]
+</Problem>
+
+<Solution>
+[UX Strategy: IA, Flow, or Design Pattern]
+</Solution>
+
+<Implementation>
+[Wireframes (Mermaid/ASCII) or Design System Specs]
+</Implementation>
+
+<Verification>
+[User testing plan or Accessibility audit steps]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| UX Roadmap | [roadmap.sh/ux-design](https://roadmap.sh/ux-design) |
+| Nielsen Norman Group | [nngroup.com](https://www.nngroup.com) |
+| Laws of UX | [lawsofux.com](https://lawsofux.com) |
+| W3C Accessibility | [w3.org/WAI](https://www.w3.org/WAI) |
+
+## Quick example
+
+**Problem:** Users are dropping off during the multi-step registration form.
+
+**Solution:** Implement a "Chunked" approach with a progress indicator and save-for-later capability to reduce perceived effort.
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: User problem and success metrics defined.
+- [ ] **Simplicity First**: Minimalist design that removes all unnecessary friction.
+- [ ] **Surgical Changes**: Improved the UX with the least amount of structural disruption.
+- [ ] **Goal-Driven Execution**: Usability validated through testing or heuristic evaluation.
+- [ ] Accessibility (WCAG) compliance verified.
+- [ ] Mobile-first responsive strategies applied.
+- [ ] Design tokens and system consistency maintained.

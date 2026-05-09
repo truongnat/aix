@@ -325,6 +325,19 @@
     ]
   },
   {
+    "name": "ai-red-teaming-pro",
+    "folder": "ai-red-teaming-pro",
+    "description": "Advanced security testing for AI systems, specializing in prompt injection, jailbreaking, and model robustness.",
+    "triggers": [],
+    "when_to_use": [
+      "Auditing an LLM-based application for security vulnerabilities.",
+      "Designing defenses against prompt injection attacks.",
+      "Performing robustness testing on a machine learning model.",
+      "Setting up automated safety evaluation gates."
+    ],
+    "references": []
+  },
+  {
     "name": "algorithm-pro",
     "folder": "algorithm-pro",
     "description": "Professional algorithm engineering: formal modeling, problem taxonomy (optimization, counting, online, …), strategy selection (greedy/DP/graph/search), correctness and complexity proofs, pattern recognition, competitive debugging (WA/TLE/MLE), systems constraints (memory, IO, streaming), and performance trade-offs.\n\nUse this skill when the user designs or optimizes algorithms, compares approaches, proves correctness, solves hard CS problems, or tunes implementations under strict limits.\n\nUse **with** **`testing-pro`** for adversarial and property-based tests, **`data-analysis-pro`** for benchmarks, **`network-infra-pro`** / **`caching-pro`** when algorithms run in distributed or cached pipelines.\n\nTriggers: \"algorithm\", \"data structure\", \"dynamic programming\", \"graph\", \"greedy\", \"complexity\", \"Big-O\", \"optimize\", \"proof\", \"LeetCode\", \"competitive programming\", \"two pointers\", \"binary search on answer\", \"Dijkstra\", \"bitmask\", \"TLE\", \"WA\", \"MLE\", \"overflow\", \"streaming\", \"batch\", \"pattern\", \"prefix sum\", \"segment tree\".",
@@ -442,6 +455,19 @@
       "versions.md",
       "workflow-and-state-transitions.md"
     ]
+  },
+  {
+    "name": "api-security-pro",
+    "folder": "api-security-pro",
+    "description": "Expert-level API security based on OWASP API Top 10, including OAuth2, OIDC, Rate Limiting, and JWT hardening.",
+    "triggers": [],
+    "when_to_use": [
+      "Designing a secure authentication flow for a microservices architecture.",
+      "Implementing rate limiting and anti-DDoS measures for an API.",
+      "Hardening JWT implementation (algorithms, rotations, claims).",
+      "Auditing an API for OWASP API Top 10 vulnerabilities (BOLA, BFLA, etc.)."
+    ],
+    "references": []
   },
   {
     "name": "auth-pro",
@@ -846,6 +872,19 @@
       "tips-and-tricks.md",
       "versions.md"
     ]
+  },
+  {
+    "name": "claude-code-pro",
+    "folder": "claude-code-pro",
+    "description": "Expert optimization for Claude-native tools (Claude Code CLI, Projects, Artifacts). Focuses on long-context management and model-specific capabilities.",
+    "triggers": [],
+    "when_to_use": [
+      "Setting up a professional Claude Project for a large codebase.",
+      "Optimizing complex prompts to reduce token usage while maintaining precision.",
+      "Orchestrating Claude Code CLI for automated refactoring or testing.",
+      "Designing interactive UI demos using Claude Artifacts."
+    ],
+    "references": []
   },
   {
     "name": "clean-architecture",
@@ -1704,6 +1743,19 @@
     "references": []
   },
   {
+    "name": "fullstack-pro",
+    "folder": "fullstack-pro",
+    "description": "Comprehensive Fullstack development in 2026: Next.js 15, Server Actions, shadcn/ui, and AI integration.\nUse this skill to architect, implement, and review end-to-end fullstack features.",
+    "triggers": [],
+    "when_to_use": [
+      "Building a new feature from database schema to UI components.",
+      "Architecting a complex module (Auth, Payment, Dashboard).",
+      "Reviewing an entire feature for consistency, performance, and security.",
+      "Integrating AI capabilities into an existing application."
+    ],
+    "references": []
+  },
+  {
     "name": "fullstack-rag-pro",
     "folder": "fullstack-rag-pro",
     "description": "Building production-grade Retrieval-Augmented Generation (RAG) pipelines with Vector DBs and hybrid search.",
@@ -2155,6 +2207,19 @@
       "tips-and-tricks.md",
       "versions.md"
     ]
+  },
+  {
+    "name": "mlops-pro",
+    "folder": "mlops-pro",
+    "description": "Professional-grade Machine Learning Operations (MLOps) covering model versioning, feature stores, CI/CD for ML, and monitoring.",
+    "triggers": [],
+    "when_to_use": [
+      "Designing a CI/CD pipeline for machine learning models.",
+      "Implementing model monitoring and drift detection.",
+      "Setting up a centralized feature store for a data team.",
+      "Architecting a scalable model serving infrastructure on Kubernetes."
+    ],
+    "references": []
   },
   {
     "name": "mobile-design-pro",
@@ -3194,22 +3259,15 @@
   {
     "name": "senior-architect",
     "folder": "senior-architect",
-    "description": "Comprehensive software architecture skill for designing scalable, maintainable systems using ReactJS, NextJS, NodeJS, Express, React Native, Swift, Kotlin, Flutter, Postgres, GraphQL, Go, Python. Includes architecture diagram generation, system design patterns, tech stack decision frameworks, and dependency analysis. Use when designing system architecture, making technical decisions, creating architecture diagrams, evaluating trade-offs, or defining integration patterns.",
+    "description": "Comprehensive software architecture skill for designing scalable, maintainable systems using modern tech stacks. Includes architecture diagram generation, system design patterns, tech stack decision frameworks, and dependency analysis.",
     "triggers": [],
     "when_to_use": [
       "Use this skill when:",
-      "Designing system architecture",
-      "Making technical decisions",
-      "Creating architecture diagrams",
-      "Evaluating trade-offs",
-      "Defining integration patterns",
-      "Analyzing dependencies",
-      "Selecting tech stacks",
-      "DO NOT use this skill for:",
-      "Implementation details (use framework-specific skills: react-pro, nextjs-pro, nestjs-pro, etc.)",
-      "Infrastructure deployment (use ci-cd-pro, docker-pro skills)",
-      "Database schema design (use database-specific skills)",
-      "API endpoint design (use api-design-pro skill)"
+      "Designing system architecture from scratch.",
+      "Making high-level technical decisions and tech stack selections.",
+      "Creating architecture diagrams (C4 model, Sequence, ERD).",
+      "Evaluating trade-offs (CAP theorem, Scalability vs Latency).",
+      "Defining integration patterns for microservices or modular monoliths."
     ],
     "references": [
       "architecture_patterns.md",
@@ -4119,6 +4177,19 @@
     ]
   },
   {
+    "name": "ux-design-pro",
+    "folder": "ux-design-pro",
+    "description": "Comprehensive User Experience (UX) design including research, information architecture, wireframing, and accessibility standards.",
+    "triggers": [],
+    "when_to_use": [
+      "Designing a new product feature from the user's perspective.",
+      "Auditing an existing application for usability or accessibility issues.",
+      "Creating a comprehensive Design System and Information Architecture.",
+      "Mapping out complex user journeys and state transitions."
+    ],
+    "references": []
+  },
+  {
     "name": "vercel-deployment-pro",
     "folder": "vercel-deployment-pro",
     "description": "Best practices for deploying fullstack applications to Vercel, including Edge Functions, ISR/SSG strategies, and caching.",
@@ -4128,6 +4199,19 @@
       "Optimizing Serverless Function execution times.",
       "Configuring Edge Functions for middleware or fast data fetching.",
       "Setting up Vercel Data products (KV, Postgres, Blob)."
+    ],
+    "references": []
+  },
+  {
+    "name": "vibe-coding-pro",
+    "folder": "vibe-coding-pro",
+    "description": "The 2026 paradigm of AI-assisted, high-velocity coding. Focuses on intuition, rapid iteration, and effective \"vibe-based\" collaboration with AI.",
+    "triggers": [],
+    "when_to_use": [
+      "Rapidly prototyping a new idea or MVP.",
+      "Exploring a new technology or API through iterative AI interaction.",
+      "Refactoring large codebases by setting a \"vibe\" (architectural direction).",
+      "Building complex UIs through descriptive, iterative refinement."
     ],
     "references": []
   },

@@ -1,95 +1,99 @@
 ---
 name: senior-architect
-description: Comprehensive software architecture skill for designing scalable, maintainable systems using ReactJS, NextJS, NodeJS, Express, React Native, Swift, Kotlin, Flutter, Postgres, GraphQL, Go, Python. Includes architecture diagram generation, system design patterns, tech stack decision frameworks, and dependency analysis. Use when designing system architecture, making technical decisions, creating architecture diagrams, evaluating trade-offs, or defining integration patterns.
+description: Comprehensive software architecture skill for designing scalable, maintainable systems using modern tech stacks. Includes architecture diagram generation, system design patterns, tech stack decision frameworks, and dependency analysis.
 metadata:
-  short-description: "Architecture — scalable system design, diagrams, tech stack decisions"
+  short-description: Architecture — Scalable System Design, Diagrams, Tech Stack Decisions, Vibe Coding
+  content-language: en
+  domain: architecture
+  level: professional
 ---
+
+# Senior Architect
+
+Expert-level guidance for designing robust, scalable, and evolutionary software systems.
 
 ## Boundary
 
-This skill provides comprehensive software architecture guidance for designing scalable, maintainable systems using ReactJS, NextJS, NodeJS, Express, React Native, Swift, Kotlin, Flutter, Postgres, GraphQL, Go, Python. It focuses on architecture diagram generation, system design patterns, tech stack decision frameworks, and dependency analysis. It does NOT cover implementation details (use framework-specific skills) or infrastructure deployment (use devops-specific skills).
+This skill provides comprehensive software architecture guidance for designing systems across Web, Mobile, and Cloud. It focuses on architecture diagrams, system design patterns, tech stack decision frameworks, and dependency analysis. Implementation details are owned by framework-specific skills (e.g., `react-pro`, `nextjs-pro`).
 
 ## When to use
 
 Use this skill when:
-- Designing system architecture
-- Making technical decisions
-- Creating architecture diagrams
-- Evaluating trade-offs
-- Defining integration patterns
-- Analyzing dependencies
-- Selecting tech stacks
-
-DO NOT use this skill for:
-- Implementation details (use framework-specific skills: react-pro, nextjs-pro, nestjs-pro, etc.)
-- Infrastructure deployment (use ci-cd-pro, docker-pro skills)
-- Database schema design (use database-specific skills)
-- API endpoint design (use api-design-pro skill)
+- Designing system architecture from scratch.
+- Making high-level technical decisions and tech stack selections.
+- Creating architecture diagrams (C4 model, Sequence, ERD).
+- Evaluating trade-offs (CAP theorem, Scalability vs Latency).
+- Defining integration patterns for microservices or modular monoliths.
 
 ## Workflow
 
-1. **Understand requirements** (functional, non-functional, constraints)
-2. **Select appropriate tools** (diagram generator, project architect, dependency analyzer)
-3. **Design the architecture** (components, layers, patterns)
-4. **Generate architecture diagrams** for visualization
-5. **Evaluate trade-offs** (performance, scalability, maintainability)
-6. **Document decisions** and rationale
-7. **Review and iterate** with stakeholders
+1. **Requirement Analysis**: Gather functional and non-functional requirements (SLIs/SLOs).
+2. **Context Mapping**: Define system boundaries and external dependencies.
+3. **Pattern Selection**: Choose appropriate architecture patterns (Event-driven, Microservices, etc.).
+4. **Tech Stack Decision**: Use decision frameworks (ADRs) to select technologies.
+5. **Diagramming**: Generate visual representations of the system.
+6. **Trade-off Evaluation**: Document the "Why" behind the "What".
 
 ### Operating principles
 
-- **Scalability First**: Design for horizontal scaling and growth
-- **Separation of Concerns**: Clear boundaries between layers and components
-- **SOLID Principles**: Apply SOLID principles to architecture design
-- **Trade-off Analysis**: Explicitly evaluate and document trade-offs
-- **Documentation**: Maintain up-to-date architecture diagrams
-- **Dependency Management**: Minimize coupling, maximize cohesion
-- **Technology Fit**: Choose technologies based on requirements, not trends
-- **Evolutionary Architecture**: Design for change and evolution
+- **Scalability First**: Design for horizontal scaling and growth.
+- **Separation of Concerns**: Clear boundaries between layers and components.
+- **Evolutionary Architecture**: Design for change and incremental upgrades.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
 
-## Suggested response format
+## Suggested response format (STRICT)
 
-```
-Architecture Type: [monolith / microservices / serverless / hybrid]
-Tech Stack: [languages, frameworks, databases]
-Diagram: [architecture diagram or file path]
-Status: [success/failed]
-Details: [architecture decisions, trade-offs, patterns used]
-Next steps: [follow-up actions if any]
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior Software Architect.
+</Role>
+
+<Context>
+[Requirement summary and architectural constraints]
+</Context>
+
+<Design>
+- Pattern: [e.g. Event-driven]
+- Stack: [e.g. Next.js 15, Go, Kafka, PostgreSQL]
+- Diagram: [Mermaid diagram]
+</Design>
+
+<Rationale>
+[Detailed architectural decisions and trade-offs]
+</Rationale>
+
+<Verification>
+[Step-by-step verification plan for the architecture]
+</Verification>
 ```
 
 ## Resources in this skill
 
-- **Architecture Diagram Generator**: Automated diagram creation
-- **Project Architect**: Project structure and organization
-- **Dependency Analyzer**: Dependency analysis and visualization
-- **Design Patterns**: System design patterns and best practices
-- **Tech Stack Decision Frameworks**: Frameworks for technology selection
-- **Integration Patterns**: Integration patterns and approaches
+| Topic | Reference |
+|-------|-----------|
+| Software Architect Roadmap | [roadmap.sh/software-architect](https://roadmap.sh/software-architect) |
+| System Design Primer | [github.com/donnemartin/system-design-primer](https://github.com/donnemartin/system-design-primer) |
+| Architecture Patterns | [references/architecture_patterns.md](file:///Users/truongdev/Documents/projects/labs/skills/references/architecture_patterns.md) |
+| Tech Decision Guide | [references/tech_decision_guide.md](file:///Users/truongdev/Documents/projects/labs/skills/references/tech_decision_guide.md) |
 
 ## Quick example
 
-**Design a microservices architecture:**
-
-```
-1. Analyze requirements and constraints
-2. Define service boundaries
-3. Select communication patterns (REST, GraphQL, gRPC)
-4. Design data architecture (databases per service vs shared)
-5. Generate architecture diagram
-6. Document trade-offs and decisions
-```
+**Design a microservices architecture for E-commerce:**
+1. Define service boundaries (Orders, Catalog, Auth).
+2. Select communication patterns (gRPC for internal, REST for external).
+3. Design data architecture (Database per service).
+4. Evaluate trade-offs (Consistency vs Availability).
 
 ## Checklist before calling the skill done
-
-- [ ] Requirements are clearly defined
-- [ ] Non-functional requirements are identified (performance, scalability, availability)
-- [ ] Constraints are understood (budget, timeline, team skills)
-- [ ] Technology preferences are known
-- [ ] Integration requirements are defined
-- [ ] Deployment environment is understood
-- [ ] Stakeholders are identified
-- [ ] Documentation requirements are defined
+- [ ] **Think Before Coding**: Functional and non-functional requirements clearly defined.
+- [ ] **Simplicity First**: Avoided over-engineering; chose the simplest architecture that scales.
+- [ ] **Surgical Changes**: Architectural updates are modular and minimize blast radius.
+- [ ] **Goal-Driven Execution**: Architecture validated against SLOs and business goals.
+- [ ] System boundaries and interaction patterns documented.
+- [ ] Tech stack decisions justified with ADRs.
+- [ ] Diagrams generated for all major components.
 
 ---
 

@@ -1,0 +1,86 @@
+---
+name: vibe-coding-pro
+description: The 2026 paradigm of AI-assisted, high-velocity coding. Focuses on intuition, rapid iteration, and effective "vibe-based" collaboration with AI.
+metadata:
+  short-description: Vibe Coding — High-Velocity AI Development, Intuition-Led Prototyping
+  content-language: en
+  domain: development-paradigm
+  level: professional
+---
+
+# Vibe Coding Pro
+
+Master the art of "Vibe Coding" — the high-speed, 2026-native approach to building software where the human provides the intuition and the AI handles the implementation.
+
+## Boundary
+
+**`vibe-coding-pro`** covers rapid prototyping, AI-native workflows (Cursor, Claude Code), and techniques for communicating complex ideas to LLMs via "vibes" (sketches, high-level intent, and iterative feedback). It does NOT replace traditional software engineering fundamentals but augments them for extreme speed.
+
+## When to use
+
+- Rapidly prototyping a new idea or MVP.
+- Exploring a new technology or API through iterative AI interaction.
+- Refactoring large codebases by setting a "vibe" (architectural direction).
+- Building complex UIs through descriptive, iterative refinement.
+
+## Workflow
+
+1. **Vibe Check**: Define the core "feel" and intent of the feature. What is the success state?
+2. **AI Initiation**: Provide a high-level, descriptive prompt to seed the initial implementation.
+3. **Iterative Loop**: Use "natural language debugging" to refine the output. "Make it feel more like X," "Fix that weird overlap," etc.
+4. **Surgical Refinement**: Once the "vibe" is right, use surgical edits to fix edge cases and performance.
+5. **Validation**: Run the AI-generated code and verify it matches the mental model.
+6. **Hardening**: Convert the "vibe" into stable code by adding tests and types.
+
+### Operating principles
+
+- **Speed is a Feature**: Don't get bogged down in perfect architecture early on. Get it working, then refine.
+- **Trust but Verify**: Let the AI lead the implementation, but you must be the ultimate judge of correctness.
+- **Descriptive over Imperative**: Tell the AI *what* you want to achieve, not *how* to write every line.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Expert Vibe Coder / AI Software Architect.
+</Role>
+
+<Intent>
+[The high-level "vibe" and goal]
+</Intent>
+
+<Implementation>
+[Rapid code artifacts: Usually a single, cohesive block or a clear diff]
+</Implementation>
+
+<NextIteration>
+[Suggested feedback or refinements for the next loop]
+</NextIteration>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| Vibe Coding Manifesto | [vibe-coding.com](https://vibe-coding.com) |
+| Claude Code Docs | [docs.anthropic.com/claude/docs/claude-code](https://docs.anthropic.com/claude/docs/claude-code) |
+| Cursor Best Practices | [cursor.com/docs](https://cursor.com/docs) |
+
+## Quick example
+
+**Intent:** "Build a glassmorphism dashboard that feels like a futuristic spaceship interface."
+
+**Implementation:** *Generates a single React component with heavy Tailwind blur, neon borders, and subtle animations.*
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Core "vibe" and success criteria clearly defined.
+- [ ] **Simplicity First**: Achieved the goal with the minimum necessary AI interactions.
+- [ ] **Surgical Changes**: Refined the initial AI output without destroying the core logic.
+- [ ] **Goal-Driven Execution**: The result matches the initial "vibe" and works as intended.
+- [ ] Responsive design works across mobile/desktop.
+- [ ] Micro-animations added for that "premium feel".
+- [ ] Code is readable enough for future hardening.

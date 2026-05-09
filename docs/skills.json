@@ -48,6 +48,12 @@
     "domain": "ai-integration"
   },
   {
+    "id": "ai-red-teaming-pro",
+    "name": "ai-red-teaming-pro",
+    "description": "Advanced security testing for AI systems, specializing in prompt injection, jailbreaking, and model robustness.",
+    "domain": "security"
+  },
+  {
     "id": "algorithm-pro",
     "name": "algorithm-pro",
     "description": "Professional algorithm engineering: formal modeling, problem taxonomy (optimization, counting, online, …), strategy selection (greedy/DP/graph/search), correctness and complexity proofs, pattern recognition, competitive debugging (WA/TLE/MLE), systems constraints (memory, IO, streaming), and performance trade-offs.\n\nUse this skill when the user designs or optimizes algorithms, compares approaches, proves correctness, solves hard CS problems, or tunes implementations under strict limits.\n\nUse **with** **`testing-pro`** for adversarial and property-based tests, **`data-analysis-pro`** for benchmarks, **`network-infra-pro`** / **`caching-pro`** when algorithms run in distributed or cached pipelines.\n\nTriggers: \"algorithm\", \"data structure\", \"dynamic programming\", \"graph\", \"greedy\", \"complexity\", \"Big-O\", \"optimize\", \"proof\", \"LeetCode\", \"competitive programming\", \"two pointers\", \"binary search on answer\", \"Dijkstra\", \"bitmask\", \"TLE\", \"WA\", \"MLE\", \"overflow\", \"streaming\", \"batch\", \"pattern\", \"prefix sum\", \"segment tree\".\n",
@@ -58,6 +64,12 @@
     "name": "api-design-pro",
     "description": "Professional API design guidance: contract-first REST/RPC/event interfaces, resource and action modeling, mutation semantics and concurrency (PUT/PATCH/DELETE, upsert, soft delete, bulk), workflow and state-transition APIs, query/filter/search/projection, async jobs and webhooks, consistency and conflicts, versioning, pagination, error models, idempotency, backward compatibility, observability and governance, and production edge cases.\n\nUse this skill when designing new APIs, reviewing API changes, improving contract consistency, or planning backward-compatible evolution.\n\nTriggers: \"api design\", \"rest api\", \"endpoint\", \"contract\", \"versioning\", \"pagination\", \"error model\", \"idempotency\", \"backward compatibility\", \"schema evolution\", \"openapi\", \"swagger\", \"429\", \"400 vs 500\", \"webhook\", \"HATEOAS\", \"rate limit\", \"resource modeling\", \"nested resource\", \"bulk api\", \"ETag\", \"If-Match\", \"workflow api\", \"state transition\", \"cursor pagination\", \"async job\", \"202 accepted\", \"webhook signing\", \"projection\", \"sparse fieldset\", \"include expand\".\n\nCombine with `security-pro` for threat-focused hardening and `testing-pro` for contract and integration verification.\n",
     "domain": "api-design"
+  },
+  {
+    "id": "api-security-pro",
+    "name": "api-security-pro",
+    "description": "Expert-level API security based on OWASP API Top 10, including OAuth2, OIDC, Rate Limiting, and JWT hardening.",
+    "domain": "security"
   },
   {
     "id": "auth-pro",
@@ -100,6 +112,12 @@
     "name": "ci-cd-pro",
     "description": "Production-grade CI/CD system design: pipeline control plane vs runner execution, trigger-to-deploy data flow, immutable artifact and digest promotion, GitHub Actions and GitLab CI/CD patterns, secrets/OIDC/IAM boundaries, caching and parallelism economics, deployment strategies (blue-green, canary, rolling), merge queue and migration gates, failure-mode detection/mitigation, pipeline observability and governance (cost, audit, approvals), artifact signing/provenance hooks, fork/untrusted PR safety, self-hosted runner risk, and YAML quality guardrails — not syntax tutorials alone.\n\nUse when designing or reviewing pipelines, workflows, runners, OIDC deploys, release automation, branch protection, merge queues, flake strategy in CI, supply-chain gates, or aligning CI with rollout/rollback beyond the workflow file.\n\nUse with docker-pro, deployment-pro, testing-pro, security-pro, git-operations-pro, code-packaging-pro, postgresql-pro as needed.\n\nTriggers: \"GitHub Actions\", \"GitLab CI\", \"CircleCI\", \"Jenkins\", \"pipeline\", \"workflow\", \"YAML\", \".github/workflows\", \".gitlab-ci.yml\", \"runner\", \"OIDC\", \"Workload identity\", \"artifact\", \"digest\", \"provenance\", \"SBOM\", \"matrix\", \"concurrency\", \"environment protection\", \"merge queue\", \"branch protection\", \"fork PR secrets\", \"self-hosted runner\", \"flake\", \"canary\", \"blue-green\", \"rollback\", \"migration pipeline\", \"DORA\", \"immutable tag\".\n",
     "domain": "ci-cd"
+  },
+  {
+    "id": "claude-code-pro",
+    "name": "claude-code-pro",
+    "description": "Expert optimization for Claude-native tools (Claude Code CLI, Projects, Artifacts). Focuses on long-context management and model-specific capabilities.",
+    "domain": "development-tooling"
   },
   {
     "id": "clean-architecture",
@@ -216,10 +234,16 @@
     "domain": "General"
   },
   {
+    "id": "fullstack-pro",
+    "name": "fullstack-pro",
+    "description": "Comprehensive Fullstack development in 2026: Next.js 15, Server Actions, shadcn/ui, and AI integration.\nUse this skill to architect, implement, and review end-to-end fullstack features.\n",
+    "domain": "fullstack"
+  },
+  {
     "id": "fullstack-rag-pro",
     "name": "fullstack-rag-pro",
     "description": "Building production-grade Retrieval-Augmented Generation (RAG) pipelines with Vector DBs and hybrid search.",
-    "domain": "General"
+    "domain": "ai-integration"
   },
   {
     "id": "gemini-api-dev",
@@ -288,6 +312,12 @@
     "domain": "microservices"
   },
   {
+    "id": "mlops-pro",
+    "name": "mlops-pro",
+    "description": "Professional-grade Machine Learning Operations (MLOps) covering model versioning, feature stores, CI/CD for ML, and monitoring.",
+    "domain": "data-ai"
+  },
+  {
     "id": "mobile-design-pro",
     "name": "mobile-design-pro",
     "description": "Production-grade mobile product design: touch targets, safe areas, thumb reach, density, navigation (tabs, stacks, sheets), iOS vs Material behavior, keyboards and forms, accessibility on small screens, offline and permissions — plus mobile UX constraint layers (hardware → OS chrome → layout), failure modes (tiny CTAs, keyboard occlusion, gesture conflict, RTL/fold issues, motion-only cues), trade-offs (parity vs native-first, density), guardrails (44pt vs 48dp honesty, no store approval promises).\n\nUse this skill when designing or reviewing **mobile-native** UX (phone/tablet), gestures, onboarding, foldables, or comparing HIG vs Material.\n\nUse **with** **`design-system-pro`** (tokens, dark mode), **`react-native-pro`** / **`flutter-pro`** (SafeArea, navigation, keyboard avoidance), **`testing-pro`**, **`performance-tuning-pro`**, **`security-pro`** when sensitive UI matters. This skill owns **mobile-specific UX rules**; framework skills own **code**.\n\nTriggers: \"mobile design\", \"mobile UX\", \"iOS HIG\", \"Material Design mobile\", \"touch target\", \"safe area\", \"notch\", \"bottom navigation\", \"thumb zone\", \"one-handed\", \"mobile keyboard\", \"gesture\", \"bottom sheet\", \"mobile onboarding\", \"tablet layout\", \"foldable\", \"mobile a11y\", \"VoiceOver\", \"TalkBack\", \"dynamic type\", \"hitSlop\", \"home indicator\", \"predictive back\", \"reduce motion\", \"large content size\", \"split view iPad\", \"Cupertino vs Material\".\n",
@@ -315,7 +345,7 @@
     "id": "nextjs-15-pro",
     "name": "nextjs-15-pro",
     "description": "Expert-level implementation of Next.js 15 features including Server Actions, Partial Prerendering (PPR), React 19 hooks, and Turbopack.",
-    "domain": "General"
+    "domain": "web-framework"
   },
   {
     "id": "nextjs-pro",
@@ -434,8 +464,8 @@
   {
     "id": "senior-architect",
     "name": "senior-architect",
-    "description": "Comprehensive software architecture skill for designing scalable, maintainable systems using ReactJS, NextJS, NodeJS, Express, React Native, Swift, Kotlin, Flutter, Postgres, GraphQL, Go, Python. Includes architecture diagram generation, system design patterns, tech stack decision frameworks, and dependency analysis. Use when designing system architecture, making technical decisions, creating architecture diagrams, evaluating trade-offs, or defining integration patterns.",
-    "domain": "General"
+    "description": "Comprehensive software architecture skill for designing scalable, maintainable systems using modern tech stacks. Includes architecture diagram generation, system design patterns, tech stack decision frameworks, and dependency analysis.",
+    "domain": "architecture"
   },
   {
     "id": "senior-backend",
@@ -588,10 +618,22 @@
     "domain": "ux-systems"
   },
   {
+    "id": "ux-design-pro",
+    "name": "ux-design-pro",
+    "description": "Comprehensive User Experience (UX) design including research, information architecture, wireframing, and accessibility standards.",
+    "domain": "design"
+  },
+  {
     "id": "vercel-deployment-pro",
     "name": "vercel-deployment-pro",
     "description": "Best practices for deploying fullstack applications to Vercel, including Edge Functions, ISR/SSG strategies, and caching.",
-    "domain": "General"
+    "domain": "devops"
+  },
+  {
+    "id": "vibe-coding-pro",
+    "name": "vibe-coding-pro",
+    "description": "The 2026 paradigm of AI-assisted, high-velocity coding. Focuses on intuition, rapid iteration, and effective \"vibe-based\" collaboration with AI.",
+    "domain": "development-paradigm"
   },
   {
     "id": "web-research-pro",

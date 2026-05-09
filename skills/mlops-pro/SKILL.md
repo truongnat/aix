@@ -1,0 +1,95 @@
+---
+name: mlops-pro
+description: Professional-grade Machine Learning Operations (MLOps) covering model versioning, feature stores, CI/CD for ML, and monitoring.
+metadata:
+  short-description: MLOps — Model Lifecycle, Feature Stores, ML Pipelines, Monitoring
+  content-language: en
+  domain: data-ai
+  level: professional
+---
+
+# MLOps Pro
+
+Expert-level orchestration of machine learning systems. Focuses on bridging the gap between data science and operations to ensure reliable, scalable AI deployment.
+
+## Boundary
+
+**`mlops-pro`** covers the operational side of AI: data versioning (DVC), model registries (MLflow), feature stores (Feast), and serving (Triton, Seldon). It does NOT cover model research or deep mathematical training logic.
+
+## When to use
+
+- Designing a CI/CD pipeline for machine learning models.
+- Implementing model monitoring and drift detection.
+- Setting up a centralized feature store for a data team.
+- Architecting a scalable model serving infrastructure on Kubernetes.
+
+## Workflow
+
+1. **Data Governance**: Implement data versioning and lineage tracking.
+2. **Feature Engineering**: Centralize transformations in a feature store.
+3. **Training Automation**: Orchestrate training jobs with experiment tracking.
+4. **Model Registry**: Manage model versions and stage transitions (Staging -> Prod).
+5. **Deployment**: Deploy via Canary or Blue/Green strategies.
+6. **Monitoring**: Track prediction drift and data quality metrics.
+
+### Operating principles
+
+- **Reproducibility**: Every model must be traceable back to its exact code, data, and environment.
+- **Automation over Manual**: Eliminate manual model hand-offs between DS and DevOps.
+- **Monitoring is Mandatory**: A model without monitoring is a liability.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior MLOps Engineer.
+</Role>
+
+<Feature>
+[MLOps Component Description]
+</Feature>
+
+<Implementation>
+[Code Artifacts: CI/CD yaml, Monitoring scripts, or Registry config]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| MLOps Roadmap | [roadmap.sh/mlops](https://roadmap.sh/mlops) |
+| MLflow | [mlflow.org](https://mlflow.org) |
+| DVC | [dvc.org](https://dvc.org) |
+| Feast | [feast.dev](https://feast.dev) |
+
+## Quick example
+
+**Feature:** Set up experiment tracking with MLflow.
+
+```python
+import mlflow
+
+mlflow.set_tracking_uri("http://localhost:5000")
+with mlflow.start_run():
+    mlflow.log_param("alpha", 0.5)
+    mlflow.log_metric("rmse", 0.1)
+    mlflow.log_artifact("model.pkl")
+```
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Data lineage and model ownership defined.
+- [ ] **Simplicity First**: Simple serving wrapper preferred over complex orchestration if possible.
+- [ ] **Surgical Changes**: Only updated the relevant parts of the ML pipeline.
+- [ ] **Goal-Driven Execution**: Model metrics and drift triggers verified.
+- [ ] Experiment tracking integrated (MLflow/Weights & Biases).
+- [ ] Model versioning and registry transitions defined.
+- [ ] Monitoring and alerting for data/model drift included.
