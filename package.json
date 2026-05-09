@@ -1,5 +1,5 @@
 {
-  "name": "@truongnat/devkit",
+  "name": "@david-choi/devkit",
   "version": "1.0.1",
   "description": "Production-grade agent skills, workflows, and knowledge base for AI-assisted development.",
   "publishConfig": {

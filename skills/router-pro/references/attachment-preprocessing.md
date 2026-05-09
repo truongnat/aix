@@ -45,7 +45,7 @@ node .agents/devkit/dist/tools.js analyze-doc path/to/file.pdf path/to/spec.docx
 From the npm package:
 
 ```bash
-npx @truongnat/devkit analyze-doc path/to/file.pdf
+npx @david-choi/devkit analyze-doc path/to/file.pdf
 ```
 
 Direct fallback when the repo helper is unavailable:

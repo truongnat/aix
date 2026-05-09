@@ -2,7 +2,7 @@
   <h1>🚀 Skills Devkit</h1>
   <p><strong>Production-grade AI Agent Skills, Workflows & Knowledge Base</strong></p>
   
-  [![npm version](https://img.shields.io/npm/v/@truongnat/devkit.svg)](https://npmjs.org/package/@truongnat/devkit)
+  [![npm version](https://img.shields.io/npm/v/@david-choi/devkit.svg)](https://npmjs.org/package/@david-choi/devkit)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   [![CI](https://github.com/truongnat/skills/actions/workflows/ci.yml/badge.svg)](https://github.com/truongnat/skills/actions)
   [![Skills: 101](https://img.shields.io/badge/Skills-101-blue.svg)](#)
@@ -29,7 +29,7 @@
 Initialize the Skills Devkit in any project folder:
 
 ```bash
-npx @truongnat/devkit@latest
+npx @david-choi/devkit@latest
 ```
 
 *This will automatically sync the devkit bundle (skills, workflows, rules, commands) to your local project.*

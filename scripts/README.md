@@ -4,7 +4,7 @@ All runtime tooling is now implemented in TypeScript and compiled to `dist/tools
 
 ## Primary entrypoints
 
-- Install/uninstall bundle CLI: `node dist/own-skills.js` (npm bin: **`devkit`** or **`own-skills`**) or `npx github:truongnat/skills`. Full install syncs to **`.agents/devkit/`**.
+- Install/uninstall bundle CLI: `node dist/own-skills.js` (npm bin: **`devkit`** or **`own-skills`**) or `npx @david-choi/devkit`. Full install syncs to **`.agents/devkit/`**.
 - Tool command runner: `node dist/tools.js <command> ...`.
 - Unified script wrapper: `node scripts/tools.js <command> ...` (simpler alternative to bash wrappers)
 
@@ -45,7 +45,7 @@ node .agents/devkit/dist/tools.js analyze-doc path/to/file.pdf path/to/spec.docx
 When using the npm package directly, the installer bin forwards tool commands into the bundled tools runner:
 
 ```bash
-npx @truongnat/devkit analyze-doc path/to/file.pdf
+npx @david-choi/devkit analyze-doc path/to/file.pdf
 ```
 
 This helper is bundled with devkit and wraps Microsoft's MarkItDown CLI when available. MarkItDown itself is optional but recommended for cleaner PDF/Office extraction; install it only after the user confirms optional tooling is allowed:

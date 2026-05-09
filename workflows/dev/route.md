@@ -27,7 +27,7 @@ Automatically analyze a user request, research and optimize the prompt for clari
 2. **Preprocess attached files or local paths**
    - If file-processing intent is ambiguous, clarify the goal and file scope before starting
    - If the request includes files, read text/code directly and optionally convert document formats with MarkItDown before optimizing
-   - MarkItDown is optional but recommended for PDF/Office extraction; use the bundled `node .agents/devkit/dist/tools.js analyze-doc <file...>` or `npx @truongnat/devkit analyze-doc <file...>`
+   - MarkItDown is optional but recommended for PDF/Office extraction; use the bundled `node .agents/devkit/dist/tools.js analyze-doc <file...>` or `npx @david-choi/devkit analyze-doc <file...>`
    - If MarkItDown is missing, notify the user and ask before installing it
    - Capture provenance: filename, extraction method, relevant section/page/sheet, and uncertainty
    - Keep only the minimum extracted context needed for routing and execution
