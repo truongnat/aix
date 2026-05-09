@@ -57,6 +57,7 @@
     "query-graph": "node dist/tools.js query-graph",
     "impact-analysis": "node dist/tools.js impact-analysis",
     "generate-gap-analysis": "node dist/tools.js generate-gap-analysis",
+    "analyze-doc": "tsx src/analyze-document.ts",
     "sync-catalogs": "node dist/tools.js sync-catalogs",
     "prepare": "husky"
   },

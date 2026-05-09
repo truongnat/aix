@@ -32,8 +32,8 @@ function renderSkills(skills) {
 
 skillSearch.addEventListener('input', (e) => {
   const query = e.target.value.toLowerCase();
-  const filtered = allSkills.filter(skill => 
-    skill.name.toLowerCase().includes(query) || 
+  const filtered = allSkills.filter(skill =>
+    skill.name.toLowerCase().includes(query) ||
     skill.description.toLowerCase().includes(query) ||
     skill.id.toLowerCase().includes(query)
   );
