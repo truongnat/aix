@@ -1,0 +1,103 @@
+---
+name: data-engineering-pro
+description: Expert Data Engineering development covering ETL/ELT pipelines, distributed processing (Spark, Flink), message queues (Kafka), and data warehouse architecture (Snowflake, BigQuery).
+metadata:
+  short-description: Data Engineering — ETL/ELT, Kafka, Spark, Airflow, Data Warehousing
+  content-language: en
+  domain: data-ai
+  level: professional
+---
+
+# Data Engineering Pro
+
+Expert-level orchestration of scalable data pipelines and storage architecture. Focuses on turning raw data into structured, actionable insights at scale.
+
+## Boundary
+
+**`data-engineering-pro`** covers Data Ingestion (Kafka, Kinesis), Orchestration (Airflow, Dagster), Processing (Spark, dbt), and Storage (Snowflake, BigQuery, Data Lakes). It does NOT cover machine learning model training (use `machine-learning-pro`) or advanced analytics (use `data-science-pro`).
+
+## When to use
+
+- Building robust ETL or ELT pipelines for analytical databases.
+- Designing a data warehouse or data lake architecture.
+- Implementing real-time event streaming architectures with Kafka.
+- Optimizing slow data transformation jobs (e.g., rewriting in PySpark or dbt).
+
+## Workflow
+
+1. **Architecture Planning**: Choose between Batch (Airflow/dbt) or Streaming (Kafka/Flink).
+2. **Ingestion**: Design connectors to extract data from operational databases or APIs.
+3. **Storage**: Define the raw storage layer (S3, GCS) and the structured warehouse (Snowflake).
+4. **Transformation**: Write scalable data transformations using SQL or PySpark.
+5. **Orchestration**: Schedule and monitor pipelines using Airflow or Prefect.
+6. **Data Quality**: Implement data validation tests (Great Expectations) to ensure reliability.
+
+### Operating principles
+
+- **Idempotency**: Data pipelines must be re-runnable without causing data duplication.
+- **ELT over ETL**: Extract and Load raw data first, then Transform it within the scalable data warehouse.
+- **Data as a Product**: Treat datasets with the same rigor as software (versioning, quality checks, SLAs).
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior Data Engineer.
+</Role>
+
+<Architecture>
+[Data Pipeline or Storage Architecture Description]
+</Architecture>
+
+<Implementation>
+[Data Engineering Artifact: Airflow DAG, PySpark script, or dbt model]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan with Data Quality checks]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| Data Engineer Roadmap | [roadmap.sh/data-engineer](https://roadmap.sh/data-engineer) |
+| Apache Airflow Docs | [airflow.apache.org/docs](https://airflow.apache.org/docs/) |
+| dbt Documentation | [docs.getdbt.com](https://docs.getdbt.com) |
+| Apache Kafka Docs | [kafka.apache.org/documentation](https://kafka.apache.org/documentation/) |
+
+## Quick example
+
+**Architecture:** A simple dbt model to aggregate daily user signups.
+
+```sql
+-- models/marts/core/fct_daily_signups.sql
+{{ config(materialized='table') }}
+
+WITH raw_users AS (
+    SELECT * FROM {{ ref('stg_users') }}
+),
+daily_aggregated AS (
+    SELECT
+        DATE_TRUNC('day', created_at) AS signup_date,
+        COUNT(user_id) AS total_signups
+    FROM raw_users
+    GROUP BY 1
+)
+
+SELECT * FROM daily_aggregated
+```
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Data volume, velocity, and schema evolution planned.
+- [ ] **Simplicity First**: Simple SQL/dbt used over complex distributed frameworks (Spark) if data fits in memory/warehouse.
+- [ ] **Surgical Changes**: Modified only necessary pipeline stages or transformations.
+- [ ] **Goal-Driven Execution**: Verified data output matches expected schema and quality rules.
+- [ ] Pipeline is fully idempotent (can be safely retried).
+- [ ] Data quality tests (e.g., null checks, uniqueness) are implemented.
+- [ ] PII and sensitive data are appropriately masked or secured.

@@ -1324,6 +1324,32 @@
     ]
   },
   {
+    "name": "data-engineering-pro",
+    "folder": "data-engineering-pro",
+    "description": "Expert Data Engineering development covering ETL/ELT pipelines, distributed processing (Spark, Flink), message queues (Kafka), and data warehouse architecture (Snowflake, BigQuery).",
+    "triggers": [],
+    "when_to_use": [
+      "Building robust ETL or ELT pipelines for analytical databases.",
+      "Designing a data warehouse or data lake architecture.",
+      "Implementing real-time event streaming architectures with Kafka.",
+      "Optimizing slow data transformation jobs (e.g., rewriting in PySpark or dbt)."
+    ],
+    "references": []
+  },
+  {
+    "name": "data-science-pro",
+    "folder": "data-science-pro",
+    "description": "Expert Data Science development covering statistical analysis, Exploratory Data Analysis (EDA), machine learning (Scikit-Learn), and data visualization.",
+    "triggers": [],
+    "when_to_use": [
+      "Performing Exploratory Data Analysis (EDA) on a new dataset.",
+      "Designing and analyzing A/B tests to validate product changes.",
+      "Building predictive models (Classification, Regression, Clustering) using traditional ML.",
+      "Creating comprehensive data visualizations to communicate findings to stakeholders."
+    ],
+    "references": []
+  },
+  {
     "name": "deployment-pro",
     "folder": "deployment-pro",
     "description": "Production-grade software deployment and release engineering: deployment runtime model (control plane vs workloads, artifact promotion graph, drift, consistency expectations per platform), CI/CD flows and gates, hosting trade-offs (static, PaaS, containers, serverless, VM), release strategies (rolling, blue-green, canary, recreate, feature flags), GitOps promotion, environments and rollback literacy, coordinated DB migrations (expand/contract handoff), failure modes (crash loops, PDB blocks, regional canary failure, forward-only migrations, CDN mixed assets), decision frameworks (staging vs prod-only mitigation), observability-linked deploy markers, OIDC/supply-chain pointers — cross-stack orchestration narrative, not vendor-docs paste.\n\nUse when designing pipelines, promoting builds, choosing rollout strategies, debugging failed deploys, zero-downtime migrations, rollback, GitOps drift, multi-region concerns.\n\nCombine with testing-pro, security-pro, postgresql-pro, code-packaging-pro, ci-cd-pro, git-operations-pro, network-infra-pro, caching-pro, api-design-pro, framework skills as needed.\n\nTriggers: \"deploy\", \"deployment\", \"rollback\", \"canary\", \"blue-green\", \"rolling\", \"Kubernetes\", \"Helm\", \"GitOps\", \"Argo CD\", \"Flux\", \"promote\", \"staging\", \"production\", \"immutable artifact\", \"digest\", \"readiness probe\", \"liveness\", \"PDB\", \"crashloop\", \"drift\", \"zero downtime\", \"migration deploy\", \"expand contract\", \"traffic shift\", \"Lambda alias\", \"CloudFront\", \"rollout undo\", \"SLO deploy\".",
@@ -2283,6 +2309,19 @@
       "Writing Helm charts for complex applications.",
       "Hardening K8s security through RBAC and Pod Security Standards.",
       "Troubleshooting container connectivity or resource issues in a cluster."
+    ],
+    "references": []
+  },
+  {
+    "name": "machine-learning-pro",
+    "folder": "machine-learning-pro",
+    "description": "Expert Machine Learning development covering Deep Learning, PyTorch/TensorFlow, Model Fine-tuning, NLP, and Computer Vision.",
+    "triggers": [],
+    "when_to_use": [
+      "Designing and training a custom neural network using PyTorch.",
+      "Fine-tuning a pre-trained Large Language Model (LLM) on custom data.",
+      "Implementing an image classification or object detection pipeline.",
+      "Optimizing a deep learning model for inference speed (Quantization, Pruning)."
     ],
     "references": []
   },
@@ -3819,6 +3858,19 @@
       "Web3 integration (use web3-specific skills)",
       "Non-Solidity smart contracts (use those specific skills)",
       "Backend infrastructure security (use security-pro skill)"
+    ],
+    "references": []
+  },
+  {
+    "name": "spring-boot-pro",
+    "folder": "spring-boot-pro",
+    "description": "Expert Spring Boot development covering REST APIs, Spring Data JPA, Dependency Injection, Security, and Microservices architecture.",
+    "triggers": [],
+    "when_to_use": [
+      "Building robust, enterprise-grade REST APIs in Java.",
+      "Implementing data access layers using Spring Data JPA and Hibernate.",
+      "Securing web applications with JWT or OAuth2 via Spring Security.",
+      "Designing modular architectures using standard Spring Stereotypes (`@Controller`, `@Service`, `@Repository`)."
     ],
     "references": []
   },

@@ -1,0 +1,109 @@
+---
+name: data-science-pro
+description: Expert Data Science development covering statistical analysis, Exploratory Data Analysis (EDA), machine learning (Scikit-Learn), and data visualization.
+metadata:
+  short-description: Data Science — EDA, Pandas, Stats, Scikit-Learn, Visualization
+  content-language: en
+  domain: data-ai
+  level: professional
+---
+
+# Data Science Pro
+
+Expert-level orchestration of analytical workflows and statistical modeling. Focuses on extracting actionable insights from data through rigorous analysis and scientific methods.
+
+## Boundary
+
+**`data-science-pro`** covers Data Wrangling (Pandas, NumPy), Exploratory Data Analysis (EDA), Statistical Testing (A/B testing, Hypothesis testing), traditional Machine Learning (Scikit-Learn, XGBoost), and Visualization (Matplotlib, Seaborn). It does NOT cover deep learning/LLM training (use `machine-learning-pro`) or building production data pipelines (use `data-engineering-pro`).
+
+## When to use
+
+- Performing Exploratory Data Analysis (EDA) on a new dataset.
+- Designing and analyzing A/B tests to validate product changes.
+- Building predictive models (Classification, Regression, Clustering) using traditional ML.
+- Creating comprehensive data visualizations to communicate findings to stakeholders.
+
+## Workflow
+
+1. **Problem Definition**: Define the business question or hypothesis.
+2. **Data Acquisition & Cleaning**: Gather data and handle missing values, outliers, and formats.
+3. **Exploratory Data Analysis (EDA)**: Understand distributions, correlations, and basic patterns.
+4. **Feature Engineering**: Create new meaningful features from raw data.
+5. **Modeling & Evaluation**: Train statistical or ML models and evaluate using appropriate metrics (F1-score, RMSE).
+6. **Communication**: Present findings visually and document actionable business recommendations.
+
+### Operating principles
+
+- **Garbage In, Garbage Out**: The quality of your analysis depends entirely on the quality of your data cleaning.
+- **Start Simple**: Always start with a simple baseline model (e.g., Logistic Regression) before trying complex algorithms.
+- **Explainability**: In business contexts, an interpretable model is often more valuable than a slightly more accurate "black box".
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior Data Scientist.
+</Role>
+
+<Methodology>
+[Description of statistical approach or ML methodology]
+</Methodology>
+
+<Implementation>
+[Data Science Artifact: Python/Pandas script, Jupyter Notebook snippet, or Model logic]
+</Implementation>
+
+<Verification>
+[Validation plan: Cross-validation, P-value checks, or Visual checks]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| Data Scientist Roadmap | [roadmap.sh/data-scientist](https://roadmap.sh/data-scientist) |
+| Pandas Documentation | [pandas.pydata.org/docs](https://pandas.pydata.org/docs/) |
+| Scikit-Learn | [scikit-learn.org/stable](https://scikit-learn.org/stable/) |
+| Statistical Learning (ISLR) | [statlearning.com](https://www.statlearning.com/) |
+
+## Quick example
+
+**Methodology:** Fill missing values and train a Random Forest Classifier.
+
+```python
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Data Prep
+df = pd.read_csv('data.csv')
+df.fillna(df.median(), inplace=True)
+
+X = df.drop('target', axis=1)
+y = df['target']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Modeling
+clf = RandomForestClassifier(n_estimators=100)
+clf.fit(X_train, y_train)
+
+# Evaluation
+preds = clf.predict(X_test)
+print(f"Accuracy: {accuracy_score(y_test, preds):.2f}")
+```
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Statistical assumptions and bias in the dataset analyzed.
+- [ ] **Simplicity First**: Simple models and clear visualizations prioritized.
+- [ ] **Surgical Changes**: Only applied necessary transformations or model tuning.
+- [ ] **Goal-Driven Execution**: Verified model performance against a holdout test set.
+- [ ] Data leakage prevented (e.g., scaling applied *after* train-test split).
+- [ ] Visualizations are accessible, labeled, and tell a clear story.
+- [ ] Statistical significance tested where appropriate.

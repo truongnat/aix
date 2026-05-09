@@ -204,6 +204,18 @@
     "domain": "data-analysis"
   },
   {
+    "id": "data-engineering-pro",
+    "name": "data-engineering-pro",
+    "description": "Expert Data Engineering development covering ETL/ELT pipelines, distributed processing (Spark, Flink), message queues (Kafka), and data warehouse architecture (Snowflake, BigQuery).",
+    "domain": "data-ai"
+  },
+  {
+    "id": "data-science-pro",
+    "name": "data-science-pro",
+    "description": "Expert Data Science development covering statistical analysis, Exploratory Data Analysis (EDA), machine learning (Scikit-Learn), and data visualization.",
+    "domain": "data-ai"
+  },
+  {
     "id": "deployment-pro",
     "name": "deployment-pro",
     "description": "Production-grade software deployment and release engineering: deployment runtime model (control plane vs workloads, artifact promotion graph, drift, consistency expectations per platform), CI/CD flows and gates, hosting trade-offs (static, PaaS, containers, serverless, VM), release strategies (rolling, blue-green, canary, recreate, feature flags), GitOps promotion, environments and rollback literacy, coordinated DB migrations (expand/contract handoff), failure modes (crash loops, PDB blocks, regional canary failure, forward-only migrations, CDN mixed assets), decision frameworks (staging vs prod-only mitigation), observability-linked deploy markers, OIDC/supply-chain pointers — cross-stack orchestration narrative, not vendor-docs paste.\n\nUse when designing pipelines, promoting builds, choosing rollout strategies, debugging failed deploys, zero-downtime migrations, rollback, GitOps drift, multi-region concerns.\n\nCombine with testing-pro, security-pro, postgresql-pro, code-packaging-pro, ci-cd-pro, git-operations-pro, network-infra-pro, caching-pro, api-design-pro, framework skills as needed.\n\nTriggers: \"deploy\", \"deployment\", \"rollback\", \"canary\", \"blue-green\", \"rolling\", \"Kubernetes\", \"Helm\", \"GitOps\", \"Argo CD\", \"Flux\", \"promote\", \"staging\", \"production\", \"immutable artifact\", \"digest\", \"readiness probe\", \"liveness\", \"PDB\", \"crashloop\", \"drift\", \"zero downtime\", \"migration deploy\", \"expand contract\", \"traffic shift\", \"Lambda alias\", \"CloudFront\", \"rollout undo\", \"SLO deploy\".\n",
@@ -394,6 +406,12 @@
     "name": "kubernetes-pro",
     "description": "Expert Kubernetes (K8s) orchestration covering manifests, Helm, Kustomize, security, networking, and cluster management.",
     "domain": "cloud"
+  },
+  {
+    "id": "machine-learning-pro",
+    "name": "machine-learning-pro",
+    "description": "Expert Machine Learning development covering Deep Learning, PyTorch/TensorFlow, Model Fine-tuning, NLP, and Computer Vision.",
+    "domain": "data-ai"
   },
   {
     "id": "market-research-pro",
@@ -646,6 +664,12 @@
     "name": "solidity-security",
     "description": "Master smart contract security best practices to prevent common vulnerabilities and implement secure Solidity patterns. Use when writing smart contracts, auditing existing contracts, or implementing security measures for blockchain applications.",
     "domain": "General"
+  },
+  {
+    "id": "spring-boot-pro",
+    "name": "spring-boot-pro",
+    "description": "Expert Spring Boot development covering REST APIs, Spring Data JPA, Dependency Injection, Security, and Microservices architecture.",
+    "domain": "backend"
   },
   {
     "id": "sql-data-access-pro",

@@ -1,0 +1,107 @@
+---
+name: spring-boot-pro
+description: Expert Spring Boot development covering REST APIs, Spring Data JPA, Dependency Injection, Security, and Microservices architecture.
+metadata:
+  short-description: Spring Boot — REST APIs, JPA, Dependency Injection, Microservices, Security
+  content-language: en
+  domain: backend
+  level: professional
+---
+
+# Spring Boot Pro
+
+Expert-level orchestration of enterprise Java applications using Spring Boot. Focuses on the "convention over configuration" philosophy, robustness, and scalability.
+
+## Boundary
+
+**`spring-boot-pro`** covers Spring Core (IoC, Dependency Injection), Spring Web (REST APIs), Spring Data JPA (Hibernate, Repositories), Spring Security, and Spring Boot Actuator. It does NOT cover core JVM tuning (use `java-pro` for that).
+
+## When to use
+
+- Building robust, enterprise-grade REST APIs in Java.
+- Implementing data access layers using Spring Data JPA and Hibernate.
+- Securing web applications with JWT or OAuth2 via Spring Security.
+- Designing modular architectures using standard Spring Stereotypes (`@Controller`, `@Service`, `@Repository`).
+
+## Workflow
+
+1. **Project Init**: Initialize with Spring Initializr (Maven/Gradle).
+2. **Domain Modeling**: Define JPA `@Entity` classes.
+3. **Data Access**: Create Spring Data `@Repository` interfaces for database interactions.
+4. **Business Logic**: Implement `@Service` classes containing core rules.
+5. **API Layer**: Expose REST endpoints using `@RestController`.
+6. **Testing**: Write slice tests using `@WebMvcTest` or `@DataJpaTest`, and integration tests with `@SpringBootTest`.
+
+### Operating principles
+
+- **Convention over Configuration**: Rely on Spring Boot's auto-configuration; only override when absolutely necessary.
+- **Dependency Injection**: Use constructor injection for required dependencies to ensure immutability and ease of testing.
+- **Separation of Concerns**: Strictly separate the Controller, Service, and Repository layers.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior Spring Boot Engineer.
+</Role>
+
+<Feature>
+[Spring Boot Component/API Description]
+</Feature>
+
+<Implementation>
+[Clean, enterprise-grade Spring Boot Java code Artifact]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan with MockMvc or JUnit examples]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| Spring Boot Roadmap | [roadmap.sh/spring-boot](https://roadmap.sh/spring-boot) |
+| Spring Boot Reference | [docs.spring.io/spring-boot/docs/current/reference/htmlsingle](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/) |
+| Baeldung Spring Tutorials | [baeldung.com/spring-boot](https://www.baeldung.com/spring-boot) |
+| Spring Data JPA | [spring.io/projects/spring-data-jpa](https://spring.io/projects/spring-data-jpa) |
+
+## Quick example
+
+**Feature:** A REST Controller with Constructor Injection.
+
+```java
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+
+    private final UserService userService;
+
+    // Constructor Injection (recommended)
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findById(id));
+    }
+}
+```
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Layer architecture (Controller -> Service -> Repository) planned.
+- [ ] **Simplicity First**: Leveraged Spring Data methods instead of writing custom queries where possible.
+- [ ] **Surgical Changes**: Only modified relevant beans or configuration.
+- [ ] **Goal-Driven Execution**: Verified with `@SpringBootTest` and MockMvc.
+- [ ] Constructor injection used instead of `@Autowired` on fields.
+- [ ] Exception handling centralized using `@ControllerAdvice`.
+- [ ] DTOs (Data Transfer Objects) used to decouple internal entities from the API.
