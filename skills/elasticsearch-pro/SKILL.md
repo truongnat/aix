@@ -1,0 +1,100 @@
+---
+name: elasticsearch-pro
+description: Expert Elasticsearch development covering indexing strategies, DSL queries, Aggregations, and cluster performance tuning.
+metadata:
+  short-description: Elasticsearch — Indexing, Query DSL, Aggregations, Cluster Health
+  content-language: en
+  domain: database
+  level: professional
+---
+
+# Elasticsearch Pro
+
+Expert-level orchestration of Elasticsearch for search and analytics. Focuses on full-text search relevance, complex aggregations, and cluster scalability.
+
+## Boundary
+
+**`elasticsearch-pro`** covers Indexing (Mappings, Settings, Analyzers), Query DSL (Match, Bool, Filter, Fuzzy), Aggregations (Metric, Bucket), and Cluster Management (Sharding, Replicas, ILM). It does NOT cover general log management (use the broader ELK stack context for that).
+
+## When to use
+
+- Building powerful, high-relevance full-text search features.
+- Implementing real-time analytics and dashboards using aggregations.
+- Scaling search clusters to handle millions of documents and queries.
+- Optimizing search performance through custom analyzers and sharding strategies.
+
+## Workflow
+
+1. **Mapping Design**: Define field types, analyzers, and normalizers.
+2. **Ingestion**: Index documents via the Bulk API or Logstash/Beats.
+3. **Query Implementation**: Build search queries using the Query DSL.
+4. **Aggregations**: Implement analytics pipelines for real-time insights.
+5. **Optimization**: Analyze query performance with the Profile API and adjust sharding.
+6. **Maintenance**: Manage cluster health, snapshots, and index lifecycle (ILM).
+
+### Operating principles
+
+- **Relevance over Raw Speed**: Focus on getting the *right* results before optimizing for milliseconds.
+- **Understand Analyzers**: The way data is indexed determines how it can be searched.
+- **Scale Horizontally**: Use sharding and replicas to distribute load and ensure availability.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior Elasticsearch Engineer.
+</Role>
+
+<Mapping>
+[Index Mapping and Analysis settings]
+</Mapping>
+
+<Implementation>
+[Query DSL or Aggregation Artifact]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan: Kibana Console or curl]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| Elasticsearch Roadmap | [roadmap.sh/elasticsearch](https://roadmap.sh/elasticsearch) |
+| Elastic Documentation | [elastic.co/guide/en/elasticsearch/reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html) |
+| Query DSL Guide | [elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html) |
+| Aggregations Guide | [elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html) |
+
+## Quick example
+
+**Feature:** A boolean query with multi-match and filtering.
+
+```json
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "multi_match": { "query": "modern development", "fields": ["title^3", "content"] } }
+      ],
+      "filter": [
+        { "term": { "status": "published" } }
+      ]
+    }
+  }
+}
+```
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Mapping and analysis strategy planned (static vs dynamic).
+- [ ] **Simplicity First**: Standard queries used unless complex custom analyzers are needed.
+- [ ] **Surgical Changes**: Only modified relevant indices or mapping fields.
+- [ ] **Goal-Driven Execution**: Verified search relevance and performance with the Profile API.
+- [ ] Sharding and replica strategy defined based on data volume.
+- [ ] Index Lifecycle Management (ILM) policies configured for long-term data.
+- [ ] Cluster health and monitoring (Stack Monitoring) established.

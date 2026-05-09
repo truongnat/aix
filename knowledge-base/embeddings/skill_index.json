@@ -406,6 +406,19 @@
     ]
   },
   {
+    "name": "angular-pro",
+    "folder": "angular-pro",
+    "description": "Expert Angular development covering Angular 18+, Standalone Components, Signals, RxJS, and enterprise-grade architecture.",
+    "triggers": [],
+    "when_to_use": [
+      "Building large-scale enterprise frontends using Angular 18+.",
+      "Implementing reactive data flows using RxJS and Angular Signals.",
+      "Designing modular, standalone components and services.",
+      "Setting up complex routing and lazy-loading strategies."
+    ],
+    "references": []
+  },
+  {
     "name": "api-design-pro",
     "folder": "api-design-pro",
     "description": "Professional API design guidance: contract-first REST/RPC/event interfaces, resource and action modeling, mutation semantics and concurrency (PUT/PATCH/DELETE, upsert, soft delete, bulk), workflow and state-transition APIs, query/filter/search/projection, async jobs and webhooks, consistency and conflicts, versioning, pagination, error models, idempotency, backward compatibility, observability and governance, and production edge cases.\n\nUse this skill when designing new APIs, reviewing API changes, improving contract consistency, or planning backward-compatible evolution.\n\nTriggers: \"api design\", \"rest api\", \"endpoint\", \"contract\", \"versioning\", \"pagination\", \"error model\", \"idempotency\", \"backward compatibility\", \"schema evolution\", \"openapi\", \"swagger\", \"429\", \"400 vs 500\", \"webhook\", \"HATEOAS\", \"rate limit\", \"resource modeling\", \"nested resource\", \"bulk api\", \"ETag\", \"If-Match\", \"workflow api\", \"state transition\", \"cursor pagination\", \"async job\", \"202 accepted\", \"webhook signing\", \"projection\", \"sparse fieldset\", \"include expand\".\n\nCombine with `security-pro` for threat-focused hardening and `testing-pro` for contract and integration verification.",
@@ -1094,6 +1107,19 @@
     ]
   },
   {
+    "name": "cloudflare-pro",
+    "folder": "cloudflare-pro",
+    "description": "Expert Cloudflare development covering Workers, R2 Storage, D1 Database, KV, Pages, and Edge computing architecture.",
+    "triggers": [],
+    "when_to_use": [
+      "Building globally distributed, low-latency applications at the edge.",
+      "implementing serverless backends using Cloudflare Workers and D1/R2.",
+      "Designing stateful edge applications with Durable Objects.",
+      "Deploying frontend applications via Cloudflare Pages with edge functions."
+    ],
+    "references": []
+  },
+  {
     "name": "code-packaging-pro",
     "folder": "code-packaging-pro",
     "description": "Production-grade code packaging and CI build automation: artifact graph (wheel, sdist, OCI image) from source to registry; reproducible builds, lockfiles vs semver library ranges, pyproject.toml / build backends (hatchling, setuptools), multi-stage Docker and .dockerignore, GitHub Actions job graphs (lint → test → build → publish), trusted publishing OIDC to PyPI/GHCR, supply-chain hooks (SBOM, attestations pointers), failure modes (ABI mismatch, PEP 668, cache drift, fork secrets, publish races), decision trade-offs (library vs app, slim vs fat image), multi-ecosystem notes (npm), boundary with deployment runtime promotion.\n\nUse when authoring pyproject.toml, Dockerfiles, CI workflows for build/publish, choosing packaging tooling, or reviewing reproducibility and registry safety — not for choosing Kubernetes vs Lambda runtime topology alone.\n\nUse with deployment-pro, testing-pro, security-pro, ci-cd-pro, docker-pro, javascript-pro as needed.\n\nTriggers: \"pyproject.toml\", \"Dockerfile\", \"multi-stage\", \"GitHub Actions\", \"workflow yml\", \"build wheel\", \"publish PyPI\", \"trusted publishing\", \"OIDC PyPI\", \"GHCR\", \"ECR\", \"manylinux\", \"cibuildwheel\", \"dockerignore\", \"hatchling\", \"setuptools\", \"uv lock\", \"poetry export\", \"pip-tools\", \"PEP 621\", \"PEP 668\", \"sigstore\", \"SBOM\", \"npm publish\", \"package.json files\", \"digest pin\", \"reproducible build\".",
@@ -1200,6 +1226,19 @@
       "tips-and-tricks.md",
       "versions.md"
     ]
+  },
+  {
+    "name": "cpp-pro",
+    "folder": "cpp-pro",
+    "description": "Expert C++ development covering modern C++20/23 standards, RAII, Smart Pointers, Template Metaprogramming, and performance optimization.",
+    "triggers": [],
+    "when_to_use": [
+      "Building high-performance systems (Game engines, Financial trading, Compilers).",
+      "Optimizing existing codebases for memory and CPU efficiency.",
+      "Implementing low-level hardware or OS interfaces.",
+      "Developing performance-critical libraries or middleware."
+    ],
+    "references": []
   },
   {
     "name": "data-analysis-pro",
@@ -1389,6 +1428,19 @@
     ]
   },
   {
+    "name": "django-pro",
+    "folder": "django-pro",
+    "description": "Expert Django development covering the ORM, Admin interface, Django REST Framework (DRF), and enterprise application patterns.",
+    "triggers": [],
+    "when_to_use": [
+      "Building complex, data-driven backends with a rich admin interface.",
+      "Implementing robust REST APIs using Django REST Framework (DRF).",
+      "Designing applications that benefit from the \"batteries-included\" approach (Auth, Admin, ORM).",
+      "Scaling existing Django applications through caching and database optimization."
+    ],
+    "references": []
+  },
+  {
     "name": "docker-pro",
     "folder": "docker-pro",
     "description": "Production-grade Docker and container development: Dockerfile authoring, multi-stage builds, image optimization, Docker Compose, networking, volumes, secrets, BuildKit, and production hardening — plus system model (build context → layers → image digest → runtime), failure modes (cache bust, secret leak, PID 1, arch/libc mismatch, compose races, OOM), decision trade-offs (Alpine vs slim vs distroless, speed vs reproducibility), quality guardrails (no fabricated registry digests; pin bases deliberately).\n\nUse this skill when the user works on Docker, Dockerfile, docker-compose, container images, multi-stage builds, .dockerignore, image layers, container networking, volumes, bind mounts, secrets, health checks, Docker Hub, container registries, BuildKit, or containerizing Node/Python/Go/Java applications.\n\nCombine with **`ci-cd-pro`**, **`deployment-pro`**, **`security-pro`**, **`network-infra-pro`**, **`code-packaging-pro`**, **`testing-pro`** (Testcontainers), **`postgresql-pro`** when databases are containerized.\n\nTriggers: \"Docker\", \"Dockerfile\", \"docker-compose\", \"container\", \"image\", \"multi-stage build\", \"layer\", \"BuildKit\", \"COPY\", \"RUN\", \"CMD\", \"ENTRYPOINT\", \"ARG\", \"ENV\", \"volume\", \"bind mount\", \"health check\", \"registry\", \"docker push\", \"docker pull\", \"distroless\", \".dockerignore\", \"compose\", \"docker network\", \"bridge network\", \"overlay\".",
@@ -1442,6 +1494,19 @@
       "tips-and-tricks.md",
       "versions.md"
     ]
+  },
+  {
+    "name": "elasticsearch-pro",
+    "folder": "elasticsearch-pro",
+    "description": "Expert Elasticsearch development covering indexing strategies, DSL queries, Aggregations, and cluster performance tuning.",
+    "triggers": [],
+    "when_to_use": [
+      "Building powerful, high-relevance full-text search features.",
+      "Implementing real-time analytics and dashboards using aggregations.",
+      "Scaling search clusters to handle millions of documents and queries.",
+      "Optimizing search performance through custom analyzers and sharding strategies."
+    ],
+    "references": []
   },
   {
     "name": "electron-pro",
@@ -1526,6 +1591,19 @@
       "integration-map.md",
       "progress-tracking.md"
     ]
+  },
+  {
+    "name": "fastapi-pro",
+    "folder": "fastapi-pro",
+    "description": "Expert FastAPI development covering async API design, Pydantic validation, Dependency Injection, and high-performance patterns.",
+    "triggers": [],
+    "when_to_use": [
+      "Building high-performance, async APIs in Python.",
+      "Implementing robust data validation and serialization using Pydantic.",
+      "Designing modular APIs through FastAPI's Dependency Injection system.",
+      "Generating interactive API documentation (Swagger/ReDoc) automatically."
+    ],
+    "references": []
   },
   {
     "name": "feedback-pro",
@@ -2031,6 +2109,19 @@
     ]
   },
   {
+    "name": "java-pro",
+    "folder": "java-pro",
+    "description": "Expert Java development covering modern Java 21+, Virtual Threads (Loom), JVM tuning, and enterprise architecture patterns.",
+    "triggers": [],
+    "when_to_use": [
+      "Building highly scalable enterprise backends.",
+      "Optimizing JVM performance for high-throughput systems.",
+      "Refactoring legacy Java code to modern Java 21+ standards.",
+      "Implementing concurrent logic using Virtual Threads (Project Loom)."
+    ],
+    "references": []
+  },
+  {
     "name": "javascript-pro",
     "folder": "javascript-pro",
     "description": "Production-grade JavaScript: architecture and maintainability, runtime semantics (event loop, microtasks, ESM/CJS graph), async flows, performance — plus execution/module model, failure modes (lost Promises, `this`, pollution, FP dates, dual-package), trade-offs (JS vs TypeScript, mutability), quality guardrails (engine-accurate features; no sloppy security claims).\n\nUse this skill when implementing or reviewing JavaScript/TypeScript application logic at the language/runtime level, debugging tricky behavior, or handling edge cases in browser/Node projects.\n\nCombine with **`testing-pro`**, **`security-pro`**, **`typescript-pro`**, **`code-packaging-pro`**, and stack skills (**`react-pro`**, **`nestjs-pro`**, **`nextjs-pro`**) per integration map.\n\nTriggers: \"javascript\", \"js\", \"event loop\", \"promise\", \"closure\", \"this\", \"prototype\", \"hoisting\", \"microtask\", \"edge case\", \"tip\", \"trick\", \"await\", \"async\", \"TypeError\", \"ReferenceError\", \"undefined is not a function\", \"ESM\", \"CommonJS\", \"cjs\", \"mjs\", \"import.meta\".",
@@ -2327,6 +2418,19 @@
       "touch-layout-safe-areas-and-density.md",
       "versions.md"
     ]
+  },
+  {
+    "name": "mongodb-pro",
+    "folder": "mongodb-pro",
+    "description": "Expert MongoDB development covering document modeling, the Aggregation Framework, indexing strategies, and Atlas administration.",
+    "triggers": [],
+    "when_to_use": [
+      "Designing flexible, high-scale document schemas for web/mobile apps.",
+      "Implementing complex data processing pipelines using the Aggregation Framework.",
+      "Optimizing slow queries through advanced indexing and profiling.",
+      "Setting up and managing MongoDB Atlas clusters with serverless features."
+    ],
+    "references": []
   },
   {
     "name": "motion-design-pro",
@@ -3103,6 +3207,19 @@
     ]
   },
   {
+    "name": "redis-pro",
+    "folder": "redis-pro",
+    "description": "Expert Redis development covering data structures, caching strategies, Pub/Sub, Lua scripting, and RediSearch/JSON modules.",
+    "triggers": [],
+    "when_to_use": [
+      "Implementing high-speed caching layers to reduce database load.",
+      "Building real-time features like leaderboards (Sorted Sets) or chat (Pub/Sub).",
+      "Designing distributed locks and rate limiters.",
+      "Managing high-throughput event streams with Redis Streams."
+    ],
+    "references": []
+  },
+  {
     "name": "repo-tooling-pro",
     "folder": "repo-tooling-pro",
     "description": "Production-grade repository tooling for this devkit: Node/TypeScript CLI (`dist/tools.js`) for KB batch queries, skill inventory, validation, KB build/verify, skill-index generation, project indexing, and wiki generation — plus system model (repo-root workspace, skills vs KB artifact lifecycles, batch query execution), failure modes (wrong cwd, missing dist, stale embeddings/index, OOM batch, interrupted builds), decision trade-offs (batch vs single query, when to rebuild KB, analyze depth, CI vs local), and quality guardrails (canonical scripts/README, no invented flags, reproducible Node/commit).\n\nUse this skill when the user runs or wires CI for build-kb, query-kb, query-kb-batch, verify-kb, list-skills, validate-skills, analyze-skills, build-skill-index, index-project, generate-wiki; asks how to speed up multiple KB queries; needs a JSON list of bundled skills; or wants automation reports for skills vs `scripts/` helpers.\n\nCombine with **`skills-self-review-pro`** for bundle audits, **`ci-cd-pro`** for pipeline YAML, **`deployment-pro`** for runner capacity and secrets, **`security-pro`** for API keys and log hygiene, and **`web-research-pro`** for external verification.\n\nTriggers: \"scripts\", \"dist/tools.js\", \"query-kb-batch\", \"batch query\", \"list_skills\", \"validate_skills\", \"analyze_skills\", \"skill analysis report\", \"build_kb\", \"verify_kb\", \"index-project\", \"generate-wiki\", \"project index\", \"wiki html\", \"CI skills\", \"RAG performance\", \"embeddings\", \"repo automation\", \"npm run validate-skills\", \"build-skill-index\", \"OOM query-kb\", \"wrong cwd\", \"list-skills --json\", \"query_kb_batch\".",
@@ -3187,6 +3304,19 @@
       "template-catalog.md",
       "workflow-execution.md"
     ]
+  },
+  {
+    "name": "rust-pro",
+    "folder": "rust-pro",
+    "description": "Expert Rust development covering ownership, borrowing, async (Tokio), zero-cost abstractions, and systems programming.",
+    "triggers": [],
+    "when_to_use": [
+      "Building performance-critical systems (Browsers, OS, Runtimes).",
+      "Implementing memory-safe alternatives to C/C++.",
+      "Developing high-throughput async servers with `Tokio`.",
+      "Writing WASM (WebAssembly) modules for frontend performance."
+    ],
+    "references": []
   },
   {
     "name": "security-pro",
@@ -4290,6 +4420,19 @@
       "Exploring a new technology or API through iterative AI interaction.",
       "Refactoring large codebases by setting a \"vibe\" (architectural direction).",
       "Building complex UIs through descriptive, iterative refinement."
+    ],
+    "references": []
+  },
+  {
+    "name": "vue-pro",
+    "folder": "vue-pro",
+    "description": "Expert Vue 3 development covering the Composition API, Pinia, Vue Router, and modern Vite-based workflows.",
+    "triggers": [],
+    "when_to_use": [
+      "Building high-performance, reactive frontends using Vue 3.",
+      "Implementing complex state management with Pinia.",
+      "Designing modular, reusable components using the Composition API.",
+      "Setting up a modern Vite-based frontend project."
     ],
     "references": []
   },

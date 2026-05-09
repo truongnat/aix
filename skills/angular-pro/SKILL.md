@@ -1,0 +1,105 @@
+---
+name: angular-pro
+description: Expert Angular development covering Angular 18+, Standalone Components, Signals, RxJS, and enterprise-grade architecture.
+metadata:
+  short-description: Angular — Angular 18+, Signals, Standalone Components, RxJS
+  content-language: en
+  domain: frontend
+  level: professional
+---
+
+# Angular Pro
+
+Expert-level orchestration of modern Angular applications. Focuses on the Angular 18+ ecosystem, performance, and enterprise-grade state management.
+
+## Boundary
+
+**`angular-pro`** covers modern Angular (Standalone Components, Signals, Deferrable Views), Reactive programming (RxJS), Routing, and the Angular CLI. It does NOT cover legacy NgModule-based patterns unless specifically requested for migration.
+
+## When to use
+
+- Building large-scale enterprise frontends using Angular 18+.
+- Implementing reactive data flows using RxJS and Angular Signals.
+- Designing modular, standalone components and services.
+- Setting up complex routing and lazy-loading strategies.
+
+## Workflow
+
+1. **Project Setup**: Initialize with `ng new`.
+2. **Component Design**: Build Standalone Components using Signals for local state.
+3. **Data Management**: Use RxJS and Services for shared data and API calls.
+4. **Routing**: Configure the Router with standalone-friendly providers.
+5. **Logic Implementation**: Use `signal`, `computed`, and `effect` for fine-grained reactivity.
+6. **Testing**: Write unit tests with Jasmine/Karma or Vitest.
+
+### Operating principles
+
+- **Signals over Observables for State**: Use Signals for local UI state; keep RxJS for async data streams.
+- **Standalone First**: Never create an `NgModule` for new features.
+- **Strict Typing**: Leverage TypeScript's full power for predictable data flows.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior Angular Architect.
+</Role>
+
+<Feature>
+[Angular Component/Feature Description]
+</Feature>
+
+<Implementation>
+[Modern Angular 18+ code Artifact]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan with Angular Testing examples]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| Angular Roadmap | [roadmap.sh/angular](https://roadmap.sh/angular) |
+| Angular Docs | [angular.dev/overview](https://angular.dev/overview) |
+| RxJS Docs | [rxjs.dev/guide/overview](https://rxjs.dev/guide/overview) |
+| Angular Signals Guide | [angular.dev/guide/signals](https://angular.dev/guide/signals) |
+
+## Quick example
+
+**Feature:** A standalone counter component using Angular Signals.
+
+```typescript
+import { Component, signal, computed } from '@angular/core';
+
+@Component({
+  selector: 'app-counter',
+  standalone: true,
+  template: `
+    <button (click)="increment()">Count: {{ count() }} (Double: {{ doubleCount() }})</button>
+  `
+})
+export class CounterComponent {
+  count = signal(0);
+  doubleCount = computed(() => this.count() * 2);
+
+  increment() {
+    this.count.update(c => c + 1);
+  }
+}
+```
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Component tree and signal/RxJS strategy planned.
+- [ ] **Simplicity First**: Built-in directives (`*ngIf`, `*ngFor` or new control flow) used.
+- [ ] **Surgical Changes**: Only updated relevant components, services, or routes.
+- [ ] **Goal-Driven Execution**: Verified with `ng test` and browser interaction.
+- [ ] Standalone Components used for all new features.
+- [ ] Angular Signals leveraged for local and computed state.
+- [ ] Deferrable views (`@defer`) used for performance optimization.
