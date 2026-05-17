@@ -45,7 +45,7 @@ services:
     container_name: kb-api
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3456:3000"
     env_file: .env
     depends_on:
       - neo4j

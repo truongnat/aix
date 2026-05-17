@@ -177,7 +177,7 @@ systemctl daemon-reload
 # ── 14. Health check ─────────────────────────────────────────────────────────
 log "Waiting for API to be healthy..."
 sleep 10
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/auth/keys \
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3456/auth/keys \
   -H "x-master-password: $(grep MASTER_PASSWORD .env | cut -d= -f2)" 2>/dev/null || echo "000")
 
 if [ "$HTTP_CODE" = "200" ]; then
