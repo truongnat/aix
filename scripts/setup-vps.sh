@@ -3,7 +3,13 @@
 # Usage: bash setup-vps.sh
 set -euo pipefail
 
-REPO="https://github.com/truongnat/personal-ai.git"
+# Pass GITHUB_TOKEN env var for private repo auth
+GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+if [ -n "$GITHUB_TOKEN" ]; then
+  REPO="https://${GITHUB_TOKEN}@github.com/truongnat/personal-ai.git"
+else
+  REPO="https://github.com/truongnat/personal-ai.git"
+fi
 APP_DIR="/opt/personal-ai"
 DOMAIN="dev.truongsoftware.com"
 EMAIL="truongdq.dev@gmail.com"

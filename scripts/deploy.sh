@@ -10,7 +10,12 @@ log() { echo -e "${GREEN}[deploy]${NC} $*"; }
 cd "$APP_DIR"
 
 log "Pulling latest code..."
-git pull --ff-only
+# Use stored token if present in git remote
+git pull --ff-only || {
+  GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+  [ -n "$GITHUB_TOKEN" ] && git remote set-url origin "https://${GITHUB_TOKEN}@github.com/truongnat/personal-ai.git"
+  git pull --ff-only
+}
 
 log "Rebuilding API image..."
 docker compose build api
