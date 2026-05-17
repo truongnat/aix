@@ -209,4 +209,19 @@ export class KbController {
   async getMetrics() {
     return this.kbService.getMetrics()
   }
+
+  @Post('import')
+  @ApiOperation({
+    summary: 'Bulk import solutions',
+    description: 'Import multiple solutions from markdown files, Notion exports, or Obsidian vaults',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Import summary with success/failure counts',
+  })
+  async importBulk(
+    @Body() dto: { files: Array<{ path: string; content: string }>; project?: string; format?: 'markdown' | 'notion' | 'obsidian' },
+  ) {
+    return this.kbService.importBulk(dto.files, dto.project, dto.format)
+  }
 }

@@ -6,6 +6,7 @@ import { Neo4jService } from '../neo4j/neo4j.service'
 import { CacheService } from '../cache/cache.service'
 import { SearchService } from '../search/search.service'
 import { GithubService } from '../github/github.service'
+import { KbImportService } from './kb-import.service'
 import { PushKbDto } from './dto/push-kb.dto'
 import { UpdateKbDto } from './dto/update-kb.dto'
 import { SuggestedTagDto } from './dto/suggest-tags.dto'
@@ -14,12 +15,16 @@ import { KbMetricsDto } from './dto/kb-metrics.dto'
 
 @Injectable()
 export class KbService {
+  private importSvc: KbImportService
+
   constructor(
     private neo4j: Neo4jService,
     private cache: CacheService,
     private searchSvc: SearchService,
     private github: GithubService,
-  ) {}
+  ) {
+    this.importSvc = new KbImportService(this)
+  }
 
   async push(dto: PushKbDto): Promise<{ id: string; message: string; related_found: number }> {
     const id = uuidv4()
@@ -679,5 +684,26 @@ export class KbService {
         connected_via_relations: connectedViaRelations,
       },
     }
+  }
+
+  async importBulk(
+    files: Array<{ path: string; content: string }>,
+    defaultProject?: string,
+    format: 'markdown' | 'notion' | 'obsidian' = 'markdown',
+  ): Promise<any> {
+    // Adjust parsing based on format
+    const processedFiles = files.map((f) => {
+      let content = f.content
+      if (format === 'notion') {
+        const parsed = this.importSvc.parseNotionExport(content)
+        content = parsed.content
+      } else if (format === 'obsidian') {
+        const parsed = this.importSvc.parseObsidianNote(content)
+        content = parsed.content
+      }
+      return { ...f, content }
+    })
+
+    return this.importSvc.importSolutions(processedFiles, defaultProject)
   }
 }

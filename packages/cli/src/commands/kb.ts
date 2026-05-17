@@ -170,4 +170,51 @@ export function registerKbCommands(program: Command) {
         process.exit(1)
       }
     })
+
+  kb
+    .command('import <directory>')
+    .description('Bulk import solutions from markdown files')
+    .option('--project <name>', 'default project for imported solutions')
+    .option('--format <fmt>', 'file format: markdown, notion, obsidian', 'markdown')
+    .action(async (dir: string, opts: { project?: string; format: string }) => {
+      const fs = await import('fs')
+      const path = await import('path')
+
+      const spinner = ora(`Scanning ${dir}...`).start()
+      try {
+        const files = fs.readdirSync(dir).filter((f) => f.endsWith('.md'))
+        if (files.length === 0) {
+          spinner.warn(`No markdown files found in ${dir}`)
+          return
+        }
+
+        const contents = files.map((f) => ({
+          path: f,
+          content: fs.readFileSync(path.join(dir, f), 'utf-8'),
+        }))
+
+        spinner.text = `Importing ${files.length} files...`
+        const summary = await api.post<any>('/kb/import', {
+          files: contents,
+          project: opts.project,
+          format: opts.format,
+        })
+
+        spinner.stop()
+        console.log(chalk.green(`\n✓ Import complete: ${summary.successful}/${summary.total_files} successful\n`))
+
+        if (summary.results.length > 0 && summary.failed > 0) {
+          console.log(chalk.red(`Failed imports:`))
+          for (const r of summary.results.filter((x) => !x.success)) {
+            console.log(chalk.red(`  ✗ ${r.file}: ${r.error}`))
+          }
+          console.log()
+        }
+
+        console.log(chalk.dim(`Summary: ${summary.successful} imported, ${summary.failed} failed`))
+      } catch (err: any) {
+        spinner.fail(err.message)
+        process.exit(1)
+      }
+    })
 }
