@@ -32,6 +32,7 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
       'CREATE CONSTRAINT tech_name IF NOT EXISTS FOR (t:Technology) REQUIRE t.name IS UNIQUE',
       'CREATE CONSTRAINT skill_name IF NOT EXISTS FOR (s:Skill) REQUIRE s.name IS UNIQUE',
       'CREATE CONSTRAINT aitool_name IF NOT EXISTS FOR (t:AITool) REQUIRE t.name IS UNIQUE',
+      'CREATE CONSTRAINT github_issue_url IF NOT EXISTS FOR (g:GitHubIssue) REQUIRE g.url IS UNIQUE',
     ]
     // Index on key_prefix enables O(1) lookup in validateKey (without this, prefix query is still O(n))
     const indexes = [
@@ -40,6 +41,8 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
       'CREATE INDEX solution_created IF NOT EXISTS FOR (s:Solution) ON (s.created_at)',
       'CREATE INDEX solution_revision_solution IF NOT EXISTS FOR (r:SolutionRevision) ON (r.solution_id)',
       'CREATE INDEX solution_revision_version IF NOT EXISTS FOR (r:SolutionRevision) ON (r.version)',
+      'CREATE INDEX github_issue_repo IF NOT EXISTS FOR (g:GitHubIssue) ON (g.repo)',
+      'CREATE INDEX github_issue_number IF NOT EXISTS FOR (g:GitHubIssue) ON (g.number)',
     ]
     for (const c of [...constraints, ...indexes]) {
       await this.runQuery(c)

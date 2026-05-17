@@ -8,6 +8,7 @@ import { SearchModule } from './search/search.module'
 import { AuthModule } from './auth/auth.module'
 import { KbModule } from './kb/kb.module'
 import { SkillModule } from './skill/skill.module'
+import { GithubModule } from './github/github.module'
 import { AppController } from './app.controller'
 
 @Module({
@@ -21,6 +22,7 @@ import { AppController } from './app.controller'
     CacheModule,
     SearchModule,
     AuthModule,
+    GithubModule,
     KbModule,
     SkillModule,
   ],

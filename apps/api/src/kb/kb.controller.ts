@@ -181,4 +181,19 @@ export class KbController {
   getHistory(@Param('id') id: string) {
     return this.kbService.getHistory(id)
   }
+
+  @Get('github/search')
+  @ApiOperation({
+    summary: 'Find solutions by GitHub issue',
+    description: 'Retrieve solutions linked to a specific GitHub issue/PR',
+  })
+  @ApiQuery({ name: 'repo', type: 'string', description: 'GitHub repo (owner/repo)' })
+  @ApiQuery({ name: 'number', type: 'number', description: 'Issue/PR number' })
+  @ApiResponse({ status: 200, description: 'Matching solutions' })
+  findByGithubIssue(
+    @Query('repo') repo: string,
+    @Query('number') number: string,
+  ) {
+    return this.kbService.findByGithubIssue(repo, parseInt(number))
+  }
 }

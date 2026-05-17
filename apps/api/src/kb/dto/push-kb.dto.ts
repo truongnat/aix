@@ -22,4 +22,8 @@ export class PushKbDto {
   @IsArray()
   @IsOptional()
   technologies?: string[]
+
+  @IsArray()
+  @IsOptional()
+  github_issues?: string[] // GitHub issue URLs or refs (e.g., "owner/repo#123")
 }

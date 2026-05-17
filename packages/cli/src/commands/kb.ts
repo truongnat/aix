@@ -51,8 +51,9 @@ export function registerKbCommands(program: Command) {
     .option('-t, --tags <tags>', 'comma-separated tags')
     .option('--ticket <ref>', 'ticket reference')
     .option('--project <name>', 'project name')
+    .option('--github-issues <issues>', 'comma-separated GitHub issue URLs or refs (owner/repo#123)')
     .option('--skip-suggestions', 'skip tag suggestions')
-    .action(async (file: string, opts: { tags?: string; ticket?: string; project?: string; skipSuggestions?: boolean }) => {
+    .action(async (file: string, opts: { tags?: string; ticket?: string; project?: string; githubIssues?: string; skipSuggestions?: boolean }) => {
       const spinner = ora('Reading solution...').start()
       try {
         const content = readFileSync(file, 'utf-8')
@@ -103,6 +104,7 @@ export function registerKbCommands(program: Command) {
           tags: finalTags,
           ticket_ref: opts.ticket,
           project: opts.project ?? (config.default_project || undefined),
+          github_issues: opts.githubIssues ? opts.githubIssues.split(',').map((i) => i.trim()) : undefined,
         })
 
         spinner.succeed(chalk.green(`Pushed: ${title}`))

@@ -5,6 +5,7 @@ import neo4j from 'neo4j-driver'
 import { Neo4jService } from '../neo4j/neo4j.service'
 import { CacheService } from '../cache/cache.service'
 import { SearchService } from '../search/search.service'
+import { GithubService } from '../github/github.service'
 import { PushKbDto } from './dto/push-kb.dto'
 import { UpdateKbDto } from './dto/update-kb.dto'
 import { SuggestedTagDto } from './dto/suggest-tags.dto'
@@ -16,6 +17,7 @@ export class KbService {
     private neo4j: Neo4jService,
     private cache: CacheService,
     private searchSvc: SearchService,
+    private github: GithubService,
   ) {}
 
   async push(dto: PushKbDto): Promise<{ id: string; message: string; related_found: number }> {
@@ -75,6 +77,25 @@ export class KbService {
          MERGE (s)-[:USES]->(t)`,
         { technologies, id },
       )
+    }
+
+    // Handle GitHub issue linking
+    if (dto.github_issues && dto.github_issues.length > 0) {
+      const issues = []
+      for (const issueRef of dto.github_issues) {
+        try {
+          const issue = await this.github.resolveIssue(issueRef)
+          issues.push(issue)
+        } catch (err: any) {
+          // Log error but continue; don't fail the entire push
+          console.warn(`Failed to resolve GitHub issue ${issueRef}: ${err.message}`)
+        }
+      }
+
+      if (issues.length > 0) {
+        const { cypher, params } = await this.github.createIssueLinkQuery(id, issues)
+        await this.neo4j.runQuery(cypher, params)
+      }
     }
 
     let relatedFound = 0
@@ -431,5 +452,27 @@ export class KbService {
           }
         }),
     }
+  }
+
+  async findByGithubIssue(repo: string, number: number): Promise<any[]> {
+    const result = await this.neo4j.runQuery(
+      `MATCH (s:Solution)-[:SOLVES]->(gh:GitHubIssue { repo: $repo, number: $number })
+       OPTIONAL MATCH (s)-[:TAGGED_WITH]->(t:Tag)
+       RETURN s, collect(DISTINCT t.name) AS tags`,
+      { repo, number },
+    )
+
+    return result.records.map((rec) => {
+      const s = rec.get('s').properties
+      return {
+        id: s.id,
+        title: s.title,
+        summary: s.summary,
+        project: s.project,
+        tags: rec.get('tags'),
+        created_at: s.created_at,
+        updated_at: s.updated_at,
+      }
+    })
   }
 }
