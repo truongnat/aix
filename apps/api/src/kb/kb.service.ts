@@ -10,6 +10,7 @@ import { PushKbDto } from './dto/push-kb.dto'
 import { UpdateKbDto } from './dto/update-kb.dto'
 import { SuggestedTagDto } from './dto/suggest-tags.dto'
 import { SolutionRevisionDto, SolutionHistoryResponseDto, RevisionDiffDto } from './dto/solution-revision.dto'
+import { KbMetricsDto } from './dto/kb-metrics.dto'
 
 @Injectable()
 export class KbService {
@@ -474,5 +475,209 @@ export class KbService {
         updated_at: s.updated_at,
       }
     })
+  }
+
+  async getMetrics(): Promise<KbMetricsDto> {
+    const cacheKey = 'metrics:kb:health'
+    const cached = await this.cache.get<KbMetricsDto>(cacheKey)
+    if (cached) return cached
+
+    // Run all metric queries in parallel
+    const [
+      overview,
+      byProject,
+      topTags,
+      topTechnologies,
+      coverage,
+      recentActivity,
+      qualityMetrics,
+    ] = await Promise.all([
+      this.queryOverview(),
+      this.queryByProject(),
+      this.queryTopTags(),
+      this.queryTopTechnologies(),
+      this.queryCoverage(),
+      this.queryRecentActivity(),
+      this.queryQualityMetrics(),
+    ])
+
+    const metrics: KbMetricsDto = {
+      overview,
+      by_project: byProject,
+      top_tags: topTags,
+      top_technologies: topTechnologies,
+      coverage,
+      recent_activity: recentActivity,
+      quality_metrics: qualityMetrics,
+    }
+
+    // Cache for 1 hour
+    await this.cache.set(cacheKey, metrics, 3600)
+    return metrics
+  }
+
+  private async queryOverview() {
+    const result = await this.neo4j.runQuery(
+      `MATCH (s:Solution)
+       OPTIONAL MATCH (t:Tag)
+       OPTIONAL MATCH (p:Project)
+       OPTIONAL MATCH (tech:Technology)
+       OPTIONAL MATCH (s)-[:SOLVES]->(gh:GitHubIssue)
+       WITH count(DISTINCT s) AS totalSolutions,
+            count(DISTINCT t) AS totalTags,
+            count(DISTINCT p) AS totalProjects,
+            count(DISTINCT tech) AS totalTechnologies,
+            count(DISTINCT gh) AS totalGithubLinks
+       OPTIONAL MATCH (s:Solution)-[:TAGGED_WITH]->(tag:Tag)
+       WITH totalSolutions, totalTags, totalProjects, totalTechnologies, totalGithubLinks,
+            count(tag) AS totalTagAssignments
+       RETURN totalSolutions, totalTags, totalProjects, totalTechnologies, totalGithubLinks,
+              CASE WHEN totalSolutions > 0 THEN toFloat(totalTagAssignments) / totalSolutions ELSE 0 END AS avgTagsPerSolution`,
+    )
+    const rec = result.records[0]
+    return {
+      total_solutions: rec.get('totalSolutions').toNumber() || 0,
+      total_tags: rec.get('totalTags').toNumber() || 0,
+      total_projects: rec.get('totalProjects').toNumber() || 0,
+      total_technologies: rec.get('totalTechnologies').toNumber() || 0,
+      average_tags_per_solution: rec.get('avgTagsPerSolution').toNumber() || 0,
+      solutions_with_github_links: rec.get('totalGithubLinks').toNumber() || 0,
+    }
+  }
+
+  private async queryByProject() {
+    const result = await this.neo4j.runQuery(
+      `MATCH (s:Solution)-[:BELONGS_TO]->(p:Project)
+       WITH p.name AS project, count(s) AS count
+       WITH project, count,
+            (SELECT count(s2) FROM (:Solution)) AS total
+       RETURN project, count, ROUND(toFloat(count) / total * 100) AS percentage
+       ORDER BY count DESC`,
+    )
+    return result.records.map((r) => ({
+      name: r.get('project'),
+      count: r.get('count').toNumber(),
+      percentage: r.get('percentage').toNumber() || 0,
+    }))
+  }
+
+  private async queryTopTags() {
+    const result = await this.neo4j.runQuery(
+      `MATCH (t:Tag)<-[:TAGGED_WITH]-(s:Solution)
+       WITH t.name AS name, count(DISTINCT s) AS solutions
+       RETURN name, solutions, solutions AS count
+       ORDER BY count DESC
+       LIMIT 20`,
+    )
+    return result.records.map((r) => ({
+      name: r.get('name'),
+      count: r.get('count').toNumber(),
+      solutions: r.get('solutions').toNumber(),
+    }))
+  }
+
+  private async queryTopTechnologies() {
+    const result = await this.neo4j.runQuery(
+      `MATCH (tech:Technology)<-[:USES]-(s:Solution)
+       WITH tech.name AS name, count(DISTINCT s) AS solutions
+       RETURN name, solutions, solutions AS count
+       ORDER BY count DESC
+       LIMIT 20`,
+    )
+    return result.records.map((r) => ({
+      name: r.get('name'),
+      count: r.get('count').toNumber(),
+      solutions: r.get('solutions').toNumber(),
+    }))
+  }
+
+  private async queryCoverage() {
+    const result = await this.neo4j.runQuery(
+      `MATCH (s:Solution)
+       WITH count(s) AS totalSolutions,
+            sum(CASE WHEN s.content CONTAINS '```' THEN 1 ELSE 0 END) AS withCode,
+            sum(CASE WHEN (s)-[:USES]->() THEN 1 ELSE 0 END) AS withTech,
+            sum(CASE WHEN (s)<-[:FOR]-() THEN 1 ELSE 0 END) AS withRevisions
+       OPTIONAL MATCH (s:Solution)<-[:FOR]-(r:SolutionRevision)
+       WITH totalSolutions, withCode, withTech, withRevisions,
+            CASE WHEN totalSolutions > 0 THEN AVG(COUNT(*)) ELSE 0 END AS avgRevisions
+       OPTIONAL MATCH (s:Solution)-[:SOLVES]-(gh:GitHubIssue)
+       WITH totalSolutions, withCode, withTech, withRevisions, avgRevisions,
+            count(DISTINCT gh) AS withGithubLinks
+       RETURN totalSolutions, withCode, withTech, withRevisions, avgRevisions, withGithubLinks`,
+    )
+    const rec = result.records[0]
+    return {
+      solutions_with_code_examples: rec.get('withCode').toNumber() || 0,
+      solutions_with_tech_tags: rec.get('withTech').toNumber() || 0,
+      solutions_with_revisions: rec.get('withRevisions').toNumber() || 0,
+      average_revisions: rec.get('avgRevisions').toNumber() || 0,
+      solutions_with_github_links: rec.get('withGithubLinks').toNumber() || 0,
+    }
+  }
+
+  private async queryRecentActivity() {
+    const now = new Date()
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
+
+    const result = await this.neo4j.runQuery(
+      `MATCH (s:Solution)
+       RETURN
+         sum(CASE WHEN s.created_at > $sevenDaysAgo THEN 1 ELSE 0 END) AS created7d,
+         sum(CASE WHEN s.updated_at > $sevenDaysAgo THEN 1 ELSE 0 END) AS updated7d,
+         sum(CASE WHEN s.created_at > $thirtyDaysAgo THEN 1 ELSE 0 END) AS created30d,
+         sum(CASE WHEN s.updated_at > $thirtyDaysAgo THEN 1 ELSE 0 END) AS updated30d`,
+      { sevenDaysAgo, thirtyDaysAgo },
+    )
+    const rec = result.records[0]
+    return {
+      created_last_7_days: rec.get('created7d').toNumber() || 0,
+      updated_last_7_days: rec.get('updated7d').toNumber() || 0,
+      created_last_30_days: rec.get('created30d').toNumber() || 0,
+      updated_last_30_days: rec.get('updated30d').toNumber() || 0,
+    }
+  }
+
+  private async queryQualityMetrics() {
+    const result = await this.neo4j.runQuery(
+      `MATCH (s:Solution)
+       WITH avg(size(s.content)) AS avgLength
+       OPTIONAL MATCH (s)-[:TAGGED_WITH]->()
+       WITH avgLength,
+            sum(CASE WHEN 1=1 THEN 1 ELSE 0 END) AS totalTags,
+            count(DISTINCT s) AS totalSolutions,
+            sum(CASE WHEN (s)-[:TAGGED_WITH]->() AND EXISTS((s)-[:TAGGED_WITH]->()(2)) THEN 1 ELSE 0 END) AS multipleTags
+       OPTIONAL MATCH (s:Solution) WHERE NOT (s)-[:TAGGED_WITH]->()
+       WITH avgLength, multipleTags, totalSolutions,
+            count(DISTINCT s) AS withoutTags,
+            (totalSolutions - multipleTags - count(DISTINCT s)) AS singleTag
+       OPTIONAL MATCH (s:Solution) WHERE NOT (s)-[:RELATED_TO]->() AND NOT (s)<-[:RELATED_TO]-()
+       WITH avgLength, multipleTags, withoutTags, singleTag, totalSolutions,
+            count(DISTINCT s) AS isolated
+       OPTIONAL MATCH (s:Solution)-[:RELATED_TO]->()
+       WITH avgLength, multipleTags, withoutTags, singleTag, totalSolutions, isolated,
+            count(DISTINCT s) AS connectedRelations
+       RETURN ROUND(avgLength) AS avgLength, multipleTags, withoutTags, singleTag, totalSolutions,
+              isolated, connectedRelations`,
+    )
+    const rec = result.records[0]
+    const totalSolutions = rec.get('totalSolutions').toNumber() || 0
+    const connectedViaRelations = rec.get('connectedRelations').toNumber() || 0
+    const isolated = rec.get('isolated').toNumber() || 0
+    const connectedViaTags = totalSolutions - isolated - connectedViaRelations
+
+    return {
+      avg_solution_length: rec.get('avgLength').toNumber() || 0,
+      avg_tags_per_solution: totalSolutions > 0 ? (totalSolutions - rec.get('withoutTags').toNumber()) / totalSolutions : 0,
+      solutions_with_multiple_tags: rec.get('multipleTags').toNumber() || 0,
+      solutions_with_single_tag: rec.get('singleTag').toNumber() || 0,
+      solutions_without_tags: rec.get('withoutTags').toNumber() || 0,
+      graph_connectivity: {
+        isolated_solutions: isolated,
+        connected_via_tags: Math.max(0, connectedViaTags),
+        connected_via_relations: connectedViaRelations,
+      },
+    }
   }
 }

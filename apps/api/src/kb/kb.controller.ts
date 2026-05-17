@@ -196,4 +196,17 @@ export class KbController {
   ) {
     return this.kbService.findByGithubIssue(repo, parseInt(number))
   }
+
+  @Get('metrics')
+  @ApiOperation({
+    summary: 'KB health metrics dashboard',
+    description: 'Comprehensive KB statistics: coverage, quality, activity, and connectivity',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'KB metrics and health dashboard',
+  })
+  async getMetrics() {
+    return this.kbService.getMetrics()
+  }
 }
