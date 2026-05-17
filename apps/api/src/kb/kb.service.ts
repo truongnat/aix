@@ -599,16 +599,16 @@ export class KbService {
   private async queryCoverage() {
     const result = await this.neo4j.runQuery(
       `MATCH (s:Solution)
-       WITH count(s) AS totalSolutions,
-            sum(CASE WHEN s.content CONTAINS '```' THEN 1 ELSE 0 END) AS withCode,
-            sum(CASE WHEN (s)-[:USES]->() THEN 1 ELSE 0 END) AS withTech,
-            sum(CASE WHEN (s)<-[:FOR]-() THEN 1 ELSE 0 END) AS withRevisions
+       WITH COUNT(DISTINCT s) AS totalSolutions,
+            SUM(CASE WHEN size(s.content) >= 100 THEN 1 ELSE 0 END) AS withCode,
+            SUM(CASE WHEN EXISTS((s)-[:USES]->()) THEN 1 ELSE 0 END) AS withTech,
+            SUM(CASE WHEN EXISTS(()-[:FOR]->(s)) THEN 1 ELSE 0 END) AS withRevisions
        OPTIONAL MATCH (s:Solution)<-[:FOR]-(r:SolutionRevision)
        WITH totalSolutions, withCode, withTech, withRevisions,
-            CASE WHEN totalSolutions > 0 THEN AVG(COUNT(*)) ELSE 0 END AS avgRevisions
+            AVG(SIZE([(s)<-[:FOR]-() | 1])) AS avgRevisions
        OPTIONAL MATCH (s:Solution)-[:SOLVES]-(gh:GitHubIssue)
        WITH totalSolutions, withCode, withTech, withRevisions, avgRevisions,
-            count(DISTINCT gh) AS withGithubLinks
+            COUNT(DISTINCT gh) AS withGithubLinks
        RETURN totalSolutions, withCode, withTech, withRevisions, avgRevisions, withGithubLinks`,
     )
     const rec = result.records[0]
@@ -647,23 +647,18 @@ export class KbService {
   private async queryQualityMetrics() {
     const result = await this.neo4j.runQuery(
       `MATCH (s:Solution)
-       WITH avg(size(s.content)) AS avgLength
-       OPTIONAL MATCH (s)-[:TAGGED_WITH]->()
-       WITH avgLength,
-            sum(CASE WHEN 1=1 THEN 1 ELSE 0 END) AS totalTags,
-            count(DISTINCT s) AS totalSolutions,
-            sum(CASE WHEN (s)-[:TAGGED_WITH]->() AND EXISTS((s)-[:TAGGED_WITH]->()(2)) THEN 1 ELSE 0 END) AS multipleTags
-       OPTIONAL MATCH (s:Solution) WHERE NOT (s)-[:TAGGED_WITH]->()
-       WITH avgLength, multipleTags, totalSolutions,
-            count(DISTINCT s) AS withoutTags,
-            (totalSolutions - multipleTags - count(DISTINCT s)) AS singleTag
-       OPTIONAL MATCH (s:Solution) WHERE NOT (s)-[:RELATED_TO]->() AND NOT (s)<-[:RELATED_TO]-()
-       WITH avgLength, multipleTags, withoutTags, singleTag, totalSolutions,
-            count(DISTINCT s) AS isolated
-       OPTIONAL MATCH (s:Solution)-[:RELATED_TO]->()
-       WITH avgLength, multipleTags, withoutTags, singleTag, totalSolutions, isolated,
-            count(DISTINCT s) AS connectedRelations
-       RETURN ROUND(avgLength) AS avgLength, multipleTags, withoutTags, singleTag, totalSolutions,
+       WITH s, avg(size(s.content)) OVER () AS avgLength
+       WITH s, avgLength,
+            size([(s)-[:TAGGED_WITH]->(t) | t]) AS tagCount,
+            size([(s)-[:RELATED_TO]->() | 1]) + size([()-[:RELATED_TO]->(s) | 1]) AS relationshipCount
+       WITH COUNT(DISTINCT s) AS totalSolutions,
+            ROUND(avgLength) AS avgLength,
+            SUM(CASE WHEN tagCount >= 2 THEN 1 ELSE 0 END) AS multipleTags,
+            SUM(CASE WHEN tagCount = 1 THEN 1 ELSE 0 END) AS singleTag,
+            SUM(CASE WHEN tagCount = 0 THEN 1 ELSE 0 END) AS withoutTags,
+            SUM(CASE WHEN relationshipCount = 0 THEN 1 ELSE 0 END) AS isolated,
+            SUM(CASE WHEN relationshipCount >= 1 THEN 1 ELSE 0 END) AS connectedRelations
+       RETURN avgLength, multipleTags, withoutTags, singleTag, totalSolutions,
               isolated, connectedRelations`,
     )
     const rec = result.records[0]
