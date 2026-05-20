@@ -196,10 +196,9 @@ use policy::{
 use runtime::{
     apply_role_overrides, build_domain_registry, build_thread_flow_workflow,
     default_role_for_template_or_workflow, ensure_thread_execution_context,
-    infer_workflow_ref_from_template, inject_task_only, inject_template_prompt,
-    instance_summary, load_template_prompt, parse_role_override_map,
-    resolve_role_workflow_selection, resolve_template_workflow_selection,
-    resolve_thread_branch_name, resolve_workflow_selection,
+    infer_workflow_ref_from_template, inject_task_only, inject_template_prompt, instance_summary,
+    load_template_prompt, parse_role_override_map, resolve_role_workflow_selection,
+    resolve_template_workflow_selection, resolve_thread_branch_name, resolve_workflow_selection,
     select_template_and_workflow_for_message, validate_git_ref_like,
 };
 use scaffold::{
@@ -808,15 +807,15 @@ where
     }
 }
 
+mod agent_export;
 mod catalog;
 mod entrypoint;
+mod mcp_server;
 mod ops;
 mod policy;
 mod runtime;
 mod scaffold;
 mod skillpack;
-mod agent_export;
-mod mcp_server;
 mod types;
 mod workflow_control;
 

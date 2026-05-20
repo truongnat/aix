@@ -7,6 +7,21 @@ pub(super) fn handle_workflow_control_command(
     command: Commands,
 ) -> Result<WorkflowLaunchAction> {
     match command {
+        Commands::Init {
+            json,
+            strict_ollama,
+        } => {
+            run_project_init(project_layout, json, strict_ollama)?;
+            Ok(WorkflowLaunchAction::Noop)
+        }
+        Commands::Index {
+            max_files,
+            memory_persist,
+            json,
+        } => {
+            run_project_index(project_layout, max_files, memory_persist, json)?;
+            Ok(WorkflowLaunchAction::Noop)
+        }
         Commands::Bug { .. } => Ok(WorkflowLaunchAction::Noop),
         Commands::Workflow { action } => match *action {
             WorkflowCommand::List => {
@@ -629,37 +644,7 @@ pub(super) fn handle_workflow_control_command(
                 json,
                 strict_ollama,
             } => {
-                let created = ensure_bootstrap_package(project_layout)?;
-                let report = run_workflow_doctor(
-                    project_layout,
-                    resolve_bootstrap_strict_ollama(strict_ollama),
-                )?;
-                if json {
-                    let payload = SetupReport {
-                        created_files: created
-                            .iter()
-                            .map(|path| path.display().to_string())
-                            .collect(),
-                        doctor: report.clone(),
-                    };
-                    println!("{}", serde_json::to_string_pretty(&payload)?);
-                } else {
-                    if created.is_empty() {
-                        println!("Setup: package skeleton already present (no files created).");
-                    } else {
-                        println!("Setup: created {} file(s):", created.len());
-                        for path in &created {
-                            println!("- {}", path.display());
-                        }
-                    }
-                    print_doctor_report(&report);
-                }
-                if !report.ok {
-                    return Err(anyhow!(
-                        "workflow setup failed with {} error check(s)",
-                        doctor_error_count(&report)
-                    ));
-                }
+                run_project_init(project_layout, json, strict_ollama)?;
                 Ok(WorkflowLaunchAction::Noop)
             }
             WorkflowCommand::McpRegister {
@@ -1083,6 +1068,78 @@ pub(super) fn handle_workflow_control_command(
         }
         Commands::Harness { .. } => Ok(WorkflowLaunchAction::Noop),
     }
+}
+
+fn run_project_init(
+    project_layout: &AgentProjectLayout,
+    json: bool,
+    strict_ollama: bool,
+) -> Result<()> {
+    let created = ensure_bootstrap_package(project_layout)?;
+    let report = run_workflow_doctor(
+        project_layout,
+        resolve_bootstrap_strict_ollama(strict_ollama),
+    )?;
+    if json {
+        let payload = SetupReport {
+            created_files: created
+                .iter()
+                .map(|path| path.display().to_string())
+                .collect(),
+            doctor: report.clone(),
+        };
+        println!("{}", serde_json::to_string_pretty(&payload)?);
+    } else {
+        if created.is_empty() {
+            println!("Init: package skeleton already present (no files created).");
+        } else {
+            println!("Init: created {} file(s):", created.len());
+            for path in &created {
+                println!("- {}", path.display());
+            }
+        }
+        print_doctor_report(&report);
+        println!("\nNext:");
+        println!("- asd workflow check");
+        println!("- asd index");
+        println!("- asd workflow list");
+        println!("- asd bug analyze <ticket.md>");
+    }
+    if !report.ok {
+        return Err(anyhow!(
+            "project init failed with {} error check(s)",
+            doctor_error_count(&report)
+        ));
+    }
+    Ok(())
+}
+
+fn run_project_index(
+    project_layout: &AgentProjectLayout,
+    max_files: usize,
+    memory_persist: bool,
+    json: bool,
+) -> Result<()> {
+    let report = build_graph_index(project_layout, max_files, memory_persist)?;
+    if json {
+        println!("{}", serde_json::to_string_pretty(&report)?);
+    } else {
+        println!(
+            "Project index rebuilt: path={} nodes={} edges={} context_db={} vector_table={} graph_table={} vector_entries={} graph_entries={}",
+            report.index_path,
+            report.nodes,
+            report.edges,
+            report.context_db_path,
+            report.context_vector_table,
+            report.context_graph_table,
+            report.vector_entries,
+            report.graph_entries
+        );
+        println!("Next:");
+        println!("- asd bug analyze <ticket.md>");
+        println!("- asd workflow list");
+    }
+    Ok(())
 }
 
 fn mcp_registry_path(project_layout: &AgentProjectLayout) -> PathBuf {

@@ -407,7 +407,9 @@ fn extract_run_script_command(input: &SkillInput) -> Result<String> {
     }
 }
 
-fn parse_write_files_from_json_input(input: &SkillInput) -> Result<(Option<PathBuf>, Vec<(PathBuf, String)>)> {
+fn parse_write_files_from_json_input(
+    input: &SkillInput,
+) -> Result<(Option<PathBuf>, Vec<(PathBuf, String)>)> {
     let value = match input {
         SkillInput::Json(value) => value,
         SkillInput::Text(text) => {
@@ -462,7 +464,9 @@ fn parse_write_files_from_json_input(input: &SkillInput) -> Result<(Option<PathB
     }
 
     if out.is_empty() {
-        return Err(anyhow!("write_files_from_json requires at least one file entry"));
+        return Err(anyhow!(
+            "write_files_from_json requires at least one file entry"
+        ));
     }
 
     Ok((root_dir, out))
@@ -898,13 +902,11 @@ fn build_artifact_blueprint(task: &str) -> Value {
     {
         return build_node_todo_cli_blueprint();
     }
-    if normalized.contains("todo")
-        && (normalized.contains("python") || normalized.contains("py "))
+    if normalized.contains("todo") && (normalized.contains("python") || normalized.contains("py "))
     {
         return build_python_todo_cli_blueprint();
     }
-    if normalized.contains("todo")
-        && (normalized.contains("rust") || normalized.contains("cargo"))
+    if normalized.contains("todo") && (normalized.contains("rust") || normalized.contains("cargo"))
     {
         return build_rust_todo_cli_blueprint();
     }
@@ -1363,10 +1365,7 @@ impl Skill for ArtifactBlueprintGateSkill {
             .or_else(|| value.get("command"))
             .and_then(Value::as_str);
         let has_command = command.is_some();
-        let command_safe = command
-            .map(validate_run_script_policy)
-            .transpose()
-            .is_ok();
+        let command_safe = command.map(validate_run_script_policy).transpose().is_ok();
         let degraded = value
             .get("risks")
             .and_then(Value::as_array)
@@ -1389,18 +1388,18 @@ impl Skill for ArtifactBlueprintGateSkill {
         }
 
         Ok(SkillOutput::json(json!({
-            "status": "failed",
-            "summary": "Artifact blueprint is incomplete or degraded and cannot be applied safely.",
-                "actions": ["regenerate blueprint", "verify model/provider availability"],
-                "risks": [
-                    if !has_root_dir { "missing_root_dir" } else { "root_dir_ok" },
-                    if !root_dir_safe { "unsafe_root_dir" } else { "safe_root_dir" },
-                    if !has_files { "missing_files" } else { "files_ok" },
-                    if !has_command { "missing_validation_command" } else { "validation_command_ok" },
-                    if !command_safe { "unsafe_validation_command" } else { "safe_validation_command" },
-                    if degraded { "degraded_or_simulated_output" } else { "not_degraded" }
-                ]
-            })))
+        "status": "failed",
+        "summary": "Artifact blueprint is incomplete or degraded and cannot be applied safely.",
+            "actions": ["regenerate blueprint", "verify model/provider availability"],
+            "risks": [
+                if !has_root_dir { "missing_root_dir" } else { "root_dir_ok" },
+                if !root_dir_safe { "unsafe_root_dir" } else { "safe_root_dir" },
+                if !has_files { "missing_files" } else { "files_ok" },
+                if !has_command { "missing_validation_command" } else { "validation_command_ok" },
+                if !command_safe { "unsafe_validation_command" } else { "safe_validation_command" },
+                if degraded { "degraded_or_simulated_output" } else { "not_degraded" }
+            ]
+        })))
     }
 }
 
@@ -1537,13 +1536,10 @@ mod tests {
             value.get("validation_command").and_then(Value::as_str),
             Some("npm test --prefix local_tmp/generated-app")
         );
-        let files = value
-            .get("files")
-            .and_then(Value::as_array)
-            .expect("files");
-        assert!(files.iter().any(|entry| {
-            entry.get("path").and_then(Value::as_str) == Some("bin/todo.js")
-        }));
+        let files = value.get("files").and_then(Value::as_array).expect("files");
+        assert!(files
+            .iter()
+            .any(|entry| { entry.get("path").and_then(Value::as_str) == Some("bin/todo.js") }));
     }
 
     #[test]
@@ -1553,13 +1549,10 @@ mod tests {
             value.get("validation_command").and_then(Value::as_str),
             Some("python3 -m unittest discover -s local_tmp/generated-app/tests -q")
         );
-        let files = value
-            .get("files")
-            .and_then(Value::as_array)
-            .expect("files");
-        assert!(files.iter().any(|entry| {
-            entry.get("path").and_then(Value::as_str) == Some("todo.py")
-        }));
+        let files = value.get("files").and_then(Value::as_array).expect("files");
+        assert!(files
+            .iter()
+            .any(|entry| { entry.get("path").and_then(Value::as_str) == Some("todo.py") }));
     }
 
     #[test]
@@ -1569,12 +1562,9 @@ mod tests {
             value.get("validation_command").and_then(Value::as_str),
             Some("cargo test --manifest-path local_tmp/generated-app/Cargo.toml")
         );
-        let files = value
-            .get("files")
-            .and_then(Value::as_array)
-            .expect("files");
-        assert!(files.iter().any(|entry| {
-            entry.get("path").and_then(Value::as_str) == Some("src/main.rs")
-        }));
+        let files = value.get("files").and_then(Value::as_array).expect("files");
+        assert!(files
+            .iter()
+            .any(|entry| { entry.get("path").and_then(Value::as_str) == Some("src/main.rs") }));
     }
 }

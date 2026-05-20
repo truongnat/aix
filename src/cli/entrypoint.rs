@@ -1,25 +1,41 @@
 use super::*;
+use crate::engine::project::resolve_project_root_from;
+use std::path::{Path, PathBuf};
+
+fn resolve_input_path_from(invocation_dir: &Path, input_file: &str) -> PathBuf {
+    let input_path = Path::new(input_file);
+    if input_path.is_absolute() {
+        input_path.to_path_buf()
+    } else {
+        invocation_dir.join(input_path)
+    }
+}
 
 pub(super) async fn run_impl() -> Result<()> {
     let cli = Cli::parse();
+    let invocation_dir = std::env::current_dir()?;
 
     if let Some(ref command) = cli.command {
         if let Commands::Bug { action } = &**command {
             match &**action {
                 BugCommand::Analyze { input_file } => {
-                    crate::bug::run_analyze(input_file).await?;
+                    let input_path = resolve_input_path_from(&invocation_dir, input_file);
+                    crate::bug::run_analyze(&input_path.to_string_lossy()).await?;
                     return Ok(());
                 }
                 BugCommand::Plan { input_file } => {
-                    crate::bug::run_plan(input_file).await?;
+                    let input_path = resolve_input_path_from(&invocation_dir, input_file);
+                    crate::bug::run_plan(&input_path.to_string_lossy()).await?;
                     return Ok(());
                 }
                 BugCommand::Reply { input_file } => {
-                    crate::bug::run_reply(input_file).await?;
+                    let input_path = resolve_input_path_from(&invocation_dir, input_file);
+                    crate::bug::run_reply(&input_path.to_string_lossy()).await?;
                     return Ok(());
                 }
                 BugCommand::Prompt { input_file } => {
-                    crate::bug::run_prompt(input_file).await?;
+                    let input_path = resolve_input_path_from(&invocation_dir, input_file);
+                    crate::bug::run_prompt(&input_path.to_string_lossy()).await?;
                     return Ok(());
                 }
             }
@@ -40,8 +56,8 @@ pub(super) async fn run_impl() -> Result<()> {
         eprintln!("Warning: --snapshot-out is ignored; snapshot export is no longer supported.");
     }
 
-    let cwd = std::env::current_dir()?;
-    let project_root = cwd.to_string_lossy().to_string();
+    let project_root_path = resolve_project_root_from(&invocation_dir)?;
+    let project_root = project_root_path.to_string_lossy().to_string();
     let project_layout = AgentProjectLayout::discover(&project_root)?;
     project_layout.validate_startup()?;
     let mut harness_run_request: Option<(String, String, bool)> = None;
@@ -641,9 +657,7 @@ pub(super) async fn run_impl() -> Result<()> {
         } else {
             println!(
                 "Harness run: config='{}' workflow_id='{}' task='{}'",
-                config_path,
-                config.workflow.id,
-                task
+                config_path, config.workflow.id, task
             );
             print_instance_summary(&instance);
         }

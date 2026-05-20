@@ -13,7 +13,10 @@ impl LoadedBugInput {
         let path_ref = path.as_ref();
         let raw = std::fs::read_to_string(path_ref)
             .with_context(|| format!("failed to read bug input '{}'", path_ref.display()))?;
-        let lines = raw.lines().map(|line| line.trim_end().to_string()).collect();
+        let lines = raw
+            .lines()
+            .map(|line| line.trim_end().to_string())
+            .collect();
         Ok(Self {
             path: path_ref.to_path_buf(),
             raw,

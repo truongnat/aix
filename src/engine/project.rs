@@ -4,6 +4,7 @@ use crate::engine::security::DomainSecurityPolicy;
 use crate::skill::capability::TrustTier;
 use crate::workflow::loader::load_workflow;
 use anyhow::{anyhow, Result};
+use git2::Repository;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
@@ -247,6 +248,18 @@ impl AgentProjectLayout {
     pub fn load_merge_rules(&self) -> Result<ProjectMergeRules> {
         self.load_markdown_rule("merge_rules.md")
     }
+}
+
+pub fn resolve_project_root_from(start_dir: &Path) -> Result<PathBuf> {
+    if let Ok(repo) = Repository::discover(start_dir) {
+        if let Some(workdir) = repo.workdir() {
+            return Ok(workdir.to_path_buf());
+        }
+        if let Some(parent) = repo.path().parent() {
+            return Ok(parent.to_path_buf());
+        }
+    }
+    Ok(start_dir.to_path_buf())
 }
 
 fn extract_json_code_block(markdown: &str) -> Option<String> {
@@ -501,11 +514,12 @@ impl ProjectRuntimeRules {
 
 #[cfg(test)]
 mod tests {
-    use super::{AgentProjectLayout, ProjectRuntimeRules};
+    use super::{resolve_project_root_from, AgentProjectLayout, ProjectRuntimeRules};
     use crate::engine::budget::{ExecutionBudget, ResourceBudget};
     use crate::engine::routing::RoutingPolicy;
     use crate::engine::security::DomainSecurityPolicy;
     use crate::skill::capability::TrustTier;
+    use git2::Repository;
 
     #[test]
     fn rules_apply_with_restrictive_merge() {
@@ -778,6 +792,51 @@ mod tests {
         assert!(layout.resolve_workflow_path("domain_a/plan").is_some());
         assert!(layout.resolve_workflow_path("domain_b/plan").is_some());
         assert!(layout.resolve_workflow_path("plan").is_none());
+
+        let _ = std::fs::remove_dir_all(root_path);
+    }
+
+    #[test]
+    fn resolve_project_root_from_returns_git_repo_root() {
+        let unique = format!(
+            "agentic-sdlc-git-root-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root_path = std::env::temp_dir().join(unique);
+        let nested = root_path.join("packages").join("feature");
+        std::fs::create_dir_all(&nested).expect("nested dir");
+
+        let repo = Repository::init(&root_path).expect("init repo");
+        drop(repo);
+
+        let resolved = resolve_project_root_from(&nested)
+            .expect("resolve git root")
+            .canonicalize()
+            .expect("canonical resolved");
+        let expected = root_path.canonicalize().expect("canonical root");
+        assert_eq!(resolved, expected);
+
+        let _ = std::fs::remove_dir_all(root_path);
+    }
+
+    #[test]
+    fn resolve_project_root_from_falls_back_to_start_dir_outside_git() {
+        let unique = format!(
+            "agentic-sdlc-non-git-root-test-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .expect("time")
+                .as_nanos()
+        );
+        let root_path = std::env::temp_dir().join(unique);
+        let nested = root_path.join("packages").join("feature");
+        std::fs::create_dir_all(&nested).expect("nested dir");
+
+        let resolved = resolve_project_root_from(&nested).expect("resolve fallback root");
+        assert_eq!(resolved, nested);
 
         let _ = std::fs::remove_dir_all(root_path);
     }

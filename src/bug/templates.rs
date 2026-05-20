@@ -29,7 +29,10 @@ pub(crate) fn render_analysis(input: &LoadedBugInput, signals: &BugSignals) -> S
     ));
     out.push(format!(
         "Impact\n{}\n",
-        numbered_block(&signals.impact, "Impact still needs blast-radius confirmation.")
+        numbered_block(
+            &signals.impact,
+            "Impact still needs blast-radius confirmation."
+        )
     ));
     out.push(format!(
         "Suspected root cause\n{}\n",
@@ -207,7 +210,12 @@ where
 
 fn merge_for_checks(signals: &BugSignals) -> Vec<String> {
     let mut items = Vec::new();
-    items.extend(signals.api_points.iter().map(|item| format!("API: `{}`", item)));
+    items.extend(
+        signals
+            .api_points
+            .iter()
+            .map(|item| format!("API: `{}`", item)),
+    );
     items.extend(signals.db_points.iter().cloned());
     items.extend(
         signals

@@ -557,13 +557,18 @@ fn parse_input_payload(input: &SkillInput) -> Result<(Option<String>, String)> {
     }
 }
 
-fn build_prompt(role_name: &str, role_prompt: &str, instruction_input: &str, discipline: Option<&str>) -> String {
+fn build_prompt(
+    role_name: &str,
+    role_prompt: &str,
+    instruction_input: &str,
+    discipline: Option<&str>,
+) -> String {
     let mut parts = Vec::new();
-    
+
     if let Some(d) = discipline {
         parts.push(format!("Discipline Guidelines:\n{}", d));
     }
-    
+
     parts.push(format!("Role: {}", role_name));
     let trimmed_role_prompt = role_prompt.trim();
     if !trimmed_role_prompt.is_empty() {
@@ -650,18 +655,23 @@ fn extract_string_array(value: &serde_json::Value, key: &str) -> Vec<serde_json:
 
 fn load_karpathy_discipline_if_enabled(project_root: &str) -> Option<String> {
     let rule_path = std::path::Path::new(project_root).join(".agents/rules/karpathy_rules.md");
-    if !rule_path.exists() { return None; }
-    
+    if !rule_path.exists() {
+        return None;
+    }
+
     let content = std::fs::read_to_string(&rule_path).ok()?;
-    if !content.contains("\"require_karpathy_discipline\": true") { return None; }
-    
-    let skill_path = std::path::Path::new(project_root).join(".agents/skills/karpathy_discipline/SKILL.md");
+    if !content.contains("\"require_karpathy_discipline\": true") {
+        return None;
+    }
+
+    let skill_path =
+        std::path::Path::new(project_root).join(".agents/skills/karpathy_discipline/SKILL.md");
     let skill_content = std::fs::read_to_string(&skill_path).ok()?;
-    
+
     if let Some(idx) = skill_content.find("## System Prompt (Injected)") {
         return Some(skill_content[idx + 27..].trim().to_string());
     }
-    
+
     None
 }
 
@@ -682,7 +692,8 @@ impl LlmSubAgentSkill {
             .ok()
             .and_then(|v| v.trim().parse::<u32>().ok())
             .unwrap_or(1);
-        let fallback_providers = parse_provider_list(std::env::var("AGENTIC_SDLC_LLM_FALLBACK").ok());
+        let fallback_providers =
+            parse_provider_list(std::env::var("AGENTIC_SDLC_LLM_FALLBACK").ok());
         let fallback_policy =
             parse_fallback_policy(std::env::var("AGENTIC_SDLC_LLM_FALLBACK_POLICY").ok());
         Self {
@@ -828,8 +839,11 @@ impl LlmSubAgentSkill {
         temperature: f32,
     ) -> Result<ProviderCallResult, ProviderCallFailure> {
         let ollama_client = super::ollama::OllamaClient::new();
-        let model = ollama_client.resolve_model(model_requested).await.unwrap_or_else(|_| model_requested.to_string());
-        
+        let model = ollama_client
+            .resolve_model(model_requested)
+            .await
+            .unwrap_or_else(|_| model_requested.to_string());
+
         let client = build_http_client().map_err(|err| {
             provider_failure(
                 LlmProvider::Ollama,
@@ -1585,7 +1599,12 @@ impl Skill for LlmSubAgentSkill {
         }
 
         let discipline = load_karpathy_discipline_if_enabled(&ctx.project_root);
-        let prompt = build_prompt(&role_name, &role_prompt, &instruction_input, discipline.as_deref());
+        let prompt = build_prompt(
+            &role_name,
+            &role_prompt,
+            &instruction_input,
+            discipline.as_deref(),
+        );
 
         // Check replay cache before calling providers
         if let Some(cache) = &self.replay_cache {
@@ -1860,7 +1879,10 @@ mod tests {
     use std::path::PathBuf;
 
     fn live_smoke_enabled() -> bool {
-        std::env::var("AGENTIC_SDLC_RUN_LIVE_LLM_TESTS").ok().as_deref() == Some("1")
+        std::env::var("AGENTIC_SDLC_RUN_LIVE_LLM_TESTS")
+            .ok()
+            .as_deref()
+            == Some("1")
     }
 
     fn has_env_var(name: &str) -> bool {

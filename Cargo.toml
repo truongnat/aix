@@ -23,6 +23,10 @@ exclude = [
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
+[[bin]]
+name = "asd"
+path = "src/bin/asd.rs"
+
 [dependencies]
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }

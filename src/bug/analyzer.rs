@@ -7,11 +7,11 @@ pub(crate) fn analyze_input(input: &LoadedBugInput) -> BugSignals {
         r"(?P<path>[A-Za-z0-9_./-]+\.(rs|go|ts|tsx|js|jsx|py|java|kt|swift|dart|sql|yml|yaml|json|md))",
     )
     .expect("file regex");
-    let api_regex =
-        Regex::new(r"(/[A-Za-z0-9._~!$&'()*+,;=:@%-]+){1,}").expect("api regex");
-    let db_regex =
-        Regex::new(r"\b(select|insert|update|delete|from|where|join|table|column|index|migration)\b")
-            .expect("db regex");
+    let api_regex = Regex::new(r"(/[A-Za-z0-9._~!$&'()*+,;=:@%-]+){1,}").expect("api regex");
+    let db_regex = Regex::new(
+        r"\b(select|insert|update|delete|from|where|join|table|column|index|migration)\b",
+    )
+    .expect("db regex");
 
     let mut signals = BugSignals::default();
     let mut languages = BTreeSet::new();
@@ -92,9 +92,9 @@ pub(crate) fn analyze_input(input: &LoadedBugInput) -> BugSignals {
         if let Some(title) = signals.title.as_ref() {
             signals.summary.push(title.clone());
         } else {
-            signals
-                .summary
-                .push("Input contains a bug/ticket report that needs structured triage.".to_string());
+            signals.summary.push(
+                "Input contains a bug/ticket report that needs structured triage.".to_string(),
+            );
         }
     }
     if signals.current_behavior.is_empty() {
@@ -125,9 +125,9 @@ pub(crate) fn analyze_input(input: &LoadedBugInput) -> BugSignals {
             .push("No concrete file/module path is referenced.".to_string());
     }
     if signals.api_points.is_empty() && signals.db_points.is_empty() && !signals.has_logs {
-        signals
-            .missing_information
-            .push("No logs, API endpoint, or DB clue is present for technical tracing.".to_string());
+        signals.missing_information.push(
+            "No logs, API endpoint, or DB clue is present for technical tracing.".to_string(),
+        );
     }
 
     build_root_cause(&mut signals);
@@ -198,7 +198,9 @@ fn looks_like_repro_step(line: &str) -> bool {
         || (lower.contains("repro") && line.contains(':'))
         || line.contains("再現")
         || line.contains("手順")
-        || Regex::new(r"^\d+[.)]\s+").expect("step regex").is_match(line)
+        || Regex::new(r"^\d+[.)]\s+")
+            .expect("step regex")
+            .is_match(line)
 }
 
 fn looks_like_impact(line: &str) -> bool {
@@ -226,7 +228,9 @@ fn is_error_or_log_line(line: &str) -> bool {
         || lower.contains("[error]")
         || lower.contains("[warn]")
         || lower.contains("nullpointer")
-        || Regex::new(r"\b[45]\d{2}\b").expect("status regex").is_match(line)
+        || Regex::new(r"\b[45]\d{2}\b")
+            .expect("status regex")
+            .is_match(line)
 }
 
 fn extract_error_signature(line: &str) -> Option<String> {
@@ -326,9 +330,10 @@ fn build_root_cause(signals: &mut BugSignals) {
         );
     }
     if signals.suspected_root_cause.is_empty() {
-        signals
-            .suspected_root_cause
-            .push("Input suggests a behavior mismatch, but the technical trigger is still unclear.".to_string());
+        signals.suspected_root_cause.push(
+            "Input suggests a behavior mismatch, but the technical trigger is still unclear."
+                .to_string(),
+        );
     }
 }
 
@@ -365,9 +370,10 @@ fn build_investigation_points(signals: &mut BugSignals) {
         );
     }
     if signals.investigation_points.is_empty() {
-        signals
-            .investigation_points
-            .push("Start by reproducing locally and capturing the first deterministic failing step.".to_string());
+        signals.investigation_points.push(
+            "Start by reproducing locally and capturing the first deterministic failing step."
+                .to_string(),
+        );
     }
 }
 
@@ -378,9 +384,10 @@ fn build_impact(signals: &mut BugSignals) {
             .iter()
             .any(|item| item.contains("HTTP 500"))
         {
-            signals
-                .impact
-                .push("Request is failing at runtime and likely blocks the affected user flow.".to_string());
+            signals.impact.push(
+                "Request is failing at runtime and likely blocks the affected user flow."
+                    .to_string(),
+            );
         } else if signals
             .error_signatures
             .iter()
@@ -390,9 +397,10 @@ fn build_impact(signals: &mut BugSignals) {
                 .impact
                 .push("Feature cannot reach the expected route/resource, so the flow is partially broken.".to_string());
         } else {
-            signals
-                .impact
-                .push("User-facing behavior is inconsistent and needs confirmation of blast radius.".to_string());
+            signals.impact.push(
+                "User-facing behavior is inconsistent and needs confirmation of blast radius."
+                    .to_string(),
+            );
         }
     }
 }
@@ -451,7 +459,10 @@ mod tests {
 
         let signals = analyze_input(&input);
         assert!(signals.has_logs);
-        assert!(signals.error_signatures.iter().any(|item| item == "HTTP 500"));
+        assert!(signals
+            .error_signatures
+            .iter()
+            .any(|item| item == "HTTP 500"));
         assert!(signals.api_points.iter().any(|item| item == "/api/orders"));
     }
 
@@ -459,7 +470,8 @@ mod tests {
     fn extracts_japanese_ticket_lines() {
         let input = LoadedBugInput {
             path: "sample.md".into(),
-            raw: "不具合概要: 決済時に500エラーが発生します\n期待結果: 正常に完了すること\n".to_string(),
+            raw: "不具合概要: 決済時に500エラーが発生します\n期待結果: 正常に完了すること\n"
+                .to_string(),
             lines: vec![
                 "不具合概要: 決済時に500エラーが発生します".to_string(),
                 "期待結果: 正常に完了すること".to_string(),

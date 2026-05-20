@@ -7,11 +7,10 @@ use super::{
     parse_role_override_map, parse_scaffold_profile, parse_simple_yaml_map,
     parse_skillpack_install_mode, read_bundle_catalog, read_skills_lockfile, render_otel_trace,
     resolve_bootstrap_strict_ollama, resolve_role_workflow_selection, run_skill_quality_check,
-    sanitize_package_name, scaffold_domain_pack, scaffold_markdown_package,
+    run_workflow_doctor, sanitize_package_name, scaffold_domain_pack, scaffold_markdown_package,
     select_template_and_workflow_for_message, validate_git_ref_like, verify_skills_lock,
-    BugCommand, Cli, Commands, ImportSkillpackOptions, RoleRunRequest, ScaffoldProfile,
-    SkillpackInstallMode,
-    ThreadFlowRequest,
+    BugCommand, Cli, Commands, DoctorCheckStatus, ImportSkillpackOptions, RoleRunRequest,
+    ScaffoldProfile, SkillpackInstallMode, ThreadFlowRequest,
 };
 use crate::engine::budget::ExecutionBudget;
 use crate::engine::context::ExecutionContext;
@@ -56,6 +55,44 @@ fn cli_parses_bug_analyze_command() {
                 other => panic!("expected analyze command, got {:?}", other),
             },
             other => panic!("expected bug command, got {:?}", other),
+        },
+        None => panic!("expected subcommand"),
+    }
+}
+
+#[test]
+fn cli_parses_init_command() {
+    let cli = Cli::parse_from(["agentic-sdlc", "init", "--strict-ollama"]);
+    match cli.command {
+        Some(command) => match *command {
+            Commands::Init {
+                json,
+                strict_ollama,
+            } => {
+                assert!(!json);
+                assert!(strict_ollama);
+            }
+            other => panic!("expected init command, got {:?}", other),
+        },
+        None => panic!("expected subcommand"),
+    }
+}
+
+#[test]
+fn cli_parses_index_command() {
+    let cli = Cli::parse_from(["agentic-sdlc", "index", "--max-files", "500", "--json"]);
+    match cli.command {
+        Some(command) => match *command {
+            Commands::Index {
+                max_files,
+                memory_persist,
+                json,
+            } => {
+                assert_eq!(max_files, 500);
+                assert!(!memory_persist);
+                assert!(json);
+            }
+            other => panic!("expected index command, got {:?}", other),
         },
         None => panic!("expected subcommand"),
     }
@@ -1346,6 +1383,33 @@ fn setup_bootstraps_core_markdown_package() {
 
     let second = ensure_bootstrap_package(&layout).expect("setup idempotent");
     assert!(second.is_empty());
+
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
+fn doctor_allows_repositories_without_language_manifest() {
+    let unique = format!(
+        "agentic-sdlc-cli-doctor-generic-repo-{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .expect("time")
+            .as_nanos()
+    );
+    let root = std::env::temp_dir().join(unique);
+    std::fs::create_dir_all(&root).expect("create temp project");
+    let root_str = root.to_string_lossy().to_string();
+    let layout = AgentProjectLayout::discover(&root_str).expect("discover layout");
+    let _ = ensure_bootstrap_package(&layout).expect("bootstrap package");
+
+    let report = run_workflow_doctor(&layout, false).expect("doctor report");
+    let manifest_check = report
+        .checks
+        .iter()
+        .find(|entry| entry.name == "project_manifest")
+        .expect("manifest check");
+    assert!(matches!(manifest_check.status, DoctorCheckStatus::Warning));
+    assert!(report.ok, "doctor should allow generic repositories");
 
     let _ = std::fs::remove_dir_all(root);
 }

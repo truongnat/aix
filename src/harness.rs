@@ -62,8 +62,13 @@ impl Default for HarnessWorkflowConfig {
 
 impl HarnessConfig {
     pub fn load(path: &Path) -> Result<Self> {
-        let body = std::fs::read_to_string(path)
-            .map_err(|err| anyhow!("Failed to read harness config '{}': {}", path.display(), err))?;
+        let body = std::fs::read_to_string(path).map_err(|err| {
+            anyhow!(
+                "Failed to read harness config '{}': {}",
+                path.display(),
+                err
+            )
+        })?;
         let config: HarnessConfig = serde_yaml::from_str(&body).map_err(|err| {
             anyhow!(
                 "Failed to parse harness config '{}': {}",

@@ -52,13 +52,13 @@ impl OllamaClient {
             .no_proxy()
             .timeout(Duration::from_millis(ollama_http_timeout_ms()))
             .build()?;
-        let res = client
-            .get(format!("{}/api/tags", self.host))
-            .send()
-            .await?;
+        let res = client.get(format!("{}/api/tags", self.host)).send().await?;
 
         if !res.status().is_success() {
-            return Err(anyhow!("Failed to list Ollama models: status {}", res.status()));
+            return Err(anyhow!(
+                "Failed to list Ollama models: status {}",
+                res.status()
+            ));
         }
 
         let payload: OllamaListResponse = res.json().await?;
@@ -68,7 +68,7 @@ impl OllamaClient {
 
     pub async fn resolve_model(&self, requested: &str) -> Result<String> {
         let state_path = std::path::Path::new(".agents/state/ollama_resolution.json");
-        
+
         // 1. Check persistent cache
         if let Ok(content) = std::fs::read_to_string(state_path) {
             if let Ok(cache) = serde_json::from_str::<serde_json::Value>(&content) {
@@ -83,14 +83,17 @@ impl OllamaClient {
         }
 
         let models = self.list_models().await?;
-        
+
         // 2. Exact match
         if models.iter().any(|m| m.name == requested) {
             return Ok(requested.to_string());
         }
 
         // 3. Try to pull if missing and auto-pull is enabled
-        if std::env::var("AGENTIC_SDLC_OLLAMA_AUTO_PULL").map(|v| v == "true").unwrap_or(false) {
+        if std::env::var("AGENTIC_SDLC_OLLAMA_AUTO_PULL")
+            .map(|v| v == "true")
+            .unwrap_or(false)
+        {
             match self.pull_model(requested).await {
                 Ok(_) => {
                     // Refresh cache after pull
@@ -110,7 +113,10 @@ impl OllamaClient {
         let requested_base = requested.split(':').next().unwrap_or(requested);
         let mut resolved = None;
         if let Some(m) = models.iter().find(|m| m.name.starts_with(requested_base)) {
-            println!("💡 [OLLAMA] Requested model '{}' not found, falling back to base match '{}'", requested, m.name);
+            println!(
+                "💡 [OLLAMA] Requested model '{}' not found, falling back to base match '{}'",
+                requested, m.name
+            );
             resolved = Some(m.name.clone());
         }
 
@@ -138,19 +144,25 @@ impl OllamaClient {
             } else {
                 serde_json::json!({})
             };
-            
+
             if let Some(obj) = cache.as_object_mut() {
                 obj.insert(requested.to_string(), serde_json::json!(res));
                 if let Some(parent) = state_path.parent() {
                     let _ = std::fs::create_dir_all(parent);
                 }
-                let _ = std::fs::write(state_path, serde_json::to_string_pretty(&cache).unwrap_or_default());
+                let _ = std::fs::write(
+                    state_path,
+                    serde_json::to_string_pretty(&cache).unwrap_or_default(),
+                );
             }
-            
+
             return Ok(res);
         }
 
-        Err(anyhow!("Model '{}' not found and no local models available to fallback", requested))
+        Err(anyhow!(
+            "Model '{}' not found and no local models available to fallback",
+            requested
+        ))
     }
 
     pub async fn pull_model(&self, name: &str) -> Result<()> {
@@ -166,7 +178,11 @@ impl OllamaClient {
             .await?;
 
         if !res.status().is_success() {
-            return Err(anyhow!("Failed to pull model '{}': status {}", name, res.status()));
+            return Err(anyhow!(
+                "Failed to pull model '{}': status {}",
+                name,
+                res.status()
+            ));
         }
 
         println!("✅ [OLLAMA] Successfully pulled model '{}'", name);
@@ -176,7 +192,7 @@ impl OllamaClient {
 
 fn score_model(name: &str) -> u32 {
     let name = name.to_lowercase();
-    
+
     // Base preference list
     let base_scores = [
         ("qwen2.5-coder", 110),
@@ -200,18 +216,36 @@ fn score_model(name: &str) -> u32 {
     }
 
     // Heuristic boosts/penalties
-    if name.contains("coder") { score += 5; }
-    if name.contains("instruct") { score += 2; }
-    
-    if name.contains("mini") { score = score.saturating_sub(15); }
-    if name.contains("tiny") { score = score.saturating_sub(20); }
-    
+    if name.contains("coder") {
+        score += 5;
+    }
+    if name.contains("instruct") {
+        score += 2;
+    }
+
+    if name.contains("mini") {
+        score = score.saturating_sub(15);
+    }
+    if name.contains("tiny") {
+        score = score.saturating_sub(20);
+    }
+
     // Parameter size boosts
-    if name.contains("70b") { score += 30; }
-    if name.contains("32b") { score += 20; }
-    if name.contains("14b") { score += 10; }
-    if name.contains("8b") { score += 5; }
-    if name.contains("7b") { score += 3; }
+    if name.contains("70b") {
+        score += 30;
+    }
+    if name.contains("32b") {
+        score += 20;
+    }
+    if name.contains("14b") {
+        score += 10;
+    }
+    if name.contains("8b") {
+        score += 5;
+    }
+    if name.contains("7b") {
+        score += 3;
+    }
 
     score
 }

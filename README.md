@@ -4,6 +4,65 @@
 
 Practical daily developer assistant for bug/ticket analysis, with a deterministic workflow harness underneath.
 
+## Global install
+
+If you want a global command similar to `npm link`, install the binaries from this repo:
+
+```bash
+cargo install --path .
+```
+
+That gives you both:
+
+```bash
+agentic-sdlc
+asd
+```
+
+`asd` is a short alias binary for `agentic-sdlc`.
+
+`as` is intentionally not used because it conflicts with the system assembler command on macOS and Linux.
+
+When you run either command globally, the tool works against the directory you invoke it from. If that directory is inside a Git repository, `agentic-sdlc` resolves the repository root and uses that as the working project root for workflow/package operations.
+
+## Init another project
+
+From the root of another repository, run:
+
+```bash
+asd init
+```
+
+This bootstraps the local `.agents/` package skeleton needed by `agentic-sdlc`:
+- rules
+- starter workflows
+- templates
+- roles
+- baseline skills
+- memory index files
+
+It also runs the built-in doctor checks so you can see whether the target project is ready to use the framework.
+
+## Index a project
+
+After init, build the local project index:
+
+```bash
+asd index
+```
+
+This refreshes:
+- `.agents/memory/graph_index.json`
+- `.agents/memory/context.db`
+- vector and graph context tables used by retrieval
+
+Optional:
+
+```bash
+asd index --max-files 500
+asd index --json
+```
+
 ## Fastest useful path
 
 If you want the most immediately useful command in this repo, start here:
@@ -322,10 +381,10 @@ Onboard/check local prerequisites:
 ```bash
 ./scripts/bootstrap.sh
 cargo run -- workflow doctor
-cargo run -- workflow setup
+cargo run -- init
 ```
 
-`workflow setup` now bootstraps a full core package when missing:
+`init` now bootstraps a full core package when missing:
 - rules (`runtime/branching/coding/merge`)
 - workflows (`starter/feature/bugfix/review/release`)
 - templates (`feature/bugfix/review/release_prompt`)

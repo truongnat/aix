@@ -2,6 +2,20 @@ use super::*;
 
 #[derive(Subcommand, Debug, Clone)]
 pub(crate) enum Commands {
+    Init {
+        #[arg(long, default_value_t = false)]
+        json: bool,
+        #[arg(long, default_value_t = false)]
+        strict_ollama: bool,
+    },
+    Index {
+        #[arg(long, default_value_t = 300)]
+        max_files: usize,
+        #[arg(long, default_value_t = false)]
+        memory_persist: bool,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
     Bug {
         #[command(subcommand)]
         action: Box<BugCommand>,
@@ -22,18 +36,10 @@ pub(crate) enum Commands {
 
 #[derive(Subcommand, Debug, Clone)]
 pub(crate) enum BugCommand {
-    Analyze {
-        input_file: String,
-    },
-    Plan {
-        input_file: String,
-    },
-    Reply {
-        input_file: String,
-    },
-    Prompt {
-        input_file: String,
-    },
+    Analyze { input_file: String },
+    Plan { input_file: String },
+    Reply { input_file: String },
+    Prompt { input_file: String },
 }
 
 #[derive(Subcommand, Debug, Clone)]

@@ -324,10 +324,13 @@ impl SkillTrait for FileSkill {
                     .model
                     .clone()
                     .unwrap_or_else(|| "mistral".to_string());
-                
+
                 let ollama = super::ollama::OllamaClient::new();
-                let model = ollama.resolve_model(&model_requested).await.unwrap_or_else(|_| model_requested.clone());
-                
+                let model = ollama
+                    .resolve_model(&model_requested)
+                    .await
+                    .unwrap_or_else(|_| model_requested.clone());
+
                 let timeout_ms = ollama_timeout_ms();
                 println!(
                     "🤖 [OLLAMA] Calling model: {} (requested={}) (timeout={}ms)",

@@ -272,7 +272,7 @@ fn parse_report_payload(input: &SkillInput) -> Result<serde_json::Value> {
 
 fn report_quality_findings(payload: &serde_json::Value) -> Vec<String> {
     let mut findings = Vec::<String>::new();
-    
+
     let min_summary_len = std::env::var("AGENTIC_SDLC_REPORT_MIN_SUMMARY_LEN")
         .ok()
         .and_then(|v| v.parse::<usize>().ok())
@@ -292,7 +292,10 @@ fn report_quality_findings(payload: &serde_json::Value) -> Vec<String> {
         .map(|v| v.trim())
         .unwrap_or_default();
     if summary.len() < min_summary_len {
-        findings.push(format!("summary must be at least {} characters", min_summary_len));
+        findings.push(format!(
+            "summary must be at least {} characters",
+            min_summary_len
+        ));
     }
     if summary
         .to_ascii_lowercase()
@@ -307,7 +310,10 @@ fn report_quality_findings(payload: &serde_json::Value) -> Vec<String> {
         .cloned()
         .unwrap_or_default();
     if actions.len() < min_actions {
-        findings.push(format!("actions must contain at least {} items", min_actions));
+        findings.push(format!(
+            "actions must contain at least {} items",
+            min_actions
+        ));
     }
     for (idx, action) in actions.iter().enumerate() {
         let text = action.as_str().map(|v| v.trim()).unwrap_or_default();

@@ -57,19 +57,33 @@ pub(crate) fn run_agent_export(
     };
 
     if !json {
-        println!("Exported {} to {} files.", report.target, report.files.len());
-        for f in &report.files { println!("- {}", f); }
+        println!(
+            "Exported {} to {} files.",
+            report.target,
+            report.files.len()
+        );
+        for f in &report.files {
+            println!("- {}", f);
+        }
     }
 
     Ok(report)
 }
 
 fn load_karpathy_system_prompt(layout: &AgentProjectLayout) -> String {
-    let path = layout.skills_dir.join("karpathy_discipline").join("SKILL.md");
-    fs::read_to_string(path).ok().and_then(|c| {
-        c.find("## System Prompt (Injected)")
-            .map(|i| c[i + 27..].trim().to_string())
-    }).unwrap_or_else(|| "Follow Karpathy principles: Think, Simplify, Surgical, Goal-driven.".to_string())
+    let path = layout
+        .skills_dir
+        .join("karpathy_discipline")
+        .join("SKILL.md");
+    fs::read_to_string(path)
+        .ok()
+        .and_then(|c| {
+            c.find("## System Prompt (Injected)")
+                .map(|i| c[i + 27..].trim().to_string())
+        })
+        .unwrap_or_else(|| {
+            "Follow Karpathy principles: Think, Simplify, Surgical, Goal-driven.".to_string()
+        })
 }
 
 fn load_system_contract(layout: &AgentProjectLayout) -> String {
@@ -82,7 +96,11 @@ fn load_rules_summary(layout: &AgentProjectLayout) -> String {
         for e in entries.flatten() {
             if e.path().extension().is_some_and(|ex| ex == "md") {
                 if let Ok(c) = fs::read_to_string(e.path()) {
-                    out.push_str(&format!("### {}\n{}\n\n", e.file_name().to_string_lossy(), c.trim()));
+                    out.push_str(&format!(
+                        "### {}\n{}\n\n",
+                        e.file_name().to_string_lossy(),
+                        c.trim()
+                    ));
                 }
             }
         }
@@ -91,15 +109,24 @@ fn load_rules_summary(layout: &AgentProjectLayout) -> String {
 }
 
 fn build_claude_md(karpathy: &str, contract: &str, rules: &str) -> String {
-    format!("# CLAUDE.md\n\n## Discipline\n{}\n\n## Contract\n{}\n\n## Rules\n{}", karpathy, contract, rules)
+    format!(
+        "# CLAUDE.md\n\n## Discipline\n{}\n\n## Contract\n{}\n\n## Rules\n{}",
+        karpathy, contract, rules
+    )
 }
 
 fn build_cursor_mdc(karpathy: &str, rules: &str) -> String {
-    format!("---\ndescription: Guidelines\nglobs: *\n---\n# Discipline\n{}\n\n# Rules\n{}", karpathy, rules)
+    format!(
+        "---\ndescription: Guidelines\nglobs: *\n---\n# Discipline\n{}\n\n# Rules\n{}",
+        karpathy, rules
+    )
 }
 
 fn build_gemini_md(karpathy: &str, contract: &str, rules: &str) -> String {
-    format!("# GEMINI.md\n\n## Discipline\n{}\n\n## Contract\n{}\n\n## Rules\n{}", karpathy, contract, rules)
+    format!(
+        "# GEMINI.md\n\n## Discipline\n{}\n\n## Contract\n{}\n\n## Rules\n{}",
+        karpathy, contract, rules
+    )
 }
 #[cfg(test)]
 mod tests {

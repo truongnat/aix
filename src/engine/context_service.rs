@@ -110,8 +110,7 @@ impl ContextService for DeterministicContextService {
             return Ok(ContextInjectionResult::passthrough(input));
         };
 
-        let (max_items, max_chars) =
-            budget_for_step(step, self.max_items, self.max_chars_per_item);
+        let (max_items, max_chars) = budget_for_step(step, self.max_items, self.max_chars_per_item);
         let mut snippets = Vec::new();
         let mut seen_keys = HashSet::new();
         for dep in &step.depends_on {
@@ -140,8 +139,7 @@ impl ContextService for DeterministicContextService {
                         score: Some(item.score),
                         text: truncate_chars(item.text.trim(), max_chars),
                     };
-                    let _ =
-                        push_unique_snippet(&mut snippets, &mut seen_keys, snippet, max_items);
+                    let _ = push_unique_snippet(&mut snippets, &mut seen_keys, snippet, max_items);
                 }
             }
         }
@@ -162,7 +160,11 @@ impl ContextService for DeterministicContextService {
 /// Steps whose ID contains planning keywords get richer context; fix/debug steps get
 /// a tighter budget to avoid flooding the prompt with stale context.
 /// Falls back to the service-level env-configured defaults for all other steps.
-fn budget_for_step(step: &WorkflowStep, default_items: usize, default_chars: usize) -> (usize, usize) {
+fn budget_for_step(
+    step: &WorkflowStep,
+    default_items: usize,
+    default_chars: usize,
+) -> (usize, usize) {
     let id = step.id.trim().to_ascii_lowercase();
     if id.contains("plan") || id.contains("think") || id.contains("analyz") {
         (10, 600)

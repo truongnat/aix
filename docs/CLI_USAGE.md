@@ -1,6 +1,57 @@
 # CLI Usage
 
-Binary command name in this repo is `agentic-sdlc` (normally invoked here via `cargo run -- ...`).
+Binary command names are `agentic-sdlc` and `asd`.
+
+For a global install similar to `npm link`:
+
+```bash
+cargo install --path .
+```
+
+That installs both binaries globally:
+
+```bash
+agentic-sdlc
+asd
+```
+
+`as` is intentionally not used because it conflicts with the system assembler command on macOS and Linux.
+
+When invoked globally, the CLI works against the directory you call it from. If that directory is inside a Git repository, workflow/package operations resolve to the repository root instead of the binary installation directory.
+
+## Init a project
+
+To initialize another repository for first use:
+
+```bash
+asd init
+```
+
+Optional:
+
+```bash
+asd init --strict-ollama
+asd init --json
+```
+
+`init` bootstraps the local `.agents/` structure and runs the same setup checks previously exposed under `workflow setup`.
+
+## Index a project
+
+To build or refresh the local project index:
+
+```bash
+asd index
+```
+
+Optional:
+
+```bash
+asd index --max-files 500
+asd index --json
+```
+
+`index` rebuilds the graph index and sqlite context store used by project retrieval.
 
 ## Fastest useful path
 
@@ -364,9 +415,9 @@ cargo run -- workflow doctor --json
 Bootstrap missing package skeleton files (rules + core workflows/templates/roles/skills + memory indexes) and run doctor:
 
 ```bash
-cargo run -- workflow setup
-cargo run -- workflow setup --strict-ollama
-cargo run -- workflow setup --json
+cargo run -- init
+cargo run -- init --strict-ollama
+cargo run -- init --json
 ```
 
 Generate scaffold markdown packages with correct schema headers:
@@ -508,7 +559,7 @@ Run the full deterministic gate:
 - package layout under `.agents/` (workflows/rules/skills/roles/templates/memory) and markdown-only policy (no YAML under workflows/skills/roles/rules/templates)
 - `workflow check` integrity
 
-`workflow setup` additionally creates missing baseline markdown package files:
+`init` additionally creates missing baseline markdown package files:
 - `.agents/rules/{runtime,branching_rules,coding_rules,merge_rules}.md`
 - `.agents/workflows/{starter,feature,bugfix,review,release}.md` (created when each file is missing)
 - `.agents/templates/{feature_prompt,bugfix_prompt,review_prompt,release_prompt}.md` (created when each file is missing)
@@ -530,5 +581,5 @@ Context retrieval injection controls:
 
 `ci_gate.sh` includes clean-clone smoke coverage:
 - clones repo into a temp directory
-- runs `workflow setup`, `workflow doctor`, `workflow check`
+- runs `init`, `workflow doctor`, `workflow check`
 - runs `cargo run -- --workflow valid_flow.md` in the fresh clone

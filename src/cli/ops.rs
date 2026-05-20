@@ -102,8 +102,8 @@ pub(super) fn run_workflow_doctor(
     if detected_manifests.is_empty() {
         checks.push(DoctorCheckResult {
             name: "project_manifest".to_string(),
-            status: DoctorCheckStatus::Error,
-            message: "no project manifest found (expected one of Cargo.toml/package.json/pyproject.toml/go.mod)".to_string(),
+            status: DoctorCheckStatus::Warning,
+            message: "no common project manifest found (Cargo.toml/package.json/pyproject.toml/go.mod). This is allowed; agentic-sdlc can operate on generic repositories.".to_string(),
         });
     } else {
         checks.push(DoctorCheckResult {
@@ -170,10 +170,7 @@ pub(super) fn run_workflow_doctor(
             checks.push(DoctorCheckResult {
                 name: name.to_string(),
                 status: DoctorCheckStatus::Warning,
-                message: format!(
-                    "missing ({}). Run 'cargo run -- workflow setup' to bootstrap.",
-                    file.display()
-                ),
+                message: format!("missing ({}). Run 'asd init' to bootstrap.", file.display()),
             });
         }
     }

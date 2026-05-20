@@ -301,10 +301,8 @@ impl ExecutionEngine {
                                     .insert(step.id.clone(), outcome.output);
                                 failed.insert(step.id.clone());
                                 instance.mark_failed_step(&step.id);
-                                instance.last_error = Some(format!(
-                                    "Step '{}' returned failed status",
-                                    step.id
-                                ));
+                                instance.last_error =
+                                    Some(format!("Step '{}' returned failed status", step.id));
                                 instance.record_trace(format!(
                                     "[{}] step '{}' {:?} context_items={} cost_units={} cost_usd={:.6} tokens={} provider={} model={}",
                                     now_ms(),
