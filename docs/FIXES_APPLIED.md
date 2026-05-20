@@ -175,16 +175,16 @@ let class = if err_msg.contains("timeout") || err_msg.contains("Timeout") {
 #[test]
 fn resolve_temperature_clamps_to_valid_range() {
     // Test upper bound
-    std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "3.0");
+    std::env::set_var("AGENTIC_SDLC_LLM_TEMPERATURE", "3.0");
     let temp = super::resolve_temperature();
     assert_eq!(temp, 2.0);
-    std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE"); // Clean up!
+    std::env::remove_var("AGENTIC_SDLC_LLM_TEMPERATURE"); // Clean up!
     
     // Test lower bound
-    std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "-1.0");
+    std::env::set_var("AGENTIC_SDLC_LLM_TEMPERATURE", "-1.0");
     let temp = super::resolve_temperature();
     assert_eq!(temp, 0.0);
-    std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE"); // Clean up!
+    std::env::remove_var("AGENTIC_SDLC_LLM_TEMPERATURE"); // Clean up!
 }
 ```
 

@@ -21,7 +21,7 @@ export AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 export AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
 
 # 4. Configure provider
-export ANTIGRAV_LLM_PROVIDER=azure_openai
+export AGENTIC_SDLC_LLM_PROVIDER=azure_openai
 
 # 5. Run workflow
 cargo run -- --workflow feature.md
@@ -38,24 +38,24 @@ export AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 export AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
 
 # Provider selection
-export ANTIGRAV_LLM_PROVIDER=azure_openai
+export AGENTIC_SDLC_LLM_PROVIDER=azure_openai
 # or
-export ANTIGRAV_LLM_PROVIDER=azure
+export AGENTIC_SDLC_LLM_PROVIDER=azure
 ```
 
 ### Optional Configuration
 
 ```bash
 # Model override (uses deployment name)
-export ANTIGRAV_LLM_MODEL=gpt-4o-mini
-export ANTIGRAV_LLM_MODEL_AZURE=your-deployment-name
+export AGENTIC_SDLC_LLM_MODEL=gpt-4o-mini
+export AGENTIC_SDLC_LLM_MODEL_AZURE=your-deployment-name
 
 # API version (default: 2024-02-15-preview)
 export AZURE_OPENAI_API_VERSION=2024-02-15-preview
 
 # Deterministic mode
-export ANTIGRAV_LLM_TEMPERATURE=0.0
-export ANTIGRAV_LLM_SEED=42
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.0
+export AGENTIC_SDLC_LLM_SEED=42
 ```
 
 ## 💰 Pricing
@@ -80,7 +80,7 @@ Check Azure pricing calculator for your region.
 export AZURE_OPENAI_API_KEY=...
 export AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 export AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
-export ANTIGRAV_LLM_PROVIDER=azure_openai
+export AGENTIC_SDLC_LLM_PROVIDER=azure_openai
 cargo run -- --workflow feature.md
 ```
 
@@ -163,7 +163,7 @@ az cognitiveservices account deployment list \
 ```bash
 # Increase quota in Azure Portal
 # Or enable fallback
-export ANTIGRAV_LLM_FALLBACK=openai,gemini
+export AGENTIC_SDLC_LLM_FALLBACK=openai,gemini
 ```
 
 ## 📚 Resources

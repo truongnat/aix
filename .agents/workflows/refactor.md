@@ -3,7 +3,7 @@ description: refactor workflow
 ---
 
 # Workflow: refactor
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: agent
 
 ## Step: ensure_branch

@@ -2,7 +2,7 @@
 description: ai-engineering feature delivery with impact analysis and acceptance gates
 ---
 # Workflow: ai-engineering-feature
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: ai-engineering
 MaxCpuMs: 240000
 MaxWallTimeMs: 900000

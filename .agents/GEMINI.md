@@ -16,7 +16,7 @@ Operate within this repository and treat `.agents/` as the source of truth for:
 
 1. Keep execution deterministic.
 2. Prefer minimal, auditable diffs.
-3. Preserve schema compliance (`antigrav.*@v1`).
+3. Preserve schema compliance (`agentic-sdlc.*@v1`).
 4. Run package validation before claiming completion.
 
 ## Security Baseline

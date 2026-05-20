@@ -309,10 +309,10 @@ cargo run -- --workflow feature.md --replay-mode cache.json
 
 ```bash
 # Choose provider
-export ANTIGRAV_LLM_PROVIDER=openai  # or ollama, gemini, anthropic, azure, bedrock
+export AGENTIC_SDLC_LLM_PROVIDER=openai  # or ollama, gemini, anthropic, azure, bedrock
 
 # Configure fallback
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
 
 # Run workflow
 cargo run -- --workflow feature.md
@@ -328,8 +328,8 @@ cargo run -- --workflow feature.md
 
 ```bash
 # OpenAI with seed
-export ANTIGRAV_LLM_TEMPERATURE=0.0
-export ANTIGRAV_LLM_SEED=42
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.0
+export AGENTIC_SDLC_LLM_SEED=42
 cargo run -- --workflow feature.md
 ```
 
@@ -345,7 +345,7 @@ cargo run -- --workflow feature.md
 ### Development
 ```bash
 # Use Ollama (free, local)
-export ANTIGRAV_LLM_PROVIDER=ollama
+export AGENTIC_SDLC_LLM_PROVIDER=ollama
 cargo run -- --workflow feature.md
 ```
 
@@ -361,16 +361,16 @@ cargo run -- --workflow test.md --replay-mode baseline.json
 ### Production
 ```bash
 # Use OpenAI with fallback
-export ANTIGRAV_LLM_PROVIDER=openai
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
-export ANTIGRAV_LLM_TEMPERATURE=0.0
+export AGENTIC_SDLC_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.0
 cargo run -- --workflow feature.md
 ```
 
 ### Cost Optimization
 ```bash
 # Use Gemini (cheapest cloud)
-export ANTIGRAV_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
 cargo run -- --workflow feature.md
 ```
 

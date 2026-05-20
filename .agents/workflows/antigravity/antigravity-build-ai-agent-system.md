@@ -4,7 +4,7 @@ source: https://github.com/sickn33/antigravity-awesome-skills
 category: ai-agents
 ---
 # Workflow: antigravity-build-ai-agent-system
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: antigravity
 Goal: Build an AI Agent System
 

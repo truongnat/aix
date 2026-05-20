@@ -890,35 +890,35 @@ mod tests {
 
         std::fs::write(
             workflows.join("w.md"),
-            "---\ndescription: minimal valid workflow\n---\n# Workflow: w\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::draft implementation plan\n\n## Step: security_check\nSkill: demo.echo\nDependsOn: s1\nInput: security check complete\n",
+            "---\ndescription: minimal valid workflow\n---\n# Workflow: w\nSchema: agentic-sdlc.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::draft implementation plan\n\n## Step: security_check\nSkill: demo.echo\nDependsOn: s1\nInput: security check complete\n",
         )
         .expect("workflow");
 
         std::fs::write(
             rules.join("runtime.md"),
-            "---\ndescription: runtime rules\ntrigger: always_on\n---\n# Runtime\nSchema: antigrav.rule@v1\n```json\n{}\n```\n",
+            "---\ndescription: runtime rules\ntrigger: always_on\n---\n# Runtime\nSchema: agentic-sdlc.rule@v1\n```json\n{}\n```\n",
         )
         .expect("runtime");
         std::fs::write(
             rules.join("branching_rules.md"),
-            "---\ndescription: branching rules\ntrigger: always_on\n---\n# Branch\nSchema: antigrav.rule@v1\n```json\n{}\n```\n",
+            "---\ndescription: branching rules\ntrigger: always_on\n---\n# Branch\nSchema: agentic-sdlc.rule@v1\n```json\n{}\n```\n",
         )
         .expect("branching");
         std::fs::write(
             rules.join("coding_rules.md"),
-            "---\ndescription: coding rules\ntrigger: always_on\n---\n# Coding\nSchema: antigrav.rule@v1\n```json\n{}\n```\n",
+            "---\ndescription: coding rules\ntrigger: always_on\n---\n# Coding\nSchema: agentic-sdlc.rule@v1\n```json\n{}\n```\n",
         )
         .expect("coding");
         std::fs::write(
             rules.join("merge_rules.md"),
-            "---\ndescription: merge rules\ntrigger: always_on\n---\n# Merge\nSchema: antigrav.rule@v1\n```json\n{}\n```\n",
+            "---\ndescription: merge rules\ntrigger: always_on\n---\n# Merge\nSchema: agentic-sdlc.rule@v1\n```json\n{}\n```\n",
         )
         .expect("merge");
 
         std::fs::write(
             skills.join("sample").join("SKILL.md"),
             r#"# Skill: sample
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 ```json
 {"name":"sample","domain":"agent","executor":"ollama","model":"qwen3:8b"}
 ```
@@ -930,7 +930,7 @@ body
         std::fs::write(
             roles.join("architect.md"),
             r#"# Role: architect
-Schema: antigrav.role@v1
+Schema: agentic-sdlc.role@v1
 ```json
 {"name":"architect","provider":"ollama","model":"qwen3:8b","temperature":0.1}
 ```
@@ -986,7 +986,7 @@ Create deterministic and minimal implementation plans.
         write_minimal_valid_package(&root);
         std::fs::write(
             root.join(".agents").join("workflows").join("missing_role.md"),
-            "---\ndescription: workflow referencing missing role\n---\n# Workflow: missing-role\nSchema: antigrav.workflow@v1\nDomain: agent\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: missing_role:::investigate bug\n",
+            "---\ndescription: workflow referencing missing role\n---\n# Workflow: missing-role\nSchema: agentic-sdlc.workflow@v1\nDomain: agent\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: missing_role:::investigate bug\n",
         )
         .expect("workflow");
 
@@ -1008,7 +1008,7 @@ Create deterministic and minimal implementation plans.
         write_minimal_valid_package(&root);
         std::fs::write(
             root.join(".agents").join("workflows").join("missing_security_gate.md"),
-            "---\ndescription: workflow missing security gate\n---\n# Workflow: missing-security-gate\nSchema: antigrav.workflow@v1\nDomain: agent\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::plan rollout\n",
+            "---\ndescription: workflow missing security gate\n---\n# Workflow: missing-security-gate\nSchema: agentic-sdlc.workflow@v1\nDomain: agent\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::plan rollout\n",
         )
         .expect("workflow");
 
@@ -1028,7 +1028,7 @@ Create deterministic and minimal implementation plans.
         write_minimal_valid_package(&root);
         std::fs::write(
             root.join(".agents").join("workflows").join("with_security_gate.md"),
-            "---\ndescription: workflow with security gate\n---\n# Workflow: with-security-gate\nSchema: antigrav.workflow@v1\nDomain: agent\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::plan rollout\n\n## Step: internet_security_check\nSkill: demo.echo\nDependsOn: s1\nInput: run security checks\n",
+            "---\ndescription: workflow with security gate\n---\n# Workflow: with-security-gate\nSchema: agentic-sdlc.workflow@v1\nDomain: agent\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::plan rollout\n\n## Step: internet_security_check\nSkill: demo.echo\nDependsOn: s1\nInput: run security checks\n",
         )
         .expect("workflow");
 
@@ -1077,7 +1077,7 @@ body
         std::fs::write(
             root.join(".agents").join("skills").join("scripted.md"),
             r#"# Skill: scripted
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 ```json
 {"name":"scripted","domain":"agent","executor":"script","command":"cargo test"}
 ```
@@ -1109,7 +1109,7 @@ Runs shell command.
         std::fs::create_dir_all(&nested_workflow_dir).expect("nested workflow dir");
         std::fs::write(
             nested_workflow_dir.join("nested.md"),
-            "---\ndescription: nested valid workflow\n---\n# Workflow: nested\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::nested plan\n\n## Step: security_check\nSkill: demo.echo\nDependsOn: s1\nInput: nested security check\n",
+            "---\ndescription: nested valid workflow\n---\n# Workflow: nested\nSchema: agentic-sdlc.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: agent.llm_subagent\nInput: architect:::nested plan\n\n## Step: security_check\nSkill: demo.echo\nDependsOn: s1\nInput: nested security check\n",
         )
         .expect("nested workflow");
 
@@ -1123,7 +1123,7 @@ Runs shell command.
         std::fs::write(
             nested_skill_dir.join("SKILL.md"),
             r#"# Skill: nested_skill
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 ```json
 {"name":"nested_skill","domain":"agent","executor":"ollama","model":"qwen3:8b"}
 ```

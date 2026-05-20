@@ -1,5 +1,5 @@
 # Skill: workflow-orchestration-patterns
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 
 ```json
 {

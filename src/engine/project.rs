@@ -211,6 +211,23 @@ impl AgentProjectLayout {
         self.loaded_workflows.get(workflow_ref).cloned()
     }
 
+    pub fn list_workflow_definitions(&self) -> Result<Vec<(String, PathBuf)>> {
+        let mut out = Vec::new();
+        if !self.workflows_dir.exists() {
+            return Ok(out);
+        }
+        let files = collect_markdown_files_recursive(&self.workflows_dir)?;
+        for path in files {
+            let relative = path
+                .strip_prefix(&self.workflows_dir)
+                .map_err(|_| anyhow!("Workflow path '{}' escaped root", path.display()))?;
+            let workflow_id = workflow_id_from_relative_path(relative)?;
+            out.push((workflow_id, path));
+        }
+        out.sort_by(|a, b| a.0.cmp(&b.0));
+        Ok(out)
+    }
+
     pub fn resolve_template_path(&self, template_ref: &str) -> Option<PathBuf> {
         resolve_markdown_resource_path(&self.templates_dir, template_ref)
     }

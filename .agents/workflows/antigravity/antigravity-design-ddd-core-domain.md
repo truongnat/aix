@@ -4,7 +4,7 @@ source: https://github.com/sickn33/antigravity-awesome-skills
 category: architecture
 ---
 # Workflow: antigravity-design-ddd-core-domain
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: antigravity
 Goal: Design a DDD Core Domain
 

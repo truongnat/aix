@@ -30,5 +30,24 @@ jobs:
 
       - name: Run deterministic CI gate
         env:
-          ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA: "0"
+          AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA: "0"
         run: ./scripts/ci_gate.sh
+
+  long-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: quality-gate
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run bounded long e2e test
+        run: |
+          timeout 8m cargo test --quiet cli::tests::e2e_thread_flow_multi_thread_runs_with_auto_resolve_and_thread_sessions -- --ignored --exact

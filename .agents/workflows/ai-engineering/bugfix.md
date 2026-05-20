@@ -2,7 +2,7 @@
 description: ai-engineering bugfix workflow with root-cause and regression guard
 ---
 # Workflow: ai-engineering-bugfix
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: ai-engineering
 MaxCpuMs: 220000
 MaxWallTimeMs: 900000

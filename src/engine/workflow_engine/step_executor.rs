@@ -382,6 +382,8 @@ impl StepExecutor {
                     let telemetry = extract_output_telemetry(&output);
                     let status = if output_requests_pause(&output) {
                         StepExecutionStatus::Paused
+                    } else if output_requests_failure(&output) {
+                        StepExecutionStatus::Failed
                     } else {
                         StepExecutionStatus::Succeeded
                     };
@@ -523,6 +525,48 @@ fn output_requests_pause(output: &SkillOutput) -> bool {
         .unwrap_or(false)
 }
 
+fn output_requests_failure(output: &SkillOutput) -> bool {
+    match output {
+        SkillOutput::Boolean(value) => !value,
+        SkillOutput::Json(value) => {
+            if value
+                .get("status")
+                .and_then(Value::as_str)
+                .map(|v| v.eq_ignore_ascii_case("failed") || v.eq_ignore_ascii_case("error"))
+                .unwrap_or(false)
+            {
+                return true;
+            }
+            if value
+                .get("result")
+                .and_then(Value::as_str)
+                .map(|v| v.eq_ignore_ascii_case("failed") || v.eq_ignore_ascii_case("error"))
+                .unwrap_or(false)
+            {
+                return true;
+            }
+            if value
+                .get("pass")
+                .and_then(Value::as_bool)
+                .map(|v| !v)
+                .unwrap_or(false)
+            {
+                return true;
+            }
+            if value
+                .get("ok")
+                .and_then(Value::as_bool)
+                .map(|v| !v)
+                .unwrap_or(false)
+            {
+                return true;
+            }
+            false
+        }
+        _ => false,
+    }
+}
+
 fn infer_domain_from_skill_ref(default_domain: &str, skill_ref: &str) -> String {
     let normalized = skill_ref.trim();
     if let Some((domain, _)) = normalized.split_once('.') {
@@ -654,6 +698,7 @@ mod tests {
     }
 
     struct PauseSkill;
+    struct FalseSkill;
 
     #[async_trait]
     impl Skill for RetrySkill {
@@ -713,6 +758,33 @@ mod tests {
                 "pause_workflow": true,
                 "status": "pending"
             })))
+        }
+    }
+
+    #[async_trait]
+    impl Skill for FalseSkill {
+        fn name(&self) -> &str {
+            "false_skill"
+        }
+
+        fn capability(&self) -> SkillCapability {
+            SkillCapability::new(
+                self.name(),
+                "returns false for gate failure",
+                SkillIOType::Text,
+                SkillIOType::Boolean,
+                CapabilityPermissions::new(false, false, false, false, false),
+                SideEffectClass::Pure,
+            )
+            .with_trust_tier(TrustTier::Constrained)
+        }
+
+        async fn execute(
+            &self,
+            _input: SkillInput,
+            _ctx: &mut ExecutionContext,
+        ) -> Result<SkillOutput> {
+            Ok(SkillOutput::boolean(false))
         }
     }
 
@@ -911,6 +983,56 @@ mod tests {
         assert_eq!(
             out.status,
             crate::engine::workflow_engine::instance::StepExecutionStatus::Paused
+        );
+    }
+
+    #[tokio::test]
+    async fn boolean_false_output_sets_failed_step_status() {
+        let mut registry = DomainRegistry::new();
+        registry.register_domain("demo");
+        registry
+            .register_skill("demo", Arc::new(FalseSkill))
+            .expect("register");
+        let executor = StepExecutor::new(".", Arc::new(registry));
+
+        let workflow = Workflow {
+            meta: WorkflowMeta {
+                name: "gate-fail".to_string(),
+                domain: Some("demo".to_string()),
+                goal: None,
+                target_type: None,
+                routing_policy: Some(RoutingPolicy::for_single_domain("demo")),
+                security_policy: Some(DomainSecurityPolicy::default()),
+                resource_budget: None,
+                projected_cost: None,
+                projected_latency_ms: None,
+                projected_steps: None,
+            },
+            steps: vec![WorkflowStep {
+                id: "gate".to_string(),
+                skill: "demo.false_skill".to_string(),
+                input: "x".to_string(),
+                depends_on: Vec::new(),
+                condition: None,
+                retry: None,
+                on_failure: FailureStrategy::FailFast,
+            }],
+        };
+        let instance = WorkflowInstance::new(&workflow, None);
+        let out = executor
+            .execute_step(
+                &workflow,
+                &workflow.steps[0],
+                &instance,
+                &ExecutionBudget::default(),
+                &RoutingPolicy::for_single_domain("demo"),
+                &DomainSecurityPolicy::default(),
+            )
+            .await
+            .expect("step");
+        assert_eq!(
+            out.status,
+            crate::engine::workflow_engine::instance::StepExecutionStatus::Failed
         );
     }
 }

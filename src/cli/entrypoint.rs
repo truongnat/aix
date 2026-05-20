@@ -3,6 +3,29 @@ use super::*;
 pub(super) async fn run_impl() -> Result<()> {
     let cli = Cli::parse();
 
+    if let Some(ref command) = cli.command {
+        if let Commands::Bug { action } = &**command {
+            match &**action {
+                BugCommand::Analyze { input_file } => {
+                    crate::bug::run_analyze(input_file).await?;
+                    return Ok(());
+                }
+                BugCommand::Plan { input_file } => {
+                    crate::bug::run_plan(input_file).await?;
+                    return Ok(());
+                }
+                BugCommand::Reply { input_file } => {
+                    crate::bug::run_reply(input_file).await?;
+                    return Ok(());
+                }
+                BugCommand::Prompt { input_file } => {
+                    crate::bug::run_prompt(input_file).await?;
+                    return Ok(());
+                }
+            }
+        }
+    }
+
     if cli.replay.is_some() {
         return Err(anyhow!(
             "Replay mode (--replay) is deprecated after engine consolidation; use 'workflow trace <id> --timeline|--json'"
@@ -21,6 +44,77 @@ pub(super) async fn run_impl() -> Result<()> {
     let project_root = cwd.to_string_lossy().to_string();
     let project_layout = AgentProjectLayout::discover(&project_root)?;
     project_layout.validate_startup()?;
+    let mut harness_run_request: Option<(String, String, bool)> = None;
+    let mut harness_config = None::<crate::harness::HarnessConfig>;
+
+    if let Some(ref command) = cli.command {
+        if let Commands::Harness { action } = &**command {
+            match &**action {
+                HarnessCommand::Init {
+                    config,
+                    workflow_id,
+                    force,
+                } => {
+                    let config_path = if config.trim().is_empty() {
+                        crate::harness::default_config_path()
+                    } else {
+                        std::path::PathBuf::from(config)
+                    };
+                    let written = crate::harness::HarnessConfig::write_default(
+                        &config_path,
+                        workflow_id,
+                        *force,
+                    )?;
+                    println!(
+                        "Harness initialized: config='{}' workflow_id='{}' name='{}'",
+                        config_path.display(),
+                        written.workflow.id,
+                        written.name
+                    );
+                    return Ok(());
+                }
+                HarnessCommand::Show { config, json } => {
+                    let config_path = if config.trim().is_empty() {
+                        crate::harness::default_config_path()
+                    } else {
+                        std::path::PathBuf::from(config)
+                    };
+                    let loaded = crate::harness::HarnessConfig::load(&config_path)?;
+                    if *json {
+                        println!("{}", serde_json::to_string_pretty(&loaded)?);
+                    } else {
+                        println!(
+                            "Harness config: path='{}' name='{}' workflow_id='{}' providers={}",
+                            config_path.display(),
+                            loaded.name,
+                            loaded.workflow.id,
+                            if loaded.providers.is_empty() {
+                                "-".to_string()
+                            } else {
+                                loaded.providers.join(",")
+                            }
+                        );
+                    }
+                    return Ok(());
+                }
+                HarnessCommand::Run { config, task, json } => {
+                    let config_path = if config.trim().is_empty() {
+                        crate::harness::default_config_path()
+                    } else {
+                        std::path::PathBuf::from(config)
+                    };
+                    let loaded = crate::harness::HarnessConfig::load(&config_path)?;
+                    loaded.apply_env_overrides();
+                    harness_config = Some(loaded);
+                    harness_run_request = Some((
+                        config_path.to_string_lossy().to_string(),
+                        task.clone(),
+                        *json,
+                    ));
+                }
+            }
+        }
+    }
     let thread_session_store = ThreadSessionStore::new(&project_root)?;
 
     let mut resume_instance_id: Option<String> = None;
@@ -30,33 +124,36 @@ pub(super) async fn run_impl() -> Result<()> {
     let mut thread_flow_request: Option<ThreadFlowRequest> = None;
     if let Some(ref command) = cli.command {
         let state_store = WorkflowStateStore::new(&project_root)?;
-        match handle_workflow_control_command(
-            &state_store,
-            &thread_session_store,
-            &project_layout,
-            *command.clone(),
-        )? {
-            WorkflowLaunchAction::Noop => return Ok(()),
-            WorkflowLaunchAction::Resume { id } => resume_instance_id = Some(id),
-            WorkflowLaunchAction::StartTemplate(request) => template_request = Some(request),
-            WorkflowLaunchAction::StartRole(request) => role_request = Some(request),
-            WorkflowLaunchAction::ChatThread(request) => chat_thread_request = Some(request),
-            WorkflowLaunchAction::ThreadFlow(request) => thread_flow_request = Some(request),
-            WorkflowLaunchAction::StartOffice(request) => {
-                use crate::office::runtime::OfficeRuntime;
+        match &**command {
+            Commands::Harness { .. } => {}
+            _ => match handle_workflow_control_command(
+                &state_store,
+                &thread_session_store,
+                &project_layout,
+                *command.clone(),
+            )? {
+                WorkflowLaunchAction::Noop => return Ok(()),
+                WorkflowLaunchAction::Resume { id } => resume_instance_id = Some(id),
+                WorkflowLaunchAction::StartTemplate(request) => template_request = Some(request),
+                WorkflowLaunchAction::StartRole(request) => role_request = Some(request),
+                WorkflowLaunchAction::ChatThread(request) => chat_thread_request = Some(request),
+                WorkflowLaunchAction::ThreadFlow(request) => thread_flow_request = Some(request),
+                WorkflowLaunchAction::StartOffice(request) => {
+                    use crate::office::runtime::OfficeRuntime;
 
-                let project_root = project_layout
-                    .agents_root
-                    .parent()
-                    .map(|p| p.to_string_lossy().to_string())
-                    .unwrap_or_else(|| ".".to_string());
+                    let project_root = project_layout
+                        .agents_root
+                        .parent()
+                        .map(|p| p.to_string_lossy().to_string())
+                        .unwrap_or_else(|| ".".to_string());
 
-                let mut runtime = OfficeRuntime::new(&project_root)?;
-                runtime.start(request.task, request.parallel, request.roles)?;
-                println!("Office started successfully.");
-                runtime.office.print_status();
-                return Ok(());
-            }
+                    let mut runtime = OfficeRuntime::new(&project_root)?;
+                    runtime.start(request.task, request.parallel, request.roles)?;
+                    println!("Office started successfully.");
+                    runtime.office.print_status();
+                    return Ok(());
+                }
+            },
         }
     }
     if template_request.is_some() && (cli.template.is_some() || cli.task.is_some()) {
@@ -130,6 +227,9 @@ pub(super) async fn run_impl() -> Result<()> {
     );
     let project_rules = project_layout.load_runtime_rules()?;
     project_rules.apply_to(&mut budget, &mut routing_policy, &mut security_policy);
+    if let Some(config) = harness_config.as_ref() {
+        config.apply_runtime_overrides(&mut budget, &mut security_policy);
+    }
     configure_run_script_policy_env(&project_rules, &security_policy);
 
     let session = cli
@@ -498,6 +598,58 @@ pub(super) async fn run_impl() -> Result<()> {
         return Ok(());
     }
 
+    if let Some((config_path, task, as_json)) = harness_run_request {
+        let config = harness_config
+            .clone()
+            .ok_or_else(|| anyhow!("Harness config was not loaded"))?;
+        let workflow_path = project_layout
+            .resolve_workflow_path(&config.workflow.id)
+            .ok_or_else(|| {
+                anyhow!(
+                    "Harness workflow id '{}' from '{}' not found",
+                    config.workflow.id,
+                    config_path
+                )
+            })?;
+        let workflow_path_str = workflow_path
+            .to_str()
+            .ok_or_else(|| anyhow!("Invalid harness workflow path encoding"))?
+            .to_string();
+        let mut workflow = load_workflow(&workflow_path_str)?;
+        inject_task_only(&mut workflow, &task)?;
+        if workflow.meta.routing_policy.is_none() {
+            workflow.meta.routing_policy = Some(routing_policy.clone());
+        }
+        if workflow.meta.security_policy.is_none() {
+            workflow.meta.security_policy = Some(security_policy.clone());
+        }
+        if workflow.meta.domain.is_none() {
+            workflow.meta.domain = Some(default_domain_name.clone());
+        }
+        let instance = execute_workflow_instance(
+            Arc::clone(&runtime_engine),
+            workflow,
+            Some(workflow_path_str),
+            budget.clone(),
+            routing_policy.clone(),
+            security_policy.clone(),
+            "harness run execution",
+        )
+        .await?;
+        if as_json {
+            println!("{}", serde_json::to_string_pretty(&instance)?);
+        } else {
+            println!(
+                "Harness run: config='{}' workflow_id='{}' task='{}'",
+                config_path,
+                config.workflow.id,
+                task
+            );
+            print_instance_summary(&instance);
+        }
+        return Ok(());
+    }
+
     if let Some(goal) = cli.goal.clone() {
         println!(
             "🤖 Autonomous Goal: '{}' in domain: '{}'",
@@ -561,18 +713,13 @@ pub(super) async fn run_impl() -> Result<()> {
             &security_policy,
         )?
     };
-    if cli.task.is_some() && cli.template.is_none() {
-        return Err(anyhow!(
-            "--task requires --template for direct workflow runs"
-        ));
-    }
-    if let Some(template_ref) = cli.template.as_deref() {
-        let task = cli
-            .task
-            .as_deref()
-            .ok_or_else(|| anyhow!("--task is required when --template is provided"))?;
-        let template_prompt = load_template_prompt(&project_layout, template_ref)?;
-        inject_template_prompt(&mut workflow, &template_prompt, task)?;
+    if let Some(task) = cli.task.as_deref() {
+        if let Some(template_ref) = cli.template.as_deref() {
+            let template_prompt = load_template_prompt(&project_layout, template_ref)?;
+            inject_template_prompt(&mut workflow, &template_prompt, task)?;
+        } else {
+            inject_task_only(&mut workflow, task)?;
+        }
     }
     let replaced_roles = apply_role_overrides(&mut workflow, &role_overrides);
     if replaced_roles > 0 {

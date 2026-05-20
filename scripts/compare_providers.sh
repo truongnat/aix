@@ -71,7 +71,7 @@ for provider in "${PROVIDERS[@]}"; do
     
     # Run workflow
     START_TIME=$(date +%s%3N)
-    OUTPUT=$(ANTIGRAV_LLM_PROVIDER=$provider cargo run --quiet -- --workflow "$WORKFLOW" 2>&1 | grep -E "(completed|summary|cost)" || true)
+    OUTPUT=$(AGENTIC_SDLC_LLM_PROVIDER=$provider cargo run --quiet -- --workflow "$WORKFLOW" 2>&1 | grep -E "(completed|summary|cost)" || true)
     END_TIME=$(date +%s%3N)
     DURATION=$((END_TIME - START_TIME))
     

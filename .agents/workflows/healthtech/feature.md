@@ -2,7 +2,7 @@
 description: healthtech feature delivery with impact analysis and acceptance gates
 ---
 # Workflow: healthtech-feature
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: healthtech
 MaxCpuMs: 240000
 MaxWallTimeMs: 900000

@@ -368,13 +368,13 @@ Project hiện tại có ý tưởng tốt về deterministic runtime cho AI age
 **Priority:** 🟡 Medium | **Effort:** Low
 
 **Problem:**
-- Tool name (`antigrav`) ≠ repo name (`agentic-sdlc`)
+- Tool name (`agentic-sdlc`) ≠ repo name (`agentic-sdlc`)
 - v1.0.1 nhưng chỉ 27 commits, 1 star
 - Không có binary distribution
 
 **Solution:**
 - [ ] Unify branding:
-  - Decide: keep `antigrav` or rename to `agentic-sdlc`
+  - Decide: keep `agentic-sdlc` or rename to `agentic-sdlc`
   - Update all references consistently
   - Create logo/visual identity
 - [ ] Improve project maturity signals:
@@ -393,7 +393,7 @@ Project hiện tại có ý tưởng tốt về deterministic runtime cho AI age
 - `CODE_OF_CONDUCT.md` - Community guidelines
 - `SECURITY.md` - Security policy
 - `Dockerfile` - Container image
-- `homebrew/antigrav.rb` - Homebrew formula
+- `homebrew/agentic-sdlc.rb` - Homebrew formula
 
 **Acceptance:**
 - Consistent naming everywhere

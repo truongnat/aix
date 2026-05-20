@@ -50,7 +50,7 @@ fn select_context_backend(override_var: &str) -> ContextIndexBackend {
         .ok()
         .and_then(|value| parse_context_backend(&value))
         .or_else(|| {
-            std::env::var("ANTIGRAV_CONTEXT_BACKEND")
+            std::env::var("AGENTIC_SDLC_CONTEXT_BACKEND")
                 .ok()
                 .and_then(|value| parse_context_backend(&value))
         })
@@ -71,21 +71,21 @@ pub struct VectorIndexContextRetrievalService {
 
 impl VectorIndexContextRetrievalService {
     pub fn from_env() -> Self {
-        let source = match select_context_backend("ANTIGRAV_CONTEXT_VECTOR_BACKEND") {
+        let source = match select_context_backend("AGENTIC_SDLC_CONTEXT_VECTOR_BACKEND") {
             ContextIndexBackend::Json => VectorIndexSource::Json {
                 index_path: PathBuf::from(
-                    std::env::var("ANTIGRAV_CONTEXT_INDEX_PATH")
+                    std::env::var("AGENTIC_SDLC_CONTEXT_INDEX_PATH")
                         .ok()
                         .unwrap_or_else(|| ".agents/memory/vector_index.json".to_string()),
                 ),
             },
             ContextIndexBackend::Sqlite => VectorIndexSource::Sqlite {
                 db_path: PathBuf::from(
-                    std::env::var("ANTIGRAV_CONTEXT_DB_PATH")
+                    std::env::var("AGENTIC_SDLC_CONTEXT_DB_PATH")
                         .ok()
                         .unwrap_or_else(|| DEFAULT_CONTEXT_DB_PATH.to_string()),
                 ),
-                table: std::env::var("ANTIGRAV_CONTEXT_VECTOR_TABLE")
+                table: std::env::var("AGENTIC_SDLC_CONTEXT_VECTOR_TABLE")
                     .ok()
                     .map(|v| v.trim().to_string())
                     .filter(|v| !v.is_empty())
@@ -93,7 +93,7 @@ impl VectorIndexContextRetrievalService {
             },
         };
 
-        let min_score = std::env::var("ANTIGRAV_CONTEXT_MIN_SCORE")
+        let min_score = std::env::var("AGENTIC_SDLC_CONTEXT_MIN_SCORE")
             .ok()
             .and_then(|v| v.trim().parse::<f32>().ok())
             .map(|v| v.clamp(0.0, 1.0))
@@ -162,21 +162,21 @@ pub struct GraphIndexContextRetrievalService {
 
 impl GraphIndexContextRetrievalService {
     pub fn from_env() -> Self {
-        let source = match select_context_backend("ANTIGRAV_CONTEXT_GRAPH_BACKEND") {
+        let source = match select_context_backend("AGENTIC_SDLC_CONTEXT_GRAPH_BACKEND") {
             ContextIndexBackend::Json => GraphIndexSource::Json {
                 index_path: PathBuf::from(
-                    std::env::var("ANTIGRAV_CONTEXT_GRAPH_INDEX_PATH")
+                    std::env::var("AGENTIC_SDLC_CONTEXT_GRAPH_INDEX_PATH")
                         .ok()
                         .unwrap_or_else(|| ".agents/memory/graph_index.json".to_string()),
                 ),
             },
             ContextIndexBackend::Sqlite => GraphIndexSource::Sqlite {
                 db_path: PathBuf::from(
-                    std::env::var("ANTIGRAV_CONTEXT_DB_PATH")
+                    std::env::var("AGENTIC_SDLC_CONTEXT_DB_PATH")
                         .ok()
                         .unwrap_or_else(|| DEFAULT_CONTEXT_DB_PATH.to_string()),
                 ),
-                table: std::env::var("ANTIGRAV_CONTEXT_GRAPH_TABLE")
+                table: std::env::var("AGENTIC_SDLC_CONTEXT_GRAPH_TABLE")
                     .ok()
                     .map(|v| v.trim().to_string())
                     .filter(|v| !v.is_empty())
@@ -184,7 +184,7 @@ impl GraphIndexContextRetrievalService {
             },
         };
 
-        let min_score = std::env::var("ANTIGRAV_CONTEXT_GRAPH_MIN_SCORE")
+        let min_score = std::env::var("AGENTIC_SDLC_CONTEXT_GRAPH_MIN_SCORE")
             .ok()
             .and_then(|v| v.trim().parse::<f64>().ok())
             .map(|v| v.clamp(0.0, 1.0))

@@ -4,7 +4,7 @@ source: self
 ---
 
 # Workflow: dev-create-showcase-video
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: dev
 Goal: Produce a creator-grade Remotion showcase plan that proves structure, CLI, use cases, and landing-page output.
 

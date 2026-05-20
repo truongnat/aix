@@ -53,7 +53,7 @@ Updated the Agentic SDLC landing page to reflect the project's production-ready 
 **Updated installation commands:**
 - Added `cargo run -- workflow doctor` step
 - Simplified workflow commands
-- Added global installation option: `cargo install --path .` and `antigrav workflow doctor`
+- Added global installation option: `cargo install --path .` and `agentic-sdlc workflow doctor`
 - Removed `workflow setup` command
 
 ### 5. MainLayout Component (`MainLayout.astro`)

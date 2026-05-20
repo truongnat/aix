@@ -4,7 +4,7 @@ source: https://github.com/sickn33/antigravity-awesome-skills
 category: web
 ---
 # Workflow: antigravity-ship-saas-mvp
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: antigravity
 Goal: Ship a SaaS MVP
 

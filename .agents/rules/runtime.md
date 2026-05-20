@@ -4,7 +4,7 @@ trigger: always_on
 ---
 
 # Runtime Rules
-Schema: antigrav.rule@v1
+Schema: agentic-sdlc.rule@v1
 
 ```json
 {
@@ -63,6 +63,8 @@ Schema: antigrav.rule@v1
     "just",
     "go",
     "pytest",
+    "python",
+    "python3",
     "flutter",
     "dart",
     "bash",

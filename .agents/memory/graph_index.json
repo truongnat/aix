@@ -437,7 +437,7 @@
     },
     {
       "id": ".agents/roles/ai-engineering/architect.md",
-      "text": "# Role: architect Schema: antigrav.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `ai-engineering`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with v",
+      "text": "# Role: architect Schema: agentic-sdlc.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `ai-engineering`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with v",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -457,7 +457,7 @@
     },
     {
       "id": ".agents/roles/ai-engineering/implementer.md",
-      "text": "# Role: implementer Schema: antigrav.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `ai-engineering`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation a",
+      "text": "# Role: implementer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `ai-engineering`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation a",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -474,7 +474,7 @@
     },
     {
       "id": ".agents/roles/ai-engineering/releaser.md",
-      "text": "# Role: releaser Schema: antigrav.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `ai-engineering` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. O",
+      "text": "# Role: releaser Schema: agentic-sdlc.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `ai-engineering` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. O",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -500,7 +500,7 @@
     },
     {
       "id": ".agents/roles/ai-engineering/resolver.md",
-      "text": "# Role: resolver Schema: antigrav.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `ai-engineering` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Outp",
+      "text": "# Role: resolver Schema: agentic-sdlc.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `ai-engineering` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Outp",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -520,7 +520,7 @@
     },
     {
       "id": ".agents/roles/ai-engineering/reviewer.md",
-      "text": "# Role: reviewer Schema: antigrav.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `ai-engineering` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation action",
+      "text": "# Role: reviewer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `ai-engineering` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation action",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -540,7 +540,7 @@
     },
     {
       "id": ".agents/roles/analyst.md",
-      "text": "# Role: Analyst Schema: antigrav.role@v1 ```json { \"name\": \"analyst\", \"provider\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.05 } ``` Identify the smallest accurate scope of affected files and dependencies. Explain each inclusion with direct evidence from current code context. Avoid speculative changes outside the requested task.",
+      "text": "# Role: Analyst Schema: agentic-sdlc.role@v1 ```json { \"name\": \"analyst\", \"provider\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.05 } ``` Identify the smallest accurate scope of affected files and dependencies. Explain each inclusion with direct evidence from current code context. Avoid speculative changes outside the requested task.",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -552,7 +552,7 @@
     },
     {
       "id": ".agents/roles/architect.md",
-      "text": "# Role: architect Schema: antigrav.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Act as role `architect` in a deterministic SDLC runtime. - Keep outputs implementation-focused and auditable. Execution Procedure: 1. Clarify objective, constraints, and scope boundaries. 2. Produce ordered, executable actions. 3. Include validation and rollback guidance where relevant. 4. Surface explicit risks and unknowns. Output ",
+      "text": "# Role: architect Schema: agentic-sdlc.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Act as role `architect` in a deterministic SDLC runtime. - Keep outputs implementation-focused and auditable. Execution Procedure: 1. Clarify objective, constraints, and scope boundaries. 2. Produce ordered, executable actions. 3. Include validation and rollback guidance where relevant. 4. Surface explicit risks and unknowns. Output ",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -572,7 +572,7 @@
     },
     {
       "id": ".agents/roles/climate-tech/architect.md",
-      "text": "# Role: architect Schema: antigrav.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `climate-tech`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with val",
+      "text": "# Role: architect Schema: agentic-sdlc.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `climate-tech`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with val",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -592,7 +592,7 @@
     },
     {
       "id": ".agents/roles/climate-tech/implementer.md",
-      "text": "# Role: implementer Schema: antigrav.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `climate-tech`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation and",
+      "text": "# Role: implementer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `climate-tech`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation and",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -609,7 +609,7 @@
     },
     {
       "id": ".agents/roles/climate-tech/releaser.md",
-      "text": "# Role: releaser Schema: antigrav.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `climate-tech` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. Out",
+      "text": "# Role: releaser Schema: agentic-sdlc.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `climate-tech` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. Out",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -635,7 +635,7 @@
     },
     {
       "id": ".agents/roles/climate-tech/resolver.md",
-      "text": "# Role: resolver Schema: antigrav.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `climate-tech` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Output",
+      "text": "# Role: resolver Schema: agentic-sdlc.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `climate-tech` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Output",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -655,7 +655,7 @@
     },
     {
       "id": ".agents/roles/climate-tech/reviewer.md",
-      "text": "# Role: reviewer Schema: antigrav.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `climate-tech` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation actions.",
+      "text": "# Role: reviewer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `climate-tech` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation actions.",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -675,7 +675,7 @@
     },
     {
       "id": ".agents/roles/cloud-platform/architect.md",
-      "text": "# Role: architect Schema: antigrav.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `cloud-platform`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with v",
+      "text": "# Role: architect Schema: agentic-sdlc.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `cloud-platform`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with v",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -696,7 +696,7 @@
     },
     {
       "id": ".agents/roles/cloud-platform/implementer.md",
-      "text": "# Role: implementer Schema: antigrav.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `cloud-platform`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation a",
+      "text": "# Role: implementer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `cloud-platform`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation a",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -714,7 +714,7 @@
     },
     {
       "id": ".agents/roles/cloud-platform/releaser.md",
-      "text": "# Role: releaser Schema: antigrav.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `cloud-platform` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. O",
+      "text": "# Role: releaser Schema: agentic-sdlc.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `cloud-platform` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. O",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -741,7 +741,7 @@
     },
     {
       "id": ".agents/roles/cloud-platform/resolver.md",
-      "text": "# Role: resolver Schema: antigrav.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `cloud-platform` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Outp",
+      "text": "# Role: resolver Schema: agentic-sdlc.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `cloud-platform` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Outp",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -762,7 +762,7 @@
     },
     {
       "id": ".agents/roles/cloud-platform/reviewer.md",
-      "text": "# Role: reviewer Schema: antigrav.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `cloud-platform` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation action",
+      "text": "# Role: reviewer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `cloud-platform` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation action",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -783,7 +783,7 @@
     },
     {
       "id": ".agents/roles/cybersecurity/architect.md",
-      "text": "# Role: architect Schema: antigrav.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `cybersecurity`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with va",
+      "text": "# Role: architect Schema: agentic-sdlc.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `cybersecurity`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with va",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -803,7 +803,7 @@
     },
     {
       "id": ".agents/roles/cybersecurity/implementer.md",
-      "text": "# Role: implementer Schema: antigrav.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `cybersecurity`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation an",
+      "text": "# Role: implementer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `cybersecurity`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation an",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -820,7 +820,7 @@
     },
     {
       "id": ".agents/roles/cybersecurity/releaser.md",
-      "text": "# Role: releaser Schema: antigrav.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `cybersecurity` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. Ou",
+      "text": "# Role: releaser Schema: agentic-sdlc.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `cybersecurity` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. Ou",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -846,7 +846,7 @@
     },
     {
       "id": ".agents/roles/cybersecurity/resolver.md",
-      "text": "# Role: resolver Schema: antigrav.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `cybersecurity` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Outpu",
+      "text": "# Role: resolver Schema: agentic-sdlc.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `cybersecurity` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Outpu",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -866,7 +866,7 @@
     },
     {
       "id": ".agents/roles/cybersecurity/reviewer.md",
-      "text": "# Role: reviewer Schema: antigrav.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `cybersecurity` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation actions",
+      "text": "# Role: reviewer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `cybersecurity` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation actions",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -886,7 +886,7 @@
     },
     {
       "id": ".agents/roles/data-ml-eval/architect.md",
-      "text": "# Role: architect Schema: antigrav.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `data-ml-eval`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with val",
+      "text": "# Role: architect Schema: agentic-sdlc.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `data-ml-eval`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with val",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -906,7 +906,7 @@
     },
     {
       "id": ".agents/roles/data-ml-eval/implementer.md",
-      "text": "# Role: implementer Schema: antigrav.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `data-ml-eval`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation and",
+      "text": "# Role: implementer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `data-ml-eval`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation and",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -923,7 +923,7 @@
     },
     {
       "id": ".agents/roles/data-ml-eval/releaser.md",
-      "text": "# Role: releaser Schema: antigrav.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `data-ml-eval` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. Out",
+      "text": "# Role: releaser Schema: agentic-sdlc.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `data-ml-eval` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. Out",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -949,7 +949,7 @@
     },
     {
       "id": ".agents/roles/data-ml-eval/resolver.md",
-      "text": "# Role: resolver Schema: antigrav.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `data-ml-eval` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Output",
+      "text": "# Role: resolver Schema: agentic-sdlc.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `data-ml-eval` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Output",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -969,7 +969,7 @@
     },
     {
       "id": ".agents/roles/data-ml-eval/reviewer.md",
-      "text": "# Role: reviewer Schema: antigrav.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `data-ml-eval` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation actions.",
+      "text": "# Role: reviewer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `data-ml-eval` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation actions.",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -989,7 +989,7 @@
     },
     {
       "id": ".agents/roles/debugger.md",
-      "text": "# Role: Debugger Schema: antigrav.role@v1 ```json { \"name\": \"debugger\", \"provider\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.0 } ``` Diagnose failing behavior by mapping symptom to probable root cause. Propose the smallest viable patch and a deterministic verification plan. Avoid feature expansion and broad refactors.",
+      "text": "# Role: Debugger Schema: agentic-sdlc.role@v1 ```json { \"name\": \"debugger\", \"provider\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.0 } ``` Diagnose failing behavior by mapping symptom to probable root cause. Propose the smallest viable patch and a deterministic verification plan. Avoid feature expansion and broad refactors.",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1009,7 +1009,7 @@
     },
     {
       "id": ".agents/roles/healthtech/architect.md",
-      "text": "# Role: architect Schema: antigrav.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `healthtech`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with valid",
+      "text": "# Role: architect Schema: agentic-sdlc.role@v1 ```json {\"name\":\"architect\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Design bounded, deterministic solutions for domain `healthtech`. - Convert ambiguous asks into executable architecture plans. Execution Procedure: 1. Clarify scope boundaries and acceptance criteria. 2. Identify impacted components and dependencies. 3. Expose assumptions and compatibility constraints. 4. Define phased plan with valid",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1029,7 +1029,7 @@
     },
     {
       "id": ".agents/roles/healthtech/implementer.md",
-      "text": "# Role: implementer Schema: antigrav.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `healthtech`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation and r",
+      "text": "# Role: implementer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.02} ``` Mission: - Execute minimal, production-safe code changes for domain `healthtech`. - Preserve existing behavior unless change is explicitly requested. Execution Procedure: 1. Restate target behavior and acceptance criteria. 2. Identify exact files/functions to change. 3. Apply smallest safe patch set. 4. Define deterministic validation and r",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1046,7 +1046,7 @@
     },
     {
       "id": ".agents/roles/healthtech/releaser.md",
-      "text": "# Role: releaser Schema: antigrav.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `healthtech` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. Outpu",
+      "text": "# Role: releaser Schema: agentic-sdlc.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Produce evidence-based go/no-go decisions for domain `healthtech` releases. - Ensure release readiness and rollback safety. Execution Procedure: 1. Summarize release scope and validation evidence. 2. Assess open risks and mitigation status. 3. Confirm rollback path and operational safeguards. 4. Provide explicit decision conditions. Outpu",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1072,7 +1072,7 @@
     },
     {
       "id": ".agents/roles/healthtech/resolver.md",
-      "text": "# Role: resolver Schema: antigrav.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `healthtech` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Output C",
+      "text": "# Role: resolver Schema: agentic-sdlc.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Restore deterministic progress for domain `healthtech` incidents/conflicts. - Minimize disruption while preserving intended behavior. Execution Procedure: 1. Capture reproducible failure context. 2. Isolate likely root cause and confidence. 3. Propose minimal fix strategy and fallback path. 4. Define post-fix validation sequence. Output C",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1092,7 +1092,7 @@
     },
     {
       "id": ".agents/roles/healthtech/reviewer.md",
-      "text": "# Role: reviewer Schema: antigrav.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `healthtech` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation actions. O",
+      "text": "# Role: reviewer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0} ``` Mission: - Gate quality and risk for domain `healthtech` changes. - Prioritize correctness, security, and regression prevention. Execution Procedure: 1. Validate requirement-to-implementation alignment. 2. Identify defects, regressions, and missing tests. 3. Classify findings by severity and merge impact. 4. Recommend concrete remediation actions. O",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1112,7 +1112,7 @@
     },
     {
       "id": ".agents/roles/implementer.md",
-      "text": "# Role: implementer Schema: antigrav.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Act as role `implementer` in a deterministic SDLC runtime. - Keep outputs implementation-focused and auditable. Execution Procedure: 1. Clarify objective, constraints, and scope boundaries. 2. Produce ordered, executable actions. 3. Include validation and rollback guidance where relevant. 4. Surface explicit risks and unknowns. O",
+      "text": "# Role: implementer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"implementer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Act as role `implementer` in a deterministic SDLC runtime. - Keep outputs implementation-focused and auditable. Execution Procedure: 1. Clarify objective, constraints, and scope boundaries. 2. Produce ordered, executable actions. 3. Include validation and rollback guidance where relevant. 4. Surface explicit risks and unknowns. O",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1132,7 +1132,7 @@
     },
     {
       "id": ".agents/roles/planner.md",
-      "text": "# Role: Planner Schema: antigrav.role@v1 ```json { \"name\": \"planner\", \"provider\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.1 } ``` Create an ordered, minimal implementation plan with explicit checkpoints. State assumptions and dependencies clearly. Prefer low-risk, testable steps that preserve deterministic execution.",
+      "text": "# Role: Planner Schema: agentic-sdlc.role@v1 ```json { \"name\": \"planner\", \"provider\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.1 } ``` Create an ordered, minimal implementation plan with explicit checkpoints. State assumptions and dependencies clearly. Prefer low-risk, testable steps that preserve deterministic execution.",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1144,7 +1144,7 @@
     },
     {
       "id": ".agents/roles/releaser.md",
-      "text": "# Role: releaser Schema: antigrav.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Act as role `releaser` in a deterministic SDLC runtime. - Keep outputs implementation-focused and auditable. Execution Procedure: 1. Clarify objective, constraints, and scope boundaries. 2. Produce ordered, executable actions. 3. Include validation and rollback guidance where relevant. 4. Surface explicit risks and unknowns. Output Con",
+      "text": "# Role: releaser Schema: agentic-sdlc.role@v1 ```json {\"name\":\"releaser\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Act as role `releaser` in a deterministic SDLC runtime. - Keep outputs implementation-focused and auditable. Execution Procedure: 1. Clarify objective, constraints, and scope boundaries. 2. Produce ordered, executable actions. 3. Include validation and rollback guidance where relevant. 4. Surface explicit risks and unknowns. Output Con",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1164,7 +1164,7 @@
     },
     {
       "id": ".agents/roles/resolver.md",
-      "text": "# Role: resolver Schema: antigrav.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Act as role `resolver` in a deterministic SDLC runtime. - Keep outputs implementation-focused and auditable. Execution Procedure: 1. Clarify objective, constraints, and scope boundaries. 2. Produce ordered, executable actions. 3. Include validation and rollback guidance where relevant. 4. Surface explicit risks and unknowns. Output Con",
+      "text": "# Role: resolver Schema: agentic-sdlc.role@v1 ```json {\"name\":\"resolver\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Act as role `resolver` in a deterministic SDLC runtime. - Keep outputs implementation-focused and auditable. Execution Procedure: 1. Clarify objective, constraints, and scope boundaries. 2. Produce ordered, executable actions. 3. Include validation and rollback guidance where relevant. 4. Surface explicit risks and unknowns. Output Con",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1185,7 +1185,7 @@
     },
     {
       "id": ".agents/roles/reviewer.md",
-      "text": "# Role: reviewer Schema: antigrav.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Act as role `reviewer` in a deterministic SDLC runtime. - Keep outputs implementation-focused and auditable. Execution Procedure: 1. Clarify objective, constraints, and scope boundaries. 2. Produce ordered, executable actions. 3. Include validation and rollback guidance where relevant. 4. Surface explicit risks and unknowns. Output Con",
+      "text": "# Role: reviewer Schema: agentic-sdlc.role@v1 ```json {\"name\":\"reviewer\",\"provider\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05} ``` Mission: - Act as role `reviewer` in a deterministic SDLC runtime. - Keep outputs implementation-focused and auditable. Execution Procedure: 1. Clarify objective, constraints, and scope boundaries. 2. Produce ordered, executable actions. 3. Include validation and rollback guidance where relevant. 4. Surface explicit risks and unknowns. Output Con",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1205,7 +1205,7 @@
     },
     {
       "id": ".agents/roles/tester.md",
-      "text": "# Role: Tester Schema: antigrav.role@v1 ```json { \"name\": \"tester\", \"provider\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.0 } ``` Generate deterministic test cases that prove behavior and edge cases. Map each test directly to expected outcomes and failure symptoms. Keep tests focused on the requested change scope.",
+      "text": "# Role: Tester Schema: agentic-sdlc.role@v1 ```json { \"name\": \"tester\", \"provider\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.0 } ``` Generate deterministic test cases that prove behavior and edge cases. Map each test directly to expected outcomes and failure symptoms. Keep tests focused on the requested change scope.",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1217,7 +1217,7 @@
     },
     {
       "id": ".agents/roles/validator.md",
-      "text": "# Role: Validator Schema: antigrav.role@v1 ```json { \"name\": \"validator\", \"provider\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.0 } ``` Generate concise validation steps for build, test, and lint. Prefer deterministic commands and explicit expected outcomes. Call out residual risks if validation coverage is incomplete.",
+      "text": "# Role: Validator Schema: agentic-sdlc.role@v1 ```json { \"name\": \"validator\", \"provider\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.0 } ``` Generate concise validation steps for build, test, and lint. Prefer deterministic commands and explicit expected outcomes. Call out residual risks if validation coverage is incomplete.",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1228,7 +1228,7 @@
     },
     {
       "id": ".agents/rules/branching_rules.md",
-      "text": "--- description: branching strategy rules trigger: always_on --- # Branching Rules Schema: antigrav.rule@v1 ```json { \"strategy\": \"thread-per-branch\", \"prefix\": \"thread/\", \"allow_auto_create\": true, \"allow_auto_checkout\": true, \"cleanup_after_merge\": true } ``` ## Policy Intent - Keep workflow execution deterministic, auditable, and production-safe. - Prefer explicit guardrails over implicit behavior.",
+      "text": "--- description: branching strategy rules trigger: always_on --- # Branching Rules Schema: agentic-sdlc.rule@v1 ```json { \"strategy\": \"thread-per-branch\", \"prefix\": \"thread/\", \"allow_auto_create\": true, \"allow_auto_checkout\": true, \"cleanup_after_merge\": true } ``` ## Policy Intent - Keep workflow execution deterministic, auditable, and production-safe. - Prefer explicit guardrails over implicit behavior.",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1239,7 +1239,7 @@
     },
     {
       "id": ".agents/rules/coding_rules.md",
-      "text": "--- description: coding quality rules trigger: always_on --- # Coding Rules Schema: antigrav.rule@v1 ```json { \"no_unused_imports\": true, \"require_tests_for_new_feature\": true, \"forbid_unrelated_file_changes\": true, \"require_memory_index_update\": true, \"require_structured_commit_message\": true, \"commit_format\": \"type(scope): short summary\\n\\n- change 1\\n- change 2\" } ``` ## Policy Intent - Keep workflow execution deterministic, auditable, and production-safe. - Prefer explici",
+      "text": "--- description: coding quality rules trigger: always_on --- # Coding Rules Schema: agentic-sdlc.rule@v1 ```json { \"no_unused_imports\": true, \"require_tests_for_new_feature\": true, \"forbid_unrelated_file_changes\": true, \"require_memory_index_update\": true, \"require_structured_commit_message\": true, \"commit_format\": \"type(scope): short summary\\n\\n- change 1\\n- change 2\" } ``` ## Policy Intent - Keep workflow execution deterministic, auditable, and production-safe. - Prefer explici",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1250,7 +1250,7 @@
     },
     {
       "id": ".agents/rules/merge_rules.md",
-      "text": "--- description: merge and conflict policy rules trigger: always_on --- # Merge Rules Schema: antigrav.rule@v1 ```json { \"require_validation_before_merge\": true, \"analyze_conflicts\": true, \"auto_conflict_resolution_assist\": true, \"auto_conflict_resolution_strategy\": \"ours\", \"auto_conflict_resolution_max_attempts\": 2, \"delete_feature_branch_after_merge\": true, \"protected_branches\": [\"main\", \"master\"], \"require_rebase_before_merge\": false } ``` ## Policy Intent - Keep workflow ",
+      "text": "--- description: merge and conflict policy rules trigger: always_on --- # Merge Rules Schema: agentic-sdlc.rule@v1 ```json { \"require_validation_before_merge\": true, \"analyze_conflicts\": true, \"auto_conflict_resolution_assist\": true, \"auto_conflict_resolution_strategy\": \"ours\", \"auto_conflict_resolution_max_attempts\": 2, \"delete_feature_branch_after_merge\": true, \"protected_branches\": [\"main\", \"master\"], \"require_rebase_before_merge\": false } ``` ## Policy Intent - Keep workflow ",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1262,7 +1262,7 @@
     },
     {
       "id": ".agents/rules/runtime.md",
-      "text": "--- description: runtime policy rules trigger: always_on --- # Runtime Rules Schema: antigrav.rule@v1 ```json { \"allowed_domains\": [ \"demo\", \"utils\", \"agent\", \"dev\", \"antigravity\", \"anthropic\", \"ai-research\", \"ai-engineering\", \"cloud-platform\", \"cybersecurity\", \"data-ml-eval\", \"healthtech\", \"climate-tech\" ], \"preferred_domains\": [ \"agent\", \"dev\", \"cybersecurity\", \"ai-engineering\", \"cloud-platform\", \"data-ml-eval\", \"healthtech\", \"climate-tech\", \"antigravity\", \"anthropic\", \"ai-",
+      "text": "--- description: runtime policy rules trigger: always_on --- # Runtime Rules Schema: agentic-sdlc.rule@v1 ```json { \"allowed_domains\": [ \"demo\", \"utils\", \"agent\", \"dev\", \"antigravity\", \"anthropic\", \"ai-research\", \"ai-engineering\", \"cloud-platform\", \"cybersecurity\", \"data-ml-eval\", \"healthtech\", \"climate-tech\" ], \"preferred_domains\": [ \"agent\", \"dev\", \"cybersecurity\", \"ai-engineering\", \"cloud-platform\", \"data-ml-eval\", \"healthtech\", \"climate-tech\", \"antigravity\", \"anthropic\", \"ai-",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1313,7 +1313,7 @@
     },
     {
       "id": ".agents/skills/ai-engineering/acceptance_guard/SKILL.md",
-      "text": "# Skill: acceptance_guard Schema: antigrav.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"ai-engineering\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":",
+      "text": "# Skill: acceptance_guard Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"ai-engineering\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1347,7 +1347,7 @@
     },
     {
       "id": ".agents/skills/ai-engineering/impact_analyzer/SKILL.md",
-      "text": "# Skill: impact_analyzer Schema: antigrav.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"ai-engineering\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_proc",
+      "text": "# Skill: impact_analyzer Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"ai-engineering\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_proc",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1381,7 +1381,7 @@
     },
     {
       "id": ".agents/skills/ai-engineering/risk_register/SKILL.md",
-      "text": "# Skill: risk_register Schema: antigrav.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"ai-engineering\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow",
+      "text": "# Skill: risk_register Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"ai-engineering\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1415,7 +1415,7 @@
     },
     {
       "id": ".agents/skills/analyze_code/SKILL.md",
-      "text": "# Skill: analyze_code Schema: antigrav.skill@v1 ```json { \"name\": \"analyze_code\", \"domain\": \"agent\", \"description\": \"Analyze a code task and produce a deterministic backend implementation assessment.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"analysis\", \"backend\", \"planning\"], \"executor\": \"ollama\", \"model\": \"minimax-m2.5:cloud\", \"temperature\": 0.2 } ``` ## Overview You are a senior backend engineer focused on correctness and implementation clarity. ## When to Use - Use whe",
+      "text": "# Skill: analyze_code Schema: agentic-sdlc.skill@v1 ```json { \"name\": \"analyze_code\", \"domain\": \"agent\", \"description\": \"Analyze a code task and produce a deterministic backend implementation assessment.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"analysis\", \"backend\", \"planning\"], \"executor\": \"ollama\", \"model\": \"minimax-m2.5:cloud\", \"temperature\": 0.2 } ``` ## Overview You are a senior backend engineer focused on correctness and implementation clarity. ## When to Use - Use whe",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1449,7 +1449,7 @@
     },
     {
       "id": ".agents/skills/climate-tech/acceptance_guard/SKILL.md",
-      "text": "# Skill: acceptance_guard Schema: antigrav.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"climate-tech\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":fa",
+      "text": "# Skill: acceptance_guard Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"climate-tech\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":fa",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1483,7 +1483,7 @@
     },
     {
       "id": ".agents/skills/climate-tech/impact_analyzer/SKILL.md",
-      "text": "# Skill: impact_analyzer Schema: antigrav.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"climate-tech\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_proces",
+      "text": "# Skill: impact_analyzer Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"climate-tech\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_proces",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1517,7 +1517,7 @@
     },
     {
       "id": ".agents/skills/climate-tech/risk_register/SKILL.md",
-      "text": "# Skill: risk_register Schema: antigrav.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"climate-tech\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_p",
+      "text": "# Skill: risk_register Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"climate-tech\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_p",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1551,7 +1551,7 @@
     },
     {
       "id": ".agents/skills/cloud-platform/acceptance_guard/SKILL.md",
-      "text": "# Skill: acceptance_guard Schema: antigrav.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"cloud-platform\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":",
+      "text": "# Skill: acceptance_guard Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"cloud-platform\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1585,7 +1585,7 @@
     },
     {
       "id": ".agents/skills/cloud-platform/impact_analyzer/SKILL.md",
-      "text": "# Skill: impact_analyzer Schema: antigrav.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"cloud-platform\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_proc",
+      "text": "# Skill: impact_analyzer Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"cloud-platform\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_proc",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1619,7 +1619,7 @@
     },
     {
       "id": ".agents/skills/cloud-platform/risk_register/SKILL.md",
-      "text": "# Skill: risk_register Schema: antigrav.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"cloud-platform\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow",
+      "text": "# Skill: risk_register Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"cloud-platform\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1653,7 +1653,7 @@
     },
     {
       "id": ".agents/skills/cybersecurity/acceptance_guard/SKILL.md",
-      "text": "# Skill: acceptance_guard Schema: antigrav.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"cybersecurity\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":f",
+      "text": "# Skill: acceptance_guard Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"cybersecurity\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":f",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1687,7 +1687,7 @@
     },
     {
       "id": ".agents/skills/cybersecurity/impact_analyzer/SKILL.md",
-      "text": "# Skill: impact_analyzer Schema: antigrav.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"cybersecurity\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_proce",
+      "text": "# Skill: impact_analyzer Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"cybersecurity\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_proce",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1721,7 +1721,7 @@
     },
     {
       "id": ".agents/skills/cybersecurity/risk_register/SKILL.md",
-      "text": "# Skill: risk_register Schema: antigrav.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"cybersecurity\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_",
+      "text": "# Skill: risk_register Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"cybersecurity\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1755,7 +1755,7 @@
     },
     {
       "id": ".agents/skills/cybersecurity/security_scan_guard/SKILL.md",
-      "text": "# Skill: security_scan_guard Schema: antigrav.skill@v1 ```json {\"name\":\"security_scan_guard\",\"domain\":\"cybersecurity\",\"description\":\"Evaluate internet-surface risk and security readiness for workflow outputs\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"security\",\"internet-surface\",\"risk-gate\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3000,\"allow_fs_read\":false,\"allow_fs_write\":fals",
+      "text": "# Skill: security_scan_guard Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"security_scan_guard\",\"domain\":\"cybersecurity\",\"description\":\"Evaluate internet-surface risk and security readiness for workflow outputs\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"security\",\"internet-surface\",\"risk-gate\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3000,\"allow_fs_read\":false,\"allow_fs_write\":fals",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1789,7 +1789,7 @@
     },
     {
       "id": ".agents/skills/data-ml-eval/acceptance_guard/SKILL.md",
-      "text": "# Skill: acceptance_guard Schema: antigrav.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"data-ml-eval\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":fa",
+      "text": "# Skill: acceptance_guard Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"data-ml-eval\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":fa",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1823,7 +1823,7 @@
     },
     {
       "id": ".agents/skills/data-ml-eval/impact_analyzer/SKILL.md",
-      "text": "# Skill: impact_analyzer Schema: antigrav.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"data-ml-eval\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_proces",
+      "text": "# Skill: impact_analyzer Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"data-ml-eval\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_proces",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1857,7 +1857,7 @@
     },
     {
       "id": ".agents/skills/data-ml-eval/risk_register/SKILL.md",
-      "text": "# Skill: risk_register Schema: antigrav.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"data-ml-eval\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_p",
+      "text": "# Skill: risk_register Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"data-ml-eval\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_p",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1891,7 +1891,7 @@
     },
     {
       "id": ".agents/skills/dev/landing_page_architect/SKILL.md",
-      "text": "# Skill: landing_page_architect Schema: antigrav.skill@v1 ```json { \"name\": \"landing_page_architect\", \"domain\": \"dev\", \"executor\": \"ollama\", \"description\": \"Design an implementation-ready landing page spec with sections, UX intent, and acceptance criteria.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"dev\", \"landing-page\", \"ux\", \"planning\"], \"model\": \"qwen3:8b\", \"temperature\": 0.1, \"trust_tier\": \"Constrained\", \"input_type\": \"text\", \"output_type\": \"text\" } ``` ## Overview You ",
+      "text": "# Skill: landing_page_architect Schema: agentic-sdlc.skill@v1 ```json { \"name\": \"landing_page_architect\", \"domain\": \"dev\", \"executor\": \"ollama\", \"description\": \"Design an implementation-ready landing page spec with sections, UX intent, and acceptance criteria.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"dev\", \"landing-page\", \"ux\", \"planning\"], \"model\": \"qwen3:8b\", \"temperature\": 0.1, \"trust_tier\": \"Constrained\", \"input_type\": \"text\", \"output_type\": \"text\" } ``` ## Overview You ",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1925,7 +1925,7 @@
     },
     {
       "id": ".agents/skills/dev/landing_page_implementer/SKILL.md",
-      "text": "# Skill: landing_page_implementer Schema: antigrav.skill@v1 ```json { \"name\": \"landing_page_implementer\", \"domain\": \"dev\", \"executor\": \"ollama\", \"description\": \"Generate implementation-ready landing page file changes and validation checklist from a spec.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"dev\", \"landing-page\", \"implementation\", \"frontend\"], \"model\": \"qwen3:8b\", \"temperature\": 0.1, \"trust_tier\": \"Constrained\", \"input_type\": \"text\", \"output_type\": \"text\" } ``` ## Ove",
+      "text": "# Skill: landing_page_implementer Schema: agentic-sdlc.skill@v1 ```json { \"name\": \"landing_page_implementer\", \"domain\": \"dev\", \"executor\": \"ollama\", \"description\": \"Generate implementation-ready landing page file changes and validation checklist from a spec.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"dev\", \"landing-page\", \"implementation\", \"frontend\"], \"model\": \"qwen3:8b\", \"temperature\": 0.1, \"trust_tier\": \"Constrained\", \"input_type\": \"text\", \"output_type\": \"text\" } ``` ## Ove",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1959,7 +1959,7 @@
     },
     {
       "id": ".agents/skills/dev/project_intelligence_advisor/SKILL.md",
-      "text": "# Skill: project_intelligence_advisor Schema: antigrav.skill@v1 ```json { \"name\": \"project_intelligence_advisor\", \"domain\": \"dev\", \"executor\": \"ollama\", \"description\": \"Synthesize indexed project context and recommend the best workflows and skills to upgrade delivery quality.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"dev\", \"indexing\", \"project-understanding\", \"recommendations\"], \"model\": \"qwen3:8b\", \"temperature\": 0.1, \"trust_tier\": \"Constrained\", \"input_type\": \"text\", \"o",
+      "text": "# Skill: project_intelligence_advisor Schema: agentic-sdlc.skill@v1 ```json { \"name\": \"project_intelligence_advisor\", \"domain\": \"dev\", \"executor\": \"ollama\", \"description\": \"Synthesize indexed project context and recommend the best workflows and skills to upgrade delivery quality.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"dev\", \"indexing\", \"project-understanding\", \"recommendations\"], \"model\": \"qwen3:8b\", \"temperature\": 0.1, \"trust_tier\": \"Constrained\", \"input_type\": \"text\", \"o",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -1993,7 +1993,7 @@
     },
     {
       "id": ".agents/skills/dev/remotion_io_visualizer/SKILL.md",
-      "text": "# Skill: remotion_io_visualizer Schema: antigrav.skill@v1 ```json { \"name\": \"remotion_io_visualizer\", \"domain\": \"dev\", \"executor\": \"ollama\", \"description\": \"Turn real workflow input/output traces into a Remotion storyboard and render plan for landing pages.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"dev\", \"remotion\", \"visualization\", \"workflow-trace\", \"landing-page\"], \"model\": \"qwen3:8b\", \"temperature\": 0.1, \"trust_tier\": \"Constrained\", \"input_type\": \"text\", \"output_type\":",
+      "text": "# Skill: remotion_io_visualizer Schema: agentic-sdlc.skill@v1 ```json { \"name\": \"remotion_io_visualizer\", \"domain\": \"dev\", \"executor\": \"ollama\", \"description\": \"Turn real workflow input/output traces into a Remotion storyboard and render plan for landing pages.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"dev\", \"remotion\", \"visualization\", \"workflow-trace\", \"landing-page\"], \"model\": \"qwen3:8b\", \"temperature\": 0.1, \"trust_tier\": \"Constrained\", \"input_type\": \"text\", \"output_type\":",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2076,7 +2076,7 @@
     },
     {
       "id": ".agents/skills/generate_tests/SKILL.md",
-      "text": "# Skill: generate_tests Schema: antigrav.skill@v1 ```json { \"name\": \"generate_tests\", \"domain\": \"agent\", \"description\": \"Generate deterministic unit tests from feature or bugfix requirements.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"testing\", \"unit-tests\", \"quality\"], \"executor\": \"ollama\", \"model\": \"qwen3:8b\" } ``` ## Overview Generate unit test suites with clear arrange-act-assert structure. ## When to Use - Use when adding tests for a new feature or regression fix. - U",
+      "text": "# Skill: generate_tests Schema: agentic-sdlc.skill@v1 ```json { \"name\": \"generate_tests\", \"domain\": \"agent\", \"description\": \"Generate deterministic unit tests from feature or bugfix requirements.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"testing\", \"unit-tests\", \"quality\"], \"executor\": \"ollama\", \"model\": \"qwen3:8b\" } ``` ## Overview Generate unit test suites with clear arrange-act-assert structure. ## When to Use - Use when adding tests for a new feature or regression fix. - U",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2110,7 +2110,7 @@
     },
     {
       "id": ".agents/skills/healthtech/acceptance_guard/SKILL.md",
-      "text": "# Skill: acceptance_guard Schema: antigrav.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"healthtech\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":fals",
+      "text": "# Skill: acceptance_guard Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"acceptance_guard\",\"domain\":\"healthtech\",\"description\":\"Validate acceptance criteria and test completeness\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"acceptance\",\"quality\",\"validation\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":10,\"estimated_latency_ms\":3200,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":fals",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2144,7 +2144,7 @@
     },
     {
       "id": ".agents/skills/healthtech/impact_analyzer/SKILL.md",
-      "text": "# Skill: impact_analyzer Schema: antigrav.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"healthtech\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_process_",
+      "text": "# Skill: impact_analyzer Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"impact_analyzer\",\"domain\":\"healthtech\",\"description\":\"Estimate blast radius and dependency impact\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"analysis\",\"planning\",\"risk\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":9,\"estimated_latency_ms\":2800,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_process_",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2178,7 +2178,7 @@
     },
     {
       "id": ".agents/skills/healthtech/risk_register/SKILL.md",
-      "text": "# Skill: risk_register Schema: antigrav.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"healthtech\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_pro",
+      "text": "# Skill: risk_register Schema: agentic-sdlc.skill@v1 ```json {\"name\":\"risk_register\",\"domain\":\"healthtech\",\"description\":\"Generate risk register with severity and mitigation\",\"risk\":\"safe\",\"source\":\"self\",\"tags\":[\"risk\",\"mitigation\",\"release\"],\"executor\":\"ollama\",\"model\":\"qwen3:8b\",\"temperature\":0.05,\"input_type\":\"text\",\"output_type\":\"json\",\"estimated_cost\":8,\"estimated_latency_ms\":2600,\"allow_fs_read\":false,\"allow_fs_write\":false,\"allow_network\":true,\"allow_env\":false,\"allow_pro",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2212,7 +2212,7 @@
     },
     {
       "id": ".agents/skills/imported/agent-evaluation/SKILL.md",
-      "text": "# Skill: agent-evaluation Schema: antigrav.skill@v1 ```json { \"description\": \"Testing and benchmarking LLM agents including behavioral testing, capability assessment, reliability metrics, and production monitoring\\\\u2014where even top agents achieve less than 50% on re...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154350, \"model\": \"qwen3:8b\", \"name\": \"agent-evaluation\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_comm",
+      "text": "# Skill: agent-evaluation Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Testing and benchmarking LLM agents including behavioral testing, capability assessment, reliability metrics, and production monitoring\\\\u2014where even top agents achieve less than 50% on re...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154350, \"model\": \"qwen3:8b\", \"name\": \"agent-evaluation\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_comm",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2246,7 +2246,7 @@
     },
     {
       "id": ".agents/skills/imported/api-security-best-practices/SKILL.md",
-      "text": "# Skill: api-security-best-practices Schema: antigrav.skill@v1 ```json { \"description\": \"Implement secure API design patterns including authentication, authorization, input validation, rate limiting, and protection against common API vulnerabilities\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154358, \"model\": \"qwen3:8b\", \"name\": \"api-security-best-practices\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1",
+      "text": "# Skill: api-security-best-practices Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Implement secure API design patterns including authentication, authorization, input validation, rate limiting, and protection against common API vulnerabilities\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154358, \"model\": \"qwen3:8b\", \"name\": \"api-security-best-practices\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2280,7 +2280,7 @@
     },
     {
       "id": ".agents/skills/imported/ask-questions-if-underspecified/SKILL.md",
-      "text": "# Skill: ask-questions-if-underspecified Schema: antigrav.skill@v1 ```json { \"description\": \"Clarify requirements before implementing. Use when serious doubts arise.\", \"domain\": \"imported\", \"executor\": \"ollama\", \"imported_at_ms\": 1772726746670, \"model\": \"qwen3:8b\", \"name\": \"ask-questions-if-underspecified\", \"risk\": \"none\", \"source\": \"https://github.com/trailofbits/skills\", \"source_commit\": \"8f92c6dee05a130f7f7840806b1f3a8e58fb48df\", \"source_license\": \"CC0-1.0\", \"source_path\":",
+      "text": "# Skill: ask-questions-if-underspecified Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Clarify requirements before implementing. Use when serious doubts arise.\", \"domain\": \"imported\", \"executor\": \"ollama\", \"imported_at_ms\": 1772726746670, \"model\": \"qwen3:8b\", \"name\": \"ask-questions-if-underspecified\", \"risk\": \"none\", \"source\": \"https://github.com/trailofbits/skills\", \"source_commit\": \"8f92c6dee05a130f7f7840806b1f3a8e58fb48df\", \"source_license\": \"CC0-1.0\", \"source_path\":",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2314,7 +2314,7 @@
     },
     {
       "id": ".agents/skills/imported/browser-automation/SKILL.md",
-      "text": "# Skill: browser-automation Schema: antigrav.skill@v1 ```json { \"description\": \"Browser automation powers web testing, scraping, and AI agent interactions. The difference between a flaky script and a reliable system comes down to understanding selectors, waiting strategies, an...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154365, \"model\": \"qwen3:8b\", \"name\": \"browser-automation\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"s",
+      "text": "# Skill: browser-automation Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Browser automation powers web testing, scraping, and AI agent interactions. The difference between a flaky script and a reliable system comes down to understanding selectors, waiting strategies, an...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154365, \"model\": \"qwen3:8b\", \"name\": \"browser-automation\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"s",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2348,7 +2348,7 @@
     },
     {
       "id": ".agents/skills/imported/code-review-checklist/SKILL.md",
-      "text": "# Skill: code-review-checklist Schema: antigrav.skill@v1 ```json { \"description\": \"Comprehensive checklist for conducting thorough code reviews covering functionality, security, performance, and maintainability\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154366, \"model\": \"qwen3:8b\", \"name\": \"code-review-checklist\", \"risk\": \"none\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source_license\": \"MIT\", \"source_pat",
+      "text": "# Skill: code-review-checklist Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Comprehensive checklist for conducting thorough code reviews covering functionality, security, performance, and maintainability\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154366, \"model\": \"qwen3:8b\", \"name\": \"code-review-checklist\", \"risk\": \"none\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source_license\": \"MIT\", \"source_pat",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2382,7 +2382,7 @@
     },
     {
       "id": ".agents/skills/imported/evaluating-llms-harness/SKILL.md",
-      "text": "# Skill: evaluating-llms-harness Schema: antigrav.skill@v1 ```json { \"description\": \"Evaluates LLMs across 60+ academic benchmarks (MMLU, HumanEval, GSM8K, TruthfulQA, HellaSwag). Use when benchmarking model quality, comparing models, reporting academic results, or tracking training p\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155424, \"model\": \"qwen3:8b\", \"name\": \"evaluating-llms-harness\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-",
+      "text": "# Skill: evaluating-llms-harness Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Evaluates LLMs across 60+ academic benchmarks (MMLU, HumanEval, GSM8K, TruthfulQA, HellaSwag). Use when benchmarking model quality, comparing models, reporting academic results, or tracking training p\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155424, \"model\": \"qwen3:8b\", \"name\": \"evaluating-llms-harness\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2416,7 +2416,7 @@
     },
     {
       "id": ".agents/skills/imported/langchain/SKILL.md",
-      "text": "# Skill: langchain Schema: antigrav.skill@v1 ```json { \"description\": \"Framework for building LLM-powered applications with agents, chains, and RAG. Supports multiple providers (OpenAI, Anthropic, Google), 500+ integrations, ReAct agents, tool calling, memory management,\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155443, \"model\": \"qwen3:8b\", \"name\": \"langchain\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-Research/AI-Research-SKILLs\"",
+      "text": "# Skill: langchain Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Framework for building LLM-powered applications with agents, chains, and RAG. Supports multiple providers (OpenAI, Anthropic, Google), 500+ integrations, ReAct agents, tool calling, memory management,\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155443, \"model\": \"qwen3:8b\", \"name\": \"langchain\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-Research/AI-Research-SKILLs\"",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2450,7 +2450,7 @@
     },
     {
       "id": ".agents/skills/imported/langfuse/SKILL.md",
-      "text": "# Skill: langfuse Schema: antigrav.skill@v1 ```json { \"description\": \"Expert in Langfuse - the open-source LLM observability platform. Covers tracing, prompt management, evaluation, datasets, and integration with LangChain, LlamaIndex, and OpenAI. Essential for debug...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154386, \"model\": \"qwen3:8b\", \"name\": \"langfuse\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174",
+      "text": "# Skill: langfuse Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Expert in Langfuse - the open-source LLM observability platform. Covers tracing, prompt management, evaluation, datasets, and integration with LangChain, LlamaIndex, and OpenAI. Essential for debug...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154386, \"model\": \"qwen3:8b\", \"name\": \"langfuse\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2484,7 +2484,7 @@
     },
     {
       "id": ".agents/skills/imported/langgraph-docs/SKILL.md",
-      "text": "# Skill: langgraph-docs Schema: antigrav.skill@v1 ```json { \"description\": \"Use this skill for requests related to LangGraph in order to fetch relevant documentation to provide accurate, up-to-date guidance.\", \"domain\": \"imported\", \"executor\": \"ollama\", \"imported_at_ms\": 1772726744424, \"model\": \"qwen3:8b\", \"name\": \"langgraph-docs\", \"risk\": \"safe\", \"source\": \"https://github.com/langchain-ai/deepagents\", \"source_commit\": \"47b920b7a5266d60d379bc0ed66d9c6352e20e28\", \"source_licen",
+      "text": "# Skill: langgraph-docs Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Use this skill for requests related to LangGraph in order to fetch relevant documentation to provide accurate, up-to-date guidance.\", \"domain\": \"imported\", \"executor\": \"ollama\", \"imported_at_ms\": 1772726744424, \"model\": \"qwen3:8b\", \"name\": \"langgraph-docs\", \"risk\": \"safe\", \"source\": \"https://github.com/langchain-ai/deepagents\", \"source_commit\": \"47b920b7a5266d60d379bc0ed66d9c6352e20e28\", \"source_licen",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2518,7 +2518,7 @@
     },
     {
       "id": ".agents/skills/imported/langgraph/SKILL.md",
-      "text": "# Skill: langgraph Schema: antigrav.skill@v1 ```json { \"description\": \"Expert in LangGraph - the production-grade framework for building stateful, multi-actor AI applications. Covers graph construction, state management, cycles and branches, persistence with checkpoin...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154388, \"model\": \"qwen3:8b\", \"name\": \"langgraph\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"51",
+      "text": "# Skill: langgraph Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Expert in LangGraph - the production-grade framework for building stateful, multi-actor AI applications. Covers graph construction, state management, cycles and branches, persistence with checkpoin...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154388, \"model\": \"qwen3:8b\", \"name\": \"langgraph\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"51",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2552,7 +2552,7 @@
     },
     {
       "id": ".agents/skills/imported/langsmith-observability/SKILL.md",
-      "text": "# Skill: langsmith-observability Schema: antigrav.skill@v1 ```json { \"description\": \"LLM observability platform for tracing, evaluation, and monitoring. Use when debugging LLM applications, evaluating model outputs against datasets, monitoring production systems, or building systemati\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155463, \"model\": \"qwen3:8b\", \"name\": \"langsmith-observability\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-",
+      "text": "# Skill: langsmith-observability Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"LLM observability platform for tracing, evaluation, and monitoring. Use when debugging LLM applications, evaluating model outputs against datasets, monitoring production systems, or building systemati\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155463, \"model\": \"qwen3:8b\", \"name\": \"langsmith-observability\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2586,7 +2586,7 @@
     },
     {
       "id": ".agents/skills/imported/llm-app-patterns/SKILL.md",
-      "text": "# Skill: llm-app-patterns Schema: antigrav.skill@v1 ```json { \"description\": \"Production-ready patterns for building LLM applications. Covers RAG pipelines, agent architectures, prompt IDEs, and LLMOps monitoring. Use when designing AI applications, implementing RAG, buildin...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154390, \"model\": \"qwen3:8b\", \"name\": \"llm-app-patterns\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"sourc",
+      "text": "# Skill: llm-app-patterns Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Production-ready patterns for building LLM applications. Covers RAG pipelines, agent architectures, prompt IDEs, and LLMOps monitoring. Use when designing AI applications, implementing RAG, buildin...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154390, \"model\": \"qwen3:8b\", \"name\": \"llm-app-patterns\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"sourc",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2620,7 +2620,7 @@
     },
     {
       "id": ".agents/skills/imported/mcp-builder/SKILL.md",
-      "text": "# Skill: mcp-builder Schema: antigrav.skill@v1 ```json { \"description\": \"Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate exte...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154392, \"model\": \"qwen3:8b\", \"name\": \"mcp-builder\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\":",
+      "text": "# Skill: mcp-builder Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. Use when building MCP servers to integrate exte...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154392, \"model\": \"qwen3:8b\", \"name\": \"mcp-builder\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\":",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2654,7 +2654,7 @@
     },
     {
       "id": ".agents/skills/imported/observability-engineer/SKILL.md",
-      "text": "# Skill: observability-engineer Schema: antigrav.skill@v1 ```json { \"description\": \"Build production-ready monitoring, logging, and tracing systems.\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154392, \"model\": \"qwen3:8b\", \"name\": \"observability-engineer\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source_license\": \"MIT\", \"source_path\": \"observability-engineer/SKILL.md\", \"source_requested\": \"/",
+      "text": "# Skill: observability-engineer Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Build production-ready monitoring, logging, and tracing systems.\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154392, \"model\": \"qwen3:8b\", \"name\": \"observability-engineer\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source_license\": \"MIT\", \"source_path\": \"observability-engineer/SKILL.md\", \"source_requested\": \"/",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2688,7 +2688,7 @@
     },
     {
       "id": ".agents/skills/imported/phoenix-observability/SKILL.md",
-      "text": "# Skill: phoenix-observability Schema: antigrav.skill@v1 ```json { \"description\": \"Open-source AI observability platform for LLM tracing, evaluation, and monitoring. Use when debugging LLM applications with detailed traces, running evaluations on datasets, or monitoring production A\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155464, \"model\": \"qwen3:8b\", \"name\": \"phoenix-observability\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-Rese",
+      "text": "# Skill: phoenix-observability Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Open-source AI observability platform for LLM tracing, evaluation, and monitoring. Use when debugging LLM applications with detailed traces, running evaluations on datasets, or monitoring production A\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155464, \"model\": \"qwen3:8b\", \"name\": \"phoenix-observability\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-Rese",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2722,7 +2722,7 @@
     },
     {
       "id": ".agents/skills/imported/pinecone/SKILL.md",
-      "text": "# Skill: pinecone Schema: antigrav.skill@v1 ```json { \"description\": \"Managed vector database for production AI applications. Fully managed, auto-scaling, with hybrid search (dense + sparse), metadata filtering, and namespaces. Low latency (<100ms p95). Use for producti\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155448, \"model\": \"qwen3:8b\", \"name\": \"pinecone\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-Research/AI-Research-SKILLs\", ",
+      "text": "# Skill: pinecone Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Managed vector database for production AI applications. Fully managed, auto-scaling, with hybrid search (dense + sparse), metadata filtering, and namespaces. Low latency (<100ms p95). Use for producti\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155448, \"model\": \"qwen3:8b\", \"name\": \"pinecone\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-Research/AI-Research-SKILLs\", ",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2756,7 +2756,7 @@
     },
     {
       "id": ".agents/skills/imported/qdrant-vector-search/SKILL.md",
-      "text": "# Skill: qdrant-vector-search Schema: antigrav.skill@v1 ```json { \"description\": \"High-performance vector similarity search engine for RAG and semantic search. Use when building production RAG systems requiring fast nearest neighbor search, hybrid search with filtering, or scalable\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155449, \"model\": \"qwen3:8b\", \"name\": \"qdrant-vector-search\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-Resear",
+      "text": "# Skill: qdrant-vector-search Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"High-performance vector similarity search engine for RAG and semantic search. Use when building production RAG systems requiring fast nearest neighbor search, hybrid search with filtering, or scalable\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155449, \"model\": \"qwen3:8b\", \"name\": \"qdrant-vector-search\", \"risk\": \"safe\", \"source\": \"https://github.com/Orchestra-Resear",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2790,7 +2790,7 @@
     },
     {
       "id": ".agents/skills/imported/rag-implementation/SKILL.md",
-      "text": "# Skill: rag-implementation Schema: antigrav.skill@v1 ```json { \"description\": \"RAG (Retrieval-Augmented Generation) implementation workflow covering embedding selection, vector database setup, chunking strategies, and retrieval optimization.\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154396, \"model\": \"qwen3:8b\", \"name\": \"rag-implementation\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source",
+      "text": "# Skill: rag-implementation Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"RAG (Retrieval-Augmented Generation) implementation workflow covering embedding selection, vector database setup, chunking strategies, and retrieval optimization.\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154396, \"model\": \"qwen3:8b\", \"name\": \"rag-implementation\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2824,7 +2824,7 @@
     },
     {
       "id": ".agents/skills/imported/sast-configuration/SKILL.md",
-      "text": "# Skill: sast-configuration Schema: antigrav.skill@v1 ```json { \"description\": \"Configure Static Application Security Testing (SAST) tools for automated vulnerability detection in application code. Use when setting up security scanning, implementing DevSecOps practices, or aut...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154399, \"model\": \"qwen3:8b\", \"name\": \"sast-configuration\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"s",
+      "text": "# Skill: sast-configuration Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Configure Static Application Security Testing (SAST) tools for automated vulnerability detection in application code. Use when setting up security scanning, implementing DevSecOps practices, or aut...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154399, \"model\": \"qwen3:8b\", \"name\": \"sast-configuration\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"s",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2858,7 +2858,7 @@
     },
     {
       "id": ".agents/skills/imported/security-auditor/SKILL.md",
-      "text": "# Skill: security-auditor Schema: antigrav.skill@v1 ```json { \"description\": \"Expert security auditor specializing in DevSecOps, comprehensive\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154400, \"model\": \"qwen3:8b\", \"name\": \"security-auditor\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source_license\": \"MIT\", \"source_path\": \"security-auditor/SKILL.md\", \"source_requested\": \"/tmp/agentic-sdlc-c",
+      "text": "# Skill: security-auditor Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Expert security auditor specializing in DevSecOps, comprehensive\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154400, \"model\": \"qwen3:8b\", \"name\": \"security-auditor\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source_license\": \"MIT\", \"source_path\": \"security-auditor/SKILL.md\", \"source_requested\": \"/tmp/agentic-sdlc-c",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2892,7 +2892,7 @@
     },
     {
       "id": ".agents/skills/imported/skypilot-multi-cloud-orchestration/SKILL.md",
-      "text": "# Skill: skypilot-multi-cloud-orchestration Schema: antigrav.skill@v1 ```json { \"description\": \"Multi-cloud orchestration for ML workloads with automatic cost optimization. Use when you need to run training or batch jobs across multiple clouds, leverage spot instances with auto-recovery, or opti\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155411, \"model\": \"qwen3:8b\", \"name\": \"skypilot-multi-cloud-orchestration\", \"risk\": \"safe\", \"source\": \"https:/",
+      "text": "# Skill: skypilot-multi-cloud-orchestration Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Multi-cloud orchestration for ML workloads with automatic cost optimization. Use when you need to run training or batch jobs across multiple clouds, leverage spot instances with auto-recovery, or opti\", \"domain\": \"ai-research\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121155411, \"model\": \"qwen3:8b\", \"name\": \"skypilot-multi-cloud-orchestration\", \"risk\": \"safe\", \"source\": \"https:/",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2926,7 +2926,7 @@
     },
     {
       "id": ".agents/skills/imported/systematic-debugging/SKILL.md",
-      "text": "# Skill: systematic-debugging Schema: antigrav.skill@v1 ```json { \"description\": \"Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154401, \"model\": \"qwen3:8b\", \"name\": \"systematic-debugging\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source_license\": \"MIT\", \"source_path\": \"systematic-debugging/SKILL.md\", \"",
+      "text": "# Skill: systematic-debugging Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154401, \"model\": \"qwen3:8b\", \"name\": \"systematic-debugging\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source_license\": \"MIT\", \"source_path\": \"systematic-debugging/SKILL.md\", \"",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2960,7 +2960,7 @@
     },
     {
       "id": ".agents/skills/imported/test-driven-development/SKILL.md",
-      "text": "# Skill: test-driven-development Schema: antigrav.skill@v1 ```json { \"description\": \"Use when implementing any feature or bugfix, before writing implementation code\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154402, \"model\": \"qwen3:8b\", \"name\": \"test-driven-development\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source_license\": \"MIT\", \"source_path\": \"test-driven-development/SKILL.md\", \"sou",
+      "text": "# Skill: test-driven-development Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Use when implementing any feature or bugfix, before writing implementation code\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154402, \"model\": \"qwen3:8b\", \"name\": \"test-driven-development\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", \"source_commit\": \"5174a1eae642\", \"source_license\": \"MIT\", \"source_path\": \"test-driven-development/SKILL.md\", \"sou",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -2994,7 +2994,7 @@
     },
     {
       "id": ".agents/skills/imported/threat-modeling-expert/SKILL.md",
-      "text": "# Skill: threat-modeling-expert Schema: antigrav.skill@v1 ```json { \"description\": \"Expert in threat modeling methodologies, security architecture review, and risk assessment. Masters STRIDE, PASTA, attack trees, and security requirement extraction. Use for security architecture r...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154403, \"model\": \"qwen3:8b\", \"name\": \"threat-modeling-expert\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-ski",
+      "text": "# Skill: threat-modeling-expert Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Expert in threat modeling methodologies, security architecture review, and risk assessment. Masters STRIDE, PASTA, attack trees, and security requirement extraction. Use for security architecture r...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154403, \"model\": \"qwen3:8b\", \"name\": \"threat-modeling-expert\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-ski",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -3028,7 +3028,7 @@
     },
     {
       "id": ".agents/skills/imported/top-web-vulnerabilities/SKILL.md",
-      "text": "# Skill: top-web-vulnerabilities Schema: antigrav.skill@v1 ```json { \"description\": \"This skill should be used when the user asks to \\\\\\\"identify web application vulnerabilities\\\\\\\", \\\\\\\"explain common security flaws\\\\\\\", \\\\\\\"understand vulnerability categories\\\\\\\", \\\\\\\"learn about inject...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154406, \"model\": \"qwen3:8b\", \"name\": \"top-web-vulnerabilities\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-aw",
+      "text": "# Skill: top-web-vulnerabilities Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"This skill should be used when the user asks to \\\\\\\"identify web application vulnerabilities\\\\\\\", \\\\\\\"explain common security flaws\\\\\\\", \\\\\\\"understand vulnerability categories\\\\\\\", \\\\\\\"learn about inject...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154406, \"model\": \"qwen3:8b\", \"name\": \"top-web-vulnerabilities\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-aw",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -3062,7 +3062,7 @@
     },
     {
       "id": ".agents/skills/imported/vector-database-engineer/SKILL.md",
-      "text": "# Skill: vector-database-engineer Schema: antigrav.skill@v1 ```json { \"description\": \"Expert in vector databases, embedding strategies, and semantic search implementation. Masters Pinecone, Weaviate, Qdrant, Milvus, and pgvector for RAG applications, recommendation systems, and similar\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154407, \"model\": \"qwen3:8b\", \"name\": \"vector-database-engineer\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome",
+      "text": "# Skill: vector-database-engineer Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Expert in vector databases, embedding strategies, and semantic search implementation. Masters Pinecone, Weaviate, Qdrant, Milvus, and pgvector for RAG applications, recommendation systems, and similar\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154407, \"model\": \"qwen3:8b\", \"name\": \"vector-database-engineer\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -3096,7 +3096,7 @@
     },
     {
       "id": ".agents/skills/imported/verification-before-completion/SKILL.md",
-      "text": "# Skill: verification-before-completion Schema: antigrav.skill@v1 ```json { \"description\": \"Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evide...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154408, \"model\": \"qwen3:8b\", \"name\": \"verification-before-completion\", \"risk\": \"none\", \"source\": \"sickn33/antigra",
+      "text": "# Skill: verification-before-completion Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evide...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154408, \"model\": \"qwen3:8b\", \"name\": \"verification-before-completion\", \"risk\": \"none\", \"source\": \"sickn33/antigra",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -3130,7 +3130,7 @@
     },
     {
       "id": ".agents/skills/imported/web-research/SKILL.md",
-      "text": "# Skill: web-research Schema: antigrav.skill@v1 ```json { \"description\": \"Use this skill for requests related to web research; it provides a structured approach to conducting comprehensive web research\", \"domain\": \"imported\", \"executor\": \"ollama\", \"imported_at_ms\": 1772726744425, \"model\": \"qwen3:8b\", \"name\": \"web-research\", \"risk\": \"safe\", \"source\": \"https://github.com/langchain-ai/deepagents\", \"source_commit\": \"47b920b7a5266d60d379bc0ed66d9c6352e20e28\", \"source_license\": \"MI",
+      "text": "# Skill: web-research Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Use this skill for requests related to web research; it provides a structured approach to conducting comprehensive web research\", \"domain\": \"imported\", \"executor\": \"ollama\", \"imported_at_ms\": 1772726744425, \"model\": \"qwen3:8b\", \"name\": \"web-research\", \"risk\": \"safe\", \"source\": \"https://github.com/langchain-ai/deepagents\", \"source_commit\": \"47b920b7a5266d60d379bc0ed66d9c6352e20e28\", \"source_license\": \"MI",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -3164,7 +3164,7 @@
     },
     {
       "id": ".agents/skills/imported/webapp-testing/SKILL.md",
-      "text": "# Skill: webapp-testing Schema: antigrav.skill@v1 ```json { \"description\": \"Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser l\", \"domain\": \"anthropic\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121153443, \"model\": \"qwen3:8b\", \"name\": \"webapp-testing\", \"risk\": \"safe\", \"source\": \"anthropics/skills\", \"source_commit\": \"3d595115185",
+      "text": "# Skill: webapp-testing Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser l\", \"domain\": \"anthropic\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121153443, \"model\": \"qwen3:8b\", \"name\": \"webapp-testing\", \"risk\": \"safe\", \"source\": \"anthropics/skills\", \"source_commit\": \"3d595115185",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -3198,7 +3198,7 @@
     },
     {
       "id": ".agents/skills/imported/workflow-automation/SKILL.md",
-      "text": "# Skill: workflow-automation Schema: antigrav.skill@v1 ```json { \"description\": \"Workflow automation is the infrastructure that makes AI agents reliable. Without durable execution, a network hiccup during a 10-step payment flow means lost money and angry customers. With it, wor...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154408, \"model\": \"qwen3:8b\", \"name\": \"workflow-automation\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", ",
+      "text": "# Skill: workflow-automation Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Workflow automation is the infrastructure that makes AI agents reliable. Without durable execution, a network hiccup during a 10-step payment flow means lost money and angry customers. With it, wor...\", \"domain\": \"antigravity\", \"executor\": \"ollama\", \"imported_at_ms\": 1772121154408, \"model\": \"qwen3:8b\", \"name\": \"workflow-automation\", \"risk\": \"safe\", \"source\": \"sickn33/antigravity-awesome-skills\", ",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -3232,7 +3232,7 @@
     },
     {
       "id": ".agents/skills/imported/workflow-orchestration-patterns/SKILL.md",
-      "text": "# Skill: workflow-orchestration-patterns Schema: antigrav.skill@v1 ```json { \"description\": \"Design durable workflows with Temporal for distributed systems. Covers workflow vs activity separation, saga patterns, state management, and determinism constraints. Use when building long-running pro\", \"domain\": \"imported\", \"executor\": \"ollama\", \"imported_at_ms\": 1772726592693, \"model\": \"qwen3:8b\", \"name\": \"workflow-orchestration-patterns\", \"risk\": \"safe\", \"source\": \"https://github.c",
+      "text": "# Skill: workflow-orchestration-patterns Schema: agentic-sdlc.skill@v1 ```json { \"description\": \"Design durable workflows with Temporal for distributed systems. Covers workflow vs activity separation, saga patterns, state management, and determinism constraints. Use when building long-running pro\", \"domain\": \"imported\", \"executor\": \"ollama\", \"imported_at_ms\": 1772726592693, \"model\": \"qwen3:8b\", \"name\": \"workflow-orchestration-patterns\", \"risk\": \"safe\", \"source\": \"https://github.c",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -3266,7 +3266,7 @@
     },
     {
       "id": ".agents/skills/next_steps/SKILL.md",
-      "text": "# Skill: next_steps Schema: antigrav.skill@v1 ```json { \"name\": \"next_steps\", \"domain\": \"agent\", \"description\": \"Derive the next actionable workflow tasks from current progress notes.\", \"risk\": \"none\", \"source\": \"self\", \"tags\": [\"planning\", \"workflow\", \"orchestration\"], \"executor\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.1 } ``` ## Overview Create concise, execution-ready next tasks based on current workflow context. ## When to Use - Use when workflow progress needs t",
+      "text": "# Skill: next_steps Schema: agentic-sdlc.skill@v1 ```json { \"name\": \"next_steps\", \"domain\": \"agent\", \"description\": \"Derive the next actionable workflow tasks from current progress notes.\", \"risk\": \"none\", \"source\": \"self\", \"tags\": [\"planning\", \"workflow\", \"orchestration\"], \"executor\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.1 } ``` ## Overview Create concise, execution-ready next tasks based on current workflow context. ## When to Use - Use when workflow progress needs t",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -3300,7 +3300,7 @@
     },
     {
       "id": ".agents/skills/refactor_code/SKILL.md",
-      "text": "# Skill: refactor_code Schema: antigrav.skill@v1 ```json { \"name\": \"refactor_code\", \"domain\": \"agent\", \"description\": \"Propose modular refactoring plans that preserve behavior and reduce complexity.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"refactoring\", \"architecture\", \"maintainability\"], \"executor\": \"ollama\", \"model\": \"qwen3-coder-next\", \"temperature\": 0.1 } ``` ## Overview Act as a software architect focused on low-risk, high-impact refactors. ## When to Use - Use when",
+      "text": "# Skill: refactor_code Schema: agentic-sdlc.skill@v1 ```json { \"name\": \"refactor_code\", \"domain\": \"agent\", \"description\": \"Propose modular refactoring plans that preserve behavior and reduce complexity.\", \"risk\": \"safe\", \"source\": \"self\", \"tags\": [\"refactoring\", \"architecture\", \"maintainability\"], \"executor\": \"ollama\", \"model\": \"qwen3-coder-next\", \"temperature\": 0.1 } ``` ## Overview Act as a software architect focused on low-risk, high-impact refactors. ## When to Use - Use when",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -3334,7 +3334,7 @@
     },
     {
       "id": ".agents/skills/set_memory/SKILL.md",
-      "text": "# Skill: set_memory Schema: antigrav.skill@v1 ```json { \"name\": \"set_memory\", \"domain\": \"agent\", \"description\": \"Normalize and structure KEY=VALUE memory updates for downstream workflow steps.\", \"risk\": \"none\", \"source\": \"self\", \"tags\": [\"memory\", \"state\", \"workflow\"], \"executor\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.0 } ``` ## Overview Prepare memory state updates in a deterministic KEY=VALUE style for runtime consumption. ## When to Use - Use when a workflow step",
+      "text": "# Skill: set_memory Schema: agentic-sdlc.skill@v1 ```json { \"name\": \"set_memory\", \"domain\": \"agent\", \"description\": \"Normalize and structure KEY=VALUE memory updates for downstream workflow steps.\", \"risk\": \"none\", \"source\": \"self\", \"tags\": [\"memory\", \"state\", \"workflow\"], \"executor\": \"ollama\", \"model\": \"qwen3:8b\", \"temperature\": 0.0 } ``` ## Overview Prepare memory state updates in a deterministic KEY=VALUE style for runtime consumption. ## When to Use - Use when a workflow step",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5052,7 +5052,7 @@
     },
     {
       "id": ".agents/workflows/ai-engineering/bugfix.md",
-      "text": "--- description: ai-engineering bugfix workflow with root-cause and regression guard --- # Workflow: ai-engineering-bugfix Schema: antigrav.workflow@v1 Domain: ai-engineering MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: ai-engineering/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: ai-engineering.impact_analyzer DependsOn: incident_triage Input: {{incident_",
+      "text": "--- description: ai-engineering bugfix workflow with root-cause and regression guard --- # Workflow: ai-engineering-bugfix Schema: agentic-sdlc.workflow@v1 Domain: ai-engineering MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: ai-engineering/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: ai-engineering.impact_analyzer DependsOn: incident_triage Input: {{incident_",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5086,7 +5086,7 @@
     },
     {
       "id": ".agents/workflows/ai-engineering/feature.md",
-      "text": "--- description: ai-engineering feature delivery with impact analysis and acceptance gates --- # Workflow: ai-engineering-feature Schema: antigrav.workflow@v1 Domain: ai-engineering MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: ai-engineering/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: ai-engineering.impact_analyzer Dep",
+      "text": "--- description: ai-engineering feature delivery with impact analysis and acceptance gates --- # Workflow: ai-engineering-feature Schema: agentic-sdlc.workflow@v1 Domain: ai-engineering MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: ai-engineering/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: ai-engineering.impact_analyzer Dep",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5120,7 +5120,7 @@
     },
     {
       "id": ".agents/workflows/ai-engineering/release.md",
-      "text": "--- description: ai-engineering release workflow with quality signal and risk approval --- # Workflow: ai-engineering-release Schema: antigrav.workflow@v1 Domain: ai-engineering MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: ai-engineering/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: ai-engineering.acceptance_guard DependsOn: release_sc",
+      "text": "--- description: ai-engineering release workflow with quality signal and risk approval --- # Workflow: ai-engineering-release Schema: agentic-sdlc.workflow@v1 Domain: ai-engineering MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: ai-engineering/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: ai-engineering.acceptance_guard DependsOn: release_sc",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5154,7 +5154,7 @@
     },
     {
       "id": ".agents/workflows/ai-engineering/review.md",
-      "text": "--- description: ai-engineering review workflow focused on correctness, risk, and release readiness --- # Workflow: ai-engineering-review Schema: antigrav.workflow@v1 Domain: ai-engineering MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: ai-engineering/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: ai-engineering.acceptance_guard Depend",
+      "text": "--- description: ai-engineering review workflow focused on correctness, risk, and release readiness --- # Workflow: ai-engineering-review Schema: agentic-sdlc.workflow@v1 Domain: ai-engineering MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: ai-engineering/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: ai-engineering.acceptance_guard Depend",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5188,7 +5188,7 @@
     },
     {
       "id": ".agents/workflows/antigravity/antigravity-build-ai-agent-system.md",
-      "text": "--- description: Imported from antigravity-awesome-skills workflow 'build-ai-agent-system' source: https://github.com/sickn33/antigravity-awesome-skills category: ai-agents --- # Workflow: antigravity-build-ai-agent-system Schema: antigrav.workflow@v1 Domain: antigravity Goal: Build an AI Agent System ## Step: stage_01_define_use_case_and_reliability_targets Skill: antigravity.ai-agents-architect Input: Goal: Choose a narrow use case and measurable quality goals. Notes: Set l",
+      "text": "--- description: Imported from antigravity-awesome-skills workflow 'build-ai-agent-system' source: https://github.com/sickn33/antigravity-awesome-skills category: ai-agents --- # Workflow: antigravity-build-ai-agent-system Schema: agentic-sdlc.workflow@v1 Domain: antigravity Goal: Build an AI Agent System ## Step: stage_01_define_use_case_and_reliability_targets Skill: antigravity.ai-agents-architect Input: Goal: Choose a narrow use case and measurable quality goals. Notes: Set l",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5222,7 +5222,7 @@
     },
     {
       "id": ".agents/workflows/antigravity/antigravity-design-ddd-core-domain.md",
-      "text": "--- description: Imported from antigravity-awesome-skills workflow 'design-ddd-core-domain' source: https://github.com/sickn33/antigravity-awesome-skills category: architecture --- # Workflow: antigravity-design-ddd-core-domain Schema: antigrav.workflow@v1 Domain: antigravity Goal: Design a DDD Core Domain ## Step: stage_01_assess_ddd_fit_and_scope Skill: antigravity.domain-driven-design Input: Goal: Decide if full DDD is justified and define the modeling scope. Notes: Docume",
+      "text": "--- description: Imported from antigravity-awesome-skills workflow 'design-ddd-core-domain' source: https://github.com/sickn33/antigravity-awesome-skills category: architecture --- # Workflow: antigravity-design-ddd-core-domain Schema: agentic-sdlc.workflow@v1 Domain: antigravity Goal: Design a DDD Core Domain ## Step: stage_01_assess_ddd_fit_and_scope Skill: antigravity.domain-driven-design Input: Goal: Decide if full DDD is justified and define the modeling scope. Notes: Docume",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5256,7 +5256,7 @@
     },
     {
       "id": ".agents/workflows/antigravity/antigravity-qa-browser-automation.md",
-      "text": "--- description: Imported from antigravity-awesome-skills workflow 'qa-browser-automation' source: https://github.com/sickn33/antigravity-awesome-skills category: testing --- # Workflow: antigravity-qa-browser-automation Schema: antigrav.workflow@v1 Domain: antigravity Goal: QA and Browser Automation ## Step: stage_01_prepare_test_strategy Skill: antigravity.e2e-testing-patterns Input: Goal: Define critical user journeys, environments, and test data. Notes: Focus on business-",
+      "text": "--- description: Imported from antigravity-awesome-skills workflow 'qa-browser-automation' source: https://github.com/sickn33/antigravity-awesome-skills category: testing --- # Workflow: antigravity-qa-browser-automation Schema: agentic-sdlc.workflow@v1 Domain: antigravity Goal: QA and Browser Automation ## Step: stage_01_prepare_test_strategy Skill: antigravity.e2e-testing-patterns Input: Goal: Define critical user journeys, environments, and test data. Notes: Focus on business-",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5290,7 +5290,7 @@
     },
     {
       "id": ".agents/workflows/antigravity/antigravity-security-audit-web-app.md",
-      "text": "--- description: Imported from antigravity-awesome-skills workflow 'security-audit-web-app' source: https://github.com/sickn33/antigravity-awesome-skills category: security --- # Workflow: antigravity-security-audit-web-app Schema: antigrav.workflow@v1 Domain: antigravity Goal: Security Audit for a Web App ## Step: stage_01_define_scope_and_threat_model Skill: antigravity.ethical-hacking-methodology Input: Goal: Identify critical assets, trust boundaries, and threat scenarios",
+      "text": "--- description: Imported from antigravity-awesome-skills workflow 'security-audit-web-app' source: https://github.com/sickn33/antigravity-awesome-skills category: security --- # Workflow: antigravity-security-audit-web-app Schema: agentic-sdlc.workflow@v1 Domain: antigravity Goal: Security Audit for a Web App ## Step: stage_01_define_scope_and_threat_model Skill: antigravity.ethical-hacking-methodology Input: Goal: Identify critical assets, trust boundaries, and threat scenarios",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5324,7 +5324,7 @@
     },
     {
       "id": ".agents/workflows/antigravity/antigravity-ship-saas-mvp.md",
-      "text": "--- description: Imported from antigravity-awesome-skills workflow 'ship-saas-mvp' source: https://github.com/sickn33/antigravity-awesome-skills category: web --- # Workflow: antigravity-ship-saas-mvp Schema: antigrav.workflow@v1 Domain: antigravity Goal: Ship a SaaS MVP ## Step: stage_01_plan_the_scope Skill: antigravity.brainstorming Input: Goal: Convert the idea into a clear implementation plan and milestones. Notes: Define problem, user persona, MVP boundaries, and accept",
+      "text": "--- description: Imported from antigravity-awesome-skills workflow 'ship-saas-mvp' source: https://github.com/sickn33/antigravity-awesome-skills category: web --- # Workflow: antigravity-ship-saas-mvp Schema: agentic-sdlc.workflow@v1 Domain: antigravity Goal: Ship a SaaS MVP ## Step: stage_01_plan_the_scope Skill: antigravity.brainstorming Input: Goal: Convert the idea into a clear implementation plan and milestones. Notes: Define problem, user persona, MVP boundaries, and accept",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5358,7 +5358,7 @@
     },
     {
       "id": ".agents/workflows/bugfix.md",
-      "text": "--- description: bugfix advanced workflow with deterministic gates and report quality guard --- # Workflow: bugfix Schema: antigrav.workflow@v1 Domain: agent MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 30 ## Step: intent_analysis Skill: agent.llm_subagent Input: Analyze task scope, constraints, and acceptance criteria for bugfix. Return strict JSON with summary/actions/risks. ## Step: execution_plan Skill: agent.llm_subagent DependsOn: intent_analysis Input: Build",
+      "text": "--- description: bugfix advanced workflow with deterministic gates and report quality guard --- # Workflow: bugfix Schema: agentic-sdlc.workflow@v1 Domain: agent MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 30 ## Step: intent_analysis Skill: agent.llm_subagent Input: Analyze task scope, constraints, and acceptance criteria for bugfix. Return strict JSON with summary/actions/risks. ## Step: execution_plan Skill: agent.llm_subagent DependsOn: intent_analysis Input: Build",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5392,7 +5392,7 @@
     },
     {
       "id": ".agents/workflows/build-feature.md",
-      "text": "--- description: build feature workflow --- # Workflow: Build Feature Schema: antigrav.workflow@v1 Domain: agent ## Step: detect_current_branch Skill: agent.run_script Input: git rev-parse --abbrev-ref HEAD ## Step: clarify_requirement Skill: agent.llm_subagent DependsOn: detect_current_branch Input: architect:::Summarize the feature requirement and assumptions in strict mode, with clear confirmation checkpoints. ## Step: identify_affected_files Skill: agent.llm_subagent Depe",
+      "text": "--- description: build feature workflow --- # Workflow: Build Feature Schema: agentic-sdlc.workflow@v1 Domain: agent ## Step: detect_current_branch Skill: agent.run_script Input: git rev-parse --abbrev-ref HEAD ## Step: clarify_requirement Skill: agent.llm_subagent DependsOn: detect_current_branch Input: architect:::Summarize the feature requirement and assumptions in strict mode, with clear confirmation checkpoints. ## Step: identify_affected_files Skill: agent.llm_subagent Depe",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5426,7 +5426,7 @@
     },
     {
       "id": ".agents/workflows/climate-tech/bugfix.md",
-      "text": "--- description: climate-tech bugfix workflow with root-cause and regression guard --- # Workflow: climate-tech-bugfix Schema: antigrav.workflow@v1 Domain: climate-tech MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: climate-tech/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: climate-tech.impact_analyzer DependsOn: incident_triage Input: {{incident_triage}} #",
+      "text": "--- description: climate-tech bugfix workflow with root-cause and regression guard --- # Workflow: climate-tech-bugfix Schema: agentic-sdlc.workflow@v1 Domain: climate-tech MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: climate-tech/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: climate-tech.impact_analyzer DependsOn: incident_triage Input: {{incident_triage}} #",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5460,7 +5460,7 @@
     },
     {
       "id": ".agents/workflows/climate-tech/feature.md",
-      "text": "--- description: climate-tech feature delivery with impact analysis and acceptance gates --- # Workflow: climate-tech-feature Schema: antigrav.workflow@v1 Domain: climate-tech MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: climate-tech/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: climate-tech.impact_analyzer DependsOn: in",
+      "text": "--- description: climate-tech feature delivery with impact analysis and acceptance gates --- # Workflow: climate-tech-feature Schema: agentic-sdlc.workflow@v1 Domain: climate-tech MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: climate-tech/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: climate-tech.impact_analyzer DependsOn: in",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5494,7 +5494,7 @@
     },
     {
       "id": ".agents/workflows/climate-tech/release.md",
-      "text": "--- description: climate-tech release workflow with quality signal and risk approval --- # Workflow: climate-tech-release Schema: antigrav.workflow@v1 Domain: climate-tech MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: climate-tech/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: climate-tech.acceptance_guard DependsOn: release_scope Input:",
+      "text": "--- description: climate-tech release workflow with quality signal and risk approval --- # Workflow: climate-tech-release Schema: agentic-sdlc.workflow@v1 Domain: climate-tech MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: climate-tech/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: climate-tech.acceptance_guard DependsOn: release_scope Input:",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5528,7 +5528,7 @@
     },
     {
       "id": ".agents/workflows/climate-tech/review.md",
-      "text": "--- description: climate-tech review workflow focused on correctness, risk, and release readiness --- # Workflow: climate-tech-review Schema: antigrav.workflow@v1 Domain: climate-tech MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: climate-tech/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: climate-tech.acceptance_guard DependsOn: revie",
+      "text": "--- description: climate-tech review workflow focused on correctness, risk, and release readiness --- # Workflow: climate-tech-review Schema: agentic-sdlc.workflow@v1 Domain: climate-tech MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: climate-tech/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: climate-tech.acceptance_guard DependsOn: revie",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5562,7 +5562,7 @@
     },
     {
       "id": ".agents/workflows/cloud-platform/bugfix.md",
-      "text": "--- description: cloud-platform bugfix workflow with root-cause and regression guard --- # Workflow: cloud-platform-bugfix Schema: antigrav.workflow@v1 Domain: cloud-platform MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: cloud-platform/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: cloud-platform.impact_analyzer DependsOn: incident_triage Input: {{incident_",
+      "text": "--- description: cloud-platform bugfix workflow with root-cause and regression guard --- # Workflow: cloud-platform-bugfix Schema: agentic-sdlc.workflow@v1 Domain: cloud-platform MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: cloud-platform/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: cloud-platform.impact_analyzer DependsOn: incident_triage Input: {{incident_",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5596,7 +5596,7 @@
     },
     {
       "id": ".agents/workflows/cloud-platform/feature.md",
-      "text": "--- description: cloud-platform feature delivery with impact analysis and acceptance gates --- # Workflow: cloud-platform-feature Schema: antigrav.workflow@v1 Domain: cloud-platform MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: cloud-platform/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: cloud-platform.impact_analyzer Dep",
+      "text": "--- description: cloud-platform feature delivery with impact analysis and acceptance gates --- # Workflow: cloud-platform-feature Schema: agentic-sdlc.workflow@v1 Domain: cloud-platform MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: cloud-platform/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: cloud-platform.impact_analyzer Dep",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5630,7 +5630,7 @@
     },
     {
       "id": ".agents/workflows/cloud-platform/release.md",
-      "text": "--- description: cloud-platform release workflow with quality signal and risk approval --- # Workflow: cloud-platform-release Schema: antigrav.workflow@v1 Domain: cloud-platform MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: cloud-platform/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: cloud-platform.acceptance_guard DependsOn: release_sc",
+      "text": "--- description: cloud-platform release workflow with quality signal and risk approval --- # Workflow: cloud-platform-release Schema: agentic-sdlc.workflow@v1 Domain: cloud-platform MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: cloud-platform/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: cloud-platform.acceptance_guard DependsOn: release_sc",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5664,7 +5664,7 @@
     },
     {
       "id": ".agents/workflows/cloud-platform/review.md",
-      "text": "--- description: cloud-platform review workflow focused on correctness, risk, and release readiness --- # Workflow: cloud-platform-review Schema: antigrav.workflow@v1 Domain: cloud-platform MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: cloud-platform/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: cloud-platform.acceptance_guard Depend",
+      "text": "--- description: cloud-platform review workflow focused on correctness, risk, and release readiness --- # Workflow: cloud-platform-review Schema: agentic-sdlc.workflow@v1 Domain: cloud-platform MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: cloud-platform/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: cloud-platform.acceptance_guard Depend",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5698,7 +5698,7 @@
     },
     {
       "id": ".agents/workflows/cybersecurity/bugfix.md",
-      "text": "--- description: cybersecurity bugfix workflow with root-cause and regression guard --- # Workflow: cybersecurity-bugfix Schema: antigrav.workflow@v1 Domain: cybersecurity MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: cybersecurity/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: cybersecurity.impact_analyzer DependsOn: incident_triage Input: {{incident_triag",
+      "text": "--- description: cybersecurity bugfix workflow with root-cause and regression guard --- # Workflow: cybersecurity-bugfix Schema: agentic-sdlc.workflow@v1 Domain: cybersecurity MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: cybersecurity/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: cybersecurity.impact_analyzer DependsOn: incident_triage Input: {{incident_triag",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5732,7 +5732,7 @@
     },
     {
       "id": ".agents/workflows/cybersecurity/feature.md",
-      "text": "--- description: cybersecurity feature delivery with impact analysis and acceptance gates --- # Workflow: cybersecurity-feature Schema: antigrav.workflow@v1 Domain: cybersecurity MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: cybersecurity/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: cybersecurity.impact_analyzer DependsO",
+      "text": "--- description: cybersecurity feature delivery with impact analysis and acceptance gates --- # Workflow: cybersecurity-feature Schema: agentic-sdlc.workflow@v1 Domain: cybersecurity MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: cybersecurity/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: cybersecurity.impact_analyzer DependsO",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5766,7 +5766,7 @@
     },
     {
       "id": ".agents/workflows/cybersecurity/release.md",
-      "text": "--- description: cybersecurity release workflow with quality signal and risk approval --- # Workflow: cybersecurity-release Schema: antigrav.workflow@v1 Domain: cybersecurity MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: cybersecurity/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: cybersecurity.acceptance_guard DependsOn: release_scope I",
+      "text": "--- description: cybersecurity release workflow with quality signal and risk approval --- # Workflow: cybersecurity-release Schema: agentic-sdlc.workflow@v1 Domain: cybersecurity MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: cybersecurity/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: cybersecurity.acceptance_guard DependsOn: release_scope I",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5800,7 +5800,7 @@
     },
     {
       "id": ".agents/workflows/cybersecurity/review.md",
-      "text": "--- description: cybersecurity review workflow focused on correctness, risk, and release readiness --- # Workflow: cybersecurity-review Schema: antigrav.workflow@v1 Domain: cybersecurity MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: cybersecurity/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: cybersecurity.acceptance_guard DependsOn: ",
+      "text": "--- description: cybersecurity review workflow focused on correctness, risk, and release readiness --- # Workflow: cybersecurity-review Schema: agentic-sdlc.workflow@v1 Domain: cybersecurity MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: cybersecurity/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: cybersecurity.acceptance_guard DependsOn: ",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5834,7 +5834,7 @@
     },
     {
       "id": ".agents/workflows/cybersecurity/security-scan.md",
-      "text": "--- description: Deterministic security scan workflow for package integrity and internet-surface risk source: self --- # Workflow: cybersecurity-security-scan Schema: antigrav.workflow@v1 Domain: cybersecurity Goal: Run policy checks and produce a security decision with explicit mitigations. ## Step: package_integrity Skill: agent.run_script Input: bash -lc './target/debug/agentic-sdlc workflow check' ## Step: quality_integrity Skill: agent.run_script DependsOn: package_integ",
+      "text": "--- description: Deterministic security scan workflow for package integrity and internet-surface risk source: self --- # Workflow: cybersecurity-security-scan Schema: agentic-sdlc.workflow@v1 Domain: cybersecurity Goal: Run policy checks and produce a security decision with explicit mitigations. ## Step: package_integrity Skill: agent.run_script Input: bash -lc './target/debug/agentic-sdlc workflow check' ## Step: quality_integrity Skill: agent.run_script DependsOn: package_integ",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5868,7 +5868,7 @@
     },
     {
       "id": ".agents/workflows/data-ml-eval/bugfix.md",
-      "text": "--- description: data-ml-eval bugfix workflow with root-cause and regression guard --- # Workflow: data-ml-eval-bugfix Schema: antigrav.workflow@v1 Domain: data-ml-eval MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: data-ml-eval/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: data-ml-eval.impact_analyzer DependsOn: incident_triage Input: {{incident_triage}} #",
+      "text": "--- description: data-ml-eval bugfix workflow with root-cause and regression guard --- # Workflow: data-ml-eval-bugfix Schema: agentic-sdlc.workflow@v1 Domain: data-ml-eval MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: data-ml-eval/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: data-ml-eval.impact_analyzer DependsOn: incident_triage Input: {{incident_triage}} #",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5902,7 +5902,7 @@
     },
     {
       "id": ".agents/workflows/data-ml-eval/feature.md",
-      "text": "--- description: data-ml-eval feature delivery with impact analysis and acceptance gates --- # Workflow: data-ml-eval-feature Schema: antigrav.workflow@v1 Domain: data-ml-eval MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: data-ml-eval/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: data-ml-eval.impact_analyzer DependsOn: in",
+      "text": "--- description: data-ml-eval feature delivery with impact analysis and acceptance gates --- # Workflow: data-ml-eval-feature Schema: agentic-sdlc.workflow@v1 Domain: data-ml-eval MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: data-ml-eval/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: data-ml-eval.impact_analyzer DependsOn: in",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5936,7 +5936,7 @@
     },
     {
       "id": ".agents/workflows/data-ml-eval/release.md",
-      "text": "--- description: data-ml-eval release workflow with quality signal and risk approval --- # Workflow: data-ml-eval-release Schema: antigrav.workflow@v1 Domain: data-ml-eval MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: data-ml-eval/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: data-ml-eval.acceptance_guard DependsOn: release_scope Input:",
+      "text": "--- description: data-ml-eval release workflow with quality signal and risk approval --- # Workflow: data-ml-eval-release Schema: agentic-sdlc.workflow@v1 Domain: data-ml-eval MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: data-ml-eval/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: data-ml-eval.acceptance_guard DependsOn: release_scope Input:",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -5970,7 +5970,7 @@
     },
     {
       "id": ".agents/workflows/data-ml-eval/review.md",
-      "text": "--- description: data-ml-eval review workflow focused on correctness, risk, and release readiness --- # Workflow: data-ml-eval-review Schema: antigrav.workflow@v1 Domain: data-ml-eval MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: data-ml-eval/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: data-ml-eval.acceptance_guard DependsOn: revie",
+      "text": "--- description: data-ml-eval review workflow focused on correctness, risk, and release readiness --- # Workflow: data-ml-eval-review Schema: agentic-sdlc.workflow@v1 Domain: data-ml-eval MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: data-ml-eval/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: data-ml-eval.acceptance_guard DependsOn: revie",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6004,7 +6004,7 @@
     },
     {
       "id": ".agents/workflows/dev/build-landing-page.md",
-      "text": "--- description: Build a value-first landing page from brief to implementation-ready handoff source: self --- # Workflow: dev-build-landing-page Schema: antigrav.workflow@v1 Domain: dev Goal: Produce a production-ready landing page plan that maximizes value communication and conversion clarity. ## Step: clarify_goal Skill: agent.llm_subagent Input: architect:::Extract objective, audience, core pain, promised outcome, trust signals, primary CTA, and constraints from task conte",
+      "text": "--- description: Build a value-first landing page from brief to implementation-ready handoff source: self --- # Workflow: dev-build-landing-page Schema: agentic-sdlc.workflow@v1 Domain: dev Goal: Produce a production-ready landing page plan that maximizes value communication and conversion clarity. ## Step: clarify_goal Skill: agent.llm_subagent Input: architect:::Extract objective, audience, core pain, promised outcome, trust signals, primary CTA, and constraints from task conte",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6038,7 +6038,7 @@
     },
     {
       "id": ".agents/workflows/dev/create-showcase-video.md",
-      "text": "--- description: Build a showcase video plan from real project runtime I/O and artifacts source: self --- # Workflow: dev-create-showcase-video Schema: antigrav.workflow@v1 Domain: dev Goal: Produce a creator-grade Remotion showcase plan that proves structure, CLI, use cases, and landing-page output. ## Step: collect_repo_structure Skill: agent.run_script Input: git ls-files src ## Step: collect_cli_surface Skill: agent.run_script DependsOn: collect_repo_structure Input: git ",
+      "text": "--- description: Build a showcase video plan from real project runtime I/O and artifacts source: self --- # Workflow: dev-create-showcase-video Schema: agentic-sdlc.workflow@v1 Domain: dev Goal: Produce a creator-grade Remotion showcase plan that proves structure, CLI, use cases, and landing-page output. ## Step: collect_repo_structure Skill: agent.run_script Input: git ls-files src ## Step: collect_cli_surface Skill: agent.run_script DependsOn: collect_repo_structure Input: git ",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6072,7 +6072,7 @@
     },
     {
       "id": ".agents/workflows/dev/project-intelligence.md",
-      "text": "--- description: Index current project and generate workflow/skill upgrade recommendations source: self --- # Workflow: dev-project-intelligence Schema: antigrav.workflow@v1 Domain: dev Goal: Understand project quickly, then suggest best workflows and skills to improve delivery. ## Step: detect_current_branch Skill: agent.run_script Input: git rev-parse --abbrev-ref HEAD ## Step: snapshot_repo_files Skill: agent.run_script DependsOn: detect_current_branch Input: git ls-files ",
+      "text": "--- description: Index current project and generate workflow/skill upgrade recommendations source: self --- # Workflow: dev-project-intelligence Schema: agentic-sdlc.workflow@v1 Domain: dev Goal: Understand project quickly, then suggest best workflows and skills to improve delivery. ## Step: detect_current_branch Skill: agent.run_script Input: git rev-parse --abbrev-ref HEAD ## Step: snapshot_repo_files Skill: agent.run_script DependsOn: detect_current_branch Input: git ls-files ",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6106,7 +6106,7 @@
     },
     {
       "id": ".agents/workflows/dev/video-idea-lab.md",
-      "text": "--- description: Generate high-conversion video concepts from project evidence and workflow traces source: self --- # Workflow: dev-video-idea-lab Schema: antigrav.workflow@v1 Domain: dev Goal: Produce a practical backlog of creator-grade video ideas that prove project value with real CLI/runtime evidence. ## Step: collect_project_surface Skill: agent.run_script Input: git ls-files src .agents/workflows docs/landing-astro ## Step: collect_cli_proof Skill: agent.run_script Dep",
+      "text": "--- description: Generate high-conversion video concepts from project evidence and workflow traces source: self --- # Workflow: dev-video-idea-lab Schema: agentic-sdlc.workflow@v1 Domain: dev Goal: Produce a practical backlog of creator-grade video ideas that prove project value with real CLI/runtime evidence. ## Step: collect_project_surface Skill: agent.run_script Input: git ls-files src .agents/workflows docs/landing-astro ## Step: collect_cli_proof Skill: agent.run_script Dep",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6140,7 +6140,7 @@
     },
     {
       "id": ".agents/workflows/feature.md",
-      "text": "--- description: feature advanced workflow with deterministic gates and report quality guard --- # Workflow: feature Schema: antigrav.workflow@v1 Domain: agent MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 30 ## Step: intent_analysis Skill: agent.llm_subagent Input: Analyze task scope, constraints, and acceptance criteria for feature. Return strict JSON with summary/actions/risks. ## Step: execution_plan Skill: agent.llm_subagent DependsOn: intent_analysis Input: Bu",
+      "text": "--- description: feature advanced workflow with deterministic gates and report quality guard --- # Workflow: feature Schema: agentic-sdlc.workflow@v1 Domain: agent MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 30 ## Step: intent_analysis Skill: agent.llm_subagent Input: Analyze task scope, constraints, and acceptance criteria for feature. Return strict JSON with summary/actions/risks. ## Step: execution_plan Skill: agent.llm_subagent DependsOn: intent_analysis Input: Bu",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6174,7 +6174,7 @@
     },
     {
       "id": ".agents/workflows/healthtech/bugfix.md",
-      "text": "--- description: healthtech bugfix workflow with root-cause and regression guard --- # Workflow: healthtech-bugfix Schema: antigrav.workflow@v1 Domain: healthtech MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: healthtech/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: healthtech.impact_analyzer DependsOn: incident_triage Input: {{incident_triage}} ## Step: pa",
+      "text": "--- description: healthtech bugfix workflow with root-cause and regression guard --- # Workflow: healthtech-bugfix Schema: agentic-sdlc.workflow@v1 Domain: healthtech MaxCpuMs: 220000 MaxWallTimeMs: 900000 ## Step: incident_triage Skill: agent.llm_subagent Input: healthtech/resolver:::Diagnose failure mode and likely root cause. Prioritize deterministic repro. ## Step: blast_radius Skill: healthtech.impact_analyzer DependsOn: incident_triage Input: {{incident_triage}} ## Step: pa",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6208,7 +6208,7 @@
     },
     {
       "id": ".agents/workflows/healthtech/feature.md",
-      "text": "--- description: healthtech feature delivery with impact analysis and acceptance gates --- # Workflow: healthtech-feature Schema: antigrav.workflow@v1 Domain: healthtech MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: healthtech/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: healthtech.impact_analyzer DependsOn: intent_triag",
+      "text": "--- description: healthtech feature delivery with impact analysis and acceptance gates --- # Workflow: healthtech-feature Schema: agentic-sdlc.workflow@v1 Domain: healthtech MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 35 ## Step: intent_triage Skill: agent.llm_subagent Input: healthtech/architect:::Clarify objective, scope boundaries, and measurable acceptance criteria for this feature. ## Step: impact_analysis Skill: healthtech.impact_analyzer DependsOn: intent_triag",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6242,7 +6242,7 @@
     },
     {
       "id": ".agents/workflows/healthtech/release.md",
-      "text": "--- description: healthtech release workflow with quality signal and risk approval --- # Workflow: healthtech-release Schema: antigrav.workflow@v1 Domain: healthtech MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: healthtech/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: healthtech.acceptance_guard DependsOn: release_scope Input: {{release",
+      "text": "--- description: healthtech release workflow with quality signal and risk approval --- # Workflow: healthtech-release Schema: agentic-sdlc.workflow@v1 Domain: healthtech MaxCpuMs: 220000 MaxWallTimeMs: 900000 MaxNetworkCalls: 25 ## Step: release_scope Skill: agent.llm_subagent Input: healthtech/releaser:::Build release scope summary, included features, and customer impact. ## Step: release_quality_signal Skill: healthtech.acceptance_guard DependsOn: release_scope Input: {{release",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6276,7 +6276,7 @@
     },
     {
       "id": ".agents/workflows/healthtech/review.md",
-      "text": "--- description: healthtech review workflow focused on correctness, risk, and release readiness --- # Workflow: healthtech-review Schema: antigrav.workflow@v1 Domain: healthtech MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: healthtech/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: healthtech.acceptance_guard DependsOn: review_context ",
+      "text": "--- description: healthtech review workflow focused on correctness, risk, and release readiness --- # Workflow: healthtech-review Schema: agentic-sdlc.workflow@v1 Domain: healthtech MaxCpuMs: 180000 MaxWallTimeMs: 600000 MaxNetworkCalls: 20 ## Step: review_context Skill: agent.llm_subagent Input: healthtech/reviewer:::Summarize current diff intent, architecture impact, and likely weak spots. ## Step: specification_gate Skill: healthtech.acceptance_guard DependsOn: review_context ",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6310,7 +6310,7 @@
     },
     {
       "id": ".agents/workflows/merge.md",
-      "text": "--- description: merge workflow --- # Workflow: merge Schema: antigrav.workflow@v1 Domain: agent ## Step: merge_branch Skill: agent.git_merge_branch OnFailure: Continue Input: main ## Step: analyze_conflicts Skill: agent.analyze_conflicts DependsOn: merge_branch Input: scan ## Step: resolve_conflicts Skill: agent.llm_subagent DependsOn: analyze_conflicts Input: resolver:::If conflicts exist, propose deterministic conflict resolution steps. ## Step: validate_merge Skill: agent",
+      "text": "--- description: merge workflow --- # Workflow: merge Schema: agentic-sdlc.workflow@v1 Domain: agent ## Step: merge_branch Skill: agent.git_merge_branch OnFailure: Continue Input: main ## Step: analyze_conflicts Skill: agent.analyze_conflicts DependsOn: merge_branch Input: scan ## Step: resolve_conflicts Skill: agent.llm_subagent DependsOn: analyze_conflicts Input: resolver:::If conflicts exist, propose deterministic conflict resolution steps. ## Step: validate_merge Skill: agent",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6344,7 +6344,7 @@
     },
     {
       "id": ".agents/workflows/refactor.md",
-      "text": "--- description: refactor workflow --- # Workflow: refactor Schema: antigrav.workflow@v1 Domain: agent ## Step: ensure_branch Skill: agent.ensure_branch Input: refactor-thread ## Step: analyze_code Skill: agent.semantic_search DependsOn: ensure_branch Input: 5:::code smell hotspots and maintainability risks ## Step: propose_refactor Skill: agent.llm_subagent DependsOn: analyze_code Input: architect:::Propose refactor plan with no API changes unless explicitly required. ## Ste",
+      "text": "--- description: refactor workflow --- # Workflow: refactor Schema: agentic-sdlc.workflow@v1 Domain: agent ## Step: ensure_branch Skill: agent.ensure_branch Input: refactor-thread ## Step: analyze_code Skill: agent.semantic_search DependsOn: ensure_branch Input: 5:::code smell hotspots and maintainability risks ## Step: propose_refactor Skill: agent.llm_subagent DependsOn: analyze_code Input: architect:::Propose refactor plan with no API changes unless explicitly required. ## Ste",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6378,7 +6378,7 @@
     },
     {
       "id": ".agents/workflows/release.md",
-      "text": "--- description: release advanced workflow with deterministic gates and report quality guard --- # Workflow: release Schema: antigrav.workflow@v1 Domain: agent MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 30 ## Step: intent_analysis Skill: agent.llm_subagent Input: Analyze task scope, constraints, and acceptance criteria for release. Return strict JSON with summary/actions/risks. ## Step: execution_plan Skill: agent.llm_subagent DependsOn: intent_analysis Input: Bu",
+      "text": "--- description: release advanced workflow with deterministic gates and report quality guard --- # Workflow: release Schema: agentic-sdlc.workflow@v1 Domain: agent MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 30 ## Step: intent_analysis Skill: agent.llm_subagent Input: Analyze task scope, constraints, and acceptance criteria for release. Return strict JSON with summary/actions/risks. ## Step: execution_plan Skill: agent.llm_subagent DependsOn: intent_analysis Input: Bu",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -6412,7 +6412,7 @@
     },
     {
       "id": ".agents/workflows/review.md",
-      "text": "--- description: review advanced workflow with deterministic gates and report quality guard --- # Workflow: review Schema: antigrav.workflow@v1 Domain: agent MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 30 ## Step: intent_analysis Skill: agent.llm_subagent Input: Analyze task scope, constraints, and acceptance criteria for review. Return strict JSON with summary/actions/risks. ## Step: execution_plan Skill: agent.llm_subagent DependsOn: intent_analysis Input: Build",
+      "text": "--- description: review advanced workflow with deterministic gates and report quality guard --- # Workflow: review Schema: agentic-sdlc.workflow@v1 Domain: agent MaxCpuMs: 240000 MaxWallTimeMs: 900000 MaxNetworkCalls: 30 ## Step: intent_analysis Skill: agent.llm_subagent Input: Analyze task scope, constraints, and acceptance criteria for review. Return strict JSON with summary/actions/risks. ## Step: execution_plan Skill: agent.llm_subagent DependsOn: intent_analysis Input: Build",
       "tags": [
         "dir:.agents",
         "ext:md"
@@ -8280,7 +8280,7 @@
     },
     {
       "id": "docs/ARCHITECTURE_DIAGRAM.md",
-      "text": "# Architecture Diagrams ## System Overview ```mermaid graph TB subgraph \"User Interface\" CLI[CLI - antigrav] end subgraph \"Workflow Engine\" WE[Workflow Engine] PS[Planner/Scheduler] EX[Executor] SS[State Store] end subgraph \"Skills Layer\" LLM[LLM Subagent] GIT[Git Operations] FILE[File Operations] SEC[Security Scan] VEC[Vector Memory] end subgraph \"LLM Providers\" OLLAMA[Ollama] OPENAI[OpenAI] GEMINI[Gemini] ANTHROPIC[Anthropic] AZURE[Azure OpenAI] BEDROCK[AWS Bedrock] end CLI",
+      "text": "# Architecture Diagrams ## System Overview ```mermaid graph TB subgraph \"User Interface\" CLI[CLI - agentic-sdlc] end subgraph \"Workflow Engine\" WE[Workflow Engine] PS[Planner/Scheduler] EX[Executor] SS[State Store] end subgraph \"Skills Layer\" LLM[LLM Subagent] GIT[Git Operations] FILE[File Operations] SEC[Security Scan] VEC[Vector Memory] end subgraph \"LLM Providers\" OLLAMA[Ollama] OPENAI[OpenAI] GEMINI[Gemini] ANTHROPIC[Anthropic] AZURE[Azure OpenAI] BEDROCK[AWS Bedrock] end CLI",
       "tags": [
         "dir:docs",
         "ext:md"
@@ -8348,7 +8348,7 @@
     },
     {
       "id": "docs/CLI_USAGE.md",
-      "text": "# CLI Usage Binary command name is `antigrav` (invoked in this repo via `cargo run -- ...`). ## Workflow Mode Workflow definitions under `.agents/workflows` must use Markdown (`.md`) format. Project rules under `.agents/rules` are Markdown files with a fenced `json` block. Custom skills under `.agents/skills` are Markdown files with a fenced `json` metadata block plus prompt body. Role profiles under `.agents/roles` are Markdown files (optional fenced `json` metadata + role p",
+      "text": "# CLI Usage Binary command name is `agentic-sdlc` (invoked in this repo via `cargo run -- ...`). ## Workflow Mode Workflow definitions under `.agents/workflows` must use Markdown (`.md`) format. Project rules under `.agents/rules` are Markdown files with a fenced `json` block. Custom skills under `.agents/skills` are Markdown files with a fenced `json` metadata block plus prompt body. Role profiles under `.agents/roles` are Markdown files (optional fenced `json` metadata + role p",
       "tags": [
         "dir:docs",
         "ext:md"
@@ -8716,7 +8716,7 @@
     },
     {
       "id": "docs/IMPLEMENTATION_PLAN.md",
-      "text": "# Implementation Plan - Gap Fixes Kế hoạch implementation chi tiết cho việc fix các gaps của `agentic-sdlc`. ## Quick Wins (Có thể làm ngay) ### 1. Add Anthropic & Azure OpenAI Support **Status:** ✅ Dependencies đã có trong Cargo.toml **Effort:** 2-3 hours **Files:** - `src/skills/llm_subagent.rs` - Đã có `call_anthropic()` và `call_azure_openai()` - Chỉ cần test và document **Action:** ```bash # Test Anthropic ANTIGRAV_LLM_PROVIDER=anthropic ANTHROPIC_API_KEY=... cargo test ",
+      "text": "# Implementation Plan - Gap Fixes Kế hoạch implementation chi tiết cho việc fix các gaps của `agentic-sdlc`. ## Quick Wins (Có thể làm ngay) ### 1. Add Anthropic & Azure OpenAI Support **Status:** ✅ Dependencies đã có trong Cargo.toml **Effort:** 2-3 hours **Files:** - `src/skills/llm_subagent.rs` - Đã có `call_anthropic()` và `call_azure_openai()` - Chỉ cần test và document **Action:** ```bash # Test Anthropic AGENTIC_SDLC_LLM_PROVIDER=anthropic ANTHROPIC_API_KEY=... cargo test ",
       "tags": [
         "dir:docs",
         "ext:md"
@@ -9117,7 +9117,7 @@
     },
     {
       "id": "docs/PROGRESS_SUMMARY.md",
-      "text": "# Progress Summary - Gap Fixes ## Completed ✅ ### 1. Documentation & Planning - ✅ Created `docs/GAP_ROADMAP.md` - Comprehensive 20-week roadmap - ✅ Created `docs/IMPLEMENTATION_PLAN.md` - Detailed implementation strategy - ✅ Created `docs/PROGRESS_SUMMARY.md` - This file ### 2. LLM Determinism (Partial) - ✅ Added `resolve_temperature()` function - reads from `ANTIGRAV_LLM_TEMPERATURE` env var - ✅ Added `generate_seed()` function - deterministic seed from trace_id + step_id - ",
+      "text": "# Progress Summary - Gap Fixes ## Completed ✅ ### 1. Documentation & Planning - ✅ Created `docs/GAP_ROADMAP.md` - Comprehensive 20-week roadmap - ✅ Created `docs/IMPLEMENTATION_PLAN.md` - Detailed implementation strategy - ✅ Created `docs/PROGRESS_SUMMARY.md` - This file ### 2. LLM Determinism (Partial) - ✅ Added `resolve_temperature()` function - reads from `AGENTIC_SDLC_LLM_TEMPERATURE` env var - ✅ Added `generate_seed()` function - deterministic seed from trace_id + step_id - ",
       "tags": [
         "dir:docs",
         "ext:md"
@@ -9151,7 +9151,7 @@
     },
     {
       "id": "docs/QUICK_START_FIXES.md",
-      "text": "# Quick Start - Gap Fixes Quick reference for implementing gap fixes in `agentic-sdlc`. ## 🚀 Quick Wins (Do Now!) ### 1. Test Existing Providers (30 minutes) ```bash # Test Anthropic (already implemented!) ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \\ ANTHROPIC_API_KEY=sk-ant-... \\ cargo test llm_subagent_live_smoke_anthropic -- --nocapture # Test Azure OpenAI (already implemented!) ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \\ AZURE_OPENAI_KEY=... \\ AZURE_OPENAI_ENDPOINT=https://....openai.azure.com \\ ",
+      "text": "# Quick Start - Gap Fixes Quick reference for implementing gap fixes in `agentic-sdlc`. ## 🚀 Quick Wins (Do Now!) ### 1. Test Existing Providers (30 minutes) ```bash # Test Anthropic (already implemented!) AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \\ ANTHROPIC_API_KEY=sk-ant-... \\ cargo test llm_subagent_live_smoke_anthropic -- --nocapture # Test Azure OpenAI (already implemented!) AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \\ AZURE_OPENAI_KEY=... \\ AZURE_OPENAI_ENDPOINT=https://....openai.azure.com \\ ",
       "tags": [
         "dir:docs",
         "ext:md"
@@ -9457,7 +9457,7 @@
     },
     {
       "id": "docs/TROUBLESHOOTING_LLM.md",
-      "text": "# LLM Troubleshooting Guide Common issues and solutions for LLM providers in `agentic-sdlc`. ## 🔍 Quick Diagnosis ```bash # Check provider configuration echo $ANTIGRAV_LLM_PROVIDER # Check API keys echo $OPENAI_API_KEY | head -c 10 echo $GEMINI_API_KEY | head -c 10 echo $ANTHROPIC_API_KEY | head -c 10 # Test provider cargo run -- --workflow test_replay_workflow.md ``` ## 🐛 Common Issues ### 1. API Key Not Found **Error:** ``` OPENAI_API_KEY is not set GEMINI_API_KEY is not se",
+      "text": "# LLM Troubleshooting Guide Common issues and solutions for LLM providers in `agentic-sdlc`. ## 🔍 Quick Diagnosis ```bash # Check provider configuration echo $AGENTIC_SDLC_LLM_PROVIDER # Check API keys echo $OPENAI_API_KEY | head -c 10 echo $GEMINI_API_KEY | head -c 10 echo $ANTHROPIC_API_KEY | head -c 10 # Test provider cargo run -- --workflow test_replay_workflow.md ``` ## 🐛 Common Issues ### 1. API Key Not Found **Error:** ``` OPENAI_API_KEY is not set GEMINI_API_KEY is not se",
       "tags": [
         "dir:docs",
         "ext:md"
@@ -9693,7 +9693,7 @@
     },
     {
       "id": "docs/WEEK20_PLAN.md",
-      "text": "# Week 20: Maturity & Distribution (Gap #11) **Date:** 2026-03-07 **Priority:** 🟡 Medium **Status:** In Progress (0% → 100%) --- ## 📋 Overview **Gap #11:** Maturity & Distribution **Problem:** - v1.0.1 nhưng early stage - Không có binary distribution - Branding inconsistency (antigrav vs agentic-sdlc) - Không có crates.io publication - Không có installation convenience **Current Status:** - ✅ Source code works - ❌ No binary releases - ❌ Not on crates.io - ❌ No Docker image - ",
+      "text": "# Week 20: Maturity & Distribution (Gap #11) **Date:** 2026-03-07 **Priority:** 🟡 Medium **Status:** In Progress (0% → 100%) --- ## 📋 Overview **Gap #11:** Maturity & Distribution **Problem:** - v1.0.1 nhưng early stage - Không có binary distribution - Branding inconsistency (agentic-sdlc vs agentic-sdlc) - Không có crates.io publication - Không có installation convenience **Current Status:** - ✅ Source code works - ❌ No binary releases - ❌ Not on crates.io - ❌ No Docker image - ",
       "tags": [
         "dir:docs",
         "ext:md"
@@ -10938,7 +10938,7 @@
     },
     {
       "id": "docs/providers/GEMINI.md",
-      "text": "# Google Gemini Setup Guide Complete guide to using Google Gemini models with `agentic-sdlc`. ## 🎯 Overview **Provider:** Google Gemini **Models:** Gemini 1.5 Flash, Gemini 1.5 Pro **Context Window:** 1M-2M tokens **Best For:** Cost optimization, large context ## 🚀 Quick Start ```bash # 1. Get API key from https://aistudio.google.com/app/apikey export GEMINI_API_KEY=AIza... # 2. Configure provider export ANTIGRAV_LLM_PROVIDER=gemini # 3. Run workflow cargo run -- --workflow f",
+      "text": "# Google Gemini Setup Guide Complete guide to using Google Gemini models with `agentic-sdlc`. ## 🎯 Overview **Provider:** Google Gemini **Models:** Gemini 1.5 Flash, Gemini 1.5 Pro **Context Window:** 1M-2M tokens **Best For:** Cost optimization, large context ## 🚀 Quick Start ```bash # 1. Get API key from https://aistudio.google.com/app/apikey export GEMINI_API_KEY=AIza... # 2. Configure provider export AGENTIC_SDLC_LLM_PROVIDER=gemini # 3. Run workflow cargo run -- --workflow f",
       "tags": [
         "dir:docs",
         "ext:md"
@@ -10992,7 +10992,7 @@
     },
     {
       "id": "docs/providers/OPENAI.md",
-      "text": "# OpenAI Setup Guide Complete guide to using OpenAI GPT models with `agentic-sdlc`. ## 🎯 Overview **Provider:** OpenAI **Models:** GPT-4o-mini, GPT-4.1-mini **Context Window:** 128K tokens **Best For:** Production, reliability, determinism ## 🚀 Quick Start ```bash # 1. Get API key from https://platform.openai.com/api-keys export OPENAI_API_KEY=sk-proj-... # 2. Configure provider export ANTIGRAV_LLM_PROVIDER=openai # 3. Run workflow cargo run -- --workflow feature.md ``` ## 🔧 ",
+      "text": "# OpenAI Setup Guide Complete guide to using OpenAI GPT models with `agentic-sdlc`. ## 🎯 Overview **Provider:** OpenAI **Models:** GPT-4o-mini, GPT-4.1-mini **Context Window:** 128K tokens **Best For:** Production, reliability, determinism ## 🚀 Quick Start ```bash # 1. Get API key from https://platform.openai.com/api-keys export OPENAI_API_KEY=sk-proj-... # 2. Configure provider export AGENTIC_SDLC_LLM_PROVIDER=openai # 3. Run workflow cargo run -- --workflow feature.md ``` ## 🔧 ",
       "tags": [
         "dir:docs",
         "ext:md"
@@ -11052,7 +11052,7 @@
     },
     {
       "id": "examples/anthropic_workflow.md",
-      "text": "# Anthropic Claude Example Workflow Example workflow using Anthropic Claude for high-quality code review. ## Setup ```bash export ANTHROPIC_API_KEY=sk-ant-... export ANTIGRAV_LLM_PROVIDER=anthropic export ANTIGRAV_LLM_MODEL=claude-3-5-sonnet-latest ``` ## Workflow ### analyze_code - skill: llm_subagent - input: | Analyze this Python function for potential issues: ```python def process_user_data(data): user_id = data['id'] email = data['email'] query = f\"SELECT * FROM users WH",
+      "text": "# Anthropic Claude Example Workflow Example workflow using Anthropic Claude for high-quality code review. ## Setup ```bash export ANTHROPIC_API_KEY=sk-ant-... export AGENTIC_SDLC_LLM_PROVIDER=anthropic export AGENTIC_SDLC_LLM_MODEL=claude-3-5-sonnet-latest ``` ## Workflow ### analyze_code - skill: llm_subagent - input: | Analyze this Python function for potential issues: ```python def process_user_data(data): user_id = data['id'] email = data['email'] query = f\"SELECT * FROM users WH",
       "tags": [
         "dir:examples",
         "ext:md"
@@ -11103,7 +11103,7 @@
     },
     {
       "id": "examples/cost_optimized_workflow.md",
-      "text": "# Cost-Optimized Workflow Example Example workflow using Gemini for maximum cost savings. ## Setup ```bash export GEMINI_API_KEY=AIza... export ANTIGRAV_LLM_PROVIDER=gemini export ANTIGRAV_LLM_MODEL=gemini-1.5-flash ``` ## Workflow ### analyze_requirements - skill: llm_subagent - input: | Analyze these requirements for a todo app: - Users can create, read, update, delete todos - Todos have title, description, due date, priority - Users can filter by status and priority - User",
+      "text": "# Cost-Optimized Workflow Example Example workflow using Gemini for maximum cost savings. ## Setup ```bash export GEMINI_API_KEY=AIza... export AGENTIC_SDLC_LLM_PROVIDER=gemini export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-flash ``` ## Workflow ### analyze_requirements - skill: llm_subagent - input: | Analyze these requirements for a todo app: - Users can create, read, update, delete todos - Todos have title, description, due date, priority - Users can filter by status and priority - User",
       "tags": [
         "dir:examples",
         "ext:md"
@@ -11137,7 +11137,7 @@
     },
     {
       "id": "examples/deterministic_workflow.md",
-      "text": "# Deterministic Workflow Example Example workflow using OpenAI with seed for perfect determinism. ## Setup ```bash export OPENAI_API_KEY=sk-proj-... export ANTIGRAV_LLM_PROVIDER=openai export ANTIGRAV_LLM_MODEL=gpt-4o-mini export ANTIGRAV_LLM_TEMPERATURE=0.0 export ANTIGRAV_LLM_SEED=42 ``` ## Workflow ### generate_function - skill: llm_subagent - input: | Generate a Python function that: - Takes a list of numbers - Returns the sum of even numbers - Includes docstring and type",
+      "text": "# Deterministic Workflow Example Example workflow using OpenAI with seed for perfect determinism. ## Setup ```bash export OPENAI_API_KEY=sk-proj-... export AGENTIC_SDLC_LLM_PROVIDER=openai export AGENTIC_SDLC_LLM_MODEL=gpt-4o-mini export AGENTIC_SDLC_LLM_TEMPERATURE=0.0 export AGENTIC_SDLC_LLM_SEED=42 ``` ## Workflow ### generate_function - skill: llm_subagent - input: | Generate a Python function that: - Takes a list of numbers - Returns the sum of even numbers - Includes docstring and type",
       "tags": [
         "dir:examples",
         "ext:md"
@@ -11191,7 +11191,7 @@
     },
     {
       "id": "examples/multi_provider_fallback.md",
-      "text": "# Multi-Provider Fallback Example Example workflow demonstrating automatic fallback between providers. ## Setup ```bash # Primary: OpenAI export OPENAI_API_KEY=sk-proj-... export ANTIGRAV_LLM_PROVIDER=openai # Fallback: Gemini, then Anthropic export GEMINI_API_KEY=AIza... export ANTHROPIC_API_KEY=sk-ant-... export ANTIGRAV_LLM_FALLBACK=gemini,anthropic export ANTIGRAV_LLM_FALLBACK_POLICY=transient_only ``` ## Workflow ### step1_primary - skill: llm_subagent - input: \"Explain ",
+      "text": "# Multi-Provider Fallback Example Example workflow demonstrating automatic fallback between providers. ## Setup ```bash # Primary: OpenAI export OPENAI_API_KEY=sk-proj-... export AGENTIC_SDLC_LLM_PROVIDER=openai # Fallback: Gemini, then Anthropic export GEMINI_API_KEY=AIza... export ANTHROPIC_API_KEY=sk-ant-... export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic export AGENTIC_SDLC_LLM_FALLBACK_POLICY=transient_only ``` ## Workflow ### step1_primary - skill: llm_subagent - input: \"Explain ",
       "tags": [
         "dir:examples",
         "ext:md"
@@ -11357,7 +11357,7 @@
     },
     {
       "id": "scripts/bootstrap.sh",
-      "text": "#!/usr/bin/env bash set -euo pipefail ROOT_DIR=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")/..\" && pwd)\" cd \"$ROOT_DIR\" STRICT_OLLAMA=\"${ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA:-0}\" log() { printf '[bootstrap] %s\\n' \"$*\" } warn() { printf '[bootstrap][warn] %s\\n' \"$*\" >&2 } fail() { printf '[bootstrap][error] %s\\n' \"$*\" >&2 exit 1 } require_cmd() { local cmd=\"$1\" local help_message=\"$2\" if ! command -v \"$cmd\" >/dev/null 2>&1; then fail \"$help_message\" fi } log \"Repository root: $ROO",
+      "text": "#!/usr/bin/env bash set -euo pipefail ROOT_DIR=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")/..\" && pwd)\" cd \"$ROOT_DIR\" STRICT_OLLAMA=\"${AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA:-0}\" log() { printf '[bootstrap] %s\\n' \"$*\" } warn() { printf '[bootstrap][warn] %s\\n' \"$*\" >&2 } fail() { printf '[bootstrap][error] %s\\n' \"$*\" >&2 exit 1 } require_cmd() { local cmd=\"$1\" local help_message=\"$2\" if ! command -v \"$cmd\" >/dev/null 2>&1; then fail \"$help_message\" fi } log \"Repository root: $ROO",
       "tags": [
         "dir:scripts",
         "ext:sh"
@@ -11391,7 +11391,7 @@
     },
     {
       "id": "scripts/ci_gate.sh",
-      "text": "#!/usr/bin/env bash set -euo pipefail ROOT_DIR=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")/..\" && pwd)\" cd \"$ROOT_DIR\" log() { printf '[ci-gate] %s\\n' \"$*\" } fail() { printf '[ci-gate][error] %s\\n' \"$*\" >&2 exit 1 } log \"Running bootstrap checks (non-strict Ollama mode)...\" ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA=0 ./scripts/bootstrap.sh log \"Checking formatting...\" cargo fmt --all --check log \"Running tests...\" cargo test --quiet log \"Running clippy with -D warnings...\" cargo clip",
+      "text": "#!/usr/bin/env bash set -euo pipefail ROOT_DIR=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")/..\" && pwd)\" cd \"$ROOT_DIR\" log() { printf '[ci-gate] %s\\n' \"$*\" } fail() { printf '[ci-gate][error] %s\\n' \"$*\" >&2 exit 1 } log \"Running bootstrap checks (non-strict Ollama mode)...\" AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA=0 ./scripts/bootstrap.sh log \"Checking formatting...\" cargo fmt --all --check log \"Running tests...\" cargo test --quiet log \"Running clippy with -D warnings...\" cargo clip",
       "tags": [
         "dir:scripts",
         "ext:sh"

@@ -108,7 +108,7 @@ pub(super) fn configure_run_script_policy_env(
         .run_script_timeout_ms
         .unwrap_or(security_policy.step_timeout_ms)
         .min(security_policy.step_timeout_ms);
-    std::env::set_var("ANTIGRAV_RUN_SCRIPT_TIMEOUT_MS", timeout_ms.to_string());
+    std::env::set_var("AGENTIC_SDLC_RUN_SCRIPT_TIMEOUT_MS", timeout_ms.to_string());
 
     let allowlist = project_rules
         .run_script_allowed_commands
@@ -126,6 +126,8 @@ pub(super) fn configure_run_script_policy_env(
                 "pytest".to_string(),
                 "flutter".to_string(),
                 "dart".to_string(),
+                "python".to_string(),
+                "python3".to_string(),
             ]
         });
     let normalized = allowlist
@@ -134,7 +136,7 @@ pub(super) fn configure_run_script_policy_env(
         .filter(|s| !s.is_empty())
         .collect::<Vec<_>>()
         .join(",");
-    std::env::set_var("ANTIGRAV_RUN_SCRIPT_ALLOWLIST", normalized);
+    std::env::set_var("AGENTIC_SDLC_RUN_SCRIPT_ALLOWLIST", normalized);
 
     let denylist = project_rules
         .run_script_denied_commands
@@ -156,13 +158,13 @@ pub(super) fn configure_run_script_policy_env(
         .filter(|s| !s.is_empty())
         .collect::<Vec<_>>()
         .join(",");
-    std::env::set_var("ANTIGRAV_RUN_SCRIPT_DENYLIST", deny_normalized);
+    std::env::set_var("AGENTIC_SDLC_RUN_SCRIPT_DENYLIST", deny_normalized);
 
     let allow_shell_operators = project_rules
         .run_script_allow_shell_operators
         .unwrap_or(false);
     std::env::set_var(
-        "ANTIGRAV_RUN_SCRIPT_ALLOW_SHELL_OPERATORS",
+        "AGENTIC_SDLC_RUN_SCRIPT_ALLOW_SHELL_OPERATORS",
         if allow_shell_operators { "1" } else { "0" },
     );
 }

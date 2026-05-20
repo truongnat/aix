@@ -2,7 +2,7 @@
 description: data-ml-eval release workflow with quality signal and risk approval
 ---
 # Workflow: data-ml-eval-release
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: data-ml-eval
 MaxCpuMs: 220000
 MaxWallTimeMs: 900000

@@ -4,7 +4,7 @@ trigger: always_on
 ---
 
 # Coding Rules
-Schema: antigrav.rule@v1
+Schema: agentic-sdlc.rule@v1
 
 ```json
 {

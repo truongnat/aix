@@ -133,12 +133,12 @@ struct OllamaResponse {
 }
 
 fn ollama_timeout_ms() -> u64 {
-    std::env::var("ANTIGRAV_OLLAMA_TIMEOUT_MS")
+    std::env::var("AGENTIC_SDLC_OLLAMA_TIMEOUT_MS")
         .ok()
         .and_then(|v| v.trim().parse::<u64>().ok())
         .filter(|v| *v > 0)
         .or_else(|| {
-            std::env::var("ANTIGRAV_LLM_TIMEOUT_MS")
+            std::env::var("AGENTIC_SDLC_LLM_TIMEOUT_MS")
                 .ok()
                 .and_then(|v| v.trim().parse::<u64>().ok())
                 .filter(|v| *v > 0)
@@ -319,15 +319,19 @@ impl SkillTrait for FileSkill {
             }
             "ollama" => {
                 ctx.require_network()?;
-                let model = self
+                let model_requested = self
                     .meta
                     .model
                     .clone()
                     .unwrap_or_else(|| "mistral".to_string());
+                
+                let ollama = super::ollama::OllamaClient::new();
+                let model = ollama.resolve_model(&model_requested).await.unwrap_or_else(|_| model_requested.clone());
+                
                 let timeout_ms = ollama_timeout_ms();
                 println!(
-                    "🤖 [OLLAMA] Calling model: {} (timeout={}ms)",
-                    model, timeout_ms
+                    "🤖 [OLLAMA] Calling model: {} (requested={}) (timeout={}ms)",
+                    model, model_requested, timeout_ms
                 );
 
                 let client = reqwest::Client::builder()

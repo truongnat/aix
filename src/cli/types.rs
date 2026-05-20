@@ -2,13 +2,63 @@ use super::*;
 
 #[derive(Subcommand, Debug, Clone)]
 pub(crate) enum Commands {
+    Bug {
+        #[command(subcommand)]
+        action: Box<BugCommand>,
+    },
     Workflow {
         #[command(subcommand)]
         action: Box<WorkflowCommand>,
     },
+    Harness {
+        #[command(subcommand)]
+        action: Box<HarnessCommand>,
+    },
     Office {
         #[command(subcommand)]
         action: Box<OfficeCommand>,
+    },
+}
+
+#[derive(Subcommand, Debug, Clone)]
+pub(crate) enum BugCommand {
+    Analyze {
+        input_file: String,
+    },
+    Plan {
+        input_file: String,
+    },
+    Reply {
+        input_file: String,
+    },
+    Prompt {
+        input_file: String,
+    },
+}
+
+#[derive(Subcommand, Debug, Clone)]
+pub(crate) enum HarnessCommand {
+    Init {
+        #[arg(long, default_value = "harness.yaml")]
+        config: String,
+        #[arg(long, default_value = "starter/app-builder")]
+        workflow_id: String,
+        #[arg(long, default_value_t = false)]
+        force: bool,
+    },
+    Run {
+        #[arg(long, default_value = "harness.yaml")]
+        config: String,
+        #[arg(long)]
+        task: String,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    Show {
+        #[arg(long, default_value = "harness.yaml")]
+        config: String,
+        #[arg(long, default_value_t = false)]
+        json: bool,
     },
 }
 
@@ -348,6 +398,17 @@ pub(crate) enum WorkflowCommand {
         json: bool,
     },
     List,
+    AgentExport {
+        target: String,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    McpServe {
+        #[arg(long, default_value = "stdio")]
+        transport: String,
+        #[arg(long, default_value_t = 3100)]
+        port: u16,
+    },
 }
 
 #[derive(Subcommand, Debug, Clone)]
@@ -1047,4 +1108,10 @@ pub(crate) struct ConstraintCheckReport {
     pub(crate) commands: Vec<ConstraintCheckCommand>,
     pub(crate) gate_result: String,
     pub(crate) next_step: String,
+}
+#[derive(Debug, Clone, Serialize)]
+pub(crate) struct AgentExportReport {
+    pub(crate) target: String,
+    pub(crate) files: Vec<String>,
+    pub(crate) karpathy_enabled: bool,
 }

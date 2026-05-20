@@ -37,7 +37,7 @@ fn hostname() -> String {
 }
 
 fn stale_lock_timeout_ms() -> u64 {
-    std::env::var("ANTIGRAV_STALE_LOCK_TIMEOUT_MS")
+    std::env::var("AGENTIC_SDLC_STALE_LOCK_TIMEOUT_MS")
         .ok()
         .and_then(|v| v.trim().parse::<u64>().ok())
         .filter(|v| *v > 0)
@@ -109,7 +109,9 @@ impl WorkflowStateStore {
     pub fn new(project_root: &str) -> Result<Self> {
         let state_dir = Path::new(project_root).join(".agents").join("state");
         std::fs::create_dir_all(&state_dir)?;
-        Ok(Self { state_dir })
+        let store = Self { state_dir };
+        store.cleanup_stale_runtime_artifacts()?;
+        Ok(store)
     }
 
     pub fn state_file_path(&self, instance_id: &str) -> PathBuf {
@@ -413,6 +415,55 @@ impl WorkflowStateStore {
         let payload: ManualApprovalDecision = serde_json::from_str(&body)?;
         Ok(Some(payload))
     }
+
+    pub fn cleanup_stale_runtime_artifacts(&self) -> Result<usize> {
+        let mut removed = 0usize;
+        if !self.state_dir.exists() {
+            return Ok(removed);
+        }
+
+        for entry in std::fs::read_dir(&self.state_dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            let Some(file_name) = path.file_name().and_then(|value| value.to_str()) else {
+                continue;
+            };
+
+            if file_name == "repo.lock" || file_name.ends_with(".lock") {
+                if Self::try_reclaim_stale_lock(&path)? {
+                    removed = removed.saturating_add(1);
+                }
+                continue;
+            }
+
+            if let Some(pid) = Self::tmp_file_pid(file_name) {
+                let stale = !process_is_alive(pid)
+                    || Self::lock_age_ms(&path)
+                        .map(|age| age > stale_lock_timeout_ms())
+                        .unwrap_or(false);
+                if stale {
+                    match std::fs::remove_file(&path) {
+                        Ok(()) => removed = removed.saturating_add(1),
+                        Err(err) if err.kind() == ErrorKind::NotFound => {}
+                        Err(err) => {
+                            return Err(anyhow!(
+                                "Failed to remove stale tmp file '{}': {}",
+                                path.display(),
+                                err
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(removed)
+    }
+
+    fn tmp_file_pid(file_name: &str) -> Option<u32> {
+        let (_, pid) = file_name.rsplit_once(".json.tmp.")?;
+        pid.trim().parse::<u32>().ok()
+    }
 }
 
 #[derive(Debug)]
@@ -519,6 +570,25 @@ mod tests {
         let _guard = store.acquire_repo_lock().expect("reclaim stale repo lock");
         let metadata = WorkflowStateStore::read_lock_metadata(&lock_path).expect("metadata");
         assert_eq!(metadata.pid, std::process::id());
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn cleanup_removes_stale_tmp_files_for_dead_pid() {
+        let root = temp_root("agentic-sdlc-v2-stale-tmp");
+        let store = WorkflowStateStore::new(root.to_str().expect("path")).expect("store");
+        let tmp_path = root
+            .join(".agents")
+            .join("state")
+            .join("starter-app-builder-1.json.tmp.999999");
+        std::fs::write(&tmp_path, b"partial-state").expect("write tmp");
+
+        let removed = store
+            .cleanup_stale_runtime_artifacts()
+            .expect("cleanup stale artifacts");
+        assert_eq!(removed, 1);
+        assert!(!tmp_path.exists());
 
         let _ = std::fs::remove_dir_all(root);
     }

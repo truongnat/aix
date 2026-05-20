@@ -12,6 +12,7 @@ pub mod manual_approval;
 pub mod model;
 pub mod parse_number;
 pub mod pinchtab;
+pub mod ollama;
 pub mod role_loader;
 pub mod security;
 pub mod vector_memory;

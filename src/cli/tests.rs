@@ -9,7 +9,8 @@ use super::{
     resolve_bootstrap_strict_ollama, resolve_role_workflow_selection, run_skill_quality_check,
     sanitize_package_name, scaffold_domain_pack, scaffold_markdown_package,
     select_template_and_workflow_for_message, validate_git_ref_like, verify_skills_lock,
-    ImportSkillpackOptions, RoleRunRequest, ScaffoldProfile, SkillpackInstallMode,
+    BugCommand, Cli, Commands, ImportSkillpackOptions, RoleRunRequest, ScaffoldProfile,
+    SkillpackInstallMode,
     ThreadFlowRequest,
 };
 use crate::engine::budget::ExecutionBudget;
@@ -30,6 +31,7 @@ use crate::skill::Skill;
 use crate::skills::echo::EchoSkill;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
+use clap::Parser;
 use serde_json::json;
 use std::collections::HashMap;
 use std::path::Path;
@@ -42,6 +44,21 @@ struct MockConflictState {
     llm_calls: u32,
     auto_resolve_calls: u32,
     merge_calls: u32,
+}
+
+#[test]
+fn cli_parses_bug_analyze_command() {
+    let cli = Cli::parse_from(["agentic-sdlc", "bug", "analyze", "ticket.md"]);
+    match cli.command {
+        Some(command) => match *command {
+            Commands::Bug { action } => match *action {
+                BugCommand::Analyze { input_file } => assert_eq!(input_file, "ticket.md"),
+                other => panic!("expected analyze command, got {:?}", other),
+            },
+            other => panic!("expected bug command, got {:?}", other),
+        },
+        None => panic!("expected subcommand"),
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -450,7 +467,7 @@ fn resolve_role_workflow_selection_applies_role_and_template() {
     std::fs::create_dir_all(&roles).expect("roles");
     std::fs::write(
             workflows.join("feature.md"),
-            "# Workflow: feature\nSchema: antigrav.workflow@v1\nDomain: agent\n\n## Step: plan\nSkill: agent.llm_subagent\nInput: planner:::draft plan\n",
+            "# Workflow: feature\nSchema: agentic-sdlc.workflow@v1\nDomain: agent\n\n## Step: plan\nSkill: agent.llm_subagent\nInput: planner:::draft plan\n",
         )
         .expect("workflow");
     std::fs::write(
@@ -460,7 +477,7 @@ fn resolve_role_workflow_selection_applies_role_and_template() {
     .expect("template");
     std::fs::write(
             roles.join("architect.md"),
-            "# Role: architect\nSchema: antigrav.role@v1\n```json\n{\"name\":\"architect\"}\n```\nPlan deterministic implementation.",
+            "# Role: architect\nSchema: agentic-sdlc.role@v1\n```json\n{\"name\":\"architect\"}\n```\nPlan deterministic implementation.",
         )
         .expect("role");
 
@@ -650,7 +667,7 @@ fn scaffold_generates_markdown_with_schema_header() {
     )
     .expect("scaffold");
     let body = std::fs::read_to_string(&path).expect("read scaffolded file");
-    assert!(body.contains("Schema: antigrav.workflow@v1"));
+    assert!(body.contains("Schema: agentic-sdlc.workflow@v1"));
     assert!(body.contains("validation_gate"));
 
     let duplicate = scaffold_markdown_package(
@@ -730,7 +747,7 @@ fn quality_check_reports_missing_skill_sections() {
     std::fs::create_dir_all(root.join(".agents").join("skills")).expect("skills dir");
     std::fs::write(
             root.join(".agents").join("skills").join("minimal.md"),
-            "# Skill: minimal\nSchema: antigrav.skill@v1\n```json\n{\"name\":\"minimal\",\"domain\":\"agent\",\"executor\":\"ollama\",\"model\":\"qwen3:8b\"}\n```\nminimal body\n",
+            "# Skill: minimal\nSchema: agentic-sdlc.skill@v1\n```json\n{\"name\":\"minimal\",\"domain\":\"agent\",\"executor\":\"ollama\",\"model\":\"qwen3:8b\"}\n```\nminimal body\n",
         )
         .expect("write skill");
     let layout = AgentProjectLayout::discover(root.to_string_lossy().as_ref()).expect("layout");
@@ -819,7 +836,7 @@ fn quality_check_accepts_skill_md_folder_entry_name() {
     std::fs::write(
         entry_dir.join("SKILL.md"),
         r#"# Skill: folder-skill
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 ```json
 {"name":"folder-skill","domain":"agent","executor":"ollama","description":"folder skill","risk":"safe","source":"self","tags":["folder","skill","agent"]}
 ```
@@ -876,7 +893,7 @@ fn lockfile_includes_import_source_provenance() {
             .join("sample")
             .join("SKILL.md"),
         r#"# Skill: sample
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 ```json
 {
   "name": "sample",
@@ -1071,7 +1088,7 @@ example
         .join("SKILL.md");
     assert!(imported_path.exists(), "imported skill not created");
     let imported_content = std::fs::read_to_string(imported_path).expect("read imported");
-    assert!(imported_content.contains("Schema: antigrav.skill@v1"));
+    assert!(imported_content.contains("Schema: agentic-sdlc.skill@v1"));
     assert!(imported_content.contains("\"source_commit\""));
     assert!(imported_content.contains("\"source_path\""));
     assert!(imported_content.contains("\"source_license\": \"MIT\""));
@@ -1166,7 +1183,7 @@ fn verify_skills_lock_can_require_import_attestation() {
             .join("sample")
             .join("SKILL.md"),
         r#"# Skill: sample
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 ```json
 {
   "name": "sample",
@@ -1370,26 +1387,27 @@ fn graph_index_builder_writes_nodes_payload() {
 
 #[test]
 fn strict_ollama_flag_respects_env_override() {
-    let before = std::env::var("ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA").ok();
-    std::env::remove_var("ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA");
+    let before = std::env::var("AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA").ok();
+    std::env::remove_var("AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA");
     assert!(!resolve_bootstrap_strict_ollama(false));
 
-    std::env::set_var("ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA", "1");
+    std::env::set_var("AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA", "1");
     assert!(resolve_bootstrap_strict_ollama(false));
 
-    std::env::set_var("ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA", "false");
+    std::env::set_var("AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA", "false");
     assert!(!resolve_bootstrap_strict_ollama(false));
 
     assert!(resolve_bootstrap_strict_ollama(true));
 
     if let Some(value) = before {
-        std::env::set_var("ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA", value);
+        std::env::set_var("AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA", value);
     } else {
-        std::env::remove_var("ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA");
+        std::env::remove_var("AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA");
     }
 }
 
 #[tokio::test]
+#[ignore = "long-running e2e; executed in dedicated CI job with bounded timeout"]
 async fn e2e_thread_flow_multi_thread_runs_with_auto_resolve_and_thread_sessions() {
     let unique = format!(
         "agentic-sdlc-cli-e2e-thread-flow-{}",
@@ -1406,7 +1424,7 @@ async fn e2e_thread_flow_multi_thread_runs_with_auto_resolve_and_thread_sessions
     std::fs::write(
         layout.rules_dir.join("merge_rules.md"),
         r#"# Merge Rules
-Schema: antigrav.rule@v1
+Schema: agentic-sdlc.rule@v1
 ```json
 {
   "auto_conflict_resolution_assist": true,

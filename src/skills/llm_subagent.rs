@@ -328,17 +328,17 @@ fn default_model_for_provider(provider: LlmProvider) -> &'static str {
 
 fn model_env_for_provider(provider: LlmProvider) -> &'static str {
     match provider {
-        LlmProvider::Ollama => "ANTIGRAV_LLM_MODEL_OLLAMA",
-        LlmProvider::OpenAI => "ANTIGRAV_LLM_MODEL_OPENAI",
-        LlmProvider::Gemini => "ANTIGRAV_LLM_MODEL_GEMINI",
-        LlmProvider::Anthropic => "ANTIGRAV_LLM_MODEL_ANTHROPIC",
-        LlmProvider::AzureOpenAI => "ANTIGRAV_LLM_MODEL_AZURE",
-        LlmProvider::Bedrock => "ANTIGRAV_LLM_MODEL_BEDROCK",
+        LlmProvider::Ollama => "AGENTIC_SDLC_LLM_MODEL_OLLAMA",
+        LlmProvider::OpenAI => "AGENTIC_SDLC_LLM_MODEL_OPENAI",
+        LlmProvider::Gemini => "AGENTIC_SDLC_LLM_MODEL_GEMINI",
+        LlmProvider::Anthropic => "AGENTIC_SDLC_LLM_MODEL_ANTHROPIC",
+        LlmProvider::AzureOpenAI => "AGENTIC_SDLC_LLM_MODEL_AZURE",
+        LlmProvider::Bedrock => "AGENTIC_SDLC_LLM_MODEL_BEDROCK",
     }
 }
 
 fn resolve_ollama_host() -> String {
-    let host = std::env::var("ANTIGRAV_OLLAMA_HOST")
+    let host = std::env::var("AGENTIC_SDLC_OLLAMA_HOST")
         .ok()
         .or_else(|| std::env::var("OLLAMA_HOST").ok())
         .unwrap_or_else(|| "http://localhost:11434".to_string());
@@ -404,7 +404,7 @@ fn round6(value: f64) -> f64 {
 /// Resolve temperature from environment or use default
 /// Default is 0.0 for deterministic mode
 fn resolve_temperature() -> f32 {
-    std::env::var("ANTIGRAV_LLM_TEMPERATURE")
+    std::env::var("AGENTIC_SDLC_LLM_TEMPERATURE")
         .ok()
         .and_then(|v| v.trim().parse::<f32>().ok())
         .unwrap_or(0.0)
@@ -415,7 +415,7 @@ fn resolve_temperature() -> f32 {
 /// This ensures same inputs produce same outputs
 fn generate_seed(trace_id: &str, step_id: &str) -> Option<i64> {
     // Allow override via environment
-    if let Ok(seed_str) = std::env::var("ANTIGRAV_LLM_SEED") {
+    if let Ok(seed_str) = std::env::var("AGENTIC_SDLC_LLM_SEED") {
         if let Ok(seed) = seed_str.trim().parse::<i64>() {
             return Some(seed);
         }
@@ -557,8 +557,14 @@ fn parse_input_payload(input: &SkillInput) -> Result<(Option<String>, String)> {
     }
 }
 
-fn build_prompt(role_name: &str, role_prompt: &str, instruction_input: &str) -> String {
-    let mut parts = vec![format!("Role: {}", role_name)];
+fn build_prompt(role_name: &str, role_prompt: &str, instruction_input: &str, discipline: Option<&str>) -> String {
+    let mut parts = Vec::new();
+    
+    if let Some(d) = discipline {
+        parts.push(format!("Discipline Guidelines:\n{}", d));
+    }
+    
+    parts.push(format!("Role: {}", role_name));
     let trimmed_role_prompt = role_prompt.trim();
     if !trimmed_role_prompt.is_empty() {
         parts.push(format!("Role Instructions:\n{}", trimmed_role_prompt));
@@ -571,39 +577,127 @@ fn build_prompt(role_name: &str, role_prompt: &str, instruction_input: &str) -> 
     parts.join("\n\n")
 }
 
+/// Extract a JSON object from raw LLM text.
+/// Handles:
+///   - Plain JSON: `{"summary":...}`
+///   - Markdown-fenced JSON: ```json\n{...}\n```
+///   - JSON embedded anywhere in prose text
+///
+/// Returns None if no valid JSON object can be found.
+fn extract_llm_json(text: &str) -> Option<serde_json::Value> {
+    let text = text.trim();
+
+    // 1. Direct parse — model returned clean JSON
+    if let Ok(v) = serde_json::from_str::<serde_json::Value>(text) {
+        if v.is_object() {
+            return Some(v);
+        }
+    }
+
+    // 2. Strip markdown code fences (```json ... ``` or ``` ... ```)
+    let stripped = strip_markdown_code_fence(text);
+    if let Ok(v) = serde_json::from_str::<serde_json::Value>(stripped.trim()) {
+        if v.is_object() {
+            return Some(v);
+        }
+    }
+
+    // 3. Find first '{' ... last '}' in the text (JSON embedded in prose)
+    if let Some(start) = text.find('{') {
+        if let Some(end) = text.rfind('}') {
+            if end > start {
+                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&text[start..=end]) {
+                    if v.is_object() {
+                        return Some(v);
+                    }
+                }
+            }
+        }
+    }
+
+    None
+}
+
+/// Remove markdown code fences from a string, returning the inner content.
+fn strip_markdown_code_fence(text: &str) -> &str {
+    let text = text.trim();
+    // Match ``` optionally followed by a language tag
+    if let Some(after_fence) = text.strip_prefix("```") {
+        // Skip optional language label on first line
+        let body = if let Some(newline) = after_fence.find('\n') {
+            &after_fence[newline + 1..]
+        } else {
+            after_fence
+        };
+        // Strip trailing ```
+        if let Some(end) = body.rfind("```") {
+            return body[..end].trim();
+        }
+        return body.trim();
+    }
+    text
+}
+
+/// Extract `actions` array from a parsed JSON value.
+/// Returns an empty Vec if the field is absent or not an array of strings.
+fn extract_string_array(value: &serde_json::Value, key: &str) -> Vec<serde_json::Value> {
+    value
+        .get(key)
+        .and_then(|v| v.as_array())
+        .cloned()
+        .unwrap_or_default()
+}
+
+fn load_karpathy_discipline_if_enabled(project_root: &str) -> Option<String> {
+    let rule_path = std::path::Path::new(project_root).join(".agents/rules/karpathy_rules.md");
+    if !rule_path.exists() { return None; }
+    
+    let content = std::fs::read_to_string(&rule_path).ok()?;
+    if !content.contains("\"require_karpathy_discipline\": true") { return None; }
+    
+    let skill_path = std::path::Path::new(project_root).join(".agents/skills/karpathy_discipline/SKILL.md");
+    let skill_content = std::fs::read_to_string(&skill_path).ok()?;
+    
+    if let Some(idx) = skill_content.find("## System Prompt (Injected)") {
+        return Some(skill_content[idx + 27..].trim().to_string());
+    }
+    
+    None
+}
+
 impl LlmSubAgentSkill {
     pub fn new() -> Self {
-        let provider = parse_llm_provider(std::env::var("ANTIGRAV_LLM_PROVIDER").ok());
-        let model = std::env::var("ANTIGRAV_LLM_MODEL")
+        let provider = parse_llm_provider(std::env::var("AGENTIC_SDLC_LLM_PROVIDER").ok());
+        let model = std::env::var("AGENTIC_SDLC_LLM_MODEL")
             .ok()
             .map(|v| v.trim().to_string())
             .filter(|v| !v.is_empty())
             .unwrap_or_else(|| default_model_for_provider(provider).to_string());
-        let timeout_ms = std::env::var("ANTIGRAV_LLM_TIMEOUT_MS")
+        let timeout_ms = std::env::var("AGENTIC_SDLC_LLM_TIMEOUT_MS")
             .ok()
             .and_then(|v| v.trim().parse::<u64>().ok())
             .filter(|v| *v > 0)
             .unwrap_or(120_000);
-        let max_retries = std::env::var("ANTIGRAV_LLM_MAX_RETRIES")
+        let max_retries = std::env::var("AGENTIC_SDLC_LLM_MAX_RETRIES")
             .ok()
             .and_then(|v| v.trim().parse::<u32>().ok())
             .unwrap_or(1);
-        let fallback_providers = parse_provider_list(std::env::var("ANTIGRAV_LLM_FALLBACK").ok());
+        let fallback_providers = parse_provider_list(std::env::var("AGENTIC_SDLC_LLM_FALLBACK").ok());
         let fallback_policy =
-            parse_fallback_policy(std::env::var("ANTIGRAV_LLM_FALLBACK_POLICY").ok());
+            parse_fallback_policy(std::env::var("AGENTIC_SDLC_LLM_FALLBACK_POLICY").ok());
         Self {
             default_role: "software-engineer".to_string(),
             model,
             provider,
             temperature: resolve_temperature(),
             roles_dir: PathBuf::from(
-                std::env::var("ANTIGRAV_ROLES_DIR")
+                std::env::var("AGENTIC_SDLC_ROLES_DIR")
                     .ok()
                     .unwrap_or_else(|| ".agents/roles".to_string()),
             ),
             fallback_providers,
             simulation_fallback: parse_simulation_fallback(
-                std::env::var("ANTIGRAV_LLM_SIMULATION_FALLBACK").ok(),
+                std::env::var("AGENTIC_SDLC_LLM_SIMULATION_FALLBACK").ok(),
             ),
             router_config: RouterConfig {
                 timeout_ms,
@@ -729,14 +823,17 @@ impl LlmSubAgentSkill {
 
     async fn call_ollama(
         &self,
-        model: &str,
+        model_requested: &str,
         prompt: &str,
         temperature: f32,
     ) -> Result<ProviderCallResult, ProviderCallFailure> {
+        let ollama_client = super::ollama::OllamaClient::new();
+        let model = ollama_client.resolve_model(model_requested).await.unwrap_or_else(|_| model_requested.to_string());
+        
         let client = build_http_client().map_err(|err| {
             provider_failure(
                 LlmProvider::Ollama,
-                model,
+                &model,
                 LlmErrorClass::Configuration,
                 err.to_string(),
             )
@@ -752,13 +849,13 @@ impl LlmSubAgentSkill {
             .json(&request)
             .send()
             .await
-            .map_err(|err| map_reqwest_error(LlmProvider::Ollama, model, err))?;
+            .map_err(|err| map_reqwest_error(LlmProvider::Ollama, &model, err))?;
         let status = response.status();
         if !response.status().is_success() {
             let body = response.text().await.unwrap_or_default();
             return Err(provider_failure(
                 LlmProvider::Ollama,
-                model,
+                &model,
                 classify_http_status(status.as_u16()),
                 format!(
                     "ollama request failed (status={}): {}",
@@ -770,7 +867,7 @@ impl LlmSubAgentSkill {
         let payload: OllamaResponse = response.json().await.map_err(|err| {
             provider_failure(
                 LlmProvider::Ollama,
-                model,
+                &model,
                 LlmErrorClass::Validation,
                 format!("ollama response parse failed: {}", err),
             )
@@ -778,7 +875,7 @@ impl LlmSubAgentSkill {
         if let Some(err) = payload.error {
             return Err(provider_failure(
                 LlmProvider::Ollama,
-                model,
+                &model,
                 LlmErrorClass::Validation,
                 format!("ollama error: {}", err),
             ));
@@ -787,7 +884,7 @@ impl LlmSubAgentSkill {
         if text.is_empty() {
             return Err(provider_failure(
                 LlmProvider::Ollama,
-                model,
+                &model,
                 LlmErrorClass::EmptyResponse,
                 "ollama returned empty response",
             ));
@@ -1487,7 +1584,8 @@ impl Skill for LlmSubAgentSkill {
             }
         }
 
-        let prompt = build_prompt(&role_name, &role_prompt, &instruction_input);
+        let discipline = load_karpathy_discipline_if_enabled(&ctx.project_root);
+        let prompt = build_prompt(&role_name, &role_prompt, &instruction_input, discipline.as_deref());
 
         // Check replay cache before calling providers
         if let Some(cache) = &self.replay_cache {
@@ -1513,14 +1611,30 @@ impl Skill for LlmSubAgentSkill {
                     total_tokens: snapshot.tokens,
                 };
 
+                let cached_parsed = extract_llm_json(&snapshot.response);
+                let cached_summary = cached_parsed
+                    .as_ref()
+                    .and_then(|v| v.get("summary"))
+                    .and_then(|v| v.as_str())
+                    .map(|s| s.trim().to_string())
+                    .unwrap_or_else(|| snapshot.response.trim().to_string());
+                let cached_actions = cached_parsed
+                    .as_ref()
+                    .map(|v| extract_string_array(v, "actions"))
+                    .unwrap_or_default();
+                let cached_risks = cached_parsed
+                    .as_ref()
+                    .map(|v| extract_string_array(v, "risks"))
+                    .unwrap_or_default();
+
                 return Ok(SkillOutput::json(json!({
                     "schema": "llm_router.v1",
                     "provider": snapshot.provider,
                     "model": snapshot.model,
                     "role": role_name,
-                    "summary": snapshot.response,
-                    "actions": [],
-                    "risks": [],
+                    "summary": cached_summary,
+                    "actions": cached_actions,
+                    "risks": cached_risks,
                     "usage": {
                         "input_tokens": usage.input_tokens,
                         "output_tokens": usage.output_tokens,
@@ -1680,14 +1794,33 @@ impl Skill for LlmSubAgentSkill {
             let _ = cache.add_to_cache(snapshot.request_hash.clone(), snapshot);
         }
 
+        // Parse JSON from the raw LLM text response.
+        // phi4-mini and other small models often wrap JSON in markdown fences
+        // or embed it in prose — extract_llm_json handles all these cases.
+        let parsed = extract_llm_json(result.text.trim());
+        let summary = parsed
+            .as_ref()
+            .and_then(|v| v.get("summary"))
+            .and_then(|v| v.as_str())
+            .map(|s| s.trim().to_string())
+            .unwrap_or_else(|| result.text.trim().to_string());
+        let actions = parsed
+            .as_ref()
+            .map(|v| extract_string_array(v, "actions"))
+            .unwrap_or_default();
+        let risks = parsed
+            .as_ref()
+            .map(|v| extract_string_array(v, "risks"))
+            .unwrap_or_default();
+
         Ok(SkillOutput::json(json!({
             "schema": "llm_router.v1",
             "provider": result.provider.as_str(),
             "model": result.model,
             "role": role_name,
-            "summary": result.text.trim(),
-            "actions": [],
-            "risks": [],
+            "summary": summary,
+            "actions": actions,
+            "risks": risks,
             "usage": {
                 "input_tokens": result.usage.input_tokens,
                 "output_tokens": result.usage.output_tokens,
@@ -1727,7 +1860,7 @@ mod tests {
     use std::path::PathBuf;
 
     fn live_smoke_enabled() -> bool {
-        std::env::var("ANTIGRAV_RUN_LIVE_LLM_TESTS").ok().as_deref() == Some("1")
+        std::env::var("AGENTIC_SDLC_RUN_LIVE_LLM_TESTS").ok().as_deref() == Some("1")
     }
 
     fn has_env_var(name: &str) -> bool {
@@ -1834,32 +1967,32 @@ mod tests {
 
     #[test]
     fn resolve_temperature_defaults_to_zero() {
-        std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
+        std::env::remove_var("AGENTIC_SDLC_LLM_TEMPERATURE");
         let temp = super::resolve_temperature();
         assert_eq!(temp, 0.0);
     }
 
     #[test]
     fn resolve_temperature_reads_from_env() {
-        std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "0.7");
+        std::env::set_var("AGENTIC_SDLC_LLM_TEMPERATURE", "0.7");
         let temp = super::resolve_temperature();
         assert_eq!(temp, 0.7);
-        std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
+        std::env::remove_var("AGENTIC_SDLC_LLM_TEMPERATURE");
     }
 
     #[test]
     fn resolve_temperature_clamps_to_valid_range() {
         // Test upper bound
-        std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "3.0");
+        std::env::set_var("AGENTIC_SDLC_LLM_TEMPERATURE", "3.0");
         let temp = super::resolve_temperature();
         assert_eq!(temp, 2.0);
-        std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
+        std::env::remove_var("AGENTIC_SDLC_LLM_TEMPERATURE");
 
         // Test lower bound
-        std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "-1.0");
+        std::env::set_var("AGENTIC_SDLC_LLM_TEMPERATURE", "-1.0");
         let temp = super::resolve_temperature();
         assert_eq!(temp, 0.0);
-        std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
+        std::env::remove_var("AGENTIC_SDLC_LLM_TEMPERATURE");
     }
 
     #[test]
@@ -1874,21 +2007,21 @@ mod tests {
 
     #[test]
     fn generate_seed_respects_env_override() {
-        std::env::set_var("ANTIGRAV_LLM_SEED", "42");
+        std::env::set_var("AGENTIC_SDLC_LLM_SEED", "42");
         let seed = super::generate_seed("trace_123", "step_1");
         assert_eq!(seed, Some(42));
-        std::env::remove_var("ANTIGRAV_LLM_SEED");
+        std::env::remove_var("AGENTIC_SDLC_LLM_SEED");
     }
 
     #[test]
     fn is_deterministic_mode_when_temperature_zero() {
-        std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "0.0");
+        std::env::set_var("AGENTIC_SDLC_LLM_TEMPERATURE", "0.0");
         assert!(super::is_deterministic_mode());
 
-        std::env::set_var("ANTIGRAV_LLM_TEMPERATURE", "0.7");
+        std::env::set_var("AGENTIC_SDLC_LLM_TEMPERATURE", "0.7");
         assert!(!super::is_deterministic_mode());
 
-        std::env::remove_var("ANTIGRAV_LLM_TEMPERATURE");
+        std::env::remove_var("AGENTIC_SDLC_LLM_TEMPERATURE");
     }
 
     #[test]
@@ -1920,7 +2053,7 @@ mod tests {
     #[tokio::test]
     async fn llm_subagent_live_smoke_openai() {
         if !live_smoke_enabled() {
-            eprintln!("skipped: set ANTIGRAV_RUN_LIVE_LLM_TESTS=1 to run live provider tests");
+            eprintln!("skipped: set AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 to run live provider tests");
             return;
         }
         if !has_env_var("OPENAI_API_KEY") {
@@ -1944,7 +2077,7 @@ mod tests {
     #[tokio::test]
     async fn llm_subagent_live_smoke_gemini() {
         if !live_smoke_enabled() {
-            eprintln!("skipped: set ANTIGRAV_RUN_LIVE_LLM_TESTS=1 to run live provider tests");
+            eprintln!("skipped: set AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 to run live provider tests");
             return;
         }
         if !has_env_var("GEMINI_API_KEY") {
@@ -1968,7 +2101,7 @@ mod tests {
     #[tokio::test]
     async fn llm_subagent_live_smoke_anthropic() {
         if !live_smoke_enabled() {
-            eprintln!("skipped: set ANTIGRAV_RUN_LIVE_LLM_TESTS=1 to run live provider tests");
+            eprintln!("skipped: set AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 to run live provider tests");
             return;
         }
         if !has_env_var("ANTHROPIC_API_KEY") {

@@ -843,7 +843,7 @@ fn normalize_imported_skill_markdown(
     let changed_fields = diff_json_object_fields(&before_json, &after_json);
     let mut out = String::new();
     out.push_str(&format!(
-        "# Skill: {}\nSchema: antigrav.skill@v1\n\n```json\n{}\n```\n",
+        "# Skill: {}\nSchema: agentic-sdlc.skill@v1\n\n```json\n{}\n```\n",
         skill_name,
         serde_json::to_string_pretty(&after_json)?
     ));
@@ -1407,7 +1407,7 @@ fn build_imported_skill_markdown(
     });
     let mut out = String::new();
     out.push_str(&format!(
-        "# Skill: {}\nSchema: antigrav.skill@v1\n\n```json\n{}\n```\n\n",
+        "# Skill: {}\nSchema: agentic-sdlc.skill@v1\n\n```json\n{}\n```\n\n",
         skill_name,
         serde_json::to_string_pretty(&json_meta).unwrap_or_else(|_| "{}".to_string())
     ));
@@ -1786,7 +1786,7 @@ mod tests {
     #[test]
     fn normalize_imported_skill_markdown_fixes_unknown_risk_and_enriches_tags() {
         let content = r#"# Skill: web-research
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 
 ```json
 {
@@ -1817,7 +1817,7 @@ Use this skill for structured web research workflows.
     #[test]
     fn normalize_imported_skill_markdown_returns_none_when_already_normalized() {
         let content = r#"# Skill: web-research
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 
 ```json
 {

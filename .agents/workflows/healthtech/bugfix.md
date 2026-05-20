@@ -2,7 +2,7 @@
 description: healthtech bugfix workflow with root-cause and regression guard
 ---
 # Workflow: healthtech-bugfix
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: healthtech
 MaxCpuMs: 220000
 MaxWallTimeMs: 900000

@@ -1,5 +1,5 @@
 # Skill: top-web-vulnerabilities
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 
 ```json
 {

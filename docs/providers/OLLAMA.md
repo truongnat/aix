@@ -22,7 +22,7 @@ ollama pull qwen3:8b
 # Check: ollama list
 
 # 4. Configure provider (default)
-export ANTIGRAV_LLM_PROVIDER=ollama
+export AGENTIC_SDLC_LLM_PROVIDER=ollama
 
 # 5. Run workflow
 cargo run -- --workflow feature.md
@@ -34,13 +34,13 @@ cargo run -- --workflow feature.md
 
 ```bash
 # Provider selection (default)
-export ANTIGRAV_LLM_PROVIDER=ollama
+export AGENTIC_SDLC_LLM_PROVIDER=ollama
 
 # Optional: Model override
-export ANTIGRAV_LLM_MODEL=qwen3:8b
+export AGENTIC_SDLC_LLM_MODEL=qwen3:8b
 
 # Optional: Ollama host
-export ANTIGRAV_OLLAMA_HOST=http://localhost:11434
+export AGENTIC_SDLC_OLLAMA_HOST=http://localhost:11434
 # or
 export OLLAMA_HOST=http://localhost:11434
 ```
@@ -100,8 +100,8 @@ ollama list
 **Example:**
 ```bash
 # Development workflow
-export ANTIGRAV_LLM_PROVIDER=ollama
-export ANTIGRAV_LLM_MODEL=qwen3:8b
+export AGENTIC_SDLC_LLM_PROVIDER=ollama
+export AGENTIC_SDLC_LLM_MODEL=qwen3:8b
 cargo run -- --workflow feature.md
 ```
 
@@ -152,7 +152,7 @@ docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
 docker exec -it ollama ollama pull qwen3:8b
 
 # Use from host
-export ANTIGRAV_OLLAMA_HOST=http://localhost:11434
+export AGENTIC_SDLC_OLLAMA_HOST=http://localhost:11434
 ```
 
 ## 🧪 Testing
@@ -170,7 +170,7 @@ ollama run qwen3:8b "Hello, how are you?"
 ### Test with agentic-sdlc
 
 ```bash
-export ANTIGRAV_LLM_PROVIDER=ollama
+export AGENTIC_SDLC_LLM_PROVIDER=ollama
 cargo run -- --workflow test_replay_workflow.md
 ```
 
@@ -218,7 +218,7 @@ ollama error: not enough memory
 **Solution:**
 ```bash
 # Use smaller model
-export ANTIGRAV_LLM_MODEL=phi3:mini
+export AGENTIC_SDLC_LLM_MODEL=phi3:mini
 
 # Or close other applications
 # Or add more RAM
@@ -229,7 +229,7 @@ export ANTIGRAV_LLM_MODEL=phi3:mini
 **Solution:**
 ```bash
 # Use smaller model
-export ANTIGRAV_LLM_MODEL=llama3.2:3b
+export AGENTIC_SDLC_LLM_MODEL=llama3.2:3b
 
 # Or use GPU acceleration (if available)
 # Ollama automatically uses GPU if detected
@@ -256,7 +256,7 @@ rocm-smi    # AMD
 
 ```bash
 # Use smaller model for speed
-export ANTIGRAV_LLM_MODEL=phi3:mini
+export AGENTIC_SDLC_LLM_MODEL=phi3:mini
 
 # Use quantized models (smaller, faster)
 ollama pull qwen3:8b-q4_0  # 4-bit quantization
@@ -288,7 +288,7 @@ ollama pull qwen3:8b-q4_0  # 4-bit quantization
 ollama create mymodel -f Modelfile
 
 # Use custom model
-export ANTIGRAV_LLM_MODEL=mymodel
+export AGENTIC_SDLC_LLM_MODEL=mymodel
 ```
 
 ### Remote Ollama
@@ -298,7 +298,7 @@ export ANTIGRAV_LLM_MODEL=mymodel
 ssh server "ollama serve"
 
 # Connect from client
-export ANTIGRAV_OLLAMA_HOST=http://server:11434
+export AGENTIC_SDLC_OLLAMA_HOST=http://server:11434
 ```
 
 ### Multiple Models
@@ -309,8 +309,8 @@ ollama pull qwen3:8b
 ollama pull codellama:7b
 
 # Switch between models
-export ANTIGRAV_LLM_MODEL=qwen3:8b      # General
-export ANTIGRAV_LLM_MODEL=codellama:7b  # Code
+export AGENTIC_SDLC_LLM_MODEL=qwen3:8b      # General
+export AGENTIC_SDLC_LLM_MODEL=codellama:7b  # Code
 ```
 
 ## 📚 Resources

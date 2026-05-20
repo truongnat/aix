@@ -161,9 +161,9 @@ The implementation is production-ready with comprehensive documentation, example
 ### 1. Automatic Fallback
 
 ```bash
-export ANTIGRAV_LLM_PROVIDER=openai
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
-export ANTIGRAV_LLM_FALLBACK_POLICY=transient_only
+export AGENTIC_SDLC_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK_POLICY=transient_only
 ```
 
 **Triggers:**
@@ -214,28 +214,28 @@ export ANTIGRAV_LLM_FALLBACK_POLICY=transient_only
 ### Development
 ```bash
 # Use Ollama (free, local)
-export ANTIGRAV_LLM_PROVIDER=ollama
+export AGENTIC_SDLC_LLM_PROVIDER=ollama
 ```
 
 ### Production
 ```bash
 # Use OpenAI (reliable, deterministic)
-export ANTIGRAV_LLM_PROVIDER=openai
-export ANTIGRAV_LLM_TEMPERATURE=0.0
-export ANTIGRAV_LLM_SEED=42
+export AGENTIC_SDLC_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.0
+export AGENTIC_SDLC_LLM_SEED=42
 ```
 
 ### Cost Optimization
 ```bash
 # Use Gemini (cheapest cloud)
-export ANTIGRAV_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
 ```
 
 ### High Quality
 ```bash
 # Use Anthropic Claude
-export ANTIGRAV_LLM_PROVIDER=anthropic
-export ANTIGRAV_LLM_MODEL=claude-3-5-sonnet-latest
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-sonnet-latest
 ```
 
 ---

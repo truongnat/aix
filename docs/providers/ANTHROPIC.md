@@ -34,7 +34,7 @@ export ANTHROPIC_API_KEY=sk-ant-api03-...
 ### 3. Configure Provider
 
 ```bash
-export ANTIGRAV_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
 ```
 
 ### 4. Run Workflow
@@ -52,12 +52,12 @@ cargo run -- --workflow feature.md
 export ANTHROPIC_API_KEY=sk-ant-api03-...
 
 # Provider selection
-export ANTIGRAV_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
 
 # Optional: Model override
-export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-haiku-latest
 # or
-export ANTIGRAV_LLM_MODEL_ANTHROPIC=claude-3-5-sonnet-latest
+export AGENTIC_SDLC_LLM_MODEL_ANTHROPIC=claude-3-5-sonnet-latest
 ```
 
 ### Available Models
@@ -74,16 +74,16 @@ export ANTIGRAV_LLM_MODEL_ANTHROPIC=claude-3-5-sonnet-latest
 
 ```bash
 # Temperature (0.0 = deterministic, 1.0 = creative)
-export ANTIGRAV_LLM_TEMPERATURE=0.0
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.0
 
 # Timeout (milliseconds)
-export ANTIGRAV_LLM_TIMEOUT_MS=120000
+export AGENTIC_SDLC_LLM_TIMEOUT_MS=120000
 
 # Max retries on failure
-export ANTIGRAV_LLM_MAX_RETRIES=1
+export AGENTIC_SDLC_LLM_MAX_RETRIES=1
 
 # Fallback providers
-export ANTIGRAV_LLM_FALLBACK=openai,gemini
+export AGENTIC_SDLC_LLM_FALLBACK=openai,gemini
 ```
 
 ## 💰 Pricing
@@ -118,7 +118,7 @@ export ANTIGRAV_LLM_FALLBACK=openai,gemini
 
 ```bash
 # Use Haiku for most tasks
-export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-haiku-latest
 
 # Use Sonnet only for complex tasks
 # (configure in role profile)
@@ -144,22 +144,22 @@ export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest
 
 **Code Review:**
 ```bash
-export ANTIGRAV_LLM_PROVIDER=anthropic
-export ANTIGRAV_LLM_MODEL=claude-3-5-sonnet-latest
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-sonnet-latest
 cargo run -- --workflow code-review.md
 ```
 
 **Security Analysis:**
 ```bash
-export ANTIGRAV_LLM_PROVIDER=anthropic
-export ANTIGRAV_LLM_MODEL=claude-3-5-sonnet-latest
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-sonnet-latest
 cargo run -- --workflow security-scan.md
 ```
 
 **Documentation:**
 ```bash
-export ANTIGRAV_LLM_PROVIDER=anthropic
-export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-haiku-latest
 cargo run -- --workflow generate-docs.md
 ```
 
@@ -168,7 +168,7 @@ cargo run -- --workflow generate-docs.md
 ### Test Connection
 
 ```bash
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 ANTHROPIC_API_KEY=sk-ant-... \
 cargo test llm_subagent_live_smoke_anthropic -- --nocapture
 ```
@@ -177,7 +177,7 @@ cargo test llm_subagent_live_smoke_anthropic -- --nocapture
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...
-export ANTIGRAV_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
 cargo run -- --workflow test_replay_workflow.md
 ```
 
@@ -225,10 +225,10 @@ anthropic request failed (status=429): Rate limit exceeded
 **Solution:**
 ```bash
 # Enable fallback
-export ANTIGRAV_LLM_FALLBACK=openai,gemini
+export AGENTIC_SDLC_LLM_FALLBACK=openai,gemini
 
 # Or increase retry delay
-export ANTIGRAV_LLM_MAX_RETRIES=3
+export AGENTIC_SDLC_LLM_MAX_RETRIES=3
 ```
 
 ### Timeout
@@ -241,10 +241,10 @@ provider timeout after 120000ms
 **Solution:**
 ```bash
 # Increase timeout
-export ANTIGRAV_LLM_TIMEOUT_MS=180000  # 3 minutes
+export AGENTIC_SDLC_LLM_TIMEOUT_MS=180000  # 3 minutes
 
 # Or use faster model
-export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-haiku-latest
 ```
 
 ### Context Too Long
@@ -276,7 +276,7 @@ anthropic request failed (status=400): prompt is too long
 
 1. **Use Haiku for speed:**
    ```bash
-   export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest
+   export AGENTIC_SDLC_LLM_MODEL=claude-3-5-haiku-latest
    ```
 
 2. **Enable caching:**
@@ -349,9 +349,9 @@ You are a software architect...
 
 ```bash
 # Primary: Anthropic, Fallback: OpenAI
-export ANTIGRAV_LLM_PROVIDER=anthropic
-export ANTIGRAV_LLM_FALLBACK=openai,gemini
-export ANTIGRAV_LLM_FALLBACK_POLICY=transient_only
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_FALLBACK=openai,gemini
+export AGENTIC_SDLC_LLM_FALLBACK_POLICY=transient_only
 ```
 
 ### Cost Tracking

@@ -2,7 +2,7 @@
 description: cloud-platform release workflow with quality signal and risk approval
 ---
 # Workflow: cloud-platform-release
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: cloud-platform
 MaxCpuMs: 220000
 MaxWallTimeMs: 900000

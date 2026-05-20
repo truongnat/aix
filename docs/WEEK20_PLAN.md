@@ -13,7 +13,7 @@
 **Problem:**
 - v1.0.1 nhưng early stage
 - Không có binary distribution
-- Branding inconsistency (antigrav vs agentic-sdlc)
+- Branding inconsistency (agentic-sdlc vs agentic-sdlc)
 - Không có crates.io publication
 - Không có installation convenience
 
@@ -31,7 +31,7 @@
 ## 🎯 Objectives
 
 ### 1. Branding Decision
-- [ ] Decide: antigrav vs agentic-sdlc
+- [ ] Decide: agentic-sdlc vs agentic-sdlc
 - [ ] Update all references
 - [ ] Update documentation
 - [ ] Update README

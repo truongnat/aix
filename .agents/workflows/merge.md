@@ -3,7 +3,7 @@ description: merge workflow
 ---
 
 # Workflow: merge
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: agent
 
 ## Step: merge_branch

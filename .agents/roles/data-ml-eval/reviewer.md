@@ -1,5 +1,5 @@
 # Role: reviewer
-Schema: antigrav.role@v1
+Schema: agentic-sdlc.role@v1
 ```json
 {"name":"reviewer","provider":"ollama","model":"qwen3:8b","temperature":0}
 ```

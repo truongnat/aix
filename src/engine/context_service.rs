@@ -45,17 +45,17 @@ pub struct DeterministicContextService {
 
 impl Default for DeterministicContextService {
     fn default() -> Self {
-        let max_items = std::env::var("ANTIGRAV_CONTEXT_MAX_ITEMS")
+        let max_items = std::env::var("AGENTIC_SDLC_CONTEXT_MAX_ITEMS")
             .ok()
             .and_then(|v| v.trim().parse::<usize>().ok())
             .filter(|v| *v > 0)
             .unwrap_or(5);
-        let max_chars_per_item = std::env::var("ANTIGRAV_CONTEXT_MAX_CHARS")
+        let max_chars_per_item = std::env::var("AGENTIC_SDLC_CONTEXT_MAX_CHARS")
             .ok()
             .and_then(|v| v.trim().parse::<usize>().ok())
             .filter(|v| *v > 32)
             .unwrap_or(300);
-        let retrieval_mode = std::env::var("ANTIGRAV_CONTEXT_RETRIEVAL_MODE")
+        let retrieval_mode = std::env::var("AGENTIC_SDLC_CONTEXT_RETRIEVAL_MODE")
             .ok()
             .unwrap_or_else(|| "vector".to_string())
             .trim()
@@ -110,23 +110,25 @@ impl ContextService for DeterministicContextService {
             return Ok(ContextInjectionResult::passthrough(input));
         };
 
+        let (max_items, max_chars) =
+            budget_for_step(step, self.max_items, self.max_chars_per_item);
         let mut snippets = Vec::new();
         let mut seen_keys = HashSet::new();
         for dep in &step.depends_on {
             let Some(output) = instance.step_results.get(dep) else {
                 continue;
             };
-            for snippet in extract_snippets_from_output(dep, output, self.max_chars_per_item) {
-                if push_unique_snippet(&mut snippets, &mut seen_keys, snippet, self.max_items) {
+            for snippet in extract_snippets_from_output(dep, output, max_chars) {
+                if push_unique_snippet(&mut snippets, &mut seen_keys, snippet, max_items) {
                     continue;
                 }
             }
-            if snippets.len() >= self.max_items {
+            if snippets.len() >= max_items {
                 break;
             }
         }
 
-        let remaining = self.max_items.saturating_sub(snippets.len());
+        let remaining = max_items.saturating_sub(snippets.len());
         if remaining > 0 {
             let query = derive_retrieval_query(&text, workflow, step);
             if !query.is_empty() {
@@ -136,10 +138,10 @@ impl ContextService for DeterministicContextService {
                         source_step: item.source,
                         id: item.id,
                         score: Some(item.score),
-                        text: truncate_chars(item.text.trim(), self.max_chars_per_item),
+                        text: truncate_chars(item.text.trim(), max_chars),
                     };
                     let _ =
-                        push_unique_snippet(&mut snippets, &mut seen_keys, snippet, self.max_items);
+                        push_unique_snippet(&mut snippets, &mut seen_keys, snippet, max_items);
                 }
             }
         }
@@ -153,6 +155,21 @@ impl ContextService for DeterministicContextService {
             input: SkillInput::Text(injected),
             injected_items: u32::try_from(snippets.len()).unwrap_or(u32::MAX),
         })
+    }
+}
+
+/// Returns (max_items, max_chars_per_item) based on the step's role in the workflow.
+/// Steps whose ID contains planning keywords get richer context; fix/debug steps get
+/// a tighter budget to avoid flooding the prompt with stale context.
+/// Falls back to the service-level env-configured defaults for all other steps.
+fn budget_for_step(step: &WorkflowStep, default_items: usize, default_chars: usize) -> (usize, usize) {
+    let id = step.id.trim().to_ascii_lowercase();
+    if id.contains("plan") || id.contains("think") || id.contains("analyz") {
+        (10, 600)
+    } else if id.contains("fix") || id.contains("debug") || id.contains("patch") {
+        (3, 200)
+    } else {
+        (default_items, default_chars)
     }
 }
 
@@ -461,6 +478,41 @@ mod tests {
             ];
             Ok(items.into_iter().take(limit).collect())
         }
+    }
+
+    #[test]
+    fn budget_for_step_returns_rich_budget_for_plan_steps() {
+        use super::budget_for_step;
+        use crate::workflow::model::{FailureStrategy, WorkflowStep};
+
+        let plan_step = WorkflowStep {
+            id: "plan".to_string(),
+            skill: "agent.llm_subagent".to_string(),
+            input: "architect:::Plan".to_string(),
+            depends_on: vec![],
+            condition: None,
+            retry: None,
+            on_failure: FailureStrategy::FailFast,
+        };
+        let (items, chars) = budget_for_step(&plan_step, 5, 300);
+        assert_eq!(items, 10);
+        assert_eq!(chars, 600);
+
+        let fix_step = WorkflowStep {
+            id: "fix".to_string(),
+            ..plan_step.clone()
+        };
+        let (items, chars) = budget_for_step(&fix_step, 5, 300);
+        assert_eq!(items, 3);
+        assert_eq!(chars, 200);
+
+        let execute_step = WorkflowStep {
+            id: "execute".to_string(),
+            ..plan_step
+        };
+        let (items, chars) = budget_for_step(&execute_step, 5, 300);
+        assert_eq!(items, 5);
+        assert_eq!(chars, 300);
     }
 
     #[test]

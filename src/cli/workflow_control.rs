@@ -7,19 +7,17 @@ pub(super) fn handle_workflow_control_command(
     command: Commands,
 ) -> Result<WorkflowLaunchAction> {
     match command {
+        Commands::Bug { .. } => Ok(WorkflowLaunchAction::Noop),
         Commands::Workflow { action } => match *action {
             WorkflowCommand::List => {
-                let instances = state_store.list_instances()?;
-                if instances.is_empty() {
-                    println!("No workflow instances found.");
+                let workflows = project_layout.list_workflow_definitions()?;
+                if workflows.is_empty() {
+                    println!("No workflow definitions found under .agents/workflows.");
                     return Ok(WorkflowLaunchAction::Noop);
                 }
-                println!("Workflow Instances:");
-                for item in instances {
-                    println!(
-                        "- {} status={:?} workflow={} updated_at={}",
-                        item.instance_id, item.status, item.workflow_name, item.updated_at_ms
-                    );
+                println!("Available Workflows:");
+                for (workflow_id, path) in workflows {
+                    println!("- {} ({})", workflow_id, path.display());
                 }
                 Ok(WorkflowLaunchAction::Noop)
             }
@@ -831,6 +829,19 @@ pub(super) fn handle_workflow_control_command(
                 }
                 Ok(WorkflowLaunchAction::Noop)
             }
+            WorkflowCommand::AgentExport { target, json } => {
+                agent_export::run_agent_export(project_layout, &target, json)?;
+                Ok(WorkflowLaunchAction::Noop)
+            }
+            WorkflowCommand::McpServe { transport, port } => {
+                let layout = project_layout.clone();
+                tokio::spawn(async move {
+                    if let Err(e) = mcp_server::run_mcp_serve(&layout, &transport, port).await {
+                        eprintln!("MCP server error: {}", e);
+                    }
+                });
+                Ok(WorkflowLaunchAction::Noop)
+            }
             WorkflowCommand::Resume { id } => Ok(WorkflowLaunchAction::Resume { id }),
             WorkflowCommand::StartTemplate {
                 template,
@@ -1070,6 +1081,7 @@ pub(super) fn handle_workflow_control_command(
 
             Ok(WorkflowLaunchAction::Noop)
         }
+        Commands::Harness { .. } => Ok(WorkflowLaunchAction::Noop),
     }
 }
 

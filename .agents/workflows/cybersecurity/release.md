@@ -2,7 +2,7 @@
 description: cybersecurity release workflow with quality signal and risk approval
 ---
 # Workflow: cybersecurity-release
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: cybersecurity
 MaxCpuMs: 220000
 MaxWallTimeMs: 900000

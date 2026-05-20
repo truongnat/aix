@@ -16,7 +16,7 @@ Complete guide to using Google Gemini models with `agentic-sdlc`.
 export GEMINI_API_KEY=AIza...
 
 # 2. Configure provider
-export ANTIGRAV_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
 
 # 3. Run workflow
 cargo run -- --workflow feature.md
@@ -31,10 +31,10 @@ cargo run -- --workflow feature.md
 export GEMINI_API_KEY=AIza...
 
 # Provider selection
-export ANTIGRAV_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
 
 # Optional: Model override
-export ANTIGRAV_LLM_MODEL=gemini-1.5-flash
+export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-flash
 ```
 
 ### Available Models
@@ -63,14 +63,14 @@ export ANTIGRAV_LLM_MODEL=gemini-1.5-flash
 **Example:**
 ```bash
 export GEMINI_API_KEY=AIza...
-export ANTIGRAV_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
 cargo run -- --workflow feature.md
 ```
 
 ## 🧪 Testing
 
 ```bash
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 GEMINI_API_KEY=AIza... \
 cargo test llm_subagent_live_smoke_gemini -- --nocapture
 ```
@@ -84,15 +84,15 @@ export GEMINI_API_KEY=AIza...
 
 ### Rate Limit
 ```bash
-export ANTIGRAV_LLM_FALLBACK=openai,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK=openai,anthropic
 ```
 
 ### Model Not Found
 ```bash
 # Use full model path
-export ANTIGRAV_LLM_MODEL=models/gemini-1.5-flash
+export AGENTIC_SDLC_LLM_MODEL=models/gemini-1.5-flash
 # or just
-export ANTIGRAV_LLM_MODEL=gemini-1.5-flash
+export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-flash
 ```
 
 ## 📚 Resources

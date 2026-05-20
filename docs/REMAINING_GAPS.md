@@ -318,7 +318,7 @@ So với bản phân tích ban đầu (11 gaps), hiện tại:
 ### Gap #11: Maturity & Distribution 📋 PLANNED
 
 **Original Problem:**
-> v1.0.1 nhưng early stage. Không có binary distribution. Branding inconsistency (antigrav vs agentic-sdlc).
+> v1.0.1 nhưng early stage. Không có binary distribution. Branding inconsistency (agentic-sdlc vs agentic-sdlc).
 
 **Status:** 📋 **PLANNED** (Week 20)
 
@@ -332,7 +332,7 @@ So với bản phân tích ban đầu (11 gaps), hiện tại:
 - ⏳ Publish to crates.io
 - ⏳ Binary releases (GitHub Releases)
 - ⏳ Docker image
-- ⏳ Branding decision (antigrav vs agentic-sdlc)
+- ⏳ Branding decision (agentic-sdlc vs agentic-sdlc)
 - ⏳ Homebrew formula
 - ⏳ Installation documentation
 

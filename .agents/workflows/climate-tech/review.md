@@ -2,7 +2,7 @@
 description: climate-tech review workflow focused on correctness, risk, and release readiness
 ---
 # Workflow: climate-tech-review
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: climate-tech
 MaxCpuMs: 180000
 MaxWallTimeMs: 600000

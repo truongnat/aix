@@ -29,7 +29,7 @@ Hoàn thành Gap #11 (Maturity & Distribution) trong 1 giờ vs 6.5 giờ planne
 **Decision:** Keep `agentic-sdlc` as primary name
 
 **Rationale:**
-- More descriptive than "antigrav"
+- More descriptive than "agentic-sdlc"
 - Better SEO and discoverability
 - Clear purpose
 - Professional

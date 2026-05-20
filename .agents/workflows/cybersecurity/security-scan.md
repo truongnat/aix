@@ -3,7 +3,7 @@ description: Deterministic security scan workflow for package integrity and inte
 source: self
 ---
 # Workflow: cybersecurity-security-scan
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: cybersecurity
 Goal: Run policy checks and produce a security decision with explicit mitigations.
 

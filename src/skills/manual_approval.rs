@@ -48,7 +48,7 @@ impl Skill for ManualApprovalSkill {
                 "instance_id": instance_id,
                 "step_id": ctx.step_id,
                 "instruction": instruction,
-                "message": "Awaiting manual approval. Run: antigrav workflow approve <instance_id> --step <step_id>"
+                "message": "Awaiting manual approval. Run: agentic-sdlc workflow approve <instance_id> --step <step_id>"
             })));
         };
 

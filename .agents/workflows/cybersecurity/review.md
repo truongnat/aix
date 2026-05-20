@@ -2,7 +2,7 @@
 description: cybersecurity review workflow focused on correctness, risk, and release readiness
 ---
 # Workflow: cybersecurity-review
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: cybersecurity
 MaxCpuMs: 180000
 MaxWallTimeMs: 600000

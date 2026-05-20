@@ -33,7 +33,7 @@ cargo test -- --nocapture
 cargo test llm_subagent
 
 # Run live provider tests (requires API keys)
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 OPENAI_API_KEY=... \
 cargo test llm_subagent_live_smoke_openai
 ```
@@ -78,48 +78,48 @@ cargo run -- --workflow-id feature --role-override "architect=planner"
 cargo run -- --workflow feature.md
 
 # Explicit temperature
-ANTIGRAV_LLM_TEMPERATURE=0.0 cargo run -- --workflow feature.md
+AGENTIC_SDLC_LLM_TEMPERATURE=0.0 cargo run -- --workflow feature.md
 
 # With specific seed
-ANTIGRAV_LLM_SEED=42 cargo run -- --workflow feature.md
+AGENTIC_SDLC_LLM_SEED=42 cargo run -- --workflow feature.md
 
 # Creative mode
-ANTIGRAV_LLM_TEMPERATURE=0.7 cargo run -- --workflow feature.md
+AGENTIC_SDLC_LLM_TEMPERATURE=0.7 cargo run -- --workflow feature.md
 ```
 
 ### Provider Selection
 ```bash
 # Use OpenAI
-ANTIGRAV_LLM_PROVIDER=openai \
+AGENTIC_SDLC_LLM_PROVIDER=openai \
 OPENAI_API_KEY=... \
 cargo run -- --workflow feature.md
 
 # Use Anthropic
-ANTIGRAV_LLM_PROVIDER=anthropic \
+AGENTIC_SDLC_LLM_PROVIDER=anthropic \
 ANTHROPIC_API_KEY=... \
 cargo run -- --workflow feature.md
 
 # Use Gemini
-ANTIGRAV_LLM_PROVIDER=gemini \
+AGENTIC_SDLC_LLM_PROVIDER=gemini \
 GEMINI_API_KEY=... \
 cargo run -- --workflow feature.md
 
 # Use Azure OpenAI
-ANTIGRAV_LLM_PROVIDER=azure \
+AGENTIC_SDLC_LLM_PROVIDER=azure \
 AZURE_OPENAI_KEY=... \
 AZURE_OPENAI_ENDPOINT=... \
 cargo run -- --workflow feature.md
 
 # Use AWS Bedrock
-ANTIGRAV_LLM_PROVIDER=bedrock \
+AGENTIC_SDLC_LLM_PROVIDER=bedrock \
 AWS_REGION=us-east-1 \
 AWS_ACCESS_KEY_ID=... \
 AWS_SECRET_ACCESS_KEY=... \
 cargo run -- --workflow feature.md
 
 # With fallback
-ANTIGRAV_LLM_PROVIDER=openai \
-ANTIGRAV_LLM_FALLBACK=gemini,anthropic \
+AGENTIC_SDLC_LLM_PROVIDER=openai \
+AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic \
 cargo run -- --workflow feature.md
 ```
 
@@ -344,31 +344,31 @@ cargo run -- workflow index-graph
 ### LLM Configuration
 ```bash
 # Provider
-export ANTIGRAV_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_PROVIDER=openai
 
 # Model
-export ANTIGRAV_LLM_MODEL=gpt-4o-mini
+export AGENTIC_SDLC_LLM_MODEL=gpt-4o-mini
 
 # Temperature (0.0 = deterministic)
-export ANTIGRAV_LLM_TEMPERATURE=0.0
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.0
 
 # Seed (for deterministic responses)
-export ANTIGRAV_LLM_SEED=42
+export AGENTIC_SDLC_LLM_SEED=42
 
 # Fallback providers
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
 
 # Fallback policy
-export ANTIGRAV_LLM_FALLBACK_POLICY=transient_only
+export AGENTIC_SDLC_LLM_FALLBACK_POLICY=transient_only
 
 # Timeout
-export ANTIGRAV_LLM_TIMEOUT_MS=30000
+export AGENTIC_SDLC_LLM_TIMEOUT_MS=30000
 
 # Max retries
-export ANTIGRAV_LLM_MAX_RETRIES=2
+export AGENTIC_SDLC_LLM_MAX_RETRIES=2
 
 # Simulation fallback
-export ANTIGRAV_LLM_SIMULATION_FALLBACK=true
+export AGENTIC_SDLC_LLM_SIMULATION_FALLBACK=true
 ```
 
 ### Provider API Keys
@@ -397,35 +397,35 @@ export AWS_SECRET_ACCESS_KEY=...
 ### Context Retrieval
 ```bash
 # Mode
-export ANTIGRAV_CONTEXT_RETRIEVAL_MODE=vector
+export AGENTIC_SDLC_CONTEXT_RETRIEVAL_MODE=vector
 
 # Backend
-export ANTIGRAV_CONTEXT_BACKEND=sqlite
+export AGENTIC_SDLC_CONTEXT_BACKEND=sqlite
 
 # Paths
-export ANTIGRAV_CONTEXT_INDEX_PATH=.agents/memory/vector_index.json
-export ANTIGRAV_CONTEXT_GRAPH_INDEX_PATH=.agents/memory/graph_index.json
-export ANTIGRAV_CONTEXT_DB_PATH=.agents/memory/context.db
+export AGENTIC_SDLC_CONTEXT_INDEX_PATH=.agents/memory/vector_index.json
+export AGENTIC_SDLC_CONTEXT_GRAPH_INDEX_PATH=.agents/memory/graph_index.json
+export AGENTIC_SDLC_CONTEXT_DB_PATH=.agents/memory/context.db
 
 # Limits
-export ANTIGRAV_CONTEXT_MAX_ITEMS=5
-export ANTIGRAV_CONTEXT_MAX_CHARS=300
-export ANTIGRAV_CONTEXT_MIN_SCORE=0.1
+export AGENTIC_SDLC_CONTEXT_MAX_ITEMS=5
+export AGENTIC_SDLC_CONTEXT_MAX_CHARS=300
+export AGENTIC_SDLC_CONTEXT_MIN_SCORE=0.1
 ```
 
 ### Other
 ```bash
 # Roles directory
-export ANTIGRAV_ROLES_DIR=.agents/roles
+export AGENTIC_SDLC_ROLES_DIR=.agents/roles
 
 # Ollama host
-export ANTIGRAV_OLLAMA_HOST=http://localhost:11434
+export AGENTIC_SDLC_OLLAMA_HOST=http://localhost:11434
 
 # Live LLM tests
-export ANTIGRAV_RUN_LIVE_LLM_TESTS=1
+export AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1
 
 # Bootstrap require Ollama
-export ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA=1
+export AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA=1
 ```
 
 ---
@@ -453,17 +453,17 @@ cargo run -- workflow trace <instance_id> --json
 ### Testing Providers
 ```bash
 # Test OpenAI
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 OPENAI_API_KEY=... \
 cargo test llm_subagent_live_smoke_openai -- --nocapture
 
 # Test Anthropic
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 ANTHROPIC_API_KEY=... \
 cargo test llm_subagent_live_smoke_anthropic -- --nocapture
 
 # Test Gemini
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 GEMINI_API_KEY=... \
 cargo test llm_subagent_live_smoke_gemini -- --nocapture
 ```
@@ -471,13 +471,13 @@ cargo test llm_subagent_live_smoke_gemini -- --nocapture
 ### Deterministic Testing
 ```bash
 # Run with deterministic mode
-ANTIGRAV_LLM_TEMPERATURE=0.0 \
-ANTIGRAV_LLM_SEED=42 \
+AGENTIC_SDLC_LLM_TEMPERATURE=0.0 \
+AGENTIC_SDLC_LLM_SEED=42 \
 cargo run -- --workflow test.md --snapshot-out run1.json
 
 # Run again
-ANTIGRAV_LLM_TEMPERATURE=0.0 \
-ANTIGRAV_LLM_SEED=42 \
+AGENTIC_SDLC_LLM_TEMPERATURE=0.0 \
+AGENTIC_SDLC_LLM_SEED=42 \
 cargo run -- --workflow test.md --snapshot-out run2.json
 
 # Compare
@@ -548,8 +548,8 @@ cargo build
 ```bash
 # Create .env
 cat > .env << 'EOF'
-ANTIGRAV_LLM_PROVIDER=openai
-ANTIGRAV_LLM_TEMPERATURE=0.0
+AGENTIC_SDLC_LLM_PROVIDER=openai
+AGENTIC_SDLC_LLM_TEMPERATURE=0.0
 OPENAI_API_KEY=sk-...
 EOF
 

@@ -49,7 +49,7 @@ So sánh giữa gaps ban đầu và những gì đã được giải quyết.
 ```rust
 // Default temperature = 0.0 for determinism
 pub fn resolve_temperature() -> f32 {
-    env::var("ANTIGRAV_LLM_TEMPERATURE")
+    env::var("AGENTIC_SDLC_LLM_TEMPERATURE")
         .ok()
         .and_then(|s| s.parse::<f32>().ok())
         .unwrap_or(0.0)  // Default: deterministic
@@ -171,7 +171,7 @@ pub struct ResourceMonitor {
 ./scripts/compare_providers.sh
 
 # Choose cost-effective provider
-export ANTIGRAV_LLM_PROVIDER=gemini  # 50% cheaper than OpenAI
+export AGENTIC_SDLC_LLM_PROVIDER=gemini  # 50% cheaper than OpenAI
 ```
 
 ✅ **Fallback & Circuit Breaker**
@@ -440,7 +440,7 @@ docs/
 **Original Problem:**
 > - v1.0.1 nhưng early stage
 > - Không có binary distribution
-> - Branding inconsistency (antigrav vs agentic-sdlc)
+> - Branding inconsistency (agentic-sdlc vs agentic-sdlc)
 
 **Status:** 📋 **PLANNED** (Week 20)
 

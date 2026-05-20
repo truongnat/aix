@@ -10,6 +10,7 @@ use crate::skills::idempotency;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use serde_json::json;
+use serde_json::Value;
 use std::collections::HashSet;
 use std::path::{Component, PathBuf};
 use std::process::Command as StdCommand;
@@ -20,9 +21,9 @@ use tokio::time::{timeout, Duration};
 
 const DEFAULT_RUN_SCRIPT_TIMEOUT_MS: u64 = 30_000;
 const MAX_CAPTURED_OUTPUT_LEN: usize = 8000;
-const VALIDATION_STATUS_ENV: &str = "ANTIGRAV_LAST_VALIDATION_PASSED";
-const RUN_SCRIPT_ALLOW_SHELL_OPERATORS_ENV: &str = "ANTIGRAV_RUN_SCRIPT_ALLOW_SHELL_OPERATORS";
-const RUN_SCRIPT_DENYLIST_ENV: &str = "ANTIGRAV_RUN_SCRIPT_DENYLIST";
+const VALIDATION_STATUS_ENV: &str = "AGENTIC_SDLC_LAST_VALIDATION_PASSED";
+const RUN_SCRIPT_ALLOW_SHELL_OPERATORS_ENV: &str = "AGENTIC_SDLC_RUN_SCRIPT_ALLOW_SHELL_OPERATORS";
+const RUN_SCRIPT_DENYLIST_ENV: &str = "AGENTIC_SDLC_RUN_SCRIPT_DENYLIST";
 
 fn load_branching_policy(project_root: &str) -> Result<BranchingPolicy> {
     let layout = AgentProjectLayout::discover(project_root)?;
@@ -35,7 +36,7 @@ fn load_branching_policy(project_root: &str) -> Result<BranchingPolicy> {
 }
 
 fn run_script_timeout_ms() -> u64 {
-    std::env::var("ANTIGRAV_RUN_SCRIPT_TIMEOUT_MS")
+    std::env::var("AGENTIC_SDLC_RUN_SCRIPT_TIMEOUT_MS")
         .ok()
         .and_then(|v| v.trim().parse::<u64>().ok())
         .filter(|v| *v > 0)
@@ -43,7 +44,7 @@ fn run_script_timeout_ms() -> u64 {
 }
 
 fn run_script_allowlist() -> HashSet<String> {
-    std::env::var("ANTIGRAV_RUN_SCRIPT_ALLOWLIST")
+    std::env::var("AGENTIC_SDLC_RUN_SCRIPT_ALLOWLIST")
         .ok()
         .map(|v| {
             v.split(',')
@@ -54,7 +55,7 @@ fn run_script_allowlist() -> HashSet<String> {
         .unwrap_or_else(|| {
             [
                 "cargo", "git", "npm", "pnpm", "yarn", "make", "just", "go", "pytest", "flutter",
-                "dart",
+                "dart", "python", "python3",
             ]
             .into_iter()
             .map(|cmd| cmd.to_string())
@@ -361,6 +362,112 @@ fn parse_write_file_input(input: &SkillInput) -> Result<(PathBuf, String)> {
     Ok((rel_path, content.to_string()))
 }
 
+fn parse_safe_relative_path(path_str: &str) -> Result<PathBuf> {
+    let rel_path = PathBuf::from(path_str.trim());
+    if rel_path.as_os_str().is_empty() {
+        return Err(anyhow!("path must be non-empty"));
+    }
+    if rel_path.is_absolute()
+        || rel_path
+            .components()
+            .any(|component| matches!(component, Component::ParentDir))
+    {
+        return Err(anyhow!("only safe relative paths are allowed"));
+    }
+    Ok(rel_path)
+}
+
+fn extract_run_script_command(input: &SkillInput) -> Result<String> {
+    match input {
+        SkillInput::Text(text) => {
+            let command = text.trim();
+            if command.is_empty() {
+                return Err(anyhow!("run_script requires non-empty command input"));
+            }
+            Ok(command.to_string())
+        }
+        SkillInput::Json(value) => {
+            let command = value
+                .get("validation_command")
+                .or_else(|| value.get("command"))
+                .and_then(Value::as_str)
+                .map(str::trim)
+                .filter(|v| !v.is_empty())
+                .ok_or_else(|| {
+                    anyhow!(
+                        "run_script expected JSON with non-empty 'validation_command' or 'command'"
+                    )
+                })?;
+            Ok(command.to_string())
+        }
+        other => Err(anyhow!(
+            "run_script expected text or JSON command input, got {:?}",
+            other
+        )),
+    }
+}
+
+fn parse_write_files_from_json_input(input: &SkillInput) -> Result<(Option<PathBuf>, Vec<(PathBuf, String)>)> {
+    let value = match input {
+        SkillInput::Json(value) => value,
+        SkillInput::Text(text) => {
+            return Err(anyhow!(
+                "write_files_from_json expected JSON input, got text preview '{}'",
+                truncated(text.trim())
+            ))
+        }
+        other => {
+            return Err(anyhow!(
+                "write_files_from_json expected JSON input, got {:?}",
+                other
+            ))
+        }
+    };
+
+    let root_dir = value
+        .get("root_dir")
+        .and_then(Value::as_str)
+        .map(parse_safe_relative_path)
+        .transpose()?;
+
+    let files = value
+        .get("files")
+        .and_then(Value::as_array)
+        .ok_or_else(|| anyhow!("write_files_from_json requires a 'files' array"))?;
+
+    let mut out = Vec::new();
+    for entry in files {
+        let path = entry
+            .get("path")
+            .and_then(Value::as_str)
+            .ok_or_else(|| anyhow!("file entry missing string 'path'"))?;
+        let content = if let Some(content) = entry.get("content").and_then(Value::as_str) {
+            content.to_string()
+        } else if let Some(lines) = entry.get("content_lines").and_then(Value::as_array) {
+            let mut joined = Vec::new();
+            for line in lines {
+                let value = line
+                    .as_str()
+                    .ok_or_else(|| anyhow!("content_lines entries must be strings"))?;
+                joined.push(value.to_string());
+            }
+            joined.join("\n")
+        } else {
+            return Err(anyhow!(
+                "file entry missing string 'content' or string[] 'content_lines'"
+            ));
+        };
+        let rel_path = parse_safe_relative_path(path)?;
+        out.push((rel_path, content));
+    }
+
+    if out.is_empty() {
+        return Err(anyhow!("write_files_from_json requires at least one file entry"));
+    }
+
+    Ok((root_dir, out))
+}
+
 #[derive(Debug, Clone)]
 pub struct EnsureBranchSkill;
 
@@ -369,6 +476,452 @@ pub struct RunScriptSkill;
 
 #[derive(Debug, Clone)]
 pub struct WriteFileSkill;
+
+#[derive(Debug, Clone)]
+pub struct WriteFilesFromJsonSkill;
+
+#[derive(Debug, Clone)]
+pub struct ExtractValidationCommandSkill;
+
+#[derive(Debug, Clone)]
+pub struct ArtifactBlueprintGateSkill;
+
+#[derive(Debug, Clone)]
+pub struct ArtifactBuilderSkill;
+
+fn build_node_todo_cli_blueprint() -> Value {
+    json!({
+        "root_dir": "local_tmp/generated-app",
+        "validation_command": "npm test --prefix local_tmp/generated-app",
+        "files": [
+            {
+                "path": "package.json",
+                "content_lines": [
+                    "{",
+                    "  \"name\": \"generated-todo-cli\",",
+                    "  \"version\": \"1.0.0\",",
+                    "  \"private\": true,",
+                    "  \"bin\": {",
+                    "    \"todo\": \"bin/todo.js\"",
+                    "  },",
+                    "  \"scripts\": {",
+                    "    \"test\": \"node --test\"",
+                    "  }",
+                    "}"
+                ]
+            },
+            {
+                "path": "bin/todo.js",
+                "content_lines": [
+                    "#!/usr/bin/env node",
+                    "const fs = require('fs');",
+                    "const path = require('path');",
+                    "",
+                    "const todoFile = process.env.TODO_FILE || path.join(process.cwd(), 'todos.json');",
+                    "",
+                    "function loadTodos() {",
+                    "  if (!fs.existsSync(todoFile)) {",
+                    "    return [];",
+                    "  }",
+                    "  return JSON.parse(fs.readFileSync(todoFile, 'utf8'));",
+                    "}",
+                    "",
+                    "function saveTodos(todos) {",
+                    "  fs.writeFileSync(todoFile, JSON.stringify(todos, null, 2) + '\\n');",
+                    "}",
+                    "",
+                    "function printUsage() {",
+                    "  console.log('Usage: todo <add|list|done> [args]');",
+                    "}",
+                    "",
+                    "const [, , command, ...args] = process.argv;",
+                    "if (!command) {",
+                    "  printUsage();",
+                    "  process.exit(1);",
+                    "}",
+                    "",
+                    "const todos = loadTodos();",
+                    "",
+                    "if (command === 'add') {",
+                    "  const text = args.join(' ').trim();",
+                    "  if (!text) {",
+                    "    console.error('Missing todo text');",
+                    "    process.exit(1);",
+                    "  }",
+                    "  todos.push({ text, done: false });",
+                    "  saveTodos(todos);",
+                    "  console.log(`Added: ${text}`);",
+                    "} else if (command === 'list') {",
+                    "  todos.forEach((todo, index) => {",
+                    "    const mark = todo.done ? 'x' : ' ';",
+                    "    console.log(`${index + 1}. [${mark}] ${todo.text}`);",
+                    "  });",
+                    "} else if (command === 'done') {",
+                    "  const index = Number(args[0]);",
+                    "  if (!Number.isInteger(index) || index < 1 || index > todos.length) {",
+                    "    console.error('Invalid todo index');",
+                    "    process.exit(1);",
+                    "  }",
+                    "  todos[index - 1].done = true;",
+                    "  saveTodos(todos);",
+                    "  console.log(`Completed: ${todos[index - 1].text}`);",
+                    "} else {",
+                    "  printUsage();",
+                    "  process.exit(1);",
+                    "}"
+                ]
+            },
+            {
+                "path": "test/todo.test.js",
+                "content_lines": [
+                    "const test = require('node:test');",
+                    "const assert = require('node:assert/strict');",
+                    "const fs = require('fs');",
+                    "const os = require('os');",
+                    "const path = require('path');",
+                    "const { spawnSync } = require('child_process');",
+                    "",
+                    "test('todo cli add/list/done flow', () => {",
+                    "  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'todo-cli-'));",
+                    "  const todoFile = path.join(tmpDir, 'todos.json');",
+                    "  const cliPath = path.join(__dirname, '..', 'bin', 'todo.js');",
+                    "  const env = { ...process.env, TODO_FILE: todoFile };",
+                    "",
+                    "  let result = spawnSync(process.execPath, [cliPath, 'add', 'ship harness'], { env, encoding: 'utf8' });",
+                    "  assert.equal(result.status, 0, result.stderr);",
+                    "  assert.match(result.stdout, /Added: ship harness/);",
+                    "",
+                    "  result = spawnSync(process.execPath, [cliPath, 'done', '1'], { env, encoding: 'utf8' });",
+                    "  assert.equal(result.status, 0, result.stderr);",
+                    "  assert.match(result.stdout, /Completed: ship harness/);",
+                    "",
+                    "  result = spawnSync(process.execPath, [cliPath, 'list'], { env, encoding: 'utf8' });",
+                    "  assert.equal(result.status, 0, result.stderr);",
+                    "  assert.match(result.stdout, /1\\. \\[x\\] ship harness/);",
+                    "});"
+                ]
+            },
+            {
+                "path": "README.md",
+                "content_lines": [
+                    "# Generated Todo CLI",
+                    "",
+                    "A minimal Node.js todo list CLI generated by agentic-sdlc.",
+                    "",
+                    "## Commands",
+                    "",
+                    "- `node bin/todo.js add \"task\"`",
+                    "- `node bin/todo.js list`",
+                    "- `node bin/todo.js done 1`"
+                ]
+            }
+        ]
+    })
+}
+
+fn build_python_todo_cli_blueprint() -> Value {
+    json!({
+        "root_dir": "local_tmp/generated-app",
+        "validation_command": "python3 -m unittest discover -s local_tmp/generated-app/tests -q",
+        "files": [
+            {
+                "path": "todo.py",
+                "content_lines": [
+                    "import json",
+                    "import os",
+                    "import sys",
+                    "",
+                    "TODO_FILE = os.environ.get(\"TODO_FILE\", os.path.join(os.getcwd(), \"todos.json\"))",
+                    "",
+                    "def load_todos():",
+                    "    if not os.path.exists(TODO_FILE):",
+                    "        return []",
+                    "    with open(TODO_FILE, \"r\", encoding=\"utf-8\") as handle:",
+                    "        return json.load(handle)",
+                    "",
+                    "def save_todos(todos):",
+                    "    with open(TODO_FILE, \"w\", encoding=\"utf-8\") as handle:",
+                    "        json.dump(todos, handle, indent=2)",
+                    "        handle.write(\"\\n\")",
+                    "",
+                    "def cmd_add(args):",
+                    "    text = \" \".join(args).strip()",
+                    "    if not text:",
+                    "        raise SystemExit(\"Missing todo text\")",
+                    "    todos = load_todos()",
+                    "    todos.append({\"text\": text, \"done\": False})",
+                    "    save_todos(todos)",
+                    "    print(f\"Added: {text}\")",
+                    "",
+                    "def cmd_list(_args):",
+                    "    todos = load_todos()",
+                    "    for index, todo in enumerate(todos, start=1):",
+                    "        mark = \"x\" if todo.get(\"done\") else \" \"",
+                    "        print(f\"{index}. [{mark}] {todo.get('text', '')}\")",
+                    "",
+                    "def cmd_done(args):",
+                    "    if not args:",
+                    "        raise SystemExit(\"Missing todo index\")",
+                    "    index = int(args[0])",
+                    "    todos = load_todos()",
+                    "    if index < 1 or index > len(todos):",
+                    "        raise SystemExit(\"Invalid todo index\")",
+                    "    todos[index - 1][\"done\"] = True",
+                    "    save_todos(todos)",
+                    "    print(f\"Completed: {todos[index - 1]['text']}\")",
+                    "",
+                    "def main(argv=None):",
+                    "    argv = list(sys.argv[1:] if argv is None else argv)",
+                    "    if not argv:",
+                    "        raise SystemExit(\"Usage: python todo.py <add|list|done> [args]\")",
+                    "    command, *args = argv",
+                    "    if command == \"add\":",
+                    "        cmd_add(args)",
+                    "    elif command == \"list\":",
+                    "        cmd_list(args)",
+                    "    elif command == \"done\":",
+                    "        cmd_done(args)",
+                    "    else:",
+                    "        raise SystemExit(f\"Unknown command: {command}\")",
+                    "",
+                    "if __name__ == \"__main__\":",
+                    "    main()"
+                ]
+            },
+            {
+                "path": "tests/test_todo.py",
+                "content_lines": [
+              "import os",
+              "import subprocess",
+              "import sys",
+              "import tempfile",
+              "import unittest",
+              "from pathlib import Path",
+              "",
+              "CLI = os.path.join(os.path.dirname(os.path.dirname(__file__)), \"todo.py\")",
+                    "",
+                    "class TodoCliTest(unittest.TestCase):",
+                    "    def test_add_done_list(self):",
+                    "        with tempfile.TemporaryDirectory() as tmp_dir:",
+                    "            todo_file = Path(tmp_dir) / \"todos.json\"",
+                    "            env = dict(os.environ)",
+                    "            env[\"TODO_FILE\"] = str(todo_file)",
+                    "",
+                    "            result = subprocess.run(",
+                    "                [sys.executable, CLI, \"add\", \"ship\", \"harness\"],",
+                    "                check=True,",
+                    "                capture_output=True,",
+                    "                text=True,",
+                    "                env=env,",
+                    "            )",
+                    "            self.assertIn(\"Added: ship harness\", result.stdout)",
+                    "",
+                    "            result = subprocess.run(",
+                    "                [sys.executable, CLI, \"done\", \"1\"],",
+                    "                check=True,",
+                    "                capture_output=True,",
+                    "                text=True,",
+                    "                env=env,",
+                    "            )",
+                    "            self.assertIn(\"Completed: ship harness\", result.stdout)",
+                    "",
+                    "            result = subprocess.run(",
+                    "                [sys.executable, CLI, \"list\"],",
+                    "                check=True,",
+                    "                capture_output=True,",
+                    "                text=True,",
+                    "                env=env,",
+                    "            )",
+                    "            self.assertIn(\"1. [x] ship harness\", result.stdout)",
+                    "",
+                    "if __name__ == \"__main__\":",
+                    "    unittest.main()"
+                ]
+            },
+            {
+                "path": "README.md",
+                "content_lines": [
+                    "# Generated Python Todo CLI",
+                    "",
+                    "Run `python3 todo.py add \"task\"`, `python3 todo.py list`, or `python3 todo.py done 1`."
+                ]
+            }
+        ]
+    })
+}
+
+fn build_rust_todo_cli_blueprint() -> Value {
+    json!({
+        "root_dir": "local_tmp/generated-app",
+        "validation_command": "cargo test --manifest-path local_tmp/generated-app/Cargo.toml",
+        "files": [
+            {
+                "path": "Cargo.toml",
+                "content_lines": [
+                    "[package]",
+                    "name = \"generated_todo_cli\"",
+                    "version = \"0.1.0\"",
+                    "edition = \"2021\"",
+                    "",
+                    "[dependencies]"
+                ]
+            },
+            {
+                "path": "src/main.rs",
+                "content_lines": [
+                    "use std::env;",
+                    "use std::fs;",
+                    "use std::path::PathBuf;",
+                    "",
+                    "fn todo_file() -> PathBuf {",
+                    "    env::var(\"TODO_FILE\")",
+                    "        .map(PathBuf::from)",
+                    "        .unwrap_or_else(|_| env::current_dir().expect(\"cwd\").join(\"todos.json\"))",
+                    "}",
+                    "",
+                    "fn load_todos() -> Vec<(String, bool)> {",
+                    "    let path = todo_file();",
+                    "    let Ok(raw) = fs::read_to_string(path) else {",
+                    "        return Vec::new();",
+                    "    };",
+                    "    raw.lines()",
+                    "        .filter_map(|line| {",
+                    "            let (status, text) = line.split_once('|')?;",
+                    "            Some((text.to_string(), status == \"1\"))",
+                    "        })",
+                    "        .collect()",
+                    "}",
+                    "",
+                    "fn save_todos(todos: &[(String, bool)]) {",
+                    "    let body = todos",
+                    "        .iter()",
+                    "        .map(|(text, done)| format!(\"{}|{}\", if *done { \"1\" } else { \"0\" }, text))",
+                    "        .collect::<Vec<_>>()",
+                    "        .join(\"\\n\");",
+                    "    fs::write(todo_file(), format!(\"{}\\n\", body)).expect(\"write todos\");",
+                    "}",
+                    "",
+                    "fn main() {",
+                    "    let mut args = env::args().skip(1);",
+                    "    let command = args.next().unwrap_or_else(|| panic!(\"usage: todo <add|list|done> [args]\"));",
+                    "    let mut todos = load_todos();",
+                    "    match command.as_str() {",
+                    "        \"add\" => {",
+                    "            let text = args.collect::<Vec<_>>().join(\" \");",
+                    "            if text.trim().is_empty() {",
+                    "                panic!(\"missing todo text\");",
+                    "            }",
+                    "            todos.push((text.clone(), false));",
+                    "            save_todos(&todos);",
+                    "            println!(\"Added: {}\", text);",
+                    "        }",
+                    "        \"list\" => {",
+                    "            for (index, (text, done)) in todos.iter().enumerate() {",
+                    "                let mark = if *done { 'x' } else { ' ' };",
+                    "                println!(\"{}. [{}] {}\", index + 1, mark, text);",
+                    "            }",
+                    "        }",
+                    "        \"done\" => {",
+                    "            let index = args.next().expect(\"missing todo index\").parse::<usize>().expect(\"invalid todo index\");",
+                    "            if index == 0 || index > todos.len() {",
+                    "                panic!(\"invalid todo index\");",
+                    "            }",
+                    "            todos[index - 1].1 = true;",
+                    "            let text = todos[index - 1].0.clone();",
+                    "            save_todos(&todos);",
+                    "            println!(\"Completed: {}\", text);",
+                    "        }",
+                    "        _ => panic!(\"unknown command\"),",
+                    "    }",
+                    "}"
+                ]
+            },
+            {
+                "path": "tests/cli_flow.rs",
+                "content_lines": [
+                    "use std::fs;",
+                    "use std::path::PathBuf;",
+                    "use std::process::Command;",
+                    "use std::time::{SystemTime, UNIX_EPOCH};",
+                    "",
+                    "fn binary_path() -> PathBuf {",
+                    "    PathBuf::from(env!(\"CARGO_BIN_EXE_generated_todo_cli\"))",
+                    "}",
+                    "",
+                    "fn temp_todo_file() -> PathBuf {",
+                    "    let unique = SystemTime::now()",
+                    "        .duration_since(UNIX_EPOCH)",
+                    "        .expect(\"time\")",
+                    "        .as_nanos();",
+                    "    std::env::temp_dir().join(format!(\"generated-todo-cli-{}.json\", unique))",
+                    "}",
+                    "",
+                    "fn run(args: &[&str], todo_file: &PathBuf) -> String {",
+                    "    let output = Command::new(binary_path())",
+                    "        .args(args)",
+                    "        .env(\"TODO_FILE\", todo_file)",
+                    "        .output()",
+                    "        .expect(\"run cli\");",
+                    "    assert!(output.status.success(), \"stderr={}\", String::from_utf8_lossy(&output.stderr));",
+                    "    String::from_utf8_lossy(&output.stdout).to_string()",
+                    "}",
+                    "",
+                    "#[test]",
+                    "fn add_done_list_flow() {",
+                    "    let todo_file = temp_todo_file();",
+                    "    let added = run(&[\"add\", \"ship\", \"harness\"], &todo_file);",
+                    "    assert!(added.contains(\"Added: ship harness\"));",
+                    "    let completed = run(&[\"done\", \"1\"], &todo_file);",
+                    "    assert!(completed.contains(\"Completed: ship harness\"));",
+                    "    let listed = run(&[\"list\"], &todo_file);",
+                    "    assert!(listed.contains(\"1. [x] ship harness\"));",
+                    "    let _ = fs::remove_file(todo_file);",
+                    "}"
+                ]
+            },
+            {
+                "path": "README.md",
+                "content_lines": [
+                    "# Generated Rust Todo CLI",
+                    "",
+                    "Run `cargo run --manifest-path Cargo.toml -- add \"task\"`, `list`, or `done 1`."
+                ]
+            }
+        ]
+    })
+}
+
+fn build_artifact_blueprint(task: &str) -> Value {
+    let normalized = task.trim().to_ascii_lowercase();
+    if normalized.contains("todo")
+        && (normalized.contains("node") || normalized.contains("javascript"))
+    {
+        return build_node_todo_cli_blueprint();
+    }
+    if normalized.contains("todo")
+        && (normalized.contains("python") || normalized.contains("py "))
+    {
+        return build_python_todo_cli_blueprint();
+    }
+    if normalized.contains("todo")
+        && (normalized.contains("rust") || normalized.contains("cargo"))
+    {
+        return build_rust_todo_cli_blueprint();
+    }
+    if normalized.contains("todo") && normalized.contains("cli") {
+        return build_node_todo_cli_blueprint();
+    }
+
+    json!({
+        "status": "failed",
+        "summary": "Built-in artifact builder does not support this task yet.",
+        "actions": [
+            "use starter/app-builder for supported todo/node tasks",
+            "extend agent.artifact_builder with a new deterministic blueprint template"
+        ],
+        "risks": ["unsupported_task"]
+    })
+}
 
 #[async_trait]
 impl Skill for EnsureBranchSkill {
@@ -476,32 +1029,24 @@ impl Skill for RunScriptSkill {
         ctx: &mut ExecutionContext,
     ) -> Result<Option<SkillOutput>> {
         ctx.require_fs_read()?;
-        let command = input
-            .as_text()
-            .map(|s| s.trim())
-            .filter(|s| !s.is_empty())
-            .ok_or_else(|| anyhow!("run_script requires non-empty command input"))?;
-        if !is_validation_command(command) {
+        let command = extract_run_script_command(input)?;
+        if !is_validation_command(&command) {
             return Ok(None);
         }
-        idempotency::load_marker(self.name(), command)
+        idempotency::load_marker(self.name(), &command)
     }
 
     async fn execute(&self, input: SkillInput, ctx: &mut ExecutionContext) -> Result<SkillOutput> {
         ctx.require_process_spawn()?;
         ctx.require_fs_read()?;
-        let command = input
-            .as_text()
-            .map(|s| s.trim())
-            .filter(|s| !s.is_empty())
-            .ok_or_else(|| anyhow!("run_script requires non-empty command input"))?;
-        let command_head = validate_run_script_policy(command)?;
+        let command = extract_run_script_command(&input)?;
+        let command_head = validate_run_script_policy(&command)?;
         let timeout_ms = run_script_timeout_ms();
-        let is_validation = is_validation_command(command);
+        let is_validation = is_validation_command(&command);
         let workdir = resolve_script_workdir()?;
         let mut child = Command::new("/bin/sh")
             .arg("-c")
-            .arg(command)
+            .arg(&command)
             .env_clear()
             .env("PATH", build_safe_path_env())
             .env("LC_ALL", "C")
@@ -590,7 +1135,7 @@ impl Skill for RunScriptSkill {
             "stderr": stderr
         }));
         if is_validation {
-            let _ = idempotency::save_marker(self.name(), command, &output);
+            let _ = idempotency::save_marker(self.name(), &command, &output);
         }
         Ok(output)
     }
@@ -658,11 +1203,244 @@ impl Skill for WriteFileSkill {
     }
 }
 
+#[async_trait]
+impl Skill for WriteFilesFromJsonSkill {
+    fn name(&self) -> &str {
+        "write_files_from_json"
+    }
+
+    fn capability(&self) -> SkillCapability {
+        SkillCapability::new(
+            self.name(),
+            "Write multiple files from JSON input with optional root_dir and files[] entries",
+            SkillIOType::Json,
+            SkillIOType::Json,
+            CapabilityPermissions::new(true, true, false, false, false),
+            SideEffectClass::ExternalMutation,
+        )
+        .with_trust_tier(TrustTier::Trusted)
+    }
+
+    fn is_idempotent(&self) -> bool {
+        true
+    }
+
+    async fn detect_already_applied(
+        &self,
+        input: &SkillInput,
+        ctx: &mut ExecutionContext,
+    ) -> Result<Option<SkillOutput>> {
+        ctx.require_fs_read()?;
+        let (root_dir, files) = parse_write_files_from_json_input(input)?;
+        let cwd = std::env::current_dir()?;
+        let base_dir = root_dir.map(|root| cwd.join(root)).unwrap_or(cwd);
+
+        let mut all_match = true;
+        for (rel_path, content) in &files {
+            let full_path = base_dir.join(rel_path);
+            if !full_path.exists() {
+                all_match = false;
+                break;
+            }
+            let existing = std::fs::read_to_string(&full_path)?;
+            if existing != *content {
+                all_match = false;
+                break;
+            }
+        }
+
+        if !all_match {
+            return Ok(None);
+        }
+
+        Ok(Some(SkillOutput::json(json!({
+            "status": "already_written",
+            "root_dir": base_dir.to_string_lossy(),
+            "file_count": files.len()
+        }))))
+    }
+
+    async fn execute(&self, input: SkillInput, ctx: &mut ExecutionContext) -> Result<SkillOutput> {
+        ctx.require_fs_write()?;
+        let (root_dir, files) = parse_write_files_from_json_input(&input)?;
+        let cwd = std::env::current_dir()?;
+        let base_dir = root_dir.map(|root| cwd.join(root)).unwrap_or(cwd);
+
+        let mut written = Vec::new();
+        for (rel_path, content) in files {
+            let full_path = base_dir.join(&rel_path);
+            if let Some(parent) = full_path.parent() {
+                std::fs::create_dir_all(parent)?;
+            }
+            std::fs::write(&full_path, content)?;
+            written.push(rel_path.to_string_lossy().to_string());
+        }
+
+        Ok(SkillOutput::json(json!({
+            "status": "written",
+            "root_dir": base_dir.to_string_lossy(),
+            "file_count": written.len(),
+            "files": written
+        })))
+    }
+}
+
+#[async_trait]
+impl Skill for ExtractValidationCommandSkill {
+    fn name(&self) -> &str {
+        "extract_validation_command"
+    }
+
+    fn capability(&self) -> SkillCapability {
+        SkillCapability::new(
+            self.name(),
+            "Extract validation_command or command from JSON payload as text",
+            SkillIOType::Json,
+            SkillIOType::Text,
+            CapabilityPermissions::new(false, false, false, false, false),
+            SideEffectClass::Pure,
+        )
+        .with_trust_tier(TrustTier::Trusted)
+    }
+
+    fn is_idempotent(&self) -> bool {
+        true
+    }
+
+    async fn execute(&self, input: SkillInput, _ctx: &mut ExecutionContext) -> Result<SkillOutput> {
+        let command = extract_run_script_command(&input)?;
+        Ok(SkillOutput::text(command))
+    }
+}
+
+#[async_trait]
+impl Skill for ArtifactBlueprintGateSkill {
+    fn name(&self) -> &str {
+        "artifact_blueprint_gate"
+    }
+
+    fn capability(&self) -> SkillCapability {
+        SkillCapability::new(
+            self.name(),
+            "Validate that an artifact blueprint contains root_dir, files, and validation_command",
+            SkillIOType::Json,
+            SkillIOType::Json,
+            CapabilityPermissions::new(false, false, false, false, false),
+            SideEffectClass::Pure,
+        )
+        .with_trust_tier(TrustTier::Trusted)
+    }
+
+    fn is_idempotent(&self) -> bool {
+        true
+    }
+
+    async fn execute(&self, input: SkillInput, _ctx: &mut ExecutionContext) -> Result<SkillOutput> {
+        let value = match input {
+            SkillInput::Json(value) => value,
+            other => {
+                return Ok(SkillOutput::json(json!({
+                    "status": "failed",
+                    "summary": "Artifact blueprint gate received non-JSON input.",
+                    "actions": ["rerun blueprint generation with strict JSON output"],
+                    "risks": [format!("unexpected_input_type:{:?}", other)]
+                })))
+            }
+        };
+
+        let root_dir = value.get("root_dir").and_then(Value::as_str);
+        let has_root_dir = root_dir.is_some();
+        let root_dir_safe = root_dir
+            .map(|dir| dir == "local_tmp" || dir.starts_with("local_tmp/"))
+            .unwrap_or(false);
+        let has_files = value
+            .get("files")
+            .and_then(Value::as_array)
+            .map(|files| !files.is_empty())
+            .unwrap_or(false);
+        let command = value
+            .get("validation_command")
+            .or_else(|| value.get("command"))
+            .and_then(Value::as_str);
+        let has_command = command.is_some();
+        let command_safe = command
+            .map(validate_run_script_policy)
+            .transpose()
+            .is_ok();
+        let degraded = value
+            .get("risks")
+            .and_then(Value::as_array)
+            .map(|risks| {
+                risks.iter().filter_map(Value::as_str).any(|risk| {
+                    risk.contains("llm_backend_unavailable")
+                        || risk.contains("output_confidence_reduced")
+                        || risk.contains("simulation")
+                })
+            })
+            .unwrap_or(false);
+
+        if has_root_dir && root_dir_safe && has_files && has_command && command_safe && !degraded {
+            return Ok(SkillOutput::json(json!({
+                "status": "ok",
+                "summary": "Artifact blueprint passed structure and degradation checks.",
+                "actions": ["apply file mutations", "run validation command"],
+                "risks": []
+            })));
+        }
+
+        Ok(SkillOutput::json(json!({
+            "status": "failed",
+            "summary": "Artifact blueprint is incomplete or degraded and cannot be applied safely.",
+                "actions": ["regenerate blueprint", "verify model/provider availability"],
+                "risks": [
+                    if !has_root_dir { "missing_root_dir" } else { "root_dir_ok" },
+                    if !root_dir_safe { "unsafe_root_dir" } else { "safe_root_dir" },
+                    if !has_files { "missing_files" } else { "files_ok" },
+                    if !has_command { "missing_validation_command" } else { "validation_command_ok" },
+                    if !command_safe { "unsafe_validation_command" } else { "safe_validation_command" },
+                    if degraded { "degraded_or_simulated_output" } else { "not_degraded" }
+                ]
+            })))
+    }
+}
+
+#[async_trait]
+impl Skill for ArtifactBuilderSkill {
+    fn name(&self) -> &str {
+        "artifact_builder"
+    }
+
+    fn capability(&self) -> SkillCapability {
+        SkillCapability::new(
+            self.name(),
+            "Generate a deterministic local artifact blueprint for supported starter tasks",
+            SkillIOType::Text,
+            SkillIOType::Json,
+            CapabilityPermissions::new(false, false, false, false, false),
+            SideEffectClass::Pure,
+        )
+        .with_trust_tier(TrustTier::Trusted)
+    }
+
+    fn is_idempotent(&self) -> bool {
+        true
+    }
+
+    async fn execute(&self, input: SkillInput, _ctx: &mut ExecutionContext) -> Result<SkillOutput> {
+        let task = input.as_text().unwrap_or_default();
+        Ok(SkillOutput::json(build_artifact_blueprint(task)))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
-        extract_command_head, is_validation_command, validate_run_script_policy_with_config,
+        build_artifact_blueprint, extract_command_head, extract_run_script_command,
+        is_validation_command, parse_write_files_from_json_input,
+        validate_run_script_policy_with_config,
     };
+    use crate::skill::io::SkillInput;
+    use serde_json::{json, Value};
     use std::collections::HashSet;
 
     #[test]
@@ -708,5 +1486,95 @@ mod tests {
             validate_run_script_policy_with_config("cargo test -q", &allowlist, &denylist, false)
                 .expect("safe command should pass");
         assert_eq!(head, "cargo");
+    }
+
+    #[test]
+    fn extract_run_script_command_supports_json_payload() {
+        let input = SkillInput::Json(json!({
+            "validation_command": "npm test --prefix local_tmp/app"
+        }));
+        let command = extract_run_script_command(&input).expect("command");
+        assert_eq!(command, "npm test --prefix local_tmp/app");
+    }
+
+    #[test]
+    fn parse_write_files_from_json_input_supports_root_dir_and_files() {
+        let input = SkillInput::Json(json!({
+            "root_dir": "local_tmp/generated-app",
+            "files": [
+                { "path": "package.json", "content": "{\"name\":\"demo\"}" },
+                { "path": "src/index.js", "content_lines": ["const x = 1;", "console.log(x);"] }
+            ]
+        }));
+        let (root_dir, files) = parse_write_files_from_json_input(&input).expect("parse");
+        assert_eq!(
+            root_dir.map(|v| v.to_string_lossy().to_string()),
+            Some("local_tmp/generated-app".to_string())
+        );
+        assert_eq!(files.len(), 2);
+        assert_eq!(files[0].0.to_string_lossy(), "package.json");
+        assert_eq!(files[1].0.to_string_lossy(), "src/index.js");
+        assert_eq!(files[1].1, "const x = 1;\nconsole.log(x);");
+    }
+
+    #[test]
+    fn extract_run_script_command_accepts_command_alias() {
+        let input = SkillInput::Json(json!({
+            "command": "cargo test -q"
+        }));
+        let command = extract_run_script_command(&input).expect("command");
+        assert_eq!(command, "cargo test -q");
+    }
+
+    #[test]
+    fn artifact_builder_generates_node_todo_cli_blueprint() {
+        let value = build_artifact_blueprint("create a todo list cli app in nodejs");
+        assert_eq!(
+            value.get("root_dir").and_then(Value::as_str),
+            Some("local_tmp/generated-app")
+        );
+        assert_eq!(
+            value.get("validation_command").and_then(Value::as_str),
+            Some("npm test --prefix local_tmp/generated-app")
+        );
+        let files = value
+            .get("files")
+            .and_then(Value::as_array)
+            .expect("files");
+        assert!(files.iter().any(|entry| {
+            entry.get("path").and_then(Value::as_str) == Some("bin/todo.js")
+        }));
+    }
+
+    #[test]
+    fn artifact_builder_generates_python_todo_cli_blueprint() {
+        let value = build_artifact_blueprint("create a todo cli in python");
+        assert_eq!(
+            value.get("validation_command").and_then(Value::as_str),
+            Some("python3 -m unittest discover -s local_tmp/generated-app/tests -q")
+        );
+        let files = value
+            .get("files")
+            .and_then(Value::as_array)
+            .expect("files");
+        assert!(files.iter().any(|entry| {
+            entry.get("path").and_then(Value::as_str) == Some("todo.py")
+        }));
+    }
+
+    #[test]
+    fn artifact_builder_generates_rust_todo_cli_blueprint() {
+        let value = build_artifact_blueprint("create a rust todo cli");
+        assert_eq!(
+            value.get("validation_command").and_then(Value::as_str),
+            Some("cargo test --manifest-path local_tmp/generated-app/Cargo.toml")
+        );
+        let files = value
+            .get("files")
+            .and_then(Value::as_array)
+            .expect("files");
+        assert!(files.iter().any(|entry| {
+            entry.get("path").and_then(Value::as_str) == Some("src/main.rs")
+        }));
     }
 }

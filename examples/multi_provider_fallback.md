@@ -7,13 +7,13 @@ Example workflow demonstrating automatic fallback between providers.
 ```bash
 # Primary: OpenAI
 export OPENAI_API_KEY=sk-proj-...
-export ANTIGRAV_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_PROVIDER=openai
 
 # Fallback: Gemini, then Anthropic
 export GEMINI_API_KEY=AIza...
 export ANTHROPIC_API_KEY=sk-ant-...
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
-export ANTIGRAV_LLM_FALLBACK_POLICY=transient_only
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK_POLICY=transient_only
 ```
 
 ## Workflow
@@ -71,7 +71,7 @@ cargo run -- --workflow examples/multi_provider_fallback.md
 ```bash
 # Simulate OpenAI failure by using invalid key
 export OPENAI_API_KEY=invalid
-export ANTIGRAV_LLM_FALLBACK=gemini
+export AGENTIC_SDLC_LLM_FALLBACK=gemini
 
 # Should fallback to Gemini
 cargo run -- --workflow examples/multi_provider_fallback.md
@@ -81,8 +81,8 @@ cargo run -- --workflow examples/multi_provider_fallback.md
 
 ```bash
 # Use cheapest provider first
-export ANTIGRAV_LLM_PROVIDER=gemini
-export ANTIGRAV_LLM_FALLBACK=openai,anthropic
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_FALLBACK=openai,anthropic
 
 # Gemini: $0.075/1M input (cheapest)
 # OpenAI: $0.15/1M input (fallback)

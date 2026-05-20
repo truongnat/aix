@@ -6,8 +6,8 @@ Example workflow using Gemini for maximum cost savings.
 
 ```bash
 export GEMINI_API_KEY=AIza...
-export ANTIGRAV_LLM_PROVIDER=gemini
-export ANTIGRAV_LLM_MODEL=gemini-1.5-flash
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-flash
 ```
 
 ## Workflow
@@ -92,7 +92,7 @@ Gemini supports 1M tokens - perfect for large documents:
 
 ```bash
 # Analyze large codebase
-export ANTIGRAV_LLM_MODEL=gemini-1.5-flash
+export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-flash
 
 # Can handle 1M tokens at $0.075/1M
 # vs OpenAI 128K limit at $0.15/1M

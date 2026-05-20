@@ -6,8 +6,8 @@ Example workflow using Anthropic Claude for high-quality code review.
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...
-export ANTIGRAV_LLM_PROVIDER=anthropic
-export ANTIGRAV_LLM_MODEL=claude-3-5-sonnet-latest
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-sonnet-latest
 ```
 
 ## Workflow

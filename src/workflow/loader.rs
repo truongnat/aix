@@ -39,14 +39,31 @@ pub fn parse_markdown_content(content: &str) -> Result<Workflow> {
     let mut max_network_calls: Option<u32> = None;
     let mut max_memory_mb: Option<u32> = None;
     let mut steps: Vec<WorkflowStep> = Vec::new();
+    let mut offset = 0;
 
     let mut current_step: Option<WorkflowStep> = None;
 
     for line in lines {
         let trimmed = line.trim();
 
-        if trimmed.is_empty() {
+        if state != ParseState::InInput && trimmed.is_empty() {
             continue;
+        }
+
+        if trimmed.starts_with("```json") {
+            let start = content[offset..].find("```json").unwrap() + offset;
+            let rest = &content[start + 7..];
+            if let Some(end) = rest.find("```") {
+                let json_str = &rest[..end];
+                if let Ok(val) = serde_json::from_str::<serde_json::Value>(json_str) {
+                    if let Some(n) = val.get("name").and_then(|v| v.as_str()) {
+                        workflow_name = n.to_string();
+                    }
+                    if let Some(d) = val.get("domain").and_then(|v| v.as_str()) {
+                        domain = Some(d.to_string());
+                    }
+                }
+            }
         }
 
         if trimmed.starts_with("# Workflow:") {
@@ -199,9 +216,10 @@ pub fn parse_markdown_content(content: &str) -> Result<Workflow> {
                 if !step.input.is_empty() {
                     step.input.push('\n');
                 }
-                step.input.push_str(trimmed);
+                step.input.push_str(line);
             }
         }
+        offset += line.len() + 1; // +1 for newline
     }
 
     if let Some(step) = current_step {
@@ -317,5 +335,27 @@ Input: cargo test
             vec!["ensure_branch".to_string()]
         );
         assert_eq!(workflow.steps[2].retry, Some(2));
+    }
+
+    #[test]
+    fn parse_markdown_preserves_multiline_input_verbatim() {
+        let content = r#"
+# Workflow: feature
+Domain: demo
+
+## Step: write_file
+Skill: agent.write_file
+Input: path/to/file:::
+#!/usr/bin/env node
+const x = 1;
+
+console.log(x);
+"#;
+        let workflow = parse_markdown_content(content).expect("parse markdown");
+        let input = &workflow.steps[0].input;
+        assert!(input.contains("path/to/file:::"));
+        assert!(input.contains("#!/usr/bin/env node"));
+        assert!(input.contains("const x = 1;"));
+        assert!(input.contains("\n\nconsole.log(x);"));
     }
 }

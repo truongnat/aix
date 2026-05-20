@@ -2,7 +2,7 @@
 description: cloud-platform bugfix workflow with root-cause and regression guard
 ---
 # Workflow: cloud-platform-bugfix
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: cloud-platform
 MaxCpuMs: 220000
 MaxWallTimeMs: 900000

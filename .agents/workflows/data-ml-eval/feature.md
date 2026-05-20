@@ -2,7 +2,7 @@
 description: data-ml-eval feature delivery with impact analysis and acceptance gates
 ---
 # Workflow: data-ml-eval-feature
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: data-ml-eval
 MaxCpuMs: 240000
 MaxWallTimeMs: 900000

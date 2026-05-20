@@ -21,7 +21,7 @@ export AWS_REGION=us-east-1
 # Go to Bedrock → Model access → Request access
 
 # 3. Configure provider
-export ANTIGRAV_LLM_PROVIDER=bedrock
+export AGENTIC_SDLC_LLM_PROVIDER=bedrock
 
 # 4. Run workflow
 cargo run -- --workflow feature.md
@@ -38,17 +38,17 @@ export AWS_SECRET_ACCESS_KEY=...
 export AWS_REGION=us-east-1
 
 # Provider selection
-export ANTIGRAV_LLM_PROVIDER=bedrock
+export AGENTIC_SDLC_LLM_PROVIDER=bedrock
 # or
-export ANTIGRAV_LLM_PROVIDER=aws_bedrock
+export AGENTIC_SDLC_LLM_PROVIDER=aws_bedrock
 ```
 
 ### Optional Configuration
 
 ```bash
 # Model override
-export ANTIGRAV_LLM_MODEL=anthropic.claude-3-haiku-20240307-v1:0
-export ANTIGRAV_LLM_MODEL_BEDROCK=anthropic.claude-3-5-sonnet-20240620-v1:0
+export AGENTIC_SDLC_LLM_MODEL=anthropic.claude-3-haiku-20240307-v1:0
+export AGENTIC_SDLC_LLM_MODEL_BEDROCK=anthropic.claude-3-5-sonnet-20240620-v1:0
 
 # Session token (if using temporary credentials)
 export AWS_SESSION_TOKEN=...
@@ -88,7 +88,7 @@ Check AWS Bedrock pricing for your region.
 export AWS_ACCESS_KEY_ID=AKIA...
 export AWS_SECRET_ACCESS_KEY=...
 export AWS_REGION=us-east-1
-export ANTIGRAV_LLM_PROVIDER=bedrock
+export AGENTIC_SDLC_LLM_PROVIDER=bedrock
 cargo run -- --workflow feature.md
 ```
 

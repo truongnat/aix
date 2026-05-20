@@ -39,6 +39,10 @@ pub(super) fn build_domain_registry(
     domains.register_skill("agent", Arc::new(EnsureBranchSkill))?;
     domains.register_skill("agent", Arc::new(RunScriptSkill))?;
     domains.register_skill("agent", Arc::new(WriteFileSkill))?;
+    domains.register_skill("agent", Arc::new(ArtifactBuilderSkill))?;
+    domains.register_skill("agent", Arc::new(WriteFilesFromJsonSkill))?;
+    domains.register_skill("agent", Arc::new(ExtractValidationCommandSkill))?;
+    domains.register_skill("agent", Arc::new(ArtifactBlueprintGateSkill))?;
     domains.register_skill("agent", Arc::new(GitCommitSkill))?;
     domains.register_skill("agent", Arc::new(GitMergeBranchSkill))?;
     domains.register_skill("agent", Arc::new(AnalyzeConflictsSkill))?;
@@ -813,4 +817,42 @@ pub(super) fn apply_role_override_to_input(
     let source = role.trim().to_ascii_lowercase();
     let target = role_overrides.get(&source)?;
     Some(format!("{}:::{}", target, rest))
+}
+
+pub(super) fn inject_task_only(
+    workflow: &mut crate::workflow::model::Workflow,
+    task: &str,
+) -> Result<()> {
+    let mut injected = false;
+    for step in &mut workflow.steps {
+        if step.input.contains("{{task}}") {
+            step.input = step.input.replace("{{task}}", task);
+            injected = true;
+        }
+    }
+
+    if !injected {
+        let workflow_name = workflow.meta.name.clone();
+        let step = workflow
+            .steps
+            .iter_mut()
+            .find(|step| is_llm_subagent_step(&step.skill) || is_karpathy_discipline_step(&step.skill))
+            .ok_or_else(|| {
+                anyhow!(
+                    "Workflow '{}' has no suitable step (llm_subagent or karpathy_discipline) to inject task",
+                    workflow_name
+                )
+            })?;
+
+        if !step.input.contains("Task:") {
+            step.input = format!("{}\n\nTask: {}", step.input.trim(), task);
+        }
+    }
+
+    Ok(())
+}
+
+fn is_karpathy_discipline_step(skill_ref: &str) -> bool {
+    let normalized = skill_ref.trim().to_ascii_lowercase();
+    normalized == "karpathy_discipline" || normalized.ends_with(".karpathy_discipline")
 }

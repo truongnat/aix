@@ -312,9 +312,9 @@ cargo run -- --workflow feature.md --replay-mode cache.json
 **Configure:**
 ```bash
 # Set resource limits
-export ANTIGRAV_SANDBOX_CPU_LIMIT=80.0
-export ANTIGRAV_SANDBOX_MEMORY_LIMIT=1073741824
-export ANTIGRAV_SANDBOX_TIMEOUT=300
+export AGENTIC_SDLC_SANDBOX_CPU_LIMIT=80.0
+export AGENTIC_SDLC_SANDBOX_MEMORY_LIMIT=1073741824
+export AGENTIC_SDLC_SANDBOX_TIMEOUT=300
 ```
 
 ---
@@ -330,11 +330,11 @@ export ANTIGRAV_SANDBOX_TIMEOUT=300
 **Try this:**
 ```bash
 # Use Anthropic Claude
-export ANTIGRAV_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
 export ANTHROPIC_API_KEY=your-key
 
 # Use Gemini (50% cheaper)
-export ANTIGRAV_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
 export GEMINI_API_KEY=your-key
 ```
 

@@ -3,7 +3,7 @@ description: build feature workflow
 ---
 
 # Workflow: Build Feature
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: agent
 
 ## Step: detect_current_branch

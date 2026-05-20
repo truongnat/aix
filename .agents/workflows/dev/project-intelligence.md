@@ -4,7 +4,7 @@ source: self
 ---
 
 # Workflow: dev-project-intelligence
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: dev
 Goal: Understand project quickly, then suggest best workflows and skills to improve delivery.
 

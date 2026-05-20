@@ -6,10 +6,10 @@ Example workflow using OpenAI with seed for perfect determinism.
 
 ```bash
 export OPENAI_API_KEY=sk-proj-...
-export ANTIGRAV_LLM_PROVIDER=openai
-export ANTIGRAV_LLM_MODEL=gpt-4o-mini
-export ANTIGRAV_LLM_TEMPERATURE=0.0
-export ANTIGRAV_LLM_SEED=42
+export AGENTIC_SDLC_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_MODEL=gpt-4o-mini
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.0
+export AGENTIC_SDLC_LLM_SEED=42
 ```
 
 ## Workflow
@@ -117,7 +117,7 @@ cargo run -- --workflow ci_test.md --replay-mode fixtures/ci_cache.json
 **Debugging:**
 ```bash
 # Reproduce exact issue
-export ANTIGRAV_LLM_SEED=42
+export AGENTIC_SDLC_LLM_SEED=42
 cargo run -- --workflow debug.md
 # Same output every time
 ```

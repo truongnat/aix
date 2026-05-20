@@ -4,7 +4,7 @@ source: https://github.com/sickn33/antigravity-awesome-skills
 category: testing
 ---
 # Workflow: antigravity-qa-browser-automation
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: antigravity
 Goal: QA and Browser Automation
 

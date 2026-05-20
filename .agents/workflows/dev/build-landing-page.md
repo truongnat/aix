@@ -4,7 +4,7 @@ source: self
 ---
 
 # Workflow: dev-build-landing-page
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: dev
 Goal: Produce a production-ready landing page plan that maximizes value communication and conversion clarity.
 

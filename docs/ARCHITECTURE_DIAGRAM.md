@@ -5,7 +5,7 @@
 ```mermaid
 graph TB
     subgraph "User Interface"
-        CLI[CLI - antigrav]
+        CLI[CLI - agentic-sdlc]
     end
     
     subgraph "Workflow Engine"
@@ -81,7 +81,7 @@ flowchart LR
     Workflow --> StateStore["Workflow State Store"]
     Context --> VectorStore["Vector/Graph Index (SQLite/Postgres)"]
     Telemetry --> TraceStore["Trace/Replay Store"]
-    OfficeState --> LocalState[".antigrav/office/state.json"]
+    OfficeState --> LocalState[".agentic-sdlc/office/state.json"]
 
     Engine --> Output["Results / Reports / Artifacts"]
     Platform --> Output

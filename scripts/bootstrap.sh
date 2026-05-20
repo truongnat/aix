@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-STRICT_OLLAMA="${ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA:-0}"
+STRICT_OLLAMA="${AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA:-${ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA:-0}}"
 
 log() {
   printf '[bootstrap] %s\n' "$*"

@@ -309,7 +309,7 @@ mod tests {
                 .join("quality")
                 .join("lint.md"),
             r#"# Skill: lint
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 ```json
 {"name":"lint","domain":"quality","executor":"shell","model":"n/a"}
 ```
@@ -342,7 +342,7 @@ model: qwen3:8b
 temperature: 0.1
 ---
 # Skill: frontmatter-skill
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 
 ## Overview
 Test body.
@@ -383,7 +383,7 @@ executor: ollama
 description: Folder skill entry
 ---
 # Skill: folder-skill
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 
 Use references docs.
 "#,

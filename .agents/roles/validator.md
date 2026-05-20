@@ -1,5 +1,5 @@
 # Role: Validator
-Schema: antigrav.role@v1
+Schema: agentic-sdlc.role@v1
 ```json
 {
   "name": "validator",

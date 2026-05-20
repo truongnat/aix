@@ -8,7 +8,7 @@
 - ✅ Created `docs/PROGRESS_SUMMARY.md` - This file
 
 ### 2. LLM Determinism (Partial)
-- ✅ Added `resolve_temperature()` function - reads from `ANTIGRAV_LLM_TEMPERATURE` env var
+- ✅ Added `resolve_temperature()` function - reads from `AGENTIC_SDLC_LLM_TEMPERATURE` env var
 - ✅ Added `generate_seed()` function - deterministic seed from trace_id + step_id
 - ✅ Added `is_deterministic_mode()` helper
 - ✅ Default temperature = 0.0 for deterministic behavior
@@ -26,18 +26,18 @@
 **Next Steps:**
 ```bash
 # Test Anthropic
-ANTIGRAV_LLM_PROVIDER=anthropic \
+AGENTIC_SDLC_LLM_PROVIDER=anthropic \
 ANTHROPIC_API_KEY=sk-... \
 cargo test llm_subagent_live_smoke_anthropic -- --nocapture
 
 # Test Azure
-ANTIGRAV_LLM_PROVIDER=azure \
+AGENTIC_SDLC_LLM_PROVIDER=azure \
 AZURE_OPENAI_KEY=... \
 AZURE_OPENAI_ENDPOINT=https://....openai.azure.com \
 cargo test
 
 # Test Bedrock
-ANTIGRAV_LLM_PROVIDER=bedrock \
+AGENTIC_SDLC_LLM_PROVIDER=bedrock \
 AWS_REGION=us-east-1 \
 cargo test
 ```
@@ -160,12 +160,12 @@ struct LlmSnapshot {
 ### Day 1-2: Test Existing Providers
 ```bash
 # 1. Test Anthropic
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 ANTHROPIC_API_KEY=sk-... \
 cargo test llm_subagent_live_smoke_anthropic -- --nocapture
 
 # 2. Test Azure (if you have access)
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 AZURE_OPENAI_KEY=... \
 AZURE_OPENAI_ENDPOINT=... \
 cargo test
@@ -224,9 +224,9 @@ let request = OpenAiChatRequest {
 ## Questions & Decisions Needed
 
 ### 1. Branding
-**Question:** Keep `antigrav` or rename to `agentic-sdlc`?
+**Question:** Keep `agentic-sdlc` or rename to `agentic-sdlc`?
 **Impact:** All documentation, CLI, crates.io
-**Recommendation:** Keep `antigrav` (shorter, catchier)
+**Recommendation:** Keep `agentic-sdlc` (shorter, catchier)
 
 ### 2. Vector Store
 **Question:** PostgreSQL+pgvector or Qdrant?

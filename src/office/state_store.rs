@@ -234,9 +234,15 @@ impl OfficeStateStore {
     /// Create a new store
     pub fn new(root: &str) -> Result<Self> {
         let root = PathBuf::from(root);
-        let office_dir = root.join(".antigrav").join("office");
-        fs::create_dir_all(&office_dir)?;
-        Ok(Self { root: office_dir })
+        let office_dir = root.join(".agentic-sdlc").join("office");
+        let legacy_office_dir = root.join(".antigrav").join("office");
+        let selected_dir = if !office_dir.exists() && legacy_office_dir.exists() {
+            legacy_office_dir
+        } else {
+            office_dir
+        };
+        fs::create_dir_all(&selected_dir)?;
+        Ok(Self { root: selected_dir })
     }
 
     /// Get the state file path

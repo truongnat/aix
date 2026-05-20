@@ -2,7 +2,7 @@
 description: ai-engineering review workflow focused on correctness, risk, and release readiness
 ---
 # Workflow: ai-engineering-review
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: ai-engineering
 MaxCpuMs: 180000
 MaxWallTimeMs: 600000

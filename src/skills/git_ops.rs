@@ -36,7 +36,7 @@ pub struct SimulationFallbackGateSkill;
 #[derive(Debug, Clone)]
 pub struct ReportQualityGateSkill;
 
-const VALIDATION_STATUS_ENV: &str = "ANTIGRAV_LAST_VALIDATION_PASSED";
+const VALIDATION_STATUS_ENV: &str = "AGENTIC_SDLC_LAST_VALIDATION_PASSED";
 
 fn run_git(args: &[&str]) -> Result<std::process::Output> {
     Ok(Command::new("git").args(args).output()?)
@@ -272,13 +272,27 @@ fn parse_report_payload(input: &SkillInput) -> Result<serde_json::Value> {
 
 fn report_quality_findings(payload: &serde_json::Value) -> Vec<String> {
     let mut findings = Vec::<String>::new();
+    
+    let min_summary_len = std::env::var("AGENTIC_SDLC_REPORT_MIN_SUMMARY_LEN")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .unwrap_or(80);
+    let min_actions = std::env::var("AGENTIC_SDLC_REPORT_MIN_ACTIONS")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .unwrap_or(2);
+    let min_risks = std::env::var("AGENTIC_SDLC_REPORT_MIN_RISKS")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .unwrap_or(1);
+
     let summary = payload
         .get("summary")
         .and_then(|v| v.as_str())
         .map(|v| v.trim())
         .unwrap_or_default();
-    if summary.len() < 80 {
-        findings.push("summary must be at least 80 characters".to_string());
+    if summary.len() < min_summary_len {
+        findings.push(format!("summary must be at least {} characters", min_summary_len));
     }
     if summary
         .to_ascii_lowercase()
@@ -292,8 +306,8 @@ fn report_quality_findings(payload: &serde_json::Value) -> Vec<String> {
         .and_then(|v| v.as_array())
         .cloned()
         .unwrap_or_default();
-    if actions.len() < 2 {
-        findings.push("actions must contain at least 2 items".to_string());
+    if actions.len() < min_actions {
+        findings.push(format!("actions must contain at least {} items", min_actions));
     }
     for (idx, action) in actions.iter().enumerate() {
         let text = action.as_str().map(|v| v.trim()).unwrap_or_default();
@@ -307,8 +321,8 @@ fn report_quality_findings(payload: &serde_json::Value) -> Vec<String> {
         .and_then(|v| v.as_array())
         .cloned()
         .unwrap_or_default();
-    if risks.is_empty() {
-        findings.push("risks must contain at least 1 item".to_string());
+    if risks.len() < min_risks {
+        findings.push(format!("risks must contain at least {} item", min_risks));
     }
 
     findings
@@ -345,7 +359,7 @@ fn protected_branch_policy_violation(
         return None;
     }
     Some(format!(
-        "merge_rules violation: target branch '{}' is protected; source branch '{}' must start with '{}' or set ANTIGRAV_ALLOW_PROTECTED_MERGE=1",
+        "merge_rules violation: target branch '{}' is protected; source branch '{}' must start with '{}' or set AGENTIC_SDLC_ALLOW_PROTECTED_MERGE=1",
         target_branch,
         source_branch,
         branch_prefix
@@ -375,7 +389,7 @@ fn enforce_merge_rules_before_merge(
             source_branch,
             protected_branches,
             prefix.trim(),
-            env_enabled("ANTIGRAV_ALLOW_PROTECTED_MERGE"),
+            env_enabled("AGENTIC_SDLC_ALLOW_PROTECTED_MERGE"),
         ) {
             return Err(anyhow!(message));
         }

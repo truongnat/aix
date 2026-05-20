@@ -28,13 +28,13 @@ Control LLM temperature (0.0 = deterministic, 2.0 = creative):
 
 ```bash
 # Default: 0.0 (deterministic)
-export ANTIGRAV_LLM_TEMPERATURE=0.0
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.0
 
 # More creative
-export ANTIGRAV_LLM_TEMPERATURE=0.7
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.7
 
 # Maximum creativity
-export ANTIGRAV_LLM_TEMPERATURE=2.0
+export AGENTIC_SDLC_LLM_TEMPERATURE=2.0
 ```
 
 ### Seed Control
@@ -46,7 +46,7 @@ For providers that support seed (OpenAI):
 # No configuration needed
 
 # Override with specific seed
-export ANTIGRAV_LLM_SEED=42
+export AGENTIC_SDLC_LLM_SEED=42
 ```
 
 ## Usage Examples
@@ -58,10 +58,10 @@ export ANTIGRAV_LLM_SEED=42
 cargo run -- --workflow feature.md
 
 # Explicitly set temperature to 0
-ANTIGRAV_LLM_TEMPERATURE=0.0 cargo run -- --workflow feature.md
+AGENTIC_SDLC_LLM_TEMPERATURE=0.0 cargo run -- --workflow feature.md
 
 # With specific seed
-ANTIGRAV_LLM_SEED=12345 cargo run -- --workflow feature.md
+AGENTIC_SDLC_LLM_SEED=12345 cargo run -- --workflow feature.md
 ```
 
 ### Check Determinism Mode
@@ -173,7 +173,7 @@ cargo run -- --workflow feature.md
 
 ```bash
 # Record baseline with replay store
-ANTIGRAV_LLM_TEMPERATURE=0.0 \
+AGENTIC_SDLC_LLM_TEMPERATURE=0.0 \
   cargo run -- --workflow test.md --save-replay baseline.json
 
 # Replay for fast, deterministic testing
@@ -186,7 +186,7 @@ cargo run -- --workflow test.md --replay-mode baseline.json
 
 ```bash
 # Use higher temperature for creativity
-ANTIGRAV_LLM_TEMPERATURE=0.7 \
+AGENTIC_SDLC_LLM_TEMPERATURE=0.7 \
   cargo run -- --workflow feature.md
 
 # Or use role-specific temperature
@@ -199,7 +199,7 @@ ANTIGRAV_LLM_TEMPERATURE=0.7 \
 
 ```bash
 # Verify temperature setting
-echo $ANTIGRAV_LLM_TEMPERATURE
+echo $AGENTIC_SDLC_LLM_TEMPERATURE
 
 # Should be 0.0 for deterministic mode
 ```
@@ -208,7 +208,7 @@ echo $ANTIGRAV_LLM_TEMPERATURE
 
 ```bash
 # OpenAI/Azure have best determinism
-export ANTIGRAV_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_PROVIDER=openai
 
 # Avoid Ollama for deterministic workflows
 # (no seed support)
@@ -233,7 +233,7 @@ cargo run -- workflow trace <instance_id> --json > trace.json
 
 ```rust
 fn resolve_temperature() -> f32 {
-    std::env::var("ANTIGRAV_LLM_TEMPERATURE")
+    std::env::var("AGENTIC_SDLC_LLM_TEMPERATURE")
         .ok()
         .and_then(|v| v.trim().parse::<f32>().ok())
         .unwrap_or(0.0)  // Default: deterministic
@@ -246,7 +246,7 @@ fn resolve_temperature() -> f32 {
 ```rust
 fn generate_seed(trace_id: &str, step_id: &str) -> Option<i64> {
     // Override via environment
-    if let Ok(seed_str) = std::env::var("ANTIGRAV_LLM_SEED") {
+    if let Ok(seed_str) = std::env::var("AGENTIC_SDLC_LLM_SEED") {
         return seed_str.parse::<i64>().ok();
     }
     

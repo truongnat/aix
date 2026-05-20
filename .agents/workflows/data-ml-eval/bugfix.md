@@ -2,7 +2,7 @@
 description: data-ml-eval bugfix workflow with root-cause and regression guard
 ---
 # Workflow: data-ml-eval-bugfix
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: data-ml-eval
 MaxCpuMs: 220000
 MaxWallTimeMs: 900000

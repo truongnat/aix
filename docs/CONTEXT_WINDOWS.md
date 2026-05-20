@@ -121,12 +121,12 @@ For OpenAI (128K limit):
 
 ```bash
 # Switch to Gemini for large context
-export ANTIGRAV_LLM_PROVIDER=gemini
-export ANTIGRAV_LLM_MODEL=gemini-1.5-flash  # 1M tokens
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-flash  # 1M tokens
 
 # Or Anthropic
-export ANTIGRAV_LLM_PROVIDER=anthropic
-export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest  # 200K tokens
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-haiku-latest  # 200K tokens
 ```
 
 ### Strategy 4: Selective Context
@@ -187,16 +187,16 @@ wc -c input.txt
 
 ```bash
 # Small context (<10K tokens)
-export ANTIGRAV_LLM_MODEL=gpt-4o-mini  # 128K
+export AGENTIC_SDLC_LLM_MODEL=gpt-4o-mini  # 128K
 
 # Medium context (10K-100K tokens)
-export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest  # 200K
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-haiku-latest  # 200K
 
 # Large context (100K-500K tokens)
-export ANTIGRAV_LLM_MODEL=gemini-1.5-flash  # 1M
+export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-flash  # 1M
 
 # Very large context (500K+ tokens)
-export ANTIGRAV_LLM_MODEL=gemini-1.5-pro  # 2M
+export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-pro  # 2M
 ```
 
 ### 3. Monitor Token Usage
@@ -233,17 +233,17 @@ Analyze this code:
 
 ```bash
 # Not yet implemented, but planned:
-export ANTIGRAV_LLM_MAX_CONTEXT_TOKENS=100000
-export ANTIGRAV_LLM_WARN_AT_PERCENT=80
-export ANTIGRAV_LLM_TRUNCATE_AT_PERCENT=90
+export AGENTIC_SDLC_LLM_MAX_CONTEXT_TOKENS=100000
+export AGENTIC_SDLC_LLM_WARN_AT_PERCENT=80
+export AGENTIC_SDLC_LLM_TRUNCATE_AT_PERCENT=90
 ```
 
 ### Enable Token Counting (Future)
 
 ```bash
 # Not yet implemented, but planned:
-export ANTIGRAV_LLM_COUNT_TOKENS=true
-export ANTIGRAV_LLM_LOG_TOKEN_USAGE=true
+export AGENTIC_SDLC_LLM_COUNT_TOKENS=true
+export AGENTIC_SDLC_LLM_LOG_TOKEN_USAGE=true
 ```
 
 ## 📊 Context Window Comparison
@@ -309,8 +309,8 @@ request failed (status=400): prompt is too long
 
 ```bash
 # Use Gemini for 500K tokens
-export ANTIGRAV_LLM_PROVIDER=gemini
-export ANTIGRAV_LLM_MODEL=gemini-1.5-flash
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-flash
 
 cargo run -- --workflow analyze_codebase.md
 ```
@@ -319,8 +319,8 @@ cargo run -- --workflow analyze_codebase.md
 
 ```bash
 # Process 100-page document (~200K tokens)
-export ANTIGRAV_LLM_PROVIDER=anthropic
-export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest
+export AGENTIC_SDLC_LLM_PROVIDER=anthropic
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-haiku-latest
 
 cargo run -- --workflow process_document.md
 ```

@@ -1,5 +1,5 @@
 # Role: resolver
-Schema: antigrav.role@v1
+Schema: agentic-sdlc.role@v1
 ```json
 {"name":"resolver","provider":"ollama","model":"qwen3:8b","temperature":0}
 ```

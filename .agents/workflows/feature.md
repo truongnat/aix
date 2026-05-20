@@ -2,7 +2,7 @@
 description: feature advanced workflow with deterministic gates and report quality guard
 ---
 # Workflow: feature
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: agent
 MaxCpuMs: 240000
 MaxWallTimeMs: 900000

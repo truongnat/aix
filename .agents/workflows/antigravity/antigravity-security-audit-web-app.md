@@ -4,7 +4,7 @@ source: https://github.com/sickn33/antigravity-awesome-skills
 category: security
 ---
 # Workflow: antigravity-security-audit-web-app
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: antigravity
 Goal: Security Audit for a Web App
 

@@ -2,7 +2,7 @@
 description: climate-tech release workflow with quality signal and risk approval
 ---
 # Workflow: climate-tech-release
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: climate-tech
 MaxCpuMs: 220000
 MaxWallTimeMs: 900000

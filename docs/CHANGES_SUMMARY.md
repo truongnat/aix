@@ -58,7 +58,7 @@ Implemented initial gap fixes for `agentic-sdlc` based on comprehensive gap anal
 **Function:** `resolve_temperature()`
 ```rust
 fn resolve_temperature() -> f32 {
-    std::env::var("ANTIGRAV_LLM_TEMPERATURE")
+    std::env::var("AGENTIC_SDLC_LLM_TEMPERATURE")
         .ok()
         .and_then(|v| v.trim().parse::<f32>().ok())
         .unwrap_or(0.0)  // Default: deterministic
@@ -68,7 +68,7 @@ fn resolve_temperature() -> f32 {
 
 **Impact:**
 - Default temperature = 0.0 (deterministic)
-- Configurable via `ANTIGRAV_LLM_TEMPERATURE` env var
+- Configurable via `AGENTIC_SDLC_LLM_TEMPERATURE` env var
 - Clamped to valid range [0.0, 2.0]
 
 #### Added Seed Generation
@@ -78,7 +78,7 @@ fn resolve_temperature() -> f32 {
 ```rust
 fn generate_seed(trace_id: &str, step_id: &str) -> Option<i64> {
     // Override via environment
-    if let Ok(seed_str) = std::env::var("ANTIGRAV_LLM_SEED") {
+    if let Ok(seed_str) = std::env::var("AGENTIC_SDLC_LLM_SEED") {
         return seed_str.parse::<i64>().ok();
     }
     
@@ -91,7 +91,7 @@ fn generate_seed(trace_id: &str, step_id: &str) -> Option<i64> {
 
 **Impact:**
 - Deterministic seed from trace_id + step_id
-- Override via `ANTIGRAV_LLM_SEED` env var
+- Override via `AGENTIC_SDLC_LLM_SEED` env var
 - Enables reproducible LLM outputs (OpenAI/Azure)
 
 #### Added Determinism Check
@@ -170,10 +170,10 @@ struct OpenAiChatRequest {
 cargo run -- --workflow feature.md
 
 # Override temperature
-ANTIGRAV_LLM_TEMPERATURE=0.7 cargo run -- --workflow feature.md
+AGENTIC_SDLC_LLM_TEMPERATURE=0.7 cargo run -- --workflow feature.md
 
 # Use specific seed (OpenAI/Azure only)
-ANTIGRAV_LLM_SEED=42 cargo run -- --workflow feature.md
+AGENTIC_SDLC_LLM_SEED=42 cargo run -- --workflow feature.md
 ```
 
 **Impact:**
@@ -254,18 +254,18 @@ ANTIGRAV_LLM_SEED=42 cargo run -- --workflow feature.md
 1. **Test Existing Providers**
    ```bash
    # Test Anthropic
-   ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+   AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
    ANTHROPIC_API_KEY=sk-... \
    cargo test llm_subagent_live_smoke_anthropic
    
    # Test Azure
-   ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+   AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
    AZURE_OPENAI_KEY=... \
    AZURE_OPENAI_ENDPOINT=... \
    cargo test
    
    # Test Bedrock
-   ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+   AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
    AWS_REGION=us-east-1 \
    cargo test
    ```

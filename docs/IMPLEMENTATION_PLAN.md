@@ -14,10 +14,10 @@ Kế hoạch implementation chi tiết cho việc fix các gaps của `agentic-s
 **Action:**
 ```bash
 # Test Anthropic
-ANTIGRAV_LLM_PROVIDER=anthropic ANTHROPIC_API_KEY=... cargo test
+AGENTIC_SDLC_LLM_PROVIDER=anthropic ANTHROPIC_API_KEY=... cargo test
 
 # Test Azure
-ANTIGRAV_LLM_PROVIDER=azure AZURE_OPENAI_KEY=... cargo test
+AGENTIC_SDLC_LLM_PROVIDER=azure AZURE_OPENAI_KEY=... cargo test
 ```
 
 ### 2. Add Temperature & Seed Enforcement
@@ -27,8 +27,8 @@ ANTIGRAV_LLM_PROVIDER=azure AZURE_OPENAI_KEY=... cargo test
 **Changes needed:**
 - Add `temperature` and `seed` fields to all LLM request structs
 - Default `temperature=0` for deterministic mode
-- Add env var: `ANTIGRAV_LLM_TEMPERATURE` (default: 0)
-- Add env var: `ANTIGRAV_LLM_SEED` (default: hash of trace_id)
+- Add env var: `AGENTIC_SDLC_LLM_TEMPERATURE` (default: 0)
+- Add env var: `AGENTIC_SDLC_LLM_SEED` (default: hash of trace_id)
 
 ### 3. Improve Documentation Structure
 **Effort:** 2-3 hours

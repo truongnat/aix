@@ -2,7 +2,7 @@
 description: healthtech review workflow focused on correctness, risk, and release readiness
 ---
 # Workflow: healthtech-review
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: healthtech
 MaxCpuMs: 180000
 MaxWallTimeMs: 600000

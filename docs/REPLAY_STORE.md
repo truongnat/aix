@@ -166,13 +166,13 @@ For maximum reproducibility:
 
 ```bash
 # Record with deterministic settings
-ANTIGRAV_LLM_TEMPERATURE=0.0 \
-ANTIGRAV_LLM_SEED=42 \
+AGENTIC_SDLC_LLM_TEMPERATURE=0.0 \
+AGENTIC_SDLC_LLM_SEED=42 \
 cargo run -- --workflow feature.md --save-replay cache.json
 
 # Replay with same settings
-ANTIGRAV_LLM_TEMPERATURE=0.0 \
-ANTIGRAV_LLM_SEED=42 \
+AGENTIC_SDLC_LLM_TEMPERATURE=0.0 \
+AGENTIC_SDLC_LLM_SEED=42 \
 cargo run -- --workflow feature.md --replay-mode cache.json
 ```
 

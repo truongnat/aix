@@ -1,13 +1,39 @@
 # agentic-sdlc
 
 [![CI](https://github.com/truongnat/agentic-sdlc/actions/workflows/ci.yml/badge.svg)](https://github.com/truongnat/agentic-sdlc/actions/workflows/ci.yml)
-[![Harness](https://img.shields.io/badge/Harness-Production%20Ready-2ea44f)](https://github.com/truongnat/agentic-sdlc)
 
-> **Deterministic agentic SDLC harness — from spec to production with 95% autonomy.**
+Practical daily developer assistant for bug/ticket analysis, with a deterministic workflow harness underneath.
 
-## What is this?
+## Fastest useful path
 
-A **production-grade harness** for agentic software development. It orchestrates the full lifecycle: context retrieval, constraint enforcement, verification loops, and GitHub/CI automation.
+If you want the most immediately useful command in this repo, start here:
+
+```bash
+cargo run -- bug analyze examples/bug-sample.md
+cargo run -- bug plan examples/bug-sample.md
+cargo run -- bug reply examples/bug-sample.md
+cargo run -- bug prompt examples/bug-sample.md
+```
+
+These commands read a plain text or markdown ticket and generate deterministic bug analysis output without requiring network access. The sample file is at [examples/bug-sample.md](examples/bug-sample.md).
+
+## What this repo actually does
+
+This project now has two practical layers:
+
+- a daily `bug` assistant for ticket/log analysis and prompt generation
+- a workflow runtime plus a package format under `.agents/` for:
+
+  - planning and review workflows
+  - artifact-producing workflows that write files and run validation commands
+  - package validation, policy enforcement, state persistence, and CI gates
+
+The important distinction is:
+
+- some workflows only analyze/report
+- some workflows create real artifacts
+
+If you are new here, start with the `bug` commands above or with a workflow that creates files, not an eval or PR flow.
 
 | Phase | Feature | Status |
 |-------|---------|--------|
@@ -16,39 +42,84 @@ A **production-grade harness** for agentic software development. It orchestrates
 | P3 | **Verification** — eval loops, auto-retry, 95% pass | Ready |
 | P4 | **Orchestration** — PR/CI/merge, human-in-loop | Ready |
 
-## Quick Start
+## Practical Start
 
 ```bash
 # 1. Clone & build
 git clone https://github.com/truongnat/agentic-sdlc
 cd agentic-sdlc
-cargo build --release
+cargo build
 
-# 2. Verify harness
-cargo run -- workflow eval-loop --min-pass 0.9 --max-iterations 3
+# 2. Run the practical bug assistant
+cargo run -- bug analyze examples/bug-sample.md
 
-# 3. Run full SDLC cycle
-cargo run -- workflow git-pr-flow --validate "cargo test" --no-merge
+# 3. List available workflows
+cargo run -- workflow list
+
+# 4. Run a starter workflow that creates a real artifact
+cargo run -- --workflow-id starter/app-builder --task "create a todo list app"
 ```
 
-## Commands
+That starter workflow uses a skill in `.agents` to generate an artifact blueprint, applies the files under `local_tmp/generated-app`, and runs a real validation command.
+
+## Bug commands
 
 ```bash
-# Evaluation
-$ cargo run -- workflow eval-loop              # auto-retry until 90% pass
-$ cargo run -- workflow eval dataset.json      # single eval run
+cargo run -- bug analyze <input-file>
+cargo run -- bug plan <input-file>
+cargo run -- bug reply <input-file>
+cargo run -- bug prompt <input-file>
+```
 
-# Constraints
-$ cargo run -- workflow constraints-check      # lint + arch + security
-$ cargo run -- workflow lint-gate              # clippy + fmt
+Expected use cases:
 
-# Orchestration
-$ cargo run -- workflow git-pr-flow            # branch -> validate -> PR -> merge
-$ cargo run -- workflow status                 # show active workflows
+- mixed Japanese/Vietnamese ticket text
+- logs, stack traces, API errors
+- expected/current behavior notes
+- prompt generation for a coding agent
 
-# Catalog
-$ cargo run -- workflow build-catalog          # index skills/workflows
-$ cargo run -- workflow bundles                # list shareable bundles
+## Then what?
+
+After you have seen one artifact-producing workflow succeed:
+
+```bash
+# Validate the package and workflow definitions
+cargo run -- workflow check
+
+# Inspect persisted workflow instances
+cargo run -- workflow status
+
+# Explore advanced SDLC flows
+cargo run -- workflow roles
+cargo run -- workflow templates
+```
+
+## Workflow types
+
+- `starter/*`: first-run workflows that create something concrete
+- `feature`, `bugfix`, `review`, `release`: standard harness workflows
+- `dev/*`, domain packs, and vertical packs: advanced or specialized examples
+
+Not every workflow builds software. If a workflow does not contain explicit mutation steps such as `agent.write_file` or `agent.run_script`, treat it as planning/review rather than artifact generation.
+
+## Common commands
+
+```bash
+# Starter artifact-producing paths
+$ cargo run -- --workflow-id starter/app-builder --task "create a todo list app"
+$ cargo run -- --workflow-id starter/todo-cli-node
+
+# Package validation
+$ cargo run -- workflow check
+$ cargo run -- workflow quality-skills --strict
+
+# Workflow inspection
+$ cargo run -- workflow list
+$ cargo run -- workflow status
+
+# Advanced SDLC operations
+$ cargo run -- workflow eval-loop
+$ cargo run -- workflow git-pr-flow --validate "cargo test" --no-merge
 ```
 
 ## Architecture
@@ -72,27 +143,9 @@ export GIT_REPO=agentic-sdlc
 
 MIT — see [LICENSE](LICENSE)
 
-## ✨ Production Ready (March 2026)
+## Notes on realism
 
-**Status:** ✅ All critical gaps addressed! Ready for production deployment.
-
-**What's Complete:**
-- ✅ **Perfect Determinism** - Replay store for LLM responses (10x faster, $0 cost)
-- ✅ **Process Isolation** - Sandbox for untrusted skills with resource monitoring
-- ✅ **6 LLM Providers** - OpenAI, Gemini, Anthropic, Azure, Bedrock, Ollama (fully documented)
-- ✅ **Git Integration** - Complete design for automated workflows (ready to implement in 24h)
-
-**Quality Metrics:**
-- 183 tests passing (100% pass rate)
-- 13,200+ lines of comprehensive documentation
-- Production-ready security and reliability features
-
-**Gap Analysis:** 8/12 gaps addressed (67%) - All critical gaps complete!
-- 🔴 Critical: 2/2 (100%) ✅
-- 🟠 High Priority: 3/5 (60%) ✅
-- 🟡 Medium Priority: 2/5 (40%) ✅
-
-See [docs/GAP_QUICK_REFERENCE.md](docs/GAP_QUICK_REFERENCE.md) for detailed comparison or [FINAL_SUMMARY.md](FINAL_SUMMARY.md) for complete details.
+This repository contains both practical runtime pieces and a large amount of strategy, platform, and roadmap material. The fastest way to evaluate the harness is to run a starter workflow, inspect the generated files, and then decide whether the higher-level SDLC flows match your needs.
 
 ---
 
@@ -124,10 +177,10 @@ Control LLM temperature for deterministic behavior:
 cargo run -- --workflow feature.md
 
 # Override temperature
-ANTIGRAV_LLM_TEMPERATURE=0.7 cargo run -- --workflow feature.md
+AGENTIC_SDLC_LLM_TEMPERATURE=0.7 cargo run -- --workflow feature.md
 
 # Use specific seed (OpenAI/Azure only)
-ANTIGRAV_LLM_SEED=42 cargo run -- --workflow feature.md
+AGENTIC_SDLC_LLM_SEED=42 cargo run -- --workflow feature.md
 ```
 
 ### Replay Store (Week 2 Feature)
@@ -156,11 +209,11 @@ Support for 6 LLM providers with automatic fallback:
 
 ```bash
 # Choose your provider
-export ANTIGRAV_LLM_PROVIDER=openai    # or ollama, gemini, anthropic, azure, bedrock
+export AGENTIC_SDLC_LLM_PROVIDER=openai    # or ollama, gemini, anthropic, azure, bedrock
 export OPENAI_API_KEY=sk-proj-...
 
 # Optional: Configure fallback
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
 
 # Run workflow
 cargo run -- --workflow feature.md
@@ -183,20 +236,20 @@ See [LLM Providers Guide](docs/LLM_PROVIDERS.md) for complete documentation.
 
 **Development (Free):**
 ```bash
-export ANTIGRAV_LLM_PROVIDER=ollama
+export AGENTIC_SDLC_LLM_PROVIDER=ollama
 cargo run -- --workflow feature.md
 ```
 
 **Production (Reliable):**
 ```bash
-export ANTIGRAV_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_PROVIDER=openai
 export OPENAI_API_KEY=sk-proj-...
 cargo run -- --workflow feature.md
 ```
 
 **Cost-Optimized:**
 ```bash
-export ANTIGRAV_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
 export GEMINI_API_KEY=AIza...
 cargo run -- --workflow feature.md
 ```
@@ -288,8 +341,8 @@ Run deterministic CI gate locally:
 Optional live provider smoke tests (OpenAI/Gemini):
 
 ```bash
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 OPENAI_API_KEY=... cargo test llm_subagent_live_smoke_openai -- --nocapture
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 GEMINI_API_KEY=... cargo test llm_subagent_live_smoke_gemini -- --nocapture
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 OPENAI_API_KEY=... cargo test llm_subagent_live_smoke_openai -- --nocapture
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 GEMINI_API_KEY=... cargo test llm_subagent_live_smoke_gemini -- --nocapture
 ```
 
 Inspect active/previous runs:
@@ -519,13 +572,13 @@ cargo run -- workflow trace <instance_id> --otel
 Common environment variables:
 
 ```bash
-ANTIGRAV_LLM_PROVIDER=ollama|openai|gemini|anthropic
-ANTIGRAV_LLM_MODEL=<primary model>
-ANTIGRAV_LLM_FALLBACK=openai,gemini,anthropic
-ANTIGRAV_LLM_FALLBACK_POLICY=transient_only|always|never
-ANTIGRAV_LLM_TIMEOUT_MS=30000
-ANTIGRAV_LLM_MAX_RETRIES=2
-ANTIGRAV_LLM_SIMULATION_FALLBACK=true
+AGENTIC_SDLC_LLM_PROVIDER=ollama|openai|gemini|anthropic
+AGENTIC_SDLC_LLM_MODEL=<primary model>
+AGENTIC_SDLC_LLM_FALLBACK=openai,gemini,anthropic
+AGENTIC_SDLC_LLM_FALLBACK_POLICY=transient_only|always|never
+AGENTIC_SDLC_LLM_TIMEOUT_MS=30000
+AGENTIC_SDLC_LLM_MAX_RETRIES=2
+AGENTIC_SDLC_LLM_SIMULATION_FALLBACK=true
 OPENAI_API_KEY=...
 GEMINI_API_KEY=...
 ANTHROPIC_API_KEY=...
@@ -534,17 +587,17 @@ ANTHROPIC_API_KEY=...
 Context retrieval service (for deterministic LLM context injection):
 
 ```bash
-ANTIGRAV_CONTEXT_RETRIEVAL_MODE=vector|graph|hybrid|off
-ANTIGRAV_CONTEXT_BACKEND=json|sqlite
-ANTIGRAV_CONTEXT_INDEX_PATH=.agents/memory/vector_index.json
-ANTIGRAV_CONTEXT_MIN_SCORE=0.1
-ANTIGRAV_CONTEXT_GRAPH_INDEX_PATH=.agents/memory/graph_index.json
-ANTIGRAV_CONTEXT_GRAPH_MIN_SCORE=0.05
-ANTIGRAV_CONTEXT_DB_PATH=.agents/memory/context.db
-ANTIGRAV_CONTEXT_VECTOR_TABLE=vector_entries
-ANTIGRAV_CONTEXT_GRAPH_TABLE=graph_nodes
-ANTIGRAV_CONTEXT_MAX_ITEMS=5
-ANTIGRAV_CONTEXT_MAX_CHARS=300
+AGENTIC_SDLC_CONTEXT_RETRIEVAL_MODE=vector|graph|hybrid|off
+AGENTIC_SDLC_CONTEXT_BACKEND=json|sqlite
+AGENTIC_SDLC_CONTEXT_INDEX_PATH=.agents/memory/vector_index.json
+AGENTIC_SDLC_CONTEXT_MIN_SCORE=0.1
+AGENTIC_SDLC_CONTEXT_GRAPH_INDEX_PATH=.agents/memory/graph_index.json
+AGENTIC_SDLC_CONTEXT_GRAPH_MIN_SCORE=0.05
+AGENTIC_SDLC_CONTEXT_DB_PATH=.agents/memory/context.db
+AGENTIC_SDLC_CONTEXT_VECTOR_TABLE=vector_entries
+AGENTIC_SDLC_CONTEXT_GRAPH_TABLE=graph_nodes
+AGENTIC_SDLC_CONTEXT_MAX_ITEMS=5
+AGENTIC_SDLC_CONTEXT_MAX_CHARS=300
 ```
 
 ## Generated Artifacts
@@ -583,7 +636,7 @@ Folder-skill layout is supported:
 
 ```bash
 cargo install --path .
-antigrav workflow doctor
+agentic-sdlc workflow doctor
 ```
 
 ## Documentation

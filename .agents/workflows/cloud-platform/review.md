@@ -2,7 +2,7 @@
 description: cloud-platform review workflow focused on correctness, risk, and release readiness
 ---
 # Workflow: cloud-platform-review
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: cloud-platform
 MaxCpuMs: 180000
 MaxWallTimeMs: 600000

@@ -19,7 +19,10 @@ use crate::engine::workflow_engine::{
 };
 use crate::skill::capability::{CapabilityPermissions, TrustTier};
 use crate::skills::defuddle::DefuddleSkill;
-use crate::skills::dev_workflow::{EnsureBranchSkill, RunScriptSkill, WriteFileSkill};
+use crate::skills::dev_workflow::{
+    ArtifactBlueprintGateSkill, ArtifactBuilderSkill, EnsureBranchSkill,
+    ExtractValidationCommandSkill, RunScriptSkill, WriteFileSkill, WriteFilesFromJsonSkill,
+};
 use crate::skills::echo::EchoSkill;
 use crate::skills::flaky::FlakySkill;
 use crate::skills::git_ops::{
@@ -41,7 +44,7 @@ use serde::{Deserialize, Serialize};
 use types::*;
 
 #[derive(Parser)]
-#[command(name = "antigrav")]
+#[command(name = "agentic-sdlc")]
 #[command(about = "AI Workflow Engine for Solo Developers")]
 pub struct Cli {
     #[command(subcommand)]
@@ -193,9 +196,10 @@ use policy::{
 use runtime::{
     apply_role_overrides, build_domain_registry, build_thread_flow_workflow,
     default_role_for_template_or_workflow, ensure_thread_execution_context,
-    infer_workflow_ref_from_template, inject_template_prompt, instance_summary,
-    load_template_prompt, parse_role_override_map, resolve_role_workflow_selection,
-    resolve_template_workflow_selection, resolve_thread_branch_name, resolve_workflow_selection,
+    infer_workflow_ref_from_template, inject_task_only, inject_template_prompt,
+    instance_summary, load_template_prompt, parse_role_override_map,
+    resolve_role_workflow_selection, resolve_template_workflow_selection,
+    resolve_thread_branch_name, resolve_workflow_selection,
     select_template_and_workflow_for_message, validate_git_ref_like,
 };
 use scaffold::{
@@ -354,7 +358,7 @@ fn resolve_bootstrap_strict_ollama(flag: bool) -> bool {
     if flag {
         return true;
     }
-    let Ok(raw) = std::env::var("ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA") else {
+    let Ok(raw) = std::env::var("AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA") else {
         return false;
     };
     matches!(
@@ -811,6 +815,8 @@ mod policy;
 mod runtime;
 mod scaffold;
 mod skillpack;
+mod agent_export;
+mod mcp_server;
 mod types;
 mod workflow_control;
 

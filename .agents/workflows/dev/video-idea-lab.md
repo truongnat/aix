@@ -4,7 +4,7 @@ source: self
 ---
 
 # Workflow: dev-video-idea-lab
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: dev
 Goal: Produce a practical backlog of creator-grade video ideas that prove project value with real CLI/runtime evidence.
 

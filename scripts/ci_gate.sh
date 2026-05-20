@@ -14,7 +14,7 @@ fail() {
 }
 
 log "Running bootstrap checks (non-strict Ollama mode)..."
-ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA=0 ./scripts/bootstrap.sh
+AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA=0 ./scripts/bootstrap.sh
 
 log "Checking formatting..."
 cargo fmt --all --check

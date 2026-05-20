@@ -6,7 +6,7 @@ Common issues and solutions for LLM providers in `agentic-sdlc`.
 
 ```bash
 # Check provider configuration
-echo $ANTIGRAV_LLM_PROVIDER
+echo $AGENTIC_SDLC_LLM_PROVIDER
 
 # Check API keys
 echo $OPENAI_API_KEY | head -c 10
@@ -80,13 +80,13 @@ request failed (status=429): Rate limit exceeded
 
 **Solution 1: Enable Fallback**
 ```bash
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
-export ANTIGRAV_LLM_FALLBACK_POLICY=transient_only
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK_POLICY=transient_only
 ```
 
 **Solution 2: Increase Retries**
 ```bash
-export ANTIGRAV_LLM_MAX_RETRIES=3
+export AGENTIC_SDLC_LLM_MAX_RETRIES=3
 ```
 
 **Solution 3: Use Replay Store**
@@ -109,19 +109,19 @@ provider timeout after 120000ms
 
 **Solution 1: Increase Timeout**
 ```bash
-export ANTIGRAV_LLM_TIMEOUT_MS=180000  # 3 minutes
+export AGENTIC_SDLC_LLM_TIMEOUT_MS=180000  # 3 minutes
 ```
 
 **Solution 2: Use Faster Model**
 ```bash
 # OpenAI
-export ANTIGRAV_LLM_MODEL=gpt-4o-mini
+export AGENTIC_SDLC_LLM_MODEL=gpt-4o-mini
 
 # Anthropic
-export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-haiku-latest
 
 # Gemini
-export ANTIGRAV_LLM_MODEL=gemini-1.5-flash
+export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-flash
 ```
 
 **Solution 3: Reduce Prompt Size**
@@ -157,8 +157,8 @@ request failed: context length exceeded
 **Solution 3: Use Larger Context Model**
 ```bash
 # Switch to Gemini for large context
-export ANTIGRAV_LLM_PROVIDER=gemini
-export ANTIGRAV_LLM_MODEL=gemini-1.5-flash  # 1M tokens
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-flash  # 1M tokens
 ```
 
 ---
@@ -190,7 +190,7 @@ ollama pull qwen3:8b
 # Google: https://status.cloud.google.com/
 
 # Try fallback provider
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
 ```
 
 ---
@@ -206,9 +206,9 @@ model 'claude-4' not found
 **Solution:**
 ```bash
 # Use correct model name
-export ANTIGRAV_LLM_MODEL=gpt-4o-mini  # OpenAI
-export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest  # Anthropic
-export ANTIGRAV_LLM_MODEL=gemini-1.5-flash  # Gemini
+export AGENTIC_SDLC_LLM_MODEL=gpt-4o-mini  # OpenAI
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-haiku-latest  # Anthropic
+export AGENTIC_SDLC_LLM_MODEL=gemini-1.5-flash  # Gemini
 
 # List available models
 # OpenAI: https://platform.openai.com/docs/models
@@ -234,7 +234,7 @@ request failed (status=429): Quota exceeded
 # Gemini: Free tier available
 
 # Or use free provider
-export ANTIGRAV_LLM_PROVIDER=ollama
+export AGENTIC_SDLC_LLM_PROVIDER=ollama
 ```
 
 ---
@@ -256,7 +256,7 @@ ping google.com
 curl https://api.openai.com/v1/models
 
 # Use local provider
-export ANTIGRAV_LLM_PROVIDER=ollama
+export AGENTIC_SDLC_LLM_PROVIDER=ollama
 ```
 
 ---
@@ -268,16 +268,16 @@ export ANTIGRAV_LLM_PROVIDER=ollama
 **Solution 1: Use Faster Provider**
 ```bash
 # Fastest: Ollama (local)
-export ANTIGRAV_LLM_PROVIDER=ollama
+export AGENTIC_SDLC_LLM_PROVIDER=ollama
 
 # Fast cloud: OpenAI
-export ANTIGRAV_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_PROVIDER=openai
 ```
 
 **Solution 2: Use Smaller Model**
 ```bash
-export ANTIGRAV_LLM_MODEL=gpt-4o-mini  # vs gpt-4o
-export ANTIGRAV_LLM_MODEL=claude-3-5-haiku-latest  # vs sonnet
+export AGENTIC_SDLC_LLM_MODEL=gpt-4o-mini  # vs gpt-4o
+export AGENTIC_SDLC_LLM_MODEL=claude-3-5-haiku-latest  # vs sonnet
 ```
 
 **Solution 3: Use Replay Store**
@@ -402,8 +402,8 @@ uname -a
 cargo --version
 
 # Provider config
-echo $ANTIGRAV_LLM_PROVIDER
-echo $ANTIGRAV_LLM_MODEL
+echo $AGENTIC_SDLC_LLM_PROVIDER
+echo $AGENTIC_SDLC_LLM_MODEL
 
 # Error output
 cargo run -- --workflow feature.md 2>&1 | tee error.log

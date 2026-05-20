@@ -1,5 +1,5 @@
 # Skill: skypilot-multi-cloud-orchestration
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 
 ```json
 {

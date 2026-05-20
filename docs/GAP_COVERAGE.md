@@ -370,7 +370,7 @@ pub struct AutoMerge {
 **Original Gap:**
 > - v1.0.1 nhưng early stage
 > - Không có binary distribution
-> - Branding inconsistency (antigrav vs agentic-sdlc)
+> - Branding inconsistency (agentic-sdlc vs agentic-sdlc)
 
 **What We Did:**
 - ✅ Documented in roadmap (Week 20)

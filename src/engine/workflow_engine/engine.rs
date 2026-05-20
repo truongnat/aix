@@ -295,7 +295,41 @@ impl ExecutionEngine {
                                 self.state_store.save(&mut instance)?;
                                 return Ok(instance);
                             }
-                            _ => {}
+                            StepExecutionStatus::Failed => {
+                                instance
+                                    .step_results
+                                    .insert(step.id.clone(), outcome.output);
+                                failed.insert(step.id.clone());
+                                instance.mark_failed_step(&step.id);
+                                instance.last_error = Some(format!(
+                                    "Step '{}' returned failed status",
+                                    step.id
+                                ));
+                                instance.record_trace(format!(
+                                    "[{}] step '{}' {:?} context_items={} cost_units={} cost_usd={:.6} tokens={} provider={} model={}",
+                                    now_ms(),
+                                    step.id,
+                                    step_status,
+                                    outcome.context_injected_items,
+                                    outcome.estimated_cost_units,
+                                    outcome.actual_cost_usd,
+                                    outcome.total_tokens,
+                                    outcome.provider.as_deref().unwrap_or("-"),
+                                    outcome.model.as_deref().unwrap_or("-")
+                                ));
+                                self.state_store.save(&mut instance)?;
+
+                                if step.on_failure == FailureStrategy::FailFast {
+                                    instance.status = WorkflowInstanceStatus::Failed;
+                                    self.state_store.save(&mut instance)?;
+                                    return Err(anyhow!(
+                                        "Step '{}' returned failed status under fail-fast strategy",
+                                        step.id
+                                    ));
+                                }
+                            }
+                            StepExecutionStatus::Running => {}
+                            StepExecutionStatus::Pending => {}
                         }
                         self.state_store.save(&mut instance)?;
                     }
@@ -455,6 +489,8 @@ mod tests {
         calls: Arc<AtomicUsize>,
     }
 
+    struct ContractFailSkill;
+
     #[async_trait]
     impl Skill for RetryOnceSkill {
         fn name(&self) -> &str {
@@ -483,6 +519,33 @@ mod tests {
                 return Err(anyhow!("forced failure on first attempt"));
             }
             Ok(SkillOutput::text("ok"))
+        }
+    }
+
+    #[async_trait]
+    impl Skill for ContractFailSkill {
+        fn name(&self) -> &str {
+            "contract_fail"
+        }
+
+        fn capability(&self) -> SkillCapability {
+            SkillCapability::new(
+                self.name(),
+                "returns a boolean false output so the engine must treat it as a failed step",
+                SkillIOType::Text,
+                SkillIOType::Boolean,
+                CapabilityPermissions::new(false, false, false, false, false),
+                SideEffectClass::Pure,
+            )
+            .with_trust_tier(TrustTier::Trusted)
+        }
+
+        async fn execute(
+            &self,
+            _input: SkillInput,
+            _ctx: &mut ExecutionContext,
+        ) -> Result<SkillOutput> {
+            Ok(SkillOutput::boolean(false))
         }
     }
 
@@ -765,13 +828,78 @@ Input: {output_input}
     }
 
     #[tokio::test]
+    async fn failed_output_status_marks_step_failed_without_spin_loop() {
+        let root = temp_root("agentic-sdlc-v2-failed-output");
+        let mut registry = DomainRegistry::new();
+        registry.register_domain("demo");
+        registry
+            .register_skill("demo", Arc::new(ContractFailSkill))
+            .expect("register contract_fail");
+
+        let engine =
+            ExecutionEngine::new(root.to_str().expect("path"), Arc::new(registry)).expect("engine");
+        let workflow = Workflow {
+            meta: WorkflowMeta {
+                name: "failed-output".to_string(),
+                domain: Some("demo".to_string()),
+                goal: None,
+                target_type: None,
+                routing_policy: Some(RoutingPolicy::for_single_domain("demo")),
+                security_policy: Some(DomainSecurityPolicy::default()),
+                resource_budget: None,
+                projected_cost: None,
+                projected_latency_ms: None,
+                projected_steps: None,
+            },
+            steps: vec![WorkflowStep {
+                id: "gate".to_string(),
+                skill: "demo.contract_fail".to_string(),
+                input: "x".to_string(),
+                depends_on: Vec::new(),
+                condition: None,
+                retry: Some(0),
+                on_failure: FailureStrategy::FailFast,
+            }],
+        };
+
+        let err = engine
+            .run_new_workflow(
+                &workflow,
+                Some(root.join("failed-output.md").to_string_lossy().to_string()),
+                ExecutionBudget::default(),
+                RoutingPolicy::for_single_domain("demo"),
+                DomainSecurityPolicy::default(),
+            )
+            .await
+            .expect_err("workflow should fail");
+        assert!(err
+            .to_string()
+            .contains("returned failed status under fail-fast strategy"));
+
+        let instances = engine.state_store().list_instances().expect("instances");
+        let instance = instances
+            .iter()
+            .find(|instance| instance.workflow_name == "failed-output")
+            .expect("failed-output instance");
+        assert_eq!(instance.status, WorkflowInstanceStatus::Failed);
+        assert_eq!(instance.failed_steps, vec!["gate".to_string()]);
+
+        let state = instance.step_states.get("gate").expect("gate state");
+        assert_eq!(state.status, StepExecutionStatus::Failed);
+        assert_eq!(state.attempts, 1);
+        assert_eq!(state.retry_count, 0);
+
+        let _ = std::fs::remove_dir_all(root);
+    }
+
+    #[tokio::test]
     async fn manual_approval_pauses_and_resume_completes_after_approval() {
         let root = temp_root("agentic-sdlc-v2-manual-approval");
         let workflow_path = root.join("manual-approval.md");
         std::fs::write(
             &workflow_path,
             r#"# Workflow: manual-approval
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: agent
 
 ## Step: prep
@@ -894,7 +1022,7 @@ Input: done
         let workflow_path = workflows_dir.join("existing.md");
         std::fs::write(
             &workflow_path,
-            "# Workflow: existing\nSchema: antigrav.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: demo.echo\nInput: ok\n",
+            "# Workflow: existing\nSchema: agentic-sdlc.workflow@v1\nDomain: demo\n\n## Step: s1\nSkill: demo.echo\nInput: ok\n",
         )
         .expect("write workflow");
 

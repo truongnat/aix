@@ -16,7 +16,7 @@ Complete guide to using OpenAI GPT models with `agentic-sdlc`.
 export OPENAI_API_KEY=sk-proj-...
 
 # 2. Configure provider
-export ANTIGRAV_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_PROVIDER=openai
 
 # 3. Run workflow
 cargo run -- --workflow feature.md
@@ -31,10 +31,10 @@ cargo run -- --workflow feature.md
 export OPENAI_API_KEY=sk-proj-...
 
 # Provider selection
-export ANTIGRAV_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_PROVIDER=openai
 
 # Optional: Model override
-export ANTIGRAV_LLM_MODEL=gpt-4o-mini
+export AGENTIC_SDLC_LLM_MODEL=gpt-4o-mini
 ```
 
 ### Available Models
@@ -50,8 +50,8 @@ export ANTIGRAV_LLM_MODEL=gpt-4o-mini
 OpenAI supports seed for perfect determinism:
 
 ```bash
-export ANTIGRAV_LLM_TEMPERATURE=0.0
-export ANTIGRAV_LLM_SEED=42
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.0
+export AGENTIC_SDLC_LLM_SEED=42
 ```
 
 ## 💰 Pricing
@@ -73,15 +73,15 @@ export ANTIGRAV_LLM_SEED=42
 **Example:**
 ```bash
 export OPENAI_API_KEY=sk-proj-...
-export ANTIGRAV_LLM_PROVIDER=openai
-export ANTIGRAV_LLM_TEMPERATURE=0.0
+export AGENTIC_SDLC_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.0
 cargo run -- --workflow feature.md
 ```
 
 ## 🧪 Testing
 
 ```bash
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 OPENAI_API_KEY=sk-proj-... \
 cargo test llm_subagent_live_smoke_openai -- --nocapture
 ```
@@ -95,12 +95,12 @@ export OPENAI_API_KEY=sk-proj-...
 
 ### Rate Limit (429)
 ```bash
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
 ```
 
 ### Timeout
 ```bash
-export ANTIGRAV_LLM_TIMEOUT_MS=180000
+export AGENTIC_SDLC_LLM_TIMEOUT_MS=180000
 ```
 
 ## 📚 Resources

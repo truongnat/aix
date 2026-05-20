@@ -299,7 +299,7 @@ fn bootstrap_workflow_files() -> [(&'static str, &'static str); 5] {
 description: starter workflow
 ---
 # Workflow: starter
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: demo
 
 ## Step: hello
@@ -313,7 +313,7 @@ Input: starter workflow ready
 description: feature delivery workflow with deterministic planning and report quality gates
 ---
 # Workflow: feature
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: agent
 MaxCpuMs: 240000
 MaxWallTimeMs: 900000
@@ -378,7 +378,7 @@ Input: Feature workflow completed with report quality and next-action gates.
 description: bugfix workflow with root-cause discipline and report quality gates
 ---
 # Workflow: bugfix
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: agent
 MaxCpuMs: 220000
 MaxWallTimeMs: 900000
@@ -443,7 +443,7 @@ Input: Bugfix workflow completed with report quality and next-action gates.
 description: review workflow with detailed findings and simulation-fallback gate
 ---
 # Workflow: review
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: agent
 MaxCpuMs: 180000
 MaxWallTimeMs: 600000
@@ -505,7 +505,7 @@ Input: Review workflow completed with detailed report and simulation-fallback ga
 description: release workflow with evidence-backed decision and simulation-fallback gate
 ---
 # Workflow: release
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: agent
 MaxCpuMs: 220000
 MaxWallTimeMs: 900000
@@ -576,19 +576,19 @@ fn bootstrap_rule_files() -> [(&'static str, &'static str); 4] {
     [
         (
             "runtime.md",
-            "---\ndescription: Runtime execution policy\ntrigger: always_on\n---\n# Runtime Rules\nSchema: antigrav.rule@v1\n```json\n{\n  \"allowed_domains\": [\"agent\", \"demo\", \"utils\"],\n  \"preferred_domains\": [\"agent\"],\n  \"cross_domain_penalty\": 40,\n  \"disable_network\": false,\n  \"read_only\": false,\n  \"strict_mode\": true,\n  \"external_mutation_penalty\": 120,\n  \"step_timeout_ms\": 420000,\n  \"max_trust_tier\": \"Constrained\",\n  \"max_total_cost\": 2500,\n  \"max_total_latency_ms\": 900000,\n  \"max_steps\": 30,\n  \"max_cpu_ms\": 240000,\n  \"max_wall_time_ms\": 1200000,\n  \"max_fs_reads\": 3000,\n  \"max_fs_writes\": 450,\n  \"max_network_calls\": 25,\n  \"max_memory_mb\": 1024,\n  \"run_script_timeout_ms\": 420000,\n  \"run_script_allowed_commands\": [\n    \"npm\",\n    \"npx\",\n    \"cargo\",\n    \"rustc\",\n    \"rustfmt\",\n    \"clippy-driver\",\n    \"git\",\n    \"pnpm\",\n    \"yarn\",\n    \"node\",\n    \"bun\"\n  ],\n  \"run_script_denied_commands\": [\n    \"sudo\",\n    \"rm\",\n    \"dd\",\n    \"mkfs\",\n    \"shutdown\",\n    \"reboot\",\n    \"poweroff\",\n    \"launchctl\"\n  ],\n  \"run_script_allow_shell_operators\": false\n}\n```\n",
+            "---\ndescription: Runtime execution policy\ntrigger: always_on\n---\n# Runtime Rules\nSchema: agentic-sdlc.rule@v1\n```json\n{\n  \"allowed_domains\": [\"agent\", \"demo\", \"utils\"],\n  \"preferred_domains\": [\"agent\"],\n  \"cross_domain_penalty\": 40,\n  \"disable_network\": false,\n  \"read_only\": false,\n  \"strict_mode\": true,\n  \"external_mutation_penalty\": 120,\n  \"step_timeout_ms\": 420000,\n  \"max_trust_tier\": \"Constrained\",\n  \"max_total_cost\": 2500,\n  \"max_total_latency_ms\": 900000,\n  \"max_steps\": 30,\n  \"max_cpu_ms\": 240000,\n  \"max_wall_time_ms\": 1200000,\n  \"max_fs_reads\": 3000,\n  \"max_fs_writes\": 450,\n  \"max_network_calls\": 25,\n  \"max_memory_mb\": 1024,\n  \"run_script_timeout_ms\": 420000,\n  \"run_script_allowed_commands\": [\n    \"npm\",\n    \"npx\",\n    \"cargo\",\n    \"rustc\",\n    \"rustfmt\",\n    \"clippy-driver\",\n    \"git\",\n    \"pnpm\",\n    \"yarn\",\n    \"node\",\n    \"bun\"\n  ],\n  \"run_script_denied_commands\": [\n    \"sudo\",\n    \"rm\",\n    \"dd\",\n    \"mkfs\",\n    \"shutdown\",\n    \"reboot\",\n    \"poweroff\",\n    \"launchctl\"\n  ],\n  \"run_script_allow_shell_operators\": false\n}\n```\n",
         ),
         (
             "branching_rules.md",
-            "---\ndescription: Branching strategy for thread workflows\ntrigger: always_on\n---\n# Branching Rules\nSchema: antigrav.rule@v1\n```json\n{\n  \"strategy\": \"feature-branch-per-thread\",\n  \"prefix\": \"thread/\",\n  \"allow_auto_create\": true,\n  \"allow_auto_checkout\": true,\n  \"cleanup_after_merge\": false\n}\n```\n",
+            "---\ndescription: Branching strategy for thread workflows\ntrigger: always_on\n---\n# Branching Rules\nSchema: agentic-sdlc.rule@v1\n```json\n{\n  \"strategy\": \"feature-branch-per-thread\",\n  \"prefix\": \"thread/\",\n  \"allow_auto_create\": true,\n  \"allow_auto_checkout\": true,\n  \"cleanup_after_merge\": false\n}\n```\n",
         ),
         (
             "coding_rules.md",
-            "---\ndescription: Coding quality gate\ntrigger: always_on\n---\n# Coding Rules\nSchema: antigrav.rule@v1\n```json\n{\n  \"no_unused_imports\": true,\n  \"require_tests_for_new_feature\": true,\n  \"forbid_unrelated_file_changes\": true,\n  \"require_memory_index_update\": false,\n  \"require_structured_commit_message\": true,\n  \"commit_format\": \"type(scope): summary\"\n}\n```\n",
+            "---\ndescription: Coding quality gate\ntrigger: always_on\n---\n# Coding Rules\nSchema: agentic-sdlc.rule@v1\n```json\n{\n  \"no_unused_imports\": true,\n  \"require_tests_for_new_feature\": true,\n  \"forbid_unrelated_file_changes\": true,\n  \"require_memory_index_update\": false,\n  \"require_structured_commit_message\": true,\n  \"commit_format\": \"type(scope): summary\"\n}\n```\n",
         ),
         (
             "merge_rules.md",
-            "---\ndescription: Merge safety policy\ntrigger: always_on\n---\n# Merge Rules\nSchema: antigrav.rule@v1\n```json\n{\n  \"require_validation_before_merge\": true,\n  \"analyze_conflicts\": true,\n  \"auto_conflict_resolution_assist\": true,\n  \"auto_conflict_resolution_strategy\": \"ours\",\n  \"auto_conflict_resolution_max_attempts\": 2,\n  \"delete_feature_branch_after_merge\": false,\n  \"protected_branches\": [\"main\", \"master\"],\n  \"require_rebase_before_merge\": true\n}\n```\n",
+            "---\ndescription: Merge safety policy\ntrigger: always_on\n---\n# Merge Rules\nSchema: agentic-sdlc.rule@v1\n```json\n{\n  \"require_validation_before_merge\": true,\n  \"analyze_conflicts\": true,\n  \"auto_conflict_resolution_assist\": true,\n  \"auto_conflict_resolution_strategy\": \"ours\",\n  \"auto_conflict_resolution_max_attempts\": 2,\n  \"delete_feature_branch_after_merge\": false,\n  \"protected_branches\": [\"main\", \"master\"],\n  \"require_rebase_before_merge\": true\n}\n```\n",
         ),
     ]
 }
@@ -619,7 +619,7 @@ fn bootstrap_role_files() -> [(&'static str, &'static str); 5] {
         (
             "architect.md",
             r#"# Role: Architect
-Schema: antigrav.role@v1
+Schema: agentic-sdlc.role@v1
 ```json
 {
   "name": "architect",
@@ -650,7 +650,7 @@ Output Contract:
         (
             "implementer.md",
             r#"# Role: Implementer
-Schema: antigrav.role@v1
+Schema: agentic-sdlc.role@v1
 ```json
 {
   "name": "implementer",
@@ -681,7 +681,7 @@ Output Contract:
         (
             "reviewer.md",
             r#"# Role: Reviewer
-Schema: antigrav.role@v1
+Schema: agentic-sdlc.role@v1
 ```json
 {
   "name": "reviewer",
@@ -712,7 +712,7 @@ Output Contract:
         (
             "resolver.md",
             r#"# Role: Resolver
-Schema: antigrav.role@v1
+Schema: agentic-sdlc.role@v1
 ```json
 {
   "name": "resolver",
@@ -743,7 +743,7 @@ Output Contract:
         (
             "releaser.md",
             r#"# Role: Releaser
-Schema: antigrav.role@v1
+Schema: agentic-sdlc.role@v1
 ```json
 {
   "name": "releaser",
@@ -779,7 +779,7 @@ fn bootstrap_skill_files() -> [(&'static str, &'static str); 4] {
         (
             "analyze_code",
             r#"# Skill: analyze_code
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 
 ```json
 {
@@ -846,7 +846,7 @@ Task input:
         (
             "generate_tests",
             r#"# Skill: generate_tests
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 
 ```json
 {
@@ -913,7 +913,7 @@ Task input:
         (
             "next_steps",
             r#"# Skill: next_steps
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 
 ```json
 {
@@ -980,7 +980,7 @@ Task input:
         (
             "workflow_report",
             r#"# Skill: workflow_report
-Schema: antigrav.skill@v1
+Schema: agentic-sdlc.skill@v1
 
 ```json
 {
@@ -1236,7 +1236,7 @@ pub(super) fn build_graph_index(
 }
 
 fn resolve_context_db_path(layout: &AgentProjectLayout) -> PathBuf {
-    if let Ok(raw) = std::env::var("ANTIGRAV_CONTEXT_DB_PATH") {
+    if let Ok(raw) = std::env::var("AGENTIC_SDLC_CONTEXT_DB_PATH") {
         let trimmed = raw.trim();
         if !trimmed.is_empty() {
             let parsed = PathBuf::from(trimmed);
@@ -1301,13 +1301,13 @@ fn write_context_sqlite(
     }
 
     let vector_table = normalize_sqlite_identifier(
-        &std::env::var("ANTIGRAV_CONTEXT_VECTOR_TABLE")
+        &std::env::var("AGENTIC_SDLC_CONTEXT_VECTOR_TABLE")
             .ok()
             .unwrap_or_else(|| DEFAULT_CONTEXT_VECTOR_TABLE.to_string()),
     )
     .ok_or_else(|| anyhow!("Invalid sqlite vector table name"))?;
     let graph_table = normalize_sqlite_identifier(
-        &std::env::var("ANTIGRAV_CONTEXT_GRAPH_TABLE")
+        &std::env::var("AGENTIC_SDLC_CONTEXT_GRAPH_TABLE")
             .ok()
             .unwrap_or_else(|| DEFAULT_CONTEXT_GRAPH_TABLE.to_string()),
     )

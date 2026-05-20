@@ -2,7 +2,7 @@
 description: healthtech release workflow with quality signal and risk approval
 ---
 # Workflow: healthtech-release
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: healthtech
 MaxCpuMs: 220000
 MaxWallTimeMs: 900000

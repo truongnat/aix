@@ -1,7 +1,8 @@
 [package]
 name = "agentic-sdlc"
-version = "1.1.0"
+version = "1.2.0"
 edition = "2021"
+keywords = ["mcp", "karpathy", "discipline", "ai", "agents", "workflow", "llm", "sdlc"]
 authors = ["agentic-sdlc contributors"]
 description = "Deterministic runtime for AI agent workflows with sandboxing, LLM providers, Git integration, and observability"
 license = "MIT OR Apache-2.0"
@@ -9,7 +10,6 @@ repository = "https://github.com/truongnat/agentic-sdlc"
 homepage = "https://agentic-sdlc-truongdqdev-9126s-projects.vercel.app"
 documentation = "https://docs.rs/agentic-sdlc"
 readme = "README.md"
-keywords = ["ai", "agents", "workflow", "llm", "sdlc"]
 categories = ["development-tools", "command-line-utilities"]
 exclude = [
     "docs/*",

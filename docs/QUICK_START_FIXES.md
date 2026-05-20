@@ -8,18 +8,18 @@ Quick reference for implementing gap fixes in `agentic-sdlc`.
 
 ```bash
 # Test Anthropic (already implemented!)
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 ANTHROPIC_API_KEY=sk-ant-... \
 cargo test llm_subagent_live_smoke_anthropic -- --nocapture
 
 # Test Azure OpenAI (already implemented!)
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 AZURE_OPENAI_KEY=... \
 AZURE_OPENAI_ENDPOINT=https://....openai.azure.com \
 cargo test
 
 # Test AWS Bedrock (already implemented!)
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 AWS_REGION=us-east-1 \
 AWS_ACCESS_KEY_ID=... \
 AWS_SECRET_ACCESS_KEY=... \
@@ -33,11 +33,11 @@ cargo test
 cargo run -- --workflow feature.md
 
 # Verify deterministic mode
-ANTIGRAV_LLM_TEMPERATURE=0.0 cargo run -- --workflow feature.md
+AGENTIC_SDLC_LLM_TEMPERATURE=0.0 cargo run -- --workflow feature.md
 
 # Use specific seed for OpenAI
-ANTIGRAV_LLM_PROVIDER=openai \
-ANTIGRAV_LLM_SEED=42 \
+AGENTIC_SDLC_LLM_PROVIDER=openai \
+AGENTIC_SDLC_LLM_SEED=42 \
 cargo run -- --workflow feature.md
 ```
 
@@ -139,7 +139,7 @@ cargo test resolve_temperature
 ### Run Live Provider Tests
 ```bash
 # Requires API keys
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 OPENAI_API_KEY=... \
 GEMINI_API_KEY=... \
 ANTHROPIC_API_KEY=... \
@@ -189,9 +189,9 @@ cargo fmt --check
 ```bash
 # Create .env file
 cat > .env << EOF
-ANTIGRAV_LLM_PROVIDER=openai
-ANTIGRAV_LLM_TEMPERATURE=0.0
-ANTIGRAV_LLM_SEED=42
+AGENTIC_SDLC_LLM_PROVIDER=openai
+AGENTIC_SDLC_LLM_TEMPERATURE=0.0
+AGENTIC_SDLC_LLM_SEED=42
 OPENAI_API_KEY=sk-...
 EOF
 

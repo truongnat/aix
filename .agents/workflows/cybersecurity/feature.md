@@ -2,7 +2,7 @@
 description: cybersecurity feature delivery with impact analysis and acceptance gates
 ---
 # Workflow: cybersecurity-feature
-Schema: antigrav.workflow@v1
+Schema: agentic-sdlc.workflow@v1
 Domain: cybersecurity
 MaxCpuMs: 240000
 MaxWallTimeMs: 900000

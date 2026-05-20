@@ -1,6 +1,86 @@
 # CLI Usage
 
-Binary command name is `antigrav` (invoked in this repo via `cargo run -- ...`).
+Binary command name in this repo is `agentic-sdlc` (normally invoked here via `cargo run -- ...`).
+
+## Fastest useful path
+
+If you want the most practical daily command, run:
+
+```bash
+cargo run -- bug analyze examples/bug-sample.md
+cargo run -- bug plan examples/bug-sample.md
+cargo run -- bug reply examples/bug-sample.md
+cargo run -- bug prompt examples/bug-sample.md
+```
+
+The sample input lives at [examples/bug-sample.md](../examples/bug-sample.md).
+
+## Bug Mode
+
+These commands are deterministic by default and do not require network access.
+They read plain text or markdown files containing mixed language ticket text, logs, API errors, or stack traces.
+
+```bash
+cargo run -- bug analyze <input-file>
+cargo run -- bug plan <input-file>
+cargo run -- bug reply <input-file>
+cargo run -- bug prompt <input-file>
+```
+
+`bug analyze` outputs:
+
+- Summary
+- Current behavior
+- Expected behavior
+- Reproduction steps
+- Impact
+- Suspected root cause
+- Evidence from input
+- Missing information
+- Suggested investigation points
+- Risk level
+
+`bug plan` outputs:
+
+- step-by-step investigation
+- likely files/modules to inspect
+- DB/API/log checkpoints
+- fix direction
+- validation checklist
+- regression risk and priority
+
+`bug reply` outputs:
+
+- Vietnamese summary
+- Japanese business-style reply
+- short confirmation message
+- clarification questions if needed
+
+`bug prompt` outputs a copy-paste implementation prompt for a coding agent with:
+
+- bug summary
+- current behavior
+- expected behavior
+- investigation target
+- fix constraints
+- acceptance criteria
+- test checklist
+
+If you want to confirm the harness can create a real artifact after that, run:
+
+```bash
+cargo run -- --workflow-id starter/app-builder --task "create a todo list app"
+```
+
+This uses a skill-defined artifact blueprint to create files under `local_tmp/generated-app` and then runs a real validation command.
+
+After that, inspect what is available:
+
+```bash
+cargo run -- workflow list
+cargo run -- workflow check
+cargo run -- workflow status
+```
 
 ## Workflow Mode
 
@@ -10,10 +90,10 @@ Custom skills under `.agents/skills` are Markdown files with a fenced `json` met
 Role profiles under `.agents/roles` are Markdown files (optional fenced `json` metadata + role prompt body).
 `workflow check` also validates that `llm_subagent` role references like `architect:::` resolve to an existing role file.
 All package markdown files must include a schema line:
-- workflows: `Schema: antigrav.workflow@v1`
-- skills: `Schema: antigrav.skill@v1`
-- roles: `Schema: antigrav.role@v1`
-- rules: `Schema: antigrav.rule@v1`
+- workflows: `Schema: agentic-sdlc.workflow@v1`
+- skills: `Schema: agentic-sdlc.skill@v1`
+- roles: `Schema: agentic-sdlc.role@v1`
+- rules: `Schema: agentic-sdlc.rule@v1`
 
 Run a workflow from file path:
 
@@ -25,6 +105,8 @@ Run a workflow resolved from `.agents/workflows` ID:
 
 ```bash
 cargo run -- --workflow-id feature
+cargo run -- --workflow-id starter/app-builder --task "create a todo list app"
+cargo run -- --workflow-id starter/todo-cli-node
 ```
 
 Run a template-driven workflow (inject template prompt + concrete task into first `llm_subagent` step):
@@ -59,6 +141,11 @@ Run a normal workflow with template/task override flags (no subcommand):
 ```bash
 cargo run -- --workflow-id feature --template feature_prompt --task "add email validation to signup flow"
 ```
+
+Important:
+
+- `starter/*` workflows are the best first run when you want a concrete generated artifact.
+- many `feature/review/release` workflows are analysis/report workflows unless they include explicit mutation steps like `agent.write_file` or `agent.run_script`.
 
 Override role mapping for `llm_subagent` inputs:
 
@@ -417,7 +504,7 @@ Run the full deterministic gate:
 
 `bootstrap.sh` verifies:
 - `git`, `rustc`, `cargo`
-- Ollama availability/reachability (warn by default, strict mode via `ANTIGRAV_BOOTSTRAP_REQUIRE_OLLAMA=1`)
+- Ollama availability/reachability (warn by default, strict mode via `AGENTIC_SDLC_BOOTSTRAP_REQUIRE_OLLAMA=1`)
 - package layout under `.agents/` (workflows/rules/skills/roles/templates/memory) and markdown-only policy (no YAML under workflows/skills/roles/rules/templates)
 - `workflow check` integrity
 
@@ -431,15 +518,15 @@ Run the full deterministic gate:
 - `.agents/memory/graph_index.json`
 
 Context retrieval injection controls:
-- `ANTIGRAV_CONTEXT_RETRIEVAL_MODE=vector|graph|hybrid|off`
-- `ANTIGRAV_CONTEXT_BACKEND=json|sqlite`
-- `ANTIGRAV_CONTEXT_INDEX_PATH=.agents/memory/vector_index.json`
-- `ANTIGRAV_CONTEXT_MIN_SCORE=0.1`
-- `ANTIGRAV_CONTEXT_GRAPH_INDEX_PATH=.agents/memory/graph_index.json`
-- `ANTIGRAV_CONTEXT_GRAPH_MIN_SCORE=0.05`
-- `ANTIGRAV_CONTEXT_DB_PATH=.agents/memory/context.db`
-- `ANTIGRAV_CONTEXT_VECTOR_TABLE=vector_entries`
-- `ANTIGRAV_CONTEXT_GRAPH_TABLE=graph_nodes`
+- `AGENTIC_SDLC_CONTEXT_RETRIEVAL_MODE=vector|graph|hybrid|off`
+- `AGENTIC_SDLC_CONTEXT_BACKEND=json|sqlite`
+- `AGENTIC_SDLC_CONTEXT_INDEX_PATH=.agents/memory/vector_index.json`
+- `AGENTIC_SDLC_CONTEXT_MIN_SCORE=0.1`
+- `AGENTIC_SDLC_CONTEXT_GRAPH_INDEX_PATH=.agents/memory/graph_index.json`
+- `AGENTIC_SDLC_CONTEXT_GRAPH_MIN_SCORE=0.05`
+- `AGENTIC_SDLC_CONTEXT_DB_PATH=.agents/memory/context.db`
+- `AGENTIC_SDLC_CONTEXT_VECTOR_TABLE=vector_entries`
+- `AGENTIC_SDLC_CONTEXT_GRAPH_TABLE=graph_nodes`
 
 `ci_gate.sh` includes clean-clone smoke coverage:
 - clones repo into a temp directory

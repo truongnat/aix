@@ -20,14 +20,14 @@ Complete guide to all 6 supported LLM providers in `agentic-sdlc`.
 **For Development:**
 ```bash
 # Use Ollama (free, local)
-export ANTIGRAV_LLM_PROVIDER=ollama
+export AGENTIC_SDLC_LLM_PROVIDER=ollama
 cargo run -- --workflow feature.md
 ```
 
 **For Production:**
 ```bash
 # Use OpenAI (reliable, fast)
-export ANTIGRAV_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_PROVIDER=openai
 export OPENAI_API_KEY=sk-...
 cargo run -- --workflow feature.md
 ```
@@ -35,7 +35,7 @@ cargo run -- --workflow feature.md
 **For Cost Optimization:**
 ```bash
 # Use Gemini (cheapest cloud option)
-export ANTIGRAV_LLM_PROVIDER=gemini
+export AGENTIC_SDLC_LLM_PROVIDER=gemini
 export GEMINI_API_KEY=...
 cargo run -- --workflow feature.md
 ```
@@ -197,9 +197,9 @@ Automatic fallback to backup providers on errors:
 
 ```bash
 # Primary: OpenAI, Fallback: Gemini, Anthropic
-export ANTIGRAV_LLM_PROVIDER=openai
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
-export ANTIGRAV_LLM_FALLBACK_POLICY=transient_only
+export AGENTIC_SDLC_LLM_PROVIDER=openai
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK_POLICY=transient_only
 
 cargo run -- --workflow feature.md
 ```
@@ -294,25 +294,25 @@ cargo run -- --workflow feature.md
 
 ```bash
 # Provider selection
-export ANTIGRAV_LLM_PROVIDER=openai  # ollama|openai|gemini|anthropic|azure|bedrock
+export AGENTIC_SDLC_LLM_PROVIDER=openai  # ollama|openai|gemini|anthropic|azure|bedrock
 
 # Model override (optional)
-export ANTIGRAV_LLM_MODEL=gpt-4o-mini
-export ANTIGRAV_LLM_MODEL_OPENAI=gpt-4o-mini
-export ANTIGRAV_LLM_MODEL_GEMINI=gemini-1.5-flash
-export ANTIGRAV_LLM_MODEL_ANTHROPIC=claude-3-5-haiku-latest
+export AGENTIC_SDLC_LLM_MODEL=gpt-4o-mini
+export AGENTIC_SDLC_LLM_MODEL_OPENAI=gpt-4o-mini
+export AGENTIC_SDLC_LLM_MODEL_GEMINI=gemini-1.5-flash
+export AGENTIC_SDLC_LLM_MODEL_ANTHROPIC=claude-3-5-haiku-latest
 
 # Fallback configuration
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
-export ANTIGRAV_LLM_FALLBACK_POLICY=transient_only
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK_POLICY=transient_only
 
 # Timeout & retries
-export ANTIGRAV_LLM_TIMEOUT_MS=120000  # 2 minutes
-export ANTIGRAV_LLM_MAX_RETRIES=1
+export AGENTIC_SDLC_LLM_TIMEOUT_MS=120000  # 2 minutes
+export AGENTIC_SDLC_LLM_MAX_RETRIES=1
 
 # Deterministic mode
-export ANTIGRAV_LLM_TEMPERATURE=0.0
-export ANTIGRAV_LLM_SEED=42  # OpenAI/Azure only
+export AGENTIC_SDLC_LLM_TEMPERATURE=0.0
+export AGENTIC_SDLC_LLM_SEED=42  # OpenAI/Azure only
 ```
 
 ### Per-Provider Configuration
@@ -348,7 +348,7 @@ export AWS_REGION=us-east-1
 
 **Ollama:**
 ```bash
-export ANTIGRAV_OLLAMA_HOST=http://localhost:11434
+export AGENTIC_SDLC_OLLAMA_HOST=http://localhost:11434
 # or
 export OLLAMA_HOST=http://localhost:11434
 ```
@@ -361,17 +361,17 @@ export OLLAMA_HOST=http://localhost:11434
 
 ```bash
 # Test OpenAI
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 OPENAI_API_KEY=sk-... \
 cargo test llm_subagent_live_smoke_openai -- --nocapture
 
 # Test Gemini
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 GEMINI_API_KEY=... \
 cargo test llm_subagent_live_smoke_gemini -- --nocapture
 
 # Test Anthropic
-ANTIGRAV_RUN_LIVE_LLM_TESTS=1 \
+AGENTIC_SDLC_RUN_LIVE_LLM_TESTS=1 \
 ANTHROPIC_API_KEY=sk-ant-... \
 cargo test llm_subagent_live_smoke_anthropic -- --nocapture
 ```
@@ -408,19 +408,19 @@ export OPENAI_API_KEY=sk-...
 **Rate Limit:**
 ```bash
 # Enable fallback
-export ANTIGRAV_LLM_FALLBACK=gemini,anthropic
+export AGENTIC_SDLC_LLM_FALLBACK=gemini,anthropic
 ```
 
 **Timeout:**
 ```bash
 # Increase timeout
-export ANTIGRAV_LLM_TIMEOUT_MS=180000  # 3 minutes
+export AGENTIC_SDLC_LLM_TIMEOUT_MS=180000  # 3 minutes
 ```
 
 **Wrong Model:**
 ```bash
 # Override model
-export ANTIGRAV_LLM_MODEL=gpt-4o-mini
+export AGENTIC_SDLC_LLM_MODEL=gpt-4o-mini
 ```
 
 ---

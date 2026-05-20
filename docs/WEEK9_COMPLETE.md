@@ -399,9 +399,9 @@ test result: ok. 232 passed; 0 failed; 3 ignored
 ### Immediate (Optional Enhancements)
 
 1. **CLI Tools**
-   - `antigrav sign-skill` command
-   - `antigrav verify-skill` command
-   - `antigrav generate-keypair` command
+   - `agentic-sdlc sign-skill` command
+   - `agentic-sdlc verify-skill` command
+   - `agentic-sdlc generate-keypair` command
 
 2. **Key Rotation**
    - Automatic key rotation
