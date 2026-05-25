@@ -73,6 +73,28 @@ Three layers, last write wins:
 3. **Env var** — `GOAL_MODEL_<ROLE>=...` (e.g. `GOAL_MODEL_CODER=openai/gpt-4.1`)
 4. **CLI flag** — `--model-override coder=gpt-4`
 
+### Local fallback (Ollama)
+
+If a role's configured provider has **no API key** in the environment, the CLI automatically falls back to local Ollama (if running at `http://localhost:11434`):
+
+- **Detection**: Checks if Ollama is reachable at startup
+- **Model selection**: Auto-picks the best already-pulled model per role:
+  - `coder` → prefers `qwen2.5-coder*`, `deepseek-coder*`, `codellama*`
+  - `planner` / `rules_advisor` / `reviewer` → prefers larger models (`*70b` > `*13b` > `*8b`), prefers `llama3.*`, `qwen2.5*`, `mistral*`
+  - `task_decomposer` / `ticket_planner` → any general chat model
+- **Pull prompt**: If no suitable models are found, prompts you to `ollama pull` recommended models (`llama3.1:8b`, `qwen2.5-coder:7b`)
+- **Mixed mode**: Some roles can use cloud APIs while others fall back to Ollama
+- **Validation warning**: If both `reviewer` and `coder` fall back to the same Ollama model, a warning is printed (review quality may be degraded)
+
+To use Ollama exclusively:
+```bash
+# Don't set any API keys; ensure Ollama is running
+ollama serve
+
+# Run goal - it will auto-detect and use Ollama
+goal start "Build a CLI todo app"
+```
+
 Example global config:
 
 ```yaml

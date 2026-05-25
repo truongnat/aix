@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import os
+import subprocess
 from pathlib import Path
 from typing import Any
 
 import yaml
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 APP_NAME = "agentic-goal"
@@ -39,16 +40,6 @@ class Config(BaseModel):
     providers: dict[str, ProviderConfig] = Field(default_factory=dict)
     roles: dict[str, RoleConfig] = Field(default_factory=dict)
     budgets: BudgetConfig = Field(default_factory=BudgetConfig)
-
-    @model_validator(mode="after")
-    def check_reviewer_not_coder(self) -> Config:
-        reviewer = self.roles.get("reviewer")
-        coder = self.roles.get("coder")
-        if reviewer and coder and reviewer.model == coder.model:
-            raise ValueError(
-                f"reviewer.model ({reviewer.model}) must differ from coder.model ({coder.model})"
-            )
-        return self
 
 
 class EnvSettings(BaseSettings):
@@ -84,6 +75,7 @@ def _default_providers() -> dict[str, ProviderConfig]:
         "openrouter": ProviderConfig(api_key_env="OPENROUTER_API_KEY", base_url="https://openrouter.ai/api/v1"),
         "anthropic": ProviderConfig(api_key_env="ANTHROPIC_API_KEY"),
         "openai": ProviderConfig(api_key_env="OPENAI_API_KEY"),
+        "ollama": ProviderConfig(api_key_env="OLLAMA_NO_KEY_NEEDED", base_url="http://localhost:11434"),
     }
 
 
@@ -141,14 +133,147 @@ def _merge_into(cfg: Config, data: dict[str, Any]) -> Config:
     return cfg
 
 
+def _ollama_list_models(base_url: str = "http://localhost:11434") -> list[str]:
+    """List available Ollama models, filtering out embedding-only models."""
+    try:
+        import json
+        import urllib.request
+
+        req = urllib.request.Request(f"{base_url}/api/tags", method="GET")
+        with urllib.request.urlopen(req, timeout=2) as response:
+            data = json.loads(response.read())
+            models = [m["name"] for m in data.get("models", [])]
+            # Filter out embedding-only models (can't generate chat)
+            embedding_patterns = ["embed", "bge-", "nomic-"]
+            return [
+                m for m in models if not any(pattern in m.lower() for pattern in embedding_patterns)
+            ]
+    except Exception:
+        return []
+
+
+def _pick_ollama_model(role_name: str, available: list[str]) -> str | None:
+    """Pick best Ollama model for a role from available models."""
+    if not available:
+        return None
+
+    # Heuristics per role
+    if role_name == "coder":
+        # Prefer coder models
+        for pattern in ["qwen2.5-coder", "deepseek-coder", "codellama"]:
+            for model in available:
+                if pattern in model.lower():
+                    return model
+    elif role_name in ("planner", "rules_advisor", "reviewer"):
+        # Prefer larger param sizes for complex reasoning
+        for size in ["70b", "34b", "13b", "8b"]:
+            for model in available:
+                if size in model.lower():
+                    # Prefer llama3, qwen2.5, mistral among same size
+                    for prefix in ["llama3", "qwen2.5", "mistral"]:
+                        if prefix in model.lower():
+                            return model
+    # task_decomposer, ticket_planner: any general model
+
+    # Fallback: first available model
+    return available[0]
+
+
+def _prompt_ollama_pull(recommended: list[str]) -> bool:
+    """Prompt user to pull recommended Ollama models."""
+    import sys
+
+    from rich import print as rprint
+    from rich.panel import Panel
+
+    # Skip prompt in non-TTY environments (CI, Docker, piped input)
+    if not sys.stdin.isatty():
+        return False
+
+    rprint(
+        Panel(
+            "[yellow]No suitable Ollama models found locally.[/yellow]\n\n"
+            "Recommended pulls:\n"
+            + "\n".join(f"  - {m}" for m in recommended)
+            + "\n\n[cyan]Pull recommended models now? [Y/n][/cyan]",
+            title="Ollama Setup",
+        )
+    )
+    response = input().strip().lower()
+    if response not in ("", "y", "yes"):
+        return False
+
+    pulled: list[str] = []
+    for model in recommended:
+        rprint(f"[dim]Pulling {model}...[/dim]")
+        try:
+            subprocess.run(["ollama", "pull", model], check=True, timeout=1800)  # 30 min timeout
+            pulled.append(model)
+        except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
+            rprint(f"[red]Failed to pull {model} (ollama not found, error, or timeout)[/red]")
+    return len(pulled) > 0
+
+
+def apply_ollama_fallback(cfg: Config) -> dict[str, str]:
+    """Apply Ollama fallback for roles with missing API keys.
+
+    Returns dict of role -> new model for roles that fell back.
+    """
+    available = _ollama_list_models()
+    if not available:
+        # Prompt to pull recommended models
+        recommended = ["llama3.1:8b", "qwen2.5-coder:7b"]
+        if not _prompt_ollama_pull(recommended):
+            return {}
+        available = _ollama_list_models()
+
+    fallbacks: dict[str, str] = {}
+    for role_name, role_cfg in cfg.roles.items():
+        # Resolve provider
+        provider_hint = (
+            role_cfg.model.split("/")[0] if "/" in role_cfg.model else cfg.default_provider
+        )
+        provider = cfg.providers.get(provider_hint) or cfg.providers.get(cfg.default_provider)
+        if not provider:
+            continue
+
+        # Check if API key is missing (ollama sentinel is always "present")
+        if provider.api_key_env == "OLLAMA_NO_KEY_NEEDED":
+            continue  # Already using Ollama
+
+        key = os.environ.get(provider.api_key_env)
+        if key:
+            continue  # Key present, no fallback
+
+        # Key missing - pick Ollama model
+        ollama_model = _pick_ollama_model(role_name, available)
+        if ollama_model:
+            cfg.roles[role_name] = role_cfg.model_copy(update={"model": f"ollama/{ollama_model}"})
+            fallbacks[role_name] = cfg.roles[role_name].model
+
+    return fallbacks
+
+
 def validate_config(cfg: Config, strict: bool = False) -> None:
     """Validate config. Raises ValueError on fatal issues."""
     reviewer = cfg.roles.get("reviewer")
     coder = cfg.roles.get("coder")
     if reviewer and coder and reviewer.model == coder.model:
-        raise ValueError(
-            f"reviewer.model ({reviewer.model}) must differ from coder.model ({coder.model})"
+        # Allow same model if both are Ollama (fallback scenario)
+        both_ollama = reviewer.model.startswith("ollama/") and coder.model.startswith(
+            "ollama/"
         )
+        if both_ollama:
+            from rich import print as rprint
+
+            rprint(
+                f"[yellow]Warning: reviewer and coder using same Ollama model ({reviewer.model}). "
+                "Review quality may be degraded.[/yellow]"
+            )
+        else:
+            raise ValueError(
+                f"reviewer.model ({reviewer.model}) must differ from coder.model ({coder.model})"
+            )
 
     for role_name, role in cfg.roles.items():
         # Resolve provider from model string (e.g. "anthropic/claude-opus-4")

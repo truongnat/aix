@@ -50,10 +50,18 @@ def _make_llm(role_name: str, cfg: Config) -> Any:
     model_str = role_cfg.model
     if "/" not in model_str:
         model_str = f"{provider_hint}:{model_str}"
+    else:
+        # Strip provider prefix (e.g. "ollama/llama3.1:8b" -> "llama3.1:8b")
+        # Ollama API requires bare model name; other providers tolerate this
+        model_str = model_str.split("/", 1)[1]
 
     model_kwargs: dict[str, Any] = {}
     if role_cfg.max_tokens:
         model_kwargs["max_tokens"] = role_cfg.max_tokens
+
+    # Pass base_url for ollama provider
+    if provider_hint == "ollama" and provider.base_url:
+        model_kwargs["base_url"] = provider.base_url
 
     llm = init_chat_model(
         model_str,

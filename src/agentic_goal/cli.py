@@ -8,7 +8,7 @@ from typing import Any
 import typer
 from rich import print as rprint
 
-from agentic_goal.config import load_config, validate_config
+from agentic_goal.config import apply_ollama_fallback, load_config, validate_config
 from agentic_goal.events import EventBus, JsonlSink, MarkdownSink, TerminalSink, set_event_bus
 from agentic_goal.graph_builder import build_graph, get_checkpointer
 
@@ -45,6 +45,14 @@ def start(
             role, model = override.split("=", 1)
             if role in cfg.roles:
                 cfg.roles[role].model = model
+
+    # Apply Ollama fallback for missing API keys
+    fallbacks = apply_ollama_fallback(cfg)
+    if fallbacks:
+        from rich.panel import Panel
+
+        lines = [f"[yellow]⚠ {role} → {model}[/yellow]" for role, model in fallbacks.items()]
+        rprint(Panel("\n".join(lines), title="Ollama Fallback Active"))
 
     validate_config(cfg, strict=True)
 
@@ -116,6 +124,15 @@ def continue_cmd(
 ) -> None:
     """Resume the most recent (or specified) goal from checkpoint."""
     cfg = load_config()
+
+    # Apply Ollama fallback for missing API keys
+    fallbacks = apply_ollama_fallback(cfg)
+    if fallbacks:
+        from rich.panel import Panel
+
+        lines = [f"[yellow]⚠ {role} → {model}[/yellow]" for role, model in fallbacks.items()]
+        rprint(Panel("\n".join(lines), title="Ollama Fallback Active"))
+
     validate_config(cfg, strict=True)
 
     # Find goal directory
