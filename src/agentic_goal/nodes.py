@@ -419,3 +419,59 @@ def reviewer_node(state: AgentState) -> AgentState:
         **state,
         "messages": [AIMessage(content=review)],
     }
+
+
+def resume_analyzer_node(state: AgentState) -> AgentState:
+    """Analyze checkpointed state to determine where to resume."""
+    cfg = load_config()
+    llm = _make_llm("resume_analyzer", cfg)
+    event_bus = state.get("event_bus")
+
+    if event_bus:
+        event_bus.emit(
+            phase="resume",
+            node="resume_analyzer",
+            role="resume_analyzer",
+            model=cfg.roles["resume_analyzer"].model,
+            event_type=EventType.LLM_START,
+            data={"current_phase": state.get("phase")},
+        )
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            SystemMessage(
+                content=(
+                    "You are a resume analyzer. Given the current state, determine "
+                    "where to resume execution. Output the next node name to execute.\n"
+                    "Possible nodes: plan, rules, tasks, pick_ticket, ticket_plan, "
+                    "coder, reviewer.\n"
+                    "Output only the node name."
+                )
+            ),
+            HumanMessage(
+                content=f"Current phase: {state.get('phase')}\n"
+                f"Interrupt reason: {state.get('interrupt_reason')}\n"
+                f"Current ticket: {state.get('current_ticket_id')}"
+            ),
+        ]
+    )
+
+    response = llm.invoke(prompt.format_messages())
+    next_node = str(response.content).strip()
+
+    if event_bus:
+        event_bus.emit(
+            phase="resume",
+            node="resume_analyzer",
+            role="resume_analyzer",
+            model=cfg.roles["resume_analyzer"].model,
+            event_type=EventType.LLM_END,
+            data={"next_node": next_node},
+        )
+
+    # Update phase based on analysis
+    return {
+        **state,
+        "interrupt_reason": None,  # Clear interrupt
+        "messages": [AIMessage(content=f"Resuming at: {next_node}")],
+    }

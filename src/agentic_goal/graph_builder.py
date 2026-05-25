@@ -15,6 +15,7 @@ from agentic_goal.nodes import (
     pick_ticket_node,
     plan_approval_node,
     plan_node,
+    resume_analyzer_node,
     reviewer_node,
     rules_approval_node,
     rules_node,
@@ -41,6 +42,9 @@ def build_graph(checkpointer: SqliteSaver | None = None) -> Any:
     graph.add_node("ticket_plan", ticket_plan_node)
     graph.add_node("coder", coder_node)
     graph.add_node("reviewer", reviewer_node)
+
+    # Resume node
+    graph.add_node("resume_analyzer", resume_analyzer_node)
 
     # Entry point
     graph.set_entry_point("plan")

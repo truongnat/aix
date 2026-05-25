@@ -88,7 +88,69 @@ def continue_cmd(
     verbose: int = typer.Option(0, "--verbose", "-v", count=True),
 ) -> None:
     """Resume the most recent (or specified) goal from checkpoint."""
-    rprint("[bold yellow]Resuming goal...[/bold yellow]")
+    cfg = load_config()
+    validate_config(cfg, strict=True)
+
+    # Find goal directory
+    goal_dir: Path
+    if goal_id:
+        goal_dir = Path(".goal") / goal_id
+        if not goal_dir.exists():
+            rprint(f"[bold red]Goal not found:[/bold red] {goal_id}")
+            raise typer.Exit(1)
+    else:
+        # Find latest goal
+        goals_dir = Path(".goal")
+        if not goals_dir.exists():
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dirs = sorted(goals_dir.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+        if not goal_dirs:
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dir = goal_dirs[0]
+        goal_id = goal_dir.name
+
+    rprint(f"[bold yellow]Resuming goal:[/bold yellow] {goal_id}")
+    rprint(f"[dim]Workspace:[/dim] {goal_dir}")
+
+    # Set up event bus with 3 sinks
+    event_bus = EventBus(goal_id)
+    event_bus.add_sink(TerminalSink(verbose=verbose))
+    event_bus.add_sink(JsonlSink(goal_dir / "events.jsonl"))
+    event_bus.add_sink(MarkdownSink(goal_dir / "transcript.md"))
+
+    # Build graph with checkpointer
+    checkpointer = get_checkpointer(goal_dir)
+    graph = build_graph(checkpointer=checkpointer)
+
+    # Load checkpointed state
+    config = {"configurable": {"thread_id": goal_id}}
+    checkpoint = checkpointer.get(config)
+    if not checkpoint:
+        rprint("[bold red]No checkpoint found for this goal.[/bold red]")
+        raise typer.Exit(1)
+
+    # Get state from checkpoint
+    state = checkpoint.get("channel_values", {})
+    state["event_bus"] = event_bus
+
+    # Run resume analyzer to determine next step
+    from agentic_goal.nodes import resume_analyzer_node
+
+    state = resume_analyzer_node(state)
+
+    # Continue execution
+    final_state = graph.invoke(state, config)
+
+    # Save artifacts
+    (goal_dir / "plan.md").write_text(final_state["plan"], encoding="utf-8")
+    (goal_dir / "rules.md").write_text(final_state["rules"], encoding="utf-8")
+    if final_state["tasks"]:
+        (goal_dir / "tasks.md").write_text(final_state["tasks"][0]["raw"], encoding="utf-8")
+
+    rprint("[bold green]✓[/bold green] Goal execution continued.")
+    rprint(f"[dim]Artifacts saved to:[/dim] {goal_dir}/")
     raise typer.Exit(0)
 
 
