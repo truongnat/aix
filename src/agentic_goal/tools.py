@@ -26,16 +26,30 @@ def write_file(path: str, content: str) -> str:
     return f"Written to {path}"
 
 
+def _resolve_sandbox_cwd(cwd: str | None) -> Path:
+    """Resolve cwd, defaulting to .goal/. All shell/git ops run here."""
+    if cwd is None:
+        return Path(".goal").absolute()
+    p = Path(cwd).absolute()
+    # Ensure path is within .goal/ sandbox
+    goal_root = Path(".goal").absolute()
+    try:
+        p.relative_to(goal_root)
+    except ValueError:
+        # Not inside sandbox, fall back to sandbox root
+        return goal_root
+    return p
+
+
 @tool
 def run_shell(command: str, cwd: str | None = None) -> str:
-    """Run a shell command and return stdout/stderr."""
-    # Default to goal directory if not specified
-    if cwd is None:
-        cwd = str(Path(".goal").absolute())
+    """Run a shell command inside the .goal/ sandbox and return stdout/stderr."""
+    sandbox_cwd = _resolve_sandbox_cwd(cwd)
+    sandbox_cwd.mkdir(parents=True, exist_ok=True)
     result = subprocess.run(
         command,
         shell=True,
-        cwd=cwd,
+        cwd=str(sandbox_cwd),
         capture_output=True,
         text=True,
         timeout=300,
@@ -49,10 +63,12 @@ def run_shell(command: str, cwd: str | None = None) -> str:
 
 
 @tool
-def git_status() -> str:
-    """Get git status of the current directory."""
+def git_status(cwd: str | None = None) -> str:
+    """Get git status inside the goal sandbox."""
+    sandbox_cwd = _resolve_sandbox_cwd(cwd)
     result = subprocess.run(
         ["git", "status", "--porcelain"],
+        cwd=str(sandbox_cwd),
         capture_output=True,
         text=True,
         timeout=30,
@@ -61,26 +77,31 @@ def git_status() -> str:
 
 
 @tool
-def git_diff(path: str | None = None) -> str:
-    """Get git diff for a file or all changes."""
+def git_diff(path: str | None = None, cwd: str | None = None) -> str:
+    """Get git diff inside the goal sandbox."""
+    sandbox_cwd = _resolve_sandbox_cwd(cwd)
     cmd = ["git", "diff"]
     if path:
         cmd.append(path)
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    result = subprocess.run(
+        cmd, cwd=str(sandbox_cwd), capture_output=True, text=True, timeout=30
+    )
     return result.stdout or "No diff"
 
 
 @tool
-def git_commit(message: str) -> str:
-    """Stage all changes and commit with message."""
-    # Safety check: only allow commits in .goal directory
-    cwd = Path.cwd()
-    if not cwd.name.startswith("g_") or ".goal" not in str(cwd):
-        return "Error: git_commit only allowed in goal sandbox (.goal/g_*)"
+def git_commit(message: str, cwd: str | None = None) -> str:
+    """Stage all changes and commit inside the goal sandbox."""
+    sandbox_cwd = _resolve_sandbox_cwd(cwd)
+    if not sandbox_cwd.exists():
+        return f"Error: sandbox cwd does not exist: {sandbox_cwd}"
 
-    subprocess.run(["git", "add", "."], capture_output=True, timeout=30)
+    subprocess.run(
+        ["git", "add", "."], cwd=str(sandbox_cwd), capture_output=True, timeout=30
+    )
     result = subprocess.run(
         ["git", "commit", "-m", message],
+        cwd=str(sandbox_cwd),
         capture_output=True,
         text=True,
         timeout=30,

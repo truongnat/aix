@@ -1,5 +1,6 @@
 """CLI entry point — Typer app with subcommands."""
 
+import contextlib
 import uuid
 from pathlib import Path
 from typing import Any
@@ -12,6 +13,14 @@ from agentic_goal.events import EventBus, JsonlSink, MarkdownSink, TerminalSink,
 from agentic_goal.graph_builder import build_graph, get_checkpointer
 
 app = typer.Typer(help="Agentic SDLC CLI: /goal -> plan -> rules -> tasks -> execute")
+
+
+def _close_checkpointer(checkpointer: Any) -> None:
+    """Close the SqliteSaver's underlying connection if possible."""
+    conn = getattr(checkpointer, "conn", None)
+    if conn is not None:
+        with contextlib.suppress(Exception):
+            conn.close()
 
 
 @app.command()
@@ -58,34 +67,42 @@ def start(
 
     # Build graph with checkpointer
     checkpointer = get_checkpointer(goal_dir)
-    graph = build_graph(checkpointer=checkpointer)
+    try:
+        graph = build_graph(checkpointer=checkpointer)
 
-    # Initial state
-    initial_state: dict[str, Any] = {
-        "goal_id": goal_id,
-        "idea": idea,
-        "phase": "planning",
-        "messages": [],
-        "plan": "",
-        "rules": "",
-        "tasks": [],
-        "current_ticket_id": None,
-        "kanban": {},
-        "config_override": {},
-        "cumulative_cost_usd": 0.0,
-        "cumulative_tokens": 0,
-        "interrupt_reason": None,
-    }
+        # Initial state
+        initial_state: dict[str, Any] = {
+            "goal_id": goal_id,
+            "idea": idea,
+            "phase": "planning",
+            "messages": [],
+            "plan": "",
+            "rules": "",
+            "tasks": [],
+            "current_ticket_id": None,
+            "kanban": {},
+            "config_override": {},
+            "cumulative_cost_usd": 0.0,
+            "cumulative_tokens": 0,
+            "interrupt_reason": None,
+        }
 
-    # Run graph through plan -> rules -> tasks
-    config = {"configurable": {"thread_id": goal_id}}
-    final_state = graph.invoke(initial_state, config)
+        # Run graph through plan -> rules -> tasks
+        config = {"configurable": {"thread_id": goal_id}}
+        final_state = graph.invoke(initial_state, config)
 
-    # Save artifacts
-    (goal_dir / "plan.md").write_text(final_state["plan"], encoding="utf-8")
-    (goal_dir / "rules.md").write_text(final_state["rules"], encoding="utf-8")
-    if final_state["tasks"]:
-        (goal_dir / "tasks.md").write_text(final_state["tasks"][0]["raw"], encoding="utf-8")
+        # Save artifacts (safe access in case interrupt fired early)
+        if final_state.get("plan"):
+            (goal_dir / "plan.md").write_text(final_state["plan"], encoding="utf-8")
+        if final_state.get("rules"):
+            (goal_dir / "rules.md").write_text(final_state["rules"], encoding="utf-8")
+        if final_state.get("tasks"):
+            (goal_dir / "tasks.md").write_text(
+                final_state["tasks"][0]["raw"], encoding="utf-8"
+            )
+    finally:
+        _close_checkpointer(checkpointer)
+        event_bus.close()
 
     rprint("[bold green]✓[/bold green] Plan, rules, and tasks generated.")
     rprint(f"[dim]Artifacts saved to:[/dim] {goal_dir}/")
@@ -139,28 +156,34 @@ def continue_cmd(
 
     # Build graph with checkpointer
     checkpointer = get_checkpointer(goal_dir)
-    graph = build_graph(checkpointer=checkpointer)
+    try:
+        graph = build_graph(checkpointer=checkpointer)
 
-    # Load checkpointed state
-    config = {"configurable": {"thread_id": goal_id}}
-    checkpoint = checkpointer.get(config)
-    if not checkpoint:
-        rprint("[bold red]No checkpoint found for this goal.[/bold red]")
-        raise typer.Exit(1)
+        # Load checkpointed state
+        config = {"configurable": {"thread_id": goal_id}}
+        checkpoint = checkpointer.get(config)
+        if not checkpoint:
+            rprint("[bold red]No checkpoint found for this goal.[/bold red]")
+            raise typer.Exit(1)
 
-    # Get state from checkpoint
-    state = checkpoint.get("channel_values", {})
+        # Get state from checkpoint
+        state = checkpoint.get("channel_values", {})
 
-    # Continue execution - LangGraph auto-resumes from checkpoint
-    final_state = graph.invoke(state, config)
+        # Continue execution - LangGraph auto-resumes from checkpoint
+        final_state = graph.invoke(state, config)
 
-    # Save artifacts
-    if final_state.get("plan"):
-        (goal_dir / "plan.md").write_text(final_state["plan"], encoding="utf-8")
-    if final_state.get("rules"):
-        (goal_dir / "rules.md").write_text(final_state["rules"], encoding="utf-8")
-    if final_state.get("tasks"):
-        (goal_dir / "tasks.md").write_text(final_state["tasks"][0]["raw"], encoding="utf-8")
+        # Save artifacts
+        if final_state.get("plan"):
+            (goal_dir / "plan.md").write_text(final_state["plan"], encoding="utf-8")
+        if final_state.get("rules"):
+            (goal_dir / "rules.md").write_text(final_state["rules"], encoding="utf-8")
+        if final_state.get("tasks"):
+            (goal_dir / "tasks.md").write_text(
+                final_state["tasks"][0]["raw"], encoding="utf-8"
+            )
+    finally:
+        _close_checkpointer(checkpointer)
+        event_bus.close()
 
     rprint("[bold green]✓[/bold green] Goal execution continued.")
     rprint(f"[dim]Artifacts saved to:[/dim] {goal_dir}/")
@@ -199,14 +222,17 @@ def status(
 
     # Load checkpointed state
     checkpointer = get_checkpointer(goal_dir)
-    config = {"configurable": {"thread_id": goal_id}}
-    checkpoint = checkpointer.get(config)
+    try:
+        config = {"configurable": {"thread_id": goal_id}}
+        checkpoint = checkpointer.get(config)
 
-    if not checkpoint:
-        rprint("[bold red]No checkpoint found for this goal.[/bold red]")
-        raise typer.Exit(1)
+        if not checkpoint:
+            rprint("[bold red]No checkpoint found for this goal.[/bold red]")
+            raise typer.Exit(1)
 
-    state = checkpoint.get("channel_values", {})
+        state = checkpoint.get("channel_values", {})
+    finally:
+        _close_checkpointer(checkpointer)
 
     rprint(f"[bold cyan]Goal:[/bold cyan] {goal_id}")
     rprint(f"[dim]Phase:[/dim] {state.get('phase', 'unknown')}")
@@ -240,22 +266,29 @@ def list_goals() -> None:
         rprint("[bold red]No goals found.[/bold red]")
         raise typer.Exit(0)
 
-    goal_dirs = sorted(goals_dir.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+    goal_dirs = sorted(
+        (p for p in goals_dir.iterdir() if p.is_dir()),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
 
     rprint("[bold cyan]Goals:[/bold cyan]")
     for goal_dir in goal_dirs:
         goal_id = goal_dir.name
         # Load checkpoint to get phase
         checkpointer = get_checkpointer(goal_dir)
-        config = {"configurable": {"thread_id": goal_id}}
-        checkpoint = checkpointer.get(config)
-        if checkpoint:
-            state = checkpoint.get("channel_values", {})
-            phase = state.get("phase", "unknown")
-            idea = state.get("idea", "No idea")[:50]  # Truncate long ideas
-        else:
-            phase = "no checkpoint"
-            idea = "N/A"
+        try:
+            config = {"configurable": {"thread_id": goal_id}}
+            checkpoint = checkpointer.get(config)
+            if checkpoint:
+                state = checkpoint.get("channel_values", {})
+                phase = state.get("phase", "unknown")
+                idea = state.get("idea", "No idea")[:50]  # Truncate long ideas
+            else:
+                phase = "no checkpoint"
+                idea = "N/A"
+        finally:
+            _close_checkpointer(checkpointer)
 
         mtime = goal_dir.stat().st_mtime
         from datetime import datetime

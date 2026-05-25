@@ -484,28 +484,35 @@ def coder_node(state: AgentState) -> AgentState:
         if not response.tool_calls:
             break
 
-        # Execute tool calls
+        # Execute tool calls - MUST append a ToolMessage for every tool_call
+        # or the next LLM call will fail with API error.
         for tool_call in response.tool_calls:
             tool_name = tool_call.get("name")
             tool_args = tool_call.get("args", {})
+            tool_call_id = tool_call.get("id", "")
 
             if tool_name in tool_map:
                 tool = tool_map[tool_name]
                 try:
                     result = tool.invoke(tool_args)
                     messages.append(
-                        ToolMessage(
-                            content=result,
-                            tool_call_id=tool_call.get("id", ""),
-                        )
+                        ToolMessage(content=str(result), tool_call_id=tool_call_id)
                     )
                 except Exception as e:
                     messages.append(
                         ToolMessage(
                             content=f"Error: {str(e)}",
-                            tool_call_id=tool_call.get("id", ""),
+                            tool_call_id=tool_call_id,
                         )
                     )
+            else:
+                # Unknown tool - still append ToolMessage to satisfy API contract
+                messages.append(
+                    ToolMessage(
+                        content=f"Error: unknown tool '{tool_name}'",
+                        tool_call_id=tool_call_id,
+                    )
+                )
 
     # Update cumulative tokens/cost
     cumulative_tokens = state.get("cumulative_tokens", 0) + total_tokens_in + total_tokens_out
@@ -557,8 +564,8 @@ def reviewer_node(state: AgentState) -> AgentState:
 
     diff_output = git_diff.invoke({})
 
-    # Use structured output
-    llm_structured = llm.with_structured_output(ReviewOutput)
+    # Use structured output with include_raw to also get usage metadata
+    llm_structured = llm.with_structured_output(ReviewOutput, include_raw=True)
 
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -582,17 +589,27 @@ def reviewer_node(state: AgentState) -> AgentState:
         ]
     )
 
-    response = _invoke_llm_with_retry(llm_structured, prompt.format_messages())
+    raw_response = _invoke_llm_with_retry(llm_structured, prompt.format_messages())
+    # raw_response is a dict {"raw": AIMessage, "parsed": ReviewOutput, "parsing_error": ...}
+    parsed: ReviewOutput | None = raw_response.get("parsed")
+    raw_msg = raw_response.get("raw")
 
-    # Track tokens and cost
-    tokens_in, tokens_out = _get_usage_metadata(response)
+    # Track tokens and cost from raw message
+    tokens_in, tokens_out = _get_usage_metadata(raw_msg)
     total_tokens = state.get("cumulative_tokens", 0) + tokens_in + tokens_out
     cost_usd = (tokens_in + tokens_out) / 1000 * 0.001
     total_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
-    score = response.score
-    approved = response.approved
-    review = f"Score: {score}/10\nApproved: {approved}\nFeedback: {response.feedback}"
+    # Fallback if parsing failed
+    if parsed is None:
+        score = 0
+        approved = False
+        feedback = "Review parsing failed."
+    else:
+        score = parsed.score
+        approved = parsed.approved
+        feedback = parsed.feedback
+    review = f"Score: {score}/10\nApproved: {approved}\nFeedback: {feedback}"
 
     # Mark ticket as done if approved
     if approved and ticket_id in kanban:
