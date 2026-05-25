@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from agentic_goal.config import Config, load_config
-from agentic_goal.events import EventType
+from agentic_goal.events import EventType, get_event_bus
 from agentic_goal.graph import AgentState
 from agentic_goal.tools import CODER_TOOLS
 
@@ -107,7 +107,7 @@ def plan_node(state: AgentState) -> AgentState:
     """Generate a detailed plan from the idea using top-tier model."""
     cfg = load_config()
     llm = _make_llm("planner", cfg)
-    event_bus = state.get("event_bus")
+    event_bus = get_event_bus()
 
     if event_bus:
         event_bus.emit(
@@ -187,7 +187,7 @@ def rules_node(state: AgentState) -> AgentState:
     """Generate questions for user to define rules/stack."""
     cfg = load_config()
     llm = _make_llm("rules_advisor", cfg)
-    event_bus = state.get("event_bus")
+    event_bus = get_event_bus()
 
     if event_bus:
         event_bus.emit(
@@ -261,7 +261,7 @@ def tasks_node(state: AgentState) -> AgentState:
     """Decompose plan into tickets/phases."""
     cfg = load_config()
     llm = _make_llm("task_decomposer", cfg)
-    event_bus = state.get("event_bus")
+    event_bus = get_event_bus()
 
     if event_bus:
         event_bus.emit(
@@ -360,7 +360,7 @@ def ticket_plan_node(state: AgentState) -> AgentState:
     """Plan the current ticket implementation."""
     cfg = load_config()
     llm = _make_llm("ticket_planner", cfg)
-    event_bus = state.get("event_bus")
+    event_bus = get_event_bus()
     ticket_id = state.get("current_ticket_id") or "unknown"
     kanban = state.get("kanban", {})
     ticket = kanban.get(ticket_id, {}) if ticket_id and ticket_id in kanban else {}
@@ -426,7 +426,7 @@ def coder_node(state: AgentState) -> AgentState:
     """Implement the current ticket using tools."""
     cfg = load_config()
     llm = _make_llm("coder", cfg)
-    event_bus = state.get("event_bus")
+    event_bus = get_event_bus()
     ticket_id = state.get("current_ticket_id") or "unknown"
     kanban = state.get("kanban", {})
     ticket = kanban.get(ticket_id, {}) if ticket_id in kanban else {}
@@ -537,7 +537,7 @@ def reviewer_node(state: AgentState) -> AgentState:
     """Review the code and score it (0-10)."""
     cfg = load_config()
     llm = _make_llm("reviewer", cfg)
-    event_bus = state.get("event_bus")
+    event_bus = get_event_bus()
     ticket_id = state.get("current_ticket_id") or "unknown"
     kanban = state.get("kanban", {})
     ticket = kanban.get(ticket_id, {}) if ticket_id in kanban else {}

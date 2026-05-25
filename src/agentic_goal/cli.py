@@ -8,7 +8,7 @@ import typer
 from rich import print as rprint
 
 from agentic_goal.config import load_config, validate_config
-from agentic_goal.events import EventBus, JsonlSink, MarkdownSink, TerminalSink
+from agentic_goal.events import EventBus, JsonlSink, MarkdownSink, TerminalSink, set_event_bus
 from agentic_goal.graph_builder import build_graph, get_checkpointer
 
 app = typer.Typer(help="Agentic SDLC CLI: /goal -> plan -> rules -> tasks -> execute")
@@ -53,6 +53,9 @@ def start(
     event_bus.add_sink(JsonlSink(goal_dir / "events.jsonl"))
     event_bus.add_sink(MarkdownSink(goal_dir / "transcript.md"))
 
+    # Set event_bus in context for nodes to access
+    set_event_bus(event_bus)
+
     # Build graph with checkpointer
     checkpointer = get_checkpointer(goal_dir)
     graph = build_graph(checkpointer=checkpointer)
@@ -72,7 +75,6 @@ def start(
         "cumulative_cost_usd": 0.0,
         "cumulative_tokens": 0,
         "interrupt_reason": None,
-        "event_bus": event_bus,
     }
 
     # Run graph through plan -> rules -> tasks
@@ -132,6 +134,9 @@ def continue_cmd(
     event_bus.add_sink(JsonlSink(goal_dir / "events.jsonl"))
     event_bus.add_sink(MarkdownSink(goal_dir / "transcript.md"))
 
+    # Set event_bus in context for nodes to access
+    set_event_bus(event_bus)
+
     # Build graph with checkpointer
     checkpointer = get_checkpointer(goal_dir)
     graph = build_graph(checkpointer=checkpointer)
@@ -145,7 +150,6 @@ def continue_cmd(
 
     # Get state from checkpoint
     state = checkpoint.get("channel_values", {})
-    state["event_bus"] = event_bus
 
     # Continue execution - LangGraph auto-resumes from checkpoint
     final_state = graph.invoke(state, config)

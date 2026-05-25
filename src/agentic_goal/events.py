@@ -2,12 +2,28 @@
 
 from __future__ import annotations
 
+import contextvars
 import json
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
 from typing import Any, Protocol
+
+# Context variable for event_bus - avoids serialization issues in checkpointed state
+_event_bus_context: contextvars.ContextVar[EventBus | None] = contextvars.ContextVar(
+    "event_bus", default=None
+)
+
+
+def get_event_bus() -> EventBus | None:
+    """Get the current thread's event_bus from context."""
+    return _event_bus_context.get()
+
+
+def set_event_bus(event_bus: EventBus) -> None:
+    """Set the event_bus for the current thread."""
+    _event_bus_context.set(event_bus)
 
 
 class EventType(StrEnum):
