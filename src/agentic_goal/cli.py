@@ -29,6 +29,14 @@ def start(
 ) -> None:
     """Start a new goal pipeline from an idea."""
     cfg = load_config()
+
+    # Apply model overrides from CLI
+    for override in model_override:
+        if "=" in override:
+            role, model = override.split("=", 1)
+            if role in cfg.roles:
+                cfg.roles[role].model = model
+
     validate_config(cfg, strict=True)
 
     goal_id = f"g_{uuid.uuid4().hex[:12]}"
@@ -104,7 +112,11 @@ def continue_cmd(
         if not goals_dir.exists():
             rprint("[bold red]No goals found.[/bold red]")
             raise typer.Exit(1)
-        goal_dirs = sorted(goals_dir.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+        goal_dirs = sorted(
+            (p for p in goals_dir.iterdir() if p.is_dir()),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
         if not goal_dirs:
             rprint("[bold red]No goals found.[/bold red]")
             raise typer.Exit(1)
@@ -135,18 +147,15 @@ def continue_cmd(
     state = checkpoint.get("channel_values", {})
     state["event_bus"] = event_bus
 
-    # Run resume analyzer to determine next step
-    from agentic_goal.nodes import resume_analyzer_node
-
-    state = resume_analyzer_node(state)
-
-    # Continue execution
+    # Continue execution - LangGraph auto-resumes from checkpoint
     final_state = graph.invoke(state, config)
 
     # Save artifacts
-    (goal_dir / "plan.md").write_text(final_state["plan"], encoding="utf-8")
-    (goal_dir / "rules.md").write_text(final_state["rules"], encoding="utf-8")
-    if final_state["tasks"]:
+    if final_state.get("plan"):
+        (goal_dir / "plan.md").write_text(final_state["plan"], encoding="utf-8")
+    if final_state.get("rules"):
+        (goal_dir / "rules.md").write_text(final_state["rules"], encoding="utf-8")
+    if final_state.get("tasks"):
         (goal_dir / "tasks.md").write_text(final_state["tasks"][0]["raw"], encoding="utf-8")
 
     rprint("[bold green]✓[/bold green] Goal execution continued.")
@@ -173,7 +182,11 @@ def status(
         if not goals_dir.exists():
             rprint("[bold red]No goals found.[/bold red]")
             raise typer.Exit(1)
-        goal_dirs = sorted(goals_dir.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+        goal_dirs = sorted(
+            (p for p in goals_dir.iterdir() if p.is_dir()),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
         if not goal_dirs:
             rprint("[bold red]No goals found.[/bold red]")
             raise typer.Exit(1)
@@ -273,7 +286,11 @@ def logs(
         if not goals_dir.exists():
             rprint("[bold red]No goals found.[/bold red]")
             raise typer.Exit(1)
-        goal_dirs = sorted(goals_dir.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+        goal_dirs = sorted(
+            (p for p in goals_dir.iterdir() if p.is_dir()),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
         if not goal_dirs:
             rprint("[bold red]No goals found.[/bold red]")
             raise typer.Exit(1)
@@ -330,7 +347,11 @@ def cost_dashboard(
         if not goals_dir.exists():
             rprint("[bold red]No goals found.[/bold red]")
             raise typer.Exit(1)
-        goal_dirs = sorted(goals_dir.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+        goal_dirs = sorted(
+            (p for p in goals_dir.iterdir() if p.is_dir()),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
         if not goal_dirs:
             rprint("[bold red]No goals found.[/bold red]")
             raise typer.Exit(1)

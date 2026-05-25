@@ -29,6 +29,9 @@ def write_file(path: str, content: str) -> str:
 @tool
 def run_shell(command: str, cwd: str | None = None) -> str:
     """Run a shell command and return stdout/stderr."""
+    # Default to goal directory if not specified
+    if cwd is None:
+        cwd = str(Path(".goal").absolute())
     result = subprocess.run(
         command,
         shell=True,
@@ -70,6 +73,11 @@ def git_diff(path: str | None = None) -> str:
 @tool
 def git_commit(message: str) -> str:
     """Stage all changes and commit with message."""
+    # Safety check: only allow commits in .goal directory
+    cwd = Path.cwd()
+    if not cwd.name.startswith("g_") or ".goal" not in str(cwd):
+        return "Error: git_commit only allowed in goal sandbox (.goal/g_*)"
+
     subprocess.run(["git", "add", "."], capture_output=True, timeout=30)
     result = subprocess.run(
         ["git", "commit", "-m", message],

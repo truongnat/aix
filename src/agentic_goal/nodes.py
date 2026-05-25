@@ -2,17 +2,33 @@
 
 from __future__ import annotations
 
+import re
 import uuid
 from typing import Any
 
 from langchain_community.chat_models import init_chat_model
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langchain_core.prompts import ChatPromptTemplate
+from pydantic import BaseModel, Field
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 from agentic_goal.config import Config, load_config
 from agentic_goal.events import EventType
 from agentic_goal.graph import AgentState
 from agentic_goal.tools import CODER_TOOLS
+
+
+class ReviewOutput(BaseModel):
+    """Structured output for code review."""
+    score: int = Field(description="Score from 0-10", ge=0, le=10)
+    feedback: str = Field(description="Detailed feedback on the code")
+    approved: bool = Field(description="Whether the code is approved")
+
+
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))
+def _invoke_llm_with_retry(llm: Any, messages: list[Any]) -> Any:
+    """Invoke LLM with retry logic."""
+    return llm.invoke(messages)
 
 
 def _make_llm(role_name: str, cfg: Config) -> Any:
@@ -47,6 +63,44 @@ def _make_llm(role_name: str, cfg: Config) -> Any:
     )
 
     return llm
+
+
+def _get_usage_metadata(response: Any) -> tuple[int, int]:
+    """Extract token usage from response, defaulting to 0."""
+    if hasattr(response, "usage_metadata"):
+        return (
+            response.usage_metadata.get("input_tokens", 0),
+            response.usage_metadata.get("output_tokens", 0),
+        )
+    return 0, 0
+
+
+def _parse_tasks_to_kanban(tasks_md: str) -> dict[str, dict[str, Any]]:
+    """Parse tasks markdown into structured kanban dict."""
+    kanban: dict[str, dict[str, Any]] = {}
+    # Simple regex to extract ticket info from markdown
+    # Pattern: ## ticket-001: Title
+    ticket_pattern = re.compile(r"##\s+(ticket-\d+):\s*(.+)")
+    current_ticket = None
+
+    for line in tasks_md.split("\n"):
+        match = ticket_pattern.match(line)
+        if match:
+            ticket_id = match.group(1)
+            title = match.group(2)
+            kanban[ticket_id] = {
+                "title": title,
+                "status": "todo",
+                "description": "",
+            }
+            current_ticket = ticket_id
+        elif current_ticket and line.strip():
+            if kanban[current_ticket]["description"]:
+                kanban[current_ticket]["description"] += "\n" + line
+            else:
+                kanban[current_ticket]["description"] = line
+
+    return kanban
 
 
 def plan_node(state: AgentState) -> AgentState:
@@ -84,8 +138,15 @@ def plan_node(state: AgentState) -> AgentState:
         ]
     )
 
-    response = llm.invoke(prompt.format_messages())
+    response = _invoke_llm_with_retry(llm, prompt.format_messages())
     plan_content = str(response.content)
+
+    # Track tokens and cost
+    tokens_in, tokens_out = _get_usage_metadata(response)
+    total_tokens = state.get("cumulative_tokens", 0) + tokens_in + tokens_out
+    # Simple cost estimation: $0.001/1K tokens (placeholder)
+    cost_usd = (tokens_in + tokens_out) / 1000 * 0.001
+    total_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
     if event_bus:
         event_bus.emit(
@@ -95,6 +156,9 @@ def plan_node(state: AgentState) -> AgentState:
             model=cfg.roles["planner"].model,
             event_type=EventType.LLM_END,
             data={"plan_length": len(plan_content)},
+            tokens_in=tokens_in,
+            tokens_out=tokens_out,
+            cost_usd=cost_usd,
         )
 
     # Ensure goal_id exists
@@ -106,6 +170,8 @@ def plan_node(state: AgentState) -> AgentState:
         "plan": plan_content,
         "phase": "planning",
         "messages": [AIMessage(content=plan_content)],
+        "cumulative_tokens": total_tokens,
+        "cumulative_cost_usd": total_cost,
     }
 
 
@@ -151,8 +217,14 @@ def rules_node(state: AgentState) -> AgentState:
         ]
     )
 
-    response = llm.invoke(prompt.format_messages())
+    response = _invoke_llm_with_retry(llm, prompt.format_messages())
     questions = str(response.content)
+
+    # Track tokens and cost
+    tokens_in, tokens_out = _get_usage_metadata(response)
+    total_tokens = state.get("cumulative_tokens", 0) + tokens_in + tokens_out
+    cost_usd = (tokens_in + tokens_out) / 1000 * 0.001
+    total_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
     if event_bus:
         event_bus.emit(
@@ -162,6 +234,9 @@ def rules_node(state: AgentState) -> AgentState:
             model=cfg.roles["rules_advisor"].model,
             event_type=EventType.LLM_END,
             data={"questions_length": len(questions)},
+            tokens_in=tokens_in,
+            tokens_out=tokens_out,
+            cost_usd=cost_usd,
         )
 
     return {
@@ -169,6 +244,8 @@ def rules_node(state: AgentState) -> AgentState:
         "rules": questions,
         "phase": "rules",
         "messages": [AIMessage(content=questions)],
+        "cumulative_tokens": total_tokens,
+        "cumulative_cost_usd": total_cost,
     }
 
 
@@ -214,8 +291,14 @@ def tasks_node(state: AgentState) -> AgentState:
         ]
     )
 
-    response = llm.invoke(prompt.format_messages())
+    response = _invoke_llm_with_retry(llm, prompt.format_messages())
     tasks_md = str(response.content)
+
+    # Track tokens and cost
+    tokens_in, tokens_out = _get_usage_metadata(response)
+    total_tokens = state.get("cumulative_tokens", 0) + tokens_in + tokens_out
+    cost_usd = (tokens_in + tokens_out) / 1000 * 0.001
+    total_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
     if event_bus:
         event_bus.emit(
@@ -225,13 +308,22 @@ def tasks_node(state: AgentState) -> AgentState:
             model=cfg.roles["task_decomposer"].model,
             event_type=EventType.LLM_END,
             data={"tasks_length": len(tasks_md)},
+            tokens_in=tokens_in,
+            tokens_out=tokens_out,
+            cost_usd=cost_usd,
         )
+
+    # Parse tasks into kanban
+    kanban = _parse_tasks_to_kanban(tasks_md)
 
     return {
         **state,
-        "tasks": [{"raw": tasks_md}],  # Placeholder: will parse into structured list later
+        "tasks": [{"raw": tasks_md}],
+        "kanban": kanban,
         "phase": "tasks",
         "messages": [AIMessage(content=tasks_md)],
+        "cumulative_tokens": total_tokens,
+        "cumulative_cost_usd": total_cost,
     }
 
 
@@ -245,12 +337,14 @@ def tasks_approval_node(state: AgentState) -> AgentState:
 
 def pick_ticket_node(state: AgentState) -> AgentState:
     """Pick the next pending ticket from kanban."""
-    # Simple implementation: find first ticket not in 'done' status
     kanban = state.get("kanban", {})
     for ticket_id, ticket_info in kanban.items():
-        if ticket_info.get("status") != "done":
+        if ticket_info.get("status") == "todo":
+            # Mark as in_progress
+            kanban[ticket_id]["status"] = "in_progress"
             return {
                 **state,
+                "kanban": kanban,
                 "current_ticket_id": ticket_id,
                 "phase": "execution",
             }
@@ -269,7 +363,7 @@ def ticket_plan_node(state: AgentState) -> AgentState:
     event_bus = state.get("event_bus")
     ticket_id = state.get("current_ticket_id") or "unknown"
     kanban = state.get("kanban", {})
-    ticket = kanban.get(ticket_id, {}) if ticket_id in kanban else {}
+    ticket = kanban.get(ticket_id, {}) if ticket_id and ticket_id in kanban else {}
 
     if event_bus:
         event_bus.emit(
@@ -297,8 +391,14 @@ def ticket_plan_node(state: AgentState) -> AgentState:
         ]
     )
 
-    response = llm.invoke(prompt.format_messages())
+    response = _invoke_llm_with_retry(llm, prompt.format_messages())
     plan = str(response.content)
+
+    # Track tokens and cost
+    tokens_in, tokens_out = _get_usage_metadata(response)
+    total_tokens = state.get("cumulative_tokens", 0) + tokens_in + tokens_out
+    cost_usd = (tokens_in + tokens_out) / 1000 * 0.001
+    total_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
     if event_bus:
         event_bus.emit(
@@ -308,12 +408,17 @@ def ticket_plan_node(state: AgentState) -> AgentState:
             model=cfg.roles["ticket_planner"].model,
             event_type=EventType.LLM_END,
             data={"plan_length": len(plan)},
+            tokens_in=tokens_in,
+            tokens_out=tokens_out,
+            cost_usd=cost_usd,
         )
 
     # Save ticket plan
     return {
         **state,
         "messages": [AIMessage(content=plan)],
+        "cumulative_tokens": total_tokens,
+        "cumulative_cost_usd": total_cost,
     }
 
 
@@ -322,7 +427,9 @@ def coder_node(state: AgentState) -> AgentState:
     cfg = load_config()
     llm = _make_llm("coder", cfg)
     event_bus = state.get("event_bus")
-    ticket_id = state.get("current_ticket_id", "unknown")
+    ticket_id = state.get("current_ticket_id") or "unknown"
+    kanban = state.get("kanban", {})
+    ticket = kanban.get(ticket_id, {}) if ticket_id in kanban else {}
 
     if event_bus:
         event_bus.emit(
@@ -337,20 +444,73 @@ def coder_node(state: AgentState) -> AgentState:
     # Bind tools to LLM
     llm_with_tools = llm.bind_tools(CODER_TOOLS)
 
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            SystemMessage(
-                content=(
-                    "You are a pragmatic engineer implementing a ticket. "
-                    "Use the available tools (read_file, write_file, run_shell, git_*) "
-                    "to implement the solution. Commit your changes when done."
-                )
-            ),
-            HumanMessage(content="Implement the ticket based on the plan."),
-        ]
-    )
+    # Build tool map for execution
+    tool_map = {tool.name: tool for tool in CODER_TOOLS}
 
-    response = llm_with_tools.invoke(prompt.format_messages())
+    # Initial messages
+    messages = [
+        SystemMessage(
+            content=(
+                "You are a pragmatic engineer implementing a ticket. "
+                "Use the available tools (read_file, write_file, run_shell, git_*) "
+                "to implement the solution. Commit your changes when done."
+            )
+        ),
+        HumanMessage(
+            content=(
+                f"Project Plan:\n{state.get('plan', 'N/A')}\n\n"
+                f"Project Rules:\n{state.get('rules', 'N/A')}\n\n"
+                f"Ticket:\n{ticket}\n\n"
+                "Implement this ticket based on the plan and rules."
+            )
+        ),
+    ]
+
+    # Tool execution loop
+    max_iterations = 10
+    total_tokens_in = 0
+    total_tokens_out = 0
+
+    for _ in range(max_iterations):
+        response = _invoke_llm_with_retry(llm_with_tools, messages)
+        messages.append(response)
+
+        # Track tokens
+        if hasattr(response, "usage_metadata"):
+            total_tokens_in += response.usage_metadata.get("input_tokens", 0)
+            total_tokens_out += response.usage_metadata.get("output_tokens", 0)
+
+        # If no tool calls, we're done
+        if not response.tool_calls:
+            break
+
+        # Execute tool calls
+        for tool_call in response.tool_calls:
+            tool_name = tool_call.get("name")
+            tool_args = tool_call.get("args", {})
+
+            if tool_name in tool_map:
+                tool = tool_map[tool_name]
+                try:
+                    result = tool.invoke(tool_args)
+                    messages.append(
+                        ToolMessage(
+                            content=result,
+                            tool_call_id=tool_call.get("id", ""),
+                        )
+                    )
+                except Exception as e:
+                    messages.append(
+                        ToolMessage(
+                            content=f"Error: {str(e)}",
+                            tool_call_id=tool_call.get("id", ""),
+                        )
+                    )
+
+    # Update cumulative tokens/cost
+    cumulative_tokens = state.get("cumulative_tokens", 0) + total_tokens_in + total_tokens_out
+    cost_usd = (total_tokens_in + total_tokens_out) / 1000 * 0.001
+    cumulative_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
     if event_bus:
         event_bus.emit(
@@ -359,12 +519,17 @@ def coder_node(state: AgentState) -> AgentState:
             role="coder",
             model=cfg.roles["coder"].model,
             event_type=EventType.LLM_END,
-            data={"has_tool_calls": len(response.tool_calls) > 0},
+            data={"message_count": len(messages)},
+            tokens_in=total_tokens_in,
+            tokens_out=total_tokens_out,
+            cost_usd=cost_usd,
         )
 
     return {
         **state,
-        "messages": [response],
+        "messages": messages,
+        "cumulative_tokens": cumulative_tokens,
+        "cumulative_cost_usd": cumulative_cost,
     }
 
 
@@ -373,7 +538,9 @@ def reviewer_node(state: AgentState) -> AgentState:
     cfg = load_config()
     llm = _make_llm("reviewer", cfg)
     event_bus = state.get("event_bus")
-    ticket_id = state.get("current_ticket_id", "unknown")
+    ticket_id = state.get("current_ticket_id") or "unknown"
+    kanban = state.get("kanban", {})
+    ticket = kanban.get(ticket_id, {}) if ticket_id in kanban else {}
 
     if event_bus:
         event_bus.emit(
@@ -385,6 +552,14 @@ def reviewer_node(state: AgentState) -> AgentState:
             data={"ticket_id": ticket_id},
         )
 
+    # Get git diff for context
+    from agentic_goal.tools import git_diff
+
+    diff_output = git_diff.invoke({})
+
+    # Use structured output
+    llm_structured = llm.with_structured_output(ReviewOutput)
+
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -394,16 +569,34 @@ def reviewer_node(state: AgentState) -> AgentState:
                     "- Correctness\n"
                     "- Code quality\n"
                     "- Testing\n"
-                    "- Documentation\n\n"
-                    "Output JSON with keys: score (int), feedback (str), approved (bool)."
+                    "- Documentation"
                 )
             ),
-            HumanMessage(content="Review the recent changes."),
+            HumanMessage(
+                content=(
+                    f"Ticket:\n{ticket}\n\n"
+                    f"Git Diff:\n{diff_output}\n\n"
+                    "Review the implementation based on the ticket requirements."
+                )
+            ),
         ]
     )
 
-    response = llm.invoke(prompt.format_messages())
-    review = str(response.content)
+    response = _invoke_llm_with_retry(llm_structured, prompt.format_messages())
+
+    # Track tokens and cost
+    tokens_in, tokens_out = _get_usage_metadata(response)
+    total_tokens = state.get("cumulative_tokens", 0) + tokens_in + tokens_out
+    cost_usd = (tokens_in + tokens_out) / 1000 * 0.001
+    total_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
+
+    score = response.score
+    approved = response.approved
+    review = f"Score: {score}/10\nApproved: {approved}\nFeedback: {response.feedback}"
+
+    # Mark ticket as done if approved
+    if approved and ticket_id in kanban:
+        kanban[ticket_id]["status"] = "done"
 
     if event_bus:
         event_bus.emit(
@@ -412,12 +605,18 @@ def reviewer_node(state: AgentState) -> AgentState:
             role="reviewer",
             model=cfg.roles["reviewer"].model,
             event_type=EventType.LLM_END,
-            data={"review_length": len(review)},
+            data={"review_length": len(review), "score": score, "approved": approved},
+            tokens_in=tokens_in,
+            tokens_out=tokens_out,
+            cost_usd=cost_usd,
         )
 
     return {
         **state,
+        "kanban": kanban,
         "messages": [AIMessage(content=review)],
+        "cumulative_tokens": total_tokens,
+        "cumulative_cost_usd": total_cost,
     }
 
 
@@ -456,7 +655,7 @@ def resume_analyzer_node(state: AgentState) -> AgentState:
         ]
     )
 
-    response = llm.invoke(prompt.format_messages())
+    response = _invoke_llm_with_retry(llm, prompt.format_messages())
     next_node = str(response.content).strip()
 
     if event_bus:

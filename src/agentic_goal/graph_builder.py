@@ -66,22 +66,38 @@ def build_graph(checkpointer: SqliteSaver | None = None) -> Any:
 
     # Conditional edge: if reviewer approves (score >= 9), go to pick_ticket, else back to coder
     def should_continue_review(state: AgentState) -> str:
-        # Simple check: if phase is "done", exit loop
+        # If phase is "done", exit loop
         if state.get("phase") == "done":
             return END
-        # For now, always loop back to pick_ticket after reviewer
-        # TODO: parse review score from messages
+
+        # Check if current ticket was marked as done
+        ticket_id = state.get("current_ticket_id")
+        kanban = state.get("kanban", {})
+        if ticket_id and ticket_id in kanban:
+            if kanban[ticket_id].get("status") == "done":
+                return "pick_ticket"  # Move to next ticket
+            else:
+                return "coder"  # Retry implementation
+
+        # Default: continue to pick_ticket
         return "pick_ticket"
 
     graph.add_conditional_edges(
-        "reviewer", should_continue_review, {"pick_ticket": "pick_ticket", END: END}
+        "reviewer",
+        should_continue_review,
+        {"pick_ticket": "pick_ticket", "coder": "coder", END: END},
     )
 
-    return graph.compile(checkpointer=checkpointer)
+    return graph.compile(
+        checkpointer=checkpointer,
+        interrupt_before=["plan_approval", "rules_approval", "tasks_approval"],
+    )
 
 
 def get_checkpointer(goal_dir: Path) -> SqliteSaver:
     """Create a SqliteSaver for the given goal."""
     db_path = goal_dir / "state.db"
     conn = sqlite3.connect(str(db_path), check_same_thread=False)
-    return SqliteSaver(conn)
+    checkpointer = SqliteSaver(conn)
+    # Note: caller should close checkpointer when done
+    return checkpointer
