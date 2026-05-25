@@ -12,6 +12,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from agentic_goal.config import Config, load_config
 from agentic_goal.events import EventType
 from agentic_goal.graph import AgentState
+from agentic_goal.tools import CODER_TOOLS
 
 
 def _make_llm(role_name: str, cfg: Config) -> Any:
@@ -239,4 +240,182 @@ def tasks_approval_node(state: AgentState) -> AgentState:
     return {
         **state,
         "interrupt_reason": "tasks_approval",
+    }
+
+
+def pick_ticket_node(state: AgentState) -> AgentState:
+    """Pick the next pending ticket from kanban."""
+    # Simple implementation: find first ticket not in 'done' status
+    kanban = state.get("kanban", {})
+    for ticket_id, ticket_info in kanban.items():
+        if ticket_info.get("status") != "done":
+            return {
+                **state,
+                "current_ticket_id": ticket_id,
+                "phase": "execution",
+            }
+    # All tickets done
+    return {
+        **state,
+        "current_ticket_id": None,
+        "phase": "done",
+    }
+
+
+def ticket_plan_node(state: AgentState) -> AgentState:
+    """Plan the current ticket implementation."""
+    cfg = load_config()
+    llm = _make_llm("ticket_planner", cfg)
+    event_bus = state.get("event_bus")
+    ticket_id = state.get("current_ticket_id") or "unknown"
+    kanban = state.get("kanban", {})
+    ticket = kanban.get(ticket_id, {}) if ticket_id in kanban else {}
+
+    if event_bus:
+        event_bus.emit(
+            phase="execution",
+            node="ticket_plan",
+            role="ticket_planner",
+            model=cfg.roles["ticket_planner"].model,
+            event_type=EventType.LLM_START,
+            data={"ticket_id": ticket_id},
+        )
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            SystemMessage(
+                content=(
+                    "You are a senior engineer. Given a ticket from the task list, "
+                    "produce a detailed implementation plan. Include:\n"
+                    "- Files to create/modify\n"
+                    "- Step-by-step implementation approach\n"
+                    "- Testing strategy\n\n"
+                    "Output in Markdown format."
+                )
+            ),
+            HumanMessage(content=f"Ticket:\n{ticket}"),
+        ]
+    )
+
+    response = llm.invoke(prompt.format_messages())
+    plan = str(response.content)
+
+    if event_bus:
+        event_bus.emit(
+            phase="execution",
+            node="ticket_plan",
+            role="ticket_planner",
+            model=cfg.roles["ticket_planner"].model,
+            event_type=EventType.LLM_END,
+            data={"plan_length": len(plan)},
+        )
+
+    # Save ticket plan
+    return {
+        **state,
+        "messages": [AIMessage(content=plan)],
+    }
+
+
+def coder_node(state: AgentState) -> AgentState:
+    """Implement the current ticket using tools."""
+    cfg = load_config()
+    llm = _make_llm("coder", cfg)
+    event_bus = state.get("event_bus")
+    ticket_id = state.get("current_ticket_id", "unknown")
+
+    if event_bus:
+        event_bus.emit(
+            phase="execution",
+            node="coder",
+            role="coder",
+            model=cfg.roles["coder"].model,
+            event_type=EventType.LLM_START,
+            data={"ticket_id": ticket_id},
+        )
+
+    # Bind tools to LLM
+    llm_with_tools = llm.bind_tools(CODER_TOOLS)
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            SystemMessage(
+                content=(
+                    "You are a pragmatic engineer implementing a ticket. "
+                    "Use the available tools (read_file, write_file, run_shell, git_*) "
+                    "to implement the solution. Commit your changes when done."
+                )
+            ),
+            HumanMessage(content="Implement the ticket based on the plan."),
+        ]
+    )
+
+    response = llm_with_tools.invoke(prompt.format_messages())
+
+    if event_bus:
+        event_bus.emit(
+            phase="execution",
+            node="coder",
+            role="coder",
+            model=cfg.roles["coder"].model,
+            event_type=EventType.LLM_END,
+            data={"has_tool_calls": len(response.tool_calls) > 0},
+        )
+
+    return {
+        **state,
+        "messages": [response],
+    }
+
+
+def reviewer_node(state: AgentState) -> AgentState:
+    """Review the code and score it (0-10)."""
+    cfg = load_config()
+    llm = _make_llm("reviewer", cfg)
+    event_bus = state.get("event_bus")
+    ticket_id = state.get("current_ticket_id", "unknown")
+
+    if event_bus:
+        event_bus.emit(
+            phase="execution",
+            node="reviewer",
+            role="reviewer",
+            model=cfg.roles["reviewer"].model,
+            event_type=EventType.LLM_START,
+            data={"ticket_id": ticket_id},
+        )
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            SystemMessage(
+                content=(
+                    "You are a strict code reviewer. Review the implementation and score it 0-10 "
+                    "based on:\n"
+                    "- Correctness\n"
+                    "- Code quality\n"
+                    "- Testing\n"
+                    "- Documentation\n\n"
+                    "Output JSON with keys: score (int), feedback (str), approved (bool)."
+                )
+            ),
+            HumanMessage(content="Review the recent changes."),
+        ]
+    )
+
+    response = llm.invoke(prompt.format_messages())
+    review = str(response.content)
+
+    if event_bus:
+        event_bus.emit(
+            phase="execution",
+            node="reviewer",
+            role="reviewer",
+            model=cfg.roles["reviewer"].model,
+            event_type=EventType.LLM_END,
+            data={"review_length": len(review)},
+        )
+
+    return {
+        **state,
+        "messages": [AIMessage(content=review)],
     }

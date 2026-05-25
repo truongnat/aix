@@ -11,12 +11,16 @@ from langgraph.graph import END, StateGraph
 
 from agentic_goal.graph import AgentState
 from agentic_goal.nodes import (
+    coder_node,
+    pick_ticket_node,
     plan_approval_node,
     plan_node,
+    reviewer_node,
     rules_approval_node,
     rules_node,
     tasks_approval_node,
     tasks_node,
+    ticket_plan_node,
 )
 
 
@@ -32,16 +36,42 @@ def build_graph(checkpointer: SqliteSaver | None = None) -> Any:
     graph.add_node("tasks", tasks_node)
     graph.add_node("tasks_approval", tasks_approval_node)
 
+    # Execution loop nodes
+    graph.add_node("pick_ticket", pick_ticket_node)
+    graph.add_node("ticket_plan", ticket_plan_node)
+    graph.add_node("coder", coder_node)
+    graph.add_node("reviewer", reviewer_node)
+
     # Entry point
     graph.set_entry_point("plan")
 
-    # Edges: plan -> plan_approval -> rules -> rules_approval -> tasks -> tasks_approval -> END
+    # Edges: plan -> plan_approval -> rules -> rules_approval -> tasks -> tasks_approval
     graph.add_edge("plan", "plan_approval")
     graph.add_edge("plan_approval", "rules")
     graph.add_edge("rules", "rules_approval")
     graph.add_edge("rules_approval", "tasks")
     graph.add_edge("tasks", "tasks_approval")
-    graph.add_edge("tasks_approval", END)
+
+    # After tasks approval, start execution loop
+    graph.add_edge("tasks_approval", "pick_ticket")
+
+    # Ticket execution loop: pick_ticket -> ticket_plan -> coder -> reviewer
+    graph.add_edge("pick_ticket", "ticket_plan")
+    graph.add_edge("ticket_plan", "coder")
+    graph.add_edge("coder", "reviewer")
+
+    # Conditional edge: if reviewer approves (score >= 9), go to pick_ticket, else back to coder
+    def should_continue_review(state: AgentState) -> str:
+        # Simple check: if phase is "done", exit loop
+        if state.get("phase") == "done":
+            return END
+        # For now, always loop back to pick_ticket after reviewer
+        # TODO: parse review score from messages
+        return "pick_ticket"
+
+    graph.add_conditional_edges(
+        "reviewer", should_continue_review, {"pick_ticket": "pick_ticket", END: END}
+    )
 
     return graph.compile(checkpointer=checkpointer)
 
