@@ -291,6 +291,15 @@ struct ProviderCallResult {
 }
 
 #[derive(Debug, Clone)]
+pub struct SynthesizedText {
+    pub provider: String,
+    pub model: String,
+    pub text: String,
+    pub attempts: u32,
+    pub fallback_used: bool,
+}
+
+#[derive(Debug, Clone)]
 struct ProviderCallFailure {
     provider: LlmProvider,
     model: String,
@@ -830,6 +839,58 @@ impl LlmSubAgentSkill {
             LlmProvider::AzureOpenAI => self.call_azure_openai(model, prompt, temperature).await,
             LlmProvider::Bedrock => self.call_bedrock(model, prompt, temperature).await,
         }
+    }
+
+    pub async fn synthesize_text(&self, prompt: &str) -> Result<SynthesizedText> {
+        let primary_provider = self.provider;
+        let temperature = self.temperature;
+        let chain = build_provider_chain(primary_provider, &self.fallback_providers);
+        let mut errors = Vec::new();
+        let mut total_attempts = 0_u32;
+
+        for (idx, provider) in chain.iter().enumerate() {
+            let model = self.resolve_model_for_provider(*provider, primary_provider, None);
+            match self
+                .call_provider_with_retry(*provider, &model, prompt, temperature)
+                .await
+            {
+                Ok(result) => {
+                    total_attempts = total_attempts.saturating_add(result.attempts);
+                    return Ok(SynthesizedText {
+                        provider: result.provider.as_str().to_string(),
+                        model: result.model,
+                        text: result.text,
+                        attempts: total_attempts.max(result.attempts),
+                        fallback_used: idx > 0,
+                    });
+                }
+                Err(failure) => {
+                    total_attempts = total_attempts.saturating_add(failure.attempts);
+                    errors.push(format!(
+                        "provider={} model={} class={} transient={} message={}",
+                        failure.provider.as_str(),
+                        failure.model,
+                        failure.class.as_str(),
+                        failure.class.is_transient(),
+                        failure.message
+                    ));
+                    let has_next_provider = idx + 1 < chain.len();
+                    if has_next_provider
+                        && !should_attempt_fallback(
+                            self.router_config.fallback_policy,
+                            failure.class,
+                        )
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        Err(anyhow!(
+            "llm router failed across providers [{}]",
+            errors.join(" | ")
+        ))
     }
 
     async fn call_ollama(

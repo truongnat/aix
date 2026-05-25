@@ -1,7 +1,7 @@
 # Documentation Index
 
-**Last Updated:** 2026-03-10  
-**Status:** Production Ready ✅
+**Last Updated:** 2026-05-20  
+**Status:** Rebuild In Progress
 
 ---
 
@@ -9,10 +9,14 @@
 
 **New to the project?** Start here:
 
-1. [README.md](../README.md) - Project overview
-2. [Gap Quick Reference](GAP_QUICK_REFERENCE.md) - What's been done (5 min read)
-3. [Tóm Tắt Tiếng Việt](TOM_TAT_TIENG_VIET.md) - Vietnamese summary (5 min read)
-4. [Final Summary](../FINAL_SUMMARY.md) - Complete 4-week summary (15 min read)
+1. [README.md](../README.md) - Project overview and rebuild context
+2. [LangGraph Rebuild Plan](LANGGRAPH_REBUILD_PLAN.md) - Approved rebuild direction for the local web UI surface
+3. [LangGraph Runtime Contracts](LANGGRAPH_RUNTIME_CONTRACTS.md) - Source-of-truth runtime contracts for the rebuild
+4. [Ask/Plan/Implement Architecture](ASK_PLAN_IMPLEMENT_ARCHITECTURE.md) - Legacy command-surface architecture kept for reference
+5. [Output Schemas](OUTPUT_SCHEMAS.md) - Machine-readable `ask.v1`, `plan.v1`, `implement.v1` contracts from the earlier CLI track
+6. [Gap Quick Reference](GAP_QUICK_REFERENCE.md) - Historical delivery summary (5 min read)
+7. [Tóm Tắt Tiếng Việt](TOM_TAT_TIENG_VIET.md) - Vietnamese summary (5 min read)
+8. [Final Summary](../FINAL_SUMMARY.md) - Complete 4-week summary (15 min read)
 
 ---
 

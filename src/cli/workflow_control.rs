@@ -22,6 +22,113 @@ pub(super) fn handle_workflow_control_command(
             run_project_index(project_layout, max_files, memory_persist, json)?;
             Ok(WorkflowLaunchAction::Noop)
         }
+        Commands::Ask { .. } => Ok(WorkflowLaunchAction::Noop),
+        Commands::Handoff { .. } => Ok(WorkflowLaunchAction::Noop),
+        Commands::Plan { goal, json } => {
+            let plan = crate::plan::generate_plan(project_layout, &goal);
+            let verification = crate::plan::verify_plan(&plan);
+            let output = crate::plan::PlanOutput {
+                schema_version: "plan.v1".to_string(),
+                plan,
+                verification,
+            };
+            if json {
+                println!("{}", serde_json::to_string_pretty(&output)?);
+            } else {
+                println!("Plan Goal: {}", output.plan.goal);
+                println!("Tasks: {}", output.plan.tasks.len());
+                println!(
+                    "Harness verify: {}",
+                    if output.verification.ok { "pass" } else { "fail" }
+                );
+                for task in &output.plan.tasks {
+                    println!("- {}: {}", task.id, task.title);
+                }
+            }
+            if output.verification.ok {
+                Ok(WorkflowLaunchAction::Noop)
+            } else {
+                Err(anyhow!("plan verification failed"))
+            }
+        }
+        Commands::Implement {
+            goal,
+            plan_file,
+            task_id,
+            json,
+            dry_run,
+            allow_dirty,
+            resume_run,
+        } => {
+            let doctor_report = run_workflow_doctor(project_layout, resolve_bootstrap_strict_ollama(false))?;
+            if !doctor_report.ok {
+                return Err(anyhow!(
+                    "implement preflight failed: doctor has {} error check(s)",
+                    doctor_error_count(&doctor_report)
+                ));
+            }
+            if !allow_dirty && has_dirty_working_tree(project_layout)? {
+                return Err(anyhow!(
+                    "implement preflight failed: working tree is dirty; commit or use --allow-dirty"
+                ));
+            }
+            let report = crate::implement::run_implement(
+                project_layout,
+                goal.as_deref(),
+                plan_file.as_deref(),
+                task_id.as_deref(),
+                dry_run,
+                resume_run.as_deref(),
+            )?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                println!(
+                    "Implement run={} goal='{}' source={} tasks={} result={}",
+                    report.run_id,
+                    report.goal,
+                    report.plan_source,
+                    report.selected_tasks,
+                    if report.ok { "pass" } else { "fail" }
+                );
+                for task in &report.reports {
+                    println!(
+                        "- {} ({}) verification={}",
+                        task.task_id,
+                        task.title,
+                        if task.verification_ok { "pass" } else { "fail" }
+                    );
+                    for cmd in &task.command_results {
+                        println!(
+                            "  * {} => {}",
+                            cmd.command,
+                            if cmd.ok { "ok" } else { "failed" }
+                        );
+                    }
+                }
+            }
+            if report.ok {
+                Ok(WorkflowLaunchAction::Noop)
+            } else {
+                Err(anyhow!("implement verification failed"))
+            }
+        }
+        Commands::Doctor { json, strict_ollama } => {
+            let report = run_workflow_doctor(project_layout, resolve_bootstrap_strict_ollama(strict_ollama))?;
+            if json {
+                println!("{}", serde_json::to_string_pretty(&report)?);
+            } else {
+                print_doctor_report(&report);
+            }
+            if report.ok {
+                Ok(WorkflowLaunchAction::Noop)
+            } else {
+                Err(anyhow!(
+                    "doctor failed with {} error check(s)",
+                    doctor_error_count(&report)
+                ))
+            }
+        }
         Commands::Bug { .. } => Ok(WorkflowLaunchAction::Noop),
         Commands::Workflow { action } => match *action {
             WorkflowCommand::List => {
@@ -2621,4 +2728,32 @@ fn run_git_pr_flow(
     }
 
     Ok(report)
+}
+
+fn has_dirty_working_tree(layout: &AgentProjectLayout) -> Result<bool> {
+    if !std::path::Path::new(&layout.project_root)
+        .join(".git")
+        .exists()
+    {
+        return Ok(false);
+    }
+    let output = std::process::Command::new("git")
+        .arg("status")
+        .arg("--porcelain")
+        .current_dir(&layout.project_root)
+        .output()
+        .map_err(|err| {
+            anyhow!(
+                "failed to inspect git status in '{}': {}",
+                layout.project_root,
+                err
+            )
+        })?;
+    if !output.status.success() {
+        return Err(anyhow!(
+            "git status --porcelain failed in '{}'",
+            layout.project_root
+        ));
+    }
+    Ok(!String::from_utf8_lossy(&output.stdout).trim().is_empty())
 }

@@ -4,6 +4,30 @@
 
 Practical daily developer assistant for bug/ticket analysis, with a deterministic workflow harness underneath.
 
+## Rebuild track
+
+The current rebuild direction is shifting the product surface toward a local web control room in `apps/web`, backed by the LangGraph-style runtime contracts documented in:
+
+- [docs/LANGGRAPH_REBUILD_PLAN.md](docs/LANGGRAPH_REBUILD_PLAN.md)
+- [docs/LANGGRAPH_RUNTIME_CONTRACTS.md](docs/LANGGRAPH_RUNTIME_CONTRACTS.md)
+
+The web shell is intentionally being built first so the new goal-driven loop has a real local UI surface before deeper runtime migration work.
+
+Current shell status:
+- local web UI scaffold exists in `apps/web`
+- runtime loop now goes through a dedicated runtime service adapter with transport resolution
+- current default adapter is local checkpoint persistence; remote runtime transport now expects an HTTP runtime API via `VITE_RUNTIME_TRANSPORT` and `VITE_RUNTIME_BASE_URL`
+- `/goal -> analyze -> plan -> execute -> verify -> repair/done` transitions are visible in the UI
+- persisted backend/LangGraph adapter is still the next step beyond the current local `localStorage` checkpoint
+
+Local remote-transport dev path:
+- copy `apps/web/.env.example` to `.env`
+- set `VITE_RUNTIME_TRANSPORT=remote`
+- run `npm run runtime:server` inside `apps/web`
+- point `VITE_RUNTIME_BASE_URL` at that local runtime server
+- remote dispatch now uses server-held state as source of truth and rejects stale client run ids with HTTP `409`
+- the web store now auto-rehydrates the latest remote snapshot after a `409` conflict
+
 ## Global install
 
 If you want a global command similar to `npm link`, install the binaries from this repo:
@@ -62,6 +86,38 @@ Optional:
 asd index --max-files 500
 asd index --json
 ```
+
+## Ask the project
+
+After indexing, ask the repository directly:
+
+```bash
+asd ask "project này làm gì?"
+asd ask "where is email validation implemented?"
+asd ask "tiếp theo nên làm gì?"
+```
+
+This uses the local project index and returns deterministic, retrieval-based answers with relevant files.
+
+## Plan and implement (harness-gated)
+
+After `ask`, move through explicit planning and controlled execution:
+
+```bash
+# Build a machine-readable plan
+asd plan "implement ask -> plan -> implement loop" --json
+
+# Execute plan validations in dry-run mode first
+asd implement "implement ask -> plan -> implement loop" --dry-run --allow-dirty --json
+```
+
+`implement` enforces preflight checks (`doctor`, plan verification) before task execution.
+Execution reports are versioned and include `run_id` for stateful resume.
+
+Schema contracts:
+
+- [docs/OUTPUT_SCHEMAS.md](docs/OUTPUT_SCHEMAS.md)
+- [docs/ASK_PLAN_IMPLEMENT_ARCHITECTURE.md](docs/ASK_PLAN_IMPLEMENT_ARCHITECTURE.md)
 
 ## Fastest useful path
 
@@ -164,6 +220,12 @@ Not every workflow builds software. If a workflow does not contain explicit muta
 ## Common commands
 
 ```bash
+# Core flow
+$ asd doctor --json
+$ asd ask "tiếp theo nên làm gì để triển khai?" --json
+$ asd plan "deliver feature X with harness verify" --json
+$ asd implement --plan-file /tmp/plan.json --dry-run --allow-dirty --json
+
 # Starter artifact-producing paths
 $ cargo run -- --workflow-id starter/app-builder --task "create a todo list app"
 $ cargo run -- --workflow-id starter/todo-cli-node

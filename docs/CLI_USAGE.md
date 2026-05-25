@@ -53,6 +53,25 @@ asd index --json
 
 `index` rebuilds the graph index and sqlite context store used by project retrieval.
 
+## Ask a project
+
+After indexing, ask questions against the local repository context:
+
+```bash
+asd ask "project này làm gì?"
+asd ask "where is auth logic?"
+asd ask "tiếp theo nên làm gì?"
+```
+
+Optional:
+
+```bash
+asd ask "where is auth logic?" --limit 8
+asd ask "project này làm gì?" --json
+```
+
+`ask` uses deterministic retrieval from the local index. It does not require network or a remote LLM.
+
 ## Fastest useful path
 
 If you want the most practical daily command, run:

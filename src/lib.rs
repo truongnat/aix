@@ -1,12 +1,15 @@
 #![allow(dead_code)]
 
+mod ask;
 mod bmad;
 mod bug;
 mod cli;
 mod engine;
 mod harness;
+mod implement;
 mod office;
 mod pinchtab;
+mod plan;
 mod platform;
 mod skill;
 mod skills;

@@ -98,6 +98,130 @@ fn cli_parses_index_command() {
     }
 }
 
+#[test]
+fn cli_parses_ask_command() {
+    let cli = Cli::parse_from([
+        "agentic-sdlc",
+        "ask",
+        "where is auth logic?",
+        "--limit",
+        "4",
+    ]);
+    match cli.command {
+        Some(command) => match *command {
+            Commands::Ask {
+                question,
+                limit,
+                json,
+            } => {
+                assert_eq!(question, "where is auth logic?");
+                assert_eq!(limit, 4);
+                assert!(!json);
+            }
+            other => panic!("expected ask command, got {:?}", other),
+        },
+        None => panic!("expected subcommand"),
+    }
+}
+
+#[test]
+fn cli_parses_handoff_command() {
+    let cli = Cli::parse_from([
+        "agentic-sdlc",
+        "handoff",
+        "tiếp theo nên làm gì?",
+        "--limit",
+        "5",
+        "--json",
+    ]);
+    match cli.command {
+        Some(command) => match *command {
+            Commands::Handoff {
+                question,
+                limit,
+                json,
+            } => {
+                assert_eq!(question, "tiếp theo nên làm gì?");
+                assert_eq!(limit, 5);
+                assert!(json);
+            }
+            other => panic!("expected handoff command, got {:?}", other),
+        },
+        None => panic!("expected subcommand"),
+    }
+}
+
+#[test]
+fn cli_parses_plan_command() {
+    let cli = Cli::parse_from(["agentic-sdlc", "plan", "ship ask contract", "--json"]);
+    match cli.command {
+        Some(command) => match *command {
+            Commands::Plan { goal, json } => {
+                assert_eq!(goal, "ship ask contract");
+                assert!(json);
+            }
+            other => panic!("expected plan command, got {:?}", other),
+        },
+        None => panic!("expected subcommand"),
+    }
+}
+
+#[test]
+fn cli_parses_implement_command() {
+    let cli = Cli::parse_from([
+        "agentic-sdlc",
+        "implement",
+        "ship ask plan",
+        "--plan-file",
+        "plan.json",
+        "--task-id",
+        "T2-implement-core",
+        "--json",
+        "--dry-run",
+        "--allow-dirty",
+        "--resume-run",
+        "run-123",
+    ]);
+    match cli.command {
+        Some(command) => match *command {
+            Commands::Implement {
+                goal,
+                plan_file,
+                task_id,
+                json,
+                dry_run,
+                allow_dirty,
+                resume_run,
+            } => {
+                assert_eq!(goal.as_deref(), Some("ship ask plan"));
+                assert_eq!(plan_file.as_deref(), Some("plan.json"));
+                assert_eq!(task_id.as_deref(), Some("T2-implement-core"));
+                assert!(json);
+                assert!(dry_run);
+                assert!(allow_dirty);
+                assert_eq!(resume_run.as_deref(), Some("run-123"));
+            }
+            other => panic!("expected implement command, got {:?}", other),
+        },
+        None => panic!("expected subcommand"),
+    }
+}
+
+#[test]
+fn cli_parses_doctor_command() {
+    let cli = Cli::parse_from(["agentic-sdlc", "doctor", "--json", "--strict-ollama"]);
+    match cli.command {
+        Some(command) => match *command {
+            Commands::Doctor { json, strict_ollama } => {
+                assert!(json);
+                assert!(strict_ollama);
+            }
+            other => panic!("expected doctor command, got {:?}", other),
+        },
+        None => panic!("expected subcommand"),
+    }
+}
+
 #[derive(Debug, Clone)]
 struct MockEnsureBranchSkill;
 

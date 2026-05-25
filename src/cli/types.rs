@@ -16,6 +16,55 @@ pub(crate) enum Commands {
         #[arg(long, default_value_t = false)]
         json: bool,
     },
+    Ask {
+        question: String,
+        #[arg(long, default_value_t = 6)]
+        limit: usize,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    Handoff {
+        question: String,
+        #[arg(long, default_value_t = 6)]
+        limit: usize,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    Plan {
+        goal: String,
+        #[arg(long, default_value_t = false)]
+        json: bool,
+    },
+    Implement {
+        /// Optional high-level goal. If provided without --plan-file, a deterministic plan is generated first.
+        goal: Option<String>,
+        /// Optional path to a previously generated plan JSON (PlanOutput or ExecutionPlan).
+        #[arg(long)]
+        plan_file: Option<String>,
+        /// Execute only one task from the plan by task id.
+        #[arg(long)]
+        task_id: Option<String>,
+        /// Print machine-readable report.
+        #[arg(long, default_value_t = false)]
+        json: bool,
+        /// Do not run commands; only show what would execute.
+        #[arg(long, default_value_t = false)]
+        dry_run: bool,
+        /// Allow execution when git working tree is dirty.
+        #[arg(long, default_value_t = false)]
+        allow_dirty: bool,
+        /// Resume a previous implement run by id.
+        #[arg(long)]
+        resume_run: Option<String>,
+    },
+    Doctor {
+        /// Print machine-readable doctor report
+        #[arg(long, default_value_t = false)]
+        json: bool,
+        /// Require Ollama to be installed and daemon-responsive
+        #[arg(long, default_value_t = false)]
+        strict_ollama: bool,
+    },
     Bug {
         #[command(subcommand)]
         action: Box<BugCommand>,

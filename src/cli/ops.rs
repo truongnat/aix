@@ -1216,8 +1216,10 @@ pub(super) fn build_graph_index(
     let edge_count = nodes.iter().map(|node| node.links.len()).sum::<usize>();
     let payload = GraphIndexPayloadDoc { nodes };
     let index_path = layout.memory_dir.join("graph_index.json");
+    let vector_index_path = layout.memory_dir.join("vector_index.json");
     std::fs::create_dir_all(&layout.memory_dir)?;
     std::fs::write(&index_path, serde_json::to_string_pretty(&payload)?)?;
+    write_vector_index_json(&vector_index_path, &payload)?;
     let sqlite_report = write_context_sqlite(layout, &payload, memory_persist)?;
 
     Ok(GraphIndexBuildReport {
@@ -1230,6 +1232,22 @@ pub(super) fn build_graph_index(
         vector_entries: sqlite_report.vector_entries,
         graph_entries: sqlite_report.graph_entries,
     })
+}
+
+fn write_vector_index_json(path: &Path, payload: &GraphIndexPayloadDoc) -> Result<()> {
+    let entries = payload
+        .nodes
+        .iter()
+        .map(|node| {
+            serde_json::json!({
+                "id": node.id,
+                "text": node.text,
+                "embedding": embed_for_context(&node.text),
+            })
+        })
+        .collect::<Vec<_>>();
+    std::fs::write(path, serde_json::to_string_pretty(&entries)?)?;
+    Ok(())
 }
 
 fn resolve_context_db_path(layout: &AgentProjectLayout) -> PathBuf {
@@ -1414,6 +1432,7 @@ fn collect_graph_source_files(
             let rel = rel.to_string_lossy();
             if rel.starts_with(".git/")
                 || rel.starts_with("target/")
+                || rel.starts_with(".agents/memory/")
                 || rel.starts_with(".agents/state/")
                 || rel.starts_with("node_modules/")
             {

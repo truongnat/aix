@@ -60,6 +60,26 @@ pub(super) async fn run_impl() -> Result<()> {
     let project_root = project_root_path.to_string_lossy().to_string();
     let project_layout = AgentProjectLayout::discover(&project_root)?;
     project_layout.validate_startup()?;
+    if let Some(ref command) = cli.command {
+        if let Commands::Ask {
+            question,
+            limit,
+            json,
+        } = &**command
+        {
+            crate::ask::run_ask(&project_layout, question, *limit, *json).await?;
+            return Ok(());
+        }
+        if let Commands::Handoff {
+            question,
+            limit,
+            json,
+        } = &**command
+        {
+            crate::ask::run_handoff(&project_layout, question, *limit, *json).await?;
+            return Ok(());
+        }
+    }
     let mut harness_run_request: Option<(String, String, bool)> = None;
     let mut harness_config = None::<crate::harness::HarnessConfig>;
 
