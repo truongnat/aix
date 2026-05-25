@@ -93,6 +93,27 @@ class MarkdownSink:
         pass
 
 
+class TerminalSink:
+    """Print events to terminal with Rich formatting."""
+
+    def __init__(self, verbose: int = 0) -> None:
+        self.verbose = verbose
+
+    def emit(self, event: Event) -> None:
+        from rich import print as rprint
+
+        ts = event.ts.split("T")[1].split(".")[0]
+        node_color = "cyan" if event.node in ("plan", "rules", "tasks") else "yellow"
+        rprint(f"[dim][{ts}][/dim] [{node_color}]{event.node}[/{node_color}] · {event.role}")
+        if self.verbose >= 1:
+            rprint(f"  [dim]{event.event_type.value}[/dim]")
+        if self.verbose >= 2 and event.data:
+            rprint(f"  [dim]{json.dumps(event.data, default=str, ensure_ascii=False)}[/dim]")
+
+    def close(self) -> None:
+        pass
+
+
 class EventBus:
     """Fan-out events to all registered sinks."""
 

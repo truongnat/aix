@@ -8,6 +8,7 @@ import typer
 from rich import print as rprint
 
 from agentic_goal.config import load_config, validate_config
+from agentic_goal.events import EventBus, JsonlSink, MarkdownSink, TerminalSink
 from agentic_goal.graph_builder import build_graph, get_checkpointer
 
 app = typer.Typer(help="Agentic SDLC CLI: /goal -> plan -> rules -> tasks -> execute")
@@ -18,6 +19,7 @@ def start(
     idea: str = typer.Argument(..., help="Goal idea / requirement"),
     verbose: int = typer.Option(0, "--verbose", "-v", count=True, help="Verbosity (-v, -vv, -vvv)"),
     model_override: list[str] = typer.Option(  # noqa: B008
+        None,
         "--model-override",
         default_factory=list,
         help="Override model per role, e.g. coder=gpt-4",
@@ -27,7 +29,7 @@ def start(
 ) -> None:
     """Start a new goal pipeline from an idea."""
     cfg = load_config()
-    validate_config(cfg)
+    validate_config(cfg, strict=True)
 
     goal_id = f"g_{uuid.uuid4().hex[:12]}"
     goal_dir = Path(".goal") / goal_id
@@ -37,9 +39,15 @@ def start(
     rprint(f"[dim]Goal ID:[/dim] {goal_id}")
     rprint(f"[dim]Workspace:[/dim] {goal_dir}")
 
+    # Set up event bus with 3 sinks
+    event_bus = EventBus(goal_id)
+    event_bus.add_sink(TerminalSink(verbose=verbose))
+    event_bus.add_sink(JsonlSink(goal_dir / "events.jsonl"))
+    event_bus.add_sink(MarkdownSink(goal_dir / "transcript.md"))
+
     # Build graph with checkpointer
-    graph = build_graph()
-    checkpointer = get_checkpointer(goal_id, goal_dir)
+    checkpointer = get_checkpointer(goal_dir)
+    graph = build_graph(checkpointer=checkpointer)
 
     # Initial state
     initial_state: dict[str, Any] = {
@@ -56,24 +64,25 @@ def start(
         "cumulative_cost_usd": 0.0,
         "cumulative_tokens": 0,
         "interrupt_reason": None,
+        "event_bus": event_bus,
     }
 
     # Run graph through plan -> rules -> tasks
     config = {"configurable": {"thread_id": goal_id}}
-    final_state = graph.invoke(initial_state, config, checkpointer)
+    final_state = graph.invoke(initial_state, config)
 
     # Save artifacts
-    (goal_dir / "plan.md").write_text(final_state["plan"])
-    (goal_dir / "rules.md").write_text(final_state["rules"])
+    (goal_dir / "plan.md").write_text(final_state["plan"], encoding="utf-8")
+    (goal_dir / "rules.md").write_text(final_state["rules"], encoding="utf-8")
     if final_state["tasks"]:
-        (goal_dir / "tasks.md").write_text(final_state["tasks"][0]["raw"])
+        (goal_dir / "tasks.md").write_text(final_state["tasks"][0]["raw"], encoding="utf-8")
 
     rprint("[bold green]✓[/bold green] Plan, rules, and tasks generated.")
     rprint(f"[dim]Artifacts saved to:[/dim] {goal_dir}/")
     raise typer.Exit(0)
 
 
-@app.command()
+@app.command("continue")
 def continue_cmd(
     goal_id: str = typer.Option("", "--id", help="Goal ID to resume (default: latest)"),
     verbose: int = typer.Option(0, "--verbose", "-v", count=True),

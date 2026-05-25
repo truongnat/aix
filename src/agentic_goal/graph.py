@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Any
+from typing import TYPE_CHECKING, Annotated, Any
 
 from langgraph.graph.message import add_messages
 from typing_extensions import TypedDict
+
+if TYPE_CHECKING:
+    from agentic_goal.events import EventBus
 
 
 class AgentState(TypedDict):
@@ -24,3 +27,4 @@ class AgentState(TypedDict):
     cumulative_cost_usd: float
     cumulative_tokens: int
     interrupt_reason: str | None
+    event_bus: EventBus | None  # Optional for event emission

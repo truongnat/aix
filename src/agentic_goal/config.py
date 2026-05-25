@@ -129,11 +129,9 @@ def _merge_into(cfg: Config, data: dict[str, Any]) -> Config:
     # Roles
     for name, r in data.get("roles", {}).items():
         if name in cfg.roles:
-            existing = cfg.roles[name].model
-            updated = RoleConfig(**r)
-            if "model" not in r:
-                updated.model = existing
-            cfg.roles[name] = updated
+            # Merge with existing to allow partial overrides
+            merged = {**cfg.roles[name].model_dump(), **r}
+            cfg.roles[name] = RoleConfig(**merged)
         else:
             cfg.roles[name] = RoleConfig(**r)
     # Budgets

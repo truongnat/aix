@@ -3,36 +3,66 @@
 from __future__ import annotations
 
 import uuid
+from typing import Any
 
+from langchain_community.chat_models import init_chat_model
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
 
-from agentic_goal.config import load_config
+from agentic_goal.config import Config, load_config
+from agentic_goal.events import EventType
 from agentic_goal.graph import AgentState
+
+
+def _make_llm(role_name: str, cfg: Config) -> Any:
+    """Create LLM instance based on role config and provider routing."""
+    role_cfg = cfg.roles.get(role_name)
+    if not role_cfg:
+        raise ValueError(f"Missing role config: {role_name}")
+
+    # Resolve provider from model string (e.g. "anthropic/claude-opus-4")
+    provider_hint = (
+        role_cfg.model.split("/")[0] if "/" in role_cfg.model else cfg.default_provider
+    )
+    provider = cfg.providers.get(provider_hint) or cfg.providers.get(cfg.default_provider)
+    if not provider:
+        raise ValueError(f"No provider config for role '{role_name}' (hint: {provider_hint})")
+
+    # Use init_chat_model for multi-provider support
+    # Model format: "provider:model" or just "model" (defaults to openai)
+    model_str = role_cfg.model
+    if "/" not in model_str:
+        model_str = f"{provider_hint}:{model_str}"
+
+    model_kwargs: dict[str, Any] = {}
+    if role_cfg.max_tokens:
+        model_kwargs["max_tokens"] = role_cfg.max_tokens
+
+    llm = init_chat_model(
+        model_str,
+        model_provider=provider_hint,
+        temperature=role_cfg.temperature,
+        model_kwargs=model_kwargs,
+    )
+
+    return llm
 
 
 def plan_node(state: AgentState) -> AgentState:
     """Generate a detailed plan from the idea using top-tier model."""
     cfg = load_config()
-    planner_role = cfg.roles.get("planner")
-    if not planner_role:
-        raise ValueError("Missing planner role config")
+    llm = _make_llm("planner", cfg)
+    event_bus = state.get("event_bus")
 
-    # Resolve provider and create LLM
-    provider_hint = (
-        planner_role.model.split("/")[0] if "/" in planner_role.model else cfg.default_provider
-    )
-    provider = cfg.providers.get(provider_hint) or cfg.providers.get(cfg.default_provider)
-    if not provider:
-        raise ValueError(f"No provider for planner: {provider_hint}")
-
-    # For now, use OpenAI-compatible interface (works with OpenRouter too)
-    llm = ChatOpenAI(
-        model=planner_role.model,
-        temperature=planner_role.temperature,
-        base_url=provider.base_url,
-    )
+    if event_bus:
+        event_bus.emit(
+            phase="planning",
+            node="plan",
+            role="planner",
+            model=cfg.roles["planner"].model,
+            event_type=EventType.LLM_START,
+            data={"idea": state["idea"]},
+        )
 
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -56,6 +86,16 @@ def plan_node(state: AgentState) -> AgentState:
     response = llm.invoke(prompt.format_messages())
     plan_content = str(response.content)
 
+    if event_bus:
+        event_bus.emit(
+            phase="planning",
+            node="plan",
+            role="planner",
+            model=cfg.roles["planner"].model,
+            event_type=EventType.LLM_END,
+            data={"plan_length": len(plan_content)},
+        )
+
     # Ensure goal_id exists
     goal_id = state.get("goal_id") or f"g_{uuid.uuid4().hex[:12]}"
 
@@ -68,25 +108,29 @@ def plan_node(state: AgentState) -> AgentState:
     }
 
 
+def plan_approval_node(state: AgentState) -> AgentState:
+    """Interrupt for user to approve the plan."""
+    return {
+        **state,
+        "interrupt_reason": "plan_approval",
+    }
+
+
 def rules_node(state: AgentState) -> AgentState:
     """Generate questions for user to define rules/stack."""
     cfg = load_config()
-    advisor_role = cfg.roles.get("rules_advisor")
-    if not advisor_role:
-        raise ValueError("Missing rules_advisor role config")
+    llm = _make_llm("rules_advisor", cfg)
+    event_bus = state.get("event_bus")
 
-    provider_hint = (
-        advisor_role.model.split("/")[0] if "/" in advisor_role.model else cfg.default_provider
-    )
-    provider = cfg.providers.get(provider_hint) or cfg.providers.get(cfg.default_provider)
-    if not provider:
-        raise ValueError(f"No provider for rules_advisor: {provider_hint}")
-
-    llm = ChatOpenAI(
-        model=advisor_role.model,
-        temperature=advisor_role.temperature,
-        base_url=provider.base_url,
-    )
+    if event_bus:
+        event_bus.emit(
+            phase="rules",
+            node="rules",
+            role="rules_advisor",
+            model=cfg.roles["rules_advisor"].model,
+            event_type=EventType.LLM_START,
+            data={"plan_length": len(state["plan"])},
+        )
 
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -109,6 +153,16 @@ def rules_node(state: AgentState) -> AgentState:
     response = llm.invoke(prompt.format_messages())
     questions = str(response.content)
 
+    if event_bus:
+        event_bus.emit(
+            phase="rules",
+            node="rules",
+            role="rules_advisor",
+            model=cfg.roles["rules_advisor"].model,
+            event_type=EventType.LLM_END,
+            data={"questions_length": len(questions)},
+        )
+
     return {
         **state,
         "rules": questions,
@@ -117,27 +171,29 @@ def rules_node(state: AgentState) -> AgentState:
     }
 
 
+def rules_approval_node(state: AgentState) -> AgentState:
+    """Interrupt for user to answer rules questions."""
+    return {
+        **state,
+        "interrupt_reason": "rules_approval",
+    }
+
+
 def tasks_node(state: AgentState) -> AgentState:
     """Decompose plan into tickets/phases."""
     cfg = load_config()
-    decomposer_role = cfg.roles.get("task_decomposer")
-    if not decomposer_role:
-        raise ValueError("Missing task_decomposer role config")
+    llm = _make_llm("task_decomposer", cfg)
+    event_bus = state.get("event_bus")
 
-    provider_hint = (
-        decomposer_role.model.split("/")[0]
-        if "/" in decomposer_role.model
-        else cfg.default_provider
-    )
-    provider = cfg.providers.get(provider_hint) or cfg.providers.get(cfg.default_provider)
-    if not provider:
-        raise ValueError(f"No provider for task_decomposer: {provider_hint}")
-
-    llm = ChatOpenAI(
-        model=decomposer_role.model,
-        temperature=decomposer_role.temperature,
-        base_url=provider.base_url,
-    )
+    if event_bus:
+        event_bus.emit(
+            phase="tasks",
+            node="tasks",
+            role="task_decomposer",
+            model=cfg.roles["task_decomposer"].model,
+            event_type=EventType.LLM_START,
+            data={"plan_length": len(state["plan"]), "rules_length": len(state["rules"])},
+        )
 
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -158,11 +214,29 @@ def tasks_node(state: AgentState) -> AgentState:
     )
 
     response = llm.invoke(prompt.format_messages())
-    tasks_md = response.content
+    tasks_md = str(response.content)
+
+    if event_bus:
+        event_bus.emit(
+            phase="tasks",
+            node="tasks",
+            role="task_decomposer",
+            model=cfg.roles["task_decomposer"].model,
+            event_type=EventType.LLM_END,
+            data={"tasks_length": len(tasks_md)},
+        )
 
     return {
         **state,
         "tasks": [{"raw": tasks_md}],  # Placeholder: will parse into structured list later
         "phase": "tasks",
         "messages": [AIMessage(content=tasks_md)],
+    }
+
+
+def tasks_approval_node(state: AgentState) -> AgentState:
+    """Interrupt for user to approve the task decomposition."""
+    return {
+        **state,
+        "interrupt_reason": "tasks_approval",
     }
