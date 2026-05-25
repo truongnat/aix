@@ -160,27 +160,220 @@ def status(
     goal_id: str = typer.Option("", "--id", help="Goal ID"),
 ) -> None:
     """Show kanban + current phase."""
-    rprint("[bold cyan]Status:[/bold cyan]")
+    # Find goal directory
+    goal_dir: Path
+    if goal_id:
+        goal_dir = Path(".goal") / goal_id
+        if not goal_dir.exists():
+            rprint(f"[bold red]Goal not found:[/bold red] {goal_id}")
+            raise typer.Exit(1)
+    else:
+        # Find latest goal
+        goals_dir = Path(".goal")
+        if not goals_dir.exists():
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dirs = sorted(goals_dir.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+        if not goal_dirs:
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dir = goal_dirs[0]
+        goal_id = goal_dir.name
+
+    # Load checkpointed state
+    checkpointer = get_checkpointer(goal_dir)
+    config = {"configurable": {"thread_id": goal_id}}
+    checkpoint = checkpointer.get(config)
+
+    if not checkpoint:
+        rprint("[bold red]No checkpoint found for this goal.[/bold red]")
+        raise typer.Exit(1)
+
+    state = checkpoint.get("channel_values", {})
+
+    rprint(f"[bold cyan]Goal:[/bold cyan] {goal_id}")
+    rprint(f"[dim]Phase:[/dim] {state.get('phase', 'unknown')}")
+    rprint(f"[dim]Current ticket:[/dim] {state.get('current_ticket_id', 'none')}")
+
+    # Show kanban
+    kanban = state.get("kanban", {})
+    if kanban:
+        rprint("\n[bold]Kanban:[/bold]")
+        for ticket_id, ticket_info in kanban.items():
+            status_emoji = {
+                "todo": "⏳",
+                "in_progress": "🔄",
+                "done": "✅",
+            }.get(ticket_info.get("status"), "❓")
+            rprint(f"  {status_emoji} {ticket_id}: {ticket_info.get('title', 'No title')}")
+
+    # Show cumulative cost
+    cost = state.get("cumulative_cost_usd", 0.0)
+    tokens = state.get("cumulative_tokens", 0)
+    rprint(f"\n[dim]Cost:[/dim] ${cost:.4f} | [dim]Tokens:[/dim] {tokens:,}")
+
     raise typer.Exit(0)
 
 
 @app.command()
 def list_goals() -> None:
     """List all goals."""
+    goals_dir = Path(".goal")
+    if not goals_dir.exists():
+        rprint("[bold red]No goals found.[/bold red]")
+        raise typer.Exit(0)
+
+    goal_dirs = sorted(goals_dir.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+
     rprint("[bold cyan]Goals:[/bold cyan]")
+    for goal_dir in goal_dirs:
+        goal_id = goal_dir.name
+        # Load checkpoint to get phase
+        checkpointer = get_checkpointer(goal_dir)
+        config = {"configurable": {"thread_id": goal_id}}
+        checkpoint = checkpointer.get(config)
+        if checkpoint:
+            state = checkpoint.get("channel_values", {})
+            phase = state.get("phase", "unknown")
+            idea = state.get("idea", "No idea")[:50]  # Truncate long ideas
+        else:
+            phase = "no checkpoint"
+            idea = "N/A"
+
+        mtime = goal_dir.stat().st_mtime
+        from datetime import datetime
+
+        time_str = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M")
+
+        rprint(f"  [dim]{time_str}[/dim] [bold]{goal_id}[/bold] - {phase}")
+        rprint(f"    [dim]{idea}[/dim]")
+
     raise typer.Exit(0)
 
 
 @app.command()
 def logs(
-    goal_id: str = typer.Option("", "--id"),
-    follow: bool = typer.Option(False, "--follow"),
-    phase: str = typer.Option("", "--phase"),
-    ticket: str = typer.Option("", "--ticket"),
-    role: str = typer.Option("", "--role"),
+    goal_id: str = typer.Option("", "--id", help="Goal ID"),
+    follow: bool = typer.Option(False, "--follow", help="Follow mode (not implemented)"),
+    phase: str = typer.Option("", "--phase", help="Filter by phase"),
+    ticket: str = typer.Option("", "--ticket", help="Filter by ticket"),
+    role: str = typer.Option("", "--role", help="Filter by role"),
 ) -> None:
     """View agent transcript / event log."""
-    rprint("[bold cyan]Logs:[/bold cyan]")
+    # Find goal directory
+    goal_dir: Path
+    if goal_id:
+        goal_dir = Path(".goal") / goal_id
+        if not goal_dir.exists():
+            rprint(f"[bold red]Goal not found:[/bold red] {goal_id}")
+            raise typer.Exit(1)
+    else:
+        # Find latest goal
+        goals_dir = Path(".goal")
+        if not goals_dir.exists():
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dirs = sorted(goals_dir.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+        if not goal_dirs:
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dir = goal_dirs[0]
+        goal_id = goal_dir.name
+
+    # Show transcript
+    transcript_path = goal_dir / "transcript.md"
+    if transcript_path.exists():
+        rprint(f"[bold cyan]Transcript for {goal_id}:[/bold cyan]")
+        content = transcript_path.read_text(encoding="utf-8")
+        rprint(content)
+    else:
+        rprint("[dim]No transcript found.[/dim]")
+
+    # Show events.jsonl if requested
+    if phase or ticket or role:
+        events_path = goal_dir / "events.jsonl"
+        if events_path.exists():
+            import json
+
+            rprint("\n[bold cyan]Filtered events:[/bold cyan]")
+            with events_path.open(encoding="utf-8") as f:
+                for line in f:
+                    event = json.loads(line)
+                    if phase and event.get("phase") != phase:
+                        continue
+                    if ticket and event.get("ticket_id") != ticket:
+                        continue
+                    if role and event.get("role") != role:
+                        continue
+                    rprint(f"  {event.get('ts')} - {event.get('event_type')} - {event.get('node')}")
+        else:
+            rprint("[dim]No events found.[/dim]")
+
+    raise typer.Exit(0)
+
+
+@app.command()
+def cost_dashboard(
+    goal_id: str = typer.Option("", "--id", help="Goal ID"),
+) -> None:
+    """Show cost dashboard with breakdown by role/phase."""
+    # Find goal directory
+    goal_dir: Path
+    if goal_id:
+        goal_dir = Path(".goal") / goal_id
+        if not goal_dir.exists():
+            rprint(f"[bold red]Goal not found:[/bold red] {goal_id}")
+            raise typer.Exit(1)
+    else:
+        # Find latest goal
+        goals_dir = Path(".goal")
+        if not goals_dir.exists():
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dirs = sorted(goals_dir.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+        if not goal_dirs:
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dir = goal_dirs[0]
+        goal_id = goal_dir.name
+
+    # Load events for cost breakdown
+    events_path = goal_dir / "events.jsonl"
+    if not events_path.exists():
+        rprint("[dim]No events found.[/dim]")
+        raise typer.Exit(0)
+
+    import json
+    from collections import defaultdict
+
+    # Aggregate costs by role
+    costs_by_role: dict[str, float] = defaultdict(float)
+    tokens_by_role: dict[str, int] = defaultdict(int)
+    total_cost = 0.0
+    total_tokens = 0
+
+    with events_path.open(encoding="utf-8") as f:
+        for line in f:
+            event = json.loads(line)
+            cost = event.get("cost_usd", 0.0)
+            tokens = event.get("tokens_in", 0) + event.get("tokens_out", 0)
+            role = event.get("role", "unknown")
+
+            costs_by_role[role] += cost
+            tokens_by_role[role] += tokens
+            total_cost += cost
+            total_tokens += tokens
+
+    rprint(f"[bold cyan]Cost Dashboard for {goal_id}:[/bold cyan]")
+    rprint(f"\n[bold]Total:[/bold] ${total_cost:.4f} | {total_tokens:,} tokens\n")
+
+    rprint("[bold]By Role:[/bold]")
+    for role, cost in sorted(costs_by_role.items(), key=lambda x: x[1], reverse=True):
+        tokens = tokens_by_role[role]
+        pct = (cost / total_cost * 100) if total_cost > 0 else 0
+        bar = "█" * int(pct / 2)
+        rprint(f"  {role:20s} ${cost:8.4f} ({pct:5.1f}%) {bar}")
+
     raise typer.Exit(0)
 
 
