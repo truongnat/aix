@@ -76,7 +76,6 @@ def _default_roles() -> dict[str, RoleConfig]:
             tools_enabled=["read_file", "write_file", "run_shell", "git"],
         ),
         "reviewer": RoleConfig(model="anthropic/claude-opus-4", temperature=0.0),
-        "resume_analyzer": RoleConfig(model="anthropic/claude-sonnet-4"),
     }
 
 
