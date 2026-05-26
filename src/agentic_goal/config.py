@@ -109,6 +109,9 @@ def load_config(
             if role in defaults.roles:
                 defaults.roles[role].model = os.environ[key]
 
+    # Auto-apply Ollama fallback for missing API keys
+    apply_ollama_fallback(defaults)
+
     return defaults
 
 
@@ -153,29 +156,53 @@ def _ollama_list_models(base_url: str = "http://localhost:11434") -> list[str]:
 
 
 def _pick_ollama_model(role_name: str, available: list[str]) -> str | None:
-    """Pick best Ollama model for a role from available models."""
+    """Pick best Ollama model for a role from available models.
+
+    Strategy:
+      1. Role-specific preferences (coder -> coder models).
+      2. Prefer larger param sizes for complex reasoning roles.
+      3. De-prioritize known weak/tiny models (phi3-mini, phi4-mini, gemma:2b).
+      4. Fall back to any non-tiny model, then to anything.
+    """
     if not available:
         return None
 
-    # Heuristics per role
+    # Models known to be too weak for these structured agent tasks.
+    # Used only as last resort.
+    weak_patterns = ("phi3-mini", "phi4-mini", "gemma:2b", "tinyllama", "qwen2:0.5b")
+
+    def is_weak(m: str) -> bool:
+        ml = m.lower()
+        return any(p in ml for p in weak_patterns)
+
+    strong = [m for m in available if not is_weak(m)]
+
+    # Role-specific preferences
     if role_name == "coder":
-        # Prefer coder models
-        for pattern in ["qwen2.5-coder", "deepseek-coder", "codellama"]:
-            for model in available:
+        for pattern in ("qwen2.5-coder", "deepseek-coder", "codellama"):
+            for model in strong:
                 if pattern in model.lower():
                     return model
-    elif role_name in ("planner", "rules_advisor", "reviewer"):
-        # Prefer larger param sizes for complex reasoning
-        for size in ["70b", "34b", "13b", "8b"]:
-            for model in available:
-                if size in model.lower():
-                    # Prefer llama3, qwen2.5, mistral among same size
-                    for prefix in ["llama3", "qwen2.5", "mistral"]:
-                        if prefix in model.lower():
-                            return model
-    # task_decomposer, ticket_planner: any general model
+    if role_name in ("planner", "rules_advisor", "reviewer"):
+        # Prefer larger param sizes
+        for size in ("70b", "34b", "13b", "8b"):
+            for prefix in ("llama3", "qwen2.5", "qwen2", "mistral"):
+                for model in strong:
+                    ml = model.lower()
+                    if size in ml and prefix in ml:
+                        return model
 
-    # Fallback: first available model
+    # Generic preference: any reasonable-size strong model
+    for prefix in ("llama3", "qwen2.5", "qwen2", "mistral", "gemma"):
+        for model in strong:
+            if prefix in model.lower():
+                return model
+
+    # Any strong model
+    if strong:
+        return strong[0]
+
+    # Last resort: a weak model is better than nothing
     return available[0]
 
 
@@ -226,6 +253,27 @@ def apply_ollama_fallback(cfg: Config) -> dict[str, str]:
         if not _prompt_ollama_pull(recommended):
             return {}
         available = _ollama_list_models()
+
+    # Warn if only weak/tiny models are available
+    weak_patterns = ("phi3-mini", "phi4-mini", "gemma:2b", "tinyllama", "qwen2:0.5b")
+    if available and all(
+        any(p in m.lower() for p in weak_patterns) for m in available
+    ):
+        from rich import print as rprint
+        from rich.panel import Panel
+
+        rprint(
+            Panel(
+                "[yellow]Only small/weak Ollama models found locally.[/yellow]\n\n"
+                "These models often produce gibberish or fail tool-calling for "
+                "structured SDLC tasks. Recommended pulls:\n"
+                "  - llama3.1:8b\n"
+                "  - qwen2.5:7b\n"
+                "  - qwen2.5-coder:7b (for the coder role)\n\n"
+                "Run: [bold]ollama pull llama3.1:8b[/bold]",
+                title="⚠ Weak Ollama models",
+            )
+        )
 
     fallbacks: dict[str, str] = {}
     for role_name, role_cfg in cfg.roles.items():
@@ -281,6 +329,9 @@ def validate_config(cfg: Config, strict: bool = False) -> None:
         provider = cfg.providers.get(provider_hint) or cfg.providers.get(cfg.default_provider)
         if not provider:
             raise ValueError(f"No provider config for role '{role_name}' (hint: {provider_hint})")
+        # Skip API key check for Ollama (uses sentinel env var)
+        if provider.api_key_env == "OLLAMA_NO_KEY_NEEDED":
+            continue
         api_key = os.environ.get(provider.api_key_env)
         if strict and not api_key:
             raise ValueError(

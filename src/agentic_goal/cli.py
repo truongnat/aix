@@ -8,7 +8,7 @@ from typing import Any
 import typer
 from rich import print as rprint
 
-from agentic_goal.config import apply_ollama_fallback, load_config, validate_config
+from agentic_goal.config import load_config, validate_config
 from agentic_goal.events import EventBus, JsonlSink, MarkdownSink, TerminalSink, set_event_bus
 from agentic_goal.graph_builder import build_graph, get_checkpointer
 
@@ -26,11 +26,10 @@ def _close_checkpointer(checkpointer: Any) -> None:
 @app.command()
 def start(
     idea: str = typer.Argument(..., help="Goal idea / requirement"),
-    verbose: int = typer.Option(0, "--verbose", "-v", count=True, help="Verbosity (-v, -vv, -vvv)"),
-    model_override: list[str] = typer.Option(  # noqa: B008
+    verbose: int = typer.Option(0, "--verbose", "-v", help="Verbosity (-v, -vv, -vvv)"),
+    model_override: list[str] | None = typer.Option(  # noqa: B008
         None,
         "--model-override",
-        default_factory=list,
         help="Override model per role, e.g. coder=gpt-4",
     ),
     no_color: bool = typer.Option(False, "--no-color"),
@@ -39,22 +38,18 @@ def start(
     """Start a new goal pipeline from an idea."""
     cfg = load_config()
 
+    # Convert None to empty list
+    if model_override is None:
+        model_override = []
+
     # Apply model overrides from CLI
     for override in model_override:
         if "=" in override:
             role, model = override.split("=", 1)
             if role in cfg.roles:
-                cfg.roles[role].model = model
+                cfg.roles[role] = cfg.roles[role].model_copy(update={"model": model})
 
-    # Apply Ollama fallback for missing API keys
-    fallbacks = apply_ollama_fallback(cfg)
-    if fallbacks:
-        from rich.panel import Panel
-
-        lines = [f"[yellow]⚠ {role} → {model}[/yellow]" for role, model in fallbacks.items()]
-        rprint(Panel("\n".join(lines), title="Ollama Fallback Active"))
-
-    validate_config(cfg, strict=True)
+    validate_config(cfg, strict=False)
 
     goal_id = f"g_{uuid.uuid4().hex[:12]}"
     goal_dir = Path(".goal") / goal_id
@@ -120,20 +115,12 @@ def start(
 @app.command("continue")
 def continue_cmd(
     goal_id: str = typer.Option("", "--id", help="Goal ID to resume (default: latest)"),
-    verbose: int = typer.Option(0, "--verbose", "-v", count=True),
+    verbose: int = typer.Option(0, "--verbose", "-v", help="Verbosity (-v, -vv, -vvv)"),
 ) -> None:
     """Resume the most recent (or specified) goal from checkpoint."""
     cfg = load_config()
 
-    # Apply Ollama fallback for missing API keys
-    fallbacks = apply_ollama_fallback(cfg)
-    if fallbacks:
-        from rich.panel import Panel
-
-        lines = [f"[yellow]⚠ {role} → {model}[/yellow]" for role, model in fallbacks.items()]
-        rprint(Panel("\n".join(lines), title="Ollama Fallback Active"))
-
-    validate_config(cfg, strict=True)
+    validate_config(cfg, strict=False)
 
     # Find goal directory
     goal_dir: Path

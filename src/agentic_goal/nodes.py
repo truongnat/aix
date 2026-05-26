@@ -6,7 +6,7 @@ import re
 import uuid
 from typing import Any
 
-from langchain_community.chat_models import init_chat_model
+from langchain.chat_models import init_chat_model
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
@@ -25,7 +25,7 @@ class ReviewOutput(BaseModel):
     approved: bool = Field(description="Whether the code is approved")
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), reraise=True)
 def _invoke_llm_with_retry(llm: Any, messages: list[Any]) -> Any:
     """Invoke LLM with retry logic."""
     return llm.invoke(messages)
@@ -55,19 +55,25 @@ def _make_llm(role_name: str, cfg: Config) -> Any:
         # Ollama API requires bare model name; other providers tolerate this
         model_str = model_str.split("/", 1)[1]
 
-    model_kwargs: dict[str, Any] = {}
-    if role_cfg.max_tokens:
-        model_kwargs["max_tokens"] = role_cfg.max_tokens
-
-    # Pass base_url for ollama provider
-    if provider_hint == "ollama" and provider.base_url:
-        model_kwargs["base_url"] = provider.base_url
+    # init_chat_model forwards extra kwargs directly to the underlying chat class.
+    # `model_kwargs=` is OpenAI-specific (nested API payload) — do NOT use it for
+    # provider-level config like base_url or max tokens.
+    extra: dict[str, Any] = {}
+    if provider_hint == "ollama":
+        if provider.base_url:
+            extra["base_url"] = provider.base_url
+        # Ollama uses `num_predict`, not `max_tokens`
+        if role_cfg.max_tokens:
+            extra["num_predict"] = role_cfg.max_tokens
+    else:
+        if role_cfg.max_tokens:
+            extra["max_tokens"] = role_cfg.max_tokens
 
     llm = init_chat_model(
         model_str,
         model_provider=provider_hint,
         temperature=role_cfg.temperature,
-        model_kwargs=model_kwargs,
+        **extra,
     )
 
     return llm
@@ -83,30 +89,58 @@ def _get_usage_metadata(response: Any) -> tuple[int, int]:
     return 0, 0
 
 
+def _estimate_cost(role_cfg_model: str, tokens_in: int, tokens_out: int) -> float:
+    """Estimate cost based on model. Local Ollama is free."""
+    if role_cfg_model.startswith("ollama/"):
+        return 0.0
+    # Placeholder $0.001/1K total tokens for cloud providers
+    return (tokens_in + tokens_out) / 1000 * 0.001
+
+
 def _parse_tasks_to_kanban(tasks_md: str) -> dict[str, dict[str, Any]]:
-    """Parse tasks markdown into structured kanban dict."""
+    """Parse tasks markdown into structured kanban dict.
+
+    Supports formats:
+      ## ticket-001: Title
+      ## Ticket-001\n**Title:** Title
+      ### Ticket 001 — Title
+    """
     kanban: dict[str, dict[str, Any]] = {}
-    # Simple regex to extract ticket info from markdown
-    # Pattern: ## ticket-001: Title
-    ticket_pattern = re.compile(r"##\s+(ticket-\d+):\s*(.+)")
+    # Match ticket headers - flexible on case, separator, and level (## or ###)
+    # Captures ticket id and optional inline title
+    ticket_pattern = re.compile(
+        r"^#{2,3}\s+ticket[-\s]?(\d+)(?:\s*[:\-—–]\s*(.+))?\s*$",
+        re.IGNORECASE,
+    )
+    title_pattern = re.compile(r"^\*\*Title:\*\*\s*(.+)", re.IGNORECASE)
     current_ticket = None
 
     for line in tasks_md.split("\n"):
-        match = ticket_pattern.match(line)
+        match = ticket_pattern.match(line.strip())
         if match:
-            ticket_id = match.group(1)
-            title = match.group(2)
+            num = match.group(1).zfill(3)
+            ticket_id = f"ticket-{num}"
+            inline_title = (match.group(2) or "").strip()
             kanban[ticket_id] = {
-                "title": title,
+                "title": inline_title,
                 "status": "todo",
                 "description": "",
             }
             current_ticket = ticket_id
-        elif current_ticket and line.strip():
-            if kanban[current_ticket]["description"]:
-                kanban[current_ticket]["description"] += "\n" + line
-            else:
-                kanban[current_ticket]["description"] = line
+            continue
+
+        if current_ticket:
+            # If title not yet set, look for **Title:** on subsequent line
+            if not kanban[current_ticket]["title"]:
+                tmatch = title_pattern.match(line.strip())
+                if tmatch:
+                    kanban[current_ticket]["title"] = tmatch.group(1).strip()
+                    continue
+            if line.strip():
+                if kanban[current_ticket]["description"]:
+                    kanban[current_ticket]["description"] += "\n" + line
+                else:
+                    kanban[current_ticket]["description"] = line
 
     return kanban
 
@@ -152,8 +186,7 @@ def plan_node(state: AgentState) -> AgentState:
     # Track tokens and cost
     tokens_in, tokens_out = _get_usage_metadata(response)
     total_tokens = state.get("cumulative_tokens", 0) + tokens_in + tokens_out
-    # Simple cost estimation: $0.001/1K tokens (placeholder)
-    cost_usd = (tokens_in + tokens_out) / 1000 * 0.001
+    cost_usd = _estimate_cost(cfg.roles["planner"].model, tokens_in, tokens_out)
     total_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
     if event_bus:
@@ -231,7 +264,7 @@ def rules_node(state: AgentState) -> AgentState:
     # Track tokens and cost
     tokens_in, tokens_out = _get_usage_metadata(response)
     total_tokens = state.get("cumulative_tokens", 0) + tokens_in + tokens_out
-    cost_usd = (tokens_in + tokens_out) / 1000 * 0.001
+    cost_usd = _estimate_cost(cfg.roles["rules_advisor"].model, tokens_in, tokens_out)
     total_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
     if event_bus:
@@ -305,7 +338,7 @@ def tasks_node(state: AgentState) -> AgentState:
     # Track tokens and cost
     tokens_in, tokens_out = _get_usage_metadata(response)
     total_tokens = state.get("cumulative_tokens", 0) + tokens_in + tokens_out
-    cost_usd = (tokens_in + tokens_out) / 1000 * 0.001
+    cost_usd = _estimate_cost(cfg.roles["task_decomposer"].model, tokens_in, tokens_out)
     total_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
     if event_bus:
@@ -405,7 +438,7 @@ def ticket_plan_node(state: AgentState) -> AgentState:
     # Track tokens and cost
     tokens_in, tokens_out = _get_usage_metadata(response)
     total_tokens = state.get("cumulative_tokens", 0) + tokens_in + tokens_out
-    cost_usd = (tokens_in + tokens_out) / 1000 * 0.001
+    cost_usd = _estimate_cost(cfg.roles["ticket_planner"].model, tokens_in, tokens_out)
     total_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
     if event_bus:
@@ -524,7 +557,7 @@ def coder_node(state: AgentState) -> AgentState:
 
     # Update cumulative tokens/cost
     cumulative_tokens = state.get("cumulative_tokens", 0) + total_tokens_in + total_tokens_out
-    cost_usd = (total_tokens_in + total_tokens_out) / 1000 * 0.001
+    cost_usd = _estimate_cost(cfg.roles["coder"].model, total_tokens_in, total_tokens_out)
     cumulative_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
     if event_bus:
@@ -605,7 +638,7 @@ def reviewer_node(state: AgentState) -> AgentState:
     # Track tokens and cost from raw message
     tokens_in, tokens_out = _get_usage_metadata(raw_msg)
     total_tokens = state.get("cumulative_tokens", 0) + tokens_in + tokens_out
-    cost_usd = (tokens_in + tokens_out) / 1000 * 0.001
+    cost_usd = _estimate_cost(cfg.roles["reviewer"].model, tokens_in, tokens_out)
     total_cost = state.get("cumulative_cost_usd", 0.0) + cost_usd
 
     # Fallback if parsing failed
@@ -615,8 +648,20 @@ def reviewer_node(state: AgentState) -> AgentState:
         feedback = "Review parsing failed."
     else:
         score = parsed.score
-        approved = parsed.approved
         feedback = parsed.feedback
+        # Don't trust the LLM's `approved` field — small/local models often
+        # emit `approved=true` despite low scores. Enforce score threshold
+        # AND require non-empty diff (i.e. coder actually changed something).
+        approved = bool(parsed.approved) and score >= 7 and bool(diff_output.strip())
+
+    # Also fail-safe: empty diff means coder didn't produce any changes
+    if not diff_output.strip():
+        feedback = (
+            "[auto] Coder produced no changes (empty git diff). "
+            "Marking as not approved.\n\n" + feedback
+        )
+        approved = False
+
     review = f"Score: {score}/10\nApproved: {approved}\nFeedback: {feedback}"
 
     # Mark ticket as done if approved

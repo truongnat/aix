@@ -86,7 +86,6 @@ def build_graph(checkpointer: SqliteSaver | None = None) -> Any:
 
     return graph.compile(
         checkpointer=checkpointer,
-        interrupt_before=["plan_approval", "rules_approval", "tasks_approval"],
     )
 
 
