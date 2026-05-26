@@ -37,46 +37,59 @@ def _make_llm(role_name: str, cfg: Config) -> Any:
     if not role_cfg:
         raise ValueError(f"Missing role config: {role_name}")
 
-    # Resolve provider from model string (e.g. "anthropic/claude-opus-4")
+    # If the effective provider is openrouter, route everything through ChatOpenRouter.
+    # Model string may be "openrouter/anthropic/claude-haiku-4-5" or bare
+    # "anthropic/claude-haiku-4-5" — strip the leading "openrouter/" prefix if present
+    # and pass the rest directly as the OpenRouter model slug.
+    effective_provider = cfg.default_provider
+    model_str = role_cfg.model
+    if model_str.startswith("openrouter/"):
+        effective_provider = "openrouter"
+        model_str = model_str[len("openrouter/"):]  # e.g. "anthropic/claude-haiku-4-5"
+
+    if effective_provider == "openrouter":
+        from langchain_openrouter import ChatOpenRouter
+
+        extra: dict[str, Any] = {}
+        if role_cfg.max_tokens:
+            extra["max_tokens"] = role_cfg.max_tokens
+        return ChatOpenRouter(
+            model=model_str,
+            temperature=role_cfg.temperature,
+            **extra,
+        )
+
+    # --- Non-OpenRouter path ---
+    # Resolve provider from model string prefix (e.g. "anthropic/claude-opus-4")
     provider_hint = (
-        role_cfg.model.split("/")[0] if "/" in role_cfg.model else cfg.default_provider
+        model_str.split("/")[0] if "/" in model_str else effective_provider
     )
-    provider = cfg.providers.get(provider_hint) or cfg.providers.get(cfg.default_provider)
+    provider = cfg.providers.get(provider_hint) or cfg.providers.get(effective_provider)
     if not provider:
         raise ValueError(f"No provider config for role '{role_name}' (hint: {provider_hint})")
 
-    # Use init_chat_model for multi-provider support
-    # Model format: "provider:model" or just "model" (defaults to openai)
-    model_str = role_cfg.model
     if "/" not in model_str:
         model_str = f"{provider_hint}:{model_str}"
     else:
-        # Strip provider prefix (e.g. "ollama/llama3.1:8b" -> "llama3.1:8b")
-        # Ollama API requires bare model name; other providers tolerate this
+        # Strip provider prefix for direct calls (e.g. "ollama/llama3.1:8b" -> "llama3.1:8b")
         model_str = model_str.split("/", 1)[1]
 
-    # init_chat_model forwards extra kwargs directly to the underlying chat class.
-    # `model_kwargs=` is OpenAI-specific (nested API payload) — do NOT use it for
-    # provider-level config like base_url or max tokens.
-    extra: dict[str, Any] = {}
+    extra = {}
     if provider_hint == "ollama":
         if provider.base_url:
             extra["base_url"] = provider.base_url
-        # Ollama uses `num_predict`, not `max_tokens`
         if role_cfg.max_tokens:
             extra["num_predict"] = role_cfg.max_tokens
     else:
         if role_cfg.max_tokens:
             extra["max_tokens"] = role_cfg.max_tokens
 
-    llm = init_chat_model(
+    return init_chat_model(
         model_str,
         model_provider=provider_hint,
         temperature=role_cfg.temperature,
         **extra,
     )
-
-    return llm
 
 
 def _get_usage_metadata(response: Any) -> tuple[int, int]:
@@ -161,6 +174,12 @@ def plan_node(state: AgentState) -> AgentState:
             data={"idea": state["idea"]},
         )
 
+    feedback = state.get("feedback") or ""
+    feedback_msg = (
+        f"\n\nThe user reviewed a previous version and gave this feedback:\n{feedback}\n"
+        "Please revise accordingly."
+        if feedback else ""
+    )
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -176,7 +195,7 @@ def plan_node(state: AgentState) -> AgentState:
                     "Output in Markdown format. Be thorough but concise."
                 )
             ),
-            HumanMessage(content=f"Goal: {state['idea']}"),
+            HumanMessage(content=f"Goal: {state['idea']}{feedback_msg}"),
         ]
     )
 
@@ -196,7 +215,7 @@ def plan_node(state: AgentState) -> AgentState:
             role="planner",
             model=cfg.roles["planner"].model,
             event_type=EventType.LLM_END,
-            data={"plan_length": len(plan_content)},
+            data={"plan_length": len(plan_content), "content": plan_content},
             tokens_in=tokens_in,
             tokens_out=tokens_out,
             cost_usd=cost_usd,
@@ -240,26 +259,27 @@ def rules_node(state: AgentState) -> AgentState:
             data={"plan_length": len(state["plan"])},
         )
 
+    feedback = state.get("feedback") or ""
+    feedback_msg = (
+        f"\n\nUser feedback on previous rules:\n{feedback}\nRevise accordingly."
+        if feedback else ""
+    )
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
                 content=(
-                    "You are a senior engineer helping define project rules and tech stack. "
-                    "Given the plan, generate 5-10 targeted questions to ask the user about:\n"
-                    "- Preferred programming language/framework\n"
-                    "- Code style preferences (formatting, linting rules)\n"
-                    "- Testing strategy\n"
-                    "- Deployment target\n"
-                    "- Any specific constraints or requirements\n\n"
-                    "Output as a numbered list of questions, one per line."
+                    "You are a senior engineer. Given the plan, produce concrete project rules "
+                    "covering tech stack, code style, testing strategy, and constraints.\n"
+                    "Output as a concise Markdown document with sections. "
+                    "Be specific and actionable — no questions, only decisions."
                 )
             ),
-            HumanMessage(content=f"Plan:\n{state['plan']}"),
+            HumanMessage(content=f"Plan:\n{state['plan']}{feedback_msg}"),
         ]
     )
 
     response = _invoke_llm_with_retry(llm, prompt.format_messages())
-    questions = str(response.content)
+    rules_content = str(response.content)
 
     # Track tokens and cost
     tokens_in, tokens_out = _get_usage_metadata(response)
@@ -274,7 +294,7 @@ def rules_node(state: AgentState) -> AgentState:
             role="rules_advisor",
             model=cfg.roles["rules_advisor"].model,
             event_type=EventType.LLM_END,
-            data={"questions_length": len(questions)},
+            data={"rules_length": len(rules_content), "content": rules_content},
             tokens_in=tokens_in,
             tokens_out=tokens_out,
             cost_usd=cost_usd,
@@ -282,9 +302,9 @@ def rules_node(state: AgentState) -> AgentState:
 
     return {
         **state,
-        "rules": questions,
+        "rules": rules_content,
         "phase": "rules",
-        "messages": [AIMessage(content=questions)],
+        "messages": [AIMessage(content=rules_content)],
         "cumulative_tokens": total_tokens,
         "cumulative_cost_usd": total_cost,
     }
@@ -314,6 +334,11 @@ def tasks_node(state: AgentState) -> AgentState:
             data={"plan_length": len(state["plan"]), "rules_length": len(state["rules"])},
         )
 
+    feedback = state.get("feedback") or ""
+    feedback_msg = (
+        f"\n\nUser feedback on previous task breakdown:\n{feedback}\nRevise accordingly."
+        if feedback else ""
+    )
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -328,7 +353,7 @@ def tasks_node(state: AgentState) -> AgentState:
                     "Output in Markdown with sections for each phase."
                 )
             ),
-            HumanMessage(content=f"Plan:\n{state['plan']}\n\nRules:\n{state['rules']}"),
+            HumanMessage(content=f"Plan:\n{state['plan']}\n\nRules:\n{state['rules']}{feedback_msg}"),
         ]
     )
 
@@ -348,7 +373,7 @@ def tasks_node(state: AgentState) -> AgentState:
             role="task_decomposer",
             model=cfg.roles["task_decomposer"].model,
             event_type=EventType.LLM_END,
-            data={"tasks_length": len(tasks_md)},
+            data={"tasks_length": len(tasks_md), "content": tasks_md},
             tokens_in=tokens_in,
             tokens_out=tokens_out,
             cost_usd=cost_usd,
@@ -448,7 +473,11 @@ def ticket_plan_node(state: AgentState) -> AgentState:
             role="ticket_planner",
             model=cfg.roles["ticket_planner"].model,
             event_type=EventType.LLM_END,
-            data={"plan_length": len(plan)},
+            data={
+                "ticket_id": ticket_id,
+                "plan_length": len(plan),
+                "content": plan,
+            },
             tokens_in=tokens_in,
             tokens_out=tokens_out,
             cost_usd=cost_usd,
@@ -494,7 +523,10 @@ def coder_node(state: AgentState) -> AgentState:
             content=(
                 "You are a pragmatic engineer implementing a ticket. "
                 "Use the available tools (read_file, write_file, run_shell, git_*) "
-                "to implement the solution. Commit your changes when done."
+                "to implement the solution in the CURRENT WORKING DIRECTORY. "
+                "Use relative paths (e.g. 'src/index.js', 'package.json'). "
+                "Do NOT write into '.goal/' — that directory is reserved for "
+                "agent metadata. Commit your changes when done."
             )
         ),
         HumanMessage(
@@ -532,6 +564,17 @@ def coder_node(state: AgentState) -> AgentState:
             tool_args = tool_call.get("args", {})
             tool_call_id = tool_call.get("id", "")
 
+            if event_bus:
+                event_bus.emit(
+                    phase="execution",
+                    node="coder",
+                    role="coder",
+                    model=cfg.roles["coder"].model,
+                    event_type=EventType.TOOL_CALL,
+                    ticket_id=ticket_id,
+                    data={"name": tool_name, "args": tool_args},
+                )
+
             if tool_name in tool_map:
                 tool = tool_map[tool_name]
                 try:
@@ -539,6 +582,20 @@ def coder_node(state: AgentState) -> AgentState:
                     messages.append(
                         ToolMessage(content=str(result), tool_call_id=tool_call_id)
                     )
+                    if event_bus:
+                        event_bus.emit(
+                            phase="execution",
+                            node="coder",
+                            role="coder",
+                            model=cfg.roles["coder"].model,
+                            event_type=EventType.TOOL_RESULT,
+                            ticket_id=ticket_id,
+                            data={
+                                "name": tool_name,
+                                "ok": True,
+                                "result": str(result)[:1000],
+                            },
+                        )
                 except Exception as e:
                     messages.append(
                         ToolMessage(
@@ -546,6 +603,16 @@ def coder_node(state: AgentState) -> AgentState:
                             tool_call_id=tool_call_id,
                         )
                     )
+                    if event_bus:
+                        event_bus.emit(
+                            phase="execution",
+                            node="coder",
+                            role="coder",
+                            model=cfg.roles["coder"].model,
+                            event_type=EventType.TOOL_RESULT,
+                            ticket_id=ticket_id,
+                            data={"name": tool_name, "ok": False, "error": str(e)},
+                        )
             else:
                 # Unknown tool - still append ToolMessage to satisfy API contract
                 messages.append(
@@ -554,6 +621,16 @@ def coder_node(state: AgentState) -> AgentState:
                         tool_call_id=tool_call_id,
                     )
                 )
+                if event_bus:
+                    event_bus.emit(
+                        phase="execution",
+                        node="coder",
+                        role="coder",
+                        model=cfg.roles["coder"].model,
+                        event_type=EventType.TOOL_RESULT,
+                        ticket_id=ticket_id,
+                        data={"name": tool_name, "ok": False, "error": "unknown tool"},
+                    )
 
     # Update cumulative tokens/cost
     cumulative_tokens = state.get("cumulative_tokens", 0) + total_tokens_in + total_tokens_out
@@ -675,7 +752,14 @@ def reviewer_node(state: AgentState) -> AgentState:
             role="reviewer",
             model=cfg.roles["reviewer"].model,
             event_type=EventType.LLM_END,
-            data={"review_length": len(review), "score": score, "approved": approved},
+            data={
+                "ticket_id": ticket_id,
+                "review_length": len(review),
+                "score": score,
+                "approved": approved,
+                "feedback": feedback,
+                "diff_preview": diff_output[:2000],
+            },
             tokens_in=tokens_in,
             tokens_out=tokens_out,
             cost_usd=cost_usd,

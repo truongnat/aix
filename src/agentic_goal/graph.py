@@ -24,3 +24,4 @@ class AgentState(TypedDict):
     cumulative_cost_usd: float
     cumulative_tokens: int
     interrupt_reason: str | None
+    feedback: str | None  # user feedback for regeneration

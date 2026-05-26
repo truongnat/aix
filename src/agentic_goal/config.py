@@ -14,6 +14,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 APP_NAME = "agentic-goal"
 DEFAULT_CONFIG_DIR = Path.home() / ".config" / APP_NAME
 DEFAULT_CONFIG_PATH = DEFAULT_CONFIG_DIR / "config.yaml"
+PROJECT_CONFIG_PATH = Path(".goal") / "config.yaml"
 
 
 class ProviderConfig(BaseModel):
@@ -83,22 +84,23 @@ def load_config(
     goal_config_path: Path | None = None,
     global_config_path: Path | None = None,
 ) -> Config:
-    """Layered config: defaults <- global yaml <- goal yaml <- .env <- cli overrides."""
+    """Layered config: defaults <- global yaml <- project yaml <- .env <- cli overrides."""
     defaults = Config(
         providers=_default_providers(),
         roles=_default_roles(),
     )
 
-    # Layer 1: global yaml
+    # Layer 1: global yaml (~/.config/agentic-goal/config.yaml)
     gpath = global_config_path or DEFAULT_CONFIG_PATH
     if gpath.exists():
         with gpath.open() as f:
             data = yaml.safe_load(f) or {}
         defaults = _merge_into(defaults, data)
 
-    # Layer 2: goal-local yaml
-    if goal_config_path and goal_config_path.exists():
-        with goal_config_path.open() as f:
+    # Layer 2: project yaml (.goal/config.yaml) — overrides global
+    ppath = goal_config_path or PROJECT_CONFIG_PATH
+    if ppath.exists():
+        with ppath.open() as f:
             data = yaml.safe_load(f) or {}
         defaults = _merge_into(defaults, data)
 
@@ -246,6 +248,12 @@ def apply_ollama_fallback(cfg: Config) -> dict[str, str]:
 
     Returns dict of role -> new model for roles that fell back.
     """
+    # If default_provider is openrouter and key present, skip entirely — no Ollama needed
+    if cfg.default_provider == "openrouter":
+        openrouter_provider = cfg.providers.get("openrouter")
+        if openrouter_provider and os.environ.get(openrouter_provider.api_key_env):
+            return {}
+
     available = _ollama_list_models()
     if not available:
         # Prompt to pull recommended models
@@ -277,6 +285,10 @@ def apply_ollama_fallback(cfg: Config) -> dict[str, str]:
 
     fallbacks: dict[str, str] = {}
     for role_name, role_cfg in cfg.roles.items():
+        # If this role's model has openrouter/ prefix, skip fallback
+        if role_cfg.model.startswith("openrouter/"):
+            continue
+
         # Resolve provider
         provider_hint = (
             role_cfg.model.split("/")[0] if "/" in role_cfg.model else cfg.default_provider
@@ -307,21 +319,22 @@ def validate_config(cfg: Config, strict: bool = False) -> None:
     reviewer = cfg.roles.get("reviewer")
     coder = cfg.roles.get("coder")
     if reviewer and coder and reviewer.model == coder.model:
-        # Allow same model if both are Ollama (fallback scenario)
-        both_ollama = reviewer.model.startswith("ollama/") and coder.model.startswith(
-            "ollama/"
-        )
-        if both_ollama:
-            from rich import print as rprint
+        from rich import print as rprint
 
-            rprint(
-                f"[yellow]Warning: reviewer and coder using same Ollama model ({reviewer.model}). "
-                "Review quality may be degraded.[/yellow]"
-            )
-        else:
-            raise ValueError(
-                f"reviewer.model ({reviewer.model}) must differ from coder.model ({coder.model})"
-            )
+        rprint(
+            f"[yellow]Warning: reviewer and coder using the same model ({reviewer.model}). "
+            "Review quality may be degraded.[/yellow]"
+        )
+
+    # If routing through openrouter, only check OPENROUTER_API_KEY once
+    if cfg.default_provider == "openrouter" or any(
+        r.model.startswith("openrouter/") for r in cfg.roles.values()
+    ):
+        or_provider = cfg.providers.get("openrouter")
+        if or_provider:
+            if strict and not os.environ.get(or_provider.api_key_env):
+                raise ValueError(f"Missing API key env var '{or_provider.api_key_env}'")
+            return
 
     for role_name, role in cfg.roles.items():
         # Resolve provider from model string (e.g. "anthropic/claude-opus-4")

@@ -27,23 +27,19 @@ def write_file(path: str, content: str) -> str:
 
 
 def _resolve_sandbox_cwd(cwd: str | None) -> Path:
-    """Resolve cwd, defaulting to .goal/. All shell/git ops run here."""
+    """Resolve cwd, defaulting to current working directory.
+
+    Shell/git ops run in the user's CWD so generated code lands where the user
+    invoked the CLI, instead of being hidden inside `.goal/`.
+    """
     if cwd is None:
-        return Path(".goal").absolute()
-    p = Path(cwd).absolute()
-    # Ensure path is within .goal/ sandbox
-    goal_root = Path(".goal").absolute()
-    try:
-        p.relative_to(goal_root)
-    except ValueError:
-        # Not inside sandbox, fall back to sandbox root
-        return goal_root
-    return p
+        return Path.cwd()
+    return Path(cwd).absolute()
 
 
 @tool
 def run_shell(command: str, cwd: str | None = None) -> str:
-    """Run a shell command inside the .goal/ sandbox and return stdout/stderr."""
+    """Run a shell command in the working directory (default: CWD)."""
     sandbox_cwd = _resolve_sandbox_cwd(cwd)
     sandbox_cwd.mkdir(parents=True, exist_ok=True)
     result = subprocess.run(
@@ -64,7 +60,7 @@ def run_shell(command: str, cwd: str | None = None) -> str:
 
 @tool
 def git_status(cwd: str | None = None) -> str:
-    """Get git status inside the goal sandbox."""
+    """Get git status in the working directory (default: CWD)."""
     sandbox_cwd = _resolve_sandbox_cwd(cwd)
     result = subprocess.run(
         ["git", "status", "--porcelain"],
@@ -78,7 +74,7 @@ def git_status(cwd: str | None = None) -> str:
 
 @tool
 def git_diff(path: str | None = None, cwd: str | None = None) -> str:
-    """Get git diff inside the goal sandbox."""
+    """Get git diff in the working directory (default: CWD)."""
     sandbox_cwd = _resolve_sandbox_cwd(cwd)
     cmd = ["git", "diff"]
     if path:
@@ -91,7 +87,7 @@ def git_diff(path: str | None = None, cwd: str | None = None) -> str:
 
 @tool
 def git_commit(message: str, cwd: str | None = None) -> str:
-    """Stage all changes and commit inside the goal sandbox."""
+    """Stage all changes and commit in the working directory (default: CWD)."""
     sandbox_cwd = _resolve_sandbox_cwd(cwd)
     if not sandbox_cwd.exists():
         return f"Error: sandbox cwd does not exist: {sandbox_cwd}"
