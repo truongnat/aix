@@ -31,7 +31,7 @@ Requires **Python 3.11+**.
 ```bash
 git clone <repo>
 cd agentic-sdlc
-pip install -e ".[dev]"
+pip3 install -e ".[dev]"
 ```
 
 This installs the `goal` CLI into your environment.
