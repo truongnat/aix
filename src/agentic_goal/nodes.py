@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 import uuid
+from pathlib import Path
 from typing import Any
 
 from langchain.chat_models import init_chat_model
@@ -16,6 +17,49 @@ from agentic_goal.config import Config, load_config
 from agentic_goal.events import EventType, get_event_bus
 from agentic_goal.graph import AgentState
 from agentic_goal.tools import CODER_TOOLS
+
+_SKILLS_DIR = Path(".goal") / "skills"
+
+# Role-to-filename mapping for skill files
+_ROLE_SKILL_FILES: dict[str, str] = {
+    "planner": "architecture.md",
+    "rules_advisor": "rules.md",
+    "task_decomposer": "tasks.md",
+    "ticket_planner": "ticket-planning.md",
+    "coder": "coding-style.md",
+    "reviewer": "review-rubric.md",
+}
+
+
+def load_skills(role_name: str) -> str:
+    """Load skill context for a role from .goal/skills/.
+
+    Reads two files (if they exist) and concatenates:
+      1. global.md       — injected into every role
+      2. <role-file>.md  — role-specific conventions / examples
+
+    Returns a formatted string ready to append to any system prompt,
+    or an empty string if no skill files are found.
+    """
+    parts: list[str] = []
+
+    global_file = _SKILLS_DIR / "global.md"
+    if global_file.exists():
+        content = global_file.read_text(encoding="utf-8").strip()
+        if content:
+            parts.append(f"## Global project context\n\n{content}")
+
+    role_filename = _ROLE_SKILL_FILES.get(role_name)
+    if role_filename:
+        role_file = _SKILLS_DIR / role_filename
+        if role_file.exists():
+            content = role_file.read_text(encoding="utf-8").strip()
+            if content:
+                parts.append(f"## Role-specific context ({role_name})\n\n{content}")
+
+    if not parts:
+        return ""
+    return "\n\n---\n\n" + "\n\n".join(parts)
 
 
 class ReviewOutput(BaseModel):
@@ -180,6 +224,7 @@ def plan_node(state: AgentState) -> AgentState:
         "Please revise accordingly."
         if feedback else ""
     )
+    skills = load_skills("planner")
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -193,6 +238,7 @@ def plan_node(state: AgentState) -> AgentState:
                     "- Potential risks and mitigations\n"
                     "- Success criteria\n\n"
                     "Output in Markdown format. Be thorough but concise."
+                    + skills
                 )
             ),
             HumanMessage(content=f"Goal: {state['idea']}{feedback_msg}"),
@@ -264,6 +310,7 @@ def rules_node(state: AgentState) -> AgentState:
         f"\n\nUser feedback on previous rules:\n{feedback}\nRevise accordingly."
         if feedback else ""
     )
+    skills = load_skills("rules_advisor")
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -272,6 +319,7 @@ def rules_node(state: AgentState) -> AgentState:
                     "covering tech stack, code style, testing strategy, and constraints.\n"
                     "Output as a concise Markdown document with sections. "
                     "Be specific and actionable — no questions, only decisions."
+                    + skills
                 )
             ),
             HumanMessage(content=f"Plan:\n{state['plan']}{feedback_msg}"),
@@ -339,6 +387,7 @@ def tasks_node(state: AgentState) -> AgentState:
         f"\n\nUser feedback on previous task breakdown:\n{feedback}\nRevise accordingly."
         if feedback else ""
     )
+    skills = load_skills("task_decomposer")
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -351,6 +400,7 @@ def tasks_node(state: AgentState) -> AgentState:
                     "- acceptance criteria\n"
                     "- dependencies (other ticket ids)\n\n"
                     "Output in Markdown with sections for each phase."
+                    + skills
                 )
             ),
             HumanMessage(content=f"Plan:\n{state['plan']}\n\nRules:\n{state['rules']}{feedback_msg}"),
@@ -441,6 +491,7 @@ def ticket_plan_node(state: AgentState) -> AgentState:
             data={"ticket_id": ticket_id},
         )
 
+    skills = load_skills("ticket_planner")
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -451,6 +502,7 @@ def ticket_plan_node(state: AgentState) -> AgentState:
                     "- Step-by-step implementation approach\n"
                     "- Testing strategy\n\n"
                     "Output in Markdown format."
+                    + skills
                 )
             ),
             HumanMessage(content=f"Ticket:\n{ticket}"),
@@ -518,6 +570,7 @@ def coder_node(state: AgentState) -> AgentState:
     tool_map = {tool.name: tool for tool in CODER_TOOLS}
 
     # Initial messages
+    skills = load_skills("coder")
     messages = [
         SystemMessage(
             content=(
@@ -527,6 +580,7 @@ def coder_node(state: AgentState) -> AgentState:
                 "Use relative paths (e.g. 'src/index.js', 'package.json'). "
                 "Do NOT write into '.goal/' — that directory is reserved for "
                 "agent metadata. Commit your changes when done."
+                + skills
             )
         ),
         HumanMessage(
@@ -685,6 +739,7 @@ def reviewer_node(state: AgentState) -> AgentState:
     # Use structured output with include_raw to also get usage metadata
     llm_structured = llm.with_structured_output(ReviewOutput, include_raw=True)
 
+    skills = load_skills("reviewer")
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -695,6 +750,7 @@ def reviewer_node(state: AgentState) -> AgentState:
                     "- Code quality\n"
                     "- Testing\n"
                     "- Documentation"
+                    + skills
                 )
             ),
             HumanMessage(

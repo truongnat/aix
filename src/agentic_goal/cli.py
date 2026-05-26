@@ -284,15 +284,28 @@ def init(
     config_path.parent.mkdir(parents=True, exist_ok=True)
     config_path.write_text(_CONFIG_TEMPLATE, encoding="utf-8")
 
+    skills_dir = config_path.parent / "skills"
+    skills_dir.mkdir(exist_ok=True)
+    global_skill = skills_dir / "global.md"
+    if not global_skill.exists():
+        global_skill.write_text(
+            "# Global project context\n\n"
+            "<!-- Add conventions, domain knowledge, or constraints that apply to ALL agents. -->\n"
+            "<!-- Examples: target language version, prohibited libraries, naming conventions. -->\n",
+            encoding="utf-8",
+        )
+
     rprint(
         Panel(
             f"[bold green]Initialised![/bold green]\n\n"
-            f"Config: [cyan]{config_path}[/cyan]\n\n"
+            f"Config:  [cyan]{config_path}[/cyan]\n"
+            f"Skills:  [cyan]{skills_dir}/[/cyan]\n\n"
             "Next steps:\n"
             "  1. Edit [cyan].goal/config.yaml[/cyan] to set your provider & models\n"
             "  2. Export your API key, e.g.:\n"
-            "     [dim]export ANTHROPIC_API_KEY=sk-ant-...[/dim]\n"
-            "  3. Run [bold cyan]goal start \"your idea\"[/bold cyan]",
+            "     [dim]export OPENROUTER_API_KEY=sk-or-...[/dim]\n"
+            "  3. (Optional) add skill files to [cyan].goal/skills/[/cyan]\n"
+            "  4. Run [bold cyan]goal start \"your idea\"[/bold cyan]",
             title="✅  goal init",
             border_style="green",
         )
