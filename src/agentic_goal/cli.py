@@ -2,7 +2,6 @@
 
 import contextlib
 import importlib.resources
-import os
 import shutil
 import uuid
 from pathlib import Path
@@ -13,7 +12,12 @@ from rich import print as rprint
 from rich.panel import Panel
 from rich.prompt import Prompt
 
-from agentic_goal.config import PROJECT_CONFIG_PATH, load_config, validate_config
+from agentic_goal.config import (
+    PROJECT_CONFIG_PATH,
+    BudgetExceededError,
+    load_config,
+    validate_config,
+)
 from agentic_goal.events import EventBus, JsonlSink, MarkdownSink, TerminalSink, set_event_bus
 from agentic_goal.graph_builder import build_graph, get_checkpointer
 
@@ -58,6 +62,14 @@ def _friendly_error(exc: Exception) -> None:
                 "[bold yellow]Rate limit hit[/bold yellow]\n\n"
                 "Too many requests. Wait a moment then try again.",
                 title="⏳ Rate Limit",
+                border_style="yellow",
+            )
+        )
+    elif isinstance(exc, BudgetExceededError):
+        rprint(
+            Panel(
+                f"[bold yellow]{msg}[/bold yellow]",
+                title="💰 Budget Exceeded",
                 border_style="yellow",
             )
         )
@@ -170,7 +182,12 @@ def _ask_action(label: str, has_skip: bool = False) -> str:
     if has_skip:
         options = ["1) approve", "2) regenerate", "3) skip", "4) abort"]
     rprint(f"\n[bold]{label}[/bold]  " + "  ".join(f"[cyan]{o}[/cyan]" for o in options))
-    mapping = {"1": "approve", "2": "regenerate", "3": "skip" if has_skip else "abort", "4": "abort"}
+    mapping = {
+        "1": "approve",
+        "2": "regenerate",
+        "3": "skip" if has_skip else "abort",
+        "4": "abort",
+    }
     while True:
         raw = input("Choice [1]: ").strip() or "1"
         if raw in mapping:
@@ -350,6 +367,7 @@ def start(
             if role in cfg.roles:
                 cfg.roles[role] = cfg.roles[role].model_copy(update={"model": model})
 
+    # Re-validate after overrides (e.g. user might have made coder == reviewer)
     validate_config(cfg, strict=False)
 
     goal_id = f"g_{uuid.uuid4().hex[:12]}"
@@ -386,7 +404,6 @@ def start(
             "tasks": [],
             "current_ticket_id": None,
             "kanban": {},
-            "config_override": {},
             "cumulative_cost_usd": 0.0,
             "cumulative_tokens": 0,
             "interrupt_reason": None,
@@ -396,10 +413,10 @@ def start(
         # Run graph through plan -> rules -> tasks (with human approvals)
         config: dict[str, Any] = {
             "configurable": {"thread_id": goal_id},
-            "recursion_limit": 200,
+            "recursion_limit": cfg.limits.recursion_limit,
         }
         try:
-            final_state = _run_with_approvals(graph, initial_state, config, goal_dir)
+            _run_with_approvals(graph, initial_state, config, goal_dir)
             approved = True
         except Exception as exc:
             _friendly_error(exc)
@@ -472,7 +489,7 @@ def continue_cmd(
         # Load checkpointed state
         config: dict[str, Any] = {
             "configurable": {"thread_id": goal_id},
-            "recursion_limit": 200,
+            "recursion_limit": cfg.limits.recursion_limit,
         }
         checkpoint = checkpointer.get(config)
         if not checkpoint:
@@ -482,7 +499,7 @@ def continue_cmd(
         # Continue execution; pass None to let LangGraph resume from checkpoint
         # and let our helper handle any pending approval interrupts.
         try:
-            final_state = _run_with_approvals(graph, None, config, goal_dir)
+            _run_with_approvals(graph, None, config, goal_dir)
         except Exception as exc:
             _friendly_error(exc)
             raise typer.Exit(1) from None
@@ -603,6 +620,75 @@ def list_goals() -> None:
         rprint(f"  [dim]{time_str}[/dim] [bold]{goal_id}[/bold] - {phase}")
         rprint(f"    [dim]{idea}[/dim]")
 
+    raise typer.Exit(0)
+
+
+@app.command()
+def clean(
+    older_than_days: int = typer.Option(
+        7, "--older-than", help="Delete goals older than N days"
+    ),
+    only_done: bool = typer.Option(
+        True, "--only-done/--all", help="Only delete completed goals (default)"
+    ),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Preview without deleting"),
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation"),
+) -> None:
+    """Clean up old goal workspaces under .goal/."""
+    import time
+    from datetime import datetime
+
+    goals_dir = Path(".goal")
+    if not goals_dir.exists():
+        rprint("[dim]No .goal/ directory found.[/dim]")
+        raise typer.Exit(0)
+
+    cutoff = time.time() - (older_than_days * 86400)
+    targets: list[tuple[Path, str, str]] = []
+
+    for goal_dir in goals_dir.iterdir():
+        if not (goal_dir.is_dir() and goal_dir.name.startswith("g_")):
+            continue
+        if goal_dir.stat().st_mtime > cutoff:
+            continue
+
+        phase = "unknown"
+        if only_done:
+            checkpointer = get_checkpointer(goal_dir)
+            try:
+                checkpoint = checkpointer.get({"configurable": {"thread_id": goal_dir.name}})
+                if checkpoint:
+                    phase = checkpoint.get("channel_values", {}).get("phase", "unknown")
+            finally:
+                _close_checkpointer(checkpointer)
+            if phase != "done":
+                continue
+
+        time_str = datetime.fromtimestamp(goal_dir.stat().st_mtime).strftime("%Y-%m-%d")
+        targets.append((goal_dir, phase, time_str))
+
+    if not targets:
+        rprint("[green]Nothing to clean.[/green]")
+        raise typer.Exit(0)
+
+    rprint(f"[bold]Found {len(targets)} goal(s) to clean:[/bold]")
+    for path, phase, time_str in targets:
+        rprint(f"  [dim]{time_str}[/dim] [yellow]{path.name}[/yellow] ({phase})")
+
+    if dry_run:
+        rprint("\n[dim]Dry run — nothing deleted.[/dim]")
+        raise typer.Exit(0)
+
+    if not force:
+        confirm = Prompt.ask("Delete these workspaces?", choices=["y", "n"], default="n")
+        if confirm != "y":
+            rprint("[dim]Aborted.[/dim]")
+            raise typer.Exit(0)
+
+    for path, _, _ in targets:
+        with contextlib.suppress(OSError):
+            shutil.rmtree(path)
+    rprint(f"[bold green]Cleaned {len(targets)} workspace(s).[/bold green]")
     raise typer.Exit(0)
 
 

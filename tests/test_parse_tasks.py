@@ -1,6 +1,5 @@
 """Tests for _parse_tasks_to_kanban."""
 
-import pytest
 
 from agentic_goal.nodes import _parse_tasks_to_kanban
 

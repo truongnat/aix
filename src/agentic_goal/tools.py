@@ -1,4 +1,8 @@
-"""Tools for coder agent: file operations, shell, git."""
+"""Tools for coder agent: file operations, shell, git.
+
+All tools are sandboxed: file ops are confined to the user's CWD, shell
+commands are checked against a denylist from config.limits.
+"""
 
 from __future__ import annotations
 
@@ -8,10 +12,45 @@ from pathlib import Path
 from langchain_core.tools import tool
 
 
+class SandboxViolation(RuntimeError):
+    """Raised when a tool tries to operate outside the sandbox."""
+
+
+def _resolve_inside_sandbox(path: str, sandbox_root: Path | None = None) -> Path:
+    """Resolve `path` and ensure it stays inside `sandbox_root` (defaults to CWD).
+
+    Blocks path traversal (`../../etc/passwd`), absolute paths outside CWD,
+    and symlinks pointing outside.
+    """
+    root = (sandbox_root or Path.cwd()).resolve()
+    candidate = (root / path).resolve() if not Path(path).is_absolute() else Path(path).resolve()
+    try:
+        candidate.relative_to(root)
+    except ValueError as exc:
+        raise SandboxViolation(
+            f"Path '{path}' resolves outside the sandbox ({root}); access denied."
+        ) from exc
+    return candidate
+
+
+def _check_command_safe(command: str, denylist: list[str] | None = None) -> None:
+    """Raise SandboxViolation if `command` matches any denylist entry."""
+    from agentic_goal.config import LimitsConfig
+
+    patterns = denylist if denylist is not None else LimitsConfig().shell_command_denylist
+    cmd_lower = command.lower()
+    for bad in patterns:
+        if bad.lower().strip() and bad.lower() in cmd_lower:
+            raise SandboxViolation(
+                f"Shell command blocked by denylist (pattern: {bad!r}). "
+                "Edit limits.shell_command_denylist in .goal/config.yaml to allow."
+            )
+
+
 @tool
 def read_file(path: str) -> str:
-    """Read the contents of a file."""
-    p = Path(path)
+    """Read the contents of a file (must be inside the project sandbox)."""
+    p = _resolve_inside_sandbox(path)
     if not p.exists():
         raise FileNotFoundError(f"File not found: {path}")
     return p.read_text(encoding="utf-8")
@@ -19,8 +58,8 @@ def read_file(path: str) -> str:
 
 @tool
 def write_file(path: str, content: str) -> str:
-    """Write content to a file, creating parent directories if needed."""
-    p = Path(path)
+    """Write content to a file (must be inside the project sandbox)."""
+    p = _resolve_inside_sandbox(path)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(content, encoding="utf-8")
     return f"Written to {path}"
@@ -39,7 +78,15 @@ def _resolve_sandbox_cwd(cwd: str | None) -> Path:
 
 @tool
 def run_shell(command: str, cwd: str | None = None) -> str:
-    """Run a shell command in the working directory (default: CWD)."""
+    """Run a shell command in the working directory (default: CWD).
+
+    Commands are checked against a configurable denylist before execution.
+    """
+    from agentic_goal.config import load_config
+
+    cfg = load_config()
+    _check_command_safe(command, cfg.limits.shell_command_denylist)
+
     sandbox_cwd = _resolve_sandbox_cwd(cwd)
     sandbox_cwd.mkdir(parents=True, exist_ok=True)
     result = subprocess.run(
@@ -48,7 +95,7 @@ def run_shell(command: str, cwd: str | None = None) -> str:
         cwd=str(sandbox_cwd),
         capture_output=True,
         text=True,
-        timeout=300,
+        timeout=cfg.limits.subprocess_timeout_seconds,
     )
     output = result.stdout or ""
     if result.stderr:

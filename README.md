@@ -5,7 +5,7 @@
 **Turn a one-line idea into shipped code — autonomously.**
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE-MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Built with LangGraph](https://img.shields.io/badge/built%20with-LangGraph-purple)](https://github.com/langchain-ai/langgraph)
 [![Powered by OpenRouter](https://img.shields.io/badge/powered%20by-OpenRouter-green)](https://openrouter.ai)
 
@@ -382,4 +382,4 @@ mypy src/
 
 ## License
 
-MIT — see [LICENSE-MIT](LICENSE-MIT)
+MIT — see [LICENSE](LICENSE)

@@ -13,7 +13,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from agentic_goal.config import Config, load_config
+from agentic_goal.config import Config, check_budget, load_config
 from agentic_goal.events import EventType, get_event_bus
 from agentic_goal.graph import AgentState
 from agentic_goal.tools import CODER_TOOLS
@@ -205,6 +205,7 @@ def _parse_tasks_to_kanban(tasks_md: str) -> dict[str, dict[str, Any]]:
 def plan_node(state: AgentState) -> AgentState:
     """Generate a detailed plan from the idea using top-tier model."""
     cfg = load_config()
+    check_budget(state.get("cumulative_cost_usd", 0.0), cfg.budgets)
     llm = _make_llm("planner", cfg)
     event_bus = get_event_bus()
 
@@ -292,6 +293,7 @@ def plan_approval_node(state: AgentState) -> AgentState:
 def rules_node(state: AgentState) -> AgentState:
     """Generate questions for user to define rules/stack."""
     cfg = load_config()
+    check_budget(state.get("cumulative_cost_usd", 0.0), cfg.budgets)
     llm = _make_llm("rules_advisor", cfg)
     event_bus = get_event_bus()
 
@@ -369,6 +371,7 @@ def rules_approval_node(state: AgentState) -> AgentState:
 def tasks_node(state: AgentState) -> AgentState:
     """Decompose plan into tickets/phases."""
     cfg = load_config()
+    check_budget(state.get("cumulative_cost_usd", 0.0), cfg.budgets)
     llm = _make_llm("task_decomposer", cfg)
     event_bus = get_event_bus()
 
@@ -475,6 +478,7 @@ def pick_ticket_node(state: AgentState) -> AgentState:
 def ticket_plan_node(state: AgentState) -> AgentState:
     """Plan the current ticket implementation."""
     cfg = load_config()
+    check_budget(state.get("cumulative_cost_usd", 0.0), cfg.budgets)
     llm = _make_llm("ticket_planner", cfg)
     event_bus = get_event_bus()
     ticket_id = state.get("current_ticket_id") or "unknown"
@@ -547,6 +551,7 @@ def ticket_plan_node(state: AgentState) -> AgentState:
 def coder_node(state: AgentState) -> AgentState:
     """Implement the current ticket using tools."""
     cfg = load_config()
+    check_budget(state.get("cumulative_cost_usd", 0.0), cfg.budgets)
     llm = _make_llm("coder", cfg)
     event_bus = get_event_bus()
     ticket_id = state.get("current_ticket_id") or "unknown"
@@ -594,7 +599,7 @@ def coder_node(state: AgentState) -> AgentState:
     ]
 
     # Tool execution loop
-    max_iterations = 10
+    max_iterations = cfg.limits.coder_max_iterations
     total_tokens_in = 0
     total_tokens_out = 0
 
@@ -715,6 +720,7 @@ def coder_node(state: AgentState) -> AgentState:
 def reviewer_node(state: AgentState) -> AgentState:
     """Review the code and score it (0-10)."""
     cfg = load_config()
+    check_budget(state.get("cumulative_cost_usd", 0.0), cfg.budgets)
     llm = _make_llm("reviewer", cfg)
     event_bus = get_event_bus()
     ticket_id = state.get("current_ticket_id") or "unknown"
@@ -785,7 +791,11 @@ def reviewer_node(state: AgentState) -> AgentState:
         # Don't trust the LLM's `approved` field — small/local models often
         # emit `approved=true` despite low scores. Enforce score threshold
         # AND require non-empty diff (i.e. coder actually changed something).
-        approved = bool(parsed.approved) and score >= 7 and bool(diff_output.strip())
+        approved = (
+            bool(parsed.approved)
+            and score >= cfg.limits.review_approval_score
+            and bool(diff_output.strip())
+        )
 
     # Also fail-safe: empty diff means coder didn't produce any changes
     if not diff_output.strip():

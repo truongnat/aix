@@ -20,7 +20,6 @@ class AgentState(TypedDict):
     tasks: list[dict[str, Any]]
     current_ticket_id: str | None
     kanban: dict[str, Any]
-    config_override: dict[str, Any]
     cumulative_cost_usd: float
     cumulative_tokens: int
     interrupt_reason: str | None

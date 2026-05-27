@@ -36,11 +36,40 @@ class BudgetConfig(BaseModel):
     hard_stop: bool = True
 
 
+class LimitsConfig(BaseModel):
+    """Tunable execution limits — moved out of magic numbers."""
+    coder_max_iterations: int = 10
+    recursion_limit: int = 200
+    subprocess_timeout_seconds: int = 300
+    review_approval_score: int = 7
+    shell_command_denylist: list[str] = Field(
+        default_factory=lambda: [
+            "rm -rf /",
+            "rm -rf ~",
+            "rm -rf ~/",
+            "rm -rf $HOME",
+            "mkfs",
+            ":(){ :|:& };:",
+            "dd if=/dev/zero",
+            "dd if=/dev/random",
+            "> /dev/sda",
+            "chmod -R 777 /",
+            "chown -R",
+            "sudo ",
+            "curl ",  # exfiltration risk
+            "wget ",
+            "nc ",
+            "ncat ",
+        ]
+    )
+
+
 class Config(BaseModel):
     default_provider: str = "openrouter"
     providers: dict[str, ProviderConfig] = Field(default_factory=dict)
     roles: dict[str, RoleConfig] = Field(default_factory=dict)
     budgets: BudgetConfig = Field(default_factory=BudgetConfig)
+    limits: LimitsConfig = Field(default_factory=LimitsConfig)
 
 
 class EnvSettings(BaseSettings):
@@ -133,9 +162,26 @@ def _merge_into(cfg: Config, data: dict[str, Any]) -> Config:
     # Budgets
     if "budgets" in data:
         cfg.budgets = BudgetConfig(**data["budgets"])
+    # Limits
+    if "limits" in data:
+        merged = {**cfg.limits.model_dump(), **data["limits"]}
+        cfg.limits = LimitsConfig(**merged)
     if "default_provider" in data:
         cfg.default_provider = data["default_provider"]
     return cfg
+
+
+class BudgetExceededError(RuntimeError):
+    """Raised when cumulative_cost_usd exceeds budgets.per_goal_usd."""
+
+
+def check_budget(cumulative_cost_usd: float, budgets: BudgetConfig) -> None:
+    """Raise BudgetExceededError if hard_stop is on and budget is exceeded."""
+    if budgets.hard_stop and cumulative_cost_usd >= budgets.per_goal_usd:
+        raise BudgetExceededError(
+            f"Budget hard-stop: ${cumulative_cost_usd:.4f} >= ${budgets.per_goal_usd:.2f}. "
+            f"Increase budgets.per_goal_usd or set hard_stop=false to continue."
+        )
 
 
 def _ollama_list_models(base_url: str = "http://localhost:11434") -> list[str]:
