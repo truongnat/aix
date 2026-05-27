@@ -6,6 +6,7 @@
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/truongnat/agentic-sdlc/actions/workflows/test.yml/badge.svg)](https://github.com/truongnat/agentic-sdlc/actions/workflows/test.yml)
 [![Built with LangGraph](https://img.shields.io/badge/built%20with-LangGraph-purple)](https://github.com/langchain-ai/langgraph)
 [![Powered by OpenRouter](https://img.shields.io/badge/powered%20by-OpenRouter-green)](https://openrouter.ai)
 
@@ -33,9 +34,9 @@ goal start "Build a REST API with auth and PostgreSQL"
 1. 🧠 **Plan** — top-tier model architects the solution
 2. 📐 **Rules** — generates project conventions & tech stack decisions
 3. 🎫 **Tasks** — decomposes into an executable kanban of tickets
-4. 🤖 **Execute** — coder agent implements each ticket, reviewer scores it; loops until ≥ 9/10
+4. 🤖 **Execute** — coder agent implements each ticket, runs tests (if defined), reviewer scores it; loops until ≥ 9/10
 
-Every step is **checkpointed to SQLite** — interrupt and resume any time.
+Every step is **checkpointed to SQLite** — interrupt and resume any time. Long text generation (plan/rules/tasks) streams in real-time.
 
 ---
 
@@ -125,7 +126,11 @@ goal start "idea"
   ┌─────────────┐   tools        ┌──────┴──────┐
   │    coder    │──────────────► │  reviewer   │
   └─────────────┘   fs/shell/git └─────────────┘
-                                       │
+        │                               │
+        ▼                               │
+   run tests (if defined)               │
+        │                               │
+        └───────────────────────────────┘
                               score ≥ 9 → done ✅
                               score < 9 → retry 🔄
 ```
@@ -167,6 +172,17 @@ budgets:
   per_goal_usd: 5.0
   per_ticket_usd: 0.5
   hard_stop: true
+
+limits:
+  coder_max_iterations: 10
+  recursion_limit: 200
+  subprocess_timeout_seconds: 300
+  review_approval_score: 7
+  shell_command_denylist:
+    - "rm -rf /"
+    - "dd if="
+    - "mkfs"
+    - "format"
 ```
 
 > ⚠️ `reviewer.model` **must differ** from `coder.model` — enforced at startup.
@@ -232,7 +248,7 @@ Skills are **reusable context blocks** injected into agent prompts to improve ou
 Each skill file contains domain knowledge, conventions, or few-shot examples that the agent loads alongside its task input.
 
 ```bash
-goal init                          # creates .goal/config.yaml
+goal init                          # creates .goal/config.yaml + default skill templates
 mkdir -p .goal/skills
 
 cat > .goal/skills/coding-style.md << 'EOF'
@@ -245,7 +261,7 @@ cat > .goal/skills/coding-style.md << 'EOF'
 EOF
 ```
 
-Skills are automatically discovered and injected — no config needed.
+Skills are automatically discovered and injected — no config needed. `goal init` creates default templates for all roles.
 
 ---
 
@@ -259,6 +275,15 @@ goal start "idea"                  # start a new goal
 goal continue [--id g_abc123]      # resume from checkpoint
 goal status  [--id g_abc123]       # kanban + phase + cost
 goal list-goals                    # all goals with phase & idea
+```
+
+### Recovery commands
+
+```bash
+goal retry-ticket <ticket-id> [--id g_abc123]    # mark ticket as pending for re-execution
+goal skip-ticket <ticket-id> [--id g_abc123]     # mark ticket as done (skip it)
+goal abort [--id g_abc123]                       # mark goal as aborted (stop execution)
+goal clean [--older-than 7d] [--only-done]       # remove old goal workspaces
 ```
 
 ### Observation & debugging
