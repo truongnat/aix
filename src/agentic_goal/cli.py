@@ -1,7 +1,9 @@
 """CLI entry point — Typer app with subcommands."""
 
 import contextlib
+import importlib.resources
 import os
+import shutil
 import uuid
 from pathlib import Path
 from typing import Any
@@ -127,6 +129,22 @@ def _require_init() -> None:
             )
         )
         raise typer.Exit(1)
+
+
+def _copy_skill_templates(skills_dir: Path, force: bool = False) -> None:
+    """Copy built-in skill templates from package into skills_dir.
+
+    Skips files that already exist unless force=True.
+    """
+    try:
+        templates_ref = importlib.resources.files("agentic_goal") / "templates" / "skills"
+        for resource in templates_ref.iterdir():
+            dest = skills_dir / resource.name
+            if dest.exists() and not force:
+                continue
+            dest.write_bytes(resource.read_bytes())
+    except (FileNotFoundError, TypeError):
+        pass
 
 
 def _close_checkpointer(checkpointer: Any) -> None:
@@ -286,14 +304,7 @@ def init(
 
     skills_dir = config_path.parent / "skills"
     skills_dir.mkdir(exist_ok=True)
-    global_skill = skills_dir / "global.md"
-    if not global_skill.exists():
-        global_skill.write_text(
-            "# Global project context\n\n"
-            "<!-- Add conventions, domain knowledge, or constraints that apply to ALL agents. -->\n"
-            "<!-- Examples: target language version, prohibited libraries, naming conventions. -->\n",
-            encoding="utf-8",
-        )
+    _copy_skill_templates(skills_dir, force=force)
 
     rprint(
         Panel(
@@ -304,7 +315,7 @@ def init(
             "  1. Edit [cyan].goal/config.yaml[/cyan] to set your provider & models\n"
             "  2. Export your API key, e.g.:\n"
             "     [dim]export OPENROUTER_API_KEY=sk-or-...[/dim]\n"
-            "  3. (Optional) add skill files to [cyan].goal/skills/[/cyan]\n"
+            "  3. Edit skill files in [cyan].goal/skills/[/cyan] to match your project\n"
             "  4. Run [bold cyan]goal start \"your idea\"[/bold cyan]",
             title="✅  goal init",
             border_style="green",

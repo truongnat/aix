@@ -43,6 +43,7 @@ goal = "agentic_goal.cli:app"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/agentic_goal"]
+artifacts = ["src/agentic_goal/templates/**/*.md"]
 
 [tool.ruff]
 target-version = "py311"
