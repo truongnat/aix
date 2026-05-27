@@ -31,6 +31,29 @@ _ROLE_SKILL_FILES: dict[str, str] = {
 }
 
 
+def _extract_test_command(rules: str) -> str | None:
+    """Extract the test command from rules markdown.
+
+    Looks for patterns like:
+    - Test command: `npm test`
+    - Test: pytest -v
+    - Run tests: `make test`
+    """
+    import re
+
+    patterns = [
+        r"(?i)test command:\s*`([^`]+)`",
+        r"(?i)run tests:\s*`([^`]+)`",
+        r"(?i)test:\s*`([^`]+)`",
+        r"(?i)testing:\s*`([^`]+)`",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, rules)
+        if match:
+            return match.group(1).strip()
+    return None
+
+
 def load_skills(role_name: str) -> str:
     """Load skill context for a role from .goal/skills/.
 
@@ -70,9 +93,32 @@ class ReviewOutput(BaseModel):
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10), reraise=True)
-def _invoke_llm_with_retry(llm: Any, messages: list[Any]) -> Any:
-    """Invoke LLM with retry logic."""
-    return llm.invoke(messages)
+def _invoke_llm_with_retry(
+    llm: Any, messages: list[Any], stream: bool = False
+) -> Any:
+    """Invoke LLM with retry logic. Optionally stream output with Rich Live."""
+    if not stream:
+        return llm.invoke(messages)
+
+    from rich.console import Console
+    from rich.live import Live
+
+    console = Console()
+    full_content = ""
+
+    with Live("", console=console, refresh_per_second=10) as live:
+        for chunk in llm.stream(messages):
+            if hasattr(chunk, "content"):
+                full_content += chunk.content
+                live.update(full_content)
+            elif isinstance(chunk, str):
+                full_content += chunk
+                live.update(full_content)
+
+    # Return an AIMessage-like object with the accumulated content
+    from langchain_core.messages import AIMessage
+
+    return AIMessage(content=full_content)
 
 
 def _make_llm(role_name: str, cfg: Config) -> Any:
@@ -246,7 +292,7 @@ def plan_node(state: AgentState) -> AgentState:
         ]
     )
 
-    response = _invoke_llm_with_retry(llm, prompt.format_messages())
+    response = _invoke_llm_with_retry(llm, prompt.format_messages(), stream=True)
     plan_content = str(response.content)
 
     # Track tokens and cost
@@ -328,7 +374,7 @@ def rules_node(state: AgentState) -> AgentState:
         ]
     )
 
-    response = _invoke_llm_with_retry(llm, prompt.format_messages())
+    response = _invoke_llm_with_retry(llm, prompt.format_messages(), stream=True)
     rules_content = str(response.content)
 
     # Track tokens and cost
@@ -410,7 +456,7 @@ def tasks_node(state: AgentState) -> AgentState:
         ]
     )
 
-    response = _invoke_llm_with_retry(llm, prompt.format_messages())
+    response = _invoke_llm_with_retry(llm, prompt.format_messages(), stream=True)
     tasks_md = str(response.content)
 
     # Track tokens and cost
@@ -513,7 +559,7 @@ def ticket_plan_node(state: AgentState) -> AgentState:
         ]
     )
 
-    response = _invoke_llm_with_retry(llm, prompt.format_messages())
+    response = _invoke_llm_with_retry(llm, prompt.format_messages(), stream=True)
     plan = str(response.content)
 
     # Track tokens and cost
@@ -709,11 +755,53 @@ def coder_node(state: AgentState) -> AgentState:
             cost_usd=cost_usd,
         )
 
+    # Run tests if test command defined in rules
+    test_output = None
+    test_cmd = _extract_test_command(state.get("rules", ""))
+    if test_cmd:
+        from agentic_goal.tools import run_shell
+
+        if event_bus:
+            event_bus.emit(
+                phase="execution",
+                node="coder",
+                role="coder",
+                model=cfg.roles["coder"].model,
+                event_type=EventType.TOOL_CALL,
+                ticket_id=ticket_id,
+                data={"name": "run_tests", "args": {"command": test_cmd}},
+            )
+        try:
+            test_output = run_shell.invoke({"command": test_cmd})
+            if event_bus:
+                event_bus.emit(
+                    phase="execution",
+                    node="coder",
+                    role="coder",
+                    model=cfg.roles["coder"].model,
+                    event_type=EventType.TOOL_RESULT,
+                    ticket_id=ticket_id,
+                    data={"name": "run_tests", "ok": True, "result": test_output[:1000]},
+                )
+        except Exception as e:
+            test_output = f"Test execution failed: {e}"
+            if event_bus:
+                event_bus.emit(
+                    phase="execution",
+                    node="coder",
+                    role="coder",
+                    model=cfg.roles["coder"].model,
+                    event_type=EventType.TOOL_RESULT,
+                    ticket_id=ticket_id,
+                    data={"name": "run_tests", "ok": False, "error": str(e)},
+                )
+
     return {
         **state,
         "messages": messages,
         "cumulative_tokens": cumulative_tokens,
         "cumulative_cost_usd": cumulative_cost,
+        "test_output": test_output,
     }
 
 
@@ -746,6 +834,8 @@ def reviewer_node(state: AgentState) -> AgentState:
     llm_structured = llm.with_structured_output(ReviewOutput, include_raw=True)
 
     skills = load_skills("reviewer")
+    test_output = state.get("test_output") or ""
+    test_section = f"\n\nTest Output:\n{test_output}" if test_output else ""
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -762,7 +852,8 @@ def reviewer_node(state: AgentState) -> AgentState:
             HumanMessage(
                 content=(
                     f"Ticket:\n{ticket}\n\n"
-                    f"Git Diff:\n{diff_output}\n\n"
+                    f"Git Diff:\n{diff_output}\n"
+                    f"{test_section}\n\n"
                     "Review the implementation based on the ticket requirements."
                 )
             ),

@@ -408,6 +408,7 @@ def start(
             "cumulative_tokens": 0,
             "interrupt_reason": None,
             "feedback": None,
+            "test_output": None,
         }
 
         # Run graph through plan -> rules -> tasks (with human approvals)
@@ -689,6 +690,149 @@ def clean(
         with contextlib.suppress(OSError):
             shutil.rmtree(path)
     rprint(f"[bold green]Cleaned {len(targets)} workspace(s).[/bold green]")
+    raise typer.Exit(0)
+
+
+@app.command("retry-ticket")
+def retry_ticket(
+    goal_id: str = typer.Option("", "--id", help="Goal ID (default: latest)"),
+    ticket_id: str = typer.Argument(..., help="Ticket ID to retry (e.g. ticket-001)"),
+) -> None:
+    """Mark a ticket as pending so it will be re-executed on next continue."""
+    _require_init()
+
+    # Find goal directory
+    goal_dir: Path
+    if goal_id:
+        goal_dir = Path(".goal") / goal_id
+    else:
+        goals_dir = Path(".goal")
+        if not goals_dir.exists():
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dirs = sorted(
+            (p for p in goals_dir.iterdir() if p.is_dir() and p.name.startswith("g_")),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        if not goal_dirs:
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dir = goal_dirs[0]
+
+    checkpointer = get_checkpointer(goal_dir)
+    try:
+        config = {"configurable": {"thread_id": goal_dir.name}}
+        checkpoint = checkpointer.get(config)
+        if not checkpoint:
+            rprint("[bold red]No checkpoint found.[/bold red]")
+            raise typer.Exit(1)
+
+        state = checkpoint.get("channel_values", {})
+        kanban = state.get("kanban", {})
+        if ticket_id not in kanban:
+            rprint(f"[bold red]Ticket not found:[/bold red] {ticket_id}")
+            raise typer.Exit(1)
+
+        kanban[ticket_id]["status"] = "pending"
+        # Update checkpoint
+        checkpointer.put(config, state)
+        rprint(
+            f"[bold green]Marked {ticket_id} as pending. "
+            "Run goal continue to retry.[/bold green]"
+        )
+    finally:
+        _close_checkpointer(checkpointer)
+    raise typer.Exit(0)
+
+
+@app.command("skip-ticket")
+def skip_ticket(
+    goal_id: str = typer.Option("", "--id", help="Goal ID (default: latest)"),
+    ticket_id: str = typer.Argument(..., help="Ticket ID to skip (e.g. ticket-001)"),
+) -> None:
+    """Mark a ticket as done (skipped) so it won't be executed."""
+    _require_init()
+
+    goal_dir: Path
+    if goal_id:
+        goal_dir = Path(".goal") / goal_id
+    else:
+        goals_dir = Path(".goal")
+        if not goals_dir.exists():
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dirs = sorted(
+            (p for p in goals_dir.iterdir() if p.is_dir() and p.name.startswith("g_")),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        if not goal_dirs:
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dir = goal_dirs[0]
+
+    checkpointer = get_checkpointer(goal_dir)
+    try:
+        config = {"configurable": {"thread_id": goal_dir.name}}
+        checkpoint = checkpointer.get(config)
+        if not checkpoint:
+            rprint("[bold red]No checkpoint found.[/bold red]")
+            raise typer.Exit(1)
+
+        state = checkpoint.get("channel_values", {})
+        kanban = state.get("kanban", {})
+        if ticket_id not in kanban:
+            rprint(f"[bold red]Ticket not found:[/bold red] {ticket_id}")
+            raise typer.Exit(1)
+
+        kanban[ticket_id]["status"] = "done"
+        checkpointer.put(config, state)
+        rprint(f"[bold yellow]Skipped {ticket_id}. Run goal continue to proceed.[/bold yellow]")
+    finally:
+        _close_checkpointer(checkpointer)
+    raise typer.Exit(0)
+
+
+@app.command("abort")
+def abort(
+    goal_id: str = typer.Option("", "--id", help="Goal ID (default: latest)"),
+) -> None:
+    """Mark the goal as aborted (phase=done) to stop execution."""
+    _require_init()
+
+    goal_dir: Path
+    if goal_id:
+        goal_dir = Path(".goal") / goal_id
+    else:
+        goals_dir = Path(".goal")
+        if not goals_dir.exists():
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dirs = sorted(
+            (p for p in goals_dir.iterdir() if p.is_dir() and p.name.startswith("g_")),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        if not goal_dirs:
+            rprint("[bold red]No goals found.[/bold red]")
+            raise typer.Exit(1)
+        goal_dir = goal_dirs[0]
+
+    checkpointer = get_checkpointer(goal_dir)
+    try:
+        config = {"configurable": {"thread_id": goal_dir.name}}
+        checkpoint = checkpointer.get(config)
+        if not checkpoint:
+            rprint("[bold red]No checkpoint found.[/bold red]")
+            raise typer.Exit(1)
+
+        state = checkpoint.get("channel_values", {})
+        state["phase"] = "done"
+        checkpointer.put(config, state)
+        rprint(f"[bold red]Aborted goal {goal_dir.name}.[/bold red]")
+    finally:
+        _close_checkpointer(checkpointer)
     raise typer.Exit(0)
 
 
