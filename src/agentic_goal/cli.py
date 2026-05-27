@@ -371,6 +371,7 @@ def start(
 
     # Build graph with checkpointer
     checkpointer = get_checkpointer(goal_dir)
+    approved = False
     try:
         graph = build_graph(checkpointer=checkpointer)
 
@@ -399,12 +400,17 @@ def start(
         }
         try:
             final_state = _run_with_approvals(graph, initial_state, config, goal_dir)
+            approved = True
         except Exception as exc:
             _friendly_error(exc)
             raise typer.Exit(1) from None
     finally:
         _close_checkpointer(checkpointer)
         event_bus.close()
+        if not approved:
+            with contextlib.suppress(OSError):
+                shutil.rmtree(goal_dir)
+            rprint(f"[dim]Cleaned up workspace:[/dim] {goal_dir}")
 
     rprint("[bold green]✓[/bold green] Plan, rules, and tasks generated.")
     rprint(f"[dim]Artifacts saved to:[/dim] {goal_dir}/")
