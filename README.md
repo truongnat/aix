@@ -9,16 +9,18 @@
 [![Built with LangGraph](https://img.shields.io/badge/built%20with-LangGraph-purple)](https://github.com/langchain-ai/langgraph)
 [![Powered by OpenRouter](https://img.shields.io/badge/powered%20by-OpenRouter-green)](https://openrouter.ai)
 
-```
+```bash
 goal start "Build a REST API with auth and PostgreSQL"
 ```
 
-```
-⚡ Plan        → Architecture drafted, waiting for your approval
-📋 Rules       → Tech stack & conventions locked in
-🎫 Tasks       → 12 tickets decomposed and ready
-🤖 Executing   → ticket-001 ✅  ticket-002 ✅  ticket-003 🔄
-```
+| Phase | Status |
+|---|---|
+| ⚡ Plan | Architecture drafted — approved |
+| � Rules | Tech stack & conventions locked in |
+| 🎫 Tasks | 12 tickets decomposed and ready |
+| 🤖 ticket-001 | ✅ done |
+| 🤖 ticket-002 | ✅ done |
+| 🤖 ticket-003 | 🔄 in progress |
 
 </div>
 
