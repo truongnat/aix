@@ -235,33 +235,58 @@ Model selection per role:
 
 ## Skills
 
-Skills are **reusable context blocks** injected into agent prompts to improve output quality. Place Markdown files in `.goal/skills/`:
+Skills are **reusable context blocks** injected into agent prompts to improve output quality. The system supports three layers of skill loading:
 
 ```
 .goal/skills/
-├── coding-style.md      # applied to: coder
-├── review-rubric.md     # applied to: reviewer
-├── architecture.md      # applied to: planner
-└── global.md            # applied to: all roles
+├── global.md                    # injected into every role
+├── coding-style.md              # primary skill for coder
+├── review-rubric.md             # primary skill for reviewer
+├── architecture.md              # primary skill for planner
+├── coder-frontend.md           # pattern-matched (coder-*.md)
+├── db-postgres.md              # context-matched via frontmatter tags
+└── auth.md                      # context-matched via frontmatter tags
 ```
 
-Each skill file contains domain knowledge, conventions, or few-shot examples that the agent loads alongside its task input.
+### Skill layers
+
+1. **Global** (`global.md`) — injected into every role
+2. **Primary** (`coding-style.md`, etc.) — one per role, loaded by filename
+3. **Pattern-matched** (`coder-*.md`, `frontend-*.md`, etc.) — auto-discovered by glob
+4. **Contextual** — matched dynamically via YAML frontmatter tags against ticket/idea description
+
+### Dynamic contextual skills
+
+Add YAML frontmatter with tags to any `.md` file in `.goal/skills/`:
+
+```markdown
+---
+tags: [auth, jwt, security, oauth]
+description: Authentication patterns for web apps
+---
+
+# Auth Patterns
+- Use JWT access tokens (15-min expiry)
+- Store refresh tokens in httpOnly cookies
+```
+
+When a ticket mentions "Implement JWT authentication", the `auth.md` skill is **automatically loaded** because its tag `jwt` matches the context.
+
+### Import skills from the web
 
 ```bash
-goal init                          # creates .goal/config.yaml + default skill templates
-mkdir -p .goal/skills
+# Import from GitHub raw URL
+goal skills import https://raw.githubusercontent.com/.../react-hooks.md
 
-cat > .goal/skills/coding-style.md << 'EOF'
-# Coding Style
+# Import with custom name
+goal skills import https://gist.githubusercontent.com/.../auth.md --name auth.md
 
-- Use TypeScript strict mode
-- Prefer functional patterns over classes
-- Every public function must have JSDoc
-- Error handling: always use Result<T, E> pattern
-EOF
+# List all skills with tags
+goal skills list
+
+# View a skill
+goal skills show auth
 ```
-
-Skills are automatically discovered and injected — no config needed. `goal init` creates default templates for all roles.
 
 ---
 
@@ -294,6 +319,14 @@ goal logs --phase execution        # filter by phase
 goal logs --role coder             # filter by role
 goal logs --ticket ticket-003      # filter by ticket
 goal cost-dashboard [--id ID]      # cost breakdown by role (ASCII bar chart)
+```
+
+### Skills management
+
+```bash
+goal skills list                            # list all skill files with tags
+goal skills show <name>                     # display contents of a skill
+goal skills import <url> [--name <file>]    # download skill from URL
 ```
 
 ### Config management
