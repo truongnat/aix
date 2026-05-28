@@ -20,7 +20,7 @@ from agentic_goal.tools import CODER_TOOLS
 
 _SKILLS_DIR = Path(".goal") / "skills"
 
-# Role-to-filename mapping for skill files
+# Role-to-filename mapping for skill files (primary file per role)
 _ROLE_SKILL_FILES: dict[str, str] = {
     "planner": "architecture.md",
     "rules_advisor": "rules.md",
@@ -28,6 +28,25 @@ _ROLE_SKILL_FILES: dict[str, str] = {
     "ticket_planner": "ticket-planning.md",
     "coder": "coding-style.md",
     "reviewer": "review-rubric.md",
+}
+
+# Glob patterns for extra skill files auto-discovered per role.
+# Any file in .goal/skills/ matching these patterns is loaded
+# alongside the primary skill file.
+_ROLE_EXTRA_GLOBS: dict[str, list[str]] = {
+    "planner": ["planner-*.md", "architecture-*.md"],
+    "rules_advisor": ["rules-*.md", "conventions-*.md"],
+    "task_decomposer": ["tasks-*.md", "pm-*.md"],
+    "ticket_planner": ["ticket-*.md", "impl-*.md"],
+    "coder": [
+        "coder-*.md",
+        "coding-*.md",
+        "frontend-*.md",
+        "backend-*.md",
+        "testing-*.md",
+        "db-*.md",
+    ],
+    "reviewer": ["reviewer-*.md", "review-*.md", "rubric-*.md"],
 }
 
 
@@ -54,24 +73,84 @@ def _extract_test_command(rules: str) -> str | None:
     return None
 
 
-def load_skills(role_name: str) -> str:
+def _parse_skill_frontmatter(content: str) -> tuple[dict[str, Any], str]:
+    """Parse YAML frontmatter from a skill markdown file.
+
+    Returns (metadata_dict, body_without_frontmatter).
+    If no frontmatter present, returns ({}, content).
+    """
+    if not content.startswith("---"):
+        return {}, content
+    try:
+        _, frontmatter, body = content.split("---", 2)
+        import yaml
+
+        meta = yaml.safe_load(frontmatter.strip()) or {}
+        return meta, body.strip()
+    except Exception:
+        return {}, content
+
+
+def _find_contextual_skills(
+    skills_dir: Path, context: str
+) -> list[Path]:
+    """Find skill files whose tags match the given context string.
+
+    Scans every .md file in skills_dir (excluding global.md and
+    known primary role files), parses YAML frontmatter for 'tags',
+    and returns files where any tag is found as a substring in
+    the context (case-insensitive).
+    """
+    primary_names = set(_ROLE_SKILL_FILES.values())
+    primary_names.add("global.md")
+    matched: list[Path] = []
+
+    for skill_file in skills_dir.glob("*.md"):
+        if skill_file.name in primary_names:
+            continue
+        raw = skill_file.read_text(encoding="utf-8")
+        meta, _ = _parse_skill_frontmatter(raw)
+        tags = meta.get("tags", [])
+        if not isinstance(tags, list):
+            tags = [tags]
+        for tag in tags:
+            if isinstance(tag, str) and tag.lower() in context.lower():
+                matched.append(skill_file)
+                break
+    # Deterministic order
+    return sorted(matched)
+
+
+def load_skills(role_name: str, context: str = "") -> str:
     """Load skill context for a role from .goal/skills/.
 
-    Reads two files (if they exist) and concatenates:
+    Reads and concatenates (in order):
       1. global.md       — injected into every role
-      2. <role-file>.md  — role-specific conventions / examples
+      2. <role-file>.md  — primary role-specific conventions
+      3. <pattern>*.md  — auto-discovered extra skills by filename
+      4. Any other *.md whose YAML frontmatter 'tags' match the
+         provided context string (case-insensitive substring).
+
+    Args:
+        role_name: Role to load skills for (planner, coder, ...).
+        context: Optional context string (ticket description, idea,
+                 etc.) for dynamic skill selection via frontmatter tags.
 
     Returns a formatted string ready to append to any system prompt,
     or an empty string if no skill files are found.
     """
     parts: list[str] = []
+    seen: set[str] = set()
 
+    # 1. global.md
     global_file = _SKILLS_DIR / "global.md"
     if global_file.exists():
         content = global_file.read_text(encoding="utf-8").strip()
         if content:
             parts.append(f"## Global project context\n\n{content}")
+        seen.add("global.md")
 
+    # 2. Primary role skill file
     role_filename = _ROLE_SKILL_FILES.get(role_name)
     if role_filename:
         role_file = _SKILLS_DIR / role_filename
@@ -79,6 +158,30 @@ def load_skills(role_name: str) -> str:
             content = role_file.read_text(encoding="utf-8").strip()
             if content:
                 parts.append(f"## Role-specific context ({role_name})\n\n{content}")
+        seen.add(role_filename)
+
+    # 3. Filename-pattern extra skills
+    for pattern in _ROLE_EXTRA_GLOBS.get(role_name, []):
+        for extra_file in sorted(_SKILLS_DIR.glob(pattern)):
+            if extra_file.name in seen:
+                continue
+            raw = extra_file.read_text(encoding="utf-8").strip()
+            if raw:
+                parts.append(f"## Extra skill: {extra_file.stem}\n\n{raw}")
+            seen.add(extra_file.name)
+
+    # 4. Contextual skills (frontmatter tag matching)
+    if context:
+        for ctx_file in _find_contextual_skills(_SKILLS_DIR, context):
+            if ctx_file.name in seen:
+                continue
+            raw = ctx_file.read_text(encoding="utf-8").strip()
+            if raw:
+                _, body = _parse_skill_frontmatter(raw)
+                parts.append(
+                    f"## Contextual skill: {ctx_file.stem}\n\n{body}"
+                )
+            seen.add(ctx_file.name)
 
     if not parts:
         return ""
@@ -271,7 +374,7 @@ def plan_node(state: AgentState) -> AgentState:
         "Please revise accordingly."
         if feedback else ""
     )
-    skills = load_skills("planner")
+    skills = load_skills("planner", state["idea"])
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -358,7 +461,7 @@ def rules_node(state: AgentState) -> AgentState:
         f"\n\nUser feedback on previous rules:\n{feedback}\nRevise accordingly."
         if feedback else ""
     )
-    skills = load_skills("rules_advisor")
+    skills = load_skills("rules_advisor", state.get("plan", ""))
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -436,7 +539,7 @@ def tasks_node(state: AgentState) -> AgentState:
         f"\n\nUser feedback on previous task breakdown:\n{feedback}\nRevise accordingly."
         if feedback else ""
     )
-    skills = load_skills("task_decomposer")
+    skills = load_skills("task_decomposer", state.get("plan", "") + " " + state.get("rules", ""))
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -541,7 +644,7 @@ def ticket_plan_node(state: AgentState) -> AgentState:
             data={"ticket_id": ticket_id},
         )
 
-    skills = load_skills("ticket_planner")
+    skills = load_skills("ticket_planner", str(ticket))
     prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(
@@ -621,7 +724,7 @@ def coder_node(state: AgentState) -> AgentState:
     tool_map = {tool.name: tool for tool in CODER_TOOLS}
 
     # Initial messages
-    skills = load_skills("coder")
+    skills = load_skills("coder", str(ticket))
     messages = [
         SystemMessage(
             content=(
@@ -833,7 +936,7 @@ def reviewer_node(state: AgentState) -> AgentState:
     # Use structured output with include_raw to also get usage metadata
     llm_structured = llm.with_structured_output(ReviewOutput, include_raw=True)
 
-    skills = load_skills("reviewer")
+    skills = load_skills("reviewer", str(ticket))
     test_output = state.get("test_output") or ""
     test_section = f"\n\nTest Output:\n{test_output}" if test_output else ""
     prompt = ChatPromptTemplate.from_messages(
