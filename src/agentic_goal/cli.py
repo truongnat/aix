@@ -1019,5 +1019,115 @@ def config_edit() -> None:
 
 app.add_typer(config_app, name="config")
 
+
+# ---- skills subcommand group ----
+skills_app = typer.Typer(help="Manage skill files in .goal/skills/")
+
+
+@skills_app.command("import")
+def skills_import(
+    url: str = typer.Argument(..., help="URL to fetch skill from (raw markdown)"),
+    name: str = typer.Option("", "--name", "-n", help="Filename to save as (default: from URL)"),
+    force: bool = typer.Option(False, "--force", "-f", help="Overwrite existing file"),
+) -> None:
+    """Download a skill file from URL and save to .goal/skills/."""
+    _require_init()
+
+    skills_dir = Path(".goal") / "skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+
+    # Determine filename
+    dest_name = name or Path(url.split("?")[0]).name
+    if not dest_name.endswith(".md"):
+        dest_name += ".md"
+    dest_path = skills_dir / dest_name
+
+    if dest_path.exists() and not force:
+        rprint(
+            f"[bold yellow]Skill already exists:[/bold yellow] {dest_name}\n"
+            "Use --force to overwrite."
+        )
+        raise typer.Exit(0)
+
+    try:
+        import urllib.request
+
+        headers = {"User-Agent": "agentic-goal-cli/0.1.0"}
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=30) as response:
+            content = response.read().decode("utf-8")
+    except Exception as e:
+        rprint(f"[bold red]Failed to download skill:[/bold red] {e}")
+        raise typer.Exit(1) from None
+
+    dest_path.write_text(content, encoding="utf-8")
+    rprint(
+        f"[bold green]Imported skill:[/bold green] {dest_name}\n"
+        f"  Size: {len(content)} chars\n"
+        f"  Path: {dest_path}"
+    )
+    raise typer.Exit(0)
+
+
+@skills_app.command("list")
+def skills_list() -> None:
+    """List all skill files in .goal/skills/."""
+    _require_init()
+
+    skills_dir = Path(".goal") / "skills"
+    if not skills_dir.exists():
+        rprint("[dim]No skills directory found. Run goal init first.[/dim]")
+        raise typer.Exit(0)
+
+    files = sorted(skills_dir.glob("*.md"))
+    if not files:
+        rprint("[dim]No skill files found.[/dim]")
+        raise typer.Exit(0)
+
+    rprint("[bold cyan]Skill files:[/bold cyan]\n")
+    for f in files:
+        size = len(f.read_text(encoding="utf-8"))
+        tag = ""
+        raw = f.read_text(encoding="utf-8")
+        if raw.startswith("---"):
+            try:
+                _, fm, _ = raw.split("---", 2)
+                import yaml
+
+                meta = yaml.safe_load(fm.strip()) or {}
+                tags = meta.get("tags", [])
+                if tags:
+                    tag_str = ', '.join(tags) if isinstance(tags, list) else str(tags)
+                    tag = f"  [dim](tags: {tag_str})[/dim]"
+            except Exception:
+                pass
+        rprint(f"  [green]{f.name}[/green]  {size:,} chars{tag}")
+    raise typer.Exit(0)
+
+
+@skills_app.command("show")
+def skills_show(
+    name: str = typer.Argument(..., help="Skill filename to display"),
+) -> None:
+    """Display contents of a skill file."""
+    _require_init()
+
+    skills_dir = Path(".goal") / "skills"
+    skill_path = skills_dir / name
+    if not skill_path.exists() and not name.endswith(".md"):
+        skill_path = skills_dir / (name + ".md")
+
+    if not skill_path.exists():
+        rprint(f"[bold red]Skill not found:[/bold red] {name}")
+        raise typer.Exit(1)
+
+    content = skill_path.read_text(encoding="utf-8")
+    rprint(f"[bold cyan]{skill_path.name}:[/bold cyan]\n")
+    rprint(content)
+    raise typer.Exit(0)
+
+
+app.add_typer(skills_app, name="skills")
+
 if __name__ == "__main__":
     app()
