@@ -136,8 +136,8 @@ Relationships: TAGGED_WITH, RELATED_TO, HAS_VERSION, COMPATIBLE_WITH, USES
 
 ```bash
 # Clone repository
-git clone https://github.com/truongnat/personal-ai.git
-cd personal-ai
+git clone https://github.com/truongnat/dev-memory.git
+cd dev-memory
 
 # Install dependencies
 cd packages/cli
@@ -376,7 +376,7 @@ curl -X POST https://dev.truongsoftware.com/kb/push \
     "title": "Fixed Neo4j Connection Pool",
     "content": "## Problem\n\n...",
     "tags": ["neo4j", "performance"],
-    "project": "personal-ai",
+    "project": "dev-memory",
     "ticket_ref": "TICKET-123"
   }'
 
@@ -453,8 +453,8 @@ curl "https://dev.truongsoftware.com/kb/search?q=docker+compose&limit=5" \
 ```bash
 # 1. Clone to VPS
 ssh root@your-domain.com
-git clone https://github.com/truongnat/personal-ai.git /opt/personal-ai
-cd /opt/personal-ai
+git clone https://github.com/truongnat/dev-memory.git /opt/dev-memory
+cd /opt/dev-memory
 
 # 2. Configure environment
 cp .env.example .env
@@ -493,14 +493,14 @@ your-domain.com {
 make deploy
 
 # Or directly on VPS:
-bash /opt/personal-ai/scripts/deploy.sh
+bash /opt/dev-memory/scripts/deploy.sh
 ```
 
 **Backups:**
 - Daily backups run at 2 AM UTC via cron
-- 7-day retention in `/opt/personal-ai/backups/`
+- 7-day retention in `/opt/dev-memory/backups/`
 - Includes Neo4j data, Meilisearch index, solutions
-- Restore: `bash scripts/restore.sh /opt/personal-ai/backups/2026-05-17_backup.tar.gz`
+- Restore: `bash scripts/restore.sh /opt/dev-memory/backups/2026-05-17_backup.tar.gz`
 
 ---
 
@@ -638,7 +638,7 @@ curl -X POST http://localhost:7700/indexes/solutions/documents \
 docker compose restart neo4j
 
 # Or check logs
-docker logs personal-ai-neo4j-1
+docker logs dev-memory-neo4j-1
 
 # Increase connection pool in docker-compose.yml:
 # NEO4J_INITIAL_DBMS_DEFAULT_DATABASE_SETTING_dbms_max_connection_pool_size=100
