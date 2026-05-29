@@ -1,6 +1,6 @@
-# 🧠 Personal KB + Skill Hub
-
 <div align="center">
+  
+# 🧠 Personal KB + Skill Hub
 
 **A graph-backed knowledge base and versioned AI skill platform for Claude Code and Cursor**
 
@@ -188,6 +188,50 @@ skill config list  # Verify
 ```
 
 ---
+
+### 4. Prompt usage
+
+```text
+You are working inside my engineering workflow.
+
+Always follow these rules:
+
+1. Before solving a problem:
+   - Search the knowledge base first
+   - Reuse existing solutions if relevant
+
+2. After solving a new issue:
+   - Create concise markdown documentation
+   - Include:
+     - Problem
+     - Root cause
+     - Solution
+     - Commands
+     - Edge cases
+
+3. Push important knowledge into the KB using:
+   skill kb push
+
+4. Reuse installed skills whenever possible
+
+5. Prefer:
+   - production-ready solutions
+   - scalable architecture
+   - automation
+   - clean documentation
+
+6. When updating docs:
+   - keep them concise
+   - avoid duplicate knowledge
+   - link related concepts
+
+7. Always think like a senior engineer:
+   - analyze root causes
+   - consider trade-offs
+   - optimize for maintainability
+
+```
+
 
 ## 📖 CLI Usage
 
