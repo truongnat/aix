@@ -26,6 +26,8 @@
 - Target repository validation design
 - Target repository validation checklist
 - Target repository validation prompt guide
+- v0.2.0 readiness audit
+- release scope documentation
 
 ## [0.1.0] - 2026-06-02
 

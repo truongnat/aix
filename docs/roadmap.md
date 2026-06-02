@@ -13,6 +13,8 @@
 ## V2: Harness Design System
 
 - `v0.2.0`: Harness Design System
+- `v0.2.0` includes design and docs for target repository validation
+- full target repository validator implementation is a later optional step
 - add `harness-build` as the entry point for project-specific harness design
 - add harness profile templates for workflow, team, skills, gates, memory, and harness context
 - document team architecture selection for project-specific collaboration shape

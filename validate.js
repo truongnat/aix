@@ -23,6 +23,8 @@ const requiredFiles = [
   "docs/target-repo-validation.md",
   "docs/target-repo-validation-checklist.md",
   "docs/target-repo-validation-prompts.md",
+  "docs/v0.2.0-readiness.md",
+  "docs/v0.2.0-release-scope.md",
   "docs/system-positioning.md",
   "docs/adoption-guide.md",
   "docs/adoption-smoke-test.md",
