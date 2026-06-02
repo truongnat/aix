@@ -30,6 +30,8 @@ Prefer `--ref v0.9.0` (or current stable tag) over default branch `main` for rep
 
 The archive URL should use the same ref for tarball and documented compatibility.
 
+`install.sh` downloads `https://github.com/truongnat/ai-engineering-harness/archive/<ref>.tar.gz` then runs `node install.js` from the extracted pack. See [install-sh-usage.md](install-sh-usage.md).
+
 ## What install.sh Is Allowed To Do
 
 - download pack archive from GitHub (or documented mirror)

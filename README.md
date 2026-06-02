@@ -79,17 +79,21 @@ Start with [`commands/`](commands/) and treat the loop as the default operating 
 | Quality Gates | evidence discipline |
 | Harness Profile | project-specific operating context |
 
-## 🚀 Install (plugin-style target)
+## 🚀 Install (plugin-style)
 
-**Planned in v0.9.x** — one-line install without cloning this repo ([plugin-install-ux](docs/plugin-install-ux.md)):
+From your **product repo** ([install-sh-usage](docs/install-sh-usage.md)):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh -s -- --target .
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh -s -- --target ../my-project --dry-run
 ```
 
-`install.sh` is not in the repo yet — [Step 2 in v0.9.0 plan](docs/v0.9.0-plan.md). Pin tags with `--ref v0.9.0` when available ([install security](docs/plugin-install-security.md)).
+Preview copy list:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh -s -- --target . --dry-run
+```
+
+Pin a release tag: `--ref v0.9.0` ([install security](docs/plugin-install-security.md)).
 
 ## 🛠️ Maintainer quick start (source pack)
 

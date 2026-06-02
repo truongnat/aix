@@ -350,6 +350,48 @@ runTest("validate.js CLI returns conflict usage error for --profile-only with --
   assert.match(result.stderr, /--profile-only cannot be combined with --goal/);
 });
 
+const installShPath = path.join(repoRoot, "install.sh");
+
+runTest("install.sh exists at repository root", () => {
+  assert.ok(fs.existsSync(installShPath));
+});
+
+runTest("install.sh includes supported flags", () => {
+  const script = fs.readFileSync(installShPath, "utf8");
+
+  assert.match(script, /--target/);
+  assert.match(script, /--dry-run/);
+  assert.match(script, /--force/);
+  assert.match(script, /--ref/);
+  assert.match(script, /--help/);
+});
+
+runTest("install.sh delegates to install.js", () => {
+  const script = fs.readFileSync(installShPath, "utf8");
+
+  assert.match(script, /node install\.js/);
+});
+
+runTest("install.sh references GitHub archive tarball URL", () => {
+  const script = fs.readFileSync(installShPath, "utf8");
+
+  assert.match(script, /github\.com\/\$\{REPO\}\/archive\/\$\{REF\}\.tar\.gz/);
+  assert.match(script, /truongnat\/ai-engineering-harness/);
+});
+
+runTest("install.sh does not use sudo", () => {
+  const script = fs.readFileSync(installShPath, "utf8");
+
+  assert.equal(/\bsudo\b/.test(script), false);
+});
+
+runTest("install.sh does not contain telemetry strings", () => {
+  const script = fs.readFileSync(installShPath, "utf8").toLowerCase();
+
+  assert.equal(script.includes("telemetry"), false);
+  assert.equal(script.includes("analytics"), false);
+});
+
 if (process.exitCode) {
   process.exit(process.exitCode);
 }

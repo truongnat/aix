@@ -39,6 +39,8 @@ clone harness repo → cd into harness → point installer at my repo
 
 ## Supported User Flows
 
+Active installer: [install.sh](../install.sh) — see [install-sh-usage.md](install-sh-usage.md).
+
 ### Project install (default target = cwd)
 
 ```bash

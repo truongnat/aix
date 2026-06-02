@@ -24,7 +24,7 @@ Treat frozen docs as **pre-v1 contract candidates**—accurate for structural be
 | Runtime consumption | docs-only runtimes | **pre-v1 candidate** — [frozen-runtime-consumption-contract.md](frozen-runtime-consumption-contract.md) |
 | Packaging / release | manual packaging | **pre-v1 candidate** — [frozen-packaging-release-contract.md](frozen-packaging-release-contract.md) |
 | Source vs target boundary | pack vs product repo | **pre-v1 candidate** — [frozen-source-target-boundary-contract.md](frozen-source-target-boundary-contract.md) |
-| Plugin install UX | one-line install | **in progress** — [plugin-install-ux.md](plugin-install-ux.md) |
+| Plugin install UX | one-line install | **implemented; dogfood pending** — [install.sh](../install.sh), [install-sh-usage.md](install-sh-usage.md) |
 
 Breaking changes: [breaking-change-policy.md](breaking-change-policy.md).
 

@@ -66,6 +66,8 @@ const requiredFiles = [
   "docs/plugin-install-ux.md",
   "docs/one-line-installer-design.md",
   "docs/plugin-install-security.md",
+  "docs/install-sh-usage.md",
+  "install.sh",
   "docs/stable-contract-index.md",
   "docs/breaking-change-policy.md",
   "docs/minimal-install-tier-decision.md",

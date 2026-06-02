@@ -16,6 +16,21 @@ Design `install.sh` for remote, dependency-free installation into a target repos
 
 `install.js` remains the **canonical** file copy implementation. `install.sh` is a bootstrap wrapper only.
 
+## Implementation Status
+
+Implemented in repository root [install.sh](../install.sh):
+
+| Flag | Status |
+|---|---|
+| `--target <path>` | implemented (default `.`) |
+| `--dry-run` | implemented |
+| `--force` | implemented |
+| `--ref <git-ref>` | implemented (default `main`) |
+| `--help` | implemented |
+| `--global` | planned (future `bin/ai-harness.js`) |
+
+Usage: [install-sh-usage.md](install-sh-usage.md).
+
 ## Required Flags
 
 | Flag | Behavior |
@@ -23,8 +38,8 @@ Design `install.sh` for remote, dependency-free installation into a target repos
 | `--target <path>` | Target repository (default: current working directory) |
 | `--dry-run` | Forward to `install.js` |
 | `--force` | Forward to `install.js` |
-| `--global` | Install `ai-harness` shim to user bin (Step 3; optional in first `install.sh`) |
-| `--ref <tag>` | Git ref for archive download (for example `v0.9.0`); default `main` until policy changes |
+| `--global` | Install `ai-harness` shim to user bin (planned; not in `install.sh` yet) |
+| `--ref <tag>` | Git ref for archive download (for example `v0.9.0`); default `main` |
 | `--help` | Usage |
 
 ## Remote Source Strategy
