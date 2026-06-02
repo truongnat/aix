@@ -6,7 +6,7 @@ ai-engineering-harness
 
 ## Pack Version
 
-v0.7.0
+v0.8.0
 
 ## Pack Type
 

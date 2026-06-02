@@ -54,3 +54,7 @@ Heavy runtime systems are not part of `v0.1.0`. The first release is the markdow
 ## Scope Boundary For `v0.7.0`
 
 `v0.7.0` is a Capability Pack Packaging release and remains runtime-light and manual-packaging only. It adds `PACK.md`, packaging contracts, verification checklists, heading validation, and manual packaging guidance without adding archive generation automation, package publishing automation, marketplace automation, runtime adapters, semantic manifest body validation, installed surface checksums, or deep scanning.
+
+## Scope Boundary For `v0.8.0`
+
+`v0.8.0` is a Real Capability Pack Dogfood release and remains runtime-light and manual. It adds executed dogfood scenarios, reports, friction tracking, dogfood-driven doc fixes, and an example-to-target layout guide without adding Scenario C as a requirement, runtime adapters, distribution automation, semantic validation, minimal install tiers, or deep scanning.

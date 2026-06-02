@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.8.0] - Unreleased
+## [0.8.0] - 2026-06-02
 
 ### Planned
 
@@ -20,6 +20,7 @@
 - dogfood fix pass for Scenario A/B findings
 - v0.8.0 readiness audit
 - v0.8.0 release scope documentation
+- v0.8.0 release notes
 
 ## [0.7.0] - 2026-06-02
 
