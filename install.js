@@ -14,6 +14,8 @@ const exportPaths = [
   "docs/artifact-layout.md",
   "docs/quality-gates.md",
   "docs/adoption-guide.md",
+  "docs/usage-examples.md",
+  "docs/host-repo-checklist.md",
   "docs/runtime-compatibility.md"
 ];
 

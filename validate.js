@@ -3,7 +3,13 @@ const path = require("node:path");
 
 const root = __dirname;
 
-const requiredFiles = ["AGENTS.md", "docs/adoption-guide.md", "docs/runtime-compatibility.md"];
+const requiredFiles = [
+  "AGENTS.md",
+  "docs/adoption-guide.md",
+  "docs/usage-examples.md",
+  "docs/host-repo-checklist.md",
+  "docs/runtime-compatibility.md"
+];
 
 const commandFiles = [
   "commands/harness-map.md",

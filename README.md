@@ -81,6 +81,8 @@ The command equivalents for this loop live in `commands/` and the reusable proce
 To adopt the harness in another repository, start with:
 
 - [Adoption Guide](docs/adoption-guide.md)
+- [Usage Examples](docs/usage-examples.md)
+- [Host Repo Checklist](docs/host-repo-checklist.md)
 - [Runtime Compatibility](docs/runtime-compatibility.md)
 
 The adoption layer stays lightweight: copy markdown assets, create `.harness/`, and use the command loop without adding a runtime service.
