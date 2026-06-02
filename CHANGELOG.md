@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1] - 2026-06-02
+
+### Added
+
+- dogfood notes for local target repository validation
+- v0.4.0 idea notes based on dogfood findings
+
 ## [0.3.0] - 2026-06-02
 
 ### Planned
