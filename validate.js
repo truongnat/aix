@@ -21,7 +21,12 @@ const requiredFiles = [
   "skills/packs/backend.md",
   "skills/packs/mobile.md",
   "skills/packs/devops.md",
-  "skills/packs/debugging.md"
+  "skills/packs/debugging.md",
+  "examples/workflows/README.md",
+  "examples/workflows/feature-google-login.md",
+  "examples/workflows/bugfix-stale-widget-data.md",
+  "examples/workflows/refactor-auth-boundary.md",
+  "examples/workflows/incident-api-errors.md"
 ];
 
 const commandFiles = [

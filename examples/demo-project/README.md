@@ -31,6 +31,12 @@ demo-project/
 
 The example artifacts are intentionally generic. They do not contain secrets, tokens, customer data, or private business data.
 
+## Related Examples
+
+- [Workflow Scenarios](../workflows/README.md)
+
+`demo-project` is a host-repo style example with `.harness/` artifacts. `examples/workflows/` contains compact scenario guides for common task types.
+
 ## Scenario
 
 The compact flow models this task:

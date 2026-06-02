@@ -96,6 +96,11 @@ node install.js --target ../my-project --dry-run
 node install.js --target ../my-project
 ```
 
+## Examples
+
+- [Demo Project](examples/demo-project/)
+- [Workflow Scenarios](examples/workflows/)
+
 ## Roadmap
 
 ### V1
