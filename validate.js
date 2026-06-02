@@ -65,6 +65,19 @@ const requiredFiles = [
   "examples/workflows/bugfix-stale-widget-data.md",
   "examples/workflows/refactor-auth-boundary.md",
   "examples/workflows/incident-api-errors.md",
+  "examples/tiny-repo-adoption/README.md",
+  "examples/tiny-repo-adoption/PROJECT.md",
+  "examples/tiny-repo-adoption/HARNESS.md",
+  "examples/tiny-repo-adoption/TEAM.md",
+  "examples/tiny-repo-adoption/SKILLS.md",
+  "examples/tiny-repo-adoption/WORKFLOW.md",
+  "examples/tiny-repo-adoption/GATES.md",
+  "examples/tiny-repo-adoption/MEMORY.md",
+  "examples/tiny-repo-adoption/goals/health-check/GOAL.md",
+  "examples/tiny-repo-adoption/goals/health-check/PLAN.md",
+  "examples/tiny-repo-adoption/goals/health-check/TASKS.md",
+  "examples/tiny-repo-adoption/goals/health-check/VERIFY.md",
+  "examples/tiny-repo-adoption/goals/health-check/REMEMBER.md",
   "examples/harness-build/flutter-google-login/README.md",
   "examples/harness-build/flutter-google-login/PROJECT.md",
   "examples/harness-build/flutter-google-login/HARNESS.md",
@@ -409,8 +422,17 @@ function validateHarnessRepository(baseDir = root) {
   assertHeadings(baseDir, "examples/harness-build/flutter-google-login/WORKFLOW.md", workflowHeadings, failures);
   assertHeadings(baseDir, "examples/harness-build/flutter-google-login/GATES.md", gatesHeadings, failures);
   assertHeadings(baseDir, "examples/harness-build/flutter-google-login/MEMORY.md", memoryHeadings, failures);
+  assertHeadings(baseDir, "examples/tiny-repo-adoption/HARNESS.md", harnessHeadings, failures);
+  assertHeadings(baseDir, "examples/tiny-repo-adoption/TEAM.md", teamHeadings, failures);
+  assertHeadings(baseDir, "examples/tiny-repo-adoption/SKILLS.md", selectedSkillsHeadings, failures);
+  assertHeadings(baseDir, "examples/tiny-repo-adoption/WORKFLOW.md", workflowHeadings, failures);
+  assertHeadings(baseDir, "examples/tiny-repo-adoption/GATES.md", gatesHeadings, failures);
+  assertHeadings(baseDir, "examples/tiny-repo-adoption/MEMORY.md", memoryHeadings, failures);
   for (const [relativePath, headings] of Object.entries(goalArtifactHeadings)) {
     assertHeadings(baseDir, relativePath, headings, failures);
+  }
+  for (const [fileName, headings] of Object.entries(goalTemplateHeadings)) {
+    assertHeadings(baseDir, `examples/tiny-repo-adoption/goals/health-check/${fileName}`, headings, failures);
   }
   assertAgentsContent(baseDir, failures);
 

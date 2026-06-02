@@ -210,6 +210,10 @@ Recommended first follow-up validation:
 node validate.js --target ../my-project --profile-only
 ```
 
+For a very small repository or when learning the artifact shape first, use:
+
+- [examples/tiny-repo-adoption/](../examples/tiny-repo-adoption/)
+
 ## Smoke Test
 
 Before using the harness in a real repository, run the local-only [Adoption Smoke Test](adoption-smoke-test.md).

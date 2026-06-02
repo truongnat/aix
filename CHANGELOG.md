@@ -16,6 +16,7 @@
 - post-install next-step guidance
 - install output examples
 - fixed installed docs surface for post-install guidance
+- tiny repo adoption example
 
 ## [0.3.1] - 2026-06-02
 

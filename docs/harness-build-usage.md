@@ -105,6 +105,10 @@ Recommended validation flow:
 - run `node validate.js --target ../my-project --profile-only` after creating the profile artifacts
 - run `node validate.js --target ../my-project --goal <goal-id>` after creating a goal artifact set under `.harness/goals/<goal-id>/`
 
+Minimal reference output:
+
+- [examples/tiny-repo-adoption/](../examples/tiny-repo-adoption/)
+
 ## How To Proceed After `harness-build`
 
 1. Review the output with [docs/harness-build-review-checklist.md](harness-build-review-checklist.md).
