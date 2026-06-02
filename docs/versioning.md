@@ -34,3 +34,7 @@ Heavy runtime systems are not part of `v0.1.0`. The first release is the markdow
 ## Scope Boundary For `v0.2.0`
 
 `v0.2.0` remains runtime-light and markdown-first. It expands the repository into a Harness Design System through docs, templates, examples, and lightweight validation, without adding runtime adapters, servers, databases, or automation-heavy release infrastructure.
+
+## Scope Boundary For `v0.3.0`
+
+`v0.3.0` remains runtime-light and structural-only. It adds lightweight host repository validation for adopted `.harness/` artifacts without adding semantic validation, runtime adapters, servers, databases, deep scanning, or automation-heavy release infrastructure.

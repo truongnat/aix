@@ -4,7 +4,7 @@
 
 ### Markdown-first engineering discipline for AI coding agents
 
-![Version](https://img.shields.io/badge/version-v0.2.0-2563eb)
+![Version](https://img.shields.io/badge/version-v0.3.0-2563eb)
 ![License](https://img.shields.io/badge/license-MIT-16a34a)
 ![Validation](https://img.shields.io/badge/validation-passing-22c55e)
 ![Markdown First](https://img.shields.io/badge/markdown-first-7c3aed)
@@ -125,18 +125,10 @@ Then:
 
 ## 🎯 Release Status
 
-- Current release: [`v0.2.0`](docs/v0.2.0-release-notes.md)
-- Previous release: [`v0.1.0`](docs/v0.1.0-release-notes.md)
-- `v0.3.0` in readiness review:
-  [readiness](docs/v0.3.0-readiness.md) · [scope](docs/v0.3.0-release-scope.md)
-- [docs/v0.2.0-release-notes.md](docs/v0.2.0-release-notes.md)
-- [docs/v0.2.0-readiness.md](docs/v0.2.0-readiness.md)
-- [docs/v0.2.0-release-scope.md](docs/v0.2.0-release-scope.md)
-- [docs/v0.3.0-readiness.md](docs/v0.3.0-readiness.md)
-- [docs/v0.3.0-release-scope.md](docs/v0.3.0-release-scope.md)
-- [CHANGELOG.md](CHANGELOG.md)
-- [docs/release-checklist.md](docs/release-checklist.md)
-- [docs/versioning.md](docs/versioning.md)
+- Current release: [`v0.3.0`](docs/v0.3.0-release-notes.md)
+- Previous releases: [`v0.2.0`](docs/v0.2.0-release-notes.md), [`v0.1.0`](docs/v0.1.0-release-notes.md)
+- Release docs: [readiness](docs/v0.3.0-readiness.md) · [scope](docs/v0.3.0-release-scope.md) · [changelog](CHANGELOG.md)
+- Release process: [docs/release-checklist.md](docs/release-checklist.md) · [docs/versioning.md](docs/versioning.md)
 
 ## 🤝 Contributing
 
