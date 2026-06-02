@@ -100,6 +100,11 @@ After the profile exists, review the adopted host repository structure with:
 - [docs/target-repo-validation-checklist.md](target-repo-validation-checklist.md)
 - [docs/target-repo-validation-prompts.md](target-repo-validation-prompts.md)
 
+Recommended validation flow:
+
+- run `node validate.js --target ../my-project --profile-only` after creating the profile artifacts
+- run `node validate.js --target ../my-project --goal <goal-id>` after creating a goal artifact set under `.harness/goals/<goal-id>/`
+
 ## How To Proceed After `harness-build`
 
 1. Review the output with [docs/harness-build-review-checklist.md](harness-build-review-checklist.md).

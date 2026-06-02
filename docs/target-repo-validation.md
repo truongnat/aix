@@ -97,16 +97,38 @@ node validate.js --target ../my-project --profile-only
 node validate.js --target ../my-project --goal google-login
 ```
 
-Command meanings:
+## Command Guide
 
 - `node validate.js`
-  - validate this harness repository itself
+  - checks this harness repository's required files and heading contracts
+  - does not check any adopted host repository
+  - passing output:
+    `Harness validation passed. Checked <count> required files/contracts.`
+  - failing output starts with:
+    `Harness validation failed:`
 - `node validate.js --target ../my-project`
-  - validate the target repository root plus required `.harness/` profile artifacts
+  - checks the target repository root plus required `.harness/` profile artifacts
+  - does not check goal artifacts unless `--goal <goal-id>` is requested
+  - does not check application code correctness
+  - passing output:
+    `Target repository validation passed. Checked profile contract.`
+  - failing output starts with:
+    `Target repository validation failed:`
 - `node validate.js --target ../my-project --profile-only`
-  - explicitly run the same profile-level target validation as `--target <path>`
+  - explicitly runs the same profile-level target validation as `--target <path>`
+  - does not validate goal artifacts
+  - does not check application code correctness
+  - passing output:
+    `Target repository validation passed. Checked profile contract.`
+  - failing output starts with:
+    `Target repository validation failed:`
 - `node validate.js --target ../my-project --goal google-login`
-  - validate the target repository profile first, then validate `.harness/goals/google-login/`
+  - checks the target repository profile first, then validates `.harness/goals/google-login/`
+  - does not judge whether the underlying Google login implementation is correct
+  - passing output:
+    `Target repository validation passed. Checked goal contract: google-login.`
+  - failing output starts with:
+    `Target repository validation failed:`
 
 Usage safety notes:
 
@@ -115,6 +137,16 @@ Usage safety notes:
 - target validation does not prove application correctness, release readiness, or workflow quality
 - `--profile-only` and `--goal` are mutually exclusive
 - missing goal ids after `--goal` return a usage error
+
+## What Target Validation Does Not Prove
+
+Target validation does not prove:
+
+- the application code works
+- the selected workflow is optimal
+- the goal implementation is complete
+- secrets are absent from the rest of the repository
+- the repository is ready to ship
 
 ## Safety Checks
 

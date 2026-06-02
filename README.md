@@ -86,6 +86,13 @@ node install.js --target ../my-project --dry-run
 node install.js --target ../my-project
 ```
 
+Target validation examples:
+
+```bash
+node validate.js --target ../my-project --profile-only
+node validate.js --target ../my-project --goal google-login
+```
+
 Then:
 
 1. Read [AGENTS.md](AGENTS.md).

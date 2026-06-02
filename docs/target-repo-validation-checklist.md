@@ -13,6 +13,14 @@ Use this checklist to review a host repository after it has adopted the harness 
 - [ ] `.harness/GATES.md` exists.
 - [ ] `.harness/MEMORY.md` exists.
 
+## CLI Validation Commands
+
+- [ ] run `node validate.js --target ../my-project` when the adopted repository should be checked at the profile level
+- [ ] run `node validate.js --target ../my-project --profile-only` when you want the explicit profile-only form
+- [ ] run `node validate.js --target ../my-project --goal google-login` when a specific goal artifact set should be checked
+- [ ] use the profile check after creating or revising `.harness/HARNESS.md`, `TEAM.md`, `SKILLS.md`, `WORKFLOW.md`, `GATES.md`, or `MEMORY.md`
+- [ ] use the goal check after creating or revising `.harness/goals/<goal-id>/GOAL.md`, `PLAN.md`, `TASKS.md`, `VERIFY.md`, or `REMEMBER.md`
+
 ## Harness Profile Consistency
 
 - [ ] the six profile artifacts agree on risk level, workflow, and operating model.

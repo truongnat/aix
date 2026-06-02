@@ -99,6 +99,24 @@ node validate.js
 
 This confirms the source harness still satisfies its required documentation and structure checks.
 
+## Optional Target Validation Smoke Checks
+
+If the temporary smoke-test repository also contains adopted `.harness/` profile artifacts, run:
+
+```bash
+node validate.js --target ../harness-smoke-test --profile-only
+```
+
+Use this to confirm the smoke-test repository passes structural profile validation.
+
+If the smoke-test repository also contains `.harness/goals/<goal-id>/` artifacts, run:
+
+```bash
+node validate.js --target ../harness-smoke-test --goal smoke-goal
+```
+
+Use this to confirm the smoke-test repository passes structural goal validation for that goal artifact set.
+
 ## Cleanup
 
 Remove the temporary local repository when finished:
@@ -116,6 +134,8 @@ If you initialized git in the smoke-test directory, deleting the directory is en
 - a minimal `.harness/` directory can be created locally
 - the simulated command loop is understandable without adding runtime code
 - `node validate.js` passes in the source harness repository
+- optional target profile validation passes when profile artifacts are created
+- optional target goal validation passes when goal artifacts are created
 
 ## Common Failures
 

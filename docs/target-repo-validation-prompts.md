@@ -25,3 +25,19 @@ Copy and paste these prompts when asking an AI coding agent to review an adopted
 ## Check Verification Artifacts Before Ship
 
 > Read AGENTS.md, .harness/GATES.md, .harness/WORKFLOW.md, and the current goal's VERIFY.md and REMEMBER.md. Review whether the recorded verification artifacts are structurally complete enough for the selected gates before ship. Report gaps without claiming implementation correctness.
+
+## Run Profile Validation And Explain Failures
+
+> Run `node validate.js --target ../my-project --profile-only`. If validation fails, explain each missing path or heading as a structural contract failure. Do not interpret the result as application correctness.
+
+## Run Goal Validation Before Implementation
+
+> Run `node validate.js --target ../my-project --goal google-login` before implementation starts. Report whether the target profile and goal artifact set are structurally complete, and list every missing file or required heading.
+
+## Run Goal Validation Before Ship
+
+> Run `node validate.js --target ../my-project --goal google-login` before ship. Treat the result as a structural check for harness artifacts only, and separately call out that it does not prove feature correctness or release readiness.
+
+## Interpret Validation As Structural Only
+
+> Read the target validation output and explain it as a structural harness-contract result only. Do not claim that a passing validation run proves implementation correctness, product quality, security, or ship readiness.
