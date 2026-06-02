@@ -37,3 +37,13 @@ Packs:
 - [Mobile](packs/mobile.md)
 - [DevOps](packs/devops.md)
 - [Debugging](packs/debugging.md)
+
+## Skill Authoring
+
+- [Skill Authoring Rules](SKILL_AUTHORING_RULES.md)
+- [Skill System](../docs/skill-system.md)
+- [Skill Template](../templates/SKILL.md)
+
+Core skills are mandatory behavior aids. Skill packs are routing aids. Future domain skills must follow the authoring rules and should only be added when the need is recurring, distinct, and worth keeping long term.
+
+Do not grow this repository into a large skill dump.

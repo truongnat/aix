@@ -11,6 +11,7 @@ const requiredFiles = [
   "SECURITY.md",
   "TARGET.md",
   "docs/gap-analysis.md",
+  "docs/skill-system.md",
   "docs/team-architecture-selection.md",
   "docs/memory-model.md",
   "docs/memory-safety.md",
@@ -33,6 +34,7 @@ const requiredFiles = [
   "docs/runtimes/codex.md",
   "docs/runtimes/gemini-cli.md",
   "docs/runtimes/opencode.md",
+  "skills/SKILL_AUTHORING_RULES.md",
   "skills/packs/README.md",
   "skills/packs/frontend.md",
   "skills/packs/backend.md",
@@ -53,6 +55,8 @@ const requiredFiles = [
   "templates/MEMORY.md",
   "templates/TASK.md",
   "templates/EXECUTION.md"
+  ,
+  "templates/SKILL.md"
 ];
 
 const commandFiles = [
@@ -125,6 +129,14 @@ const templateFiles = [
 ];
 
 const agentsRequiredHeadings = ["## Completion Gate", "## Memory Discipline"];
+const skillTemplateHeadings = [
+  "## Purpose",
+  "## Boundary",
+  "## When To Use",
+  "## When Not To Use",
+  "## Workflow",
+  "## Checklist Before Done"
+];
 
 function assertExists(baseDir, relativePath, failures) {
   const fullPath = path.join(baseDir, relativePath);
@@ -180,6 +192,7 @@ function countCheckedContracts() {
     commandFiles.length * commandHeadings.length +
     skillFiles.length * skillHeadings.length +
     templateFiles.length +
+    skillTemplateHeadings.length +
     agentsRequiredHeadings.length
   );
 }
@@ -203,6 +216,7 @@ function validateRepository(baseDir = root) {
     assertNonEmpty(baseDir, relativePath, failures);
   }
 
+  assertHeadings(baseDir, "templates/SKILL.md", skillTemplateHeadings, failures);
   assertAgentsContent(baseDir, failures);
 
   return failures;
@@ -233,6 +247,7 @@ module.exports = {
   requiredFiles,
   skillFiles,
   skillHeadings,
+  skillTemplateHeadings,
   templateFiles,
   validateRepository
 };

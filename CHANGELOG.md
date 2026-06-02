@@ -13,6 +13,10 @@
 - Memory model and memory safety
 - SDLC execution model
 - Task and execution templates
+- Skill authoring rules
+- Skill system documentation
+- Skill template
+- Updated writing-skills guidance
 
 ## [0.1.0] - 2026-06-02
 

@@ -18,6 +18,9 @@
 - document team architecture selection for project-specific collaboration shape
 - document memory model and memory safety for durable, sanitized recall
 - document SDLC execution model for goal and task lifecycle control
+- document a skill authoring system for compact reusable capability contracts
+- add a skill template for future project-specific skills
+- enforce anti-bloat rules for future skill growth
 - document system positioning so each layer has a clear role and boundary
 - close the highest-value gaps identified in relation to [TARGET.md](../TARGET.md)
 - keep adoption, validation, and markdown-first execution lightweight

@@ -20,6 +20,8 @@ Build a project-specific harness profile before implementation work begins.
 - `docs/memory-model.md`
 - `docs/memory-safety.md`
 - `docs/sdlc-execution-model.md`
+- `docs/skill-system.md`
+- `skills/SKILL_AUTHORING_RULES.md`
 - `.harness/PROJECT.md` if present
 - `.harness/REQUIREMENTS.md` if present
 - `.harness/ROADMAP.md` if present
@@ -35,7 +37,7 @@ Build a project-specific harness profile before implementation work begins.
 ## Step-By-Step Workflow
 
 1. Read the existing project artifacts and identify the host repository shape, delivery model, and risk profile.
-2. Determine the most relevant workflows, team patterns, core skills, and skill packs for the project.
+2. Determine the most relevant workflows, team patterns, core skills, and skill packs for the project using `docs/skill-system.md`.
 3. Define the harness profile boundaries: what the harness must guide, what it will not manage, and where human approval is required.
 4. Select the initial team architecture pattern using `docs/team-architecture-selection.md` and record why it fits this project better than the simpler alternatives.
 5. Initialize `.harness/MEMORY.md` using `docs/memory-model.md` and `docs/memory-safety.md`, including recall rules, allowed memory types, and storage boundaries.
@@ -72,6 +74,13 @@ The command is complete when the harness profile artifacts define a project-spec
 - Define what the project should remember before planning: facts, decisions, known risks, root causes, reusable commands, constraints, and hazards.
 - Define what should be remembered after shipping: durable lessons, root causes, and recurring verification guidance.
 - Keep memory sanitized. Never persist secrets, tokens, customer data, or private business data.
+
+## Skill Selection
+
+- Use `docs/skill-system.md` to select the smallest sufficient set of core skills and skill packs.
+- Use `skills/SKILL_AUTHORING_RULES.md` if a real recurring capability gap appears.
+- Do not invent a new skill for one project or one task unless the gap is recurring and distinct.
+- Record why each selected skill or pack belongs in the project harness profile.
 
 ## Stop Conditions
 
