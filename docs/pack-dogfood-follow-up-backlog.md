@@ -9,6 +9,8 @@ Doc clarifications, scenario fixes, and small guidance updates that do not chang
 - Document that `node validate.js --target` must run from the source pack (Scenario A)
 - Note install summary absolute paths when sharing dogfood evidence (Scenario A)
 - Optional: Scenario A quick-path doc linking plan, install walkthrough, and scenarios
+- Bridge doc: flutter-google-login example → `.harness/` validator heading contracts (Scenario B)
+- Clarify examples/harness-build tree vs target `.harness/goals/` layout (Scenario B)
 
 ## v0.9 Contract Freeze Candidates
 
@@ -21,6 +23,7 @@ Items that should become explicit stable contracts in `v0.9.0` (PACK.md, install
 Issues that must be resolved before a stable `v1.0.0` capability pack release.
 
 - **No v1 blockers found in Scenario A** (install, profile, goal validation succeeded)
+- **No v1 blockers found in Scenario B** (second repo, google-login goal, validation succeeded)
 
 ## Later Optional Work
 
