@@ -1,5 +1,7 @@
 # Release Archive Checklist
 
+Complete [pack-verification-checklist.md](pack-verification-checklist.md) before assembling a release archive so `PACK.md`, surface mapping, and validation commands stay aligned.
+
 ## Required Files
 
 - `PACK.md`

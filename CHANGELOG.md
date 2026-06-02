@@ -11,6 +11,10 @@
 - pack verification checklist
 - optional lightweight manifest validation
 
+### Added
+
+- pack verification checklist
+
 ## [0.6.0] - 2026-06-02
 
 ### Planned

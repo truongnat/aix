@@ -79,3 +79,5 @@ Do not add optional sections to `v0.7.0` unless they stay simple and dependency-
 Structural validation may check that `PACK.md` exists and contains required section headings.
 
 Manifest validation must not parse markdown bodies beyond heading presence checks unless explicitly added in a later step.
+
+Maintainers should complete [pack-verification-checklist.md](pack-verification-checklist.md) before each release or manual archive distribution to confirm manifest content matches installed surface, release archive, and runtime docs.

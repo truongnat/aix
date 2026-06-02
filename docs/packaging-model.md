@@ -54,14 +54,21 @@ Archives should include `PACK.md` so adopters can verify pack identity and expec
 
 See [release-archive-model.md](release-archive-model.md) and [release-archive-checklist.md](release-archive-checklist.md).
 
+## Verification
+
+Before release or manual archive distribution, run [pack-verification-checklist.md](pack-verification-checklist.md).
+
+It verifies `PACK.md`, included surface, installed surface alignment with `install.js`, release archive consistency, and structural validation commands.
+
 ## Manual Packaging Flow
 
 1. confirm the release scope matches [v0.7.0 plan](v0.7.0-plan.md) boundaries
 2. update `PACK.md` pack version to the releasing version
-3. verify the repository with the validation commands listed in `PACK.md`
-4. assemble a release archive using the release archive checklist
-5. include `PACK.md` in the archive root
-6. tag the source repository manually
+3. complete [pack-verification-checklist.md](pack-verification-checklist.md)
+4. verify the repository with the validation commands listed in `PACK.md`
+5. assemble a release archive using the release archive checklist
+6. include `PACK.md` in the archive root
+7. tag the source repository manually
 
 Archive generation scripts are not required for `v0.7.0`.
 
