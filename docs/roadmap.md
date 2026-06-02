@@ -46,8 +46,10 @@
 ## V4: Ergonomics Polish
 
 - `v0.4.0`: Ergonomics Polish
+- implemented in this release
 - focus on install-to-profile clarity
 - focus on first-time adoption experience
+- improve adoption clarity rather than validation scope
 - improve ergonomics without adding runtime systems
 - keep validation structural-only and markdown-first
 
@@ -56,6 +58,8 @@
 - optional deeper validation ideas beyond structural harness contracts
 - optional semantic validation research
 - optional context warnings for non-required artifacts
+- optional interactive setup wizard
+- optional automatic harness or profile generation
 - optional memory backend integrations
 - optional remote skill or template registry
 - optional automation layers for artifact lifecycle management

@@ -21,6 +21,8 @@
 - compact small memory template
 - install-to-profile walkthrough
 - validation troubleshooting guide
+- v0.4.0 readiness audit
+- v0.4.0 release scope documentation
 
 ## [0.3.1] - 2026-06-02
 
