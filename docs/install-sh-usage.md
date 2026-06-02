@@ -4,6 +4,14 @@
 
 Document the one-line remote installer for `ai-engineering-harness` into a target repository without manual clone.
 
+## Important: Fallback / Manual Installer
+
+**Current `install.sh` is not the final runtime-native plugin installer.**
+
+It downloads the pack and runs `install.js`, which **copies** the default installed surface into the target repo root (`AGENTS.md`, `commands/`, `skills/`, `workflows/`, `patterns/`, `templates/`, `docs/`, …). That path is **fallback / manual** only until the interactive installer ships.
+
+Target UX (in progress): choose **runtime** + **scope** → install to runtime-correct locations → project-local `.harness/` only when needed. See [interactive-installer-design.md](interactive-installer-design.md), [runtime-install-matrix-research.md](runtime-install-matrix-research.md), [project-state-policy.md](project-state-policy.md).
+
 ## Quick Install
 
 From your **product repository** root:

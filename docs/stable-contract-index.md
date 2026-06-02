@@ -17,14 +17,17 @@ Treat frozen docs as **pre-v1 contract candidates**—accurate for structural be
 | Contract | Intended v1 topic | Status |
 |---|---|---|
 | `PACK.md` | manifest headings | **pre-v1 candidate** — [frozen-pack-contract.md](frozen-pack-contract.md) |
-| Installed surface | default `exportPaths` | **pre-v1 candidate** — [frozen-installed-surface-contract.md](frozen-installed-surface-contract.md) |
+| Installed surface | default `exportPaths` | **obsolete / pre-pivot candidate** — root bulk copy is fallback only; not v1 default — [frozen-installed-surface-contract.md](frozen-installed-surface-contract.md) |
 | Target profile | `.harness/` profile | **pre-v1 candidate** — [frozen-target-profile-contract.md](frozen-target-profile-contract.md) |
 | Goal artifacts | `.harness/goals/` | **pre-v1 candidate** — [frozen-goal-artifact-contract.md](frozen-goal-artifact-contract.md) |
 | Validation behavior | `validate.js` CLI | **pre-v1 candidate** — [frozen-validation-contract.md](frozen-validation-contract.md) |
 | Runtime consumption | docs-only runtimes | **pre-v1 candidate** — [frozen-runtime-consumption-contract.md](frozen-runtime-consumption-contract.md) |
 | Packaging / release | manual packaging | **pre-v1 candidate** — [frozen-packaging-release-contract.md](frozen-packaging-release-contract.md) |
 | Source vs target boundary | pack vs product repo | **pre-v1 candidate** — [frozen-source-target-boundary-contract.md](frozen-source-target-boundary-contract.md) |
-| Plugin install UX | one-line install | **implemented and dogfooded; pre-v1 contract candidate** — [install.sh](../install.sh), [install-sh-usage.md](install-sh-usage.md), [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md) |
+| Runtime install matrix | per-runtime paths and scopes | **in progress** — [runtime-install-matrix-research.md](runtime-install-matrix-research.md) |
+| Interactive installer | runtime + scope wizard | **in progress** — [interactive-installer-design.md](interactive-installer-design.md) |
+| Project state policy | `.harness/` per repo vs global plugin | **in progress** — [project-state-policy.md](project-state-policy.md) |
+| Plugin install UX (fallback) | one-line `install.sh` + `install.js` copy | **dogfooded; fallback only** — [install.sh](../install.sh), [install-sh-usage.md](install-sh-usage.md), [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md) |
 
 Breaking changes: [breaking-change-policy.md](breaking-change-policy.md).
 

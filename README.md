@@ -79,15 +79,17 @@ Start with [`commands/`](commands/) and treat the loop as the default operating 
 | Quality Gates | evidence discipline |
 | Harness Profile | project-specific operating context |
 
-## 🚀 Install (plugin-style)
+## 🚀 Install
 
-From your **product repo** ([install-sh-usage](docs/install-sh-usage.md)):
+**Runtime-native interactive installer** (choose runtime + scope, install to correct paths, project `.harness/` only when needed) is **in progress**. Design: [interactive-installer-design](docs/interactive-installer-design.md), [runtime-install-matrix-research](docs/runtime-install-matrix-research.md), [project-state-policy](docs/project-state-policy.md).
+
+**Current fallback** (bulk copy of installed surface into your repo — not final UX): [install-sh-usage](docs/install-sh-usage.md)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh
 ```
 
-Preview copy list:
+Preview what the fallback would copy:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh -s -- --target . --dry-run

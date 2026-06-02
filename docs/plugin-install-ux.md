@@ -37,17 +37,36 @@ Not:
 clone harness repo → cd into harness → point installer at my repo
 ```
 
-## Supported User Flows
+## Target Direction: Interactive Runtime-native Installer
 
-Active installer: [install.sh](../install.sh) — see [install-sh-usage.md](install-sh-usage.md).
+The **final** consumer UX is **not** “copy the capability pack into the product repo root.”
 
-### Project install (default target = cwd)
+Target flow (design only until implemented):
+
+1. Choose **runtime** (Claude, Codex, Cursor, Gemini, OpenCode, generic, all, or manual fallback)
+2. Choose **scope** (global vs project)
+3. Install into **runtime-correct locations** only
+4. Create **project-local** `.harness/` only for project scope or explicit init
+
+See:
+
+- [runtime-install-matrix-research.md](runtime-install-matrix-research.md)
+- [interactive-installer-design.md](interactive-installer-design.md)
+- [project-state-policy.md](project-state-policy.md)
+
+## Supported User Flows (interim)
+
+**Current** active installer: [install.sh](../install.sh) — see [install-sh-usage.md](install-sh-usage.md).
+
+This is a **fallback / manual** path: download pack → `install.js` copies the default installed surface into the target repo. It is **dogfooded** but **not** the final plugin UX.
+
+### Project install (default target = cwd) — interim bulk copy
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh
 ```
 
-Installs into the current directory (the real product repository).
+Copies the harness installed surface into the current directory (legacy behavior). Prefer runtime-native install once available.
 
 ### Explicit target install
 
@@ -77,18 +96,20 @@ ai-harness validate --target . --profile-only
 
 See [one-line-installer-design.md](one-line-installer-design.md).
 
-## Future Runtime Folder Install
+## Runtime-native Install (planned)
 
-Later (`v0.10.0` direction): install into runtime capability folders, for example:
+Per-runtime install modes (implementation after research):
 
-```txt
-~/.cursor/...
-~/.claude/...
-~/.codex/...
-~/.ai-harness/...
-```
+| Step | Runtime |
+|---|---|
+| 3B | Claude Code (plugin / marketplace) |
+| 3C | Cursor (rules / plugin) |
+| 3D | OpenCode (`opencode.json` + plugin entry) |
+| 3E | Gemini CLI (extension) |
+| 3F | Codex (`AGENTS.md` bootstrap) |
+| 3G | Generic `AGENTS.md` fallback |
 
-Not part of the first `install.sh` milestone. See [runtime-consumption-model.md](runtime-consumption-model.md).
+`v0.10.0` may add runtime capability folder conventions; see [runtime-consumption-model.md](runtime-consumption-model.md).
 
 ## What This Does Not Mean
 

@@ -2,6 +2,13 @@
 
 ## [0.9.1] - Unreleased
 
+### Added
+
+- runtime install matrix research ([runtime-install-matrix-research.md](docs/runtime-install-matrix-research.md))
+- interactive installer design ([interactive-installer-design.md](docs/interactive-installer-design.md))
+- project state policy — global plugin vs per-repo `.harness/` ([project-state-policy.md](docs/project-state-policy.md))
+- root-copy `install.sh` / `install.js` path documented as fallback/manual only ([install-sh-usage.md](docs/install-sh-usage.md), [plugin-install-ux.md](docs/plugin-install-ux.md))
+
 ### Planned
 
 - pivot to Plugin Install UX ([plugin-install-ux.md](docs/plugin-install-ux.md))
