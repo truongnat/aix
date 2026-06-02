@@ -201,6 +201,7 @@ If you copied the full repository surface, this confirms the required structure 
 After install, follow the printed next-step guidance and then review:
 
 - [docs/install-output-example.md](install-output-example.md)
+- [docs/install-to-profile-walkthrough.md](install-to-profile-walkthrough.md)
 - [docs/harness-build-usage.md](harness-build-usage.md)
 - [docs/target-repo-validation.md](target-repo-validation.md)
 

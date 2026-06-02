@@ -122,6 +122,7 @@ Then:
 
 - [Adoption Guide](docs/adoption-guide.md)
 - [Adoption Smoke Test](docs/adoption-smoke-test.md)
+- [Install-To-Profile Walkthrough](docs/install-to-profile-walkthrough.md)
 - [Tiny Repo Adoption Example](examples/tiny-repo-adoption/)
 - [Small Repo Memory](docs/small-repo-memory.md)
 - [Usage Examples](docs/usage-examples.md)

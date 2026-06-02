@@ -108,6 +108,7 @@ Recommended validation flow:
 Minimal reference output:
 
 - [examples/tiny-repo-adoption/](../examples/tiny-repo-adoption/)
+- [docs/install-to-profile-walkthrough.md](install-to-profile-walkthrough.md)
 
 When `harness-build` is used on a tiny repository, prefer the small memory convention first:
 

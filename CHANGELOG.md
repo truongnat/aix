@@ -19,6 +19,7 @@
 - tiny repo adoption example
 - small repo memory conventions
 - compact small memory template
+- install-to-profile walkthrough
 
 ## [0.3.1] - 2026-06-02
 
