@@ -65,6 +65,8 @@ const requiredFiles = [
   "docs/minimal-install-tier-decision.md",
   "docs/frozen-pack-contract.md",
   "docs/frozen-installed-surface-contract.md",
+  "docs/frozen-target-profile-contract.md",
+  "docs/frozen-goal-artifact-contract.md",
   "docs/pack-dogfood-scenarios.md",
   "docs/pack-dogfood-report-template.md",
   "docs/pack-dogfood-friction-log.md",

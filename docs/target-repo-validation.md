@@ -19,6 +19,11 @@ Target repositories do not receive `validate.js` in the default installed surfac
 
 Install copies the markdown operating surface into the target repo; structural checks still use the source pack’s `validate.js` against the target path.
 
+## Frozen Contracts
+
+- `--profile-only` validates the [frozen target profile contract](frozen-target-profile-contract.md)
+- `--goal <goal-id>` validates the [frozen goal artifact contract](frozen-goal-artifact-contract.md) (after profile checks)
+
 ## What Target Repo Validation Means
 
 Target repo validation means checking whether a host repository contains the minimum adopted harness structure and profile artifacts needed to operate the harness safely and consistently.

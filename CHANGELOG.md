@@ -9,7 +9,8 @@
 - minimal install tier decision
 - frozen PACK.md contract ([frozen-pack-contract.md](docs/frozen-pack-contract.md))
 - frozen installed surface contract ([frozen-installed-surface-contract.md](docs/frozen-installed-surface-contract.md))
-- target profile and goal artifact contract freeze
+- frozen target profile contract ([frozen-target-profile-contract.md](docs/frozen-target-profile-contract.md))
+- frozen goal artifact contract ([frozen-goal-artifact-contract.md](docs/frozen-goal-artifact-contract.md))
 - validation behavior contract freeze
 - v1.0.0 readiness path
 

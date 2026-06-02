@@ -71,3 +71,12 @@ See [docs/target-repo-validation.md](target-repo-validation.md) for the future l
 - do not store secrets, tokens, customer data, or private business data
 - do not treat a passing validator as proof that the harness profile is correct
 - review the profile artifacts together before using them as a project operating contract
+
+## Frozen Target Contracts
+
+v1.0.0-stable target structure is recorded in:
+
+- [frozen-target-profile-contract.md](frozen-target-profile-contract.md) — `.harness/` profile files and headings
+- [frozen-goal-artifact-contract.md](frozen-goal-artifact-contract.md) — `.harness/goals/<goal-id>/` files and headings
+
+`harness-build` output in target repositories should conform to these contracts so `node validate.js --target <path>` can pass structural checks.

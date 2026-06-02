@@ -244,25 +244,25 @@ runTest("PACK.md heading validation passes for current repository", () => {
   assert.deepEqual(packFailures, []);
 });
 
-runTest("validateTargetProfile passes valid fixture", () => {
+runTest("frozen target profile contract: valid fixture passes", () => {
   const failures = validateTargetProfile(validTargetProfileFixture);
 
   assert.deepEqual(failures, []);
 });
 
-runTest("validateTargetProfile fails invalid fixture", () => {
+runTest("frozen target profile contract: invalid fixture fails missing heading", () => {
   const failures = validateTargetProfile(invalidTargetProfileFixture);
 
   assert.ok(failures.includes(".harness/HARNESS.md is missing heading: ## Human Review"));
 });
 
-runTest("validateTargetGoal passes valid fixture", () => {
+runTest("frozen goal artifact contract: valid fixture passes", () => {
   const failures = validateTargetGoal(validTargetGoalFixture, "google-login");
 
   assert.deepEqual(failures, []);
 });
 
-runTest("validateTargetGoal fails invalid fixture", () => {
+runTest("frozen goal artifact contract: invalid fixture fails missing heading", () => {
   const failures = validateTargetGoal(invalidTargetGoalFixture, "google-login");
 
   assert.ok(failures.includes(".harness/goals/google-login/GOAL.md is missing heading: ## Acceptance Criteria"));

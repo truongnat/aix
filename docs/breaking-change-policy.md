@@ -20,6 +20,10 @@ Breaking examples:
 - removing a default installed surface required file or directory from `install.js` `exportPaths` without migration
 - making `PACK.md` required in target repositories by default
 - changing from source-pack validation (`node validate.js --target`) to requiring target-local `validate.js` without migration
+- removing required `.harness/TEAM.md` (or any frozen profile file) from the profile contract
+- renaming `.harness/goals/<goal-id>/VERIFY.md` or other required goal files
+- removing a required heading from `.harness/goals/<goal-id>/REMEMBER.md` (or other goal files) in `validate.js`
+- making optional profile sections required in the validator without migration
 
 ## What Does Not Count As Breaking
 
@@ -68,5 +72,9 @@ After `v1.0.0`:
 | Shrink `exportPaths` and drop `docs/adoption-guide.md` | Yes without migration |
 | Add `PACK.md` to default `exportPaths` without opt-out | Yes for teams relying on no local manifest |
 | Require `validate.js` in target repo for profile validation | Yes |
+| Remove `.harness/TEAM.md` from required profile files | Yes |
+| Rename goal `VERIFY.md` to `VERIFICATION.md` in validator | Yes |
+| Drop `## Sensitive Data Check` from required REMEMBER headings | Yes |
+| Add new required `## Stakeholders` to HARNESS without migration | Yes |
 
 See also [minimal-install-tier-decision.md](minimal-install-tier-decision.md) for a deferred extension that would be breaking if introduced without a major version and migration plan.

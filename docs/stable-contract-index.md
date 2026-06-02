@@ -12,8 +12,8 @@ Use this index before making changes that affect adopters, validators, or packag
 |---|---|---|
 | `PACK.md` | v0.9.0 | **frozen for v1.0.0** — [frozen-pack-contract.md](frozen-pack-contract.md) |
 | Installed surface | v0.9.0 | **frozen for v1.0.0** — [frozen-installed-surface-contract.md](frozen-installed-surface-contract.md) |
-| Target profile | v0.9.0 | indexed; Step 3+ alignment |
-| Goal artifacts | v0.9.0 | indexed; Step 3+ alignment |
+| Target profile | v0.9.0 | **frozen for v1.0.0** — [frozen-target-profile-contract.md](frozen-target-profile-contract.md) |
+| Goal artifacts | v0.9.0 | **frozen for v1.0.0** — [frozen-goal-artifact-contract.md](frozen-goal-artifact-contract.md) |
 | Validation behavior | v0.9.0 | indexed; Step 4+ alignment |
 | Runtime consumption | v0.9.0 | indexed; Step 5+ alignment |
 | Packaging / release | v0.9.0 | indexed; Step 5+ alignment |
@@ -49,9 +49,10 @@ Enforced by: `install.js` `exportPaths` + tests; structural target validation fr
 
 ## Target Profile Contract
 
+- **Frozen record:** [frozen-target-profile-contract.md](frozen-target-profile-contract.md)
 - **Stable source:** [harness-build-contract.md](harness-build-contract.md), templates under `templates/`
-- **What is frozen:** required `.harness/` profile files (`HARNESS.md`, `TEAM.md`, `SKILLS.md`, `WORKFLOW.md`, `GATES.md`, `MEMORY.md`); required heading sets per file
-- **May still change before v1.0.0:** optional profile sections if validator unchanged; example richness under `examples/`
+- **What is frozen:** `.harness/` profile files and heading sets; `AGENTS.md` required for `--profile-only`
+- **May still change before v1.0.0:** additive optional sections if validator unchanged; example richness under `examples/`
 - **Not guaranteed:** semantic quality of profile content; automatic profile generation
 
 Enforced by: `node validate.js --target <path> --profile-only`.
@@ -60,12 +61,13 @@ Enforced by: `node validate.js --target <path> --profile-only`.
 
 ## Goal Artifact Contract
 
+- **Frozen record:** [frozen-goal-artifact-contract.md](frozen-goal-artifact-contract.md)
 - **Stable source:** [harness-build-contract.md](harness-build-contract.md), goal templates
-- **What is frozen:** per-goal directory `.harness/goals/<goal-id>/` with `GOAL.md`, `PLAN.md`, `TASKS.md`, `VERIFY.md`, `REMEMBER.md`; heading sets per file
-- **May still change before v1.0.0:** additional optional goal files only if validator and policy updated together
-- **Not guaranteed:** application correctness; CI integration
+- **What is frozen:** `.harness/goals/<goal-id>/` with five required files and heading sets per file; path-based goal id
+- **May still change before v1.0.0:** optional goal files only if not added to validator without migration
+- **Not guaranteed:** application correctness; CI integration; automatic goal generation
 
-Enforced by: `node validate.js --target <path> --goal <goal-id>`.
+Enforced by: `node validate.js --target <path> --goal <goal-id>` (includes profile contract first).
 
 Mapping from examples: [harness-example-to-target-layout.md](harness-example-to-target-layout.md).
 

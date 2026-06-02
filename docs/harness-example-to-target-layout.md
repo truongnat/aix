@@ -24,6 +24,11 @@ In a target repository after install:
 
 Structural validation with `node validate.js --target <path>` checks this target layout, not the `examples/` tree.
 
+Frozen contracts for target layout:
+
+- [frozen-target-profile-contract.md](frozen-target-profile-contract.md)
+- [frozen-goal-artifact-contract.md](frozen-goal-artifact-contract.md)
+
 ## Mapping Table
 
 Use this table when translating [flutter-google-login](../examples/harness-build/flutter-google-login/) (or similar examples) into a target repo.
