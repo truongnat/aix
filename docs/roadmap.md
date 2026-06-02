@@ -10,13 +10,14 @@
 - document concepts, architecture, artifact layout, and quality gates
 - ship lightweight validation scripts and GitHub Actions CI
 
-## V2: Runtime Adapters And Richer Validation
+## V2: Harness Design System
 
-- V2-lite: adoption docs and installer helpers for copying harness assets into host repositories
-- optional editor installers and bootstrap helpers
-- stronger structural validation and markdown linting
-- optional sync helpers for copying harness assets into host repos
-- optional artifact generators that still preserve markdown as the source of truth
+- `v0.2.0`: Harness Design System
+- add `harness-build` as the entry point for project-specific harness design
+- add harness profile templates for workflow, team, skills, gates, memory, and harness context
+- document system positioning so each layer has a clear role and boundary
+- close the highest-value gaps identified in relation to [TARGET.md](../TARGET.md)
+- keep adoption, validation, and markdown-first execution lightweight
 
 ## V3: Optional Memory Backend And Automation
 
@@ -27,7 +28,7 @@
 ## Release Milestones
 
 - `v0.1.0`: markdown-first harness operating model
-- `v0.2.0`: richer validation and adoption polish
+- `v0.2.0`: Harness Design System
 - `v0.3.0`: optional runtime-specific helpers, still no heavy runtime by default
 
 Heavy runtime systems remain out of scope for v1. Any future automation should support the markdown operating model rather than replace it.

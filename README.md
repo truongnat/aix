@@ -18,6 +18,15 @@ Plan. Build. Verify. Ship. Remember — with durable markdown artifacts.
 
 See [TARGET.md](TARGET.md) for the long-term target.
 
+## 🏗️ Harness Design System
+
+`v0.2.0` focuses on project-specific harness profiles instead of only generic operating guidance.
+
+- [TARGET.md](TARGET.md)
+- [docs/gap-analysis.md](docs/gap-analysis.md)
+- [docs/system-positioning.md](docs/system-positioning.md)
+- [commands/harness-build.md](commands/harness-build.md)
+
 ## ✨ What It Is
 
 - A markdown-first harness design system for AI-assisted engineering work

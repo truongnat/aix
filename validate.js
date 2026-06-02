@@ -10,6 +10,8 @@ const requiredFiles = [
   "LICENSE",
   "SECURITY.md",
   "TARGET.md",
+  "docs/gap-analysis.md",
+  "docs/system-positioning.md",
   "docs/adoption-guide.md",
   "docs/adoption-smoke-test.md",
   "docs/usage-examples.md",
@@ -37,13 +39,21 @@ const requiredFiles = [
   "examples/workflows/feature-google-login.md",
   "examples/workflows/bugfix-stale-widget-data.md",
   "examples/workflows/refactor-auth-boundary.md",
-  "examples/workflows/incident-api-errors.md"
+  "examples/workflows/incident-api-errors.md",
+  "commands/harness-build.md",
+  "templates/HARNESS.md",
+  "templates/TEAM.md",
+  "templates/SKILLS.md",
+  "templates/WORKFLOW.md",
+  "templates/GATES.md",
+  "templates/MEMORY.md"
 ];
 
 const commandFiles = [
   "commands/harness-map.md",
   "commands/harness-start.md",
   "commands/harness-discuss.md",
+  "commands/harness-build.md",
   "commands/harness-plan.md",
   "commands/harness-run.md",
   "commands/harness-verify.md",
@@ -86,6 +96,12 @@ const skillHeadings = [
 
 const templateFiles = [
   "templates/PROJECT.md",
+  "templates/HARNESS.md",
+  "templates/TEAM.md",
+  "templates/SKILLS.md",
+  "templates/WORKFLOW.md",
+  "templates/GATES.md",
+  "templates/MEMORY.md",
   "templates/REQUIREMENTS.md",
   "templates/ROADMAP.md",
   "templates/STATE.md",

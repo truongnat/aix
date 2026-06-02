@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.0] - Unreleased
+
+### Planned
+
+- Harness build command
+- Harness profile templates
+- Gap analysis
+- System positioning
+- Project-specific harness design surface
+
 ## [0.1.0] - 2026-06-02
 
 ### Added
