@@ -4,9 +4,12 @@ These guides explain how to consume the plugin-like markdown capability pack ins
 
 ## Start Here
 
+- [Runtime Comparison Guide](comparison.md)
 - [Runtime Consumption Model](../runtime-consumption-model.md)
 - [Plugin Model](../plugin-model.md)
 - [Consume As Pack](../consume-as-pack.md)
+
+Start with the comparison guide if you are unsure which runtime guide to use.
 
 ## Included Guides
 

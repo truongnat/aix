@@ -73,6 +73,7 @@ const requiredFiles = [
   "docs/runtimes/codex.md",
   "docs/runtimes/gemini-cli.md",
   "docs/runtimes/opencode.md",
+  "docs/runtimes/comparison.md",
   "skills/SKILL_AUTHORING_RULES.md",
   "skills/packs/README.md",
   "skills/packs/frontend.md",
