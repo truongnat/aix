@@ -81,3 +81,7 @@ Use:
 - [docs/release-archive-checklist.md](release-archive-checklist.md)
 
 to define how a future release archive should package the capability-pack surface without adding automation yet.
+
+## Frozen Source-Target Boundary
+
+v1.0.0-stable boundaries between source pack, installed surface, and target repository are recorded in [frozen-source-target-boundary-contract.md](frozen-source-target-boundary-contract.md).

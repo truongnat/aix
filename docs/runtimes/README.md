@@ -4,6 +4,7 @@ These guides explain how to consume the plugin-like markdown capability pack ins
 
 ## Start Here
 
+- [Frozen Runtime Consumption Contract](../frozen-runtime-consumption-contract.md)
 - [Runtime Comparison Guide](comparison.md)
 - [Runtime Consumption Model](../runtime-consumption-model.md)
 - [Plugin Model](../plugin-model.md)

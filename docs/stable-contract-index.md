@@ -15,9 +15,9 @@ Use this index before making changes that affect adopters, validators, or packag
 | Target profile | v0.9.0 | **frozen for v1.0.0** — [frozen-target-profile-contract.md](frozen-target-profile-contract.md) |
 | Goal artifacts | v0.9.0 | **frozen for v1.0.0** — [frozen-goal-artifact-contract.md](frozen-goal-artifact-contract.md) |
 | Validation behavior | v0.9.0 | **frozen for v1.0.0** — [frozen-validation-contract.md](frozen-validation-contract.md) |
-| Runtime consumption | v0.9.0 | indexed; Step 5+ alignment |
-| Packaging / release | v0.9.0 | indexed; Step 5+ alignment |
-| Source vs target boundary | v0.9.0 | indexed |
+| Runtime consumption | v0.9.0 | **frozen for v1.0.0** — [frozen-runtime-consumption-contract.md](frozen-runtime-consumption-contract.md) |
+| Packaging / release | v0.9.0 | **frozen for v1.0.0** — [frozen-packaging-release-contract.md](frozen-packaging-release-contract.md) |
+| Source vs target boundary | v0.9.0 | **frozen for v1.0.0** — [frozen-source-target-boundary-contract.md](frozen-source-target-boundary-contract.md) |
 
 Breaking changes: [breaking-change-policy.md](breaking-change-policy.md).
 
@@ -85,28 +85,31 @@ Mapping from examples: [harness-example-to-target-layout.md](harness-example-to-
 
 ## Runtime Consumption Contract
 
+- **Frozen record:** [frozen-runtime-consumption-contract.md](frozen-runtime-consumption-contract.md)
 - **Stable source:** [runtime-consumption-model.md](runtime-consumption-model.md), [docs/runtimes/](runtimes/), [consume-as-pack.md](consume-as-pack.md)
-- **What is frozen:** target repo is product work tree; installed surface + `.harness/` in target; docs-only runtime guidance; no runtime adapters in v1 scope
-- **May still change before v1.0.0:** runtime guide wording; comparison table rows if additive
-- **Not guaranteed:** runtime-specific plugins; global capability folder standard
+- **What is frozen:** source pack canonical; target repo product work tree; `.harness/` in target; docs-only runtime guides for Claude Code, Cursor, Codex, Gemini CLI, OpenCode
+- **May still change before v1.0.0:** guide wording; additive comparison rows
+- **Not guaranteed:** runtime adapters; global capability folder standard
 
 ---
 
 ## Packaging Contract
 
+- **Frozen record:** [frozen-packaging-release-contract.md](frozen-packaging-release-contract.md)
 - **Stable source:** [manual-packaging-guide.md](manual-packaging-guide.md), [pack-verification-checklist.md](pack-verification-checklist.md), [release-archive-model.md](release-archive-model.md)
-- **What is frozen:** manual packaging flow; `PACK.md` travels with release archives; verification checklist before tag/archive
-- **May still change before v1.0.0:** checklist items if additive; install `targetDisplay` behavior
-- **Not guaranteed:** archive generation scripts; npm/marketplace publish
+- **What is frozen:** manual packaging; `PACK.md` at archive root; manual verification and release checklists; no archive automation in v1
+- **May still change before v1.0.0:** additive checklist items
+- **Not guaranteed:** archive scripts; npm/marketplace publish
 
 ---
 
 ## Source Pack vs Target Repo Boundary
 
+- **Frozen record:** [frozen-source-target-boundary-contract.md](frozen-source-target-boundary-contract.md)
 - **Stable source:** [plugin-model.md](plugin-model.md), [distribution-model.md](distribution-model.md), [TARGET.md](../TARGET.md)
-- **What is frozen:** canonical source in this repository; target repo receives installed subset; product state in target `.harness/` and application code
+- **What is frozen:** source owns pack authoring; target owns product code and `.harness/`; validation from source with `--target`
 - **May still change before v1.0.0:** clearer docs only (non-breaking)
-- **Not guaranteed:** registry distribution; vendoring conventions as a separate standard
+- **Not guaranteed:** registry distribution; optional vendoring conventions
 
 ---
 

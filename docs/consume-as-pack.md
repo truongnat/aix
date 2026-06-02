@@ -1,5 +1,7 @@
 # Consume As Pack
 
+Frozen contracts: [frozen-runtime-consumption-contract.md](frozen-runtime-consumption-contract.md) · [frozen-source-target-boundary-contract.md](frozen-source-target-boundary-contract.md)
+
 ## What This Repo Is
 
 This repository is the canonical source pack for `ai-engineering-harness`.

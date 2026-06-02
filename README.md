@@ -144,7 +144,7 @@ Then:
 ## 🎯 Release Status
 
 - Current release: [`v0.8.0`](docs/v0.8.0-release-notes.md) — Real Capability Pack Dogfood · [PACK.md](PACK.md)
-- Next planned: `v0.9.0` Stable Contract Freeze ([plan](docs/v0.9.0-plan.md) · [contracts](docs/stable-contract-index.md) · [validation](docs/frozen-validation-contract.md))
+- Next planned: `v0.9.0` Stable Contract Freeze ([plan](docs/v0.9.0-plan.md) · [contracts](docs/stable-contract-index.md) · [runtime](docs/frozen-runtime-consumption-contract.md) · [packaging](docs/frozen-packaging-release-contract.md) · [boundary](docs/frozen-source-target-boundary-contract.md))
 - `v0.8.0` docs: [notes](docs/v0.8.0-release-notes.md) · [readiness](docs/v0.8.0-readiness.md) · [scope](docs/v0.8.0-release-scope.md) · [dogfood](docs/pack-dogfood-scenarios.md)
 - `v0.7.0` docs: [notes](docs/v0.7.0-release-notes.md) · [readiness](docs/v0.7.0-readiness.md) · [scope](docs/v0.7.0-release-scope.md) · [package](docs/manual-packaging-guide.md)
 - `v0.6.0` docs: [notes](docs/v0.6.0-release-notes.md) · [readiness](docs/v0.6.0-readiness.md) · [scope](docs/v0.6.0-release-scope.md) · [model](docs/runtime-consumption-model.md)

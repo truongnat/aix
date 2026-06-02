@@ -76,3 +76,7 @@ These are distribution concerns, not runtime-platform goals.
 The intended feel is closer to a reusable superpower pack or agent capability pack than to a standalone product framework.
 
 Agents should be able to consume the harness as discipline, process, templates, and validation guidance inside an existing workflow.
+
+## Frozen Source-Target Boundary
+
+v1.0.0-stable source pack vs target repository boundaries are recorded in [frozen-source-target-boundary-contract.md](frozen-source-target-boundary-contract.md).

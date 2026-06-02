@@ -12,6 +12,9 @@
 - frozen target profile contract ([frozen-target-profile-contract.md](docs/frozen-target-profile-contract.md))
 - frozen goal artifact contract ([frozen-goal-artifact-contract.md](docs/frozen-goal-artifact-contract.md))
 - frozen validation behavior contract ([frozen-validation-contract.md](docs/frozen-validation-contract.md))
+- frozen runtime consumption contract ([frozen-runtime-consumption-contract.md](docs/frozen-runtime-consumption-contract.md))
+- frozen packaging and release contract ([frozen-packaging-release-contract.md](docs/frozen-packaging-release-contract.md))
+- frozen source pack vs target repo boundary contract ([frozen-source-target-boundary-contract.md](docs/frozen-source-target-boundary-contract.md))
 - v1.0.0 readiness path
 
 ## [0.8.0] - 2026-06-02

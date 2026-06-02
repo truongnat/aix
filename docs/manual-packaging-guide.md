@@ -143,3 +143,7 @@ This guide does not provide or require:
 - runtime adapter or plugin compilation
 
 Future automation must stay optional and must not replace the markdown-first pack contract.
+
+## Frozen Packaging Contract
+
+v1.0.0-stable packaging and release behavior is recorded in [frozen-packaging-release-contract.md](frozen-packaging-release-contract.md).

@@ -6,6 +6,8 @@ Help maintainers verify the `ai-engineering-harness` capability pack before a re
 
 Use this checklist to confirm `PACK.md`, the distributable surface, the installed surface, and release archive expectations stay aligned.
 
+Frozen packaging contract: [frozen-packaging-release-contract.md](frozen-packaging-release-contract.md).
+
 ## When To Use
 
 Use this checklist when:

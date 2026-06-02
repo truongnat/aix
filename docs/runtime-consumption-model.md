@@ -64,3 +64,7 @@ Validation remains structural-only.
 The runtime consumption model is the runtime-facing expression of the plugin model.
 
 The plugin model explains what the pack is. Runtime consumption explains how an agent should use that pack inside a target repository today.
+
+## Frozen Runtime Contract
+
+v1.0.0-stable runtime consumption is recorded in [frozen-runtime-consumption-contract.md](frozen-runtime-consumption-contract.md).

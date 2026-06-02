@@ -27,6 +27,10 @@ Breaking examples:
 - changing `--target <path>` default mode away from profile validation without migration
 - changing existing `Missing required path:` or `is missing heading:` message shapes without migration
 - making semantic validation required for target repos that pass structural validation today
+- requiring runtime adapters or compiled plugins for documented v1 consumption
+- moving product work or required `.harness/` authoring into the source pack as the default workflow
+- removing `PACK.md` from release archive root expectations
+- requiring archive generation scripts or npm/marketplace publish for v1 adoption
 
 ## What Does Not Count As Breaking
 
@@ -82,5 +86,8 @@ After `v1.0.0`:
 | Change `--target` alone to run goal validation by default | Yes |
 | Change failure text from `Missing required path:` to `Not found:` | Yes |
 | Require secret scanning pass for profile validation | Yes |
+| Document v1 adoption as “install runtime adapter first” | Yes |
+| Drop `PACK.md` from manual release archive checklist | Yes |
+| Require `npm publish` for every target install | Yes |
 
 See also [minimal-install-tier-decision.md](minimal-install-tier-decision.md) for a deferred extension that would be breaking if introduced without a major version and migration plan.
