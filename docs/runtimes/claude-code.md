@@ -1,31 +1,85 @@
 # Claude Code
 
-## `AGENTS.md`
+## Purpose
 
-Keep `AGENTS.md` at the repository root so Claude Code can use it as the main operating contract.
+Explain how Claude Code should consume `ai-engineering-harness` as a capability pack inside a target repository.
 
-## `commands/`
+## Runtime Fit
 
-Reference `commands/` as the step-by-step operating loop. Use the command documents to decide whether the next action is map, discuss, plan, run, verify, ship, or remember.
+Claude Code is a good fit for this harness because it can work from repository-local markdown context.
 
-## `skills/`
+It should use the target repository's installed `AGENTS.md`, commands, skills, templates, and `.harness/` artifacts.
 
-Reference `skills/` as compact reusable guidance for mapping, planning, execution, verification, and memory capture.
+It should not treat the source pack repository as the application repository.
 
-## `.harness/` Artifacts
+## Consumption Model
 
-Keep active artifacts such as `.harness/GOAL.md`, `.harness/PLAN.md`, and `.harness/VERIFY.md` current. Claude Code should read them before touching code and update them as work progresses.
+Use Claude Code against the target repository after the harness operating surface has been installed or copied there.
 
-## Recommended First Prompt
+The source pack is only the canonical source. Product work happens in the target repository.
 
-> Read `AGENTS.md` and the active `.harness/` artifacts first. Use the harness command loop to determine the next step before making changes.
+## Recommended Setup
 
-## Known Limitations
+Use the current setup flow:
 
-- this repository does not install Claude-specific tooling
-- the guides do not assume any Claude marketplace or plugin packaging
-- markdown discipline still depends on the operator keeping `.harness/` current
+```bash
+node install.js --target ../my-project --dry-run
+node install.js --target ../my-project
+node validate.js --target ../my-project --profile-only
+```
 
-## Safety Reminder
+Run these commands from the source pack repository, then open Claude Code in the target repository for actual product work.
 
-Do not store secrets, tokens, customer data, or private business data in harness artifacts.
+## What Claude Code Should Read
+
+Inside the target repository, Claude Code should read:
+
+- `AGENTS.md`
+- `docs/consume-as-pack.md`
+- `docs/install-to-profile-walkthrough.md`
+- `docs/harness-build-usage.md`
+- `.harness/HARNESS.md`
+- `.harness/TEAM.md`
+- `.harness/SKILLS.md`
+- `.harness/WORKFLOW.md`
+- `.harness/GATES.md`
+- `.harness/MEMORY.md`
+- active `.harness/goals/<goal-id>/` artifacts
+
+## First Prompt
+
+> Read `AGENTS.md`, `docs/consume-as-pack.md`, `docs/install-to-profile-walkthrough.md`, and `docs/harness-build-usage.md`. Treat this repository as the target product repository. Do not use the `ai-engineering-harness` source repo as the product repo. Then inspect the existing `.harness/` artifacts and summarize the current harness state before making any changes.
+
+## Harness-Build Prompt
+
+> Run the harness-build process for this target repository. Create or update `.harness/HARNESS.md`, `TEAM.md`, `SKILLS.md`, `WORKFLOW.md`, `GATES.md`, and `MEMORY.md`. Use the smallest sufficient skill and workflow set. Do not implement application code.
+
+## Goal Execution Prompt
+
+> Using the current `.harness/` profile and `.harness/goals/<goal-id>/` artifacts, plan and execute the next task. Follow the command loop, update `TASKS.md` and `VERIFY.md` as work progresses, and stop before shipping if verification evidence is missing.
+
+## Validation Prompt
+
+> Run or ask me to run: `node validate.js --target <path> --profile-only` and `node validate.js --target <path> --goal <goal-id>`. Treat validation as structural only, not proof of application correctness.
+
+## Safety Boundaries
+
+- keep markdown as the source of truth
+- keep `.harness/` artifacts in the target repository
+- do not invent Claude-specific integration behavior
+- do not treat structural validation as proof that the application is correct
+
+## Common Mistakes
+
+- opening Claude Code in the source pack repo and treating it like the product repo
+- skipping the read-first pass over installed docs and `.harness/` artifacts
+- jumping into implementation before the harness-build or goal artifacts are clear
+- treating validation as the same thing as product verification
+
+## Completion Checklist
+
+- Claude Code is pointed at the target repository, not the source pack
+- installed `AGENTS.md` and supporting docs were read first
+- `.harness/` profile artifacts exist or were updated intentionally
+- active goal artifacts were read before execution
+- validation flow is understood as structural-only

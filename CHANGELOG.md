@@ -13,6 +13,10 @@
 - runtime comparison guidance
 - docs-only runtime consumption polish
 
+### Added
+
+- Claude Code capability pack consumption guide
+
 ## [0.5.0] - 2026-06-02
 
 ### Planned
