@@ -1,6 +1,6 @@
 # Target Repository Validation
 
-This document defines the lightweight validation mode for a host repository that has adopted `ai-engineering-harness` and produced `.harness/` profile artifacts.
+This document defines the current lightweight validation mode for a host repository that has adopted `ai-engineering-harness` and produced `.harness/` profile artifacts.
 
 Profile validation is the first implemented target-repository step.
 Goal-level validation is the second implemented target-repository step.
@@ -13,11 +13,12 @@ The validator should focus on structural contract checks, not application correc
 
 ## What It Checks Now
 
-The current profile validation mode checks:
+The current target validation modes check:
 
 - required root files exist in the host repository
 - `.harness/` exists
 - required harness profile artifacts exist
+- required goal artifacts exist when `--goal <goal-id>` is requested
 - obvious structural gaps are reported with clear, actionable messages
 - safety boundaries are preserved during validation output
 
@@ -25,7 +26,7 @@ Goal artifact validation is now implemented for `--target <path> --goal <goal-id
 
 ## What It Should Not Check
 
-The future validation mode should not:
+The current validation mode does not:
 
 - judge whether application code is correct
 - prove that the selected workflow or team pattern is the best possible choice
@@ -33,6 +34,8 @@ The future validation mode should not:
 - print secrets, tokens, customer data, or private business data
 - act like a linter for the product codebase
 - imply that a passing structural check proves the repository is ready to ship
+
+A passing target validation run proves only that the required harness artifacts exist and match the expected structural contract.
 
 ## Required Root Files In A Host Repo
 
@@ -83,6 +86,36 @@ Goal-level validation should remain scoped to the requested goal and should not 
 
 Goal-level validation is implemented after profile validation and remains structural-only.
 
+## Commands
+
+These commands are currently implemented:
+
+```bash
+node validate.js
+node validate.js --target ../my-project
+node validate.js --target ../my-project --profile-only
+node validate.js --target ../my-project --goal google-login
+```
+
+Command meanings:
+
+- `node validate.js`
+  - validate this harness repository itself
+- `node validate.js --target ../my-project`
+  - validate the target repository root plus required `.harness/` profile artifacts
+- `node validate.js --target ../my-project --profile-only`
+  - explicitly run the same profile-level target validation as `--target <path>`
+- `node validate.js --target ../my-project --goal google-login`
+  - validate the target repository profile first, then validate `.harness/goals/google-login/`
+
+Usage safety notes:
+
+- target validation is structural only
+- target validation does not inspect application source files outside the expected harness paths
+- target validation does not prove application correctness, release readiness, or workflow quality
+- `--profile-only` and `--goal` are mutually exclusive
+- missing goal ids after `--goal` return a usage error
+
 ## Safety Checks
 
 Target repo validation should be structural and contract-focused.
@@ -97,13 +130,13 @@ Safety rules:
 
 ## Validation Output Shape
 
-The future validator should stay simple and predictable.
+The validator stays simple and predictable.
 
 Recommended output shape:
 
 - one summary line: pass or fail
 - a flat list of missing or invalid paths
-- optional warnings for missing optional context files
+- optional warnings for missing optional context files in a later step
 - exit code `0` on pass
 - non-zero exit code on failure
 
@@ -132,32 +165,16 @@ Recommended warning style:
 - `Warning: optional path not found: .harness/PROJECT.md`
 - `Warning: optional path not found: .harness/ROADMAP.md`
 
-## CLI Shape
+## Deferred Scope
 
-Currently implemented:
+Still deferred:
 
-- `node validate.js`
-- `node validate.js --target ../my-project`
-- `node validate.js --target ../my-project --profile-only`
-- `node validate.js --target ../my-project --goal google-login`
-
-Currently deferred:
 - optional context warnings and informational checks
-
-Intended meanings:
-
-- `node validate.js`
-  - validate this harness repository itself
-- `node validate.js --target ../my-project`
-  - validate a host repository that adopted the harness
-- `node validate.js --target ../my-project --profile-only`
-  - validate only the profile-level adopted harness artifacts
-- `node validate.js --target ../my-project --goal google-login`
-  - validate the host repository profile artifacts and the named goal artifact set
+- anything beyond structural validation of the expected harness paths
 
 ## Non-Goals
 
-This future mode is not intended to become:
+This validation mode is not intended to become:
 
 - a runtime platform
 - a deep repository scanner
