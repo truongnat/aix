@@ -81,9 +81,18 @@ Start with [`commands/`](commands/) and treat the loop as the default operating 
 
 ## 🚀 Install
 
-**Runtime-native interactive installer** (choose runtime + scope, install to correct paths, project `.harness/` only when needed) is **in progress**. Design: [interactive-installer-design](docs/interactive-installer-design.md), [runtime-install-matrix-research](docs/runtime-install-matrix-research.md), [project-state-policy](docs/project-state-policy.md).
+**Runtime-native install** (no root pack copy): [runtime-native-install](docs/runtime-native-install.md)
 
-**Current fallback** (bulk copy of installed surface into your repo — not final UX): [install-sh-usage](docs/install-sh-usage.md)
+```bash
+curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh -s -- \
+  --runtime opencode --scope project --init-harness --yes
+```
+
+Runtimes: `claude`, `codex`, `cursor`, `windsurf`, `gemini`, `opencode`, `generic`, `all`. Legacy full copy: `--runtime manual`.
+
+Design: [interactive-installer-design](docs/interactive-installer-design.md), [runtime-install-matrix-research](docs/runtime-install-matrix-research.md), [project-state-policy](docs/project-state-policy.md).
+
+**Manual fallback** (bulk copy): [install-sh-usage](docs/install-sh-usage.md)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh

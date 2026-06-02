@@ -4,6 +4,10 @@
 
 ### Added
 
+- runtime-native install via [install-runtime.js](install-runtime.js) for Claude, Codex, Cursor, Windsurf, Gemini, OpenCode, generic, and `all`
+- runtime payloads under [runtime/](runtime/) (rules, plugins, extensions, AGENTS.md, `.claude/` hints)
+- [runtime-native-install.md](docs/runtime-native-install.md)
+
 - project `.harness/` init via [install.sh](install.sh) (`--scope project --init-harness`) with dry-run, skip, and `--force` overwrite
 - global scope + `--init-harness` rejection (no shared `.harness` state)
 - [harness-init-usage.md](docs/harness-init-usage.md)

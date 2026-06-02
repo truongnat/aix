@@ -1,0 +1,6 @@
+{
+  "name": "ai-engineering-harness",
+  "version": "0.9.1",
+  "description": "Engineering harness profile and SDLC discipline for Gemini CLI",
+  "contextFileName": "GEMINI.md"
+}

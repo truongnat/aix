@@ -31,7 +31,7 @@ Options:
   --yes                 Skip interactive confirmation
   --help                Show this help
 
-Runtime-native install (claude, cursor, …) is planned; only manual fallback root-copies today.
+Runtime-native install: claude, codex, cursor, windsurf, gemini, opencode, generic, all. Manual = legacy root copy.
 Project .harness/ init works with --scope project --init-harness (or interactive confirm).
 
 Examples:
@@ -55,7 +55,7 @@ is_interactive() {
 
 validate_runtime() {
   case "$1" in
-    claude|codex|cursor|gemini|opencode|generic|all|manual) return 0 ;;
+    claude|codex|cursor|windsurf|gemini|opencode|generic|all|manual) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -71,7 +71,7 @@ runtime_label() {
   case "$1" in
     claude) printf '%s' 'Claude Code' ;;
     codex) printf '%s' 'Codex CLI' ;;
-    cursor) printf '%s' 'Cursor' ;;
+    cursor|windsurf) printf '%s' 'Cursor / Windsurf' ;;
     gemini) printf '%s' 'Gemini CLI' ;;
     opencode) printf '%s' 'OpenCode' ;;
     generic) printf '%s' 'Generic AGENTS.md bootstrap' ;;
@@ -185,9 +185,10 @@ print_install_plan() {
     fi
   else
     printf '%s\n' \
-      "  - Runtime-native install for '$RUNTIME' is planned but NOT implemented yet" \
-      '  - No pack files will be written to the product repo root in this step' \
-      '  - Use --runtime manual for legacy root copy, or wait for runtime-specific steps'
+      "  - Install runtime-native integration for '$RUNTIME' (scope: $SCOPE)" \
+      '  - Writes only runtime paths (.cursor/rules, .opencode/plugins, .claude/, AGENTS.md, …)' \
+      '  - Does not copy commands/, skills/, workflows/ to product repo root' \
+      '  - Use --runtime manual for legacy full root copy'
   fi
   printf '%s\n' '---'
 }
@@ -466,48 +467,82 @@ init_harness_profile() {
   printf '%s\n' '--- .harness/ init complete ---'
 }
 
-run_manual_install() {
-  ARCHIVE_URL="https://github.com/${REPO}/archive/${REF}.tar.gz"
-  printf '%s\n' '' "Downloading pack for manual fallback: $ARCHIVE_URL"
+PACK_ROOT=""
+INSTALL_TMPDIR=""
 
-  command -v node >/dev/null 2>&1 || fail "node is required but was not found on PATH"
+download_pack_root() {
+  if [ -n "$PACK_ROOT" ] && [ -f "${PACK_ROOT}/install-runtime.js" ]; then
+    return 0
+  fi
+
+  _script_dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
+  if [ -f "${_script_dir}/install-runtime.js" ] && [ -f "${_script_dir}/runtime/README.md" ]; then
+    PACK_ROOT=$_script_dir
+    return 0
+  fi
+
+  ARCHIVE_URL="https://github.com/${REPO}/archive/${REF}.tar.gz"
+  printf '%s\n' "Downloading pack: $ARCHIVE_URL"
+
   command -v tar >/dev/null 2>&1 || fail "tar is required but was not found on PATH"
 
   if command -v curl >/dev/null 2>&1; then
-    DOWNLOAD="curl"
+    _download="curl"
   elif command -v wget >/dev/null 2>&1; then
-    DOWNLOAD="wget"
+    _download="wget"
   else
     fail "curl or wget is required to download the pack archive"
   fi
 
-  TMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t ai-harness-install)
-  cleanup() {
-    rm -rf "$TMPDIR"
+  INSTALL_TMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t ai-harness-install)
+  cleanup_install_tmp() {
+    rm -rf "$INSTALL_TMPDIR"
   }
-  trap cleanup EXIT INT HUP TERM
+  trap cleanup_install_tmp EXIT INT HUP TERM
 
-  ARCHIVE="${TMPDIR}/pack.tar.gz"
-
-  if [ "$DOWNLOAD" = "curl" ]; then
-    curl -fsSL "$ARCHIVE_URL" -o "$ARCHIVE" || fail "failed to download archive from $ARCHIVE_URL"
+  _archive="${INSTALL_TMPDIR}/pack.tar.gz"
+  if [ "$_download" = "curl" ]; then
+    curl -fsSL "$ARCHIVE_URL" -o "$_archive" || fail "failed to download archive from $ARCHIVE_URL"
   else
-    wget -q -O "$ARCHIVE" "$ARCHIVE_URL" || fail "failed to download archive from $ARCHIVE_URL"
+    wget -q -O "$_archive" "$ARCHIVE_URL" || fail "failed to download archive from $ARCHIVE_URL"
   fi
 
-  EXTRACT="${TMPDIR}/extract"
-  mkdir -p "$EXTRACT"
-  tar -xzf "$ARCHIVE" -C "$EXTRACT" || fail "failed to extract archive"
+  _extract="${INSTALL_TMPDIR}/extract"
+  mkdir -p "$_extract"
+  tar -xzf "$_archive" -C "$_extract" || fail "failed to extract archive"
 
   PACK_ROOT=""
-  for candidate in "$EXTRACT"/*; do
-    if [ -f "${candidate}/install.js" ]; then
+  for candidate in "$_extract"/*; do
+    if [ -f "${candidate}/install-runtime.js" ]; then
       PACK_ROOT=$candidate
       break
     fi
   done
 
-  [ -n "$PACK_ROOT" ] || fail "could not find install.js in downloaded archive"
+  [ -n "$PACK_ROOT" ] || fail "could not find install-runtime.js in downloaded archive"
+}
+
+run_runtime_native_install() {
+  command -v node >/dev/null 2>&1 || fail "node is required but was not found on PATH"
+  download_pack_root
+
+  set -- node "$PACK_ROOT/install-runtime.js" \
+    --pack-root "$PACK_ROOT" \
+    --runtime "$RUNTIME" \
+    --scope "$SCOPE" \
+    --target "$TARGET_ABS"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    set -- "$@" --dry-run
+  fi
+  if [ "$FORCE" -eq 1 ]; then
+    set -- "$@" --force
+  fi
+
+  "$@"
+}
+
+run_manual_install() {
+  download_pack_root
 
   set -- --target "$TARGET_ABS"
   if [ "$DRY_RUN" -eq 1 ]; then
@@ -641,14 +676,20 @@ if [ "$INIT_HARNESS" -eq 1 ] && [ "$RUNTIME" != manual ]; then
 fi
 
 if [ "$RUNTIME" != manual ]; then
+  if [ -z "$SCOPE" ] && [ "$RUNTIME" != all ]; then
+    fail "missing --scope for runtime '$RUNTIME'"
+  fi
+  if [ "$RUNTIME" = all ] && [ -z "$SCOPE" ]; then
+    SCOPE=project
+  fi
+  printf '%s\n' '' '--- Runtime-native install ---'
+  run_runtime_native_install
   if [ "$DRY_RUN" -eq 1 ]; then
-    printf '%s\n' '' "Dry-run complete: runtime '$RUNTIME' install is planned but not implemented yet."
+    printf '%s\n' '' "Dry-run complete for runtime '$RUNTIME'."
     exit 0
   fi
-  if [ "$INIT_HARNESS" -eq 1 ]; then
-    printf '%s\n' "Project .harness/ initialized. Runtime '$RUNTIME' native install is still not implemented."
-  fi
-  fail "Runtime '$RUNTIME' install is planned but not implemented yet. Use --runtime manual for fallback copy or wait for runtime-specific step."
+  printf '%s\n' '' "Runtime '$RUNTIME' install finished."
+  exit 0
 fi
 
 run_manual_install

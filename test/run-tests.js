@@ -21,6 +21,7 @@ const {
   validateTargetGoal,
   validateTargetProfile
 } = require(path.join(repoRoot, "validate.js"));
+const { installRuntime } = require(path.join(repoRoot, "install-runtime.js"));
 const invalidFixture = path.join(repoRoot, "test", "fixtures", "invalid-harness");
 const invalidPackManifestFixture = path.join(repoRoot, "test", "fixtures", "invalid-pack-manifest");
 const invalidHarnessProfileFixture = path.join(repoRoot, "test", "fixtures", "invalid-harness-profile");
@@ -417,11 +418,15 @@ runTest("install.sh warns manual root copy is fallback", () => {
   assert.match(script, /warning/i);
 });
 
-runTest("install.sh documents non-manual runtime not implemented", () => {
+runTest("install.sh delegates to install-runtime.js", () => {
   const script = fs.readFileSync(installShPath, "utf8");
 
-  assert.match(script, /not implemented yet/i);
-  assert.match(script, /--runtime manual/i);
+  assert.match(script, /install-runtime\.js/);
+  assert.match(script, /run_runtime_native_install/);
+});
+
+runTest("install-runtime.js exists at repository root", () => {
+  assert.ok(fs.existsSync(path.join(repoRoot, "install-runtime.js")));
 });
 
 runTest("install.sh legacy-root aliases manual fallback", () => {
@@ -441,24 +446,26 @@ function runInstallSh(args, options = {}) {
 }
 
 runTest("install.sh claude dry-run exits 0 without network", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-claude-dry-"));
   const result = runInstallSh(
-    ["--runtime", "claude", "--scope", "project", "--dry-run", "--yes", "--target", "."],
+    ["--runtime", "claude", "--scope", "project", "--dry-run", "--yes", "--target", tmp],
     { env: { PATH: process.env.PATH } }
   );
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
-  assert.match(result.stdout + result.stderr, /not implemented yet/i);
-  assert.match(result.stdout, /claude/i);
+  assert.match(result.stdout, /WOULD CREATE|WOULD UPDATE/);
+  assert.match(result.stdout, /\.claude/);
 });
 
-runTest("install.sh claude write exits non-zero with not implemented", () => {
+runTest("install.sh claude write installs runtime files", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-claude-write-"));
   const result = runInstallSh(
-    ["--runtime", "claude", "--scope", "project", "--yes", "--target", "."],
+    ["--runtime", "claude", "--scope", "project", "--yes", "--target", tmp],
     { env: { PATH: process.env.PATH } }
   );
 
-  assert.notEqual(result.status, 0);
-  assert.match(result.stdout + result.stderr, /not implemented yet/i);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.ok(fs.existsSync(path.join(tmp, ".claude", "CLAUDE.md")));
 });
 
 runTest("install.sh project init-harness dry-run prints WOULD CREATE HARNESS.md", () => {
@@ -479,11 +486,9 @@ runTest("install.sh project init-harness writes profile files", () => {
     { env: { PATH: process.env.PATH } }
   );
 
-  assert.notEqual(result.status, 0);
-  assert.match(result.stdout + result.stderr, /not implemented yet/i);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
   assert.ok(fs.existsSync(path.join(tmp, ".harness", "HARNESS.md")));
-  assert.ok(fs.existsSync(path.join(tmp, ".harness", "MEMORY.md")));
-  assert.ok(fs.existsSync(path.join(tmp, ".harness", "goals", ".gitkeep")));
+  assert.ok(fs.existsSync(path.join(tmp, ".opencode", "plugins", "ai-engineering-harness.js")));
   assert.ok(fs.existsSync(path.join(tmp, "AGENTS.md")));
 });
 
@@ -494,7 +499,7 @@ runTest("install.sh init-harness target passes profile validation", () => {
     { env: { PATH: process.env.PATH } }
   );
 
-  assert.notEqual(result.status, 0);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
   const failures = validateTargetProfile(tmp);
   assert.equal(failures.length, 0, failures.join("\n"));
 });
@@ -520,7 +525,7 @@ runTest("install.sh init-harness skips existing files without force", () => {
     { env: { PATH: process.env.PATH } }
   );
 
-  assert.notEqual(result.status, 0);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
   assert.match(result.stdout, /SKIP \.harness\/HARNESS\.md/);
   assert.equal(fs.readFileSync(path.join(tmp, ".harness", "HARNESS.md"), "utf8"), "# keep\n");
 });
@@ -545,9 +550,35 @@ runTest("install.sh init-harness force overwrites existing files", () => {
     { env: { PATH: process.env.PATH } }
   );
 
-  assert.notEqual(result.status, 0);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
   assert.match(result.stdout, /OVERWRITE \.harness\/HARNESS\.md/);
   assert.match(fs.readFileSync(path.join(tmp, ".harness", "HARNESS.md"), "utf8"), /## Purpose/);
+});
+
+runTest("install-runtime cursor project creates rule file", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "rt-cursor-"));
+  installRuntime({
+    packRoot: repoRoot,
+    runtime: "cursor",
+    scope: "project",
+    target: tmp,
+    dryRun: false,
+    force: false
+  });
+  assert.ok(fs.existsSync(path.join(tmp, ".cursor", "rules", "ai-engineering-harness.mdc")));
+});
+
+runTest("install-runtime opencode project creates plugin file", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "rt-opencode-"));
+  installRuntime({
+    packRoot: repoRoot,
+    runtime: "opencode",
+    scope: "project",
+    target: tmp,
+    dryRun: false,
+    force: false
+  });
+  assert.ok(fs.existsSync(path.join(tmp, ".opencode", "plugins", "ai-engineering-harness.js")));
 });
 
 if (process.exitCode) {

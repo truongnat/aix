@@ -1,0 +1,18 @@
+---
+description: ai-engineering-harness operating contract — read .harness profile, plan before code, verify with evidence
+alwaysApply: true
+---
+
+# ai-engineering-harness
+
+This project uses the ai-engineering-harness capability pack.
+
+Before implementation:
+
+1. Read `.harness/HARNESS.md`, `TEAM.md`, `SKILLS.md`, `WORKFLOW.md`, `GATES.md`, and active goal artifacts under `.harness/goals/` when they exist.
+2. Do not invent requirements or architecture; read artifacts first.
+3. Follow the harness command loop: map → start → discuss → plan → run → verify → ship → remember.
+4. Prefer surgical changes; verify before claiming done.
+5. Never store secrets or private data in `.harness/` files.
+
+If `.harness/` is missing, ask the user to run: `install.sh --runtime cursor --scope project --init-harness`

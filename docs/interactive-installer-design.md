@@ -13,7 +13,7 @@ Design the next-generation installer: **runtime-native**, **scope-aware**, and *
 | `--runtime` / `--scope` flags | **implemented** |
 | Interactive runtime + scope pickers | **implemented** (TTY stdin) |
 | Install plan + `--yes` confirm | **implemented** |
-| Non-manual runtime writes | **not implemented** (dry-run exits 0; write exits with message) |
+| Non-manual runtime writes | **implemented** via [install-runtime.js](../install-runtime.js) |
 | `.harness/` init (`--init-harness`) | **implemented** (project scope; [harness-init-usage.md](harness-init-usage.md)) |
 | Per-runtime native install | **planned** (Steps 6a–6f) |
 

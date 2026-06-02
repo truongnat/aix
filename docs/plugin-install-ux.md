@@ -56,9 +56,12 @@ See:
 
 ## Installer Status
 
-[install.sh](../install.sh) now **distinguishes runtime and scope** (interactive menus or `--runtime` / `--scope`). Runtime-specific file writes are implemented **one runtime at a time** (Steps 6a–6f). Today, only **`--runtime manual`** (or `--legacy-root`) performs the legacy root copy.
+[install.sh](../install.sh) + [install-runtime.js](../install-runtime.js) install **per runtime** without copying `commands/`, `skills/`, etc. to the product root. See [runtime-native-install.md](runtime-native-install.md).
 
-Non-manual runtimes: safe **dry-run** prints the plan and exits; write mode fails with a clear not-implemented message.
+| Runtime | Status |
+|---|---|
+| opencode, cursor, windsurf, claude, codex, gemini, generic, all | **implemented** (payloads in `runtime/`) |
+| manual / `--legacy-root` | legacy root copy via `install.js` (fallback) |
 
 ## Supported User Flows (interim)
 

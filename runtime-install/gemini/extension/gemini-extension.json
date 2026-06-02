@@ -1,0 +1,6 @@
+{
+  "name": "ai-engineering-harness",
+  "description": "Markdown-first AI engineering harness — bootstrap context and .harness/ discipline",
+  "version": "0.9.1",
+  "contextFileName": "GEMINI.md"
+}

@@ -1,0 +1,10 @@
+{
+  "extraKnownMarketplaces": {
+    "ai-engineering-harness": {
+      "source": {
+        "source": "github",
+        "repo": "truongnat/ai-engineering-harness"
+      }
+    }
+  }
+}
