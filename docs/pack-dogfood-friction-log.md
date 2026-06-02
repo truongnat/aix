@@ -23,6 +23,11 @@ Do not paste secrets, tokens, customer data, or private business details. Summar
 | 2026-06-02 | D1 | `AGENTS.md` CREATE in harness init then SKIP in generic runtime step (first write) | low | Scenario D1 write output | Optional one-line note in runtime-native-install or install summary | v0.9.x patch |
 | 2026-06-02 | D1 | Install summary absolute target path (repeat) | low | Scenario D1 install plan | Same as A/B/C | v0.9.x patch |
 | 2026-06-02 | D1 | No blocking friction for generic project runtime install or profile validation | none | Dry-run, write, skip re-run, validate.js passed | No action required | no action |
+| 2026-06-02 | D2 | `--init-harness` minimal AGENTS.md prevents codex runtime from writing `AGENTS.project.md` | medium | Scenario D2 diff vs bootstrap | Skip init AGENTS when runtime writes, or merge bootstrap on init | v0.9.x patch |
+| 2026-06-02 | D2 | `codex exec` needs `--skip-git-repo-check` on non-git dogfood repo | low | Scenario D2 manual attempt | Document in dogfood plan / runtime-native-install | v0.9.x patch |
+| 2026-06-02 | D2 | Manual Codex check BLOCKED (API usage limit) | low | codex exec output | Re-run when quota available; do not claim stable | later optional |
+| 2026-06-02 | D2 | Dual-phase AGENTS.md CREATE/SKIP (repeat D1) | low | Scenario D2 write output | Install output clarity | v0.9.x patch |
+| 2026-06-02 | D2 | No blocking friction for codex project install or profile validation | none | Dry-run, write, skip, validate.js passed | No action required | no action |
 
 ### Severity
 

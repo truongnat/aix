@@ -6,6 +6,7 @@
 
 - runtime-native install audit and dogfood plan ([runtime-native-install-audit.md](docs/runtime-native-install-audit.md), [runtime-native-install-dogfood-plan.md](docs/runtime-native-install-dogfood-plan.md))
 - generic project runtime dogfood report ([pack-dogfood-reports/scenario-d1-generic-project.md](docs/pack-dogfood-reports/scenario-d1-generic-project.md)) — experimental PASS
+- Codex project runtime dogfood report ([pack-dogfood-reports/scenario-d2-codex-project.md](docs/pack-dogfood-reports/scenario-d2-codex-project.md)) — experimental PASS
 
 - runtime-native install via [install-runtime.js](install-runtime.js) for Claude, Codex, Cursor, Windsurf, Gemini, OpenCode, generic, and `all` (**experimental** until dogfooded)
 - runtime payloads under [runtime/](runtime/) (rules, plugins, extensions, AGENTS.md, `.claude/` hints)

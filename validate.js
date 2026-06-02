@@ -97,6 +97,7 @@ const requiredFiles = [
   "docs/pack-dogfood-reports/scenario-b-frontend-mobile-feature.md",
   "docs/pack-dogfood-reports/scenario-c-one-line-installer.md",
   "docs/pack-dogfood-reports/scenario-d1-generic-project.md",
+  "docs/pack-dogfood-reports/scenario-d2-codex-project.md",
   "docs/packaging-model.md",
   "docs/pack-manifest-spec.md",
   "docs/pack-verification-checklist.md",

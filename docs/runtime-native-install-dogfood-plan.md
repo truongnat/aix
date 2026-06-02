@@ -59,7 +59,9 @@ node validate.js --target <repo> --profile-only
 
 ---
 
-## 2. Codex (project)
+## 2. Codex (project) — completed (Scenario D2)
+
+**Status:** **experimental PASS** (structural) — [scenario-d2-codex-project.md](pack-dogfood-reports/scenario-d2-codex-project.md) (2026-06-02). Manual `codex exec` **BLOCKED** (API usage limit). With `--init-harness`, runtime codex SKIP leaves minimal init `AGENTS.md` (not full `AGENTS.project.md`). Stable claim **No**.
 
 **Command:**
 
