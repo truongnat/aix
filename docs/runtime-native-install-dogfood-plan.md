@@ -144,7 +144,9 @@ node validate.js --target <repo> --runtime opencode --profile-only
 
 ---
 
-## 5. Gemini (global recommended first)
+## 5. Gemini (global recommended first) — completed (Scenario D5)
+
+**Status:** **experimental PASS** (file/install) — [scenario-d5-gemini.md](pack-dogfood-reports/scenario-d5-gemini.md) (2026-06-02). Project validation **pass** with `--runtime gemini`. Global write tested (safe CREATE). Manual CLI load **not confirmed**. Stable claim **No**.
 
 **Command (global):**
 

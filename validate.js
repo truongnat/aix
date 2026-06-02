@@ -100,6 +100,7 @@ const requiredFiles = [
   "docs/pack-dogfood-reports/scenario-d2-codex-project.md",
   "docs/pack-dogfood-reports/scenario-d3-cursor-project.md",
   "docs/pack-dogfood-reports/scenario-d4-opencode-project.md",
+  "docs/pack-dogfood-reports/scenario-d5-gemini.md",
   "docs/runtime-aware-validation.md",
   "docs/packaging-model.md",
   "docs/pack-manifest-spec.md",

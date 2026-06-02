@@ -19,7 +19,7 @@ D1/D2 dogfood found `--init-harness` creating a minimal `AGENTS.md` before `gene
 | [runtime/](../runtime/) | Minimal payloads (rules, plugin JS, extension manifest, AGENTS snippets) |
 | [install.js](../install.js) | **Manual fallback only** — copies installed surface to target root |
 
-Automated tests cover file creation and dry-run for several paths. **Scenarios D1–D4** dogfood **generic**, **codex**, **cursor**, and **opencode (project)** in external repos. **No external dogfood reports yet** for Claude or Gemini in real tools.
+Automated tests cover file creation and dry-run for several paths. **Scenarios D1–D5** dogfood **generic**, **codex**, **cursor**, **opencode**, and **gemini** in external repos. **No external dogfood report yet** for Claude in a real tool session.
 
 ## Runtime Payload Inventory
 
@@ -46,7 +46,7 @@ Automated tests cover file creation and dry-run for several paths. **Scenarios D
 | **cursor** | `.cursor/rules/ai-engineering-harness.mdc` | project, global | High (file/install); manual IDE **not run** | **D3 completed** ([scenario-d3-cursor-project.md](pack-dogfood-reports/scenario-d3-cursor-project.md)) — experimental PASS; use `--runtime cursor` for profile validation | **No** |
 | **windsurf** | Same as cursor (`--runtime windsurf` alias) | project, global | Medium (alias only) | Not dogfooded | **No** |
 | **opencode** | `.opencode/plugins/*.js`, `opencode.json` | project, global | High (file/install); manual CLI **not run** | **D4 completed** ([scenario-d4-opencode-project.md](pack-dogfood-reports/scenario-d4-opencode-project.md)) — experimental PASS | **No** |
-| **gemini** | `~/.gemini/extensions/...` or `<repo>/.gemini/extensions/...` | project, global | **Low–Medium** (project path is best-effort) | Not dogfooded | **No** |
+| **gemini** | `~/.gemini/extensions/...` or `<repo>/.gemini/extensions/...` | project, global | High (file/install); **Low–Medium** CLI load (project best-effort; manual list inconclusive) | **D5 completed** ([scenario-d5-gemini.md](pack-dogfood-reports/scenario-d5-gemini.md)) — experimental PASS | **No** |
 | **claude** | `.claude/CLAUDE.md`, merge `settings.json` | project, global | Medium (settings merge + marketplace hint; full plugin bundle not installed) | Not dogfooded | **No** |
 | **all** | Sequential: opencode → cursor → claude → codex → gemini → generic | project or global | Low for combined | Not dogfooded | **No** |
 | **harness init** | `.harness/*` via `install.sh` | project only | High (unit tests) | Partial (automated only) | **No** (structural scaffold only) |

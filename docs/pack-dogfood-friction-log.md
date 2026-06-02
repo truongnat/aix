@@ -34,6 +34,9 @@ Do not paste secrets, tokens, customer data, or private business details. Summar
 | 2026-06-02 | D4 | Legacy `--profile-only` fails without AGENTS.md on OpenCode-only repo | low | Scenario D4 comparison | Expected; use `--runtime opencode` | no action |
 | 2026-06-02 | D4 | Manual OpenCode check not run (CLI not installed) | low | which opencode | Install CLI and re-run session bootstrap | later optional |
 | 2026-06-02 | D4 | No blocking friction for opencode install or runtime-aware validation | none | Dry-run, write, skip, validate | No action required | no action |
+| 2026-06-02 | D5 | Project-local Gemini extension CLI load unverified | low | Audit + empty extensions list | Manual check; prefer global or gemini extensions install | later optional |
+| 2026-06-02 | D5 | `gemini extensions list` empty after global install | low | Scenario D5 manual | Re-check extension registration | later optional |
+| 2026-06-02 | D5 | No blocking friction for gemini project/global file install or runtime-aware validation | none | Dry-run, write, skip, validate | No action required | no action |
 
 ### Severity
 

@@ -47,6 +47,12 @@ Issues that must be resolved before a stable `v1.0.0` capability pack release.
 - **No v1 blockers found in Scenario D2** (codex project install, no root pollution, profile validation succeeded; manual Codex BLOCKED by API limit, bootstrap merge gap is v0.9.x patch not v1 blocker)
 - **No v1 blockers found in Scenario D3** (cursor install and `.mdc` payload pass; `--profile-only` AGENTS.md gap is v0.9 contract candidate, not install failure)
 - **No v1 blockers found in Scenario D4** (opencode install, runtime-aware validation pass; manual OpenCode not run)
+- **No v1 blockers found in Scenario D5** (gemini project/global install, runtime-aware validation pass; manual extension load not confirmed)
+
+## Post-v1 Optional Work (Gemini)
+
+- Manual Gemini CLI extension load check after global or `gemini extensions install`
+- Verify whether project-local `.gemini/extensions/` loads in Gemini CLI (best-effort today)
 
 ## Post-v1 Optional Work
 
