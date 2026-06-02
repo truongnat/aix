@@ -115,7 +115,9 @@ node validate.js --target <repo> --runtime cursor --profile-only
 
 ---
 
-## 4. OpenCode (project)
+## 4. OpenCode (project) — completed (Scenario D4)
+
+**Status:** **experimental PASS** (file/install) — [scenario-d4-opencode-project.md](pack-dogfood-reports/scenario-d4-opencode-project.md) (2026-06-02). Runtime-aware validation **pass**; legacy `--profile-only` fails without `AGENTS.md` (expected). Manual OpenCode **BLOCKED** (CLI not on host). Stable claim **No**.
 
 **Command:**
 

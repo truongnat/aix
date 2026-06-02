@@ -31,6 +31,9 @@ Do not paste secrets, tokens, customer data, or private business details. Summar
 | 2026-06-02 | D3 | `--profile-only` requires AGENTS.md but Cursor project install does not create it | medium | Scenario D3 validate.js output | **addressed** — `validate.js --runtime cursor` | v0.9.x fix |
 | 2026-06-02 | D3 | Manual Cursor IDE rule load not verified | low | D3 dogfood session | Re-run in Cursor when available | later optional |
 | 2026-06-02 | D3 | No blocking friction for cursor install, .mdc payload, or skip behavior | none | Dry-run, write, skip, diff mdc | No action required | no action |
+| 2026-06-02 | D4 | Legacy `--profile-only` fails without AGENTS.md on OpenCode-only repo | low | Scenario D4 comparison | Expected; use `--runtime opencode` | no action |
+| 2026-06-02 | D4 | Manual OpenCode check not run (CLI not installed) | low | which opencode | Install CLI and re-run session bootstrap | later optional |
+| 2026-06-02 | D4 | No blocking friction for opencode install or runtime-aware validation | none | Dry-run, write, skip, validate | No action required | no action |
 
 ### Severity
 
