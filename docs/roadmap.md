@@ -56,8 +56,10 @@
 ## V5: Plugin Distribution Model
 
 - `v0.5.0`: Plugin Distribution Model
+- implemented in this release
 - clarify the harness as a capability pack
 - support plugin-like consumption
+- focus on conceptual and distribution clarification rather than packaging automation
 - keep runtime adapters and marketplace automation out of scope for now
 
 ## Later Optional Work
@@ -67,6 +69,8 @@
 - optional context warnings for non-required artifacts
 - optional interactive setup wizard
 - optional automatic harness or profile generation
+- optional package or marketplace distribution automation
+- optional plugin registry distribution
 - optional memory backend integrations
 - optional remote skill or template registry
 - optional automation layers for artifact lifecycle management
@@ -77,5 +81,6 @@
 - `v0.2.0`: Harness Design System
 - `v0.3.0`: Lightweight Host Repository Validation
 - `v0.4.0`: Ergonomics Polish
+- `v0.5.0`: Plugin Distribution Model
 
 Heavy runtime systems remain out of scope for v1. Any future automation should support the markdown operating model rather than replace it.

@@ -14,6 +14,8 @@
 - release archive checklist
 - clearer source repo vs target repo distinction
 - future plugin or registry boundary documentation
+- v0.5.0 readiness audit
+- v0.5.0 release scope documentation
 
 ## [0.4.0] - 2026-06-02
 
