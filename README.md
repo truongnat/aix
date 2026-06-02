@@ -111,8 +111,9 @@ node install.js --target ../my-project
 
 ## Release Status
 
-- current planned release: `v0.1.0`
+- current release: `v0.1.0`
 - see [CHANGELOG.md](CHANGELOG.md)
+- see [docs/v0.1.0-release-notes.md](docs/v0.1.0-release-notes.md)
 - see [docs/release-checklist.md](docs/release-checklist.md)
 - see [docs/versioning.md](docs/versioning.md)
 

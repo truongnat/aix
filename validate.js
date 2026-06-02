@@ -16,6 +16,7 @@ const requiredFiles = [
   "docs/repository-profile.md",
   "docs/release-checklist.md",
   "docs/session-start-checklist.md",
+  "docs/v0.1.0-release-notes.md",
   "docs/versioning.md",
   "docs/quality-gates-matrix.md",
   "docs/runtime-compatibility.md",

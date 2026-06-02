@@ -54,3 +54,10 @@ Use this checklist to prepare a manual `v0.1.0` release without adding release a
 - no runtime adapters
 - no heavy runtime systems
 - no server, database, Docker, LangGraph, or orchestration framework
+
+## v0.1.0 Final Manual Commands
+
+- `node validate.js`
+- `git status`
+- `git tag v0.1.0`
+- `git push origin v0.1.0`
