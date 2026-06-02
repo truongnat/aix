@@ -4,6 +4,8 @@ License: [MIT](LICENSE) | Validation: GitHub Actions `Validate`
 
 `ai-engineering-harness` is a markdown-first operating system for engineering agents. It is designed to give Claude Code, Codex, Cursor, Gemini, OpenCode, and similar tools a lightweight but disciplined way to explore codebases, plan changes, execute work, verify outcomes, and preserve useful decisions.
 
+See [TARGET.md](TARGET.md) for the long-term project target.
+
 ## What This Repo Is
 
 This repository is not a framework, runtime, agent server, or orchestration platform. It is a portable engineering methodology expressed as markdown artifacts, reusable skills, command guides, workflow documents, and templates. The goal is to help agents behave more like reliable engineering partners and less like improvisational text generators.

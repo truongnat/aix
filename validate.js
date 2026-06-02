@@ -9,6 +9,7 @@ const requiredFiles = [
   "CONTRIBUTING.md",
   "LICENSE",
   "SECURITY.md",
+  "TARGET.md",
   "docs/adoption-guide.md",
   "docs/adoption-smoke-test.md",
   "docs/usage-examples.md",
