@@ -144,7 +144,7 @@ Then:
 ## 🎯 Release Status
 
 - Current release: [`v0.6.0`](docs/v0.6.0-release-notes.md) — Runtime Consumption Guides
-- Next planned: `v0.7.0` Capability Pack Packaging ([plan](docs/v0.7.0-plan.md) · [model](docs/packaging-model.md) · [package](docs/manual-packaging-guide.md) · [PACK.md](PACK.md))
+- Next planned: `v0.7.0` Capability Pack Packaging ([plan](docs/v0.7.0-plan.md) · [readiness](docs/v0.7.0-readiness.md) · [scope](docs/v0.7.0-release-scope.md) · [PACK.md](PACK.md))
 - `v0.6.0` docs: [notes](docs/v0.6.0-release-notes.md) · [readiness](docs/v0.6.0-readiness.md) · [scope](docs/v0.6.0-release-scope.md) · [model](docs/runtime-consumption-model.md)
 - `v0.5.0` docs: [notes](docs/v0.5.0-release-notes.md) · [readiness](docs/v0.5.0-readiness.md) · [scope](docs/v0.5.0-release-scope.md)
 - `v0.4.0` docs: [notes](docs/v0.4.0-release-notes.md) · [readiness](docs/v0.4.0-readiness.md) · [scope](docs/v0.4.0-release-scope.md)

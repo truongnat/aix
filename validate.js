@@ -52,6 +52,8 @@ const requiredFiles = [
   "docs/v0.5.0-release-scope.md",
   "docs/v0.6.0-plan.md",
   "docs/v0.7.0-plan.md",
+  "docs/v0.7.0-readiness.md",
+  "docs/v0.7.0-release-scope.md",
   "docs/packaging-model.md",
   "docs/pack-manifest-spec.md",
   "docs/pack-verification-checklist.md",

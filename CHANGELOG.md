@@ -16,6 +16,8 @@
 - pack verification checklist
 - lightweight PACK.md heading validation
 - manual packaging guide
+- v0.7.0 readiness audit
+- v0.7.0 release scope documentation
 
 ## [0.6.0] - 2026-06-02
 

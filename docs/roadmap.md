@@ -74,15 +74,18 @@
 ## V7: Capability Pack Packaging
 
 - `v0.7.0`: Capability Pack Packaging
-- pack manifest (`PACK.md`) and packaging contract
-- packaging model and manifest spec
-- manual release archive packaging guidance
-- pack verification checklist
-- optional lightweight manifest validation
-- no publishing automation, marketplace automation, or runtime adapters
+- implemented in this release
+- defines manual packaging and manifest contracts for the capability pack
+- `PACK.md` manifest, packaging model, manifest spec, and verification checklist
+- lightweight `PACK.md` heading validation and manual packaging guide
+- release archive model and checklist integration with `PACK.md`
+- no publishing automation, marketplace automation, archive generation automation, or runtime adapters in this release
 
 ## Later Optional Work
 
+- optional archive generation automation
+- optional installed surface hash or checksum validation
+- optional manifest body or version value validation
 - optional runtime adapters
 - optional marketplace package or plugin registry distribution
 - optional package publishing automation
@@ -105,6 +108,6 @@
 - `v0.4.0`: Ergonomics Polish
 - `v0.5.0`: Plugin Distribution Model
 - `v0.6.0`: Runtime Consumption Guides
-- `v0.7.0`: Capability Pack Packaging (in progress)
+- `v0.7.0`: Capability Pack Packaging
 
 Heavy runtime systems remain out of scope for v1. Any future automation should support the markdown operating model rather than replace it.
