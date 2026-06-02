@@ -41,6 +41,12 @@ Recommended current mode:
 
 Plugin-like consumption depends on a clear installed surface contract so agents know exactly what belongs in the target repository.
 
+See also:
+
+- [docs/consumption-modes.md](consumption-modes.md)
+- [docs/consume-as-pack.md](consume-as-pack.md)
+- [docs/installed-surface-contract.md](installed-surface-contract.md)
+
 ## Future Modes
 
 Possible later modes:

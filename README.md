@@ -114,7 +114,9 @@ Then:
 | Long-term direction | [TARGET.md](TARGET.md) |
 | Agent contract | [AGENTS.md](AGENTS.md) |
 | Adoption guide | [docs/adoption-guide.md](docs/adoption-guide.md) |
+| Consume as pack | [docs/consume-as-pack.md](docs/consume-as-pack.md) |
 | Plugin model | [docs/plugin-model.md](docs/plugin-model.md) |
+| Consumption modes | [docs/consumption-modes.md](docs/consumption-modes.md) |
 | Distribution model | [docs/distribution-model.md](docs/distribution-model.md) |
 | Installed surface | [docs/installed-surface-contract.md](docs/installed-surface-contract.md) |
 | Build a harness profile | [docs/harness-build-usage.md](docs/harness-build-usage.md) |

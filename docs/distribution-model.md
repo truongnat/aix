@@ -24,6 +24,7 @@ The installed surface is the subset copied or vendored into a target repository 
 That surface should stay focused on the operating materials the target repository actually needs.
 
 Use [docs/installed-surface-contract.md](installed-surface-contract.md) for the explicit installed-surface boundary.
+Use [docs/consumption-modes.md](consumption-modes.md) for the practical ways users can consume that surface.
 
 ## Target Repository Artifacts
 

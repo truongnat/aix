@@ -4,6 +4,8 @@
 
 Show the shortest practical path from install to validated profile and goal artifacts for a first-time adopter.
 
+This is the recommended current consumption flow, not the only possible future mode.
+
 ## When To Use
 
 Use this walkthrough when:

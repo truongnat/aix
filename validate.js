@@ -40,6 +40,8 @@ const requiredFiles = [
   "docs/plugin-model.md",
   "docs/distribution-model.md",
   "docs/installed-surface-contract.md",
+  "docs/consumption-modes.md",
+  "docs/consume-as-pack.md",
   "docs/v0.5.0-strategy.md",
   "docs/v0.5.0-plan.md",
   "docs/v0.3.0-plan.md",
