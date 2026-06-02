@@ -232,6 +232,11 @@ Each scenario file should include:
 
 ## After Dogfood
 
-- Update [runtime-native-install-audit.md](runtime-native-install-audit.md) stable column
-- Update [plugin-install-ux.md](plugin-install-ux.md) support table
-- Consider re-freeze pre-v1 contracts only for PASS runtimes
+- **D1–D6:** complete — see [runtime-dogfood-summary.md](runtime-dogfood-summary.md)
+- **Readiness:** [v0.9.x-readiness.md](v0.9.x-readiness.md), [v0.9.x-release-scope.md](v0.9.x-release-scope.md)
+- **Next steps:**
+  - Manual runtime follow-up checks (IDE/CLI sessions) before any stable claim
+  - v0.9.x experimental release pass if readiness accepted
+  - **Do not** dogfood or document `--runtime all` as stable
+- Update [plugin-install-ux.md](plugin-install-ux.md) when manual checks complete
+- v1.0 re-freeze only after stable manual evidence per runtime

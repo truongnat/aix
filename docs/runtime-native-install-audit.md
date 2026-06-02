@@ -166,9 +166,17 @@ Automated tests cover file creation and dry-run for several paths. **Scenarios D
 | `manual` still copies root surface | Yes — documented fallback |
 | Runtime install creates `docs/` at product root | **No** |
 
+## Dogfood Summary
+
+Scenarios **C** and **D1–D6** are complete. Consolidated matrix, verdicts, and release implications: [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
+
+All primary runtimes: **experimental PASS** (file/install + runtime-aware validation where applicable). **Stable claim: No** for every runtime-native mode until manual session checks pass.
+
+**Next:** [v0.9.x-readiness.md](v0.9.x-readiness.md) — experimental release decision; do not run `--runtime all` as stable.
+
 ## Required Dogfood Before Stable
 
-Per runtime, capture in [pack-dogfood-reports/](pack-dogfood-reports/) (new scenario files):
+Per runtime, capture in [pack-dogfood-reports/](pack-dogfood-reports/) (scenario files — **done** for D1–D6):
 
 1. Command used (dry-run + write)
 2. Files on disk (listing)

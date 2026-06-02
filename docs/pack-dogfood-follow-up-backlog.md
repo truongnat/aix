@@ -7,6 +7,19 @@ Triage dogfood findings from [pack-dogfood-friction-log.md](pack-dogfood-frictio
 - One-line install: improve `install.js` next steps to mention `curl | sh` install path and validate-from-source-pack ([scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md))
 - Repeat: install summary relative target display when invoked via `install.sh` with relative `--target`
 - D2: document `codex exec --skip-git-repo-check` for non-git throwaway targets
+- D6: document global Claude dry-run when `~/.claude/settings.json` exists ([scenario-d6-claude.md](pack-dogfood-reports/scenario-d6-claude.md))
+- Install plan wording: runtime-specific paths (omit AGENTS.md when not applicable)
+
+## Manual Runtime Follow-up (stable-claim blockers, not v0.9.x release blockers)
+
+- Codex: re-run `codex exec` when API quota available (D2)
+- Cursor: IDE rules + Agent smoke (D3)
+- OpenCode: plugin bootstrap in session (D4)
+- Gemini: `gemini extensions list` / session load; project-local path (D5)
+- Claude: `/plugin install` + CLAUDE.md in Claude Code (D6)
+- Generic: optional AGENTS.md agent read (D1)
+
+See [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
 
 ## v0.8.x Patch Candidates
 
@@ -50,9 +63,16 @@ Issues that must be resolved before a stable `v1.0.0` capability pack release.
 - **No v1 blockers found in Scenario D5** (gemini project/global install, runtime-aware validation pass; manual extension load not confirmed)
 - **No v1 blockers found in Scenario D6** (Claude project install, runtime-aware validation pass; global write skipped; manual plugin install not run)
 
-## Post-D6 Next Step
+## Post-D6 Triage (summary complete)
 
-- Runtime dogfood summary + v0.9.x readiness audit (defer v1.0.0 stable claims until manual checks or explicit experimental matrix)
+- **No root pollution blocker** for runtime-native modes (D1–D6)
+- **Runtime-aware validation** — addressed ([runtime-aware-validation.md](runtime-aware-validation.md))
+- **AGENTS.md init/runtime conflict** — addressed (D2 patch)
+- **Gemini global write safety** — documented in D5; dry-run before global writes
+- **Claude global UPDATE risk** — documented in D6; global write skipped on dogfood host
+- Manual runtime checks outstanding → **stable-claim blockers only**, not experimental v0.9.x ship blockers
+
+Artifacts: [runtime-dogfood-summary.md](runtime-dogfood-summary.md), [v0.9.x-readiness.md](v0.9.x-readiness.md), [v0.9.x-release-scope.md](v0.9.x-release-scope.md)
 
 ## Post-v1 Optional Work (Gemini)
 

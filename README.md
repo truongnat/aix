@@ -81,14 +81,16 @@ Start with [`commands/`](commands/) and treat the loop as the default operating 
 
 ## 🚀 Install
 
-**Runtime-native install** (experimental, no root pack copy): [runtime-native-install](docs/runtime-native-install.md) · [audit](docs/runtime-native-install-audit.md) · [dogfood plan](docs/runtime-native-install-dogfood-plan.md)
+**Runtime-native installer: experimental** — dogfooded for `generic`, `codex`, `cursor`, `opencode`, `gemini`, `claude` (file/install). **Stable runtime support: not yet.** Summary: [runtime-dogfood-summary](docs/runtime-dogfood-summary.md) · [readiness](docs/v0.9.x-readiness.md) · [audit](docs/runtime-native-install-audit.md)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh -s -- \
   --runtime opencode --scope project --init-harness --yes
 ```
 
-Runtimes: `claude`, `codex`, `cursor`, `windsurf`, `gemini`, `opencode`, `generic`, `all`. Legacy full copy: `--runtime manual`.
+Validate from source pack: `node validate.js --target <repo> --runtime opencode --profile-only` ([runtime-aware-validation](docs/runtime-aware-validation.md)).
+
+Runtimes: `claude`, `codex`, `cursor`, `windsurf`, `gemini`, `opencode`, `generic`. Avoid `--runtime all` until dogfooded. Legacy root copy: `--runtime manual`.
 
 Design: [interactive-installer-design](docs/interactive-installer-design.md), [runtime-install-matrix-research](docs/runtime-install-matrix-research.md), [project-state-policy](docs/project-state-policy.md).
 
@@ -104,14 +106,14 @@ Preview what the fallback would copy:
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh -s -- --target . --dry-run
 ```
 
-Project-local `.harness/` scaffold (runtime-native install still planned except manual fallback):
+Project `.harness/` scaffold with runtime-native install:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh -s -- \
   --runtime claude --scope project --init-harness --dry-run --yes
 ```
 
-See [harness-init-usage](docs/harness-init-usage.md). Runtime-specific install is **not** implemented yet unless `--runtime manual`.
+See [harness-init-usage](docs/harness-init-usage.md).
 
 Pin a release tag: `--ref v0.9.0` ([install security](docs/plugin-install-security.md)).
 

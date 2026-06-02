@@ -8,6 +8,8 @@
 
 ### Added
 
+- runtime dogfood summary ([runtime-dogfood-summary.md](docs/runtime-dogfood-summary.md)) — Scenarios C, D1–D6
+- v0.9.x readiness audit ([v0.9.x-readiness.md](docs/v0.9.x-readiness.md)) and release scope ([v0.9.x-release-scope.md](docs/v0.9.x-release-scope.md))
 - runtime-aware target validation ([runtime-aware-validation.md](docs/runtime-aware-validation.md)) — `node validate.js --target <repo> --runtime <name> --profile-only`
 - Cursor profile validation no longer requires `AGENTS.md` when `--runtime cursor` is used
 - runtime-native install audit and dogfood plan ([runtime-native-install-audit.md](docs/runtime-native-install-audit.md), [runtime-native-install-dogfood-plan.md](docs/runtime-native-install-dogfood-plan.md))

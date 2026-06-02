@@ -55,6 +55,23 @@ Do not paste secrets, tokens, customer data, or private business details. Summar
 - **v1 blocker**: must resolve before `v1.0.0`
 - **later optional work**: automation, adapters, marketplace—explicitly deferred
 
+## Runtime Native Dogfood Summary (C, D1–D6)
+
+Cross-scenario themes after runtime-native dogfood:
+
+| Theme | Severity | Notes |
+|---|---|---|
+| No root pollution in D1–D6 | none | Validated — not a release blocker |
+| Absolute target path in install summary | low | Repeat from A/B/C |
+| Manual runtime checks not run or blocked | low–medium | Stable-claim blocker, not experimental-release blocker |
+| Runtime-aware validation gap (D3) | addressed | `--runtime` flag |
+| Gemini extension visibility inconclusive | low | D5 `extensions list` empty |
+| Claude plugin install not automated | low | By design; `/plugin install` manual |
+| Global config UPDATE risk (Claude) | medium | Dry-run first; D6 global write skipped |
+| `--runtime all` not dogfooded | low | Do not promote as stable |
+
+Full matrix: [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
+
 ## Fix Pass Notes
 
 Addressed in v0.9.x D2 patch (AGENTS.md ownership):

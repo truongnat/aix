@@ -54,15 +54,27 @@ See:
 - [interactive-installer-design.md](interactive-installer-design.md)
 - [project-state-policy.md](project-state-policy.md)
 
-## Installer Status
+## Installer Status (v0.9.x)
+
+**Runtime-native installer exists.** All primary runtimes are **experimental** (file/install dogfooded; **stable support: No**). See [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
+
+Recommended consumer path:
+
+```bash
+sh install.sh --runtime <name> --scope project --init-harness --yes
+node validate.js --target <repo> --runtime <name> --profile-only   # from source pack
+```
+
+- `<name>`: `generic`, `codex`, `cursor`, `windsurf`, `opencode`, `gemini`, `claude`
+- **Manual fallback** (`manual` / default `curl | sh` without flags): root copy only — [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md)
 
 [install.sh](../install.sh) + [install-runtime.js](../install-runtime.js) install **per runtime** without copying `commands/`, `skills/`, etc. to the product root. See [runtime-native-install.md](runtime-native-install.md).
 
 | Capability | Status |
 |---|---|
-| `manual` / `--legacy-root` | **Implemented** — root copy via `install.js`; dogfooded (Scenario C); fallback only |
+| `manual` / `--legacy-root` | **Implemented** — root copy via `install.js`; dogfooded (Scenario C); **fallback only** |
 | `.harness/` init (`--init-harness`) | **Implemented** — project scope; automated tests |
-| Runtime-native modes | **Implemented, dogfood in progress** — see [runtime-native-install-audit.md](runtime-native-install-audit.md) |
+| Runtime-native modes | **Experimental PASS** (D1–D6 file/install) — [runtime-dogfood-summary.md](runtime-dogfood-summary.md); stable **No** until manual runtime checks |
 | `generic` + `project` + `--init-harness` | **experimental PASS** (Scenario D1) — [scenario-d1-generic-project.md](pack-dogfood-reports/scenario-d1-generic-project.md) |
 | `codex` + `project` + `--init-harness` | **experimental PASS** (Scenario D2) — [scenario-d2-codex-project.md](pack-dogfood-reports/scenario-d2-codex-project.md) |
 | `cursor` + `project` + `--init-harness` | **experimental PASS** (Scenario D3) — [scenario-d3-cursor-project.md](pack-dogfood-reports/scenario-d3-cursor-project.md); validate with `node validate.js --target <repo> --runtime cursor --profile-only` |
@@ -70,13 +82,13 @@ See:
 | `gemini` + `project` or `global` | **experimental PASS** (Scenario D5) — [scenario-d5-gemini.md](pack-dogfood-reports/scenario-d5-gemini.md); project validate with `--runtime gemini`; global extension path preferred for CLI load |
 | `claude` + `project` (global dry-run only in D6) | **experimental PASS** (Scenario D6) — [scenario-d6-claude.md](pack-dogfood-reports/scenario-d6-claude.md); validate with `--runtime claude`; manual `/plugin install` required |
 
-Do **not** treat runtime-native modes as **stable** until per-runtime dogfood passes and audit matrix is updated. Generic project is dogfooded; other runtimes remain pending per [runtime-native-install-dogfood-plan.md](runtime-native-install-dogfood-plan.md).
+Do **not** treat runtime-native modes as **stable** until manual session evidence exists per [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
 
-## Supported User Flows (interim)
+## Supported User Flows
 
-**Write path today:** `--runtime manual` only — see [install-sh-usage.md](install-sh-usage.md).
+**Recommended:** runtime-native install + `--init-harness` for project state — see [install-sh-usage.md](install-sh-usage.md), [harness-init-usage.md](harness-init-usage.md), [runtime-aware-validation.md](runtime-aware-validation.md).
 
-Piping `curl | sh` without flags still defaults to **manual** fallback (with a warning). That is **not** the recommended long-term default.
+Piping `curl | sh` without flags still defaults to **manual** fallback (with a warning). That is **not** the recommended default.
 
 ### Project install (default target = cwd) — interim bulk copy
 
