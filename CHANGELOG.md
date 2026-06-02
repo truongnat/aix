@@ -14,6 +14,7 @@
 ### Added
 
 - implemented target profile validation mode
+- implemented target goal validation mode
 
 ## [0.2.0] - 2026-06-02
 

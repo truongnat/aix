@@ -291,6 +291,9 @@ const targetProfileHeadingContracts = [
   [".harness/GATES.md", gatesHeadings],
   [".harness/MEMORY.md", memoryHeadings]
 ];
+const goalTemplateHeadings = Object.fromEntries(
+  Object.entries(goalArtifactHeadings).map(([relativePath, headings]) => [path.basename(relativePath), headings])
+);
 
 function resolvePath(baseDir, relativePath) {
   return path.join(baseDir, relativePath);
@@ -424,6 +427,19 @@ function validateTargetProfile(baseDir) {
   return failures;
 }
 
+function validateTargetGoal(baseDir, goalId) {
+  const failures = validateTargetProfile(baseDir);
+  const goalDir = `.harness/goals/${goalId}`;
+
+  for (const [fileName, headings] of Object.entries(goalTemplateHeadings)) {
+    const relativePath = `${goalDir}/${fileName}`;
+    assertExists(baseDir, relativePath, failures);
+    assertHeadings(baseDir, relativePath, headings, failures);
+  }
+
+  return failures;
+}
+
 function parseValidateArgs(argv = []) {
   if (argv.length === 0) {
     return {
@@ -473,12 +489,18 @@ function parseValidateArgs(argv = []) {
 
   if (hasProfileOnly && goalId) {
     usageErrors.push("--profile-only cannot be combined with --goal");
-  } else if (goalId) {
-    usageErrors.push("--goal is planned for a later v0.3.0 step but not implemented yet");
   }
 
   if (usageErrors.length > 0) {
     return { usageErrors };
+  }
+
+  if (goalId) {
+    return {
+      mode: "target-goal",
+      baseDir,
+      goalId
+    };
   }
 
   return {
@@ -499,14 +521,19 @@ function main() {
   }
 
   const validationMode = args.mode;
-  const failures =
-    validationMode === "target-profile"
-      ? validateTargetProfile(args.baseDir)
-      : validateHarnessRepository(args.baseDir);
+  let failures;
+
+  if (validationMode === "target-profile") {
+    failures = validateTargetProfile(args.baseDir);
+  } else if (validationMode === "target-goal") {
+    failures = validateTargetGoal(args.baseDir, args.goalId);
+  } else {
+    failures = validateHarnessRepository(args.baseDir);
+  }
 
   if (failures.length > 0) {
     console.error(
-      validationMode === "target-profile"
+      validationMode === "target-profile" || validationMode === "target-goal"
         ? "Target repository validation failed:"
         : "Harness validation failed:"
     );
@@ -518,6 +545,11 @@ function main() {
 
   if (validationMode === "target-profile") {
     console.log("Target repository validation passed. Checked profile contract.");
+    return;
+  }
+
+  if (validationMode === "target-goal") {
+    console.log(`Target repository validation passed. Checked goal contract: ${args.goalId}.`);
     return;
   }
 
@@ -547,6 +579,7 @@ module.exports = {
   teamHeadings,
   templateFiles,
   validateHarnessRepository,
+  validateTargetGoal,
   validateTargetProfile,
   validateRepository
 };

@@ -3,7 +3,7 @@
 This document defines the lightweight validation mode for a host repository that has adopted `ai-engineering-harness` and produced `.harness/` profile artifacts.
 
 Profile validation is the first implemented target-repository step.
-Goal-level validation comes later.
+Goal-level validation is the second implemented target-repository step.
 
 ## What Target Repo Validation Means
 
@@ -21,7 +21,7 @@ The current profile validation mode checks:
 - obvious structural gaps are reported with clear, actionable messages
 - safety boundaries are preserved during validation output
 
-Goal-level validation and optional context checks are planned for later v0.3.0 steps.
+Goal artifact validation is now implemented for `--target <path> --goal <goal-id>`. Optional context checks still come later.
 
 ## What It Should Not Check
 
@@ -71,7 +71,7 @@ Missing optional context artifacts should not fail validation by default unless 
 
 ## Optional Goal-Level Artifacts
 
-When a goal is present or a goal-specific mode is requested, the future validator should look for:
+When a goal is present or a goal-specific mode is requested, the validator looks for:
 
 - `.harness/goals/<goal-id>/GOAL.md`
 - `.harness/goals/<goal-id>/PLAN.md`
@@ -81,7 +81,7 @@ When a goal is present or a goal-specific mode is requested, the future validato
 
 Goal-level validation should remain scoped to the requested goal and should not assume that every repository always has active goals.
 
-Goal-level validation is planned after profile validation and is not part of the first target-mode implementation step.
+Goal-level validation is implemented after profile validation and remains structural-only.
 
 ## Safety Checks
 
@@ -139,10 +139,10 @@ Currently implemented:
 - `node validate.js`
 - `node validate.js --target ../my-project`
 - `node validate.js --target ../my-project --profile-only`
+- `node validate.js --target ../my-project --goal google-login`
 
 Currently deferred:
-
-- `node validate.js --target ../my-project --goal google-login`
+- optional context warnings and informational checks
 
 Intended meanings:
 
@@ -153,7 +153,7 @@ Intended meanings:
 - `node validate.js --target ../my-project --profile-only`
   - validate only the profile-level adopted harness artifacts
 - `node validate.js --target ../my-project --goal google-login`
-  - planned for a later v0.3.0 step and currently returns a usage error
+  - validate the host repository profile artifacts and the named goal artifact set
 
 ## Non-Goals
 

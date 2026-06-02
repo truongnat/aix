@@ -6,11 +6,18 @@ const childProcess = require("node:child_process");
 
 const repoRoot = path.resolve(__dirname, "..");
 const { installHarness, parseArgs } = require(path.join(repoRoot, "install.js"));
-const { parseValidateArgs, validateRepository, validateTargetProfile } = require(path.join(repoRoot, "validate.js"));
+const {
+  parseValidateArgs,
+  validateRepository,
+  validateTargetGoal,
+  validateTargetProfile
+} = require(path.join(repoRoot, "validate.js"));
 const invalidFixture = path.join(repoRoot, "test", "fixtures", "invalid-harness");
 const invalidHarnessProfileFixture = path.join(repoRoot, "test", "fixtures", "invalid-harness-profile");
 const validTargetProfileFixture = path.join(repoRoot, "test", "fixtures", "valid-target-profile");
 const invalidTargetProfileFixture = path.join(repoRoot, "test", "fixtures", "invalid-target-profile");
+const validTargetGoalFixture = path.join(repoRoot, "test", "fixtures", "valid-target-goal");
+const invalidTargetGoalFixture = path.join(repoRoot, "test", "fixtures", "invalid-target-goal");
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "ai-harness-test-"));
@@ -83,10 +90,18 @@ runTest("parseValidateArgs accepts --target with --profile-only as target profil
   assert.equal(parsed.baseDir, path.resolve(repoRoot, "..", "my-project"));
 });
 
-runTest("parseValidateArgs returns usage error for --target with --goal in this step", () => {
+runTest("parseValidateArgs accepts --target with --goal as target goal mode", () => {
   const parsed = parseValidateArgs(["--target", "../my-project", "--goal", "google-login"]);
 
-  assert.deepEqual(parsed.usageErrors, ["--goal is planned for a later v0.3.0 step but not implemented yet"]);
+  assert.equal(parsed.mode, "target-goal");
+  assert.equal(parsed.baseDir, path.resolve(repoRoot, "..", "my-project"));
+  assert.equal(parsed.goalId, "google-login");
+});
+
+runTest("parseValidateArgs returns usage error for missing goal id after --goal", () => {
+  const parsed = parseValidateArgs(["--target", "../my-project", "--goal"]);
+
+  assert.deepEqual(parsed.usageErrors, ["Missing required goal id after --goal"]);
 });
 
 runTest("parseValidateArgs returns conflict usage error for --profile-only with --goal", () => {
@@ -122,6 +137,18 @@ runTest("validateTargetProfile fails invalid fixture", () => {
   assert.ok(failures.includes(".harness/HARNESS.md is missing heading: ## Human Review"));
 });
 
+runTest("validateTargetGoal passes valid fixture", () => {
+  const failures = validateTargetGoal(validTargetGoalFixture, "google-login");
+
+  assert.deepEqual(failures, []);
+});
+
+runTest("validateTargetGoal fails invalid fixture", () => {
+  const failures = validateTargetGoal(invalidTargetGoalFixture, "google-login");
+
+  assert.ok(failures.includes(".harness/goals/google-login/GOAL.md is missing heading: ## Acceptance Criteria"));
+});
+
 runTest("validate.js CLI target profile returns success for valid fixture", () => {
   const result = childProcess.spawnSync(process.execPath, ["validate.js", "--target", validTargetProfileFixture], {
     cwd: repoRoot,
@@ -143,15 +170,36 @@ runTest("validate.js CLI target profile returns failure for invalid fixture", ()
   assert.match(result.stderr, /\.harness\/HARNESS\.md is missing heading: ## Human Review/);
 });
 
-runTest("validate.js CLI returns usage error for --target with --goal in this step", () => {
-  const result = childProcess.spawnSync(process.execPath, ["validate.js", "--target", validTargetProfileFixture, "--goal", "google-login"], {
+runTest("validate.js CLI target goal returns success for valid fixture", () => {
+  const result = childProcess.spawnSync(process.execPath, ["validate.js", "--target", validTargetGoalFixture, "--goal", "google-login"], {
+    cwd: repoRoot,
+    encoding: "utf8"
+  });
+
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /Target repository validation passed\. Checked goal contract: google-login\./);
+});
+
+runTest("validate.js CLI target goal returns failure for invalid fixture", () => {
+  const result = childProcess.spawnSync(process.execPath, ["validate.js", "--target", invalidTargetGoalFixture, "--goal", "google-login"], {
+    cwd: repoRoot,
+    encoding: "utf8"
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Target repository validation failed:/);
+  assert.match(result.stderr, /\.harness\/goals\/google-login\/GOAL\.md is missing heading: ## Acceptance Criteria/);
+});
+
+runTest("validate.js CLI returns usage error for missing goal id after --goal", () => {
+  const result = childProcess.spawnSync(process.execPath, ["validate.js", "--target", validTargetProfileFixture, "--goal"], {
     cwd: repoRoot,
     encoding: "utf8"
   });
 
   assert.equal(result.status, 1);
   assert.match(result.stderr, /Validation usage error:/);
-  assert.match(result.stderr, /--goal is planned for a later v0\.3\.0 step but not implemented yet/);
+  assert.match(result.stderr, /Missing required goal id after --goal/);
 });
 
 runTest("validate.js CLI returns conflict usage error for --profile-only with --goal", () => {
