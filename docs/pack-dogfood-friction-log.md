@@ -37,6 +37,10 @@ Do not paste secrets, tokens, customer data, or private business details. Summar
 | 2026-06-02 | D5 | Project-local Gemini extension CLI load unverified | low | Audit + empty extensions list | Manual check; prefer global or gemini extensions install | later optional |
 | 2026-06-02 | D5 | `gemini extensions list` empty after global install | low | Scenario D5 manual | Re-check extension registration | later optional |
 | 2026-06-02 | D5 | No blocking friction for gemini project/global file install or runtime-aware validation | none | Dry-run, write, skip, validate | No action required | no action |
+| 2026-06-02 | D6 | Global Claude dry-run would UPDATE existing ~/.claude/settings.json | medium | Global dry-run output | Dry-run first; use --force only when intended | v0.9.x patch |
+| 2026-06-02 | D6 | Marketplace plugin not installed by installer (manual /plugin install) | low | NEXT line in install output | Document in Claude dogfood/readme | no action |
+| 2026-06-02 | D6 | Manual Claude Code + plugin install not run | low | D6 session | Follow-up optional | later optional |
+| 2026-06-02 | D6 | No blocking friction for Claude project install or runtime-aware validation | none | Dry-run, write, skip, validate | No action required | no action |
 
 ### Severity
 

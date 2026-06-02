@@ -19,7 +19,7 @@ D1/D2 dogfood found `--init-harness` creating a minimal `AGENTS.md` before `gene
 | [runtime/](../runtime/) | Minimal payloads (rules, plugin JS, extension manifest, AGENTS snippets) |
 | [install.js](../install.js) | **Manual fallback only** — copies installed surface to target root |
 
-Automated tests cover file creation and dry-run for several paths. **Scenarios D1–D5** dogfood **generic**, **codex**, **cursor**, **opencode**, and **gemini** in external repos. **No external dogfood report yet** for Claude in a real tool session.
+Automated tests cover file creation and dry-run for several paths. **Scenarios D1–D6** dogfood all primary runtimes in external repos (project and/or global dry-run). Manual IDE/CLI load checks remain incomplete for several runtimes.
 
 ## Runtime Payload Inventory
 
@@ -47,7 +47,7 @@ Automated tests cover file creation and dry-run for several paths. **Scenarios D
 | **windsurf** | Same as cursor (`--runtime windsurf` alias) | project, global | Medium (alias only) | Not dogfooded | **No** |
 | **opencode** | `.opencode/plugins/*.js`, `opencode.json` | project, global | High (file/install); manual CLI **not run** | **D4 completed** ([scenario-d4-opencode-project.md](pack-dogfood-reports/scenario-d4-opencode-project.md)) — experimental PASS | **No** |
 | **gemini** | `~/.gemini/extensions/...` or `<repo>/.gemini/extensions/...` | project, global | High (file/install); **Low–Medium** CLI load (project best-effort; manual list inconclusive) | **D5 completed** ([scenario-d5-gemini.md](pack-dogfood-reports/scenario-d5-gemini.md)) — experimental PASS | **No** |
-| **claude** | `.claude/CLAUDE.md`, merge `settings.json` | project, global | Medium (settings merge + marketplace hint; full plugin bundle not installed) | Not dogfooded | **No** |
+| **claude** | `.claude/CLAUDE.md`, merge `settings.json` | project, global | High (project file/install); manual plugin/IDE **not run** | **D6 completed** ([scenario-d6-claude.md](pack-dogfood-reports/scenario-d6-claude.md)) — experimental PASS; global write not run on dogfood host | **No** |
 | **all** | Sequential: opencode → cursor → claude → codex → gemini → generic | project or global | Low for combined | Not dogfooded | **No** |
 | **harness init** | `.harness/*` via `install.sh` | project only | High (unit tests) | Partial (automated only) | **No** (structural scaffold only) |
 

@@ -48,6 +48,11 @@ Issues that must be resolved before a stable `v1.0.0` capability pack release.
 - **No v1 blockers found in Scenario D3** (cursor install and `.mdc` payload pass; `--profile-only` AGENTS.md gap is v0.9 contract candidate, not install failure)
 - **No v1 blockers found in Scenario D4** (opencode install, runtime-aware validation pass; manual OpenCode not run)
 - **No v1 blockers found in Scenario D5** (gemini project/global install, runtime-aware validation pass; manual extension load not confirmed)
+- **No v1 blockers found in Scenario D6** (Claude project install, runtime-aware validation pass; global write skipped; manual plugin install not run)
+
+## Post-D6 Next Step
+
+- Runtime dogfood summary + v0.9.x readiness audit (defer v1.0.0 stable claims until manual checks or explicit experimental matrix)
 
 ## Post-v1 Optional Work (Gemini)
 

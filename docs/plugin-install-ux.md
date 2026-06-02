@@ -68,6 +68,7 @@ See:
 | `cursor` + `project` + `--init-harness` | **experimental PASS** (Scenario D3) — [scenario-d3-cursor-project.md](pack-dogfood-reports/scenario-d3-cursor-project.md); validate with `node validate.js --target <repo> --runtime cursor --profile-only` |
 | `opencode` + `project` + `--init-harness` | **experimental PASS** (Scenario D4) — [scenario-d4-opencode-project.md](pack-dogfood-reports/scenario-d4-opencode-project.md); validate with `node validate.js --target <repo> --runtime opencode --profile-only` |
 | `gemini` + `project` or `global` | **experimental PASS** (Scenario D5) — [scenario-d5-gemini.md](pack-dogfood-reports/scenario-d5-gemini.md); project validate with `--runtime gemini`; global extension path preferred for CLI load |
+| `claude` + `project` (global dry-run only in D6) | **experimental PASS** (Scenario D6) — [scenario-d6-claude.md](pack-dogfood-reports/scenario-d6-claude.md); validate with `--runtime claude`; manual `/plugin install` required |
 
 Do **not** treat runtime-native modes as **stable** until per-runtime dogfood passes and audit matrix is updated. Generic project is dogfooded; other runtimes remain pending per [runtime-native-install-dogfood-plan.md](runtime-native-install-dogfood-plan.md).
 

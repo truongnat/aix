@@ -181,7 +181,9 @@ node validate.js --target <repo> --runtime gemini --profile-only
 
 ---
 
-## 6. Claude (project, then global)
+## 6. Claude (project, then global) — completed (Scenario D6)
+
+**Status:** **experimental PASS** (project file/install) — [scenario-d6-claude.md](pack-dogfood-reports/scenario-d6-claude.md) (2026-06-02). Global dry-run recorded; global write **not run** (existing `~/.claude/settings.json`). Manual `/plugin install` **not run**. Stable claim **No**.
 
 **Project command:**
 

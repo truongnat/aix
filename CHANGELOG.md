@@ -16,6 +16,7 @@
 - Cursor project runtime dogfood report ([pack-dogfood-reports/scenario-d3-cursor-project.md](docs/pack-dogfood-reports/scenario-d3-cursor-project.md)) — experimental PASS (file/install); profile validation gap documented
 - OpenCode project runtime dogfood report ([pack-dogfood-reports/scenario-d4-opencode-project.md](docs/pack-dogfood-reports/scenario-d4-opencode-project.md)) — experimental PASS
 - Gemini runtime dogfood report ([pack-dogfood-reports/scenario-d5-gemini.md](docs/pack-dogfood-reports/scenario-d5-gemini.md)) — experimental PASS (project + global file/install)
+- Claude runtime dogfood report ([pack-dogfood-reports/scenario-d6-claude.md](docs/pack-dogfood-reports/scenario-d6-claude.md)) — experimental PASS (project file/install)
 
 - runtime-native install via [install-runtime.js](install-runtime.js) for Claude, Codex, Cursor, Windsurf, Gemini, OpenCode, generic, and `all` (**experimental** until dogfooded)
 - runtime payloads under [runtime/](runtime/) (rules, plugins, extensions, AGENTS.md, `.claude/` hints)
