@@ -1,31 +1,92 @@
 # Cursor
 
-## `AGENTS.md`
+## Purpose
 
-Keep `AGENTS.md` at the repository root so Cursor sessions can use it as the shared operating contract for planning, execution, and verification.
+Explain how Cursor should consume `ai-engineering-harness` as a capability pack inside a target repository.
 
-## `commands/`
+## Runtime Fit
 
-Use `commands/` as the practical loop for deciding what the agent should do next. Point Cursor to the specific command document when you want it to map, plan, verify, or remember.
+Cursor is a good fit when the harness operating surface is installed in the same workspace as the target product repository.
 
-## `skills/`
+Cursor should use repo-local markdown context: `AGENTS.md`, commands, skills, templates, and `.harness/` artifacts.
 
-Use `skills/` as reusable references when the agent needs a strict process for planning, execution, review, or verification.
+Cursor should not treat the `ai-engineering-harness` source repo as the product workspace unless that repo itself is being maintained.
 
-## `.harness/` Artifacts
+## Consumption Model
 
-Store active project state in `.harness/`. Cursor should read the current goal, context, and plan before implementation and update the relevant artifacts as the task moves forward.
+Use Cursor against the target repository after the harness operating surface has been installed or copied there.
 
-## Recommended First Prompt
+The source pack is only the canonical source. Product work happens in the target repository workspace.
 
-> Read `AGENTS.md`, then load `.harness/GOAL.md`, `.harness/STATE.md`, and `.harness/PLAN.md` if they exist. Follow the harness loop and tell me which command should run next.
+## Recommended Setup
 
-## Known Limitations
+Use the current setup flow:
 
-- no Cursor-specific installer is provided
-- no generated Cursor configuration is required
-- the harness remains document-driven rather than editor-driven
+```bash
+node install.js --target ../my-project --dry-run
+node install.js --target ../my-project
+node validate.js --target ../my-project --profile-only
+```
 
-## Safety Reminder
+Run these commands from the source pack repo, open Cursor in the target repo for product work, and keep `.harness/` artifacts in the target repo.
 
-Do not store secrets, tokens, customer data, or private business data in harness artifacts.
+## What Cursor Should Read
+
+Inside the target repository, Cursor should read:
+
+- `AGENTS.md`
+- `docs/consume-as-pack.md`
+- `docs/install-to-profile-walkthrough.md`
+- `docs/harness-build-usage.md`
+- `.harness/HARNESS.md`
+- `.harness/TEAM.md`
+- `.harness/SKILLS.md`
+- `.harness/WORKFLOW.md`
+- `.harness/GATES.md`
+- `.harness/MEMORY.md`
+- active `.harness/goals/<goal-id>/` artifacts
+
+## Workspace Rules
+
+- use one target repo per product task when possible
+- do not mix source pack maintenance and target product work in the same prompt unless explicitly working on the harness repo
+- keep generated profile and goal artifacts in the target repo
+- do not let Cursor summarize away validation failures; fix exact files and headings
+
+## First Prompt
+
+> Read `AGENTS.md`, `docs/consume-as-pack.md`, `docs/install-to-profile-walkthrough.md`, and `docs/harness-build-usage.md`. Treat this Cursor workspace as the target product repository. Do not use the `ai-engineering-harness` source repo as the product repo. Inspect `.harness/` artifacts and summarize the current harness state before making changes.
+
+## Harness-Build Prompt
+
+> Run the harness-build process for this Cursor workspace. Create or update `.harness/HARNESS.md`, `TEAM.md`, `SKILLS.md`, `WORKFLOW.md`, `GATES.md`, and `MEMORY.md`. Use the smallest sufficient skill and workflow set. Do not implement application code.
+
+## Goal Execution Prompt
+
+> Using the current `.harness/` profile and `.harness/goals/<goal-id>/` artifacts, plan and execute the next task in this workspace. Follow the command loop, update `TASKS.md` and `VERIFY.md` as work progresses, and stop before shipping if verification evidence is missing.
+
+## Validation Prompt
+
+> Run or ask me to run: `node validate.js --target <path> --profile-only` and `node validate.js --target <path> --goal <goal-id>`. Treat validation as structural only, not proof of application correctness. Fix exact missing paths and headings.
+
+## Safety Boundaries
+
+- keep markdown as the source of truth
+- keep `.harness/` artifacts in the target repository
+- do not invent Cursor extension or integration behavior
+- do not treat structural validation as proof that the application is correct
+
+## Common Mistakes
+
+- opening Cursor in the source pack repo and treating it as the product workspace
+- mixing harness-repo maintenance and target-repo work in one ambiguous prompt
+- skipping the read-first pass over installed docs and `.harness/` artifacts
+- treating validation output as a summary instead of fixing exact missing files or headings
+
+## Completion Checklist
+
+- Cursor is pointed at the target repository, not the source pack
+- installed `AGENTS.md` and supporting docs were read first
+- `.harness/` profile artifacts exist or were updated intentionally
+- active goal artifacts were read before execution
+- validation flow is understood as structural-only

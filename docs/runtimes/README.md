@@ -12,8 +12,8 @@ These guides explain how to consume the plugin-like markdown capability pack ins
 
 - [Session Start Checklist](../session-start-checklist.md)
 - [Claude Code](claude-code.md) - updated for capability-pack consumption
+- [Cursor](cursor.md) - updated for capability-pack consumption
 - [Codex](codex.md)
-- [Cursor](cursor.md)
 - [Gemini CLI](gemini-cli.md)
 - [OpenCode](opencode.md)
 

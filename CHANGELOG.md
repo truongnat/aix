@@ -16,6 +16,7 @@
 ### Added
 
 - Claude Code capability pack consumption guide
+- Cursor capability pack consumption guide
 
 ## [0.5.0] - 2026-06-02
 
