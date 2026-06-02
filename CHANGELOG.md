@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.5.0] - Unreleased
+
+### Planned
+
+- plugin-like capability pack positioning
+- plugin model documentation
+- distribution model documentation
+- clearer source repo vs target repo distinction
+- future plugin or registry boundary documentation
+
 ## [0.4.0] - 2026-06-02
 
 ### Planned

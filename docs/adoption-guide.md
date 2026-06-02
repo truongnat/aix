@@ -1,6 +1,12 @@
 # Adoption Guide
 
-This guide explains how to adopt `ai-engineering-harness` inside another repository without introducing a runtime platform.
+This guide explains how to adopt `ai-engineering-harness` into another repository without introducing a runtime platform.
+
+This repository is the source pack.
+
+The target repository is where product work happens.
+
+The installed or copied harness surface is what agents use inside that target repository.
 
 ## Goals
 
@@ -11,7 +17,7 @@ This guide explains how to adopt `ai-engineering-harness` inside another reposit
 
 ## Manual Install
 
-Copy these assets into the target repository:
+Copy these assets from the source pack into the target repository:
 
 - `AGENTS.md`
 - `commands/`
@@ -31,7 +37,7 @@ Recommended manual steps:
 
 ## Installer Usage
 
-The repository includes a dependency-free installer.
+The source pack includes a dependency-free installer.
 
 ### Basic Copy
 
@@ -45,7 +51,7 @@ node install.js --target ../my-project
 node install.js --target ../my-project --dry-run
 ```
 
-Use this first to see exactly which files would be copied and which files would be skipped.
+Use this first to see exactly which capability-pack files would be copied and which files would be skipped.
 
 ### Force Overwrite
 
@@ -123,7 +129,7 @@ Typical usage:
 
 ## Using The Command Loop
 
-Run the harness as a working loop, not as static documentation:
+Run the installed harness surface as a working loop inside the target repository, not as static documentation:
 
 1. `Map`
 2. `Start`
@@ -198,7 +204,7 @@ If you copied the full repository surface, this confirms the required structure 
 
 ## After Running `install.js`
 
-After install, follow the printed next-step guidance and then review:
+After install, follow the printed next-step guidance inside the target repository and then review:
 
 - [docs/install-output-example.md](install-output-example.md)
 - [docs/install-to-profile-walkthrough.md](install-to-profile-walkthrough.md)

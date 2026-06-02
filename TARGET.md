@@ -2,7 +2,7 @@
 
 ## One-Line Target
 
-`ai-engineering-harness` is a markdown-first harness design system that helps AI coding agents create project-specific engineering harnesses with skills, memory, workflows, team architecture, quality gates, and durable artifacts.
+`ai-engineering-harness` is a plugin-like markdown capability pack for AI coding agents that helps them load engineering discipline into an existing repository or agent runtime.
 
 ## Why This Exists
 
@@ -12,7 +12,7 @@ This project exists to make those failure modes harder to repeat. The harness sh
 
 ## What This Project Must Become
 
-This project must evolve from a generic markdown instruction kit into a real Harness Design System.
+This project must evolve from a generic markdown instruction kit into a reusable harness capability pack.
 
 It must help an agent go from:
 
@@ -29,6 +29,10 @@ to:
 - quality gates
 - goal/task artifacts
 
+The canonical source lives in this repository, but the intended product is not “clone this repo and do product work inside it.”
+
+The intended product is a reusable pack that can be installed, copied, vendored, or otherwise consumed by an existing AI coding workflow.
+
 ## Core Philosophy
 
 - Skills give agents capability.
@@ -38,6 +42,14 @@ to:
 - Quality gates give agents evidence discipline.
 - Harness profiles give agents project-specific operating context.
 - Markdown remains the source of truth.
+
+## Distribution Philosophy
+
+- the canonical source lives in this repository
+- users should consume it as a capability pack
+- adoption can happen by copy, install script, vendoring, release archive, or a future plugin registry
+- target repositories should receive only the operating surface they need
+- the harness should feel like a superpower pack for AI engineering
 
 ## Source Inspirations
 
@@ -128,9 +140,13 @@ And the agent should produce:
 - no LangGraph
 - no Redis/Neo4j/Meilisearch
 - no background workers
-- no marketplace/plugin packaging
+- no heavy marketplace or package publishing automation yet
 - no large skill catalog import
 - no package publishing automation
+
+Plugin-like consumption is a goal.
+
+Marketplace packaging is a later optional distribution channel.
 
 ## Decision Rule
 

@@ -14,13 +14,17 @@ Use this walkthrough when:
 
 ## Prerequisites
 
-- a local clone of `ai-engineering-harness`
+- a local clone of `ai-engineering-harness` as the harness source pack
 - a local target repository path such as `../my-project`
 - Node.js available to run `install.js` and `validate.js`
 
+The source clone is only the harness source.
+
+The target repository is the actual project where product work happens.
+
 ## Step 1: Dry Run Install
 
-Preview the copy surface first:
+Preview the plugin-like operating surface first:
 
 ```bash
 node install.js --target ../my-project --dry-run
@@ -30,13 +34,13 @@ Review the `WOULD COPY` lines and confirm the target path is correct.
 
 ## Step 2: Run Install
 
-If the dry run looks correct, perform the real install:
+If the dry run looks correct, perform the real install into the target project:
 
 ```bash
 node install.js --target ../my-project
 ```
 
-Read the printed next-step guidance at the end of the install output.
+Read the printed next-step guidance at the end of the install output. The install copies the markdown operating surface into the target repository.
 
 ## Step 3: Read The Installed Entry Points
 

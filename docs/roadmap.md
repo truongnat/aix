@@ -53,6 +53,13 @@
 - improve ergonomics without adding runtime systems
 - keep validation structural-only and markdown-first
 
+## V5: Plugin Distribution Model
+
+- `v0.5.0`: Plugin Distribution Model
+- clarify the harness as a capability pack
+- support plugin-like consumption
+- keep runtime adapters and marketplace automation out of scope for now
+
 ## Later Optional Work
 
 - optional deeper validation ideas beyond structural harness contracts

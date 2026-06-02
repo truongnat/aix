@@ -14,7 +14,9 @@ Plan. Build. Verify. Ship. Remember — with durable markdown artifacts.
 
 </div>
 
-`ai-engineering-harness` helps AI coding agents work like disciplined engineering partners instead of improvising in a single prompt. It uses markdown commands, skills, workflows, memory, team patterns, and quality gates to create durable project-specific operating context.
+`ai-engineering-harness` is a plugin-like markdown capability pack for AI coding agents. It helps agents load engineering discipline into an existing repository instead of improvising in a single prompt.
+
+It can be installed or vendored into an existing repo. You do not use this repository as your product app repo.
 
 See [TARGET.md](TARGET.md) for the long-term target.
 
@@ -38,6 +40,7 @@ See [TARGET.md](TARGET.md) for the long-term target.
 ## ✨ What It Is
 
 - A markdown-first harness design system for AI-assisted engineering work
+- A plugin-like capability pack that can be installed into an existing repository
 - A portable operating model for planning, execution, verification, shipping, and memory
 - A repo-friendly approach that works with Claude Code, Codex, Cursor, Gemini, OpenCode, or any agent that can read files
 
@@ -86,6 +89,8 @@ node install.js --target ../my-project --dry-run
 node install.js --target ../my-project
 ```
 
+The clone above is the harness source pack. Your actual product work happens in the target repository.
+
 Target validation examples:
 
 ```bash
@@ -109,6 +114,8 @@ Then:
 | Long-term direction | [TARGET.md](TARGET.md) |
 | Agent contract | [AGENTS.md](AGENTS.md) |
 | Adoption guide | [docs/adoption-guide.md](docs/adoption-guide.md) |
+| Plugin model | [docs/plugin-model.md](docs/plugin-model.md) |
+| Distribution model | [docs/distribution-model.md](docs/distribution-model.md) |
 | Build a harness profile | [docs/harness-build-usage.md](docs/harness-build-usage.md) |
 | Copy-paste prompts | [docs/harness-build-prompts.md](docs/harness-build-prompts.md) |
 | Validate adopted profile | [docs/target-repo-validation.md](docs/target-repo-validation.md) |
@@ -132,6 +139,8 @@ Then:
 ## 🎯 Release Status
 
 - Current release: [`v0.4.0`](docs/v0.4.0-release-notes.md)
+- Next planned release: `v0.5.0` Plugin Distribution Model
+  ([strategy](docs/v0.5.0-strategy.md) · [plan](docs/v0.5.0-plan.md))
 - `v0.4.0` docs: [notes](docs/v0.4.0-release-notes.md) · [readiness](docs/v0.4.0-readiness.md) · [scope](docs/v0.4.0-release-scope.md)
 - Previous releases: [`v0.3.0`](docs/v0.3.0-release-notes.md), [`v0.2.0`](docs/v0.2.0-release-notes.md), [`v0.1.0`](docs/v0.1.0-release-notes.md)
 - Release docs: [v0.3.1 notes](docs/v0.3.1-release-notes.md) · [v0.3.0 readiness](docs/v0.3.0-readiness.md) · [changelog](CHANGELOG.md)
