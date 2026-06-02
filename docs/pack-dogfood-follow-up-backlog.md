@@ -6,11 +6,14 @@ Triage dogfood findings from [pack-dogfood-friction-log.md](pack-dogfood-frictio
 
 Doc clarifications, scenario fixes, and small guidance updates that do not change core contracts.
 
-- Document that `node validate.js --target` must run from the source pack (Scenario A)
-- Note install summary absolute paths when sharing dogfood evidence (Scenario A)
 - Optional: Scenario A quick-path doc linking plan, install walkthrough, and scenarios
-- Bridge doc: flutter-google-login example → `.harness/` validator heading contracts (Scenario B)
-- Clarify examples/harness-build tree vs target `.harness/goals/` layout (Scenario B)
+
+## Addressed In v0.8.0 Fix Pass
+
+- Document that `node validate.js --target` runs from the source pack (Scenarios A, B)
+- Install summary prefers `--target` argument / safe relative display (Scenarios A, B)
+- [harness-example-to-target-layout.md](harness-example-to-target-layout.md) for example → `.harness/` mapping (Scenario B)
+- flutter-google-login README layout vs target layout (Scenario B)
 
 ## v0.9 Contract Freeze Candidates
 

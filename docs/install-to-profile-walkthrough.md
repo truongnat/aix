@@ -72,13 +72,18 @@ For a minimal reference shape, use:
 
 - `examples/tiny-repo-adoption/`
 
+When using richer examples such as flutter-google-login, map `examples/...` paths to `.harness/` in the target repo. See [harness-example-to-target-layout.md](harness-example-to-target-layout.md).
+
 ## Step 5: Validate Profile
 
-Run profile validation:
+Run profile validation **from the harness source pack** (not from inside the target repo):
 
 ```bash
+# cwd: ai-engineering-harness clone
 node validate.js --target ../my-project --profile-only
 ```
+
+`validate.js` is not copied into the target repo by default. Use `--target` to check the host repository’s `.harness/` artifacts.
 
 Fix any missing files or headings before moving on.
 
@@ -96,7 +101,7 @@ Create a goal artifact set such as:
 
 ## Step 7: Validate Goal
 
-Run goal validation:
+Run goal validation from the source pack:
 
 ```bash
 node validate.js --target ../my-project --goal health-check

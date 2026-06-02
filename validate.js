@@ -60,6 +60,7 @@ const requiredFiles = [
   "docs/pack-dogfood-report-template.md",
   "docs/pack-dogfood-friction-log.md",
   "docs/pack-dogfood-follow-up-backlog.md",
+  "docs/harness-example-to-target-layout.md",
   "docs/pack-dogfood-reports/scenario-a-tiny-health-check.md",
   "docs/pack-dogfood-reports/scenario-b-frontend-mobile-feature.md",
   "docs/packaging-model.md",

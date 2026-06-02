@@ -5,6 +5,20 @@ This document defines the current lightweight validation mode for a host reposit
 Profile validation is the first implemented target-repository step.
 Goal-level validation is the second implemented target-repository step.
 
+## Run Validation From The Source Pack
+
+`validate.js` normally runs from the **harness source pack** repository with `--target <target-repo>`.
+
+```bash
+# From ai-engineering-harness (source pack), not from the target repo
+node validate.js --target ../my-project --profile-only
+node validate.js --target ../my-project --goal <goal-id>
+```
+
+Target repositories do not receive `validate.js` in the default installed surface from `install.js`. That is intentional: one canonical validator stays with the pack source unless a future contract adds an optional in-target copy.
+
+Install copies the markdown operating surface into the target repo; structural checks still use the source pack’s `validate.js` against the target path.
+
 ## What Target Repo Validation Means
 
 Target repo validation means checking whether a host repository contains the minimum adopted harness structure and profile artifacts needed to operate the harness safely and consistently.

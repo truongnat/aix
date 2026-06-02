@@ -28,3 +28,16 @@ Do not paste secrets, tokens, customer data, or private business details. Summar
 - **v0.9 contract candidate**: may require contract freeze or validator change in `v0.9.0`
 - **v1 blocker**: must resolve before `v1.0.0`
 - **later optional work**: automation, adapters, marketplace—explicitly deferred
+
+## Fix Pass Notes
+
+Addressed in v0.8.0 Step 4 (dogfood fix pass):
+
+| Scenario | Friction | Status |
+|---|---|---|
+| A, B | Install summary absolute target path | **addressed** — `install.js` uses `--target` argument or safe relative display in summary and next steps |
+| A, B | `validate.js` runs from source pack with `--target` | **addressed** — `target-repo-validation.md`, install walkthrough, install next steps |
+| B | Example shape vs `.harness/` validator contracts | **partially addressed** — [harness-example-to-target-layout.md](harness-example-to-target-layout.md); example files not rewritten |
+| B | Example goals under `examples/...` vs `.harness/goals/` | **addressed** — flutter-google-login README + layout guide |
+
+**Deferred:** optional minimal install tier (see follow-up backlog, v0.9 / later).

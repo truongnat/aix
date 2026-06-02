@@ -15,6 +15,9 @@
 
 - Scenario A tiny repo health-check dogfood report
 - Scenario B frontend/mobile feature dogfood report
+- dogfood-driven validation and source-pack clarification
+- harness example to target layout guide
+- dogfood fix pass for Scenario A/B findings
 
 ## [0.7.0] - 2026-06-02
 

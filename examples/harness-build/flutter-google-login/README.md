@@ -21,6 +21,21 @@ It is not a real Flutter app. It is a markdown-only harness profile example with
 11. [goals/google-login/VERIFY.md](goals/google-login/VERIFY.md)
 12. [goals/google-login/REMEMBER.md](goals/google-login/REMEMBER.md)
 
+## Example Layout vs Target Repo Layout
+
+This directory lives under `examples/harness-build/flutter-google-login/` in the **source pack** for demonstration and documentation.
+
+In a **real target repository** after install:
+
+- create profile artifacts under `.harness/` (not under `examples/`)
+- create goal artifacts under `.harness/goals/<goal-id>/` (not under `examples/.../goals/`)
+
+`node validate.js --target <path>` checks `.harness/` contracts in the target repo. It does not validate this example tree path.
+
+See [docs/harness-example-to-target-layout.md](../../../docs/harness-example-to-target-layout.md) for the full mapping table.
+
+Example section shapes may be richer than the heading contracts required in target `.harness/` files. Normalize to validator contracts when adopting.
+
 ## What This Shows
 
 - a project-specific harness profile

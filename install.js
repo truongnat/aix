@@ -29,9 +29,26 @@ const exportPaths = [
   "docs/runtime-compatibility.md"
 ];
 
+function formatTargetDisplay(targetArg, resolvedTarget) {
+  if (targetArg !== null) {
+    return targetArg;
+  }
+
+  const relative = path.relative(root, resolvedTarget);
+  if (relative === "") {
+    return ".";
+  }
+  if (!relative.startsWith("..") && !path.isAbsolute(relative)) {
+    return relative;
+  }
+
+  return resolvedTarget;
+}
+
 function parseArgs(argv) {
   const options = {
     target: process.cwd(),
+    targetArg: null,
     dryRun: false,
     force: false
   };
@@ -44,6 +61,7 @@ function parseArgs(argv) {
       if (!value) {
         throw new Error("Missing value for --target");
       }
+      options.targetArg = value;
       options.target = value;
       index += 1;
       continue;
@@ -62,9 +80,12 @@ function parseArgs(argv) {
     throw new Error(`Unknown argument: ${arg}`);
   }
 
+  const resolvedTarget = path.resolve(options.target);
+
   return {
     ...options,
-    target: path.resolve(options.target)
+    target: resolvedTarget,
+    targetDisplay: formatTargetDisplay(options.targetArg, resolvedTarget)
   };
 }
 
@@ -156,7 +177,7 @@ function summarizeResults(results) {
 function formatSummary(options, summary) {
   return [
     "Install summary:",
-    `- target: ${options.target}`,
+    `- target: ${options.targetDisplay}`,
     `- mode: ${options.dryRun ? "dry-run" : "write"}`,
     `- copied: ${summary.copied}`,
     `- skipped: ${summary.skipped}`,
@@ -169,7 +190,7 @@ function formatNextSteps(options) {
     return [
       "Next steps:",
       "1. Review the files marked WOULD COPY.",
-      `2. Run: node install.js --target ${options.target}`,
+      `2. Run: node install.js --target ${options.targetDisplay}`,
       "3. After install, create .harness/ profile artifacts."
     ].join("\n");
   }
@@ -180,7 +201,7 @@ function formatNextSteps(options) {
     "2. Read AGENTS.md.",
     "3. Create .harness/HARNESS.md, TEAM.md, SKILLS.md, WORKFLOW.md, GATES.md, and MEMORY.md.",
     "4. Use docs/harness-build-usage.md for the profile creation flow.",
-    `5. Validate: node validate.js --target ${options.target} --profile-only`
+    `5. Validate from the harness source pack: node validate.js --target ${options.targetDisplay} --profile-only`
   ].join("\n");
 }
 
@@ -208,6 +229,7 @@ if (require.main === module) {
 module.exports = {
   exportPaths,
   formatResults,
+  formatTargetDisplay,
   formatNextSteps,
   formatSummary,
   installHarness,

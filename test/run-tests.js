@@ -9,6 +9,7 @@ const {
   exportPaths,
   formatNextSteps,
   formatSummary,
+  formatTargetDisplay,
   installHarness,
   parseArgs,
   summarizeResults
@@ -77,19 +78,34 @@ runTest("install.js summary helper counts copied and skipped actions", () => {
 
 runTest("install.js next steps helper explains dry-run follow-up", () => {
   const text = formatNextSteps({
-    target: "/tmp/example-target",
+    target: path.resolve("/tmp/example-target"),
+    targetDisplay: "../my-project",
     dryRun: true
   });
 
   assert.match(text, /Next steps:/);
   assert.match(text, /Review the files marked WOULD COPY/);
-  assert.match(text, /node install\.js --target \/tmp\/example-target/);
+  assert.match(text, /node install\.js --target \.\.\/my-project/);
+});
+
+runTest("install.js formatTargetDisplay prefers --target argument", () => {
+  const resolved = path.resolve(repoRoot, "../harness-dogfood-tiny");
+
+  assert.equal(formatTargetDisplay("../harness-dogfood-tiny", resolved), "../harness-dogfood-tiny");
+});
+
+runTest("install.js parseArgs sets targetDisplay from --target argument", () => {
+  const options = parseArgs(["--target", "../my-project", "--dry-run"]);
+
+  assert.equal(options.targetDisplay, "../my-project");
+  assert.equal(options.target, path.resolve(repoRoot, "../my-project"));
 });
 
 runTest("install.js summary helper formats compact install summary", () => {
   const text = formatSummary(
     {
-      target: "/tmp/example-target",
+      target: path.resolve("/tmp/example-target"),
+      targetDisplay: "../my-project",
       dryRun: false
     },
     {
@@ -101,6 +117,7 @@ runTest("install.js summary helper formats compact install summary", () => {
 
   assert.match(text, /Install summary:/);
   assert.match(text, /- mode: write/);
+  assert.match(text, /- target: \.\.\/my-project/);
   assert.match(text, /- copied: 5/);
   assert.match(text, /- skipped: 2/);
 });

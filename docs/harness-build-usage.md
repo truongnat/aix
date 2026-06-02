@@ -23,6 +23,10 @@ This guide explains how to use `harness-build` manually with an AI coding agent 
 - the agent can read repository markdown files and write `.harness/` artifacts
 - a human reviewer is available to approve the generated harness profile
 
+## Example Layout In The Source Pack
+
+If you are reading `examples/harness-build/flutter-google-login/` or similar demos, see [harness-example-to-target-layout.md](harness-example-to-target-layout.md) for how example paths map to `.harness/` in a real target repository.
+
 ## Recommended Read Order
 
 1. `TARGET.md`
