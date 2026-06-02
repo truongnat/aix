@@ -7,6 +7,7 @@ Triage dogfood findings from [pack-dogfood-friction-log.md](pack-dogfood-frictio
 - One-line install: improve `install.js` next steps to mention `curl | sh` install path and validate-from-source-pack ([scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md))
 - Repeat: install summary relative target display when invoked via `install.sh` with relative `--target`
 - D2: document `codex exec --skip-git-repo-check` for non-git throwaway targets
+- D3: runtime-aware `validate.js --profile-only` or document Cursor-only repos without `AGENTS.md` ([scenario-d3-cursor-project.md](pack-dogfood-reports/scenario-d3-cursor-project.md))
 
 ## v0.8.x Patch Candidates
 
@@ -41,6 +42,7 @@ Issues that must be resolved before a stable `v1.0.0` capability pack release.
 - **No v1 blockers found in Scenario C** (one-line `curl | sh` install, profile and goal validation succeeded)
 - **No v1 blockers found in Scenario D1** (generic project runtime-native install, no root pollution, profile validation succeeded)
 - **No v1 blockers found in Scenario D2** (codex project install, no root pollution, profile validation succeeded; manual Codex BLOCKED by API limit, bootstrap merge gap is v0.9.x patch not v1 blocker)
+- **No v1 blockers found in Scenario D3** (cursor install and `.mdc` payload pass; `--profile-only` AGENTS.md gap is v0.9 contract candidate, not install failure)
 
 ## Post-v1 Optional Work
 

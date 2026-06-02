@@ -65,6 +65,7 @@ See:
 | Runtime-native modes | **Implemented, dogfood in progress** — see [runtime-native-install-audit.md](runtime-native-install-audit.md) |
 | `generic` + `project` + `--init-harness` | **experimental PASS** (Scenario D1) — [scenario-d1-generic-project.md](pack-dogfood-reports/scenario-d1-generic-project.md) |
 | `codex` + `project` + `--init-harness` | **experimental PASS** (Scenario D2) — [scenario-d2-codex-project.md](pack-dogfood-reports/scenario-d2-codex-project.md) |
+| `cursor` + `project` + `--init-harness` | **experimental PASS** (Scenario D3) — [scenario-d3-cursor-project.md](pack-dogfood-reports/scenario-d3-cursor-project.md); `--profile-only` needs `AGENTS.md` or future runtime-aware validation |
 
 Do **not** treat runtime-native modes as **stable** until per-runtime dogfood passes and audit matrix is updated. Generic project is dogfooded; other runtimes remain pending per [runtime-native-install-dogfood-plan.md](runtime-native-install-dogfood-plan.md).
 

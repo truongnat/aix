@@ -79,7 +79,9 @@ sh install.sh --runtime codex --scope project --target <repo> --init-harness --y
 
 ---
 
-## 3. Cursor (project)
+## 3. Cursor (project) — completed (Scenario D3)
+
+**Status:** **experimental PASS** (file/install) — [scenario-d3-cursor-project.md](pack-dogfood-reports/scenario-d3-cursor-project.md) (2026-06-02). `--profile-only` **FAIL** (missing `AGENTS.md` — contract gap). Manual Cursor IDE check **not run**. Stable claim **No**.
 
 **Command:**
 

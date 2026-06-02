@@ -19,7 +19,7 @@ D1/D2 dogfood found `--init-harness` creating a minimal `AGENTS.md` before `gene
 | [runtime/](../runtime/) | Minimal payloads (rules, plugin JS, extension manifest, AGENTS snippets) |
 | [install.js](../install.js) | **Manual fallback only** — copies installed surface to target root |
 
-Automated tests cover file creation and dry-run for several paths. **Scenarios D1–D2** dogfood **generic** and **codex (project)** in external repos. **No external dogfood reports yet** for Claude, Cursor, Gemini, or OpenCode in real tools.
+Automated tests cover file creation and dry-run for several paths. **Scenarios D1–D3** dogfood **generic**, **codex**, and **cursor (project)** in external repos. **No external dogfood reports yet** for Claude, Gemini, or OpenCode in real tools.
 
 ## Runtime Payload Inventory
 
@@ -43,7 +43,7 @@ Automated tests cover file creation and dry-run for several paths. **Scenarios D
 | **manual** | `install.js` → root copy | target only | High (Scenario C) | Dogfooded (one-line) | **No** (fallback only) |
 | **generic** | `AGENTS.md` bootstrap | project | High | **D1 completed** ([scenario-d1-generic-project.md](pack-dogfood-reports/scenario-d1-generic-project.md)) — experimental PASS | **No** |
 | **codex** | `AGENTS.md` or `~/.codex/AGENTS.md` | project, global | High (file/install); manual CLI **BLOCKED** (usage limit) | **D2 completed** ([scenario-d2-codex-project.md](pack-dogfood-reports/scenario-d2-codex-project.md)) — experimental PASS | **No** |
-| **cursor** | `.cursor/rules/ai-engineering-harness.mdc` | project, global | Medium (rules docs verified; IDE behavior not dogfooded) | Not dogfooded | **No** |
+| **cursor** | `.cursor/rules/ai-engineering-harness.mdc` | project, global | High (file/install); manual IDE **not run** | **D3 completed** ([scenario-d3-cursor-project.md](pack-dogfood-reports/scenario-d3-cursor-project.md)) — experimental PASS; `--profile-only` fails without `AGENTS.md` | **No** |
 | **windsurf** | Same as cursor (`--runtime windsurf` alias) | project, global | Medium (alias only) | Not dogfooded | **No** |
 | **opencode** | `.opencode/plugins/*.js`, `opencode.json` | project, global | Medium (OpenCode plugin docs; plugin is minimal console bootstrap) | Not dogfooded | **No** |
 | **gemini** | `~/.gemini/extensions/...` or `<repo>/.gemini/extensions/...` | project, global | **Low–Medium** (project path is best-effort) | Not dogfooded | **No** |
@@ -69,6 +69,7 @@ Automated tests cover file creation and dry-run for several paths. **Scenarios D
 4. **Cursor global:** Writes `~/.cursor/rules/` if home dir exists; Cursor User Rules in app UI may still be separate.
 5. **`all` runtime:** Multiple `AGENTS.md` / config writes in one target; order is fixed in `ALL_RUNTIMES` — review for redundancy.
 6. **Overclaim in README/marketing:** Must say **experimental** until per-runtime dogfood passes.
+7. **Profile validation vs Cursor-only install:** `validate.js --profile-only` requires `AGENTS.md`; Cursor project mode does not create it (D3). Needs runtime-aware validation or documented exception — not a Cursor install bug.
 
 ## Runtime-by-Runtime Audit
 
