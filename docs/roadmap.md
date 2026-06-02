@@ -84,9 +84,10 @@
 ## V8: Real Capability Pack Dogfood
 
 - `v0.8.0`: Real Capability Pack Dogfood
-- prove the capability pack in real or semi-real target repositories
-- evidence from install/copy, runtime usage, profile and goal artifacts, and structural validation
-- friction log and follow-up backlog toward `v0.9` contract freeze and `v1.0.0`
+- implemented in this release
+- Scenario A and Scenario B satisfied minimum dogfood requirement (two repos, two runtimes)
+- evidence from install/copy, profile and goal artifacts, and structural target validation
+- friction log, follow-up backlog, and dogfood fix pass
 - no runtime adapter work and no distribution automation in this release
 
 ## V9: Stable Contract Freeze (planned)
@@ -112,6 +113,8 @@
 - optional context warnings for non-required artifacts
 - optional interactive setup wizard
 - optional automatic harness or profile generation
+- optional Scenario C dogfood (backend/tooling) beyond minimum two-scenario bar
+- optional minimal install tier for tiny repositories (v0.9 discussion)
 - optional package or marketplace distribution automation
 - optional plugin registry distribution
 - optional memory backend integrations
@@ -127,6 +130,6 @@
 - `v0.5.0`: Plugin Distribution Model
 - `v0.6.0`: Runtime Consumption Guides
 - `v0.7.0`: Capability Pack Packaging
-- `v0.8.0`: Real Capability Pack Dogfood (in progress)
+- `v0.8.0`: Real Capability Pack Dogfood
 
 Heavy runtime systems remain out of scope for v1. Any future automation should support the markdown operating model rather than replace it.

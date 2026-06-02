@@ -18,6 +18,8 @@
 - dogfood-driven validation and source-pack clarification
 - harness example to target layout guide
 - dogfood fix pass for Scenario A/B findings
+- v0.8.0 readiness audit
+- v0.8.0 release scope documentation
 
 ## [0.7.0] - 2026-06-02
 

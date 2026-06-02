@@ -56,6 +56,8 @@ const requiredFiles = [
   "docs/v0.7.0-release-scope.md",
   "docs/v0.7.0-release-notes.md",
   "docs/v0.8.0-plan.md",
+  "docs/v0.8.0-readiness.md",
+  "docs/v0.8.0-release-scope.md",
   "docs/pack-dogfood-scenarios.md",
   "docs/pack-dogfood-report-template.md",
   "docs/pack-dogfood-friction-log.md",
