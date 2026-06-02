@@ -20,6 +20,7 @@ const {
   validateTargetProfile
 } = require(path.join(repoRoot, "validate.js"));
 const invalidFixture = path.join(repoRoot, "test", "fixtures", "invalid-harness");
+const invalidPackManifestFixture = path.join(repoRoot, "test", "fixtures", "invalid-pack-manifest");
 const invalidHarnessProfileFixture = path.join(repoRoot, "test", "fixtures", "invalid-harness-profile");
 const validTargetProfileFixture = path.join(repoRoot, "test", "fixtures", "valid-target-profile");
 const invalidTargetProfileFixture = path.join(repoRoot, "test", "fixtures", "invalid-target-profile");
@@ -184,6 +185,19 @@ runTest("validate.js reports missing adoption docs and AGENTS contract headings"
   assert.ok(failures.includes("Missing required path: docs/runtime-compatibility.md"));
   assert.ok(failures.includes("AGENTS.md is missing heading: ## Completion Gate"));
   assert.ok(failures.includes("AGENTS.md is missing heading: ## Memory Discipline"));
+});
+
+runTest("validate.js reports missing PACK.md required heading", () => {
+  const failures = validateRepository(invalidPackManifestFixture);
+
+  assert.ok(failures.includes("PACK.md is missing heading: ## Non-Goals"));
+});
+
+runTest("PACK.md heading validation passes for current repository", () => {
+  const failures = validateRepository(repoRoot);
+  const packFailures = failures.filter((failure) => failure.startsWith("PACK.md"));
+
+  assert.deepEqual(packFailures, []);
 });
 
 runTest("validateTargetProfile passes valid fixture", () => {

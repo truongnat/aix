@@ -19,6 +19,7 @@ Do not treat this checklist as application correctness validation. It verifies p
 
 ## Manifest Checks
 
+- [ ] `node validate.js` passes PACK.md required heading checks for the source pack
 - [ ] `PACK.md` exists at the repository or archive root
 - [ ] **Pack Name** is stable (`ai-engineering-harness`)
 - [ ] **Pack Version** matches the release intent (for example `v0.7.0`, not an old tag)
@@ -32,6 +33,8 @@ Do not treat this checklist as application correctness validation. It verifies p
 - [ ] **Non-Goals** are present (no npm publishing, marketplace, adapters, semantic validation)
 
 Compare manifest sections to [pack-manifest-spec.md](pack-manifest-spec.md).
+
+Heading validation does not replace this section. Confirm body content, version intent, and doc alignment manually.
 
 ## Included Surface Checks
 

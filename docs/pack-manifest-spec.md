@@ -76,8 +76,14 @@ Do not add optional sections to `v0.7.0` unless they stay simple and dependency-
 
 ## Validation Expectations
 
-Structural validation may check that `PACK.md` exists and contains required section headings.
+`node validate.js` checks that `PACK.md` exists and contains required section headings.
 
-Manifest validation must not parse markdown bodies beyond heading presence checks unless explicitly added in a later step.
+Current validation is heading-only:
+
+- it checks required `##` heading presence
+- it does not validate heading order
+- it does not validate body contents
+- it does not validate pack version values
+- it does not validate release archive file lists
 
 Maintainers should complete [pack-verification-checklist.md](pack-verification-checklist.md) before each release or manual archive distribution to confirm manifest content matches installed surface, release archive, and runtime docs.

@@ -14,6 +14,7 @@
 ### Added
 
 - pack verification checklist
+- lightweight PACK.md heading validation
 
 ## [0.6.0] - 2026-06-02
 

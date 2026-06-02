@@ -203,6 +203,18 @@ const templateFiles = [
 ];
 
 const agentsRequiredHeadings = ["## Completion Gate", "## Memory Discipline"];
+const packRequiredHeadings = [
+  "## Pack Name",
+  "## Pack Version",
+  "## Pack Type",
+  "## Purpose",
+  "## Included Surface",
+  "## Consumption Modes",
+  "## Runtime Compatibility",
+  "## Validation Commands",
+  "## Safety Boundaries",
+  "## Non-Goals"
+];
 const skillTemplateHeadings = [
   "## Purpose",
   "## Boundary",
@@ -414,7 +426,8 @@ function countCheckedContracts() {
     taskHeadings.length +
     executionHeadings.length +
     Object.values(goalArtifactHeadings).reduce((sum, headings) => sum + headings.length, 0) +
-    agentsRequiredHeadings.length
+    agentsRequiredHeadings.length +
+    packRequiredHeadings.length
   );
 }
 
@@ -465,6 +478,7 @@ function validateHarnessRepository(baseDir = root) {
     assertHeadings(baseDir, `examples/tiny-repo-adoption/goals/health-check/${fileName}`, headings, failures);
   }
   assertAgentsContent(baseDir, failures);
+  assertHeadings(baseDir, "PACK.md", packRequiredHeadings, failures);
 
   return failures;
 }
