@@ -39,6 +39,7 @@ const requiredFiles = [
   "docs/adoption-guide.md",
   "docs/install-output-example.md",
   "docs/install-to-profile-walkthrough.md",
+  "docs/validation-troubleshooting.md",
   "docs/adoption-smoke-test.md",
   "docs/usage-examples.md",
   "docs/host-repo-checklist.md",

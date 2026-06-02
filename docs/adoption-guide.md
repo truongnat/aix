@@ -211,6 +211,8 @@ Recommended first follow-up validation:
 node validate.js --target ../my-project --profile-only
 ```
 
+If validation fails, use [docs/validation-troubleshooting.md](validation-troubleshooting.md).
+
 For a very small repository or when learning the artifact shape first, use:
 
 - [examples/tiny-repo-adoption/](../examples/tiny-repo-adoption/)

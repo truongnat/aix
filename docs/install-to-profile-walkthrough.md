@@ -76,6 +76,8 @@ node validate.js --target ../my-project --profile-only
 
 Fix any missing files or headings before moving on.
 
+If validation fails, use [docs/validation-troubleshooting.md](validation-troubleshooting.md).
+
 ## Step 6: Create Goal Artifacts
 
 Create a goal artifact set such as:
@@ -95,6 +97,8 @@ node validate.js --target ../my-project --goal health-check
 ```
 
 Treat the result as a structural artifact check, not as proof that the application is correct.
+
+If validation fails, use [docs/validation-troubleshooting.md](validation-troubleshooting.md).
 
 ## Step 8: Proceed To Planning
 

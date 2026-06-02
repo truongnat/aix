@@ -130,6 +130,8 @@ node validate.js --target ../my-project --goal google-login
   - failing output starts with:
     `Target repository validation failed:`
 
+If a target validation run fails, use [docs/validation-troubleshooting.md](validation-troubleshooting.md) for quick fixes.
+
 Usage safety notes:
 
 - target validation is structural only

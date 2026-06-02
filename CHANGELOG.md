@@ -20,6 +20,7 @@
 - small repo memory conventions
 - compact small memory template
 - install-to-profile walkthrough
+- validation troubleshooting guide
 
 ## [0.3.1] - 2026-06-02
 
