@@ -16,6 +16,15 @@ That is where agents should read the installed harness surface, create `.harness
 
 ## The Shortest Current Flow
 
+**Consumers (recommended, experimental):** [install-sh-usage.md](install-sh-usage.md)
+
+```bash
+sh install.sh --runtime generic --scope project --init-harness --yes
+node validate.js --target ../my-project --runtime generic --profile-only   # from source pack
+```
+
+**Maintainers (source pack):**
+
 ```bash
 node install.js --target ../my-project --dry-run
 node install.js --target ../my-project

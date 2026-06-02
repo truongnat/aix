@@ -9,6 +9,7 @@ Use this checklist to prepare a manual release without adding release automation
 - confirm the intended release scope is documentation-first
 - confirm no runtime layer or dependency creep was introduced
 - confirm the repository still reflects the markdown-first operating model
+- confirm no `harness-dogfood-*` target repos or temp/debug artifacts are tracked (reports may reference `../harness-dogfood-*` paths only)
 
 ## Documentation Checks
 

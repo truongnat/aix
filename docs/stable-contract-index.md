@@ -8,9 +8,9 @@ Use this index before making changes that affect adopters, validators, or packag
 
 ## Pre-v1 Status (Pivot)
 
-Tag `v0.9.0` shipped **draft contract records** (`docs/frozen-*.md`). They are **not final v1.0.0 freeze** until **Plugin Install UX** is implemented and dogfooded ([plugin-install-ux.md](plugin-install-ux.md), [v0.9.0-plan.md](v0.9.0-plan.md)).
+Tag `v0.9.0` shipped **draft contract records** (`docs/frozen-*.md`). Tag **`v0.9.1`** shipped the **experimental runtime-native installer** (dogfood C + D1–D6) — [v0.9.1-release-notes.md](v0.9.1-release-notes.md).
 
-Treat frozen docs as **pre-v1 contract candidates**—accurate for structural behavior today, but adoption UX must match plugin-style install before v1 lock.
+Frozen docs remain **pre-v1 contract candidates** until v1 re-freeze. Runtime-native install paths are **experimental**; manual root copy is **fallback only** ([plugin-install-ux.md](plugin-install-ux.md)).
 
 ## Contract Status
 
@@ -26,7 +26,7 @@ Treat frozen docs as **pre-v1 contract candidates**—accurate for structural be
 | Source vs target boundary | pack vs product repo | **pre-v1 candidate** — [frozen-source-target-boundary-contract.md](frozen-source-target-boundary-contract.md) |
 | Runtime install matrix | per-runtime paths and scopes | **experimental** — [runtime-native-install-audit.md](runtime-native-install-audit.md) |
 | Interactive installer | runtime + scope wizard | **implemented** — [interactive-installer-design.md](interactive-installer-design.md) |
-| Runtime-native writes | `install-runtime.js` | **experimental** — dogfood pending — [runtime-native-install-dogfood-plan.md](runtime-native-install-dogfood-plan.md) |
+| Runtime-native writes | `install-runtime.js` | **experimental** — D1–D6 dogfood complete; stable **No** — [runtime-dogfood-summary.md](runtime-dogfood-summary.md) |
 | Project state policy | `.harness/` per repo vs global plugin | **implemented** (scaffold) — [harness-init-usage.md](harness-init-usage.md) |
 | Plugin install UX (fallback) | one-line `install.sh` + `install.js` copy | **dogfooded; fallback only** — [install.sh](../install.sh), [install-sh-usage.md](install-sh-usage.md), [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md) |
 

@@ -63,7 +63,7 @@ curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/ma
 
 Manual clone and `node install.js --target <repo>` remain supported for **maintainers**, not as the only adoption path.
 
-See [docs/plugin-install-ux.md](docs/plugin-install-ux.md) and [docs/v0.9.0-plan.md](docs/v0.9.0-plan.md).
+**`v0.9.1` (experimental):** runtime-native install via `install.sh --runtime <name> --scope project --init-harness` — [plugin-install-ux.md](docs/plugin-install-ux.md), [v0.9.1-release-notes.md](docs/v0.9.1-release-notes.md). Manual root copy remains fallback. Plan history: [v0.9.0-plan.md](docs/v0.9.0-plan.md).
 
 ## Source Inspirations
 

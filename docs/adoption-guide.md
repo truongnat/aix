@@ -39,6 +39,8 @@ Recommended manual steps:
 
 The source pack includes a dependency-free installer.
 
+**Consumers:** prefer runtime-native `install.sh` (`v0.9.1`, experimental) — [install-sh-usage.md](install-sh-usage.md), [plugin-install-ux.md](plugin-install-ux.md). The flows below are **maintainer** `install.js` root copy (same surface as manual fallback).
+
 ### Basic Copy
 
 ```bash

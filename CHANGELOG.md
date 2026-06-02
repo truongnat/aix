@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Final cleanup pass: stale “installer not shipped” docs updated; pin examples use `v0.9.1`; `.gitignore` excludes local `harness-dogfood-*` dirs
+
 ## [0.9.1] - 2026-06-02
 
 **Experimental Runtime-Native Installer** — runtime-native modes are experimental; stable per-runtime support is **not** claimed. See [v0.9.1-release-notes.md](docs/v0.9.1-release-notes.md).

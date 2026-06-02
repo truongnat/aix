@@ -39,11 +39,11 @@ clone harness repo → cd into harness → point installer at my repo
 
 ## Target Direction: Interactive Runtime-native Installer
 
-The **final** consumer UX is **not** “copy the capability pack into the product repo root.”
+The **recommended** consumer UX is **not** “copy the capability pack into the product repo root.”
 
-Target flow (design only until implemented):
+Target flow (**shipped in `v0.9.1`**, experimental):
 
-1. Choose **runtime** (Claude, Codex, Cursor, Gemini, OpenCode, generic, all, or manual fallback)
+1. Choose **runtime** (Claude, Codex, Cursor, Gemini, OpenCode, generic, or manual fallback — avoid `all` until dogfooded)
 2. Choose **scope** (global vs project)
 3. Install into **runtime-correct locations** only
 4. Create **project-local** `.harness/` only for project scope or explicit init

@@ -4,15 +4,24 @@
 
 Document the one-line remote installer for `ai-engineering-harness` into a target repository without manual clone.
 
-## Important: Fallback / Manual Installer
+## Recommended: Runtime-native Install
 
-**Current `install.sh` is not the final runtime-native plugin installer.**
+`install.sh` supports **runtime** + **scope** selection and calls [install-runtime.js](../install-runtime.js) for non-`manual` runtimes. Modes are **experimental** until manual session checks pass — see [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
 
-It downloads the pack and runs `install.js`, which **copies** the default installed surface into the target repo root (`AGENTS.md`, `commands/`, `skills/`, `workflows/`, `patterns/`, `templates/`, `docs/`, …). That path is **fallback / manual** only until the interactive installer ships.
+```bash
+sh install.sh --runtime cursor --scope project --init-harness --dry-run --yes
+sh install.sh --runtime cursor --scope project --init-harness --yes
+```
 
-Target UX: choose **runtime** + **scope** → install to runtime-correct locations → project-local `.harness/` only when needed.
+Pin a release: `--ref v0.9.1` ([plugin-install-security.md](plugin-install-security.md)).
 
-## Runtime Selector (Step 4)
+Validate from the source pack: `node validate.js --target <repo> --runtime <name> --profile-only` ([runtime-aware-validation.md](runtime-aware-validation.md)).
+
+## Manual Fallback (root copy)
+
+Non-interactive `curl | sh` **without** `--runtime` defaults to **`manual`**: downloads the pack and runs `install.js`, which **copies** the default installed surface into the target repo root (`AGENTS.md`, `commands/`, `skills/`, …). Use only when runtime-native install is not suitable — [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md).
+
+## Runtime Selector
 
 `install.sh` accepts **runtime** and **scope** and prints an install plan before executing.
 
@@ -24,7 +33,7 @@ Target UX: choose **runtime** + **scope** → install to runtime-correct locatio
 | `--legacy-root` | Alias for `--runtime manual` |
 | `--yes` | Skip confirmation prompt |
 
-**Experimental:** Non-`manual` runtimes call [install-runtime.js](../install-runtime.js). They are **implemented but not stable** until dogfooded — see [runtime-native-install-audit.md](runtime-native-install-audit.md).
+**Experimental:** Non-`manual` runtimes call [install-runtime.js](../install-runtime.js). File/install dogfood complete (D1–D6); **stable support: No** — see [runtime-native-install-audit.md](runtime-native-install-audit.md).
 
 **Only `--runtime manual`** performs legacy root copy (`install.js`). Other runtimes write runtime-specific paths only (no `commands/`/`skills/` at repo root):
 
@@ -37,15 +46,15 @@ Windsurf: use `--runtime windsurf` (alias for cursor) or interactive option 3 (C
 
 See [interactive-installer-design.md](interactive-installer-design.md), [runtime-install-matrix-research.md](runtime-install-matrix-research.md), [project-state-policy.md](project-state-policy.md).
 
-## Quick Install (manual fallback)
+## Quick Install (manual fallback only)
 
-From your **product repository** root:
+From your **product repository** root (root copy — not runtime-native):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh
 ```
 
-Default `--target` is the current working directory (`.`).
+Prefer runtime-native with explicit flags (see [Recommended](#recommended-runtime-native-install) above). Default `--target` is `.`.
 
 ## Explicit Target
 
@@ -72,7 +81,7 @@ curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/ma
 Install a specific GitHub ref (branch or tag):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh -s -- --ref v0.9.0 --target .
+curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh -s -- --ref v0.9.1 --runtime cursor --scope project --init-harness --target .
 ```
 
 Default ref is `main`. Prefer tags for reproducible installs ([plugin-install-security.md](plugin-install-security.md)).
@@ -82,7 +91,7 @@ Default ref is `main`. Prefer tags for reproducible installs ([plugin-install-se
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh -o install-harness.sh
 less install-harness.sh
-sh install-harness.sh --ref v0.9.0 --target .
+sh install-harness.sh --ref v0.9.1 --target .
 ```
 
 ## Requirements

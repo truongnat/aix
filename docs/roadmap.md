@@ -92,10 +92,11 @@
 
 ## V9: Plugin Install UX
 
-- `v0.9.0` tag: shipped draft contract-freeze documentation (pre-v1 candidates)
-- **active:** Plugin Install UX — one-line `install.sh`, optional global `ai-harness` CLI, no required manual clone for consumers
-- see [plugin-install-ux.md](plugin-install-ux.md), [v0.9.0-plan.md](v0.9.0-plan.md)
-- `install.js` remains canonical copy; shell/bootstrap only downloads pack and invokes Node
+- `v0.9.0` tag: draft contract-freeze documentation (pre-v1 candidates)
+- `v0.9.1` tag: **experimental** runtime-native installer — `install.sh` runtime/scope, `install-runtime.js`, `.harness` init, runtime-aware validation; dogfood C + D1–D6
+- **next:** `v0.10.x` manual runtime verification / stable-runtime narrowing — not immediate `v1.0.0`
+- see [plugin-install-ux.md](plugin-install-ux.md), [runtime-dogfood-summary.md](runtime-dogfood-summary.md), [v0.9.1-release-notes.md](v0.9.1-release-notes.md)
+- `install.js` root copy remains **fallback**; runtime-native is the recommended consumer path
 
 ## V10: Runtime Capability Folder Integration (planned)
 
@@ -139,6 +140,7 @@
 - `v0.6.0`: Runtime Consumption Guides
 - `v0.7.0`: Capability Pack Packaging
 - `v0.8.0`: Real Capability Pack Dogfood
-- `v0.9.0`: contract-freeze docs (tag); Plugin Install UX in progress
+- `v0.9.0`: contract-freeze docs (tag)
+- `v0.9.1`: experimental runtime-native installer (tag)
 
 Heavy runtime systems remain out of scope for v1. Any future automation should support the markdown operating model rather than replace it.

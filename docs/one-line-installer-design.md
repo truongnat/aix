@@ -39,7 +39,7 @@ Usage: [install-sh-usage.md](install-sh-usage.md).
 | `--dry-run` | Forward to `install.js` |
 | `--force` | Forward to `install.js` |
 | `--global` | Install `ai-harness` shim to user bin (planned; not in `install.sh` yet) |
-| `--ref <tag>` | Git ref for archive download (for example `v0.9.0`); default `main` |
+| `--ref <tag>` | Git ref for archive download (for example `v0.9.1`); default `main` |
 | `--help` | Usage |
 
 ## Remote Source Strategy
@@ -87,7 +87,7 @@ See [plugin-install-security.md](plugin-install-security.md).
 Recommend production installs pin a release tag:
 
 ```bash
-curl -fsSL .../install.sh | sh -s -- --ref v0.9.0 --target .
+curl -fsSL .../install.sh | sh -s -- --ref v0.9.1 --runtime generic --scope project --init-harness --target .
 ```
 
 Default `main` is for latest docs experiments; document risk in security doc.

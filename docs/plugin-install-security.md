@@ -19,14 +19,14 @@ executes whatever the script contains at fetch time. Users should treat this lik
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh -o install-harness.sh
 less install-harness.sh
-sh install-harness.sh --target . --ref v0.9.0
+sh install-harness.sh --target . --ref v0.9.1
 ```
 
 Or download the release tarball and run `node install.js` from the extracted pack without piping to shell.
 
 ## Pin To Tag
 
-Prefer `--ref v0.9.0` (or current stable tag) over default branch `main` for reproducible installs.
+Prefer `--ref v0.9.1` (latest experimental runtime-native tag) over default branch `main` for reproducible installs. Runtime-native modes remain **experimental**; stable per-runtime support is not claimed.
 
 The archive URL should use the same ref for tarball and documented compatibility.
 
