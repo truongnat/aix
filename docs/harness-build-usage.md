@@ -109,6 +109,10 @@ Minimal reference output:
 
 - [examples/tiny-repo-adoption/](../examples/tiny-repo-adoption/)
 
+When `harness-build` is used on a tiny repository, prefer the small memory convention first:
+
+- [docs/small-repo-memory.md](small-repo-memory.md)
+
 ## How To Proceed After `harness-build`
 
 1. Review the output with [docs/harness-build-review-checklist.md](harness-build-review-checklist.md).

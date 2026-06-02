@@ -214,6 +214,8 @@ For a very small repository or when learning the artifact shape first, use:
 
 - [examples/tiny-repo-adoption/](../examples/tiny-repo-adoption/)
 
+For tiny repositories, start with [docs/small-repo-memory.md](small-repo-memory.md) instead of creating a complex memory structure.
+
 ## Smoke Test
 
 Before using the harness in a real repository, run the local-only [Adoption Smoke Test](adoption-smoke-test.md).

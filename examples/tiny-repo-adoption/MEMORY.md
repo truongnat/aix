@@ -2,31 +2,34 @@
 
 ## Purpose
 
-Define durable memory boundaries for a tiny repository.
+Define the minimum useful shared memory surface for a tiny repository.
 
 ## Current Status
 
-Example profile.
+Example profile using small-repo memory conventions.
 
 ## Recall Before Planning
 
-Review prior durable decisions before revising plans.
+Review only durable project facts, decisions, hazards, and reusable commands before revising plans.
 
 ## Remember After Shipping
 
-Store only reusable lessons after the work completes.
+Store only reusable lessons that should influence future work.
 
 ## Memory Types
 
+- project facts
 - decisions
 - hazards
 - reusable commands
+- open questions
 
 ## Forbidden Content
 
 - secrets
 - private business data
-- temporary logs
+- raw logs
+- temporary implementation noise
 
 ## Human Review
 

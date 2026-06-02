@@ -15,6 +15,7 @@ const requiredFiles = [
   "docs/team-architecture-selection.md",
   "docs/memory-model.md",
   "docs/memory-safety.md",
+  "docs/small-repo-memory.md",
   "docs/sdlc-execution-model.md",
   "docs/harness-build-contract.md",
   "docs/harness-build-usage.md",
@@ -98,6 +99,7 @@ const requiredFiles = [
   "templates/WORKFLOW.md",
   "templates/GATES.md",
   "templates/MEMORY.md",
+  "templates/SMALL_MEMORY.md",
   "templates/TASK.md",
   "templates/EXECUTION.md",
   "templates/SKILL.md"

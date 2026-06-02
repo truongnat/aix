@@ -17,6 +17,8 @@
 - install output examples
 - fixed installed docs surface for post-install guidance
 - tiny repo adoption example
+- small repo memory conventions
+- compact small memory template
 
 ## [0.3.1] - 2026-06-02
 

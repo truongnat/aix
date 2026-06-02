@@ -123,6 +123,7 @@ Then:
 - [Adoption Guide](docs/adoption-guide.md)
 - [Adoption Smoke Test](docs/adoption-smoke-test.md)
 - [Tiny Repo Adoption Example](examples/tiny-repo-adoption/)
+- [Small Repo Memory](docs/small-repo-memory.md)
 - [Usage Examples](docs/usage-examples.md)
 - [Host Repo Checklist](docs/host-repo-checklist.md)
 

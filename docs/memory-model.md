@@ -67,6 +67,12 @@ This file should be concise, sanitized, and worth reading before planning.
 
 Not every goal-level lesson belongs in shared memory. Only durable, reusable items should move upward.
 
+## Small Repository Mode
+
+For tiny repositories or first-time adoption, start with the lighter guidance in [docs/small-repo-memory.md](small-repo-memory.md).
+
+Use the small-repo mode when one shared `MEMORY.md` plus goal-level `REMEMBER.md` is enough to capture durable lessons safely.
+
 ## What Must Never Be Stored
 
 Do not store:
