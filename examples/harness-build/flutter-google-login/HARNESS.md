@@ -12,14 +12,14 @@ Define the project-specific operating model for adding Google login to a Flutter
 - Last updated: 2026-06-02
 - Owner: demo harness build
 
-## Project Shape
+## Scope
 
 - Product or system type: Flutter mobile application with optional authenticated experience
 - Primary stack: Flutter client with possible backend auth/session boundary
 - Delivery model: feature delivery with manual and automated verification
 - Risk level: medium because guest and signed-in flows share state boundaries
 
-## Selected Choices
+## Operating Model
 
 - Primary workflow: feature
 - Execution model: goal-driven SDLC with explicit task, review, and verification loops

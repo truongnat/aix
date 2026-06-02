@@ -12,22 +12,21 @@ Define the project-specific quality gates that work must satisfy before completi
 - Last updated:
 - Owner:
 
-## Selected Gate Posture
+## Quality Gates
 
 - Strictness level:
 - Evidence expectation:
 
-## Phase Gates
+## Evidence Requirements
 
 - Phase:
 - Entry criteria:
 - Required evidence:
+
+## Stop Conditions
+
+- Phase:
 - Stop conditions:
-
-## Exceptions
-
-- Allowed exceptions:
-- Required documentation for exceptions:
 
 ## Assumptions
 

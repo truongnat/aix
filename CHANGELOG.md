@@ -18,6 +18,8 @@
 - Skill template
 - Updated writing-skills guidance
 - Demo harness build for Flutter Google login
+- Harness build contract documentation
+- Heading validation for harness profile templates and demo artifacts
 
 ## [0.1.0] - 2026-06-02
 

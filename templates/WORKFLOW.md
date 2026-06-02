@@ -12,24 +12,29 @@ Define the workflows this project should use for common work types.
 - Last updated:
 - Owner:
 
-## Selected Workflows
+## Selected Workflow
 
 - Work type:
 - Workflow:
 - Why selected:
 
-## Execution Model
+## Command Sequence
+
+- Map:
+- Start:
+- Discuss:
+- Plan:
+- Run:
+- Verify:
+- Ship:
+- Remember:
+
+## Execution Rules
 
 - Goal lifecycle:
 - Task lifecycle:
 - Review and retry loop:
 - Verification loop:
-
-## Command Expectations
-
-- Required start command:
-- Required planning command:
-- Required verification command:
 
 ## Escalation Rules
 

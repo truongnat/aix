@@ -12,7 +12,17 @@ Define what this project should remember before planning and after shipping.
 - Last updated:
 - Owner:
 
-## Memory Categories
+## Recall Before Planning
+
+- Read before planning:
+- Recall these categories first:
+
+## Remember After Shipping
+
+- Update after shipping:
+- Promote only durable lessons:
+
+## Memory Types
 
 - Project facts:
 - Decisions:
@@ -23,11 +33,12 @@ Define what this project should remember before planning and after shipping.
 - Open questions:
 - Verification lessons:
 
-## Recall Rules
+## Forbidden Content
 
-- Read before planning:
-- Update after shipping:
-- Do not persist:
+- Secrets:
+- Tokens:
+- Customer data:
+- Private business data:
 
 ## Storage Boundaries
 

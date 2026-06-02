@@ -7,6 +7,7 @@ const repoRoot = path.resolve(__dirname, "..");
 const { installHarness, parseArgs } = require(path.join(repoRoot, "install.js"));
 const { validateRepository } = require(path.join(repoRoot, "validate.js"));
 const invalidFixture = path.join(repoRoot, "test", "fixtures", "invalid-harness");
+const invalidHarnessProfileFixture = path.join(repoRoot, "test", "fixtures", "invalid-harness-profile");
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "ai-harness-test-"));
@@ -50,6 +51,12 @@ runTest("install.js skips existing files unless --force is passed", () => {
 runTest("validate.js passes for the repository", () => {
   const failures = validateRepository(repoRoot);
   assert.deepEqual(failures, []);
+});
+
+runTest("validate.js reports missing harness profile headings", () => {
+  const failures = validateRepository(invalidHarnessProfileFixture);
+
+  assert.ok(failures.includes("templates/HARNESS.md is missing heading: ## Human Review"));
 });
 
 runTest("validate.js reports missing adoption docs and AGENTS contract headings", () => {

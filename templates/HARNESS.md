@@ -12,14 +12,14 @@ Describe the project-specific harness operating model for this repository.
 - Last updated:
 - Owner:
 
-## Project Shape
+## Scope
 
 - Product or system type:
 - Primary stack:
 - Delivery model:
 - Risk level:
 
-## Selected Choices
+## Operating Model
 
 - Primary workflow:
 - Execution model:

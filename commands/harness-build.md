@@ -20,6 +20,7 @@ Build a project-specific harness profile before implementation work begins.
 - `docs/memory-model.md`
 - `docs/memory-safety.md`
 - `docs/sdlc-execution-model.md`
+- `docs/harness-build-contract.md`
 - `docs/skill-system.md`
 - `skills/SKILL_AUTHORING_RULES.md`
 - `.harness/PROJECT.md` if present
@@ -57,7 +58,7 @@ Build a project-specific harness profile before implementation work begins.
 
 ## Completion Gate
 
-The command is complete when the harness profile artifacts define a project-specific operating model with selected workflows, team structure, skills, memory expectations, and quality gates, and no application code has been changed.
+The command is complete when the harness profile artifacts satisfy `docs/harness-build-contract.md`, define a project-specific operating model with selected workflows, team structure, skills, memory expectations, and quality gates, and no application code has been changed.
 
 ## Pattern Selection
 

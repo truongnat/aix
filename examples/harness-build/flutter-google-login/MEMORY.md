@@ -12,7 +12,17 @@ Define what this project should remember before planning and after shipping for 
 - Last updated: 2026-06-02
 - Owner: demo harness build
 
-## Memory Categories
+## Recall Before Planning
+
+- Read before planning: prior auth decisions, guest-mode constraints, known session hazards
+- Recall these categories first: project facts, decisions, hazards, constraints, and open questions
+
+## Remember After Shipping
+
+- Update after shipping: durable auth, guest, and session lessons only
+- Promote only durable lessons: recurring verification guidance, confirmed root causes, and stable decisions
+
+## Memory Types
 
 - Project facts: guest mode is a supported product path and must remain independently verifiable
 - Decisions: optional authentication must not erase guest entry as a fallback
@@ -23,11 +33,12 @@ Define what this project should remember before planning and after shipping for 
 - Open questions: whether guest data migration or backend-issued session rules exist
 - Verification lessons: signed-in success is not enough; guest and logout paths must be checked independently
 
-## Recall Rules
+## Forbidden Content
 
-- Read before planning: prior auth decisions, guest-mode constraints, known session hazards
-- Update after shipping: durable auth, guest, and session lessons only
-- Do not persist: provider secrets, raw tokens, customer data, copied raw logs, private business detail
+- Secrets: never store provider secrets or backend credentials
+- Tokens: never store raw auth tokens or refresh tokens
+- Customer data: never store user-identifying app data
+- Private business data: never store internal commercial or operational details that are not safe for shared artifacts
 
 ## Storage Boundaries
 

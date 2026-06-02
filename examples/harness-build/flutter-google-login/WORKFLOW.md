@@ -12,24 +12,29 @@ Define the workflow this project should use for this feature.
 - Last updated: 2026-06-02
 - Owner: demo harness build
 
-## Selected Workflows
+## Selected Workflow
 
 - Work type: feature
 - Workflow: `feature`
 - Why selected: the request adds a user-facing capability with explicit acceptance criteria and bounded implementation scope
 
-## Execution Model
+## Command Sequence
+
+- Map: inspect guest entry, auth boundary, and existing session behavior
+- Start: establish current artifacts and acceptance criteria
+- Discuss: protect guest mode explicitly and confirm scope limits
+- Plan: define minimal feature tasks and verification
+- Run: implement only the approved feature scope
+- Verify: gather guest, login, logout, and session evidence
+- Ship: summarize changes, not-run items, and risks
+- Remember: keep durable auth and guest-flow lessons
+
+## Execution Rules
 
 - Goal lifecycle: proposed → discussed → planned → executing → verifying → shipped → remembered
 - Task lifecycle: pending → in_progress → blocked → reviewing → verified → done
 - Review and retry loop: retry inside task scope if guest/login/session behavior fails checks; re-plan if scope or architecture changes
 - Verification loop: collect targeted automated and manual evidence, record not-run items, and block ship if guest mode or auth regression remains unclear
-
-## Command Expectations
-
-- Required start command: `harness-start`
-- Required planning command: `harness-plan`
-- Required verification command: `harness-verify`
 
 ## Escalation Rules
 

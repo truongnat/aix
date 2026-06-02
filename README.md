@@ -29,6 +29,7 @@ See [TARGET.md](TARGET.md) for the long-term target.
 - [docs/memory-model.md](docs/memory-model.md)
 - [docs/memory-safety.md](docs/memory-safety.md)
 - [docs/sdlc-execution-model.md](docs/sdlc-execution-model.md)
+- [docs/harness-build-contract.md](docs/harness-build-contract.md)
 - [commands/harness-build.md](commands/harness-build.md)
 
 ## ✨ What It Is

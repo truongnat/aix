@@ -16,6 +16,7 @@ const requiredFiles = [
   "docs/memory-model.md",
   "docs/memory-safety.md",
   "docs/sdlc-execution-model.md",
+  "docs/harness-build-contract.md",
   "docs/system-positioning.md",
   "docs/adoption-guide.md",
   "docs/adoption-smoke-test.md",
@@ -150,6 +151,119 @@ const skillTemplateHeadings = [
   "## Workflow",
   "## Checklist Before Done"
 ];
+const harnessHeadings = [
+  "## Purpose",
+  "## Current Status",
+  "## Scope",
+  "## Operating Model",
+  "## Assumptions",
+  "## Unknowns",
+  "## Human Review"
+];
+const teamHeadings = [
+  "## Purpose",
+  "## Current Status",
+  "## Selected Pattern",
+  "## Roles",
+  "## Handoff Rules",
+  "## Escalation Rules",
+  "## Human Review"
+];
+const selectedSkillsHeadings = [
+  "## Purpose",
+  "## Current Status",
+  "## Selected Core Skills",
+  "## Selected Skill Packs",
+  "## Excluded Skills Or Packs",
+  "## Human Review"
+];
+const workflowHeadings = [
+  "## Purpose",
+  "## Current Status",
+  "## Selected Workflow",
+  "## Command Sequence",
+  "## Execution Rules",
+  "## Human Review"
+];
+const gatesHeadings = [
+  "## Purpose",
+  "## Current Status",
+  "## Quality Gates",
+  "## Evidence Requirements",
+  "## Stop Conditions",
+  "## Human Review"
+];
+const memoryHeadings = [
+  "## Purpose",
+  "## Current Status",
+  "## Recall Before Planning",
+  "## Remember After Shipping",
+  "## Memory Types",
+  "## Forbidden Content",
+  "## Human Review"
+];
+const taskHeadings = [
+  "## Task ID",
+  "## Goal",
+  "## Status",
+  "## Scope",
+  "## Steps",
+  "## Verification",
+  "## Completion Evidence",
+  "## Safety Notes"
+];
+const executionHeadings = [
+  "## Active Goal",
+  "## Current Task",
+  "## Execution Log",
+  "## Deviations From Plan",
+  "## Review Loop",
+  "## Verification Loop",
+  "## Current State",
+  "## Next Step",
+  "## Safety Notes"
+];
+const goalArtifactHeadings = {
+  "examples/harness-build/flutter-google-login/goals/google-login/GOAL.md": [
+    "## Goal",
+    "## Scope",
+    "## In Scope",
+    "## Out Of Scope",
+    "## Acceptance Criteria"
+  ],
+  "examples/harness-build/flutter-google-login/goals/google-login/PLAN.md": [
+    "## Goal",
+    "## Scope",
+    "## Tasks",
+    "## Verification Strategy",
+    "## Risks",
+    "## Human Approval"
+  ],
+  "examples/harness-build/flutter-google-login/goals/google-login/TASKS.md": [
+    "## Goal",
+    "## Task List",
+    "## Review Notes",
+    "## Current State"
+  ],
+  "examples/harness-build/flutter-google-login/goals/google-login/VERIFY.md": [
+    "## Goal",
+    "## Verification Commands",
+    "## Manual Verification",
+    "## Regression Checks",
+    "## Not Run",
+    "## Result",
+    "## Evidence"
+  ],
+  "examples/harness-build/flutter-google-login/goals/google-login/REMEMBER.md": [
+    "## Date",
+    "## Project",
+    "## Problem",
+    "## Decision",
+    "## Solution",
+    "## Reuse Guidance",
+    "## Sensitive Data Check"
+  ]
+};
 
 function assertExists(baseDir, relativePath, failures) {
   const fullPath = path.join(baseDir, relativePath);
@@ -206,6 +320,15 @@ function countCheckedContracts() {
     skillFiles.length * skillHeadings.length +
     templateFiles.length +
     skillTemplateHeadings.length +
+    harnessHeadings.length * 2 +
+    teamHeadings.length * 2 +
+    selectedSkillsHeadings.length * 2 +
+    workflowHeadings.length * 2 +
+    gatesHeadings.length * 2 +
+    memoryHeadings.length * 2 +
+    taskHeadings.length +
+    executionHeadings.length +
+    Object.values(goalArtifactHeadings).reduce((sum, headings) => sum + headings.length, 0) +
     agentsRequiredHeadings.length
   );
 }
@@ -230,6 +353,23 @@ function validateRepository(baseDir = root) {
   }
 
   assertHeadings(baseDir, "templates/SKILL.md", skillTemplateHeadings, failures);
+  assertHeadings(baseDir, "templates/HARNESS.md", harnessHeadings, failures);
+  assertHeadings(baseDir, "templates/TEAM.md", teamHeadings, failures);
+  assertHeadings(baseDir, "templates/SKILLS.md", selectedSkillsHeadings, failures);
+  assertHeadings(baseDir, "templates/WORKFLOW.md", workflowHeadings, failures);
+  assertHeadings(baseDir, "templates/GATES.md", gatesHeadings, failures);
+  assertHeadings(baseDir, "templates/MEMORY.md", memoryHeadings, failures);
+  assertHeadings(baseDir, "templates/TASK.md", taskHeadings, failures);
+  assertHeadings(baseDir, "templates/EXECUTION.md", executionHeadings, failures);
+  assertHeadings(baseDir, "examples/harness-build/flutter-google-login/HARNESS.md", harnessHeadings, failures);
+  assertHeadings(baseDir, "examples/harness-build/flutter-google-login/TEAM.md", teamHeadings, failures);
+  assertHeadings(baseDir, "examples/harness-build/flutter-google-login/SKILLS.md", selectedSkillsHeadings, failures);
+  assertHeadings(baseDir, "examples/harness-build/flutter-google-login/WORKFLOW.md", workflowHeadings, failures);
+  assertHeadings(baseDir, "examples/harness-build/flutter-google-login/GATES.md", gatesHeadings, failures);
+  assertHeadings(baseDir, "examples/harness-build/flutter-google-login/MEMORY.md", memoryHeadings, failures);
+  for (const [relativePath, headings] of Object.entries(goalArtifactHeadings)) {
+    assertHeadings(baseDir, relativePath, headings, failures);
+  }
   assertAgentsContent(baseDir, failures);
 
   return failures;
@@ -257,10 +397,18 @@ module.exports = {
   commandFiles,
   commandHeadings,
   countCheckedContracts,
+  executionHeadings,
+  gatesHeadings,
+  goalArtifactHeadings,
+  harnessHeadings,
+  memoryHeadings,
   requiredFiles,
+  selectedSkillsHeadings,
   skillFiles,
   skillHeadings,
   skillTemplateHeadings,
+  taskHeadings,
+  teamHeadings,
   templateFiles,
   validateRepository
 };

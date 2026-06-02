@@ -12,37 +12,42 @@ Define the project-specific quality gates for the Google login feature.
 - Last updated: 2026-06-02
 - Owner: demo harness build
 
-## Selected Gate Posture
+## Quality Gates
 
 - Strictness level: high for auth and state-handling paths
 - Evidence expectation: targeted automated checks plus explicit manual simulator or device flow checks
 
-## Phase Gates
+## Evidence Requirements
 
 - Phase: Plan
 - Entry criteria: goal and scope are clear, guest mode is protected explicitly
 - Required evidence: ordered tasks, scope boundaries, verification strategy
-- Stop conditions: implementation begins before plan approval or acceptance criteria are vague
 
 - Phase: Run
 - Entry criteria: approved plan, selected team pattern, selected skills
 - Required evidence: changed areas mapped to tasks, no unplanned scope expansion
-- Stop conditions: auth redesign emerges without approval
 
 - Phase: Verify
 - Entry criteria: implementation for the scoped feature is complete
 - Required evidence: guest flow still works, Google login works, logout works, token or session behavior checked, simulator or device manual checks recorded
-- Stop conditions: any critical flow remains unverified or broken
 
 - Phase: Ship
 - Entry criteria: verification evidence is documented
 - Required evidence: summary of what changed, not-run items, remaining risks
+
+## Stop Conditions
+
+- Phase: Plan
+- Stop conditions: implementation begins before plan approval or acceptance criteria are vague
+
+- Phase: Run
+- Stop conditions: auth redesign emerges without approval
+
+- Phase: Verify
+- Stop conditions: any critical flow remains unverified or broken
+
+- Phase: Ship
 - Stop conditions: risk summary is missing or not-run items are hidden
-
-## Exceptions
-
-- Allowed exceptions: unavailable device matrix or external provider outage may block some checks
-- Required documentation for exceptions: clearly record the not-run item, reason, and remaining risk in `VERIFY.md`
 
 ## Assumptions
 
