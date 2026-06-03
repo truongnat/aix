@@ -48,6 +48,20 @@
 - `install.sh` verbs: install, uninstall, update
 - Antigravity runtime paths after verification
 
+## [0.10.0] - Unreleased
+
+### Added
+
+- NPX interactive CLI (`bin/aih.js`) with `ai-engineering-harness` and `aih` bin aliases
+- Provider selection wizard (checkbox UI when TTY supports raw mode; numbered fallback otherwise)
+- Detection as **recommendation only** — no silent auto-install in interactive mode
+- [npx-cli-ux.md](docs/npx-cli-ux.md)
+
+### Changed
+
+- README primary quickstart is `npx ai-engineering-harness install`; `aih.sh` / `aih.ps1` documented as fallbacks
+- v0.10.0 Node CLI fronts install/update/uninstall; `aih.sh` remains backend (requires `sh`)
+
 ## [Unreleased]
 
 ### Changed

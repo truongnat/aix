@@ -435,8 +435,19 @@ runTest("validate.js CLI returns conflict usage error for --profile-only with --
 });
 
 const aihShPath = path.join(repoRoot, "aih.sh");
+const aihBinPath = path.join(repoRoot, "bin", "aih.js");
 const aihPs1Path = path.join(repoRoot, "aih.ps1");
 const installShPath = path.join(repoRoot, "install.sh");
+const packageJsonPath = path.join(repoRoot, "package.json");
+
+function runAihCli(args, options = {}) {
+  return childProcess.spawnSync(process.execPath, [aihBinPath, ...args], {
+    cwd: options.cwd || repoRoot,
+    encoding: "utf8",
+    env: { ...process.env, ...options.env },
+    timeout: options.timeout || 120000
+  });
+}
 
 runTest("aih.sh exists at repository root", () => {
   assert.ok(fs.existsSync(aihShPath));
@@ -1853,6 +1864,89 @@ runTest("aih.sh doctor message includes git init remediation", () => {
     script,
     /FAIL target is not a Git repo — run git init or run inside a cloned repository/
   );
+});
+
+runTest("package.json bin has ai-engineering-harness", () => {
+  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+  assert.equal(pkg.bin["ai-engineering-harness"], "./bin/aih.js");
+});
+
+runTest("package.json bin has aih", () => {
+  const pkg = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+  assert.equal(pkg.bin.aih, "./bin/aih.js");
+});
+
+runTest("bin/aih.js exists with Node shebang", () => {
+  assert.ok(fs.existsSync(aihBinPath));
+  const head = fs.readFileSync(aihBinPath, "utf8").split("\n")[0];
+  assert.match(head, /^#!\/usr\/bin\/env node/);
+});
+
+runTest("aih cli help mentions npx ai-engineering-harness install", () => {
+  const result = runAihCli(["--help"]);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /npx ai-engineering-harness install/);
+});
+
+runTest("cli provider model includes core providers", () => {
+  const { PROVIDERS } = require(path.join(repoRoot, "lib", "cli-providers.js"));
+  for (const id of ["cursor", "claude", "codex", "gemini", "opencode", "generic", "manual"]) {
+    assert.ok(PROVIDERS.some((p) => p.id === id), `missing provider ${id}`);
+  }
+});
+
+runTest("cli antigravity provider is disabled planned", () => {
+  const { PROVIDERS } = require(path.join(repoRoot, "lib", "cli-providers.js"));
+  const ag = PROVIDERS.find((p) => p.id === "antigravity");
+  assert.equal(ag.implemented, false);
+  assert.match(ag.description, /planned/i);
+});
+
+runTest("README primary quickstart is npx ai-engineering-harness install", () => {
+  const readme = fs.readFileSync(path.join(repoRoot, "README.md"), "utf8");
+  const quickstart = readme.slice(readme.indexOf("## 🚀 Quickstart"));
+  assert.match(quickstart, /npx ai-engineering-harness install/);
+  assert.ok(quickstart.indexOf("npx ai-engineering-harness install") < quickstart.indexOf("curl -fsSL"));
+});
+
+runTest("README keeps aih.sh as shell fallback", () => {
+  const readme = fs.readFileSync(path.join(repoRoot, "README.md"), "utf8");
+  assert.match(readme, /Shell fallback/i);
+  assert.match(readme, /aih\.sh/);
+});
+
+runTest("non-interactive aih cli install without provider fails clearly", () => {
+  const result = runAihCli(["install", "--yes"], {
+    env: { ...process.env, CI: "1" }
+  });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr + result.stdout, /No provider selected/);
+});
+
+runTest("non-interactive aih cli install dry-run with cursor provider", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "aih-cli-dry-"));
+  initFakeGitWorkTree(tmp);
+  const result = runAihCli(
+    ["install", "--provider", "cursor", "--yes", "--dry-run", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /WOULD|Will install|\.cursor\/rules/i);
+});
+
+runTest("aih cli status delegates to shell backend", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "aih-cli-status-"));
+  initFakeGitWorkTree(tmp);
+  const result = runAihCli(["status", "--target", tmp], { env: { PATH: process.env.PATH } });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /ai-engineering-harness status|git repo/i);
+});
+
+runTest("interactive install does not auto-assign providers from detection alone", () => {
+  const mainSrc = fs.readFileSync(path.join(repoRoot, "lib", "cli-main.js"), "utf8");
+  assert.match(mainSrc, /await selectMany/);
+  assert.doesNotMatch(mainSrc, /providers\s*=\s*detectRecommendedProviders/);
+  assert.match(mainSrc, /recommended: recommended\.includes/);
 });
 
 runTest("install-runtime opencode project creates plugin file", () => {

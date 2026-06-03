@@ -70,10 +70,35 @@ Primary references:
 Run this inside your target project repo:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install
+npx ai-engineering-harness install
 ```
 
-Windows PowerShell (recommended):
+Then:
+
+```bash
+npx ai-engineering-harness status
+npx ai-engineering-harness doctor
+```
+
+The install wizard shows detected context, lets you **choose provider(s)** with keyboard selection, shows a plan, and asks for confirmation — it does not auto-install based on detection alone. See [docs/npx-cli-ux.md](docs/npx-cli-ux.md).
+
+Non-interactive example:
+
+```bash
+npx ai-engineering-harness install --provider cursor --yes
+```
+
+### Shell fallback
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install --runtime cursor --yes
+```
+
+```bash
+sh aih.sh install --runtime cursor --scope project --visibility private --yes
+```
+
+### Windows PowerShell (bootstrap fallback)
 
 ```powershell
 $script = "$env:TEMP\aih.ps1"
@@ -130,7 +155,15 @@ Pin a release tag:
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install --ref v0.9.2 --runtime cursor
 ```
 
-Recommended local commands:
+Local checkout (NPX-style):
+
+```bash
+node bin/aih.js install
+node bin/aih.js status
+node bin/aih.js doctor
+```
+
+Shell fallback:
 
 ```bash
 sh aih.sh install
@@ -140,7 +173,7 @@ sh aih.sh update
 sh aih.sh uninstall
 ```
 
-Runtimes: `claude`, `codex`, `cursor`, `gemini`, `opencode`, `generic`. Avoid `--runtime all` until dogfooded. Legacy root copy remains available only as fallback via `--runtime manual`.
+Providers: `cursor`, `claude`, `codex`, `gemini`, `opencode`, `generic`, `manual` (fallback). Antigravity is planned, not implemented. Avoid `--runtime all` until dogfooded.
 
 ---
 
