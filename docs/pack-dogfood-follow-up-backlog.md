@@ -6,6 +6,11 @@ Triage dogfood findings from [pack-dogfood-friction-log.md](pack-dogfood-frictio
 
 - Git hygiene via `.git/info/exclude` for `--visibility private` — [private-install-git-hygiene.md](private-install-git-hygiene.md)
 - `--visibility` / `--ignore-strategy` flags in [install.sh](../install.sh)
+- Dogfood E1: private Cursor git status clean — [scenario-e1-cursor-private-git-hygiene.md](pack-dogfood-reports/scenario-e1-cursor-private-git-hygiene.md)
+
+## v0.9.2 Patch Candidates
+
+- `.git` as file (worktree/submodule): resolve `gitdir:` before writing `.git/info/exclude` ([scenario-e1-cursor-private-git-hygiene.md](pack-dogfood-reports/scenario-e1-cursor-private-git-hygiene.md) friction)
 
 ## v0.9.2 Blockers (remaining)
 

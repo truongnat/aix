@@ -6,6 +6,8 @@ Document how **private** project installs keep generated harness/runtime files o
 
 Implemented in `v0.9.2` Step 1 via [install.sh](../install.sh).
 
+**Dogfood:** Scenario E1 — [pack-dogfood-reports/scenario-e1-cursor-private-git-hygiene.md](pack-dogfood-reports/scenario-e1-cursor-private-git-hygiene.md) (private Cursor, `git status` clean for generated paths).
+
 ## Private vs Shared
 
 | `--visibility` | Git behavior |

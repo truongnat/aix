@@ -102,6 +102,7 @@ const requiredFiles = [
   "docs/pack-dogfood-reports/scenario-d4-opencode-project.md",
   "docs/pack-dogfood-reports/scenario-d5-gemini.md",
   "docs/pack-dogfood-reports/scenario-d6-claude.md",
+  "docs/pack-dogfood-reports/scenario-e1-cursor-private-git-hygiene.md",
   "docs/runtime-dogfood-summary.md",
   "docs/v0.9.x-readiness.md",
   "docs/v0.9.x-release-scope.md",

@@ -16,6 +16,7 @@
 
 ### Added (implementation)
 
+- dogfood E1: private Cursor git hygiene — [scenario-e1-cursor-private-git-hygiene.md](docs/pack-dogfood-reports/scenario-e1-cursor-private-git-hygiene.md)
 - private project install via `.git/info/exclude` in [install.sh](install.sh)
 - `--visibility private|shared` and `--ignore-strategy info-exclude|none|auto`
 - `install` verb alias; warning when `--visibility` omitted (defaults shared)
