@@ -9,6 +9,9 @@ Host repositories should keep harness artifacts in `.harness/`.
   PROJECT.md
   REQUIREMENTS.md
   ROADMAP.md
+  DECISIONS.md
+  HAZARDS.md
+  INDEX.md
   STATE.md
   CONTEXT.md
   GOAL.md
@@ -28,6 +31,9 @@ Host repositories should keep harness artifacts in `.harness/`.
 - `PROJECT.md`: stable project identity, mission, constraints, and quality bar
 - `REQUIREMENTS.md`: active requirements and success criteria
 - `ROADMAP.md`: phase and direction
+- `DECISIONS.md`: durable project decisions that future work should recall
+- `HAZARDS.md`: recurring risks, fragile areas, and regression-prone paths
+- `INDEX.md`: reusable commands, verification recipes, and memory lookup pointers
 - `STATE.md`: current status and next action
 - `CONTEXT.md`: relevant files, systems, and risks
 - `GOAL.md`: the active task goal
@@ -37,7 +43,13 @@ Host repositories should keep harness artifacts in `.harness/`.
 - `REVIEW.md`: findings and residual risk
 - `VERIFY.md`: evidence and verification status
 - `SHIP.md`: final summary and handoff
-- `REMEMBER.md`: durable lessons and decisions
+- `REMEMBER.md`: goal-level durable lessons before promotion into shared memory
+
+## Memory Split
+
+- `MEMORY.md` remains the profile-level memory policy when a repository uses the harness-build profile flow.
+- `DECISIONS.md`, `HAZARDS.md`, and `INDEX.md` are the operational shared-memory artifacts that command workflows should recall directly.
+- goal-level `REMEMBER.md` remains the place for per-goal lessons before promoting durable items upward.
 
 ## Local And Sensitive Data
 

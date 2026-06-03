@@ -195,6 +195,9 @@ const requiredFiles = [
   "examples/tiny-repo-adoption/WORKFLOW.md",
   "examples/tiny-repo-adoption/GATES.md",
   "examples/tiny-repo-adoption/MEMORY.md",
+  "examples/tiny-repo-adoption/DECISIONS.md",
+  "examples/tiny-repo-adoption/HAZARDS.md",
+  "examples/tiny-repo-adoption/INDEX.md",
   "examples/tiny-repo-adoption/goals/health-check/GOAL.md",
   "examples/tiny-repo-adoption/goals/health-check/PLAN.md",
   "examples/tiny-repo-adoption/goals/health-check/TASKS.md",
@@ -208,6 +211,9 @@ const requiredFiles = [
   "examples/harness-build/flutter-google-login/WORKFLOW.md",
   "examples/harness-build/flutter-google-login/GATES.md",
   "examples/harness-build/flutter-google-login/MEMORY.md",
+  "examples/harness-build/flutter-google-login/DECISIONS.md",
+  "examples/harness-build/flutter-google-login/HAZARDS.md",
+  "examples/harness-build/flutter-google-login/INDEX.md",
   "examples/harness-build/flutter-google-login/goals/google-login/GOAL.md",
   "examples/harness-build/flutter-google-login/goals/google-login/PLAN.md",
   "examples/harness-build/flutter-google-login/goals/google-login/TASKS.md",
@@ -233,6 +239,9 @@ const requiredFiles = [
   "templates/WORKFLOW.md",
   "templates/GATES.md",
   "templates/MEMORY.md",
+  "templates/DECISIONS.md",
+  "templates/HAZARDS.md",
+  "templates/INDEX.md",
   "templates/SMALL_MEMORY.md",
   "templates/TASK.md",
   "templates/EXECUTION.md",
@@ -385,6 +394,14 @@ const memoryHeadings = [
   "## Forbidden Content",
   "## Human Review"
 ];
+const decisionsHeadings = ["## How To Use This Artifact", "## Entry Template"];
+const hazardsHeadings = ["## How To Use This Artifact", "## Entry Template"];
+const indexHeadings = [
+  "## How To Use This Artifact",
+  "## Reusable Commands",
+  "## Verification Recipes",
+  "## Useful References"
+];
 const taskHeadings = [
   "## Task ID",
   "## Goal",
@@ -464,6 +481,9 @@ const targetHarnessProfileFiles = [
   ".harness/WORKFLOW.md",
   ".harness/GATES.md",
   ".harness/MEMORY.md"
+  ,".harness/DECISIONS.md"
+  ,".harness/HAZARDS.md"
+  ,".harness/INDEX.md"
 ];
 
 const targetProfileFiles = ["AGENTS.md", ...targetHarnessProfileFiles];
@@ -502,7 +522,10 @@ const targetProfileHeadingContracts = [
   [".harness/SKILLS.md", selectedSkillsHeadings],
   [".harness/WORKFLOW.md", workflowHeadings],
   [".harness/GATES.md", gatesHeadings],
-  [".harness/MEMORY.md", memoryHeadings]
+  [".harness/MEMORY.md", memoryHeadings],
+  [".harness/DECISIONS.md", decisionsHeadings],
+  [".harness/HAZARDS.md", hazardsHeadings],
+  [".harness/INDEX.md", indexHeadings]
 ];
 const goalTemplateHeadings = Object.fromEntries(
   Object.entries(goalArtifactHeadings).map(([relativePath, headings]) => [path.basename(relativePath), headings])
@@ -669,11 +692,27 @@ function assertVerifyTemplateContract(baseDir, failures) {
     return;
   }
   const content = readFile(baseDir, relativePath);
-  if (!/status:\s*(pending|passed|failed|blocked)/i.test(content)) {
+  assertVerifyArtifactContent(relativePath, content, failures, { isTemplate: true });
+}
+
+function assertVerifyArtifactContent(relativePath, content, failures, options = {}) {
+  const isTemplate = options.isTemplate ?? false;
+
+  if (!/status:\s*(pending|passed|failed|blocked|partial)/i.test(content)) {
     failures.push(
-      `${relativePath} must include a machine-readable status field (status: pending|passed|failed|blocked)`
+      `${relativePath} must include a machine-readable status field (status: pending|passed|failed|blocked|partial)`
     );
   }
+
+  if (!/freshness:\s*.+/i.test(content)) {
+    failures.push(`${relativePath} must include a machine-readable freshness field`);
+  }
+
+  const testsBody = extractMarkdownSection(content, "## Tests Run");
+  if (testsBody === null || !hasSubstantiveSectionBody(testsBody, { minChars: 20 })) {
+    failures.push(`${relativePath}: Tests Run must contain at least one substantive verification entry`);
+  }
+
   const gapsBody = extractMarkdownSection(content, "## Known Gaps");
   if (gapsBody !== null) {
     const onlyNone =
@@ -686,6 +725,13 @@ function assertVerifyTemplateContract(baseDir, failures) {
     }
     if (!hasSubstantiveSectionBody(gapsBody, { minChars: 8 })) {
       failures.push(`${relativePath}: Known Gaps must contain substantive pending wording`);
+    }
+  }
+
+  if (isTemplate) {
+    const evidenceBody = extractMarkdownSection(content, "## Evidence");
+    if (evidenceBody === null || !hasSubstantiveSectionBody(evidenceBody, { minChars: 20 })) {
+      failures.push(`${relativePath}: Evidence must contain structured summary prompts`);
     }
   }
 }
@@ -955,6 +1001,9 @@ function validateHarnessRepository(baseDir = root) {
   assertHeadings(baseDir, "templates/WORKFLOW.md", workflowHeadings, failures);
   assertHeadings(baseDir, "templates/GATES.md", gatesHeadings, failures);
   assertHeadings(baseDir, "templates/MEMORY.md", memoryHeadings, failures);
+  assertHeadings(baseDir, "templates/DECISIONS.md", decisionsHeadings, failures);
+  assertHeadings(baseDir, "templates/HAZARDS.md", hazardsHeadings, failures);
+  assertHeadings(baseDir, "templates/INDEX.md", indexHeadings, failures);
   assertHeadings(baseDir, "templates/TASK.md", taskHeadings, failures);
   assertHeadings(baseDir, "templates/EXECUTION.md", executionHeadings, failures);
   assertHeadings(baseDir, "examples/harness-build/flutter-google-login/HARNESS.md", harnessHeadings, failures);
@@ -963,12 +1012,18 @@ function validateHarnessRepository(baseDir = root) {
   assertHeadings(baseDir, "examples/harness-build/flutter-google-login/WORKFLOW.md", workflowHeadings, failures);
   assertHeadings(baseDir, "examples/harness-build/flutter-google-login/GATES.md", gatesHeadings, failures);
   assertHeadings(baseDir, "examples/harness-build/flutter-google-login/MEMORY.md", memoryHeadings, failures);
+  assertHeadings(baseDir, "examples/harness-build/flutter-google-login/DECISIONS.md", decisionsHeadings, failures);
+  assertHeadings(baseDir, "examples/harness-build/flutter-google-login/HAZARDS.md", hazardsHeadings, failures);
+  assertHeadings(baseDir, "examples/harness-build/flutter-google-login/INDEX.md", indexHeadings, failures);
   assertHeadings(baseDir, "examples/tiny-repo-adoption/HARNESS.md", harnessHeadings, failures);
   assertHeadings(baseDir, "examples/tiny-repo-adoption/TEAM.md", teamHeadings, failures);
   assertHeadings(baseDir, "examples/tiny-repo-adoption/SKILLS.md", selectedSkillsHeadings, failures);
   assertHeadings(baseDir, "examples/tiny-repo-adoption/WORKFLOW.md", workflowHeadings, failures);
   assertHeadings(baseDir, "examples/tiny-repo-adoption/GATES.md", gatesHeadings, failures);
   assertHeadings(baseDir, "examples/tiny-repo-adoption/MEMORY.md", memoryHeadings, failures);
+  assertHeadings(baseDir, "examples/tiny-repo-adoption/DECISIONS.md", decisionsHeadings, failures);
+  assertHeadings(baseDir, "examples/tiny-repo-adoption/HAZARDS.md", hazardsHeadings, failures);
+  assertHeadings(baseDir, "examples/tiny-repo-adoption/INDEX.md", indexHeadings, failures);
   for (const [relativePath, headings] of Object.entries(goalArtifactHeadings)) {
     assertHeadings(baseDir, relativePath, headings, failures);
   }
@@ -1075,6 +1130,9 @@ function validateTargetGoal(baseDir, goalId, runtime) {
     const relativePath = `${goalDir}/${fileName}`;
     assertExists(baseDir, relativePath, failures);
     assertHeadings(baseDir, relativePath, headings, failures);
+    if (fileName === "VERIFY.md" && fs.existsSync(resolvePath(baseDir, relativePath))) {
+      assertVerifyArtifactContent(relativePath, readFile(baseDir, relativePath), failures);
+    }
   }
 
   return failures;
@@ -1240,6 +1298,7 @@ module.exports = {
   assertCommandContractStructure,
   assertSkillContractStructure,
   assertVerifyTemplateContract,
+  assertVerifyArtifactContent,
   assertPlanTemplateContract,
   commandFiles,
   commandHeadings,

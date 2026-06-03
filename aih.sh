@@ -329,6 +329,53 @@ runtime_references_cache() {
   esac
 }
 
+doctor_plan_status() {
+  _plan_file="${TARGET_ABS}/.harness/PLAN.md"
+  if [ ! -f "$_plan_file" ]; then
+    printf '%s' 'missing'
+    return 0
+  fi
+
+  awk '
+    BEGIN { in_block = 0 }
+    /^## Approval Status/ { in_block = 1; next }
+    /^## / && in_block == 1 { exit }
+    in_block == 1 && $0 ~ /^status:/ {
+      sub(/^status:[[:space:]]*/, "", $0)
+      print tolower($0)
+      exit
+    }
+  ' "$_plan_file"
+}
+
+doctor_verify_has_concrete_tests() {
+  _verify_file="${TARGET_ABS}/.harness/VERIFY.md"
+  [ -f "$_verify_file" ] || return 1
+  grep -Eq '^\|[[:space:]]*`[^`]+`' "$_verify_file"
+}
+
+doctor_verify_has_concrete_evidence() {
+  _verify_file="${TARGET_ABS}/.harness/VERIFY.md"
+  [ -f "$_verify_file" ] || return 1
+  grep -Eq '^- (Commands executed|Files inspected|Output summary|Link, log, or snippet):[[:space:]]*[^[:space:]].+' "$_verify_file"
+}
+
+doctor_verify_status() {
+  _verify_file="${TARGET_ABS}/.harness/VERIFY.md"
+  if [ ! -f "$_verify_file" ]; then
+    printf '%s' 'missing'
+    return 0
+  fi
+
+  awk '
+    /^[[:space:]]*status:[[:space:]]*/ {
+      sub(/^[[:space:]]*status:[[:space:]]*/, "", $0)
+      print tolower($0)
+      exit
+    }
+  ' "$_verify_file"
+}
+
 build_exclude_block_content() {
   _paths_file="$1"
   _out="$2"
@@ -806,7 +853,7 @@ print_harness_init_plan() {
   printf '%s\n' \
     '  - Initialize project-local .harness/ (minimal structural skeletons)' \
     "  - Target: ${TARGET_ABS}/.harness/" \
-    '  - Files: HARNESS.md, TEAM.md, SKILLS.md, WORKFLOW.md, GATES.md, MEMORY.md, goals/.gitkeep' \
+    '  - Files: HARNESS.md, TEAM.md, SKILLS.md, WORKFLOW.md, GATES.md, MEMORY.md, DECISIONS.md, HAZARDS.md, INDEX.md, goals/.gitkeep' \
     '  - Does not create runtime bootstrap files (e.g. AGENTS.md); runtime or manual fallback owns those' \
     '  - Fill profile content after init; run validate.js --target <repo> --profile-only'
 }
@@ -1140,6 +1187,71 @@ run_doctor() {
     fi
   fi
 
+  if [ -d "${TARGET_ABS}/.harness" ]; then
+    _plan_status=$(doctor_plan_status)
+    case "${_plan_status:-missing}" in
+      approved)
+        printf '%s\n' 'PASS .harness/PLAN.md approval status approved'
+        ;;
+      draft|blocked)
+        printf 'WARN .harness/PLAN.md approval status is %s\n' "$_plan_status"
+        ;;
+      missing|'')
+        printf '%s\n' 'WARN .harness/PLAN.md missing Approval Status block or status field'
+        ;;
+      *)
+        printf 'WARN .harness/PLAN.md approval status is %s\n' "$_plan_status"
+        ;;
+    esac
+
+    _verify_status=$(doctor_verify_status)
+    case "${_verify_status:-missing}" in
+      passed|failed|blocked|partial)
+        if doctor_verify_has_concrete_tests && doctor_verify_has_concrete_evidence; then
+          printf '%s\n' 'PASS .harness/VERIFY.md contains verification evidence'
+        else
+          printf '%s\n' 'FAIL .harness/VERIFY.md claims completed verification without concrete evidence'
+          _fail=1
+        fi
+        ;;
+      pending)
+        if doctor_verify_has_concrete_tests || doctor_verify_has_concrete_evidence; then
+          printf '%s\n' 'WARN .harness/VERIFY.md status is pending despite recorded evidence'
+        else
+          printf '%s\n' 'WARN .harness/VERIFY.md status is pending and verification evidence is not recorded yet'
+        fi
+        ;;
+      missing|'')
+        if [ -f "${TARGET_ABS}/.harness/VERIFY.md" ]; then
+          printf '%s\n' 'FAIL .harness/VERIFY.md status missing or invalid'
+          _fail=1
+        else
+          printf '%s\n' 'WARN .harness/VERIFY.md missing'
+        fi
+        ;;
+      *)
+        printf 'FAIL .harness/VERIFY.md status is %s and is not recognized\n' "$_verify_status"
+        _fail=1
+        ;;
+    esac
+
+    _missing_typed_memory=''
+    for _memory_artifact in DECISIONS.md HAZARDS.md INDEX.md; do
+      if [ ! -f "${TARGET_ABS}/.harness/${_memory_artifact}" ]; then
+        if [ -n "$_missing_typed_memory" ]; then
+          _missing_typed_memory="${_missing_typed_memory}, ${_memory_artifact}"
+        else
+          _missing_typed_memory="${_memory_artifact}"
+        fi
+      fi
+    done
+    if [ -n "$_missing_typed_memory" ]; then
+      printf 'WARN typed memory artifacts missing: %s\n' "$_missing_typed_memory"
+    else
+      printf '%s\n' 'PASS typed memory artifacts present'
+    fi
+  fi
+
   _harness_root=$(cd "$(dirname "$0")" && pwd)
   if command -v node >/dev/null 2>&1 && [ -f "${_harness_root}/lib/command-surface-report.js" ]; then
     _rt_args=""
@@ -1411,6 +1523,95 @@ harness_skeleton_memory_md() {
 EOF
 }
 
+harness_skeleton_decisions_md() {
+  cat <<'EOF'
+# Decisions
+
+> Store durable, project-level decisions here. Do not include credentials, tokens, customer data, or private business data.
+
+## How To Use This Artifact
+
+- Record only decisions that future planning, implementation, or verification work should recall.
+- Prefer one entry per decision.
+- Link related hazards, verification expectations, or follow-up work when relevant.
+
+## Entry Template
+
+### DECISION-000
+
+- Date:
+- Status: proposed | accepted | superseded
+- Area:
+- Decision:
+- Why this decision exists:
+- What changes if revisited:
+- Related hazards:
+- Verification impact:
+- Follow-up:
+EOF
+}
+
+harness_skeleton_hazards_md() {
+  cat <<'EOF'
+# Hazards
+
+> Store durable, project-level hazards here. Do not include credentials, tokens, customer data, or private business data.
+
+## How To Use This Artifact
+
+- Put recurring failure modes, fragile integrations, and regression-prone areas here.
+- Keep entries specific enough to change planning or verification behavior.
+- Prefer confirmed hazards over vague worries.
+
+## Entry Template
+
+### HAZARD-000
+
+- Date:
+- Severity: low | medium | high
+- Area:
+- Trigger:
+- Failure mode:
+- Early warning signs:
+- Mitigation:
+- Verification focus:
+- Related decisions:
+- Notes:
+EOF
+}
+
+harness_skeleton_index_md() {
+  cat <<'EOF'
+# Memory Index
+
+> Index reusable project memory here. Do not include credentials, tokens, customer data, or private business data.
+
+## How To Use This Artifact
+
+- Capture reusable commands, verification recipes, and lookup pointers that future work can apply safely.
+- Use this file as the first stop for repeatable checks before re-deriving commands from scratch.
+- Link out to DECISIONS.md, HAZARDS.md, goal artifacts, or repo docs when that is more durable than copying content.
+
+## Reusable Commands
+
+| Name | Command | When To Use | Notes |
+| --- | --- | --- | --- |
+|  |  |  |  |
+
+## Verification Recipes
+
+| Area | Check | Evidence To Capture | Notes |
+| --- | --- | --- | --- |
+|  |  |  |  |
+
+## Useful References
+
+| Topic | Artifact Or Doc | Why It Matters |
+| --- | --- | --- |
+|  |  |  |
+EOF
+}
+
 init_harness_profile() {
   printf '%s\n' '' '--- .harness/ init ---'
   write_target_file '.harness/HARNESS.md' "$(harness_skeleton_harness_md)"
@@ -1419,6 +1620,9 @@ init_harness_profile() {
   write_target_file '.harness/WORKFLOW.md' "$(harness_skeleton_workflow_md)"
   write_target_file '.harness/GATES.md' "$(harness_skeleton_gates_md)"
   write_target_file '.harness/MEMORY.md' "$(harness_skeleton_memory_md)"
+  write_target_file '.harness/DECISIONS.md' "$(harness_skeleton_decisions_md)"
+  write_target_file '.harness/HAZARDS.md' "$(harness_skeleton_hazards_md)"
+  write_target_file '.harness/INDEX.md' "$(harness_skeleton_index_md)"
   write_target_file '.harness/goals/.gitkeep' ''
   printf '%s\n' '--- .harness/ init complete ---'
 }

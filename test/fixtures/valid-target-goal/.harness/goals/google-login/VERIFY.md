@@ -6,8 +6,9 @@ Add Google login.
 
 ## Status
 
-- `passed`
-- Summary: the structural verification artifact is complete for this fixture.
+status: passed
+freshness: fixture snapshot 2026-06-03
+summary: the structural verification artifact is complete for this fixture.
 
 ## Tests Run
 
@@ -29,4 +30,4 @@ Add Google login.
 
 ## Known Gaps
 
-- None
+- No behavioral application test evidence is included in this fixture; it is structural validation only.

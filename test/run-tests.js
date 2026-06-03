@@ -250,11 +250,30 @@ runTest("VERIFY template uses evidence-first contract headings", () => {
 runTest("VERIFY template uses structured status and safe Known Gaps default", () => {
   const text = fs.readFileSync(path.join(repoRoot, "templates", "VERIFY.md"), "utf8");
   assert.match(text, /status:\s*pending/i);
+  assert.match(text, /freshness:/i);
   assert.match(text, /Not assessed yet/i);
   assert.doesNotMatch(text, /## Known Gaps\s*\n\s*-?\s*None\s*$/im);
   const failures = [];
   assertVerifyTemplateContract(repoRoot, failures);
   assert.deepEqual(failures, []);
+});
+
+runTest("valid target goal VERIFY artifact uses machine-readable status and freshness", () => {
+  const text = fs.readFileSync(
+    path.join(
+      repoRoot,
+      "test",
+      "fixtures",
+      "valid-target-goal",
+      ".harness",
+      "goals",
+      "google-login",
+      "VERIFY.md"
+    ),
+    "utf8"
+  );
+  assert.match(text, /status:\s*(pending|passed|failed|blocked|partial)/i);
+  assert.match(text, /freshness:/i);
 });
 
 runTest("PLAN template includes Approval Status fields", () => {
@@ -2550,6 +2569,123 @@ runTest("aih.sh doctor reports runtime-commands after claude install", () => {
   const result = runAihSh(["doctor", "--target", tmp], { env: { PATH: process.env.PATH } });
   assert.match(result.stdout, /runtime-commands exists/);
   assert.match(result.stdout, /activation\.md exists/);
+});
+
+runTest("aih.sh doctor reports workflow PASS for approved plan, verification evidence, and typed memory", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-doctor-workflow-pass-"));
+  initFakeGitWorkTree(tmp);
+  assert.equal(
+    runAihSh(
+      ["install", "--runtime", "claude", "--scope", "project", "--init-harness", "--yes", "--target", tmp],
+      { env: { PATH: process.env.PATH } }
+    ).status,
+    0
+  );
+
+  fs.writeFileSync(
+    path.join(tmp, ".harness", "PLAN.md"),
+    `# Plan
+
+## Approval Status
+
+status: approved
+approved_by: test
+approved_at: 2026-06-03
+notes: approved in fixture
+`,
+    "utf8"
+  );
+  fs.writeFileSync(
+    path.join(tmp, ".harness", "VERIFY.md"),
+    `# Verification
+
+## Status
+
+status: passed
+summary: focused checks passed
+
+## Tests Run
+
+| Command | Exit Code | Result | Notes |
+|---|---:|---|---|
+| \`npm test\` | 0 | passed | focused doctor fixture |
+
+## Evidence
+
+- Commands executed: \`npm test\`
+- Output summary: 1 suite passed
+`,
+    "utf8"
+  );
+  fs.writeFileSync(path.join(tmp, ".harness", "DECISIONS.md"), "# Decisions\n", "utf8");
+  fs.writeFileSync(path.join(tmp, ".harness", "HAZARDS.md"), "# Hazards\n", "utf8");
+  fs.writeFileSync(path.join(tmp, ".harness", "INDEX.md"), "# Index\n", "utf8");
+
+  const result = runAihSh(["doctor", "--target", tmp], { env: { PATH: process.env.PATH } });
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /PASS \.harness\/PLAN\.md approval status approved/);
+  assert.match(result.stdout, /PASS \.harness\/VERIFY\.md contains verification evidence/);
+  assert.match(result.stdout, /PASS typed memory artifacts present/);
+});
+
+runTest("aih.sh doctor warns on unapproved plan, fails weak verification evidence, and warns on missing typed memory", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-doctor-workflow-fail-"));
+  initFakeGitWorkTree(tmp);
+  assert.equal(
+    runAihSh(
+      ["install", "--runtime", "claude", "--scope", "project", "--init-harness", "--yes", "--target", tmp],
+      { env: { PATH: process.env.PATH } }
+    ).status,
+    0
+  );
+
+  fs.writeFileSync(
+    path.join(tmp, ".harness", "PLAN.md"),
+    `# Plan
+
+## Approval Status
+
+status: draft
+approved_by:
+approved_at:
+notes:
+`,
+    "utf8"
+  );
+  fs.writeFileSync(
+    path.join(tmp, ".harness", "VERIFY.md"),
+    `# Verification
+
+## Status
+
+status: passed
+summary: claimed pass without real evidence
+
+## Tests Run
+
+| Command | Exit Code | Result | Notes |
+|---|---:|---|---|
+| | | | |
+
+## Evidence
+
+- Commands executed:
+- Files inspected:
+- Link, log, or snippet:
+`,
+    "utf8"
+  );
+  fs.rmSync(path.join(tmp, ".harness", "DECISIONS.md"), { force: true });
+  fs.rmSync(path.join(tmp, ".harness", "HAZARDS.md"), { force: true });
+  fs.rmSync(path.join(tmp, ".harness", "INDEX.md"), { force: true });
+
+  const result = runAihSh(["doctor", "--target", tmp], { env: { PATH: process.env.PATH } });
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stdout, /WARN \.harness\/PLAN\.md approval status is draft/);
+  assert.match(result.stdout, /FAIL \.harness\/VERIFY\.md claims completed verification without concrete evidence/);
+  assert.match(result.stdout, /WARN typed memory artifacts missing: DECISIONS\.md, HAZARDS\.md, INDEX\.md/);
 });
 
 runTest("README provider support lists four active providers without OpenCode install", () => {

@@ -9,6 +9,7 @@
 ## Status
 
 status: pending
+freshness: pending run
 summary:
 
 ## Tests Run

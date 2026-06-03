@@ -10,6 +10,8 @@ Map the host repository, active `.harness/` artifacts, affected code areas, and 
 - `.harness/STATE.md` if present
 - `.harness/GOAL.md` if present
 - `.harness/CONTEXT.md` if present
+- `.harness/HAZARDS.md` if present
+- `.harness/INDEX.md` if present
 - `.harness/REMEMBER.md` if present
 
 ## Preconditions
@@ -32,7 +34,7 @@ Map the host repository, active `.harness/` artifacts, affected code areas, and 
 
 ## Step-By-Step Workflow
 
-1. Read the active `.harness/` artifacts before inspecting code.
+1. Read the active `.harness/` artifacts before inspecting code, with `.harness/HAZARDS.md` first when present.
 2. Inventory the repository structure and identify likely entry points, boundaries, or ownership areas.
 3. Determine which code, docs, or configs are likely to be affected by the active goal.
 4. Separate observed facts from inferred structure.
@@ -61,7 +63,7 @@ The command is complete when the relevant repository areas, active artifacts, li
 
 ## Artifact Paths
 
-- Read: `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/CONTEXT.md`, `.harness/REMEMBER.md`
+- Read: `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/CONTEXT.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/REMEMBER.md`
 - Write: `.harness/CONTEXT.md`, `.harness/STATE.md`
 
 ## Human Approval

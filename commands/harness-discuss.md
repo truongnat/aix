@@ -12,6 +12,8 @@ Synthesize existing harness artifacts and produce a decision-oriented discussion
 - `.harness/PLAN.md` if present
 - `.harness/DISCUSSION.md` if present
 - `.harness/CONTEXT.md` if present
+- `.harness/DECISIONS.md` if present
+- `.harness/HAZARDS.md` if present
 
 ## Preconditions
 
@@ -33,7 +35,7 @@ Synthesize existing harness artifacts and produce a decision-oriented discussion
 
 ## Step-By-Step Workflow
 
-1. Read the minimum read set in order of artifact priority.
+1. Read the minimum read set in order of artifact priority, including typed memory artifacts when they shape scope or constraints.
 2. If `.harness/REVIEW.md` exists, synthesize it into a decision-oriented discussion instead of repeating the whole review.
 3. Otherwise restate the request, separate confirmed requirements from assumptions, and compare realistic approaches.
 4. Write or update `.harness/DISCUSSION.md`.
@@ -71,7 +73,7 @@ The command is complete when the discussion artifact makes the goal, boundaries,
 
 ## Artifact Paths
 
-- Read: `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/REVIEW.md`, `.harness/PLAN.md`, `.harness/DISCUSSION.md`, `.harness/CONTEXT.md`, `.harness/REMEMBER.md`
+- Read: `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/REVIEW.md`, `.harness/PLAN.md`, `.harness/DISCUSSION.md`, `.harness/CONTEXT.md`, `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/REMEMBER.md`
 - Write: `.harness/DISCUSSION.md`, optional `.harness/GOAL.md` or `.harness/REQUIREMENTS.md`
 
 ## Human Approval

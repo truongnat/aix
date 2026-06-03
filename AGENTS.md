@@ -51,6 +51,9 @@ Before taking action, read the relevant artifacts in `.harness/` when they exist
 
 - `.harness/PROJECT.md`
 - `.harness/ROADMAP.md`
+- `.harness/DECISIONS.md`
+- `.harness/HAZARDS.md`
+- `.harness/INDEX.md`
 - `.harness/GOAL.md`
 - `.harness/REQUIREMENTS.md`
 - `.harness/STATE.md`
@@ -69,14 +72,14 @@ Never skip the active goal, state, and plan when they exist, but do not read unr
 
 Default minimum read sets by command:
 
-- `harness-map`: `AGENTS.md`, `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/CONTEXT.md`, `.harness/REMEMBER.md`
+- `harness-map`: `AGENTS.md`, `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/CONTEXT.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/REMEMBER.md`
 - `harness-start`: `AGENTS.md`, `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/PLAN.md`, `.harness/CONTEXT.md`
-- `harness-discuss`: `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/REVIEW.md`, `.harness/PLAN.md`, `.harness/DISCUSSION.md`, `.harness/CONTEXT.md`
-- `harness-plan`: `.harness/GOAL.md`, `.harness/DISCUSSION.md`, `.harness/STATE.md`, `.harness/CONTEXT.md`
+- `harness-discuss`: `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/REVIEW.md`, `.harness/PLAN.md`, `.harness/DISCUSSION.md`, `.harness/CONTEXT.md`, `.harness/DECISIONS.md`, `.harness/HAZARDS.md`
+- `harness-plan`: `.harness/GOAL.md`, `.harness/DISCUSSION.md`, `.harness/STATE.md`, `.harness/CONTEXT.md`, `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`
 - `harness-run`: `.harness/PLAN.md`, `.harness/TASKS.md`, `.harness/GOAL.md`, `.harness/STATE.md`, relevant implementation files
-- `harness-verify`: `.harness/PLAN.md`, `.harness/GOAL.md`, `.harness/TASKS.md`, changed files, `.harness/VERIFY.md`
+- `harness-verify`: `.harness/PLAN.md`, `.harness/GOAL.md`, `.harness/TASKS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, changed files, `.harness/VERIFY.md`
 - `harness-ship`: `.harness/PLAN.md`, `.harness/VERIFY.md`, `.harness/STATE.md`, `.harness/REVIEW.md`
-- `harness-remember`: `.harness/VERIFY.md`, `.harness/SHIP.md`, `.harness/PLAN.md`, `.harness/REMEMBER.md`
+- `harness-remember`: `.harness/VERIFY.md`, `.harness/SHIP.md`, `.harness/PLAN.md`, `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/REMEMBER.md`
 
 ## Command Discipline
 
@@ -173,6 +176,13 @@ Do store:
 - recurring hazards
 - root-cause summaries
 - reusable commands and edge cases
+
+Prefer typed project-memory artifacts when the lesson applies across goals:
+
+- `.harness/DECISIONS.md` for durable project decisions
+- `.harness/HAZARDS.md` for recurring risks and fragile areas
+- `.harness/INDEX.md` for reusable commands, verification recipes, and lookup pointers
+- `.harness/REMEMBER.md` for goal-level lessons that may later be promoted
 
 Do not store:
 

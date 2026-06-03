@@ -9,6 +9,9 @@ Capture durable, reusable, non-sensitive lessons after verified work or a meanin
 - `.harness/VERIFY.md`
 - `.harness/SHIP.md` if present
 - `.harness/PLAN.md` if present
+- `.harness/DECISIONS.md` if present
+- `.harness/HAZARDS.md` if present
+- `.harness/INDEX.md` if present
 - `.harness/REMEMBER.md` if present
 
 ## Preconditions
@@ -33,12 +36,12 @@ Capture durable, reusable, non-sensitive lessons after verified work or a meanin
 1. Review the outcome, not just the implementation steps.
 2. Extract the durable lesson, decision, root cause, or hazard.
 3. Remove transient details and anything sensitive.
-4. Write the memory into `.harness/REMEMBER.md`.
+4. Write the lesson into the right memory artifact: `DECISIONS.md`, `HAZARDS.md`, `INDEX.md`, or goal-level `REMEMBER.md`.
 5. Confirm the note is safe, durable, and reusable.
 
 ## Required Outputs
 
-- `.harness/REMEMBER.md`
+- updated typed memory artifact(s) and/or `.harness/REMEMBER.md`
 - `.harness/STATE.md` updated if memory affects future execution
 - a concise durable lesson or hazard note
 
@@ -59,8 +62,8 @@ The command is complete when a future operator can recover the important lesson 
 
 ## Artifact Paths
 
-- Read: `.harness/VERIFY.md`, `.harness/SHIP.md`, `.harness/PLAN.md`, `.harness/REMEMBER.md`
-- Write: `.harness/REMEMBER.md`, optional `.harness/STATE.md`
+- Read: `.harness/VERIFY.md`, `.harness/SHIP.md`, `.harness/PLAN.md`, `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/REMEMBER.md`
+- Write: `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/REMEMBER.md`, optional `.harness/STATE.md`
 
 ## Human Approval
 

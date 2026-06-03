@@ -9,6 +9,8 @@ Gather fresh evidence that the implemented work meets the goal before any comple
 - `.harness/PLAN.md`
 - `.harness/GOAL.md`
 - `.harness/TASKS.md` if present
+- `.harness/HAZARDS.md` if present
+- `.harness/INDEX.md` if present
 - changed files
 - `.harness/VERIFY.md` if present
 
@@ -33,7 +35,7 @@ Gather fresh evidence that the implemented work meets the goal before any comple
 
 ## Step-By-Step Workflow
 
-1. Identify the exact checks that prove the claim.
+1. Identify the exact checks that prove the claim, using `.harness/INDEX.md` for reusable verification recipes and `.harness/HAZARDS.md` for regression focus when present.
 2. Run the checks fresh.
 3. Record automated checks, manual checks, evidence, and known gaps in `.harness/VERIFY.md`.
 4. Compare the evidence against the goal and plan.
@@ -64,7 +66,7 @@ The command is complete when `.harness/VERIFY.md` contains fresh evidence that c
 
 ## Artifact Paths
 
-- Read: `.harness/PLAN.md`, `.harness/GOAL.md`, `.harness/TASKS.md`, `.harness/VERIFY.md`
+- Read: `.harness/PLAN.md`, `.harness/GOAL.md`, `.harness/TASKS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/VERIFY.md`
 - Write: `.harness/VERIFY.md`, `.harness/STATE.md`, optional `.harness/REVIEW.md`
 
 ## Human Approval

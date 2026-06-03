@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the project memory model for `ai-engineering-harness`. It extends memory beyond a single `REMEMBER.md` note and explains how agents should recall and update durable context safely.
+This document defines the project memory model for `ai-engineering-harness`. It explains how agents should recall and update durable context safely across shared typed memory artifacts and goal-level lessons.
 
 ## Core Rules
 
@@ -44,16 +44,38 @@ Important unresolved items that must be revisited before future planning or exec
 
 ## Shared Project Memory
 
-`.harness/MEMORY.md` should hold durable memory that applies across goals:
+Shared project memory should be typed so command workflows can recall the right context quickly:
 
-- stable project facts
-- recurring constraints
-- repeated hazards
-- durable decisions
-- reusable verification or debug commands
-- important open questions that affect multiple goals
+### `.harness/DECISIONS.md`
 
-This file should be concise, sanitized, and worth reading before planning.
+Use for durable project decisions that shape future planning, implementation, or verification.
+
+- architectural choices
+- policy decisions
+- accepted tradeoffs
+- constraints that exist because of a deliberate choice
+
+### `.harness/HAZARDS.md`
+
+Use for recurring risks and fragile areas that should change how future work is mapped, planned, or verified.
+
+- regression-prone paths
+- brittle integrations
+- confirmed failure modes
+- mitigation and verification focus
+
+### `.harness/INDEX.md`
+
+Use for reusable commands, verification recipes, and durable lookup pointers.
+
+- repeatable verification commands
+- common debug or inspection commands
+- links to important repo docs or memory artifacts
+- evidence capture guidance that applies across goals
+
+### `.harness/MEMORY.md`
+
+Use for the memory policy or profile when a repository adopts the harness-build profile flow. This file explains memory boundaries; it should not become the only operational memory sink once typed memory artifacts exist.
 
 ## Goal-Level Memory
 
@@ -71,7 +93,7 @@ Not every goal-level lesson belongs in shared memory. Only durable, reusable ite
 
 For tiny repositories or first-time adoption, start with the lighter guidance in [docs/small-repo-memory.md](small-repo-memory.md).
 
-Use the small-repo mode when one shared `MEMORY.md` plus goal-level `REMEMBER.md` is enough to capture durable lessons safely.
+Use the small-repo mode when one shared `MEMORY.md` plus goal-level `REMEMBER.md` is enough to capture durable lessons safely. As complexity grows, split shared memory into `DECISIONS.md`, `HAZARDS.md`, and `INDEX.md`.
 
 ## What Must Never Be Stored
 
@@ -90,15 +112,15 @@ Do not store:
 
 ### Map
 
-Read shared memory first to identify known architecture facts, hazards, and prior root causes before exploring the repo.
+Read `HAZARDS.md` first when present so known failure modes shape the initial map. Then use `INDEX.md` for lookup pointers and reusable commands.
 
 ### Discuss
 
-Use memory to challenge false assumptions, surface constraints, and identify prior decisions that shape scope.
+Use `DECISIONS.md` and `HAZARDS.md` to challenge false assumptions, surface constraints, and identify prior decisions that shape scope.
 
 ### Plan
 
-Recall relevant project facts, hazards, decisions, and reusable commands before writing the plan.
+Recall `DECISIONS.md`, `HAZARDS.md`, and `INDEX.md` before writing the plan.
 
 ### Run
 
@@ -106,7 +128,7 @@ Use memory as a guardrail against repeating known mistakes or violating prior de
 
 ### Verify
 
-Use reusable commands, known regression areas, and historical hazards to shape verification depth.
+Use `INDEX.md` for reusable commands and verification recipes, and use `HAZARDS.md` for regression-prone areas.
 
 ### Ship
 
@@ -114,7 +136,12 @@ Reference memory when summarizing what changed, what risks remain, and what futu
 
 ### Remember
 
-Promote only durable, sanitized lessons into memory artifacts. Leave ephemeral session detail out.
+Promote only durable, sanitized lessons into the right memory artifact:
+
+- `DECISIONS.md` for project-level choices
+- `HAZARDS.md` for recurring risks or root-cause patterns
+- `INDEX.md` for reusable commands and recipes
+- goal-level `REMEMBER.md` for lessons that are still local to the completed goal
 
 ## Practical Rule
 

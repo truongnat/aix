@@ -10,6 +10,9 @@ Translate the agreed goal into an explicit, reviewable implementation plan.
 - `.harness/DISCUSSION.md` if present
 - `.harness/STATE.md`
 - `.harness/CONTEXT.md` if present
+- `.harness/DECISIONS.md` if present
+- `.harness/HAZARDS.md` if present
+- `.harness/INDEX.md` if present
 
 ## Preconditions
 
@@ -31,7 +34,7 @@ Translate the agreed goal into an explicit, reviewable implementation plan.
 
 ## Step-By-Step Workflow
 
-1. Restate the approved goal and scope.
+1. Restate the approved goal and scope after recalling relevant decisions, hazards, and reusable commands.
 2. Identify the files, systems, and `.harness/` artifacts that will change.
 3. Break the work into small ordered tasks.
 4. Define verification strategy, approval points, and not-run risks.
@@ -63,7 +66,7 @@ The command is complete when `.harness/PLAN.md` contains concrete ordered work, 
 
 ## Artifact Paths
 
-- Read: `.harness/GOAL.md`, `.harness/DISCUSSION.md`, `.harness/STATE.md`, `.harness/CONTEXT.md`
+- Read: `.harness/GOAL.md`, `.harness/DISCUSSION.md`, `.harness/STATE.md`, `.harness/CONTEXT.md`, `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`
 - Write: `.harness/PLAN.md`, `.harness/TASKS.md`, `.harness/STATE.md`
 
 ## Human Approval
