@@ -14,6 +14,13 @@ Inspect changes for bugs, regressions, risk, and missing verification before wor
 
 - when no changes have been made
 - when the task is only early-stage goal clarification
+- when the work is still too incomplete for meaningful inspection
+
+## Inputs
+
+- goal and plan artifacts
+- changed files or diffs
+- existing verification evidence if present
 
 ## Workflow
 
@@ -30,11 +37,19 @@ Inspect changes for bugs, regressions, risk, and missing verification before wor
 - Review the change against requirements, not just style.
 - Missing verification is a finding.
 
-## Output Format
+## Output Contract
 
-- findings list
-- open questions
-- residual risk statement
+This skill must produce:
+
+- a findings list
+- open questions when needed
+- a residual risk statement
+
+## Common Failure Modes
+
+- turning review into a style-only pass
+- restating the diff without identifying risk
+- ignoring verification gaps because code “looks fine”
 
 ## Checklist Before Done
 

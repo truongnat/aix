@@ -12,7 +12,7 @@
 
 ## Purpose
 
--
+- 
 
 ## Boundary
 
@@ -27,11 +27,7 @@
 
 - [ ]
 
-## Required Inputs
-
-- [ ]
-
-## Expected Outputs
+## Inputs
 
 - [ ]
 
@@ -43,19 +39,19 @@
 
 - [ ]
 
+## Output Contract
+
+- [ ]
+
+## Common Failure Modes
+
+- [ ]
+
 ## Decision Rules
 
 - Default:
 - Tradeoff:
 - Escalate when:
-
-## Anti-Patterns
-
-- [ ]
-
-## Output Format
-
-- [ ]
 
 ## Verification Expectations
 

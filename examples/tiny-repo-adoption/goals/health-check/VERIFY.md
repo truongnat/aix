@@ -1,30 +1,33 @@
-# VERIFY
+# Verification
 
 ## Goal
 
 Add a health check endpoint without changing existing behavior.
 
-## Verification Commands
+## Status
 
-- `node validate.js --target ../my-project --profile-only`
-- `node validate.js --target ../my-project --goal health-check`
+- `pending`
+- Summary: validation should be run in the adopted target repo before claiming completion.
 
-## Manual Verification
+## Tests Run
 
-Confirm the artifacts are understandable and structurally complete.
+| Command | Exit Code | Result | Notes |
+|---|---:|---|---|
+| `node validate.js --target ../my-project --profile-only` | not run | pending | Run after profile artifacts are created |
+| `node validate.js --target ../my-project --goal health-check` | not run | pending | Run after goal artifacts are created |
 
-## Regression Checks
+## Manual Checks
 
-Re-run validation after any artifact edits.
-
-## Not Run
-
-No application runtime checks are included in this example.
-
-## Result
-
-Pending validation.
+| Step | Expected | Observed | Result |
+|---|---|---|---|
+| Review artifact set | Artifacts are understandable and structurally complete | Not run in example | pending |
 
 ## Evidence
 
-Validation command output should be recorded during real use.
+- Commands executed: record validation commands during real use
+- Files inspected: profile and goal artifacts in the target repo
+- Link, log, or snippet: attach validation output during real verification
+
+## Known Gaps
+
+- No application runtime checks are included in this example.

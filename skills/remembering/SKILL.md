@@ -16,6 +16,12 @@ Capture durable lessons, constraints, and decisions that will improve later sess
 - for noisy details that do not help future work
 - when the lesson cannot be written safely without exposing sensitive data
 
+## Inputs
+
+- verification and ship artifacts
+- prior memory notes if present
+- the durable lesson, decision, or hazard to preserve
+
 ## Workflow
 
 1. Review the goal, plan, verification, and outcome.
@@ -31,11 +37,19 @@ Capture durable lessons, constraints, and decisions that will improve later sess
 - Short, precise memory loads faster.
 - Record constraints that are easy to forget but costly to miss.
 
-## Output Format
+## Output Contract
 
-- remember note
-- durable decision list
+This skill must produce:
+
+- a remember note
+- durable decisions or hazards
 - affected-area references
+
+## Common Failure Modes
+
+- saving transient execution chatter
+- storing secrets or sensitive business details
+- writing a lesson before verifying whether it is durable
 
 ## Checklist Before Done
 

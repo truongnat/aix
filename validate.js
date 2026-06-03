@@ -253,11 +253,11 @@ const skillFiles = [
 
 const commandHeadings = [
   "## Purpose",
-  "## When To Use",
-  "## Required Reads",
-  "## Skills To Use",
-  "## Step-By-Step Workflow",
-  "## Output Artifacts",
+  "## Minimum Read Set",
+  "## Preconditions",
+  "## Required Outputs",
+  "## Redirect Behavior",
+  "## Failure Conditions",
   "## Completion Gate"
 ];
 
@@ -265,9 +265,11 @@ const skillHeadings = [
   "## Purpose",
   "## When To Use",
   "## When Not To Use",
+  "## Inputs",
   "## Workflow",
   "## Operating Principles",
-  "## Output Format",
+  "## Output Contract",
+  "## Common Failure Modes",
   "## Checklist Before Done"
 ];
 
@@ -313,7 +315,10 @@ const skillTemplateHeadings = [
   "## Boundary",
   "## When To Use",
   "## When Not To Use",
+  "## Inputs",
   "## Workflow",
+  "## Output Contract",
+  "## Common Failure Modes",
   "## Checklist Before Done"
 ];
 const harnessHeadings = [
@@ -412,12 +417,11 @@ const goalArtifactHeadings = {
   ],
   "examples/harness-build/flutter-google-login/goals/google-login/VERIFY.md": [
     "## Goal",
-    "## Verification Commands",
-    "## Manual Verification",
-    "## Regression Checks",
-    "## Not Run",
-    "## Result",
-    "## Evidence"
+    "## Status",
+    "## Tests Run",
+    "## Manual Checks",
+    "## Evidence",
+    "## Known Gaps"
   ],
   "examples/harness-build/flutter-google-login/goals/google-login/REMEMBER.md": [
     "## Date",

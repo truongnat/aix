@@ -36,6 +36,15 @@ When information conflicts, use this order:
 
 If higher-priority artifacts conflict with each other, stop and surface the conflict before proceeding.
 
+## Progressive Loading
+
+Load only the artifacts that directly support the current command and task.
+
+- Start with the command's minimum read set.
+- Expand only when the current artifact points to a real gap, dependency, or contradiction.
+- Do not bulk-load the whole harness when a smaller read set is enough.
+- Skills should be loaded only when they directly support the active command and task, not just because they seem generally related.
+
 ## Required Reads First
 
 Before taking action, read the relevant artifacts in `.harness/` when they exist:
@@ -54,7 +63,20 @@ Before taking action, read the relevant artifacts in `.harness/` when they exist
 - `.harness/SHIP.md`
 - `.harness/REMEMBER.md`
 
-Read only what is relevant to the current command, but never skip the active goal, state, and plan when they exist.
+Never skip the active goal, state, and plan when they exist, but do not read unrelated artifacts just because they are present.
+
+## Minimum Read Sets
+
+Default minimum read sets by command:
+
+- `harness-map`: `AGENTS.md`, `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/CONTEXT.md`, `.harness/REMEMBER.md`
+- `harness-start`: `AGENTS.md`, `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/PLAN.md`, `.harness/CONTEXT.md`
+- `harness-discuss`: `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/REVIEW.md`, `.harness/PLAN.md`, `.harness/DISCUSSION.md`, `.harness/CONTEXT.md`
+- `harness-plan`: `.harness/GOAL.md`, `.harness/DISCUSSION.md`, `.harness/STATE.md`, `.harness/CONTEXT.md`
+- `harness-run`: `.harness/PLAN.md`, `.harness/TASKS.md`, `.harness/GOAL.md`, `.harness/STATE.md`, relevant implementation files
+- `harness-verify`: `.harness/PLAN.md`, `.harness/GOAL.md`, `.harness/TASKS.md`, changed files, `.harness/VERIFY.md`
+- `harness-ship`: `.harness/PLAN.md`, `.harness/VERIFY.md`, `.harness/STATE.md`, `.harness/REVIEW.md`
+- `harness-remember`: `.harness/VERIFY.md`, `.harness/SHIP.md`, `.harness/PLAN.md`, `.harness/REMEMBER.md`
 
 ## Command Discipline
 
@@ -71,11 +93,37 @@ Use the command loop intentionally:
 
 Rules:
 
-- Do not jump to `harness-run` without a clear goal and plan.
+- Do not jump to `harness-run` without a clear goal and an approved plan.
 - `harness-plan` stops before implementation.
 - `harness-run` follows the approved plan and must not drift scope silently.
 - `harness-verify` gathers evidence and must not assume success.
+- `harness-ship` requires verification evidence, not optimistic prose.
 - `harness-remember` stores only durable, non-sensitive lessons.
+
+## Phase Preconditions
+
+- `harness-plan` requires a current goal.
+- `harness-run` requires an approved plan and actionable implementation work.
+- `harness-verify` requires completed or inspectable implementation work.
+- `harness-ship` requires a verification artifact with real evidence.
+- `harness-remember` requires either a shipped result, a failed attempt, or a lesson worth preserving.
+
+## Redirect Behavior
+
+When a command's preconditions are not met:
+
+- stop immediately
+- state which precondition failed
+- redirect to the correct earlier command
+- do not pretend success
+
+Typical redirects:
+
+- unclear repo or impact zone -> `harness-map`
+- unclear goal or conflicting artifacts -> `harness-discuss`
+- missing or stale plan -> `harness-plan`
+- incomplete implementation -> `harness-run`
+- missing verification evidence -> `harness-verify`
 
 ## Skill Discipline
 
@@ -83,6 +131,16 @@ Rules:
 - Respect each skill's "when not to use" boundary.
 - Do not use a skill to justify skipping planning, review, or verification.
 - If a skill and an artifact conflict, the active artifact wins unless the human explicitly changes it.
+- Do not load a skill just because it is adjacent to the topic; load it only when it directly supports the current command and task.
+
+## Evidence-Based Verification
+
+Verification must be evidence-based:
+
+- `VERIFY.md` must record real status, tests run, manual checks, evidence, and known gaps.
+- A success claim requires fresh evidence, not confidence.
+- Skipped, blocked, or failed checks must be recorded explicitly.
+- `harness-ship` must not claim success if verification evidence is missing or contradictory.
 
 ## Safety And Scope Rules
 

@@ -50,11 +50,19 @@
 
 ## [0.11.0] - 2026-06-03
 
+### Added
+
+- v0.11.0 Step 2 command execution contracts: minimum read sets, phase preconditions, required outputs, redirect behavior, and failure conditions across harness commands
+- verification evidence contract for `VERIFY.md`: status, tests run, manual checks, evidence, and known gaps
+- skill boundaries and output contracts: `Inputs`, `Output Contract`, and `Common Failure Modes` across validated skills
+- progressive loading guidance in [AGENTS.md](AGENTS.md) so skills and artifacts are loaded only when they directly support the active command and task
+
 ### Changed
 
 - Narrowed active provider scope to Claude Code, Cursor, Codex, and Gemini.
 - Removed OpenCode from active provider support (wizard, install-runtime, README, matrices).
 - Claude Code as primary recommended path; Cursor secondary; Codex/Gemini experimental.
+- harness phase discipline now redirects to earlier commands when preconditions fail instead of allowing soft-success prose
 
 ### Notes
 

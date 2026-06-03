@@ -29,8 +29,9 @@ Every skill should define:
 - purpose
 - when to use
 - when not to use
-- required inputs
-- expected outputs
+- inputs
+- output contract
+- common failure modes
 - boundary
 
 The contract is the minimum promise the skill makes. If the boundary is unclear, the skill is not ready.
@@ -88,6 +89,7 @@ A skill is incomplete if it cannot say what “good enough” means.
 - Preserve required headings for validated skills.
 - Do not turn skills into long general essays.
 - Do not hide runtime assumptions inside the skill.
+- Do not load or recommend a skill just because it is generally related; it must directly support the active command and task.
 
 ## Anti-Bloat Rule
 

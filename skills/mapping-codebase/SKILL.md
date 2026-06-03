@@ -14,6 +14,13 @@ Understand the repository structure, active artifacts, boundaries, and likely im
 
 - when the affected area is already mapped and unchanged
 - when the task is limited to a known artifact with no impact questions
+- when the active command is already `harness-run` with a stable approved plan and no mapping gap
+
+## Inputs
+
+- current goal and state artifacts
+- repository file structure
+- relevant memory or context artifacts if they affect impact analysis
 
 ## Workflow
 
@@ -30,11 +37,19 @@ Understand the repository structure, active artifacts, boundaries, and likely im
 - Separate facts, inferences, and unknowns.
 - Focus on what the next command needs.
 
-## Output Format
+## Output Contract
 
-- affected-area map
-- dependencies and boundaries
-- unknown and risk list
+This skill must produce:
+
+- an affected-area map
+- key dependencies or boundaries
+- explicit unknowns and risks for the next command
+
+## Common Failure Modes
+
+- mapping the whole repo when only one boundary matters
+- presenting inference as fact
+- loading extra docs that do not help the next command
 
 ## Checklist Before Done
 

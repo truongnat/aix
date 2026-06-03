@@ -14,6 +14,13 @@ Produce a concrete implementation plan before changes begin.
 
 - when the session is only reading or reviewing
 - when executing an already approved and still-valid plan
+- when the goal is still materially unclear
+
+## Inputs
+
+- goal and discussion artifacts
+- current state and context
+- affected files, systems, and constraints
 
 ## Workflow
 
@@ -30,11 +37,20 @@ Produce a concrete implementation plan before changes begin.
 - Verification belongs in the plan, not just at the end.
 - Plans should minimize room for interpretation and scope drift.
 
-## Output Format
+## Output Contract
 
-- implementation plan
-- ordered task list
+This skill must produce:
+
+- an implementation plan
+- an ordered task list
 - verification and rollback strategy
+- explicit approval status or approval request
+
+## Common Failure Modes
+
+- writing a plan that is too vague to execute
+- forgetting verification or rollback
+- continuing into implementation after planning
 
 ## Checklist Before Done
 

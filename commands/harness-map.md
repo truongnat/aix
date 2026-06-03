@@ -4,21 +4,25 @@
 
 Map the host repository, active `.harness/` artifacts, affected code areas, and current constraints before deeper work.
 
+## Minimum Read Set
+
+- `AGENTS.md`
+- `.harness/STATE.md` if present
+- `.harness/GOAL.md` if present
+- `.harness/CONTEXT.md` if present
+- `.harness/REMEMBER.md` if present
+
+## Preconditions
+
+- The repository can be inspected safely.
+- The operator is not already in the middle of approved implementation work that should continue under `harness-run`.
+
 ## When To Use
 
 - at the start of a session in an unfamiliar repository
 - before `harness-discuss` or `harness-plan`
 - when `.harness/STATE.md` looks stale
 - when impact scope is unclear
-
-## Required Reads
-
-- `AGENTS.md`
-- `.harness/PROJECT.md` if present
-- `.harness/STATE.md` if present
-- `.harness/CONTEXT.md` if present
-- `.harness/GOAL.md` if present
-- `.harness/REMEMBER.md` if present
 
 ## Skills To Use
 
@@ -35,11 +39,21 @@ Map the host repository, active `.harness/` artifacts, affected code areas, and 
 5. Capture open questions, risks, and missing context in `.harness/CONTEXT.md` or `.harness/STATE.md`.
 6. Stop once the repository is mapped well enough to discuss or plan without guessing.
 
-## Output Artifacts
+## Required Outputs
 
-- `.harness/CONTEXT.md`
-- `.harness/STATE.md`
-- optional map summary in the session notes
+- `.harness/CONTEXT.md` or `.harness/STATE.md` updated with observed facts, impact zones, and open questions
+- an explicit statement of what should run next: `harness-discuss`, `harness-plan`, or `harness-start`
+
+## Redirect Behavior
+
+- If the current goal, state, or command is already clear from active artifacts, stop and redirect to the next needed command instead of remapping.
+- If artifact conflicts are discovered, stop and redirect to `harness-discuss`.
+
+## Failure Conditions
+
+- Do not claim the repo is mapped if the affected area is still guesswork.
+- Do not invent architecture, ownership, or system behavior.
+- Do not drift into planning or implementation.
 
 ## Completion Gate
 
@@ -47,20 +61,8 @@ The command is complete when the relevant repository areas, active artifacts, li
 
 ## Artifact Paths
 
-- Read: `.harness/PROJECT.md`, `.harness/STATE.md`, `.harness/CONTEXT.md`, `.harness/GOAL.md`, `.harness/REMEMBER.md`
+- Read: `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/CONTEXT.md`, `.harness/REMEMBER.md`
 - Write: `.harness/CONTEXT.md`, `.harness/STATE.md`
-
-## Stop Conditions
-
-- repository structure is mapped enough for planning
-- unresolved conflicts in artifacts have been surfaced
-- further inspection would be speculative rather than useful
-
-## Failure Modes
-
-- reading code before reading active artifacts
-- inferring architecture without evidence
-- mapping too broadly and losing task focus
 
 ## Human Approval
 

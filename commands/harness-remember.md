@@ -2,21 +2,25 @@
 
 ## Purpose
 
-Capture durable, reusable, non-sensitive lessons after verified work ships.
+Capture durable, reusable, non-sensitive lessons after verified work or a meaningful failed attempt.
+
+## Minimum Read Set
+
+- `.harness/VERIFY.md`
+- `.harness/SHIP.md` if present
+- `.harness/PLAN.md` if present
+- `.harness/REMEMBER.md` if present
+
+## Preconditions
+
+- There is either a shipped result, a failed attempt, or a lesson worth preserving.
+- The lesson can be written safely without storing secrets or private business data.
 
 ## When To Use
 
 - after verified work ships
-- after root causes or tradeoffs become clear
+- after a failed attempt reveals a durable hazard or root cause
 - when future sessions would benefit from a durable note
-
-## Required Reads
-
-- `.harness/PLAN.md`
-- `.harness/VERIFY.md`
-- `.harness/SHIP.md`
-- `.harness/REMEMBER.md` if present
-- `.harness/STATE.md`
 
 ## Skills To Use
 
@@ -26,17 +30,28 @@ Capture durable, reusable, non-sensitive lessons after verified work ships.
 
 ## Step-By-Step Workflow
 
-1. Review the verified outcome, not just the implementation steps.
+1. Review the outcome, not just the implementation steps.
 2. Extract the durable lesson, decision, root cause, or hazard.
 3. Remove transient details and anything sensitive.
 4. Write the memory into `.harness/REMEMBER.md`.
 5. Confirm the note is safe, durable, and reusable.
 
-## Output Artifacts
+## Required Outputs
 
 - `.harness/REMEMBER.md`
-- updated `.harness/STATE.md`
-- durable decision summary
+- `.harness/STATE.md` updated if memory affects future execution
+- a concise durable lesson or hazard note
+
+## Redirect Behavior
+
+- If the outcome is not yet verified or summarized, stop and redirect to `harness-verify` or `harness-ship`.
+- If the note is still transient status rather than durable memory, stop and keep it in state or ship artifacts instead.
+
+## Failure Conditions
+
+- Do not save transient execution noise.
+- Do not store credentials, tokens, customer data, or private business data.
+- Do not write memory before the outcome is understood well enough to generalize safely.
 
 ## Completion Gate
 
@@ -44,20 +59,8 @@ The command is complete when a future operator can recover the important lesson 
 
 ## Artifact Paths
 
-- Read: `.harness/PLAN.md`, `.harness/VERIFY.md`, `.harness/SHIP.md`, `.harness/STATE.md`
-- Write: `.harness/REMEMBER.md`, `.harness/STATE.md`
-
-## Stop Conditions
-
-- the lesson is durable
-- the note contains no secrets or private business data
-- the memory is useful for future sessions
-
-## Failure Modes
-
-- saving transient execution noise
-- storing credentials, tokens, customer data, or private business data
-- writing memory before the outcome is verified
+- Read: `.harness/VERIFY.md`, `.harness/SHIP.md`, `.harness/PLAN.md`, `.harness/REMEMBER.md`
+- Write: `.harness/REMEMBER.md`, optional `.harness/STATE.md`
 
 ## Human Approval
 

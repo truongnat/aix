@@ -14,13 +14,20 @@ Turn a vague request into a clear engineering objective with explicit scope, con
 
 - when goal, scope, and constraints are already documented clearly
 - when only executing an approved plan with no open requirement questions
+- when a review or verify artifact already dictates the next action
+
+## Inputs
+
+- current request
+- active goal, discussion, and state artifacts
+- relevant constraints or prior decisions
 
 ## Workflow
 
 1. Restate the ask in concrete engineering terms.
 2. Separate confirmed requirements from assumptions.
 3. Identify constraints, risks, and success criteria.
-4. Compare the realistic options and recommend one.
+4. Compare realistic options and recommend one.
 5. Capture the decision basis in a discussion artifact.
 
 ## Operating Principles
@@ -30,11 +37,19 @@ Turn a vague request into a clear engineering objective with explicit scope, con
 - Make tradeoffs explicit.
 - Do not invent hidden requirements or fake certainty.
 
-## Output Format
+## Output Contract
 
-- clarified goal
-- scope and constraint list
-- recommended approach with tradeoffs
+This skill must produce:
+
+- a clarified goal
+- explicit scope boundaries and constraints
+- a recommended approach with tradeoffs
+
+## Common Failure Modes
+
+- asking broad clarifying questions when existing artifacts already answer them
+- pretending assumptions are requirements
+- broadening scope during discussion
 
 ## Checklist Before Done
 

@@ -4,19 +4,24 @@
 
 Translate the agreed goal into an explicit, reviewable implementation plan.
 
+## Minimum Read Set
+
+- `.harness/GOAL.md`
+- `.harness/DISCUSSION.md` if present
+- `.harness/STATE.md`
+- `.harness/CONTEXT.md` if present
+
+## Preconditions
+
+- A current goal exists.
+- Goal and scope are explicit enough to break into ordered work.
+- Implementation has not started for the current scope.
+
 ## When To Use
 
 - after `harness-discuss`
 - before implementation or content changes
 - when an existing plan is missing, stale, or invalidated
-
-## Required Reads
-
-- `.harness/GOAL.md`
-- `.harness/DISCUSSION.md` if present
-- `.harness/CONTEXT.md`
-- `.harness/STATE.md`
-- relevant workflow and template documents
 
 ## Skills To Use
 
@@ -29,37 +34,37 @@ Translate the agreed goal into an explicit, reviewable implementation plan.
 1. Restate the approved goal and scope.
 2. Identify the files, systems, and `.harness/` artifacts that will change.
 3. Break the work into small ordered tasks.
-4. Define verification strategy and any not-run risks.
-5. Record assumptions, dependencies, rollback considerations, and approval points.
+4. Define verification strategy, approval points, and not-run risks.
+5. Record assumptions, dependencies, rollback considerations, and scope boundaries.
 6. Write the plan to `.harness/PLAN.md` and update `.harness/TASKS.md` if task tracking is needed.
 7. Stop before implementation.
 
-## Output Artifacts
+## Required Outputs
 
 - `.harness/PLAN.md`
-- `.harness/TASKS.md`
-- updated `.harness/STATE.md`
+- `.harness/TASKS.md` when tasks need tracking
+- `.harness/STATE.md` updated with planning status
+
+## Redirect Behavior
+
+- If the goal is missing or still materially ambiguous, stop and redirect to `harness-discuss`.
+- If the affected area is not understood well enough to plan safely, redirect to `harness-map`.
+- If implementation has already begun without a plan, stop, document the gap, and return to planning before further edits.
+
+## Failure Conditions
+
+- Do not write a vague plan with no verification strategy.
+- Do not mix planning with implementation.
+- Do not mark the plan execution-ready if approval status is still unclear.
 
 ## Completion Gate
 
-The command is complete when `.harness/PLAN.md` contains concrete ordered work, explicit scope, verification strategy, approval points, and implementation has not yet started.
+The command is complete when `.harness/PLAN.md` contains concrete ordered work, explicit scope, verification strategy, approval status, and implementation has not yet started.
 
 ## Artifact Paths
 
-- Read: `.harness/GOAL.md`, `.harness/DISCUSSION.md`, `.harness/CONTEXT.md`, `.harness/STATE.md`
+- Read: `.harness/GOAL.md`, `.harness/DISCUSSION.md`, `.harness/STATE.md`, `.harness/CONTEXT.md`
 - Write: `.harness/PLAN.md`, `.harness/TASKS.md`, `.harness/STATE.md`
-
-## Stop Conditions
-
-- the plan is complete enough for execution
-- approval points are explicit
-- implementation has not begun
-
-## Failure Modes
-
-- writing a vague plan with no verification
-- mixing planning with implementation
-- omitting out-of-scope or rollback considerations
 
 ## Human Approval
 

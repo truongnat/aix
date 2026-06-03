@@ -22,24 +22,18 @@ Create or revise skills so they remain clear, bounded, validated, and consistent
 - when only workflows or templates are changing
 - when an existing skill or pack already covers the need with small edits
 
-## Required Inputs
+## Inputs
 
 - [skills/SKILL_AUTHORING_RULES.md](../SKILL_AUTHORING_RULES.md)
 - [docs/skill-system.md](../../docs/skill-system.md)
 - [templates/SKILL.md](../../templates/SKILL.md)
 - the existing skill or pack set
 
-## Expected Outputs
-
-- an updated existing skill, pack, or a justified new skill
-- preserved required headings for validated skills
-- updated validation rules when new required repository files are introduced
-
 ## Workflow
 
 1. Check existing skills and packs first.
 2. Decide whether the need is better handled by updating an existing skill, updating a pack, or adding a new skill.
-3. Use `skills/SKILL_AUTHORING_RULES.md` to define metadata, contract, decision, knowledge, execution, and quality.
+3. Use `skills/SKILL_AUTHORING_RULES.md` to define metadata, contract, decision, execution, and quality.
 4. Keep the skill compact and preserve the repository heading structure.
 5. If a new required skill surface is added, update `validate.js`.
 6. Run `node validate.js` and `npm test`.
@@ -50,8 +44,22 @@ Create or revise skills so they remain clear, bounded, validated, and consistent
 - Skills should be single-purpose and distinct.
 - Boundaries prevent misuse and overlap.
 - Workflows should be actionable, not philosophical.
-- Skills should stay compact enough to scan quickly.
 - Skills should plug cleanly into commands, workflows, templates, and gates.
+
+## Output Contract
+
+This skill must produce:
+
+- an updated existing skill, pack, or a justified new skill
+- preserved required headings for validated skills
+- updated validation rules when new required repository files are introduced
+
+## Common Failure Modes
+
+- creating a new skill for a one-off task
+- duplicating an existing skill with minor wording changes
+- turning a skill into a long reference essay
+- forgetting to update validation for newly required repository contracts
 
 ## Decision Rules
 
@@ -60,33 +68,12 @@ Create or revise skills so they remain clear, bounded, validated, and consistent
 - Use a skill pack when the need is routing-oriented rather than deep capability-oriented.
 - Escalate if the proposed skill overlaps heavily with an existing skill or would create catalog bloat.
 
-## Anti-Patterns
-
-- creating a new skill for a one-off task
-- duplicating an existing skill with minor wording changes
-- turning a skill into a long reference essay
-- adding hidden runtime assumptions
-- forgetting to update validation for newly required repository contracts
-
-## Output Format
-
-- skill metadata
-- clear boundary
-- workflow and decision rules
-- output and verification expectations
-- checklist and safety notes
-
 ## Verification Expectations
 
 - `node validate.js` passes
 - `npm test` passes
 - required headings remain intact
 - the skill is compact and distinct from existing skills
-
-## Handoffs
-
-- Upstream: harness-build, skill selection, or maintainer request identifies the need
-- Downstream: updated skills, packs, docs, and validation rules can be used by future agents
 
 ## Checklist Before Done
 

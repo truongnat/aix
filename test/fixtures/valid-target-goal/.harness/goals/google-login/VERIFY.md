@@ -1,22 +1,32 @@
-# VERIFY
+# Verification
 
 ## Goal
+
 Add Google login.
 
-## Verification Commands
-Run node validate.js.
+## Status
 
-## Manual Verification
-Inspect failures.
+- `passed`
+- Summary: the structural verification artifact is complete for this fixture.
 
-## Regression Checks
-Profile contract still passes.
+## Tests Run
 
-## Not Run
-None.
+| Command | Exit Code | Result | Notes |
+|---|---:|---|---|
+| `node validate.js` | 0 | passed | Profile and goal contract validation passes |
 
-## Result
-Pass.
+## Manual Checks
+
+| Step | Expected | Observed | Result |
+|---|---|---|---|
+| Inspect failures | No structural failures remain | None observed | passed |
 
 ## Evidence
-Exit code zero.
+
+- Commands executed: `node validate.js`
+- Files inspected: `.harness/goals/google-login/*`
+- Link, log, or snippet: exit code zero
+
+## Known Gaps
+
+- None

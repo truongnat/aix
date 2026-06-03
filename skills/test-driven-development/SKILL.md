@@ -16,6 +16,12 @@ Introduce or change behavior by defining evidence first, then implementing the s
 - for structure-only repository scaffolding with no behavioral code path
 - when verification is inherently manual and cannot be automated yet
 
+## Inputs
+
+- the behavior change to prove
+- the relevant test or check surface
+- the current plan step being implemented
+
 ## Workflow
 
 1. Define the failing check or expected behavior first.
@@ -31,11 +37,19 @@ Introduce or change behavior by defining evidence first, then implementing the s
 - The smallest passing change is usually best.
 - Regression protection matters more than elegance.
 
-## Output Format
+## Output Contract
 
-- failing-check note
-- minimal implementation summary
-- passing verification note
+This skill must produce:
+
+- a failing-check note or equivalent red-state evidence
+- a minimal implementation summary
+- a passing verification note
+
+## Common Failure Modes
+
+- writing implementation before observing the failing behavior
+- expanding scope while “already in the file”
+- counting manual confidence as a substitute for regression protection
 
 ## Checklist Before Done
 

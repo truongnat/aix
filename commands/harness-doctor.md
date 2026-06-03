@@ -2,28 +2,51 @@
 
 ## Purpose
 
-Check harness readiness for **this repository** (local install only).
+Check harness readiness for this repository and report concrete remediation.
+
+## Minimum Read Set
+
+- `.ai-harness/manifest.json` if present
+- `.ai-harness/activation.md` if present
+- `.harness/STATE.md` if present
+
+## Preconditions
+
+- None. This command may be used before or after install.
 
 ## When To Use
 
 - after install
-- when `/harness:*` commands fail or agent uses wrong skills
+- when command routing fails or agents load the wrong skills
 - before a critical delivery
-
-## Required Reads
-
-- `.ai-harness/manifest.json`
-- `.ai-harness/activation.md`
 
 ## Step-By-Step Workflow
 
-1. Verify `.ai-harness/` exists.
-2. Verify `.ai-harness/runtime-commands/` exists and files reference `activation.md`.
-3. Verify `.harness/` exists or warn that project state is missing.
+1. Verify whether `.ai-harness/` exists.
+2. Verify whether `.ai-harness/runtime-commands/` exists and files reference `activation.md`.
+3. Verify whether `.harness/` exists or warn that project state is missing.
 4. Verify provider command entrypoints listed in `manifest.json` exist on disk.
-5. Confirm command files reference `.ai-harness/activation.md` (not global paths).
-6. Report PASS/WARN/FAIL per check; do not use sibling-repo or global harness files.
+5. Report PASS, WARN, or FAIL per check with remediation.
 
-## Outputs
+## Required Outputs
 
-- Doctor-style checklist with remediation (e.g. re-run `npx ai-engineering-harness install`).
+- doctor-style checklist with explicit PASS, WARN, or FAIL results
+- remediation guidance such as re-running install or build
+
+## Redirect Behavior
+
+- If the harness is not installed correctly, redirect to install or update.
+- If project state is missing but the install is healthy, redirect to `harness-build` or `harness-start`.
+
+## Failure Conditions
+
+- Do not use sibling-repo or global harness files as evidence for this repo.
+- Do not claim readiness if local command entrypoints or activation references are broken.
+
+## Completion Gate
+
+The command is complete when the operator can see whether the local harness surface is healthy and what to fix next if it is not.
+
+## Notes
+
+`harness-doctor` diagnoses local readiness. It should not silently repair state.

@@ -4,20 +4,26 @@
 
 Gather fresh evidence that the implemented work meets the goal before any completion or shipping claim.
 
+## Minimum Read Set
+
+- `.harness/PLAN.md`
+- `.harness/GOAL.md`
+- `.harness/TASKS.md` if present
+- changed files
+- `.harness/VERIFY.md` if present
+
+## Preconditions
+
+- There is completed or inspectable implementation work to verify.
+- The goal and plan define what evidence should prove success.
+- The operator is ready to run checks fresh instead of inferring success.
+
 ## When To Use
 
 - after implementation changes
 - before any completion claim
 - before merge, handoff, or release
 - after bugfixes, refactors, and risky documentation changes
-
-## Required Reads
-
-- `.harness/PLAN.md`
-- `.harness/GOAL.md`
-- `.harness/TASKS.md` if present
-- `.harness/REVIEW.md` if present
-- `.harness/VERIFY.md` if present
 
 ## Skills To Use
 
@@ -29,37 +35,37 @@ Gather fresh evidence that the implemented work meets the goal before any comple
 
 1. Identify the exact checks that prove the claim.
 2. Run the checks fresh.
-3. Record command output summaries, manual checks, and anything not run.
+3. Record automated checks, manual checks, evidence, and known gaps in `.harness/VERIFY.md`.
 4. Compare the evidence against the goal and plan.
-5. Write pass, fail, or partial status into `.harness/VERIFY.md`.
+5. Write `passed`, `failed`, `blocked`, or `pending` status into `.harness/VERIFY.md`.
 6. Stop if evidence is missing, contradictory, or failed.
 
-## Output Artifacts
+## Required Outputs
 
-- `.harness/VERIFY.md`
-- updated `.harness/STATE.md`
-- optional `.harness/REVIEW.md` if review findings were required
+- `.harness/VERIFY.md` with status, tests run, manual checks, evidence, and known gaps
+- `.harness/STATE.md` updated with verification status
+- optional `.harness/REVIEW.md` if inspection findings are required
+
+## Redirect Behavior
+
+- If implementation is not yet inspectable, stop and redirect to `harness-run`.
+- If the plan does not define what success means, stop and redirect to `harness-plan`.
+- If the goal itself is unclear, stop and redirect to `harness-discuss`.
+
+## Failure Conditions
+
+- Do not assume success because the change looks correct.
+- Do not record only passing checks and omit skipped or blocked evidence.
+- Do not reuse stale verification output as if it were fresh.
 
 ## Completion Gate
 
-The command is complete when the evidence clearly supports the claimed outcome or the exact verification gaps are documented so no one can mistake them for a pass.
+The command is complete when `.harness/VERIFY.md` contains fresh evidence that clearly supports a pass, fail, blocked, or pending result and no one could mistake missing evidence for a pass.
 
 ## Artifact Paths
 
-- Read: `.harness/PLAN.md`, `.harness/GOAL.md`, `.harness/TASKS.md`, `.harness/REVIEW.md`
-- Write: `.harness/VERIFY.md`, `.harness/STATE.md`
-
-## Stop Conditions
-
-- evidence supports the claim
-- evidence disproves the claim
-- verification is partial and the gap is documented
-
-## Failure Modes
-
-- assuming success because the change looks correct
-- reporting only passing checks and hiding skipped checks
-- claiming done with stale verification
+- Read: `.harness/PLAN.md`, `.harness/GOAL.md`, `.harness/TASKS.md`, `.harness/VERIFY.md`
+- Write: `.harness/VERIFY.md`, `.harness/STATE.md`, optional `.harness/REVIEW.md`
 
 ## Human Approval
 
@@ -67,4 +73,4 @@ Ask for approval if a known verification gap must be accepted for shipping or if
 
 ## Notes
 
-`harness-verify` is evidence collection, not optimism. Partial verification must be labeled as partial.
+`harness-verify` is evidence collection, not optimism. Partial or blocked verification must be labeled explicitly.

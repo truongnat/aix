@@ -4,20 +4,26 @@
 
 Execute the approved plan in small, surgical steps without silent scope drift.
 
+## Minimum Read Set
+
+- `.harness/PLAN.md`
+- `.harness/TASKS.md` if present
+- `.harness/GOAL.md`
+- `.harness/STATE.md`
+- relevant implementation files
+
+## Preconditions
+
+- `.harness/GOAL.md` exists and describes the current goal.
+- `.harness/PLAN.md` exists.
+- `.harness/PLAN.md` records explicit approval, such as `Status: approved` or equivalent approval notes.
+- `.harness/TASKS.md` contains at least one actionable task when task tracking is in use.
+
 ## When To Use
 
 - after `.harness/PLAN.md` is approved
 - when implementation is ready to begin
 - when resuming planned work
-
-## Required Reads
-
-- `.harness/PLAN.md`
-- `.harness/TASKS.md` if present
-- `.harness/GOAL.md`
-- `.harness/CONTEXT.md`
-- `.harness/STATE.md`
-- `.harness/VERIFY.md` if verification expectations already exist
 
 ## Skills To Use
 
@@ -33,37 +39,35 @@ Execute the approved plan in small, surgical steps without silent scope drift.
 3. Keep changes tightly aligned to the recorded scope.
 4. Update `.harness/TASKS.md` and `.harness/STATE.md` as status changes.
 5. Record deviations or blockers instead of improvising around them.
-6. Prepare verification notes in `.harness/VERIFY.md` as evidence is gathered.
-7. Stop and return to `harness-discuss` or `harness-plan` if scope changes materially.
+6. Stop once the implementation is complete enough to inspect or verify.
 
-## Output Artifacts
+## Required Outputs
 
-- implemented repository changes
-- `.harness/TASKS.md`
-- `.harness/STATE.md`
-- optional `.harness/VERIFY.md` draft notes
+- implemented repository changes required by the approved plan
+- `.harness/TASKS.md` updated with in-progress, completed, or blocked status
+- `.harness/STATE.md` updated with current execution state
+
+## Redirect Behavior
+
+- If the plan is missing, unapproved, stale, or contradicted by new findings, stop and redirect to `harness-plan`.
+- If the goal is unclear, stop and redirect to `harness-discuss`.
+- If implementation is complete enough to verify, stop and redirect to `harness-verify`.
+
+## Failure Conditions
+
+- Do not implement unplanned work.
+- Do not claim completion if implementation is partial.
+- Do not update `.harness/VERIFY.md` as a substitute for real verification.
+- Do not hide scope drift, skipped tasks, or blockers.
 
 ## Completion Gate
 
-The command is complete when the approved planned scope is implemented or explicitly paused, and any deviations are documented rather than hidden.
+The command is complete when the approved planned scope is implemented or explicitly paused, task and state artifacts reflect reality, and the next phase is `harness-verify` rather than more improvisation.
 
 ## Artifact Paths
 
-- Read: `.harness/PLAN.md`, `.harness/TASKS.md`, `.harness/GOAL.md`, `.harness/CONTEXT.md`, `.harness/STATE.md`
-- Write: `.harness/TASKS.md`, `.harness/STATE.md`, `.harness/VERIFY.md`
-
-## Stop Conditions
-
-- the next planned task is complete
-- a blocker requires re-planning
-- scope drift is detected
-- verification must run before further work
-
-## Failure Modes
-
-- implementing unplanned work
-- expanding scope because a nearby cleanup looks tempting
-- failing to update task or state artifacts
+- Read: `.harness/PLAN.md`, `.harness/TASKS.md`, `.harness/GOAL.md`, `.harness/STATE.md`
+- Write: `.harness/TASKS.md`, `.harness/STATE.md`
 
 ## Human Approval
 

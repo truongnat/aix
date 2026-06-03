@@ -1,4 +1,4 @@
-# Verify
+# Verification
 
 > Do not include credentials, tokens, customer data, or private business data.
 
@@ -6,43 +6,33 @@
 
 Prove that Google login can be added without breaking guest mode or session expectations.
 
-## Verification Commands
+## Status
 
-- Command: `flutter test`
-- Purpose: run targeted automated checks where available
+- `pending`
+- Summary: blocked until real Flutter and provider checks are run in the target app.
 
-- Command: targeted auth or widget tests
-- Purpose: verify login-related state transitions if the host repo provides them
+## Tests Run
 
-## Manual Verification
+| Command | Exit Code | Result | Notes |
+|---|---:|---|---|
+| `flutter test` | not run | pending | Example artifact only; run in the real host repo |
+| targeted auth or widget tests | not run | pending | Requires app-specific tests in the host repo |
 
-- confirm guest flow still enters the app
-- confirm Google login succeeds
-- confirm logout returns to the expected state
-- confirm token or session behavior is checked at the relevant app or API boundary
-- confirm simulator or device walkthrough is recorded
+## Manual Checks
 
-## Regression Checks
-
-- guest mode remains visible and reachable
-- login does not erase guest-mode capability
-- logout clears or resets state as expected
-- stale session state is not silently reused
-
-## Not Run
-
-- provider-specific end-to-end checks that require real credentials
-- platform matrix checks not available in the demo
-
-## Result
-
-- Status: example pending execution
-- Ship gate: blocked until the listed evidence exists
+| Step | Expected | Observed | Result |
+|---|---|---|---|
+| Guest flow still enters the app | Guest mode remains reachable | Not run in demo artifact | pending |
+| Google login succeeds | Login completes and session state is correct | Not run in demo artifact | pending |
+| Logout returns to expected state | Session resets without stale auth | Not run in demo artifact | pending |
 
 ## Evidence
 
-- This demo intentionally records the expected evidence model rather than fake execution output.
+- Commands executed: none in this example artifact
+- Files inspected: host-repo auth flow and session boundaries should be inspected during real verification
+- Link, log, or snippet: this demo records the expected evidence structure rather than fake execution output
 
-## Remaining Risks
+## Known Gaps
 
-- backend session rules may require deeper checks if the real app relies on API-issued auth state
+- Real provider credentials and platform checks are intentionally not run in the demo artifact.
+- Backend session rules may require deeper checks if the host app relies on API-issued auth state.

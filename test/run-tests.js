@@ -35,6 +35,22 @@ const validTargetProfileCursorFixture = path.join(
 const invalidTargetProfileFixture = path.join(repoRoot, "test", "fixtures", "invalid-target-profile");
 const validTargetGoalFixture = path.join(repoRoot, "test", "fixtures", "valid-target-goal");
 const invalidTargetGoalFixture = path.join(repoRoot, "test", "fixtures", "invalid-target-goal");
+const commandContractHeadings = [
+  "## Purpose",
+  "## Minimum Read Set",
+  "## Preconditions",
+  "## Required Outputs",
+  "## Redirect Behavior",
+  "## Failure Conditions"
+];
+const skillContractHeadings = [
+  "## Purpose",
+  "## When To Use",
+  "## When Not To Use",
+  "## Inputs",
+  "## Output Contract",
+  "## Common Failure Modes"
+];
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "ai-harness-test-"));
@@ -174,6 +190,50 @@ runTest("install.js skips existing files unless --force is passed", () => {
 runTest("validate.js passes for the repository", () => {
   const failures = validateRepository(repoRoot);
   assert.deepEqual(failures, []);
+});
+
+runTest("command docs include execution contract headings", () => {
+  const commandDir = path.join(repoRoot, "commands");
+
+  for (const fileName of fs.readdirSync(commandDir)) {
+    const fullPath = path.join(commandDir, fileName);
+    const text = fs.readFileSync(fullPath, "utf8");
+
+    for (const heading of commandContractHeadings) {
+      assert.match(text, new RegExp(heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    }
+  }
+});
+
+runTest("validated skills include contract headings", () => {
+  const skillDirs = [
+    "using-harness",
+    "mapping-codebase",
+    "discussing-goals",
+    "writing-plans",
+    "executing-plans",
+    "test-driven-development",
+    "code-review",
+    "verification",
+    "remembering",
+    "writing-skills"
+  ];
+
+  for (const dirName of skillDirs) {
+    const text = fs.readFileSync(path.join(repoRoot, "skills", dirName, "SKILL.md"), "utf8");
+
+    for (const heading of skillContractHeadings) {
+      assert.match(text, new RegExp(heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    }
+  }
+});
+
+runTest("VERIFY template uses evidence-first contract headings", () => {
+  const text = fs.readFileSync(path.join(repoRoot, "templates", "VERIFY.md"), "utf8");
+
+  for (const heading of ["## Status", "## Tests Run", "## Manual Checks", "## Evidence", "## Known Gaps"]) {
+    assert.match(text, new RegExp(heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
 });
 
 runTest("frozen validation contract: empty args use harness-repository mode", () => {

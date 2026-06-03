@@ -1,37 +1,34 @@
-# Verify
+# Verification
 
 > Do not include credentials, tokens, customer data, or private business data.
 
 ## Goal
 
--
+- 
 
-## Verification Commands
+## Status
 
-- Command:
-- Expected:
-- Actual:
+- `pending | passed | failed | blocked`
+- Summary:
 
-## Manual Verification
+## Tests Run
 
-- [ ]
+| Command | Exit Code | Result | Notes |
+|---|---:|---|---|
+| | | | |
 
-## Regression Checks
+## Manual Checks
 
-- [ ]
-
-## Not Run
-
-- [ ]
-
-## Result
-
-- Status: pass | fail | partial
+| Step | Expected | Observed | Result |
+|---|---|---|---|
+| | | | |
 
 ## Evidence
 
-- [ ]
+- Commands executed:
+- Files inspected:
+- Link, log, or snippet:
 
-## Remaining Risks
+## Known Gaps
 
-- [ ]
+- None

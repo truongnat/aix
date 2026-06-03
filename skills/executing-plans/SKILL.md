@@ -16,6 +16,12 @@ Execute an approved plan step by step without drifting scope or skipping state u
 - when the request is still being clarified
 - when the work is a pure review with no implementation
 
+## Inputs
+
+- approved plan
+- current task list and state
+- relevant implementation files
+
 ## Workflow
 
 1. Re-read the current plan before editing.
@@ -29,13 +35,21 @@ Execute an approved plan step by step without drifting scope or skipping state u
 - The plan is the source of execution truth.
 - Small steps reduce risk and rework.
 - Unplanned discoveries should be documented, not hidden.
-- Verification preparation should happen continuously.
+- Verification preparation should happen continuously without replacing the verify phase.
 
-## Output Format
+## Output Contract
 
-- completed step summary
-- updated tasks or state notes
+This skill must produce:
+
+- a completed step summary
+- updated task or state notes
 - documented deviations or blockers
+
+## Common Failure Modes
+
+- implementing beyond the approved step
+- silently rewriting the plan during execution
+- treating draft verification notes as final evidence
 
 ## Checklist Before Done
 
@@ -43,4 +57,4 @@ Execute an approved plan step by step without drifting scope or skipping state u
 - [ ] Work stayed within scope
 - [ ] State or task tracking was updated
 - [ ] Deviations were documented or re-planned
-- [ ] Verification notes were prepared where relevant
+- [ ] The work is ready for the next command
