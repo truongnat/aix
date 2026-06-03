@@ -26,7 +26,7 @@ The `.harness/` directory documents a full loop:
 
 `harness-start` → `harness-discuss` → `harness-plan` → approval → `harness-run` → `harness-verify` → `harness-ship` → `harness-remember`
 
-See artifacts under [.harness/](.harness/) — especially [VERIFY.md](.harness/VERIFY.md) for real test evidence.
+See artifacts under [.harness/](.harness/) — especially [VERIFY.md](.harness/VERIFY.md) for real test evidence. Terminal summary: [TRANSCRIPT.md](TRANSCRIPT.md).
 
 ## Parent pack
 

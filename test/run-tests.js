@@ -18,6 +18,7 @@ const {
   DOGFOOD_DEMO_PREFIX,
   assertCommandContractStructure,
   assertDogfoodDemoContract,
+  assertPublicDemoPolish,
   assertPlanTemplateContract,
   assertVerifyTemplateContract,
   extractMarkdownSection,
@@ -329,6 +330,28 @@ runTest("command contract validation rejects Redirect without harness command", 
   assert.ok(failures.some((f) => f.includes("Redirect Behavior")));
 });
 
+runTest("CI workflow ci.yml exists and runs validate, test, dogfood", () => {
+  const ciPath = path.join(repoRoot, ".github", "workflows", "ci.yml");
+  assert.ok(fs.existsSync(ciPath));
+  const ci = fs.readFileSync(ciPath, "utf8");
+  assert.match(ci, /node-version:\s*20/);
+  assert.match(ci, /node validate\.js/);
+  assert.match(ci, /npm test/);
+  assert.match(ci, /examples\/dogfood-tiny-node-api/);
+  assert.equal(fs.existsSync(path.join(repoRoot, ".github", "workflows", "validate.yml")), false);
+});
+
+runTest("README includes CI badge and dogfood demo section", () => {
+  const readme = fs.readFileSync(path.join(repoRoot, "README.md"), "utf8");
+  assert.match(readme, /actions\/workflows\/ci\.yml\/badge\.svg/);
+  assert.match(readme, /## Demo/);
+  assert.match(readme, /examples\/dogfood-tiny-node-api/);
+  assert.match(readme, /workflow-artifact dogfood/i);
+  const failures = [];
+  assertPublicDemoPolish(repoRoot, failures);
+  assert.deepEqual(failures, []);
+});
+
 runTest("dogfood tiny node api project files exist", () => {
   const root = path.join(repoRoot, DOGFOOD_DEMO_PREFIX);
   for (const rel of [
@@ -336,6 +359,7 @@ runTest("dogfood tiny node api project files exist", () => {
     "src/server.js",
     "test/health.test.js",
     "README.md",
+    "TRANSCRIPT.md",
     ".harness/GOAL.md",
     ".harness/DISCUSSION.md",
     ".harness/PLAN.md",

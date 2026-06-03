@@ -1,4 +1,4 @@
-name: Validate
+name: CI
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  validate:
+  validate-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,5 +19,12 @@ jobs:
         with:
           node-version: 20
 
-      - name: Run validation
+      - name: Validate pack contracts
         run: node validate.js
+
+      - name: Run repository tests
+        run: npm test
+
+      - name: Run dogfood demo tests
+        working-directory: examples/dogfood-tiny-node-api
+        run: npm test

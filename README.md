@@ -5,6 +5,7 @@
 ### A lightweight, markdown-first workflow kit for AI coding agents
 
 ![Version](https://img.shields.io/badge/version-v0.11.0-2563eb)
+![CI](https://github.com/truongnat/ai-engineering-harness/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-16a34a)
 ![Markdown First](https://img.shields.io/badge/markdown-first-7c3aed)
 
@@ -12,7 +13,7 @@
 
 Install discipline into your repo with an interactive wizard — commands, skills, and `.harness/` state stay in a private capability cache, not scattered at the project root.
 
-[Quickstart](#-quickstart) · [Providers](#provider-support) · [Commands](#-commands) · [Docs](#-docs)
+[Quickstart](#-quickstart) · [Demo](#demo) · [Providers](#provider-support) · [Commands](#-commands) · [Docs](#-docs)
 
 </div>
 
@@ -55,6 +56,20 @@ npx ai-engineering-harness install --provider cursor --yes
 ```
 
 The wizard uses [@clack/prompts](https://github.com/natemoo-re/clack) for a polished terminal flow (intro, multiselect, plan, spinner, outro). See [docs/terminal-wizard-ux.md](docs/terminal-wizard-ux.md) and [docs/npx-cli-ux.md](docs/npx-cli-ux.md).
+
+## Demo
+
+End-to-end **workflow-artifact dogfood** (not a full provider install demo): [examples/dogfood-tiny-node-api](examples/dogfood-tiny-node-api).
+
+```bash
+git clone https://github.com/truongnat/ai-engineering-harness.git
+cd ai-engineering-harness
+npm test
+cd examples/dogfood-tiny-node-api
+npm test
+```
+
+The example includes `.harness/GOAL.md`, `PLAN.md`, `VERIFY.md`, `SHIP.md`, and `REMEMBER.md`. [.harness/VERIFY.md](examples/dogfood-tiny-node-api/.harness/VERIFY.md) records real `npm test` evidence (`status: passed`). Optional terminal notes: [TRANSCRIPT.md](examples/dogfood-tiny-node-api/TRANSCRIPT.md).
 
 ## Provider support
 

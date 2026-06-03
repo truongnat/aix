@@ -214,6 +214,8 @@ const requiredFiles = [
   "examples/harness-build/flutter-google-login/goals/google-login/VERIFY.md",
   "examples/harness-build/flutter-google-login/goals/google-login/REMEMBER.md",
   "examples/dogfood-tiny-node-api/README.md",
+  "examples/dogfood-tiny-node-api/TRANSCRIPT.md",
+  ".github/workflows/ci.yml",
   "examples/dogfood-tiny-node-api/package.json",
   "examples/dogfood-tiny-node-api/src/server.js",
   "examples/dogfood-tiny-node-api/test/health.test.js",
@@ -690,6 +692,33 @@ function assertVerifyTemplateContract(baseDir, failures) {
 
 const DOGFOOD_DEMO_PREFIX = "examples/dogfood-tiny-node-api";
 
+function assertPublicDemoPolish(baseDir, failures) {
+  const readmePath = "README.md";
+  if (!fs.existsSync(resolvePath(baseDir, readmePath))) {
+    failures.push(`Missing required path: ${readmePath}`);
+    return;
+  }
+  const readme = readFile(baseDir, readmePath);
+  if (!readme.includes("examples/dogfood-tiny-node-api")) {
+    failures.push(`${readmePath} must link to examples/dogfood-tiny-node-api`);
+  }
+  if (!readme.includes("actions/workflows/ci.yml/badge.svg")) {
+    failures.push(`${readmePath} must include CI workflow badge for ci.yml`);
+  }
+
+  const ciPath = ".github/workflows/ci.yml";
+  if (!fs.existsSync(resolvePath(baseDir, ciPath))) {
+    failures.push(`Missing required path: ${ciPath}`);
+    return;
+  }
+  const ci = readFile(baseDir, ciPath);
+  for (const snippet of ["node validate.js", "npm test", "examples/dogfood-tiny-node-api"]) {
+    if (!ci.includes(snippet)) {
+      failures.push(`${ciPath} must run: ${snippet}`);
+    }
+  }
+}
+
 function assertDogfoodDemoContract(baseDir, failures) {
   const planPath = `${DOGFOOD_DEMO_PREFIX}/.harness/PLAN.md`;
   const verifyPath = `${DOGFOOD_DEMO_PREFIX}/.harness/VERIFY.md`;
@@ -851,6 +880,7 @@ function validateHarnessRepository(baseDir = root) {
   assertVerifyTemplateContract(baseDir, failures);
   assertPlanTemplateContract(baseDir, failures);
   assertDogfoodDemoContract(baseDir, failures);
+  assertPublicDemoPolish(baseDir, failures);
 
   for (const relativePath of templateFiles) {
     assertNonEmpty(baseDir, relativePath, failures);
@@ -1142,6 +1172,7 @@ if (require.main === module) {
 module.exports = {
   DOGFOOD_DEMO_PREFIX,
   assertDogfoodDemoContract,
+  assertPublicDemoPolish,
   assertCommandContractStructure,
   assertSkillContractStructure,
   assertVerifyTemplateContract,
