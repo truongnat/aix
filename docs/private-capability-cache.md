@@ -109,7 +109,7 @@ Updated payloads: [runtime/cursor/rules/ai-engineering-harness.mdc](../runtime/c
 
 ## Update Behavior
 
-Re-run `install.sh install` with the same flags. Without `--force`, existing cache files are **skipped**. With `--force`, cache files are overwritten. Uninstall/update verbs are designed in [uninstall-update-design.md](uninstall-update-design.md) — not fully implemented in Step 2.
+`install.sh update` refreshes `.ai-harness/` with overwrite semantics and preserves `.harness/`. Runtime entrypoints are refreshed in the same update step.
 
 ## Uninstall Implications
 

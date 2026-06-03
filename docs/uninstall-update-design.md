@@ -4,7 +4,7 @@
 
 Specify safe **uninstall** and **update** behavior for `install.sh` in `v0.9.2` without deleting user-owned files or breaking unrelated config.
 
-`uninstall` is implemented for **project** runtime-native installs in `v0.9.2 Step 3`. `update` remains design-only.
+`uninstall` and **project** `update` are implemented for runtime-native installs in `v0.9.2`. Global update remains planned.
 
 ## Uninstall Scope
 
@@ -32,13 +32,14 @@ Uninstall **does not** remove:
 Update refreshes **harness-owned** payloads from a pack ref:
 
 - Same paths as install for given runtime + scope
-- Default: skip if local file modified unless `--force`
+- Project update refreshes `.ai-harness/` and runtime entrypoints with overwrite semantics
 - `--ref` pins tarball version (e.g. `v0.9.2`)
 
 Update does **not**:
 
-- Change exclude/gitignore policy unless `--visibility` / `--ignore-strategy` passed on update (TBD)
-- Run uninstall of other runtimes
+- Update `.harness/`
+- Change `.gitignore`
+- Support manual runtime update
 
 ## Manifest / Ownership Tracking
 
@@ -94,6 +95,10 @@ Conservative rule: **when in doubt, skip and print**.
 
 - Planned, not implemented in this step
 
+### Global update
+
+- Planned, not implemented in this step
+
 ## `.git/info/exclude` Block Cleanup
 
 On `uninstall --scope project`:
@@ -117,8 +122,9 @@ Dry-run prints would-remove lines for both.
 `update --ref v0.9.2`:
 
 1. Download tarball at ref
-2. Re-run `install-runtime.js` equivalent for listed runtimes
-3. Re-run init only if `--init-harness` passed on update (optional flag)
+2. Re-run capability cache install with overwrite semantics
+3. Re-run `install-runtime.js` equivalent for listed runtimes with overwrite semantics
+4. Keep `.harness/` untouched
 
 Default ref: current install ref if detectable, else `main` with warning.
 
@@ -159,3 +165,4 @@ sh install.sh uninstall --runtime gemini --scope global --yes
 - [git-hygiene-policy.md](git-hygiene-policy.md)
 - [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md)
 - [uninstall-usage.md](uninstall-usage.md)
+- [update-usage.md](update-usage.md)

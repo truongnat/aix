@@ -112,6 +112,7 @@ const requiredFiles = [
   "docs/install-command-model.md",
   "docs/uninstall-update-design.md",
   "docs/uninstall-usage.md",
+  "docs/update-usage.md",
   "docs/antigravity-provider-research.md",
   "docs/private-install-git-hygiene.md",
   "docs/private-capability-cache.md",

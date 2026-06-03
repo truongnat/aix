@@ -1397,15 +1397,150 @@ runTest("install.sh uninstall generic removes AGENTS.md with harness marker", ()
   assert.equal(fs.existsSync(path.join(tmp, "AGENTS.md")), false);
 });
 
-runTest("install.sh update still reports not implemented", () => {
+runTest("install.sh update project path is implemented", () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-update-"));
   const result = runInstallSh(
     ["update", "--runtime", "cursor", "--scope", "project", "--yes", "--target", tmp],
     { env: { PATH: process.env.PATH } }
   );
 
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+});
+
+runTest("install.sh update cursor dry-run prints update plan", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-update-dry-"));
+  const result = runInstallSh(
+    ["update", "--runtime", "cursor", "--scope", "project", "--ref", "main", "--dry-run", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /--- Update plan ---/);
+  assert.match(result.stdout, /Refresh \.ai-harness\/ capability cache/);
+});
+
+runTest("install.sh update cursor overwrites .ai-harness and runtime entrypoint", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-update-overwrite-"));
+  assert.equal(
+    runInstallSh(
+      ["install", "--runtime", "cursor", "--scope", "project", "--yes", "--target", tmp],
+      { env: { PATH: process.env.PATH } }
+    ).status,
+    0
+  );
+
+  fs.writeFileSync(path.join(tmp, ".ai-harness", "AGENTS.md"), "# stale cache\n", "utf8");
+  fs.writeFileSync(
+    path.join(tmp, ".cursor", "rules", "ai-engineering-harness.mdc"),
+    "stale runtime\n",
+    "utf8"
+  );
+
+  const result = runInstallSh(
+    ["update", "--runtime", "cursor", "--scope", "project", "--ref", "main", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.notEqual(fs.readFileSync(path.join(tmp, ".ai-harness", "AGENTS.md"), "utf8"), "# stale cache\n");
+  assert.notEqual(
+    fs.readFileSync(path.join(tmp, ".cursor", "rules", "ai-engineering-harness.mdc"), "utf8"),
+    "stale runtime\n"
+  );
+});
+
+runTest("install.sh update does not overwrite .harness/HARNESS.md", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-update-harness-"));
+  assert.equal(
+    runInstallSh(
+      ["install", "--runtime", "cursor", "--scope", "project", "--init-harness", "--yes", "--target", tmp],
+      { env: { PATH: process.env.PATH } }
+    ).status,
+    0
+  );
+
+  fs.writeFileSync(path.join(tmp, ".harness", "HARNESS.md"), "# user state\n", "utf8");
+
+  const result = runInstallSh(
+    ["update", "--runtime", "cursor", "--scope", "project", "--ref", "main", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(fs.readFileSync(path.join(tmp, ".harness", "HARNESS.md"), "utf8"), "# user state\n");
+});
+
+runTest("install.sh update with --visibility private updates .git/info/exclude", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-update-private-"));
+  initFakeGitWorkTree(tmp);
+
+  const result = runInstallSh(
+    ["update", "--runtime", "cursor", "--scope", "project", "--ref", "main", "--visibility", "private", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+  const exclude = readInfoExclude(tmp);
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(exclude, /ai-engineering-harness start/);
+  assert.match(exclude, /\.cursor\/rules\/ai-engineering-harness\.mdc/);
+  assert.match(exclude, /\.ai-harness\//);
+});
+
+runTest("install.sh update without visibility does not create exclude block", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-update-no-visibility-"));
+  initFakeGitWorkTree(tmp);
+
+  const result = runInstallSh(
+    ["update", "--runtime", "cursor", "--scope", "project", "--ref", "main", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(readInfoExclude(tmp), "");
+});
+
+runTest("install.sh update global dry-run documents planned but not implemented", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-update-global-dry-"));
+  const result = runInstallSh(
+    ["update", "--runtime", "cursor", "--scope", "global", "--dry-run", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout + result.stderr, /Global update is planned but not implemented/i);
+});
+
+runTest("install.sh update manual fails with clear message", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-update-manual-"));
+  const result = runInstallSh(
+    ["update", "--runtime", "manual", "--scope", "project", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
   assert.notEqual(result.status, 0);
-  assert.match(result.stdout + result.stderr, /update is not implemented/i);
+  assert.match(result.stdout + result.stderr, /Manual fallback update is not supported/i);
+});
+
+runTest("install.sh update rejects --init-harness", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-update-init-"));
+  const result = runInstallSh(
+    ["update", "--runtime", "cursor", "--scope", "project", "--init-harness", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stdout + result.stderr, /--init-harness is only valid for install/i);
+});
+
+runTest("install.sh update rejects --remove-cache and --remove-state", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-update-remove-"));
+  const result = runInstallSh(
+    ["update", "--runtime", "cursor", "--scope", "project", "--remove-cache", "--remove-state", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stdout + result.stderr, /--remove-cache and --remove-state are only valid for uninstall/i);
 });
 
 runTest("install-runtime opencode project creates plugin file", () => {

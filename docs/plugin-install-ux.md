@@ -98,6 +98,13 @@ sh install.sh uninstall --runtime cursor --scope project --yes
 sh install.sh uninstall --runtime cursor --scope project --remove-cache --remove-state --yes
 ```
 
+Update examples:
+
+```bash
+sh install.sh update --runtime cursor --scope project --ref v0.9.2 --yes
+sh install.sh update --runtime all --scope project --ref main --yes
+```
+
 | Capability | Status |
 |---|---|
 | `manual` / `--legacy-root` | **Implemented** — root copy via `install.js`; dogfooded (Scenario C); **fallback only** |

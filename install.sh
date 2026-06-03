@@ -31,6 +31,7 @@ Usage:
   install.sh [install] [options]
   install.sh install [options]
   install.sh uninstall [options]
+  install.sh update [options]
 
 Options:
   --target <path>       Target repository (default: current directory)
@@ -59,6 +60,7 @@ Examples:
   install.sh install --runtime cursor --scope project --visibility private --init-harness --yes
   install.sh uninstall --runtime cursor --scope project --yes
   install.sh uninstall --runtime cursor --scope project --remove-cache --remove-state --yes
+  install.sh update --runtime cursor --scope project --ref v0.9.2 --yes
   install.sh --runtime claude --scope project --init-harness --dry-run --yes
   install.sh --runtime manual --target . --init-harness --dry-run
 
@@ -421,6 +423,7 @@ resolve_install_cache_settings() {
 }
 
 run_capability_cache_install() {
+  _use_force="${1:-0}"
   if [ "$INSTALL_CACHE" -ne 1 ]; then
     return 0
   fi
@@ -439,7 +442,7 @@ run_capability_cache_install() {
   if [ "$DRY_RUN" -eq 1 ]; then
     set -- "$@" --dry-run
   fi
-  if [ "$FORCE" -eq 1 ]; then
+  if [ "$FORCE" -eq 1 ] || [ "$_use_force" -eq 1 ]; then
     set -- "$@" --force
   fi
 
@@ -549,6 +552,9 @@ pick_scope_interactive() {
 }
 
 maybe_prompt_init_harness() {
+  if [ "$VERB" != install ]; then
+    return 0
+  fi
   if [ "$INIT_HARNESS" -eq 1 ]; then
     return 0
   fi
@@ -669,6 +675,47 @@ print_uninstall_plan() {
   printf '%s\n' '---'
 }
 
+resolve_update_git_hygiene_settings() {
+  INSTALL_CACHE=1
+
+  if [ -z "$VISIBILITY" ]; then
+    EFFECTIVE_IGNORE_STRATEGY=none
+    return 0
+  fi
+
+  resolve_git_hygiene_settings
+}
+
+print_update_plan() {
+  printf '%s\n' '' '--- Update plan ---'
+  printf '  runtime:       %s (%s)\n' "$RUNTIME" "$(runtime_label "$RUNTIME")"
+  printf '  scope:         %s\n' "$SCOPE"
+  printf '  target:        %s\n' "$TARGET_ABS"
+  printf '  ref:           %s\n' "$REF"
+  if [ -n "$VISIBILITY" ]; then
+    printf '  visibility:    %s\n' "$VISIBILITY"
+    printf '  ignore:        %s\n' "$EFFECTIVE_IGNORE_STRATEGY"
+  else
+    printf '  visibility:    (unchanged)\n'
+  fi
+  printf '  dry-run:       %s\n' "$([ "$DRY_RUN" -eq 1 ] && printf yes || printf no)"
+  printf '%s\n' '' 'What will happen:'
+  printf '%s\n' '  - Refresh .ai-harness/ capability cache with overwrite semantics'
+  printf '%s\n' "  - Refresh runtime entrypoints for '$RUNTIME' with overwrite semantics"
+  printf '%s\n' '  - Preserve .harness/ project state'
+  if [ -n "$VISIBILITY" ] && [ "$VISIBILITY" = private ] && [ "$EFFECTIVE_IGNORE_STRATEGY" = info-exclude ]; then
+    if is_git_repo; then
+      printf '%s\n' '  - Refresh .git/info/exclude harness block for private mode'
+    else
+      printf '%s\n' '  - Print manual .git/info/exclude instructions (target is not a Git repo)'
+    fi
+  else
+    printf '%s\n' '  - Does not change ignore settings unless --visibility private is passed'
+  fi
+  printf '%s\n' '  - Does not update .harness/'
+  printf '%s\n' '---'
+}
+
 run_uninstall() {
   if [ "$SCOPE" = global ]; then
     if [ "$DRY_RUN" -eq 1 ]; then
@@ -705,6 +752,29 @@ run_uninstall() {
   fi
 
   printf '%s\n' '--- Uninstall complete ---'
+}
+
+run_update() {
+  if [ "$RUNTIME" = manual ]; then
+    fail 'Manual fallback update is not supported. Re-run install instead.'
+  fi
+
+  if [ "$SCOPE" = global ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      printf '%s\n' '' '--- Update ---'
+      printf '%s\n' 'Global update is planned but not implemented in this step.'
+      return 0
+    fi
+    fail 'Global update is planned but not implemented in this step.'
+  fi
+
+  if [ -n "$VISIBILITY" ] && [ "$VISIBILITY" = private ] && [ "$EFFECTIVE_IGNORE_STRATEGY" = info-exclude ]; then
+    apply_private_ignore
+  fi
+
+  run_capability_cache_install 1
+  printf '%s\n' '' '--- Runtime-native update ---'
+  run_runtime_native_install 1
 }
 
 confirm_plan() {
@@ -1020,6 +1090,7 @@ download_pack_root() {
 }
 
 run_runtime_native_install() {
+  _use_force="${1:-0}"
   command -v node >/dev/null 2>&1 || fail "node is required but was not found on PATH"
   download_pack_root
 
@@ -1031,7 +1102,7 @@ run_runtime_native_install() {
   if [ "$DRY_RUN" -eq 1 ]; then
     set -- "$@" --dry-run
   fi
-  if [ "$FORCE" -eq 1 ]; then
+  if [ "$FORCE" -eq 1 ] || [ "$_use_force" -eq 1 ]; then
     set -- "$@" --force
   fi
 
@@ -1157,10 +1228,7 @@ case "$VERB" in
     usage
     exit 0
     ;;
-  update)
-    fail "update is not implemented in v0.9.2 Step 3"
-    ;;
-  uninstall|install)
+  uninstall|install|update)
     ;;
   *)
     fail "unknown command: $VERB (try install, --help)"
@@ -1237,6 +1305,28 @@ if [ "$VERB" = uninstall ]; then
     printf '%s\n' '' "Dry-run complete for uninstall '$RUNTIME'."
   else
     printf '%s\n' '' "Runtime '$RUNTIME' uninstall finished."
+  fi
+  exit 0
+fi
+
+if [ "$VERB" = update ]; then
+  if [ "$INIT_HARNESS" -eq 1 ]; then
+    fail '--init-harness is only valid for install'
+  fi
+  if [ "$UNINSTALL_REMOVE_CACHE" -eq 1 ] || [ "$UNINSTALL_REMOVE_STATE" -eq 1 ]; then
+    fail '--remove-cache and --remove-state are only valid for uninstall'
+  fi
+  if [ "$NO_INSTALL_CACHE" -eq 1 ]; then
+    fail '--no-install-cache is not supported for update'
+  fi
+  resolve_update_git_hygiene_settings
+  print_update_plan
+  confirm_plan
+  run_update
+  if [ "$DRY_RUN" -eq 1 ]; then
+    printf '%s\n' '' "Dry-run complete for update '$RUNTIME'."
+  else
+    printf '%s\n' '' "Runtime '$RUNTIME' update finished."
   fi
   exit 0
 fi

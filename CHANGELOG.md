@@ -29,6 +29,9 @@
 - project `install.sh uninstall` for runtime-native installs
 - uninstall safe defaults: keep `.ai-harness/` and `.harness/` unless explicitly removed
 - uninstall cleans the harness block from `.git/info/exclude`
+- project `install.sh update` for runtime-native installs
+- update refreshes `.ai-harness/` and runtime entrypoints with overwrite semantics
+- update preserves `.harness/` project state
 
 ### Planned (implementation)
 
