@@ -97,6 +97,7 @@ const requiredFiles = [
   "docs/v0.10.6-release-notes.md",
   "docs/v0.10.7-release-notes.md",
   "docs/v0.10.8-release-notes.md",
+  "docs/v0.11.0-release-notes.md",
   "docs/npm-publish.md",
   "runtime-command-catalog.js",
   "install.sh",
