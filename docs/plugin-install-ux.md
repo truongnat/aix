@@ -78,6 +78,8 @@ sh aih.sh install
 node validate.js --target <repo> --runtime <name> --profile-only   # from source pack
 ```
 
+If the target repo does not expose a provider hint such as `.cursor/`, `.claude/`, `.gemini/`, or `.opencode/`, use an explicit runtime in non-interactive mode.
+
 All **project** runtime-native installs **default** to `.ai-harness/` capability cache ([private-capability-cache.md](private-capability-cache.md)) — Cursor, Claude, Codex, Generic, Gemini, OpenCode. Each runtime entrypoint only adapts the provider; capabilities live under `.ai-harness/`, project state under `.harness/`.
 
 Team-shared (files visible in `git status`):
@@ -162,7 +164,7 @@ ai-harness install --target .
 ai-harness validate --target . --profile-only
 ```
 
-`install.sh` remains available as a compatibility wrapper for existing commands.
+`install.sh` remains available as a compatibility wrapper for existing commands. Long explicit commands are still supported for advanced/debug flows, but `aih.sh` is the primary UX.
 
 See [one-line-installer-design.md](one-line-installer-design.md).
 

@@ -14,21 +14,29 @@ Triage dogfood findings from [pack-dogfood-friction-log.md](pack-dogfood-frictio
 - Default cache for private project runtime-native; bootstraps point to `.ai-harness/` + `.harness/`
 - Real-install friction: Cursor rule alone insufficient without local capability source
 
+## Addressed In v0.9.2 Step 3-5 (lifecycle + command polish)
+
+- project `update` and safe `uninstall`
+- simplified command defaults
+- `aih.sh` lifecycle dispatcher
+- `install.sh` compatibility wrapper
+- F1 simple lifecycle dogfood — [scenario-f1-simple-cli-lifecycle.md](pack-dogfood-reports/scenario-f1-simple-cli-lifecycle.md)
+
 ## v0.9.2 Patch Candidates
 
 - `.git` as file (worktree/submodule): resolve `gitdir:` before writing `.git/info/exclude` ([scenario-e1-cursor-private-git-hygiene.md](pack-dogfood-reports/scenario-e1-cursor-private-git-hygiene.md) friction)
+- Private uninstall UX: if default uninstall keeps `.ai-harness/` and `.harness/`, consider preserving or optionally preserving the local `.git/info/exclude` block so private repos do not become noisy immediately after uninstall ([scenario-f1-simple-cli-lifecycle.md](pack-dogfood-reports/scenario-f1-simple-cli-lifecycle.md))
 
 ## v0.9.2 Blockers (remaining)
 
 | Item | Doc |
 |---|---|
 | Private capability cache | ~~**blocker**~~ — Step 2 shipped |
-| `uninstall` / `update` commands | [uninstall-update-design.md](uninstall-update-design.md) |
 | Provider multi-select + wizard | [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md) |
 | Antigravity provider impl | [antigravity-provider-research.md](antigravity-provider-research.md) |
 | `--ignore-strategy gitignore` (explicit team policy) | future step |
 
-Implementation order: ~~info-exclude~~ → full verb model → multi-select → uninstall → update → Antigravity.
+Implementation order: ~~info-exclude~~ → ~~full verb model~~ → ~~uninstall~~ → ~~update~~ → multi-select → Antigravity.
 
 ## v0.9.x Patch Candidates
 
@@ -119,6 +127,10 @@ Artifacts: [runtime-dogfood-summary.md](runtime-dogfood-summary.md), [v0.9.x-rea
 ## Later Optional Work
 
 Automation, adapters, marketplace, semantic validation, archive generation, checksums—only if still justified after dogfood.
+
+- binary `aih` installer surface
+- manual runtime verification across supported providers
+- global update/uninstall if still needed
 
 ## Rejected / Not Worth It
 

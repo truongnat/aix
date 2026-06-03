@@ -29,6 +29,8 @@ curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/ma
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- uninstall
 ```
 
+Dogfood evidence: [scenario-f1-simple-cli-lifecycle.md](pack-dogfood-reports/scenario-f1-simple-cli-lifecycle.md).
+
 ## Defaults
 
 ### Install
@@ -59,6 +61,8 @@ curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/ma
 - remove `.git/info/exclude` harness block when present
 - keep `.ai-harness/`
 - keep `.harness/`
+
+After default uninstall, kept `.ai-harness/` and `.harness/` may become visible in `git status` because the local exclude block is removed.
 
 ## Runtime Detection
 

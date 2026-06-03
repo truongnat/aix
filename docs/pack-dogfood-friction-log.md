@@ -67,9 +67,16 @@ Feedback from installing into a **real** product repository with Cursor (not dis
 | 2026-06-02 | Real install | Antigravity provider not in installer | medium | Research + planned runtime — [antigravity-provider-research.md](antigravity-provider-research.md) | **v0.9.2 blocker** |
 | 2026-06-02 | Real install | No uninstall / update commands | medium | `install.sh uninstall` / `update` — [uninstall-update-design.md](uninstall-update-design.md) | **v0.9.2 blocker** |
 | 2026-06-02 | Real install | Installer too complex — want one wizard, multi-provider, scope detection | medium | [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md) | **v0.9.2 blocker** |
+| 2026-06-03 | Real install UX | `install.sh uninstall` naming felt wrong | medium | **addressed** — `aih.sh` lifecycle dispatcher + `install.sh` compatibility wrapper | v0.9.2 fix |
 
 | 2026-06-02 | E1 | Private Cursor + info-exclude — git status clean | none | Scenario E1 dogfood | no action |
 | 2026-06-02 | Real Cursor install | Runtime bootstrap + `.harness/` skeleton only — no local `commands/`, `skills/`, `workflows/` | **high** | Thin `.mdc` points at TODO `.harness/` | **addressed** — `.ai-harness/` private capability cache (v0.9.2 Step 2) | v0.9.2 fix |
+| 2026-06-03 | F1 | Simple lifecycle works end-to-end with `aih.sh` | none | [scenario-f1-simple-cli-lifecycle.md](pack-dogfood-reports/scenario-f1-simple-cli-lifecycle.md) | No action required | no action |
+| 2026-06-03 | F1 | Default uninstall removes `.git/info/exclude` block while keeping `.ai-harness/` and `.harness/`, so private repo becomes noisy again | medium | `git status --short` after `aih.sh uninstall` shows `?? .ai-harness/` and `?? .harness/` | Decide whether uninstall should preserve local exclude when cache/state are kept, or document this more explicitly | v0.9.2 patch |
+
+**Addressed in v0.9.2:** long command UX, `install.sh uninstall` naming confusion, simple lifecycle dispatcher, capability cache, private git hygiene, update/uninstall lifecycle.
+
+**Remaining after v0.9.2:** binary `aih`, Antigravity, global lifecycle hardening, and manual runtime session verification.
 
 **Conclusion:** `v0.9.1` file/install dogfood is not enough for wide promotion; `v0.9.2` Step 1 (git hygiene, E1 PASS) and Step 2 (capability cache) address real-install gaps.
 

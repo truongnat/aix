@@ -13,6 +13,8 @@ Default `uninstall` removes only the selected runtime entrypoint.
 - removes the harness block from `.git/info/exclude` when present
 - does not edit `.gitignore`
 
+If cache/state are kept, they may become visible in `git status` after uninstall because the local exclude block is removed.
+
 ## Commands
 
 ```bash

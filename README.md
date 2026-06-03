@@ -4,7 +4,7 @@
 
 ### Markdown-first engineering discipline for AI coding agents
 
-![Version](https://img.shields.io/badge/version-v0.9.1%20(experimental)-2563eb)
+![Version](https://img.shields.io/badge/version-v0.9.2%20(experimental)-2563eb)
 ![License](https://img.shields.io/badge/license-MIT-16a34a)
 ![Validation](https://img.shields.io/badge/validation-passing-22c55e)
 ![Markdown First](https://img.shields.io/badge/markdown-first-7c3aed)
@@ -81,7 +81,19 @@ Start with [`commands/`](commands/) and treat the loop as the default operating 
 
 ## 🚀 Install
 
-**Current release: `v0.9.1` experimental** — runtime-native installer dogfooded (file/install) for `generic`, `codex`, `cursor`, `opencode`, `gemini`, `claude`. **Stable runtime support: No.** [Dogfood summary](docs/runtime-dogfood-summary.md) · [Readiness](docs/v0.9.x-readiness.md) · [Release notes](docs/v0.9.1-release-notes.md)
+**Current release: `v0.9.2` experimental** — runtime-native installer with simple lifecycle CLI, capability cache, and private git hygiene. **Stable runtime support: No.** [Dogfood summary](docs/runtime-dogfood-summary.md) · [Readiness](docs/v0.9.x-readiness.md) · [Release notes](docs/v0.9.2-release-notes.md)
+
+Quickstart:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install
+curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- status
+curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- doctor
+curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- update
+curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- uninstall
+```
+
+If provider cannot be detected in non-interactive mode, pass `--runtime cursor|claude|gemini|opencode|generic|codex`.
 
 Preview then install (local pack):
 
@@ -94,7 +106,7 @@ Remote (pin tag):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- \
-  install --ref v0.9.1 --runtime opencode --scope project --init-harness --yes
+  install --ref v0.9.2 --runtime opencode --scope project --init-harness --yes
 ```
 
 Validate from source pack: `node validate.js --target <repo> --runtime opencode --profile-only` ([runtime-aware-validation](docs/runtime-aware-validation.md)).
@@ -124,9 +136,9 @@ curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/ma
 
 See [harness-init-usage](docs/harness-init-usage.md).
 
-Pin a release tag: `--ref v0.9.1` ([install security](docs/plugin-install-security.md)).
+Pin a release tag: `--ref v0.9.2` ([install security](docs/plugin-install-security.md)).
 
-Legacy note: [install.sh](install.sh) remains as a compatibility wrapper around [aih.sh](aih.sh).
+Legacy note: [install.sh](install.sh) remains as a compatibility wrapper around [aih.sh](aih.sh). `aih.sh` is the preferred lifecycle command surface.
 
 ## 🛠️ Maintainer quick start (source pack)
 
@@ -192,9 +204,10 @@ Then:
 
 ## 🎯 Release Status
 
-- Current release: [`v0.9.1`](docs/v0.9.1-release-notes.md) — **experimental** runtime-native installer; stable runtime support: **No**
+- Current release: [`v0.9.2`](docs/v0.9.2-release-notes.md) — **experimental** simple lifecycle CLI + runtime-native installer; stable runtime support: **No**
 - Next: manual runtime verification sprint or `v0.10.x` narrowing — not immediate `v1.0.0`
 - [Plugin install UX](docs/plugin-install-ux.md) · [runtime dogfood](docs/runtime-dogfood-summary.md) · [contracts (pre-v1)](docs/stable-contract-index.md) · [PACK.md](PACK.md)
+- `v0.9.2` docs: [notes](docs/v0.9.2-release-notes.md) · [readiness](docs/v0.9.x-readiness.md) · [scope](docs/v0.9.x-release-scope.md)
 - `v0.9.1` docs: [notes](docs/v0.9.1-release-notes.md) · [readiness](docs/v0.9.x-readiness.md) · [scope](docs/v0.9.x-release-scope.md)
 - `v0.9.0` docs: [notes](docs/v0.9.0-release-notes.md) · [readiness](docs/v0.9.0-readiness.md) · [scope](docs/v0.9.0-release-scope.md) · [plan](docs/v0.9.0-plan.md)
 - `v0.8.0` docs: [notes](docs/v0.8.0-release-notes.md) · [readiness](docs/v0.8.0-readiness.md) · [scope](docs/v0.8.0-release-scope.md) · [dogfood](docs/pack-dogfood-scenarios.md)

@@ -162,3 +162,16 @@ Use this checklist to prepare a manual release without adding release automation
 - `git status`
 - `git tag v0.9.1`
 - `git push origin v0.9.1`
+
+## v0.9.2 Final Manual Commands
+
+- `node validate.js`
+- `npm test`
+- `node validate.js --target test/fixtures/valid-target-profile --profile-only`
+- `node validate.js --target test/fixtures/valid-target-goal --goal google-login`
+- `node validate.js --target test/fixtures/valid-target-profile-cursor --runtime cursor --profile-only`
+- `sh aih.sh --help`
+- `sh aih.sh status --target <dogfood target>`
+- `git status`
+- `git tag v0.9.2`
+- `git push origin v0.9.2`

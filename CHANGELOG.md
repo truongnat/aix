@@ -38,6 +38,7 @@
 - non-interactive simple install no longer defaults to manual root-copy fallback when runtime detection fails
 - `aih.sh` lifecycle dispatcher for `install`, `update`, `uninstall`, `status`, and `doctor`
 - `install.sh` kept as a compatibility wrapper around `aih.sh`
+- dogfood F1: simple lifecycle flow validated for `aih.sh` + `install.sh` wrapper compatibility
 
 ### Planned (implementation)
 

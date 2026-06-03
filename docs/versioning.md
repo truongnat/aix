@@ -67,6 +67,10 @@ Heavy runtime systems are not part of `v0.1.0`. The first release is the markdow
 
 `v0.9.1` is an **Experimental Runtime-Native Installer** release. It adds `install.sh` runtime/scope selection, `install-runtime.js`, project `.harness/` init, runtime-aware validation, and dogfood evidence (Scenarios C, D1–D6) without claiming stable runtime-native support, npm publishing, marketplace automation, or semantic validation. Manual fallback (root copy) remains available but is not the recommended UX. See [v0.9.1-release-notes.md](v0.9.1-release-notes.md) and [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
 
+## Scope Boundary For `v0.9.2`
+
+`v0.9.2` is an **Experimental Simple Lifecycle CLI + Capability Cache + Git Hygiene** release. It adds `aih.sh` as the preferred lifecycle dispatcher, keeps `install.sh` as a compatibility wrapper, installs `.ai-harness/` as the provider-agnostic capability source for project runtime-native installs, adds private `.git/info/exclude` hygiene, ships project `update` and safe `uninstall`, and includes F1 simple lifecycle dogfood evidence. It does **not** claim stable runtime support, does **not** add Antigravity, and does **not** add marketplace automation, npm publishing, or semantic validation.
+
 ## Scope Boundary For `v1.0.0`
 
 `v1.0.0` should be the first stable capability pack release using the `v0.9.0` frozen contracts as a baseline. It must **not** claim stable runtime-native support until manual runtime checks pass for selected runtimes or v1 scope is explicitly reduced. Prefer release hardening and documentation finalization over new contract surface. Expand contracts only if a documented blocker appears; follow [breaking-change-policy.md](breaking-change-policy.md).
