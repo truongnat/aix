@@ -2,226 +2,223 @@
 
 # ⚙️ ai-engineering-harness
 
-### Markdown-first engineering discipline for AI coding agents
+### Runtime-native engineering discipline for AI coding agents
 
-![Version](https://img.shields.io/badge/version-v0.9.2%20(experimental)-2563eb)
+![Version](https://img.shields.io/badge/version-v0.9.2%20experimental-2563eb)
 ![License](https://img.shields.io/badge/license-MIT-16a34a)
-![Validation](https://img.shields.io/badge/validation-passing-22c55e)
 ![Markdown First](https://img.shields.io/badge/markdown-first-7c3aed)
-![Runtime Light](https://img.shields.io/badge/runtime-lightweight-f59e0b)
+![Runtime Native](https://img.shields.io/badge/runtime-native-f59e0b)
+![Stable Runtime Support](https://img.shields.io/badge/stable%20runtime%20support-no-ef4444)
 
-Plan. Build. Verify. Ship. Remember — with durable markdown artifacts.
+**Plan → Build → Verify → Ship → Remember**
+
+A markdown capability pack that gives AI coding agents a durable operating model inside your repo — without dumping a framework into your project root.
+
+[Quickstart](#-quickstart) · [Commands](#-commands) · [Installed Layout](#-installed-layout) · [Runtime Support](#-runtime-support) · [Docs](#-docs)
 
 </div>
 
-`ai-engineering-harness` is a plugin-like markdown capability pack for AI coding agents. It helps agents load engineering discipline into an existing repository instead of improvising in a single prompt.
+---
 
-It can be installed or vendored into an existing repo. You do not use this repository as your product app repo.
+## What is this?
 
-See [TARGET.md](TARGET.md) for the long-term target.
+`ai-engineering-harness` installs a local capability pack for AI coding tools such as Cursor, Claude Code, Codex, Gemini, and OpenCode.
 
-## 🏗️ Harness Design System
+It gives the agent:
 
-`v0.2.0` focuses on project-specific harness profiles instead of only generic operating guidance.
+- reusable commands, skills, workflows, patterns, and templates
+- project-specific state under `.harness/`
+- runtime-specific entrypoints such as Cursor rules or Claude instructions
+- local git hygiene through `.git/info/exclude`, not `.gitignore`
 
-- [TARGET.md](TARGET.md)
-- [docs/harness-build-usage.md](docs/harness-build-usage.md)
-- [docs/harness-build-prompts.md](docs/harness-build-prompts.md)
-- [docs/target-repo-validation.md](docs/target-repo-validation.md)
-- [docs/gap-analysis.md](docs/gap-analysis.md)
-- [docs/system-positioning.md](docs/system-positioning.md)
-- [docs/team-architecture-selection.md](docs/team-architecture-selection.md)
-- [docs/memory-model.md](docs/memory-model.md)
-- [docs/memory-safety.md](docs/memory-safety.md)
-- [docs/sdlc-execution-model.md](docs/sdlc-execution-model.md)
-- [docs/harness-build-contract.md](docs/harness-build-contract.md)
-- [commands/harness-build.md](commands/harness-build.md)
+> [!IMPORTANT]
+> `v0.9.2` is **experimental**. File/install flows are dogfooded, but stable runtime support is **not** claimed yet.
 
-## ✨ What It Is
+---
 
-- A markdown-first harness design system for AI-assisted engineering work
-- A plugin-like capability pack that can be installed into an existing repository
-- A portable operating model for planning, execution, verification, shipping, and memory
-- A repo-friendly approach that works with Claude Code, Codex, Cursor, Gemini, OpenCode, or any agent that can read files
+## 🚀 Quickstart
 
-## 🚫 What It Is Not
-
-- No framework
-- No runtime platform
-- No server or orchestration layer
-- No database-backed memory system
-- No heavy infrastructure hidden behind the docs
-
-## 🧭 Why It Exists
-
-- Agents lose context.
-- Agents code before planning.
-- Agents skip verification.
-- Agents forget previous fixes.
-- Agents need durable project-specific artifacts.
-
-## 🔁 Core Loop
-
-```txt
-Map → Start → Discuss → Plan → Run → Verify → Ship → Remember
-```
-
-Start with [`commands/`](commands/) and treat the loop as the default operating path.
-
-## 🧱 Core Model
-
-| Layer | Purpose |
-|---|---|
-| Skills | capability |
-| Memory | context |
-| Workflows | process |
-| Team Patterns | collaboration structure |
-| Quality Gates | evidence discipline |
-| Harness Profile | project-specific operating context |
-
-## 🚀 Install
-
-**Current release: `v0.9.2` experimental** — runtime-native installer with simple lifecycle CLI, capability cache, and private git hygiene. **Stable runtime support: No.** [Dogfood summary](docs/runtime-dogfood-summary.md) · [Readiness](docs/v0.9.x-readiness.md) · [Release notes](docs/v0.9.2-release-notes.md)
-
-Quickstart:
+Run this inside your target project repo:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install
+```
+
+Then check the install:
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- status
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- doctor
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- update
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- uninstall
 ```
 
-If provider cannot be detected in non-interactive mode, pass `--runtime cursor|claude|gemini|opencode|generic|codex`.
-
-Preview then install (local pack):
+If the provider cannot be detected, pass it explicitly:
 
 ```bash
-sh aih.sh install --runtime cursor --scope project --init-harness --dry-run --yes
-sh aih.sh install --runtime cursor --scope project --init-harness --yes
+curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install --runtime cursor
 ```
 
-Remote (pin tag):
+Pin a release tag:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- \
-  install --ref v0.9.2 --runtime opencode --scope project --init-harness --yes
+curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install --ref v0.9.2 --runtime cursor
 ```
 
-Validate from source pack: `node validate.js --target <repo> --runtime opencode --profile-only` ([runtime-aware-validation](docs/runtime-aware-validation.md)).
+---
 
-Runtimes: `claude`, `codex`, `cursor`, `gemini`, `opencode`, `generic`. Avoid `--runtime all` until dogfooded. Legacy root copy: `--runtime manual`.
+## 🧰 Commands
 
-Design: [interactive-installer-design](docs/interactive-installer-design.md), [runtime-install-matrix-research](docs/runtime-install-matrix-research.md), [project-state-policy](docs/project-state-policy.md).
+| Command | Purpose |
+|---|---|
+| `aih.sh install` | Install capability cache, project state, and runtime entrypoint |
+| `aih.sh status` | Show detected runtime, cache, state, and git exclude status |
+| `aih.sh doctor` | Check whether the install is usable |
+| `aih.sh update` | Refresh `.ai-harness/` and runtime entrypoint |
+| `aih.sh uninstall` | Remove runtime entrypoint, keep cache/state by default |
+| `aih.sh uninstall --all` | Remove runtime entrypoint, `.ai-harness/`, `.harness/`, and exclude block |
 
-**Manual fallback** (bulk copy): [install-sh-usage](docs/install-sh-usage.md)
+Local source checkout:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install --runtime manual
+sh aih.sh install --runtime cursor --dry-run
+sh aih.sh install --runtime cursor
+sh aih.sh update
+sh aih.sh uninstall
 ```
 
-Preview what the fallback would copy:
+`install.sh` still exists as a compatibility wrapper around `aih.sh`, but `aih.sh` is the preferred lifecycle command.
+
+---
+
+## 📦 Installed Layout
+
+A private project install creates:
+
+```txt
+your-repo/
+├── .ai-harness/                         # capability source
+│   ├── AGENTS.md
+│   ├── commands/
+│   ├── skills/
+│   ├── workflows/
+│   ├── patterns/
+│   ├── templates/
+│   └── docs/
+├── .harness/                            # project state
+│   ├── HARNESS.md
+│   ├── TEAM.md
+│   ├── SKILLS.md
+│   ├── WORKFLOW.md
+│   ├── GATES.md
+│   ├── MEMORY.md
+│   └── goals/
+└── .cursor/rules/ai-engineering-harness.mdc
+```
+
+Provider entrypoints change by runtime:
+
+| Runtime | Entrypoint |
+|---|---|
+| Cursor | `.cursor/rules/ai-engineering-harness.mdc` |
+| Claude Code | `.claude/CLAUDE.md` |
+| Codex / Generic | `AGENTS.md` |
+| Gemini | `.gemini/extensions/ai-engineering-harness/` |
+| OpenCode | `.opencode/plugins/ai-engineering-harness.js` |
+
+Root pollution is avoided: `commands/`, `skills/`, `workflows/`, and `templates/` are installed under `.ai-harness/`, not your project root.
+
+---
+
+## 🧼 Git Hygiene
+
+Private project installs use `.git/info/exclude` so generated harness files do **not** dirty your repo and `.gitignore` is not modified.
+
+Typical private exclude block:
+
+```gitignore
+# ai-engineering-harness start
+.ai-harness/
+.harness/
+.cursor/rules/ai-engineering-harness.mdc
+# ai-engineering-harness end
+```
+
+Use shared/team mode only when you intentionally want generated files visible for commit.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install --runtime manual --target . --dry-run
+sh aih.sh install --runtime cursor --visibility shared
 ```
 
-Project `.harness/` scaffold with runtime-native install:
+---
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- \
-  install --runtime claude --scope project --init-harness --dry-run --yes
+## 🧠 How agents use it
+
+```txt
+runtime entrypoint
+        ↓
+.ai-harness/  = reusable capability source
+        ↓
+.harness/     = this repo's project state
 ```
 
-See [harness-init-usage](docs/harness-init-usage.md).
+The agent should read `.ai-harness/AGENTS.md` first, then use `.ai-harness/commands/`, `.ai-harness/skills/`, and `.ai-harness/workflows/`. It reads `.harness/` for project-specific memory, goals, gates, and workflow choices.
 
-Pin a release tag: `--ref v0.9.2` ([install security](docs/plugin-install-security.md)).
+---
 
-Legacy note: [install.sh](install.sh) remains as a compatibility wrapper around [aih.sh](aih.sh). `aih.sh` is the preferred lifecycle command surface.
+## 🔌 Runtime Support
 
-## 🛠️ Maintainer quick start (source pack)
+| Runtime | Project install | Update | Uninstall | Stable claim |
+|---|---:|---:|---:|---:|
+| Cursor | ✅ experimental | ✅ | ✅ | No |
+| Claude Code | ✅ experimental | ✅ | ✅ | No |
+| Codex / Generic | ✅ experimental | ✅ | ✅ | No |
+| Gemini | ✅ experimental | ✅ | ✅ | No |
+| OpenCode | ✅ experimental | ✅ | ✅ | No |
+| Antigravity | planned | — | — | No |
+
+Manual root copy still exists via `--runtime manual`, but it is a fallback, not the recommended UX.
+
+---
+
+## 📚 Docs
+
+| Need | Read |
+|---|---|
+| Release notes | [docs/v0.9.2-release-notes.md](docs/v0.9.2-release-notes.md) |
+| Simple CLI | [docs/simple-cli-ux.md](docs/simple-cli-ux.md) |
+| Capability cache | [docs/private-capability-cache.md](docs/private-capability-cache.md) |
+| Git hygiene | [docs/private-install-git-hygiene.md](docs/private-install-git-hygiene.md) |
+| Runtime dogfood | [docs/runtime-dogfood-summary.md](docs/runtime-dogfood-summary.md) |
+| Validation | [docs/runtime-aware-validation.md](docs/runtime-aware-validation.md) |
+| Long-term target | [TARGET.md](TARGET.md) |
+
+---
+
+## 🛠️ Maintainers
 
 ```bash
 git clone https://github.com/truongnat/ai-engineering-harness.git
 cd ai-engineering-harness
 node validate.js
-node install.js --target ../my-project --dry-run
-node install.js --target ../my-project
+npm test
 ```
-
-Clone is for **maintainers and contributors**. Product work stays in the target repository.
 
 Target validation examples:
 
 ```bash
 node validate.js --target ../my-project --profile-only
-node validate.js --target ../my-project --goal google-login
+node validate.js --target ../my-project --runtime cursor --profile-only
 ```
 
-Then:
+---
 
-1. Read [AGENTS.md](AGENTS.md).
-2. Create or review `.harness/` artifacts in the host repo.
-3. Follow the printed next steps after install.
-4. Run `node validate.js --target ../my-project --profile-only`.
-5. Start with [`commands/harness-start.md`](commands/harness-start.md).
-6. Move through the loop with evidence at each phase.
+## Status
 
-## 🗂️ Start Here
+- Current release: [`v0.9.2`](docs/v0.9.2-release-notes.md), experimental
+- Stable runtime support: **No**
+- Next likely work: binary `aih`, manual runtime verification, Antigravity research
 
-| If You Need | Read |
-|---|---|
-| Long-term direction | [TARGET.md](TARGET.md) |
-| Agent contract | [AGENTS.md](AGENTS.md) |
-| Adoption guide | [docs/adoption-guide.md](docs/adoption-guide.md) |
-| Consume as pack | [docs/consume-as-pack.md](docs/consume-as-pack.md) |
-| Plugin model | [docs/plugin-model.md](docs/plugin-model.md) |
-| Consumption modes | [docs/consumption-modes.md](docs/consumption-modes.md) |
-| Distribution model | [docs/distribution-model.md](docs/distribution-model.md) |
-| Release archive | [docs/release-archive-model.md](docs/release-archive-model.md) |
-| Installed surface | [docs/installed-surface-contract.md](docs/installed-surface-contract.md) |
-| Runtime comparison | [docs/runtimes/comparison.md](docs/runtimes/comparison.md) |
-| Build a harness profile | [docs/harness-build-usage.md](docs/harness-build-usage.md) |
-| Copy-paste prompts | [docs/harness-build-prompts.md](docs/harness-build-prompts.md) |
-| Validate adopted profile | [docs/target-repo-validation.md](docs/target-repo-validation.md) |
-| Runtime overview | [docs/runtime-compatibility.md](docs/runtime-compatibility.md) |
-| Runtime-specific usage | [docs/runtimes/README.md](docs/runtimes/README.md) |
-| Quality gates | [docs/quality-gates-matrix.md](docs/quality-gates-matrix.md) |
-| Session startup | [docs/session-start-checklist.md](docs/session-start-checklist.md) |
-| Examples | [examples/demo-project/](examples/demo-project/), [examples/workflows/](examples/workflows/), and [examples/harness-build/flutter-google-login/](examples/harness-build/flutter-google-login/) |
+## Contributing
 
-## 🛠️ Adoption
-
-- [Adoption Guide](docs/adoption-guide.md)
-- [Adoption Smoke Test](docs/adoption-smoke-test.md)
-- [Install-To-Profile Walkthrough](docs/install-to-profile-walkthrough.md)
-- [Validation Troubleshooting](docs/validation-troubleshooting.md)
-- [Tiny Repo Adoption Example](examples/tiny-repo-adoption/)
-- [Small Repo Memory](docs/small-repo-memory.md)
-- [Usage Examples](docs/usage-examples.md)
-- [Host Repo Checklist](docs/host-repo-checklist.md)
-
-## 🎯 Release Status
-
-- Current release: [`v0.9.2`](docs/v0.9.2-release-notes.md) — **experimental** simple lifecycle CLI + runtime-native installer; stable runtime support: **No**
-- Next: manual runtime verification sprint or `v0.10.x` narrowing — not immediate `v1.0.0`
-- [Plugin install UX](docs/plugin-install-ux.md) · [runtime dogfood](docs/runtime-dogfood-summary.md) · [contracts (pre-v1)](docs/stable-contract-index.md) · [PACK.md](PACK.md)
-- `v0.9.2` docs: [notes](docs/v0.9.2-release-notes.md) · [readiness](docs/v0.9.x-readiness.md) · [scope](docs/v0.9.x-release-scope.md)
-- `v0.9.1` docs: [notes](docs/v0.9.1-release-notes.md) · [readiness](docs/v0.9.x-readiness.md) · [scope](docs/v0.9.x-release-scope.md)
-- `v0.9.0` docs: [notes](docs/v0.9.0-release-notes.md) · [readiness](docs/v0.9.0-readiness.md) · [scope](docs/v0.9.0-release-scope.md) · [plan](docs/v0.9.0-plan.md)
-- `v0.8.0` docs: [notes](docs/v0.8.0-release-notes.md) · [readiness](docs/v0.8.0-readiness.md) · [scope](docs/v0.8.0-release-scope.md) · [dogfood](docs/pack-dogfood-scenarios.md)
-- `v0.7.0` docs: [notes](docs/v0.7.0-release-notes.md) · [readiness](docs/v0.7.0-readiness.md) · [scope](docs/v0.7.0-release-scope.md) · [package](docs/manual-packaging-guide.md)
-- `v0.6.0` docs: [notes](docs/v0.6.0-release-notes.md) · [readiness](docs/v0.6.0-readiness.md) · [scope](docs/v0.6.0-release-scope.md) · [model](docs/runtime-consumption-model.md)
-- `v0.5.0` docs: [notes](docs/v0.5.0-release-notes.md) · [readiness](docs/v0.5.0-readiness.md) · [scope](docs/v0.5.0-release-scope.md)
-- `v0.4.0` docs: [notes](docs/v0.4.0-release-notes.md) · [readiness](docs/v0.4.0-readiness.md) · [scope](docs/v0.4.0-release-scope.md)
-- Previous releases: [`v0.3.0`](docs/v0.3.0-release-notes.md), [`v0.2.0`](docs/v0.2.0-release-notes.md), [`v0.1.0`](docs/v0.1.0-release-notes.md)
-- Release docs: [v0.3.1 notes](docs/v0.3.1-release-notes.md) · [v0.3.0 readiness](docs/v0.3.0-readiness.md) · [changelog](CHANGELOG.md)
-- Release process: [docs/release-checklist.md](docs/release-checklist.md) · [docs/versioning.md](docs/versioning.md)
-
-## 🤝 Contributing
-
-- [CONTRIBUTING.md](CONTRIBUTING.md)
-- [SECURITY.md](SECURITY.md)
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
 
 Keep markdown as the source of truth. Avoid heavy runtime features unless the roadmap explicitly moves there.
