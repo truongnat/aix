@@ -64,11 +64,14 @@
 - Narrowed active provider scope to Claude Code, Cursor, Codex, and Gemini.
 - Removed OpenCode from active provider support (wizard, install-runtime, README, matrices).
 - Claude Code as primary recommended path; Cursor secondary; Codex/Gemini experimental.
+- Product identity: lightweight markdown-first workflow kit (README, PACK.md, package description).
 - harness phase discipline now redirects to earlier commands when preconditions fail instead of allowing soft-success prose
+- Contract validation beyond headings: substantive command/skill sections, VERIFY/PLAN templates, dogfood demo contracts
 
 ### Notes
 
 - Historical changelog entries may still mention OpenCode where relevant to previous versions.
+- Release notes and checklist: [docs/v0.11.0-release-notes.md](docs/v0.11.0-release-notes.md). Feature scope frozen at v0.11.0.
 
 ## [0.10.8] - 2026-06-03
 

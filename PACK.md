@@ -77,8 +77,11 @@ Source pack:
 ```bash
 node validate.js
 npm test
+cd examples/dogfood-tiny-node-api && npm test
 node bin/aih.js --help
 ```
+
+Release notes: [docs/v0.11.0-release-notes.md](docs/v0.11.0-release-notes.md)
 
 Target profile:
 
