@@ -1,6 +1,6 @@
 <div align="center">
 
-# ai-engineering-harness
+# AI Engineering Harness
 
 ### A lightweight, markdown-first workflow kit for AI coding agents
 
