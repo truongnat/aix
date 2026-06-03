@@ -91,6 +91,13 @@ sh install.sh install --runtime <name> --scope project --visibility shared --ini
 
 [install.sh](../install.sh) + [install-runtime.js](../install-runtime.js) install **per runtime** without copying `commands/`, `skills/`, etc. to the product root. Capabilities live under **`.ai-harness/`** when cache is installed (private project default). See [runtime-native-install.md](runtime-native-install.md) and [private-capability-cache.md](private-capability-cache.md).
 
+Uninstall examples:
+
+```bash
+sh install.sh uninstall --runtime cursor --scope project --yes
+sh install.sh uninstall --runtime cursor --scope project --remove-cache --remove-state --yes
+```
+
 | Capability | Status |
 |---|---|
 | `manual` / `--legacy-root` | **Implemented** — root copy via `install.js`; dogfooded (Scenario C); **fallback only** |

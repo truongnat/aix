@@ -113,7 +113,12 @@ Re-run `install.sh install` with the same flags. Without `--force`, existing cac
 
 ## Uninstall Implications
 
-Removing harness from a repo should delete `.ai-harness/`, `.harness/` (if harness-owned), runtime bootstrap paths, and the info-exclude block. Full uninstall is a **planned** v0.9.2 follow-up.
+`install.sh uninstall` removes runtime entrypoints by default and cleans the harness block from `.git/info/exclude`.
+
+- `.ai-harness/` is kept by default; remove it with `--remove-cache`
+- `.harness/` is kept by default; remove it with `--remove-state`
+- `opencode.json` is kept
+- `AGENTS.md` is only removed when clearly harness-owned
 
 ## Troubleshooting
 

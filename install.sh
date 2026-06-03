@@ -17,6 +17,8 @@ VERB=install
 VISIBILITY=""
 IGNORE_STRATEGY=auto
 EFFECTIVE_IGNORE_STRATEGY=none
+UNINSTALL_REMOVE_CACHE=0
+UNINSTALL_REMOVE_STATE=0
 
 HARNES_IGNORE_BLOCK_START='# ai-engineering-harness start'
 HARNES_IGNORE_BLOCK_END='# ai-engineering-harness end'
@@ -28,6 +30,7 @@ ai-engineering-harness installer
 Usage:
   install.sh [install] [options]
   install.sh install [options]
+  install.sh uninstall [options]
 
 Options:
   --target <path>       Target repository (default: current directory)
@@ -38,6 +41,10 @@ Options:
   --init-harness        Scaffold project-local .harness/ profile files
   --install-cache       Install capability pack under .ai-harness/ (project scope)
   --no-install-cache    Skip .ai-harness/ cache (project runtime-native default installs cache)
+  --remove-cache        Uninstall: remove .ai-harness/
+  --keep-cache          Uninstall: keep .ai-harness/ (default)
+  --remove-state        Uninstall: remove .harness/
+  --keep-state          Uninstall: keep .harness/ (default)
   --legacy-root         Alias for --runtime manual (root copy fallback)
   --dry-run             Show plan or preview without writing
   --force               Overwrite existing .harness/ files; runtime/manual may overwrite their files
@@ -50,6 +57,8 @@ Project + --visibility shared leaves generated files visible in git status.
 
 Examples:
   install.sh install --runtime cursor --scope project --visibility private --init-harness --yes
+  install.sh uninstall --runtime cursor --scope project --yes
+  install.sh uninstall --runtime cursor --scope project --remove-cache --remove-state --yes
   install.sh --runtime claude --scope project --init-harness --dry-run --yes
   install.sh --runtime manual --target . --init-harness --dry-run
 
@@ -150,6 +159,38 @@ collect_ignore_paths() {
   } | awk '!seen[$0]++'
 }
 
+runtime_paths_for_uninstall() {
+  _rt="$1"
+  case "$_rt" in
+    cursor)
+      printf '%s\n' '.cursor/rules/ai-engineering-harness.mdc'
+      ;;
+    claude)
+      printf '%s\n' '.claude/CLAUDE.md' '.claude/settings.json'
+      ;;
+    gemini)
+      printf '%s\n' '.gemini/extensions/ai-engineering-harness/'
+      ;;
+    opencode)
+      printf '%s\n' '.opencode/plugins/ai-engineering-harness.js'
+      ;;
+    codex|generic|manual)
+      printf '%s\n' 'AGENTS.md'
+      ;;
+    all)
+      printf '%s\n' \
+        '.cursor/rules/ai-engineering-harness.mdc' \
+        '.claude/CLAUDE.md' \
+        '.claude/settings.json' \
+        '.gemini/extensions/ai-engineering-harness/' \
+        '.opencode/plugins/ai-engineering-harness.js' \
+        'AGENTS.md'
+      ;;
+    *)
+      ;;
+  esac
+}
+
 build_exclude_block_content() {
   _paths_file="$1"
   _out="$2"
@@ -205,6 +246,32 @@ append_or_update_info_exclude_block() {
   rm -f "$_paths_file" "$_block_file"
 }
 
+remove_info_exclude_block() {
+  _exclude_file=$(git_info_exclude_path)
+
+  if [ ! -f "$_exclude_file" ] || ! grep -qxF "$HARNES_IGNORE_BLOCK_START" "$_exclude_file" 2>/dev/null; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      printf 'SKIP .git/info/exclude\n'
+    else
+      printf 'SKIP .git/info/exclude\n'
+    fi
+    return 0
+  fi
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    printf 'WOULD UPDATE .git/info/exclude\n'
+    return 0
+  fi
+
+  awk '
+    $0 == "# ai-engineering-harness start" { skip = 1; next }
+    $0 == "# ai-engineering-harness end" { skip = 0; next }
+    skip == 0 { print }
+  ' "$_exclude_file" > "${_exclude_file}.tmp"
+  mv "${_exclude_file}.tmp" "$_exclude_file"
+  printf 'UPDATE .git/info/exclude\n'
+}
+
 print_manual_ignore_instructions() {
   printf '%s\n' \
     'ai-engineering-harness installer: not a Git repository (or no .git/info/exclude).' \
@@ -232,6 +299,88 @@ apply_private_ignore() {
   printf '%s\n' '' '--- Git exclude (private) ---'
   append_or_update_info_exclude_block
   printf '%s\n' '--- Git exclude complete ---' ''
+}
+
+file_contains_harness_marker() {
+  _path="$1"
+  [ -f "$_path" ] || return 1
+  grep -q 'ai-engineering-harness' "$_path" 2>/dev/null
+}
+
+remove_file_if_harness_owned() {
+  _rel="$1"
+  _ownership="${2:-always}"
+  _path="${TARGET_ABS}/${_rel}"
+
+  if [ ! -e "$_path" ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      printf 'SKIP %s\n' "$_rel"
+    else
+      printf 'SKIP %s\n' "$_rel"
+    fi
+    return 0
+  fi
+
+  case "$_ownership" in
+    marker)
+      if ! file_contains_harness_marker "$_path"; then
+        printf 'SKIP %s (not clearly harness-owned)\n' "$_rel"
+        return 0
+      fi
+      ;;
+    claude-settings)
+      printf 'SKIP %s (not clearly harness-owned)\n' "$_rel"
+      return 0
+      ;;
+    always)
+      ;;
+    *)
+      ;;
+  esac
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    printf 'WOULD REMOVE %s\n' "$_rel"
+    return 0
+  fi
+
+  if [ -d "$_path" ]; then
+    rm -rf "$_path"
+  else
+    rm -f "$_path"
+  fi
+  printf 'REMOVE %s\n' "$_rel"
+}
+
+remove_dir_if_requested() {
+  _rel="$1"
+  _should_remove="$2"
+  _path="${TARGET_ABS}/${_rel}"
+
+  if [ "$_should_remove" -ne 1 ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      printf 'WOULD KEEP %s\n' "$_rel"
+    else
+      printf 'KEEP %s\n' "$_rel"
+    fi
+    return 0
+  fi
+
+  if [ ! -e "$_path" ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      printf 'SKIP %s\n' "$_rel"
+    else
+      printf 'SKIP %s\n' "$_rel"
+    fi
+    return 0
+  fi
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    printf 'WOULD REMOVE %s\n' "$_rel"
+    return 0
+  fi
+
+  rm -rf "$_path"
+  printf 'REMOVE %s\n' "$_rel"
 }
 
 pick_visibility_interactive() {
@@ -496,6 +645,66 @@ print_install_plan() {
       '  - Use --runtime manual for legacy full root copy'
   fi
   printf '%s\n' '---'
+}
+
+print_uninstall_plan() {
+  printf '%s\n' '' '--- Uninstall plan ---'
+  printf '  runtime:       %s (%s)\n' "$RUNTIME" "$(runtime_label "$RUNTIME")"
+  printf '  scope:         %s\n' "$SCOPE"
+  printf '  target:        %s\n' "$TARGET_ABS"
+  printf '  remove-cache:  %s\n' "$([ "$UNINSTALL_REMOVE_CACHE" -eq 1 ] && printf yes || printf no)"
+  printf '  remove-state:  %s\n' "$([ "$UNINSTALL_REMOVE_STATE" -eq 1 ] && printf yes || printf no)"
+  printf '  dry-run:       %s\n' "$([ "$DRY_RUN" -eq 1 ] && printf yes || printf no)"
+  printf '%s\n' '' 'What will happen:'
+  printf '%s\n' "  - Remove runtime entrypoint paths for '$RUNTIME' when clearly harness-owned"
+  printf '%s\n' "  - $([ "$UNINSTALL_REMOVE_CACHE" -eq 1 ] && printf 'Remove' || printf 'Keep') .ai-harness/"
+  printf '%s\n' "  - $([ "$UNINSTALL_REMOVE_STATE" -eq 1 ] && printf 'Remove' || printf 'Keep') .harness/"
+  if is_git_repo; then
+    printf '%s\n' '  - Remove ai-engineering-harness block from .git/info/exclude when present'
+  else
+    printf '%s\n' '  - No .git/info/exclude cleanup (target is not a Git repo)'
+  fi
+  printf '%s\n' '  - Does not edit .gitignore'
+  printf '%s\n' '  - Does not remove opencode.json'
+  printf '%s\n' '---'
+}
+
+run_uninstall() {
+  if [ "$SCOPE" = global ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      printf '%s\n' '' '--- Uninstall ---'
+      printf '%s\n' 'Global uninstall is planned but not implemented in this step.'
+      return 0
+    fi
+    fail 'Global uninstall is planned but not implemented in this step.'
+  fi
+
+  printf '%s\n' '' '--- Uninstall ---'
+  runtime_paths_for_uninstall "$RUNTIME" | while IFS= read -r _rel; do
+    [ -n "$_rel" ] || continue
+    case "$_rel" in
+      AGENTS.md)
+        remove_file_if_harness_owned "$_rel" marker
+        ;;
+      .claude/settings.json)
+        remove_file_if_harness_owned "$_rel" claude-settings
+        ;;
+      *)
+        remove_file_if_harness_owned "$_rel" always
+        ;;
+    esac
+  done
+
+  remove_dir_if_requested '.ai-harness' "$UNINSTALL_REMOVE_CACHE"
+  remove_dir_if_requested '.harness' "$UNINSTALL_REMOVE_STATE"
+
+  if is_git_repo; then
+    remove_info_exclude_block
+  else
+    printf '%s\n' 'SKIP .git/info/exclude'
+  fi
+
+  printf '%s\n' '--- Uninstall complete ---'
 }
 
 confirm_plan() {
@@ -879,6 +1088,22 @@ while [ "$#" -gt 0 ]; do
       NO_INSTALL_CACHE=1
       shift
       ;;
+    --remove-cache)
+      UNINSTALL_REMOVE_CACHE=1
+      shift
+      ;;
+    --keep-cache)
+      UNINSTALL_REMOVE_CACHE=0
+      shift
+      ;;
+    --remove-state)
+      UNINSTALL_REMOVE_STATE=1
+      shift
+      ;;
+    --keep-state)
+      UNINSTALL_REMOVE_STATE=0
+      shift
+      ;;
     --legacy-root)
       RUNTIME=manual
       shift
@@ -932,10 +1157,11 @@ case "$VERB" in
     usage
     exit 0
     ;;
-  uninstall|update)
-    fail "$VERB is not implemented in v0.9.2 Step 1 (install and git exclude only)"
+  update)
+    fail "update is not implemented in v0.9.2 Step 3"
     ;;
-  install) ;;
+  uninstall|install)
+    ;;
   *)
     fail "unknown command: $VERB (try install, --help)"
     ;;
@@ -995,11 +1221,29 @@ else
 fi
 
 maybe_prompt_init_harness
+printf '%s\n' 'ai-engineering-harness installer'
+
+if [ "$VERB" = uninstall ]; then
+  if [ "$INIT_HARNESS" -eq 1 ]; then
+    fail '--init-harness is only valid for install'
+  fi
+  if [ "$INSTALL_CACHE" -eq 1 ] || [ "$NO_INSTALL_CACHE" -eq 1 ]; then
+    fail '--install-cache and --no-install-cache are only valid for install'
+  fi
+  print_uninstall_plan
+  confirm_plan
+  run_uninstall
+  if [ "$DRY_RUN" -eq 1 ]; then
+    printf '%s\n' '' "Dry-run complete for uninstall '$RUNTIME'."
+  else
+    printf '%s\n' '' "Runtime '$RUNTIME' uninstall finished."
+  fi
+  exit 0
+fi
 
 resolve_git_hygiene_settings
 resolve_install_cache_settings
 
-printf '%s\n' 'ai-engineering-harness installer'
 print_install_plan
 confirm_plan
 

@@ -1239,6 +1239,175 @@ runTest("install.sh rejects gitignore strategy in Step 1", () => {
   assert.match(result.stdout + result.stderr, /not implemented in v0\.9\.2 Step 1/i);
 });
 
+runTest("install.sh uninstall cursor dry-run prints WOULD REMOVE runtime entrypoint", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-uninstall-cursor-dry-"));
+  initFakeGitWorkTree(tmp);
+  fs.mkdirSync(path.join(tmp, ".cursor", "rules"), { recursive: true });
+  fs.writeFileSync(
+    path.join(tmp, ".cursor", "rules", "ai-engineering-harness.mdc"),
+    "ai-engineering-harness\n"
+  );
+
+  const result = runInstallSh(
+    ["uninstall", "--runtime", "cursor", "--scope", "project", "--dry-run", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /WOULD REMOVE \.cursor\/rules\/ai-engineering-harness\.mdc/);
+});
+
+runTest("install.sh uninstall cursor removes runtime file and keeps cache/state by default", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-uninstall-cursor-"));
+  initFakeGitWorkTree(tmp);
+  assert.equal(
+    runInstallSh(
+      ["install", "--runtime", "cursor", "--scope", "project", "--visibility", "private", "--init-harness", "--yes", "--target", tmp],
+      { env: { PATH: process.env.PATH } }
+    ).status,
+    0
+  );
+
+  const result = runInstallSh(
+    ["uninstall", "--runtime", "cursor", "--scope", "project", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(fs.existsSync(path.join(tmp, ".cursor", "rules", "ai-engineering-harness.mdc")), false);
+  assert.equal(fs.existsSync(path.join(tmp, ".ai-harness", "AGENTS.md")), true);
+  assert.equal(fs.existsSync(path.join(tmp, ".harness", "HARNESS.md")), true);
+  assert.match(result.stdout, /KEEP \.ai-harness/);
+  assert.match(result.stdout, /KEEP \.harness/);
+});
+
+runTest("install.sh uninstall cursor removes cache when requested", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-uninstall-cache-"));
+  initFakeGitWorkTree(tmp);
+  assert.equal(
+    runInstallSh(
+      ["install", "--runtime", "cursor", "--scope", "project", "--visibility", "private", "--yes", "--target", tmp],
+      { env: { PATH: process.env.PATH } }
+    ).status,
+    0
+  );
+
+  const result = runInstallSh(
+    ["uninstall", "--runtime", "cursor", "--scope", "project", "--remove-cache", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(fs.existsSync(path.join(tmp, ".ai-harness")), false);
+});
+
+runTest("install.sh uninstall cursor removes state when requested", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-uninstall-state-"));
+  initFakeGitWorkTree(tmp);
+  assert.equal(
+    runInstallSh(
+      ["install", "--runtime", "cursor", "--scope", "project", "--visibility", "private", "--init-harness", "--yes", "--target", tmp],
+      { env: { PATH: process.env.PATH } }
+    ).status,
+    0
+  );
+
+  const result = runInstallSh(
+    ["uninstall", "--runtime", "cursor", "--scope", "project", "--remove-state", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(fs.existsSync(path.join(tmp, ".harness")), false);
+});
+
+runTest("install.sh uninstall removes .git/info/exclude harness block and preserves unrelated lines", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-uninstall-exclude-"));
+  initFakeGitWorkTree(tmp);
+  fs.writeFileSync(path.join(tmp, ".git", "info", "exclude"), "custom-line\n", "utf8");
+  assert.equal(
+    runInstallSh(
+      ["install", "--runtime", "cursor", "--scope", "project", "--visibility", "private", "--yes", "--target", tmp],
+      { env: { PATH: process.env.PATH } }
+    ).status,
+    0
+  );
+
+  const result = runInstallSh(
+    ["uninstall", "--runtime", "cursor", "--scope", "project", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+  const exclude = readInfoExclude(tmp);
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.doesNotMatch(exclude, /ai-engineering-harness start/);
+  assert.match(exclude, /custom-line/);
+});
+
+runTest("install.sh uninstall all removes union runtime files and keeps opencode.json", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-uninstall-all-"));
+  initFakeGitWorkTree(tmp);
+  assert.equal(
+    runInstallSh(
+      ["install", "--runtime", "all", "--scope", "project", "--visibility", "private", "--init-harness", "--yes", "--target", tmp],
+      { env: { PATH: process.env.PATH } }
+    ).status,
+    0
+  );
+
+  const result = runInstallSh(
+    ["uninstall", "--runtime", "all", "--scope", "project", "--remove-cache", "--remove-state", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(fs.existsSync(path.join(tmp, ".cursor", "rules", "ai-engineering-harness.mdc")), false);
+  assert.equal(fs.existsSync(path.join(tmp, ".claude", "CLAUDE.md")), false);
+  assert.equal(fs.existsSync(path.join(tmp, ".gemini", "extensions", "ai-engineering-harness")), false);
+  assert.equal(fs.existsSync(path.join(tmp, ".opencode", "plugins", "ai-engineering-harness.js")), false);
+  assert.equal(fs.existsSync(path.join(tmp, ".ai-harness")), false);
+  assert.equal(fs.existsSync(path.join(tmp, ".harness")), false);
+  assert.equal(fs.existsSync(path.join(tmp, "opencode.json")), true);
+});
+
+runTest("install.sh uninstall generic skips AGENTS.md without harness marker", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-uninstall-agents-skip-"));
+  fs.writeFileSync(path.join(tmp, "AGENTS.md"), "# team custom\n", "utf8");
+
+  const result = runInstallSh(
+    ["uninstall", "--runtime", "generic", "--scope", "project", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(fs.existsSync(path.join(tmp, "AGENTS.md")), true);
+  assert.match(result.stdout, /SKIP AGENTS\.md \(not clearly harness-owned\)/);
+});
+
+runTest("install.sh uninstall generic removes AGENTS.md with harness marker", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-uninstall-agents-remove-"));
+  fs.writeFileSync(path.join(tmp, "AGENTS.md"), "ai-engineering-harness\n", "utf8");
+
+  const result = runInstallSh(
+    ["uninstall", "--runtime", "generic", "--scope", "project", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(fs.existsSync(path.join(tmp, "AGENTS.md")), false);
+});
+
+runTest("install.sh update still reports not implemented", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-update-"));
+  const result = runInstallSh(
+    ["update", "--runtime", "cursor", "--scope", "project", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stdout + result.stderr, /update is not implemented/i);
+});
+
 runTest("install-runtime opencode project creates plugin file", () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "rt-opencode-"));
   installRuntime({

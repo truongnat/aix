@@ -26,6 +26,9 @@
 - provider-agnostic model: entrypoint → `.ai-harness/` → `.harness/` (docs + runtime README)
 - runtime bootstraps (Cursor, generic, Claude, Gemini, OpenCode) point to `.ai-harness/` + `.harness/`
 - stop exposing `windsurf` as a first-class runtime until a verified native payload exists
+- project `install.sh uninstall` for runtime-native installs
+- uninstall safe defaults: keep `.ai-harness/` and `.harness/` unless explicitly removed
+- uninstall cleans the harness block from `.git/info/exclude`
 
 ### Planned (implementation)
 

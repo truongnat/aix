@@ -4,15 +4,22 @@
 
 Specify safe **uninstall** and **update** behavior for `install.sh` in `v0.9.2` without deleting user-owned files or breaking unrelated config.
 
-Design only — implementation after git hygiene and command verbs.
+`uninstall` is implemented for **project** runtime-native installs in `v0.9.2 Step 3`. `update` remains design-only.
 
 ## Uninstall Scope
 
 Uninstall is parameterized by:
 
-- `--runtime` (one or comma-separated)
+- `--runtime` (single runtime or `all`)
 - `--scope` (`global` | `project`)
 - `--target` (project root for project scope)
+
+Current safe defaults:
+
+- remove runtime entrypoint only
+- keep `.ai-harness/` unless `--remove-cache`
+- keep `.harness/` unless `--remove-state`
+- remove the harness block from `.git/info/exclude` when present
 
 Uninstall **does not** remove:
 
@@ -52,7 +59,7 @@ Ownership rules use:
 | `.harness/install-manifest.json` | **Shared** mode — committed with team harness |
 | `.git/ai-engineering-harness/manifest.json` or metadata in exclude header | **Private** mode — not committed; records paths + strategy |
 
-- **Not implemented** in v0.9.2 Step 1.
+- No manifest is used in the current implementation.
 
 ## Without Manifest Behavior
 
@@ -60,40 +67,40 @@ For each known path:
 
 | Path state | Uninstall action |
 |---|---|
-| Exists, matches pack template checksum or marker | Delete file or remove harness section |
-| Exists, user modified (heuristic: differs from template + no `--force`) | Skip; print path |
+| Exists, known runtime entrypoint | Delete file or directory |
+| Exists, requires ownership signal (`AGENTS.md`) | Delete only when file contains `ai-engineering-harness` |
+| Exists, shared config risk (`.claude/settings.json`, `opencode.json`) | Skip; print path |
 | Missing | Skip silently |
-| Directory (`.harness/`, extension dir) | Remove only harness scaffold files listed in init; **do not** delete whole `.harness/goals/` user goals without `--force` |
+| Directory (`.ai-harness/`, `.harness/`, extension dir) | Remove only when explicit flag requests it, or when it is a runtime-owned extension dir |
 
 Conservative rule: **when in doubt, skip and print**.
 
 ## Safe Delete Rules
 
-### Always safe to delete (project, with `--force` or unmodified template)
+### Always safe to delete (project)
 
 - `.cursor/rules/ai-engineering-harness.mdc`
 - `.opencode/plugins/ai-engineering-harness.js` (if no local edits detected)
 - `.claude/CLAUDE.md` only if installer-created banner present (impl detail)
 - `.gemini/extensions/ai-engineering-harness/` tree if installer-created
 
-### Never delete without explicit `--force`
+### Never delete without explicit ownership signal
 
-- Entire `.harness/goals/<id>/` with user content
-- `AGENTS.md` if user had pre-existing file (install skipped originally)
+- `AGENTS.md` if it does not clearly reference `ai-engineering-harness`
 - `opencode.json` — only strip harness plugin entry via JSON merge revert (future); v0.9.2 may skip `opencode.json` uninstall
+- `.claude/settings.json` unless a future reversible merge cleanup is added
 
 ### Global uninstall
 
-- Remove files under home paths that match install paths for runtime
-- Never touch project repo except optional exclude/gitignore block cleanup on project uninstall
+- Planned, not implemented in this step
 
 ## `.git/info/exclude` Block Cleanup
 
-On `uninstall --scope project` (private installs):
+On `uninstall --scope project`:
 
-1. If harness delimited block exists in `.git/info/exclude`, remove paths for uninstalled runtimes.
-2. If block empty, remove start/end markers.
-3. Never remove non-harness lines.
+1. If a harness delimited block exists in `.git/info/exclude`, remove the block.
+2. Preserve unrelated lines.
+3. If block is missing, print `SKIP .git/info/exclude`.
 
 Preferred cleanup target for default private strategy.
 
@@ -124,8 +131,7 @@ sh install.sh update --runtime cursor --scope project --ref v0.9.2 --dry-run
 
 Output:
 
-- `WOULD DELETE` / `WOULD SKIP (modified)` / `WOULD UPDATE`
-- Gitignore lines would remove
+- `WOULD REMOVE` / `WOULD KEEP` / `WOULD UPDATE` / `SKIP`
 
 ## Examples
 
@@ -152,3 +158,4 @@ sh install.sh uninstall --runtime gemini --scope global --yes
 - [install-command-model.md](install-command-model.md)
 - [git-hygiene-policy.md](git-hygiene-policy.md)
 - [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md)
+- [uninstall-usage.md](uninstall-usage.md)
