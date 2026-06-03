@@ -2,18 +2,17 @@
 
 # ⚙️ ai-engineering-harness
 
-### Runtime-native engineering discipline for AI coding agents
+### A lightweight, markdown-first workflow kit for AI coding agents
 
-![Version](https://img.shields.io/badge/version-v0.10.8%20experimental-2563eb)
+![Version](https://img.shields.io/badge/version-v0.11.0-2563eb)
 ![License](https://img.shields.io/badge/license-MIT-16a34a)
 ![Markdown First](https://img.shields.io/badge/markdown-first-7c3aed)
-![Stable Runtime Support](https://img.shields.io/badge/stable%20runtime%20support-no-ef4444)
 
 **Plan → Build → Verify → Ship → Remember**
 
-A markdown capability pack for AI coding agents — install with an interactive wizard, keep generated files out of your repo root.
+Install discipline into your repo with an interactive wizard — commands, skills, and `.harness/` state stay in a private capability cache, not scattered at the project root.
 
-[Quickstart](#-quickstart) · [Commands](#-commands) · [Installed layout](#-installed-layout) · [Docs](#-docs)
+[Quickstart](#-quickstart) · [Providers](#provider-support) · [Commands](#-commands) · [Docs](#-docs)
 
 </div>
 
@@ -21,10 +20,16 @@ A markdown capability pack for AI coding agents — install with an interactive 
 
 ## What is this?
 
-`ai-engineering-harness` installs a **local capability cache** (`.ai-harness/`), **project state** (`.harness/`), and a **runtime entrypoint** (Cursor rules, Claude instructions, etc.) without copying `commands/` and `skills/` into your project root.
+`ai-engineering-harness` is a **lightweight, markdown-first workflow kit** for AI coding agents. It installs a local capability cache (`.ai-harness/`), project workflow state (`.harness/`), and provider-specific entrypoints (Cursor rules, Claude commands, etc.) so agents follow the same engineering loop without copying `commands/` and `skills/` into your repo root.
 
 > [!IMPORTANT]
-> **v0.10.x is experimental.** Stable per-runtime support is **not** claimed. The install wizard lets you **choose** providers — detection only recommends; it does not auto-install.
+> **v0.11.0 is experimental.** Per-provider behavior is still being validated. The install wizard lets you **choose** providers — detection only recommends; it does not auto-install.
+
+---
+
+## Why not a framework?
+
+This kit is **not** an agent framework, orchestrator, or “harness OS.” There is no long-running service, plugin runtime platform, or universal slash-command layer across every tool. You get markdown artifacts, a small installer, and provider-native hooks where each agent already supports them. If you need a single runtime that owns sessions, tools, and routing, use a framework; if you want shared **plan → verify → ship** discipline inside repos you already work in, use this pack.
 
 ---
 
@@ -51,22 +56,29 @@ npx ai-engineering-harness install --provider cursor --yes
 
 The wizard uses [@clack/prompts](https://github.com/natemoo-re/clack) for a polished terminal flow (intro, multiselect, plan, spinner, outro). See [docs/terminal-wizard-ux.md](docs/terminal-wizard-ux.md) and [docs/npx-cli-ux.md](docs/npx-cli-ux.md).
 
-## Command support
+## Provider support
 
-Provider-native commands use **plugin packaging** at the npm package root (`.cursor-plugin/`, `.claude-plugin/`, etc.). Project `npx install` adds **activation** (`.ai-harness/`) plus provider-native paths where documented.
+Active scope (v0.11.0):
 
-| Provider | Command mode | Invocation |
-|----------|--------------|------------|
-| Claude Code | native plugin + project command files | `/harness-plan` (project file); `/plugin install` for pack skills |
-| Cursor | plugin packaging ready / marketplace pending | `/add-plugin ai-engineering-harness` when published; else rules → `.ai-harness/` |
-| OpenCode | native command files | `/harness-plan` (`.opencode/commands/harness-plan.md`) |
-| Gemini | extension context | no universal slash — `gemini extensions install` + ask **harness:plan** |
-| Codex | plugin skills via `/plugins` (marketplace pending) | no project-local `/harness:*` — see [codex-plugin-support.md](docs/codex-plugin-support.md) |
-| Generic | fallback only | `AGENTS.md` + ask **harness:plan** |
+| Provider | Status | Notes |
+|----------|--------|-------|
+| Claude Code | **Primary** | Recommended path for dogfooding and polish |
+| Cursor | **Secondary** | Plugin-ready packaging (`.cursor-plugin/`); rules fallback until marketplace publish |
+| Codex | Experimental | Plugin via `/plugins` when published; project install = AGENTS.md fallback — [codex-plugin-support.md](docs/codex-plugin-support.md) |
+| Gemini | Experimental | `gemini extensions install`; extension context |
 
-Local catalog (always): `.ai-harness/runtime-commands/` — canonical `harness:plan`, not a universal `/harness:plan` slash.
+**OpenCode is no longer part of the active provider scope** (v0.11.0). Historical releases may still mention OpenCode. Legacy cleanup: `aih.sh uninstall --runtime opencode`.
 
-See [docs/provider-command-matrix.md](docs/provider-command-matrix.md) and [docs/provider-native-command-research.md](docs/provider-native-command-research.md).
+Command details: [docs/provider-command-matrix.md](docs/provider-command-matrix.md), [docs/provider-native-command-research.md](docs/provider-native-command-research.md).
+
+Local catalog (always): `.ai-harness/runtime-commands/` — canonical `harness:plan`, not a universal `/harness:plan` slash in every UI.
+
+## Known limitations
+
+- **Slash commands differ by provider** — native `/harness-*` paths exist only where documented; elsewhere use canonical `harness:plan` via rules, AGENTS.md, or the local catalog.
+- **Shell installer is not fully cross-platform** — `aih.sh` expects a POSIX `sh`; Windows users should prefer `npx ai-engineering-harness install`.
+- **Windows** may need [Git for Windows](https://git-scm.com/download/win) (Git Bash) or WSL when using shell fallbacks.
+- **Provider support is still validating** — Claude and Cursor are the most exercised paths; Codex and Gemini are experimental.
 
 ## Command behavior
 
@@ -101,17 +113,13 @@ Aliases: `npx aih install`, `aih install` (after global install/link).
 
 ---
 
-## 🔌 Runtime support
+## Release discipline
 
-| Provider | Install | Stable claim |
-|----------|---------|--------------|
-| Cursor | ✅ experimental | No |
-| Claude Code | ✅ experimental | No |
-| Codex / Generic | ✅ experimental | No |
-| Gemini | ✅ experimental | No |
-| OpenCode | ✅ experimental | No |
-| Manual fallback | legacy root copy | No |
-| Antigravity | planned (disabled in wizard) | No |
+- **Wording-only doc edits** do not require a version bump.
+- When releasing, keep **README badge**, `package.json`, `CHANGELOG`, and git tags aligned on the same version.
+- Each versioned release should include **install verification** or a short **dogfood note** in release docs (what was actually run).
+
+Current release: [v0.11.0 release notes](docs/v0.11.0-release-notes.md).
 
 ---
 
@@ -121,7 +129,7 @@ Aliases: `npx aih install`, `aih install` (after global install/link).
 |-------|-----|
 | NPX wizard | [docs/npx-cli-ux.md](docs/npx-cli-ux.md) |
 | Slash commands | [docs/runtime-command-surface.md](docs/runtime-command-surface.md) |
-| v0.10.2 release | [docs/v0.10.2-release-notes.md](docs/v0.10.2-release-notes.md) |
+| v0.11.0 release | [docs/v0.11.0-release-notes.md](docs/v0.11.0-release-notes.md) |
 | npm publish | [docs/npm-publish.md](docs/npm-publish.md) |
 | Git hygiene | [docs/private-install-git-hygiene.md](docs/private-install-git-hygiene.md) |
 | Capability cache | [docs/private-capability-cache.md](docs/private-capability-cache.md) |
@@ -163,8 +171,8 @@ Publish: [docs/npm-publish.md](docs/npm-publish.md)
 
 ## Status
 
-- Current: **v0.10.2** (experimental) — [release notes](docs/v0.10.2-release-notes.md)
+- Current: **v0.11.0** (experimental) — [release notes](docs/v0.11.0-release-notes.md)
 - Primary UX: `npx ai-engineering-harness install`
-- Stable runtime support: **No**
+- Stable per-provider guarantees: **No** (validation in progress)
 
 [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md)

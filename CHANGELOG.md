@@ -48,6 +48,18 @@
 - `install.sh` verbs: install, uninstall, update
 - Antigravity runtime paths after verification
 
+## [0.11.0] - 2026-06-03
+
+### Changed
+
+- Narrowed active provider scope to Claude Code, Cursor, Codex, and Gemini.
+- Removed OpenCode from active provider support (wizard, install-runtime, README, matrices).
+- Claude Code as primary recommended path; Cursor secondary; Codex/Gemini experimental.
+
+### Notes
+
+- Historical changelog entries may still mention OpenCode where relevant to previous versions.
+
 ## [0.10.8] - 2026-06-03
 
 ### Fixed

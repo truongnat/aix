@@ -6,7 +6,7 @@ ai-engineering-harness
 
 ## Pack Version
 
-v0.10.8
+v0.11.0
 
 ## Pack Type
 
@@ -16,7 +16,7 @@ plugin-like markdown capability pack (npm package + shell fallbacks)
 
 Help AI coding agents consume engineering discipline inside target repositories through commands, skills, workflows, patterns, templates, harness profiles, and structural validation—without treating the source pack repository as the product work tree.
 
-## Primary Consumption (v0.10.x)
+## Primary Consumption (v0.11.x)
 
 ```bash
 npx ai-engineering-harness install
@@ -64,7 +64,7 @@ npm tarball **excludes** `test/`, `examples/`, and local dogfood dirs.
 
 ## Runtime Compatibility
 
-Documented guidance for Claude Code, Cursor, Codex, Gemini CLI, OpenCode, generic AGENTS.md.
+Documented guidance for Claude Code (primary), Cursor (secondary), Codex, Gemini CLI (experimental), generic AGENTS.md. OpenCode removed from active scope in v0.11.0.
 
 **Stable runtime support: No** (experimental per provider).
 

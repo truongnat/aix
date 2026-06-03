@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Runtime-native installs place **provider entrypoints** (Cursor rule, Claude `CLAUDE.md`, `AGENTS.md`, Gemini extension, OpenCode plugin) and **project state** under `.harness/`. They do **not** copy the full capability pack into the product repo root.
+Runtime-native installs place **provider entrypoints** (Cursor rule, Claude `CLAUDE.md`, `AGENTS.md`, Gemini extension) and **project state** under `.harness/`. They do **not** copy the full capability pack into the product repo root.
 
 Without `.ai-harness/`, every provider only gets an entrypoint that says “go read something” — with no local `commands/`, `skills/`, or `workflows/`. **v0.9.2+** installs the pack surface into a namespaced cache shared by **all** runtimes (via `npx ai-engineering-harness install` or `aih.sh`).
 
@@ -65,7 +65,6 @@ Root must **not** contain `commands/`, `skills/`, `workflows/`, or `templates/` 
 | `claude` | `.claude/CLAUDE.md`, `.claude/settings.json` | `.ai-harness/`, `.harness/` |
 | `codex`, `generic` | `AGENTS.md` (bootstrap → `.ai-harness/`) | `.ai-harness/`, `.harness/` |
 | `gemini` | `.gemini/extensions/ai-engineering-harness/` | `.ai-harness/`, `.harness/` |
-| `opencode` | `.opencode/plugins/ai-engineering-harness.js`, `opencode.json` | `.ai-harness/`, `.harness/` |
 
 Install order in [install.sh](../install.sh): (1) `.git/info/exclude` when private, (2) `.ai-harness/` cache, (3) `.harness/` if `--init-harness`, (4) runtime entrypoint.
 
@@ -107,7 +106,7 @@ Bootstraps point agents at:
 
 If `.ai-harness/` is missing, reinstall with private project install (cache is default) or explicit `--install-cache`.
 
-Updated payloads: [runtime/cursor/rules/ai-engineering-harness.mdc](../runtime/cursor/rules/ai-engineering-harness.mdc), [runtime/bootstrap/AGENTS.project.md](../runtime/bootstrap/AGENTS.project.md), Claude/Gemini/OpenCode project stubs.
+Updated payloads: [runtime/cursor/rules/ai-engineering-harness.mdc](../runtime/cursor/rules/ai-engineering-harness.mdc), [runtime/bootstrap/AGENTS.project.md](../runtime/bootstrap/AGENTS.project.md), Claude/Gemini project stubs.
 
 ## Update Behavior
 
@@ -119,7 +118,7 @@ Updated payloads: [runtime/cursor/rules/ai-engineering-harness.mdc](../runtime/c
 
 - `.ai-harness/` is kept by default; remove it with `--remove-cache`
 - `.harness/` is kept by default; remove it with `--remove-state`
-- `opencode.json` is kept
+- Legacy OpenCode installs: use `aih.sh uninstall --runtime opencode` only (not an active install target)
 - `AGENTS.md` is only removed when clearly harness-owned
 
 ## Troubleshooting

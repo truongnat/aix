@@ -26,8 +26,7 @@ const PACK_PLUGIN_PATHS = Object.freeze({
   cursor: ".cursor-plugin/plugin.json",
   claude: ".claude-plugin/plugin.json",
   codex: ".codex-plugin/plugin.json",
-  gemini: "gemini-extension.json",
-  opencode: ".opencode/INSTALL.md"
+  gemini: "gemini-extension.json"
 });
 
 const PROVIDER_COMMAND_SUPPORT = Object.freeze({
@@ -113,20 +112,6 @@ const PROVIDER_COMMAND_SUPPORT = Object.freeze({
       'gemini extensions install https://github.com/truongnat/ai-engineering-harness — context via GEMINI.md; ask "use harness:plan".',
     notes: "Extension context/skills — no invented slash commands under extension commands/.",
     invocations: {}
-  },
-  opencode: {
-    provider: "OpenCode",
-    status: "native-command-files",
-    nativeCommandSupport: true,
-    nativeCommands: true,
-    fallbackActivation: true,
-    packagingPath: ".opencode/commands/",
-    installMethod: "npx install writes .opencode/commands/harness-*.md; optional plugin in opencode.json",
-    installedPaths: [".opencode/commands/", ".opencode/plugins/ai-engineering-harness.js"],
-    actualInvocation: "/harness-plan",
-    useInstruction: "Run /harness-plan in OpenCode TUI after project install (filename → command per OpenCode docs).",
-    notes: "OpenCode docs: test.md → /test; harness-plan.md → /harness-plan. Colon names not claimed.",
-    invocations: { plan: "/harness-plan" }
   },
   antigravity: {
     provider: "Antigravity",
@@ -381,18 +366,6 @@ ${renderRuntimeCommandFile(spec)}
 `;
 }
 
-function renderOpencodeNativeCommandFile(spec) {
-  const sourcePath = `.ai-harness/${spec.sourceCommand}`;
-  return `---
-description: ${spec.title} — routes to project .ai-harness/ catalog
----
-
-Before doing anything, read @.ai-harness/activation.md and @.ai-harness/runtime-commands/harness-${spec.id}.md, then @${sourcePath}.
-
-Execute the harness workflow in **this repository only**. Do not use global or sibling-repo harness files unless the user asks.
-`;
-}
-
 function renderCursorCommandsRuleMdc() {
   const lines = [
     "---",
@@ -464,21 +437,6 @@ function renderGeminiCommandsReadme() {
     );
   }
   return `${lines.join("\n")}\n`;
-}
-
-function renderOpencodeCommandAppendix() {
-  return [
-    "",
-    "/* Harness commands — project-scoped fallback; read .ai-harness/activation.md first */",
-    "/* Ask: use harness:plan for this repo. Native slash not claimed. */",
-    "/*",
-    ...HARNESS_COMMANDS.map(
-      (s) =>
-        ` * ${s.canonical} -> .ai-harness/runtime-commands/harness-${s.id}.md -> .ai-harness/${s.sourceCommand}`
-    ),
-    " */",
-    ""
-  ].join("\n");
 }
 
 function buildManifest(providerEntrypoints = {}) {
@@ -679,36 +637,14 @@ function installGeminiHarnessFallback(targetRoot, options) {
   return results;
 }
 
-function installOpencodeNativeCommands(targetRoot, options) {
-  const results = [];
-  for (const spec of HARNESS_COMMANDS) {
-    results.push(
-      writeFile(
-        targetRoot,
-        `.opencode/commands/harness-${spec.id}.md`,
-        renderOpencodeNativeCommandFile(spec),
-        options
-      )
-    );
-  }
-  results.push(
-    mergeManifestProviders(targetRoot, "opencode", providerCommandPathsForRuntime("opencode", "project"), options)
-  );
-  return results;
-}
-
 function installProviderNativeCommands(runtime, scope, targetRoot, packRoot, options) {
   if (scope !== "project") {
     return [];
   }
-  switch (runtime) {
-    case "claude":
-      return installClaudeNativeCommands(targetRoot, packRoot, options);
-    case "opencode":
-      return installOpencodeNativeCommands(targetRoot, options);
-    default:
-      return [];
+  if (runtime === "claude") {
+    return installClaudeNativeCommands(targetRoot, packRoot, options);
   }
+  return [];
 }
 
 function installProviderFallbackCommands(runtime, scope, targetRoot, packRoot, options) {
@@ -720,8 +656,6 @@ function installProviderFallbackCommands(runtime, scope, targetRoot, packRoot, o
       return installCursorHarnessFallback(targetRoot, options);
     case "gemini":
       return installGeminiHarnessFallback(targetRoot, options);
-    case "opencode":
-      return [];
     case "codex":
     case "generic": {
       const agentsPath = path.join(targetRoot, "AGENTS.md");
@@ -757,10 +691,6 @@ function runtimeCommandCatalogPathsForPlan(providerId, scope) {
         for (const cmd of HARNESS_COMMANDS) {
           paths.push(`.claude/commands/harness-${cmd.id}.md`);
         }
-      } else if (providerId === "opencode") {
-        for (const cmd of HARNESS_COMMANDS) {
-          paths.push(`.opencode/commands/harness-${cmd.id}.md`);
-        }
       } else if (rel.endsWith("/")) {
         paths.push(rel);
       } else {
@@ -786,7 +716,6 @@ module.exports = {
   SLASH_COMMANDS,
   PROVIDER_COMMAND_SUPPORT,
   PACK_PLUGIN_PATHS,
-  renderOpencodeNativeCommandFile,
   RUNTIME_COMMANDS_DIR,
   activationMarkdown,
   renderAgentsCommandAliasesSection,

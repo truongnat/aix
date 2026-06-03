@@ -282,22 +282,9 @@ runTest("runtime-aware validation: codex runtime passes with AGENTS.md and harne
   assert.deepEqual(failures, []);
 });
 
-runTest("runtime-aware validation: opencode runtime passes with plugin paths", () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "rt-opencode-validate-"));
-  for (const name of ["HARNESS.md", "TEAM.md", "SKILLS.md", "WORKFLOW.md", "GATES.md", "MEMORY.md"]) {
-    fs.mkdirSync(path.join(tmp, ".harness"), { recursive: true });
-    fs.copyFileSync(
-      path.join(validTargetProfileFixture, ".harness", name),
-      path.join(tmp, ".harness", name)
-    );
-  }
-  fs.mkdirSync(path.join(tmp, ".opencode", "plugins"), { recursive: true });
-  fs.writeFileSync(path.join(tmp, "opencode.json"), "{}");
-  fs.writeFileSync(path.join(tmp, ".opencode", "plugins", "ai-engineering-harness.js"), "// plugin");
-
-  const failures = validateTargetProfile(tmp, "opencode");
-
-  assert.deepEqual(failures, []);
+runTest("runtime-aware validation: opencode runtime is rejected (v0.11.0)", () => {
+  const failures = validateTargetProfile(validTargetProfileFixture, "opencode");
+  assert.ok(failures.some((f) => /Unsupported runtime: opencode/.test(f)));
 });
 
 runTest("frozen validation contract: missing path message shape", () => {
@@ -514,9 +501,10 @@ runTest("aih.sh includes runtime selector flags", () => {
 runTest("aih.sh includes runtime option names", () => {
   const script = fs.readFileSync(aihShPath, "utf8");
 
-  for (const name of ["claude", "codex", "cursor", "gemini", "opencode", "generic", "all", "manual"]) {
+  for (const name of ["claude", "codex", "cursor", "gemini", "generic", "all", "manual"]) {
     assert.match(script, new RegExp(name));
   }
+  assert.match(script, /opencode removed v0\.11/i);
 });
 
 runTest("aih.sh warns manual root copy is fallback", () => {
@@ -553,7 +541,7 @@ runTest("install-runtime.js does not reference root pack copy", () => {
 
 runTest("install-runtime.js supports expected runtimes", () => {
   const { ALL_RUNTIMES } = require(path.join(repoRoot, "install-runtime.js"));
-  assert.deepEqual(ALL_RUNTIMES, ["opencode", "cursor", "claude", "codex", "gemini", "generic"]);
+  assert.deepEqual(ALL_RUNTIMES, ["cursor", "claude", "codex", "gemini", "generic"]);
 });
 
 runTest("aih.sh does not document windsurf alias", () => {
@@ -674,14 +662,13 @@ runTest("install.sh project init-harness dry-run prints WOULD CREATE HARNESS.md"
 runTest("install.sh project init-harness writes profile files", () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-init-write-"));
   const result = runInstallSh(
-    ["--runtime", "opencode", "--scope", "project", "--init-harness", "--yes", "--target", tmp],
+    ["--runtime", "claude", "--scope", "project", "--init-harness", "--yes", "--target", tmp],
     { env: { PATH: process.env.PATH } }
   );
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
   assert.ok(fs.existsSync(path.join(tmp, ".harness", "HARNESS.md")));
-  assert.ok(fs.existsSync(path.join(tmp, ".opencode", "plugins", "ai-engineering-harness.js")));
-  assert.equal(fs.existsSync(path.join(tmp, "AGENTS.md")), false);
+  assert.ok(fs.existsSync(path.join(tmp, ".claude", "CLAUDE.md")));
 });
 
 const agentsProjectBootstrapMarker = "ai-engineering-harness";
@@ -1073,7 +1060,7 @@ runTest("install.sh private cursor install is idempotent for exclude block", () 
   assert.equal(starts, 1);
 });
 
-runTest("install.sh private all runtime block includes union paths without opencode.json", () => {
+runTest("install.sh private all runtime block includes union paths for active runtimes", () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-private-all-"));
   initFakeGitWorkTree(tmp);
   const result = runInstallSh(
@@ -1095,21 +1082,19 @@ runTest("install.sh private all runtime block includes union paths without openc
   assert.equal(result.status, 0, result.stderr || result.stdout);
   const exclude = readInfoExclude(tmp);
   assert.match(exclude, /\.cursor\/rules\/ai-engineering-harness\.mdc/);
-  assert.match(exclude, /\.opencode\/plugins\/ai-engineering-harness\.js/);
-  assert.doesNotMatch(exclude, /^opencode\.json$/m);
+  assert.doesNotMatch(exclude, /\.opencode\/plugins\/ai-engineering-harness\.js/);
   assert.match(exclude, /AGENTS\.md/);
 });
 
-runTest("install.sh private opencode block does not ignore opencode.json", () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-private-opencode-"));
+runTest("install.sh rejects opencode runtime for install (v0.11.0)", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-opencode-reject-"));
   initFakeGitWorkTree(tmp);
-  runInstallSh(
-    ["--runtime", "opencode", "--scope", "project", "--visibility", "private", "--yes", "--target", tmp],
+  const result = runInstallSh(
+    ["install", "--runtime", "opencode", "--scope", "project", "--yes", "--target", tmp],
     { env: { PATH: process.env.PATH } }
   );
-  const exclude = readInfoExclude(tmp);
-  assert.match(exclude, /\.opencode\/plugins\/ai-engineering-harness\.js/);
-  assert.doesNotMatch(exclude, /^opencode\.json$/m);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stdout + result.stderr, /opencode removed v0\.11|invalid --runtime/i);
 });
 
 runTest("install.sh private cursor dry-run prints WOULD COPY .ai-harness paths", () => {
@@ -1345,23 +1330,6 @@ runTest("install.sh gemini project creates .ai-harness and GEMINI.md points to c
   assert.match(geminiMd, /\.ai-harness\/AGENTS\.md/);
 });
 
-runTest("install.sh opencode project creates .ai-harness and plugin references cache", () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-cache-opencode-"));
-  const result = runInstallSh(
-    ["--runtime", "opencode", "--scope", "project", "--init-harness", "--yes", "--target", tmp],
-    { env: { PATH: process.env.PATH } }
-  );
-
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  assert.ok(fs.existsSync(path.join(tmp, ".ai-harness", "AGENTS.md")));
-  const plugin = fs.readFileSync(
-    path.join(tmp, ".opencode", "plugins", "ai-engineering-harness.js"),
-    "utf8"
-  );
-  assert.match(plugin, /\.ai-harness\/AGENTS\.md/);
-  assert.match(plugin, /\.harness\//);
-});
-
 runTest("install-cache.js copies AGENTS.md under .ai-harness", () => {
   const { installCapabilityCache } = require(path.join(repoRoot, "install-cache.js"));
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-cache-unit-"));
@@ -1505,7 +1473,7 @@ runTest("install.sh uninstall removes .git/info/exclude harness block and preser
   assert.match(exclude, /custom-line/);
 });
 
-runTest("install.sh uninstall all removes union runtime files and keeps opencode.json", () => {
+runTest("install.sh uninstall all removes union runtime files for active providers", () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-uninstall-all-"));
   initFakeGitWorkTree(tmp);
   assert.equal(
@@ -1525,10 +1493,8 @@ runTest("install.sh uninstall all removes union runtime files and keeps opencode
   assert.equal(fs.existsSync(path.join(tmp, ".cursor", "rules", "ai-engineering-harness.mdc")), false);
   assert.equal(fs.existsSync(path.join(tmp, ".claude", "CLAUDE.md")), false);
   assert.equal(fs.existsSync(path.join(tmp, ".gemini", "extensions", "ai-engineering-harness")), false);
-  assert.equal(fs.existsSync(path.join(tmp, ".opencode", "plugins", "ai-engineering-harness.js")), false);
   assert.equal(fs.existsSync(path.join(tmp, ".ai-harness")), false);
   assert.equal(fs.existsSync(path.join(tmp, ".harness")), false);
-  assert.equal(fs.existsSync(path.join(tmp, "opencode.json")), true);
 });
 
 runTest("install.sh uninstall without runtime auto-detects installed cursor runtime", () => {
@@ -1900,11 +1866,15 @@ runTest("aih cli help mentions npx ai-engineering-harness install", () => {
   assert.match(result.stdout, /npx ai-engineering-harness install/);
 });
 
-runTest("cli provider model includes core providers", () => {
-  const { PROVIDERS } = require(path.join(repoRoot, "lib", "cli-providers.js"));
-  for (const id of ["cursor", "claude", "codex", "gemini", "opencode", "generic", "manual"]) {
+runTest("cli provider model includes active and fallback providers", () => {
+  const { PROVIDERS, ACTIVE_PROVIDER_IDS } = require(path.join(repoRoot, "lib", "cli-providers.js"));
+  for (const id of ["cursor", "claude", "codex", "gemini", "generic", "manual"]) {
     assert.ok(PROVIDERS.some((p) => p.id === id), `missing provider ${id}`);
   }
+  assert.ok(!PROVIDERS.some((p) => p.id === "opencode"));
+  assert.deepEqual(ACTIVE_PROVIDER_IDS, ["claude", "cursor", "codex", "gemini"]);
+  const claude = PROVIDERS.find((p) => p.id === "claude");
+  assert.equal(claude.priority, "primary");
 });
 
 runTest("cli antigravity provider is disabled planned", () => {
@@ -2002,7 +1972,7 @@ runTest("package.json includes @clack/prompts dependency", () => {
   const pkg = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
   assert.ok(pkg.dependencies);
   assert.ok(pkg.dependencies["@clack/prompts"]);
-  assert.equal(pkg.version, "0.10.8");
+  assert.equal(pkg.version, "0.11.0");
 });
 
 runTest("cli-ui uses clack note(message, title) signature (not object title)", () => {
@@ -2104,13 +2074,14 @@ runTest("runtime command catalog generates harness-plan with activation refs", (
 runTest("runtime-command-surface doc has provider capability matrix", () => {
   const doc = fs.readFileSync(path.join(repoRoot, "docs/runtime-command-surface.md"), "utf8");
   assert.match(doc, /plugin-ready/);
-  assert.match(doc, /native-command-files/);
-  assert.match(doc, /unknown \/ not claimed/);
+  assert.match(doc, /plugin-packaging|fallback-only/);
+  assert.match(doc, /native-plugin/);
+  assert.doesNotMatch(doc, /\| OpenCode \|/);
 });
 
 runTest("README does not claim universal native slash commands", () => {
   const readme = fs.readFileSync(path.join(repoRoot, "README.md"), "utf8");
-  assert.match(readme, /plugin packaging ready|plugin-ready|marketplace pending/i);
+  assert.match(readme, /plugin-ready|plugin packaging|marketplace pending/i);
   assert.match(readme, /harness:plan/);
   assert.doesNotMatch(readme, /Native `\/harness:\*`.*Yes/i);
 });
@@ -2123,7 +2094,7 @@ runTest("pack contains provider plugin manifests", () => {
   assert.equal(cursor.skills, "./skills/");
   assert.ok(fs.existsSync(path.join(repoRoot, ".claude-plugin/plugin.json")));
   assert.ok(fs.existsSync(path.join(repoRoot, "gemini-extension.json")));
-  assert.ok(fs.existsSync(path.join(repoRoot, ".opencode/INSTALL.md")));
+  assert.equal(fs.existsSync(path.join(repoRoot, ".opencode/INSTALL.md")), false);
 });
 
 runTest(".codex-plugin/plugin.json has skills and interface (no commands field)", () => {
@@ -2270,26 +2241,15 @@ runTest("uninstall claude removes harness command directory", () => {
   assert.ok(fs.existsSync(path.join(tmp, ".ai-harness/runtime-commands/harness-plan.md")));
 });
 
-runTest("providerCommandSupport marks cursor plugin-ready and opencode native-command-files", () => {
-  const { providerCommandSupport } = require(path.join(repoRoot, "runtime-command-catalog.js"));
+runTest("providerCommandSupport marks cursor plugin-ready without opencode entry", () => {
+  const { providerCommandSupport, PROVIDER_COMMAND_SUPPORT } = require(
+    path.join(repoRoot, "runtime-command-catalog.js")
+  );
   assert.equal(providerCommandSupport("cursor").status, "plugin-ready");
-  assert.equal(providerCommandSupport("opencode").status, "native-command-files");
   assert.equal(providerCommandSupport("claude").status, "native-plugin");
   assert.equal(providerCommandSupport("codex").status, "plugin-packaging");
   assert.equal(providerCommandSupport("codex").nativeSlashCommands, false);
-});
-
-runTest("install.sh opencode creates .opencode/commands/harness-plan.md", () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-oc-cmd-"));
-  initFakeGitWorkTree(tmp);
-  const result = runInstallSh(
-    ["install", "--runtime", "opencode", "--scope", "project", "--yes", "--target", tmp],
-    { env: { PATH: process.env.PATH } }
-  );
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  const ocPlan = path.join(tmp, ".opencode/commands/harness-plan.md");
-  assert.ok(fs.existsSync(ocPlan));
-  assert.match(fs.readFileSync(ocPlan, "utf8"), /\.ai-harness\/activation\.md/);
+  assert.equal(PROVIDER_COMMAND_SUPPORT.opencode, undefined);
 });
 
 runTest("doctor warns cursor plugin-ready via command-surface-report", () => {
@@ -2315,7 +2275,7 @@ runTest("docs provider-native-command-research exists", () => {
     "utf8"
   );
   assert.match(doc, /superpowers/i);
-  assert.match(doc, /opencode\.ai\/docs\/commands/i);
+  assert.match(doc, /removed from active scope v0\.11\.0/i);
 });
 
 runTest("manifest separates nativeCommands from fallbackActivation", () => {
@@ -2324,11 +2284,11 @@ runTest("manifest separates nativeCommands from fallbackActivation", () => {
     path.join(repoRoot, "runtime-command-catalog.js")
   );
   installRuntimeCommandCatalog(tmp, { force: true });
-  installProviderCommandSurface("opencode", "project", tmp, repoRoot, { force: true });
+  installProviderCommandSurface("claude", "project", tmp, repoRoot, { force: true });
   const manifest = JSON.parse(fs.readFileSync(path.join(tmp, ".ai-harness/manifest.json"), "utf8"));
-  const oc = manifest.commandSurface.providers.opencode;
-  assert.equal(oc.nativeCommands, true);
-  assert.equal(oc.fallbackActivation, true);
+  const cl = manifest.commandSurface.providers.claude;
+  assert.equal(cl.nativeCommands, true);
+  assert.equal(cl.fallbackActivation, true);
 });
 
 runTest("aih.sh doctor reports runtime-commands after claude install", () => {
@@ -2346,17 +2306,15 @@ runTest("aih.sh doctor reports runtime-commands after claude install", () => {
   assert.match(result.stdout, /activation\.md exists/);
 });
 
-runTest("install-runtime opencode project creates plugin file", () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "rt-opencode-"));
-  installRuntime({
-    packRoot: repoRoot,
-    runtime: "opencode",
-    scope: "project",
-    target: tmp,
-    dryRun: false,
-    force: false
-  });
-  assert.ok(fs.existsSync(path.join(tmp, ".opencode", "plugins", "ai-engineering-harness.js")));
+runTest("README provider support lists four active providers without OpenCode install", () => {
+  const readme = fs.readFileSync(path.join(repoRoot, "README.md"), "utf8");
+  const section = readme.slice(readme.indexOf("## Provider support"));
+  assert.match(section, /Claude Code.*Primary/i);
+  assert.match(section, /Cursor.*Secondary/i);
+  assert.match(section, /Codex.*Experimental/i);
+  assert.match(section, /Gemini.*Experimental/i);
+  assert.match(section, /no longer part of the active provider scope/i);
+  assert.doesNotMatch(section, /\| OpenCode \|/);
 });
 
 if (process.exitCode) {

@@ -32,7 +32,6 @@ How a command runs after routing is defined in `.ai-harness/commands/` — same 
 |----------|------|--------------|----------------------|
 | Claude Code | native-plugin | `/harness-plan` (file); plugin namespace TBD | `.claude/commands/harness-*.md` |
 | Cursor | plugin-ready | via plugin when published | `.cursor/rules/` (fallback) |
-| OpenCode | native-command-files | `/harness-plan` | `.opencode/commands/harness-*.md` |
 | Gemini | fallback-only | none | extension `GEMINI.md` + manifest |
 | Codex | plugin-packaging | plugin skills via `/plugins` | `AGENTS.md` fallback |
 | Generic | fallback-only | none | `AGENTS.md` aliases |
@@ -43,13 +42,12 @@ How a command runs after routing is defined in `.ai-harness/commands/` — same 
 |----------|-----------|----------|
 | Cursor | `/add-plugin ai-engineering-harness` | npx + rules → `.ai-harness/` |
 | Claude | `/plugin install …` | npx + `.claude/commands/` |
-| OpenCode | `/harness-plan` in TUI | ask harness:plan |
 | Gemini | `gemini extensions install <url>` | ask harness:plan |
 
 ## Troubleshooting
 
 | Symptom | Action |
 |---------|--------|
-| `/harness:plan` missing | Expected on most providers — use `/harness-plan` (OpenCode/Claude file) or ask **harness:plan** (colon form: unknown / not claimed unless plugin namespace verified) |
+| `/harness:plan` missing | Expected on most providers — use `/harness-plan` (Claude project file) or ask **harness:plan** |
 | Cursor slash empty | Install plugin when published; use rules fallback |
 | Doctor WARN plugin-ready | Informational |

@@ -1,8 +1,8 @@
 {
   "name": "ai-engineering-harness",
-  "version": "0.10.8",
+  "version": "0.11.0",
   "private": false,
-  "description": "A markdown-first operating system for engineering agents.",
+  "description": "A lightweight, markdown-first workflow kit for AI coding agents.",
   "license": "MIT",
   "type": "commonjs",
   "bin": {
@@ -23,7 +23,6 @@
     ".claude-plugin/",
     ".codex-plugin/",
     "gemini-extension.json",
-    ".opencode/",
     "hooks/",
     "aih.sh",
     "install.sh",

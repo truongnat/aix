@@ -91,7 +91,6 @@ const requiredFiles = [
   ".claude-plugin/plugin.json",
   ".codex-plugin/plugin.json",
   "gemini-extension.json",
-  ".opencode/INSTALL.md",
   "hooks/hooks-cursor.json",
   "docs/v0.10.0-release-notes.md",
   "docs/v0.10.2-release-notes.md",
@@ -433,7 +432,6 @@ const VALID_TARGET_RUNTIMES = [
   "generic",
   "codex",
   "cursor",
-  "opencode",
   "gemini",
   "claude",
   "manual"
@@ -464,8 +462,6 @@ function getRuntimeBootstrapPaths(runtime) {
       return ["AGENTS.md"];
     case "cursor":
       return [".cursor/rules/ai-engineering-harness.mdc"];
-    case "opencode":
-      return ["opencode.json", ".opencode/plugins/ai-engineering-harness.js"];
     case "gemini":
       return [
         ".gemini/extensions/ai-engineering-harness/gemini-extension.json",
@@ -650,11 +646,6 @@ function validateRuntimeCommandSurface(baseDir, failures) {
   const claudePlan = path.join(baseDir, ".claude/commands/harness-plan.md");
   if (fs.existsSync(claudePlan) && !fileReferencesActivation(claudePlan)) {
     failures.push(".claude/commands/harness-plan.md must reference .ai-harness/activation.md");
-  }
-
-  const opencodePlan = path.join(baseDir, ".opencode/commands/harness-plan.md");
-  if (fs.existsSync(opencodePlan) && !fileReferencesActivation(opencodePlan)) {
-    failures.push(".opencode/commands/harness-plan.md must reference .ai-harness/activation.md");
   }
 
   const cursorRule = path.join(baseDir, ".cursor/rules/ai-engineering-harness-commands.mdc");

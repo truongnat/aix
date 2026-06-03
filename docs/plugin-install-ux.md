@@ -43,7 +43,7 @@ The **recommended** consumer UX is **not** “copy the capability pack into the 
 
 Target flow (**shipped in `v0.9.1`**, experimental):
 
-1. Choose **runtime** (Claude, Codex, Cursor, Gemini, OpenCode, generic, or manual fallback — avoid `all` until dogfooded)
+1. Choose **runtime** (Claude, Cursor, Codex, Gemini, generic, or manual fallback — avoid `all` until dogfooded)
 2. Choose **scope** (global vs project)
 3. Install into **runtime-correct locations** only
 4. Create **project-local** `.harness/` only for project scope or explicit init
@@ -77,7 +77,7 @@ Recommended consumer path (v0.10.x — private project, capability cache, no git
 npx ai-engineering-harness install
 ```
 
-Use provider-native paths where implemented — [provider-command-matrix.md](provider-command-matrix.md). OpenCode: `/harness-plan`; Claude project: `/harness-plan`; Cursor: `/add-plugin` when published; Gemini/Codex: extension/plugin or ask **harness:plan**; local catalog always at `.ai-harness/runtime-commands/`.
+Use provider-native paths where implemented — [provider-command-matrix.md](provider-command-matrix.md). Claude (primary): `/harness-plan`; Cursor: `/add-plugin` when published; Codex/Gemini: experimental; local catalog at `.ai-harness/runtime-commands/`.
 
 Shell fallback:
 
@@ -91,9 +91,9 @@ Maintainers validate from source pack:
 node validate.js --target <repo> --runtime <name> --profile-only
 ```
 
-If the target repo does not expose a provider hint such as `.cursor/`, `.claude/`, `.gemini/`, or `.opencode/`, use an explicit runtime in non-interactive mode.
+If the target repo does not expose a provider hint such as `.cursor/`, `.claude/`, or `.gemini/`, use an explicit runtime in non-interactive mode.
 
-All **project** runtime-native installs **default** to `.ai-harness/` capability cache ([private-capability-cache.md](private-capability-cache.md)) — Cursor, Claude, Codex, Generic, Gemini, OpenCode. Each runtime entrypoint only adapts the provider; capabilities live under `.ai-harness/`, project state under `.harness/`.
+All **project** runtime-native installs **default** to `.ai-harness/` capability cache ([private-capability-cache.md](private-capability-cache.md)) — Claude, Cursor, Codex, Gemini, Generic. Each runtime entrypoint only adapts the provider; capabilities live under `.ai-harness/`, project state under `.harness/`.
 
 Team-shared (files visible in `git status`):
 
@@ -101,7 +101,7 @@ Team-shared (files visible in `git status`):
 sh aih.sh install --runtime <name> --scope project --visibility shared --init-harness --yes
 ```
 
-- `<name>`: `generic`, `codex`, `cursor`, `opencode`, `gemini`, `claude`
+- `<name>`: `generic`, `codex`, `cursor`, `gemini`, `claude`
 - **Manual fallback** (`manual` / `--legacy-root`): root copy only — [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md)
 
 [install.sh](../install.sh) + [install-runtime.js](../install-runtime.js) install **per runtime** without copying `commands/`, `skills/`, etc. to the product root. Capabilities live under **`.ai-harness/`** when cache is installed (private project default). See [runtime-native-install.md](runtime-native-install.md) and [private-capability-cache.md](private-capability-cache.md).
@@ -131,7 +131,7 @@ sh aih.sh update --runtime all --scope project --ref main --yes
 | `generic` + `project` + `--init-harness` | **experimental PASS** (Scenario D1) — [scenario-d1-generic-project.md](pack-dogfood-reports/scenario-d1-generic-project.md) |
 | `codex` + `project` + `--init-harness` | **experimental PASS** (Scenario D2) — [scenario-d2-codex-project.md](pack-dogfood-reports/scenario-d2-codex-project.md) |
 | `cursor` + `project` + `--init-harness` | **experimental PASS** (Scenario D3) — [scenario-d3-cursor-project.md](pack-dogfood-reports/scenario-d3-cursor-project.md); validate with `node validate.js --target <repo> --runtime cursor --profile-only` |
-| `opencode` + `project` + `--init-harness` | **experimental PASS** (Scenario D4) — [scenario-d4-opencode-project.md](pack-dogfood-reports/scenario-d4-opencode-project.md); validate with `node validate.js --target <repo> --runtime opencode --profile-only` |
+| OpenCode (removed v0.11.0) | Historical only — [scenario-d4-opencode-project.md](pack-dogfood-reports/scenario-d4-opencode-project.md); no longer an active install/validate runtime |
 | `gemini` + `project` or `global` | **experimental PASS** (Scenario D5) — [scenario-d5-gemini.md](pack-dogfood-reports/scenario-d5-gemini.md); project validate with `--runtime gemini`; global extension path preferred for CLI load |
 | `claude` + `project` (global dry-run only in D6) | **experimental PASS** (Scenario D6) — [scenario-d6-claude.md](pack-dogfood-reports/scenario-d6-claude.md); validate with `--runtime claude`; manual `/plugin install` required |
 
@@ -189,7 +189,7 @@ Per-runtime install modes (implementation after research):
 |---|---|
 | 3B | Claude Code (plugin / marketplace) |
 | 3C | Cursor (rules / plugin) |
-| 3D | OpenCode (`opencode.json` + plugin entry) |
+| ~~3D~~ | OpenCode removed from active scope (v0.11.0) |
 | 3E | Gemini CLI (extension) |
 | 3F | Codex (`AGENTS.md` bootstrap) |
 | 3G | Generic `AGENTS.md` fallback |

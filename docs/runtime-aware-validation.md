@@ -9,7 +9,6 @@ Validate **target repositories** after runtime-native install without forcing ev
 Legacy target profile validation (`node validate.js --target <repo> --profile-only`) always required `AGENTS.md`. That matched manual/`install.js` adoption and generic/codex project modes, but not:
 
 - **Cursor** — `.cursor/rules/ai-engineering-harness.mdc`
-- **OpenCode** — `opencode.json` + `.opencode/plugins/ai-engineering-harness.js`
 - **Gemini** — `.gemini/extensions/ai-engineering-harness/…`
 - **Claude** — `.claude/CLAUDE.md` + `.claude/settings.json`
 
@@ -43,7 +42,7 @@ node validate.js --target <repo> --profile-only
 # Runtime-native (bootstrap per runtime + .harness/)
 node validate.js --target <repo> --runtime cursor --profile-only
 node validate.js --target <repo> --runtime generic --profile-only
-node validate.js --target <repo> --runtime opencode --goal <goal-id> --runtime opencode
+node validate.js --target <repo> --runtime claude --goal <goal-id>
 ```
 
 Rules:
@@ -54,7 +53,7 @@ Rules:
 - `--profile-only` and `--goal` remain mutually exclusive.
 - `--goal` with `--runtime` validates runtime bootstrap + profile + goal artifacts.
 
-Supported values: `generic`, `codex`, `cursor`, `opencode`, `gemini`, `claude`, `manual`.
+Supported values: `generic`, `codex`, `cursor`, `gemini`, `claude`, `manual`. (`opencode` removed v0.11.0 — use legacy uninstall only via `aih.sh`.)
 
 ## Runtime Bootstrap Requirements
 
@@ -64,7 +63,6 @@ Structural **path existence** only:
 |---|---|
 | `generic`, `codex`, `manual` | `AGENTS.md` |
 | `cursor` | `.cursor/rules/ai-engineering-harness.mdc` |
-| `opencode` | `opencode.json`, `.opencode/plugins/ai-engineering-harness.js` |
 | `gemini` | `.gemini/extensions/ai-engineering-harness/gemini-extension.json`, `.gemini/extensions/ai-engineering-harness/GEMINI.md` (project scope; load path best-effort per audit) |
 | `claude` | `.claude/CLAUDE.md`, `.claude/settings.json` |
 

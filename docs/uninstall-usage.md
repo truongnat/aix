@@ -33,10 +33,10 @@ sh aih.sh uninstall --runtime all --scope project --remove-cache --remove-state 
 | `codex`, `generic`, `manual` | `AGENTS.md` only when clearly harness-owned |
 | `claude` | `.claude/CLAUDE.md`; `.claude/settings.json` is skipped unless future safe ownership logic is added |
 | `gemini` | `.gemini/extensions/ai-engineering-harness/` |
-| `opencode` | `.opencode/plugins/ai-engineering-harness.js` |
-| `all` | union of the runtime entrypoints above |
+| `opencode` | `.opencode/plugins/ai-engineering-harness.js` (legacy uninstall only; not an active install target since v0.11.0) |
+| `all` | union of active runtime entrypoints above |
 
-`opencode.json` is kept.
+`opencode.json` is kept when uninstalling legacy OpenCode installs.
 
 ## Cache Removal
 

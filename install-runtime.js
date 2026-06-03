@@ -10,7 +10,7 @@ const HARNESS_REPO = "truongnat/ai-engineering-harness";
 const HARNESS_GIT_URL = `https://github.com/${HARNESS_REPO}`;
 const { installProviderCommandSurface } = require("./runtime-command-catalog.js");
 
-const ALL_RUNTIMES = ["opencode", "cursor", "claude", "codex", "gemini", "generic"];
+const ALL_RUNTIMES = ["cursor", "claude", "codex", "gemini", "generic"];
 
 function parseArgs(argv) {
   const options = {
@@ -49,7 +49,7 @@ function parseArgs(argv) {
 function usage() {
   console.log(`Usage: node install-runtime.js --pack-root <path> --runtime <name> --scope <global|project> --target <path> [--dry-run] [--force]
 
-Runtimes: claude, codex, cursor, gemini, opencode, generic, all`);
+Runtimes: claude, codex, cursor, gemini, generic, all`);
 }
 
 function packPath(packRoot, relativePath) {
@@ -239,31 +239,6 @@ function installGemini(scope, targetRoot, packRoot, options) {
   }
 }
 
-function installOpencode(scope, targetRoot, packRoot, options) {
-  const pluginBody = fs.readFileSync(packPath(packRoot, "opencode/plugins/ai-engineering-harness.js"), "utf8");
-
-  if (scope === "global") {
-    const destRoot = path.join(os.homedir(), ".config", "opencode");
-    writeFileAction(destRoot, "plugins/ai-engineering-harness.js", pluginBody, options);
-    mergeJsonFile(destRoot, "opencode.json", { $schema: "https://opencode.ai/config.json" }, options);
-    return;
-  }
-
-  writeFileAction(targetRoot, ".opencode/plugins/ai-engineering-harness.js", pluginBody, options);
-  mergeJsonFile(
-    targetRoot,
-    "opencode.json",
-    {
-      $schema: "https://opencode.ai/config.json",
-      plugin: [`ai-engineering-harness@git+${HARNESS_GIT_URL}.git`]
-    },
-    options
-  );
-  console.log(
-    "NEXT: OpenCode native command files under .opencode/commands/ (see .opencode/INSTALL.md); plugin optional in opencode.json"
-  );
-}
-
 function installProviderCommands(runtime, scope, targetRoot, packRoot, options) {
   if (scope !== "project") {
     return;
@@ -291,9 +266,6 @@ function installOne(runtime, scope, targetRoot, packRoot, options) {
       break;
     case "gemini":
       installGemini(scope, targetRoot, packRoot, options);
-      break;
-    case "opencode":
-      installOpencode(scope, targetRoot, packRoot, options);
       break;
     case "generic":
       installGeneric(scope, targetRoot, packRoot, options);

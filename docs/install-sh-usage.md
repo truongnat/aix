@@ -27,7 +27,7 @@ Non-interactive `curl | sh` **without** `--runtime` defaults to **`manual`**: do
 
 | Flag | Purpose |
 |---|---|
-| `--runtime <name>` | `claude`, `codex`, `cursor`, `gemini`, `opencode`, `generic`, `all`, `manual` |
+| `--runtime <name>` | `claude`, `codex`, `cursor`, `gemini`, `generic`, `all`, `manual` (`opencode` legacy uninstall only via `aih.sh`) |
 | `--scope <name>` | `global` or `project` (required for non-manual when non-interactive) |
 | `--init-harness` | Scaffold project `.harness/` profile files (project scope; see [harness-init-usage.md](harness-init-usage.md)) |
 | `--legacy-root` | Alias for `--runtime manual` |

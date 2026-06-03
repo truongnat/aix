@@ -21,7 +21,7 @@ The runtime-specific documents under `docs/runtimes/` are usage guides, not adap
 - [Codex](runtimes/codex.md)
 - [Cursor](runtimes/cursor.md)
 - [Gemini CLI](runtimes/gemini-cli.md)
-- [OpenCode](runtimes/opencode.md)
+- [OpenCode](runtimes/opencode.md) — **removed from active scope (v0.11.0)**; historical guide only
 
 ## Claude Code
 
@@ -63,13 +63,9 @@ Use the same repository contract:
 
 Gemini CLI can follow the harness as long as the repository keeps the markdown artifacts current.
 
-## OpenCode
+## OpenCode (historical)
 
-Use the harness as a portable engineering layer:
-
-- copy the harness assets into the repository
-- keep the working state in `.harness/`
-- drive execution from plans and verification notes rather than prompt-only context
+OpenCode is **not** in the active provider scope as of v0.11.0. See [runtimes/opencode.md](runtimes/opencode.md) for legacy notes; use `aih.sh uninstall --runtime opencode` to remove old installs.
 
 ## Compatibility Boundaries
 

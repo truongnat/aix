@@ -2,7 +2,9 @@
 
 ## Purpose
 
-`npx ai-engineering-harness` is the **primary** install UX for v0.10.x (experimental). Interactive wizard powered by `@clack/prompts` (intro, detected hints, multiselect, plan, spinner, outro) — see [terminal-wizard-ux.md](terminal-wizard-ux.md).
+`npx ai-engineering-harness` is the **primary** install UX for v0.11.x (experimental). Interactive wizard powered by `@clack/prompts` (intro, detected hints, multiselect, plan, spinner, outro) — see [terminal-wizard-ux.md](terminal-wizard-ux.md).
+
+**Active providers:** Claude Code, Cursor, Codex, Gemini. OpenCode is not offered in the wizard (v0.11.0).
 
 **Fallbacks:** `aih.sh`, `install.sh`, `aih.ps1` — see [simple-cli-ux.md](simple-cli-ux.md).
 
@@ -16,7 +18,7 @@ Aliases: `npx aih install`, `aih install` (global/link).
 
 ## Detection is recommendation only
 
-Hints (`.cursor/`, `.claude/`, `.gemini/`, `.opencode/`, harness `AGENTS.md`) mark providers **(recommended)** and may preselect in the wizard. The CLI **never** silently installs based on detection alone.
+Hints (`.cursor/`, `.claude/`, `.gemini/`, harness `AGENTS.md`) mark providers **(recommended)** and may preselect in the wizard. Claude is listed first as primary. The CLI **never** silently installs based on detection alone.
 
 ## Slash commands after install
 

@@ -45,7 +45,7 @@ Recommended:
 
 Options:
   --target <path>       Target repository (default: current directory)
-  --runtime <name>      claude | codex | cursor | gemini | opencode | generic | all | manual
+  --runtime <name>      claude | codex | cursor | gemini | generic | all | manual
   --scope <name>        global | project (required for non-manual non-interactive)
   --visibility <name>   private | shared (project scope; private uses .git/info/exclude)
   --ignore-strategy <name>  info-exclude | none | auto (private project; default auto → info-exclude)
@@ -101,7 +101,13 @@ is_interactive() {
 
 validate_runtime() {
   case "$1" in
-    claude|codex|cursor|gemini|opencode|generic|all|manual) return 0 ;;
+    claude|codex|cursor|gemini|generic|all|manual) return 0 ;;
+    opencode)
+      case "${VERB:-}" in
+        uninstall|update) return 0 ;;
+        *) return 1 ;;
+      esac
+      ;;
     *) return 1 ;;
   esac
 }
@@ -247,7 +253,6 @@ harness_ignore_paths_for_runtime() {
         '.claude/settings.json' \
         '.claude/commands/' \
         '.gemini/extensions/ai-engineering-harness/' \
-        '.opencode/plugins/ai-engineering-harness.js' \
         'AGENTS.md'
       ;;
     *)
@@ -293,7 +298,6 @@ runtime_paths_for_uninstall() {
         '.claude/settings.json' \
         '.claude/commands/' \
         '.gemini/extensions/ai-engineering-harness/' \
-        '.opencode/plugins/ai-engineering-harness.js' \
         'AGENTS.md'
       ;;
     *)
@@ -642,27 +646,25 @@ runtime_label() {
 pick_runtime_interactive() {
   printf '%s\n' '' 'AI Engineering Harness Installer' '' 'Choose agent runtime:'
   printf '%s\n' \
-    '  1) Claude Code' \
-    '  2) Codex CLI' \
-    '  3) Cursor' \
-    '  4) Gemini CLI' \
-    '  5) OpenCode' \
-    '  6) Generic AGENTS.md bootstrap' \
-    '  7) All supported' \
-    '  8) Manual fallback / root copy'
+    '  1) Claude Code (primary)' \
+    '  2) Cursor' \
+    '  3) Codex CLI (experimental)' \
+    '  4) Gemini CLI (experimental)' \
+    '  5) Generic AGENTS.md bootstrap' \
+    '  6) All supported' \
+    '  7) Manual fallback / root copy'
   while true; do
-    printf '%s' 'Select runtime [1-8]: '
+    printf '%s' 'Select runtime [1-7]: '
     read -r choice || fail 'could not read runtime selection'
     case "$choice" in
       1) RUNTIME=claude; break ;;
-      2) RUNTIME=codex; break ;;
-      3) RUNTIME=cursor; break ;;
+      2) RUNTIME=cursor; break ;;
+      3) RUNTIME=codex; break ;;
       4) RUNTIME=gemini; break ;;
-      5) RUNTIME=opencode; break ;;
-      6) RUNTIME=generic; break ;;
-      7) RUNTIME=all; break ;;
-      8) RUNTIME=manual; break ;;
-      *) printf '%s\n' '  Invalid choice. Enter 1-8.' ;;
+      5) RUNTIME=generic; break ;;
+      6) RUNTIME=all; break ;;
+      7) RUNTIME=manual; break ;;
+      *) printf '%s\n' '  Invalid choice. Enter 1-7.' ;;
     esac
   done
 }
@@ -728,7 +730,7 @@ apply_install_defaults() {
       if is_interactive; then
         pick_runtime_interactive
       else
-        fail "could not detect provider for install; pass --runtime explicitly (e.g. cursor, claude, gemini, opencode, generic)"
+        fail "could not detect provider for install; pass --runtime explicitly (e.g. claude, cursor, codex, gemini, generic)"
       fi
     fi
   fi
@@ -873,7 +875,7 @@ print_install_plan() {
   else
     printf '%s\n' \
       "  - Install runtime-native integration for '$RUNTIME' (scope: $SCOPE)" \
-      '  - Writes only runtime paths (.cursor/rules, .opencode/plugins, .claude/, AGENTS.md, …)' \
+      '  - Writes only runtime paths (.cursor/rules, .claude/, AGENTS.md, …)' \
       '  - Does not copy commands/, skills/, workflows/ to product repo root' \
       '  - Use --runtime manual for legacy full root copy'
   fi
@@ -1635,7 +1637,7 @@ if [ -n "$VISIBILITY" ] && ! validate_visibility "$VISIBILITY"; then
 fi
 
 if [ -n "$RUNTIME" ] && ! validate_runtime "$RUNTIME"; then
-  fail "invalid --runtime: $RUNTIME (try claude, codex, cursor, gemini, opencode, generic, all, manual)"
+  fail "invalid --runtime: $RUNTIME (try claude, codex, cursor, gemini, generic, all, manual; opencode removed v0.11)"
 fi
 
 if [ -n "$SCOPE" ] && ! validate_scope "$SCOPE"; then

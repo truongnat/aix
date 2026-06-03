@@ -1,6 +1,6 @@
 # Session Start Checklist
 
-Use this checklist at the beginning of a session regardless of whether the agent runtime is Claude Code, Codex, Cursor, Gemini CLI, or OpenCode.
+Use this checklist at the beginning of a session with any **active** provider (Claude Code, Cursor, Codex, or Gemini CLI).
 
 ## Minimum Artifact Read Order
 

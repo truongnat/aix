@@ -116,10 +116,11 @@ Installed runtime detection order:
 - `.cursor/rules/ai-engineering-harness.mdc` → `cursor`
 - `.claude/CLAUDE.md` → `claude`
 - `.gemini/extensions/ai-engineering-harness/GEMINI.md` → `gemini`
-- `.opencode/plugins/ai-engineering-harness.js` → `opencode`
 - `AGENTS.md` containing `ai-engineering-harness` → `generic`
 
-Install-time provider detection uses provider-specific project hints such as `.cursor/`, `.claude/`, `.gemini/`, `.opencode/`, or a harness-owned `AGENTS.md`.
+Legacy `.opencode/plugins/ai-engineering-harness.js` may still be detected for **uninstall** only (OpenCode removed from install scope v0.11.0).
+
+Install-time provider detection uses project hints such as `.cursor/`, `.claude/`, `.gemini/`, or a harness-owned `AGENTS.md`.
 
 If no provider can be detected:
 
@@ -130,7 +131,7 @@ Manual fallback is still supported explicitly with `--runtime manual` or `--lega
 
 ## Entrypoints
 
-- `npx ai-engineering-harness` / `bin/aih.js` — **primary** interactive CLI (v0.10.x)
+- `npx ai-engineering-harness` / `bin/aih.js` — **primary** interactive CLI (v0.11.x)
 - `aih.sh` — lifecycle backend and shell fallback
 - `install.sh` — compatibility wrapper around `aih.sh`
 - `aih.ps1` — experimental Windows bootstrap (downloads `aih.sh`, requires `sh`)

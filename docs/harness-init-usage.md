@@ -56,7 +56,7 @@ sh install.sh --runtime generic --scope project --target . --init-harness --yes
 sh install.sh --runtime codex --scope project --target . --init-harness --yes
 ```
 
-Runtimes that do not write `AGENTS.md` (e.g. `cursor`, `claude`, `opencode`) require `AGENTS.md` from another runtime or `manual` install before `--profile-only` validation passes.
+Runtimes that do not write `AGENTS.md` (e.g. `cursor`, `claude`) require `AGENTS.md` from another runtime or `manual` install before `--profile-only` validation passes.
 
 Fill content after init. Do not store secrets in `.harness/`.
 

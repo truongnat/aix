@@ -28,7 +28,7 @@ It does **not** mean compiled plugins, runtime adapters, or server integrations.
 
 ## Runtime
 
-- the agent tool (Claude Code, Cursor, Codex, Gemini CLI, OpenCode, or similar)
+- the agent tool (Claude Code, Cursor, Codex, Gemini CLI, or similar; OpenCode removed from active scope v0.11.0)
 - reads installed surface + `.harness/` from the target repo
 - follows docs-only guidance under `docs/runtimes/`
 
@@ -50,7 +50,7 @@ v1.0.0 documents consumption for:
 - [Cursor](runtimes/cursor.md)
 - [Codex](runtimes/codex.md)
 - [Gemini CLI](runtimes/gemini-cli.md)
-- [OpenCode](runtimes/opencode.md)
+- [OpenCode](runtimes/opencode.md) — historical only (not active install scope v0.11.0)
 
 See also [runtimes/comparison.md](runtimes/comparison.md) and [runtimes/README.md](runtimes/README.md).
 

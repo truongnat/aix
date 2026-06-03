@@ -12,7 +12,6 @@ This document records **verified** provider mechanisms. Project-local markdown p
 | `.claude-plugin/plugin.json` | Claude marketplace plugin |
 | `.codex-plugin/` | Codex plugin packaging |
 | `gemini-extension.json` | `gemini extensions install <url>` |
-| `.opencode/INSTALL.md` | OpenCode plugin array + native commands |
 
 Cursor manifest (upstream): `commands: "./commands/"`, `skills: "./skills/"` — see [plugin.json](https://github.com/obra/superpowers/blob/main/.cursor-plugin/plugin.json).
 
@@ -43,18 +42,9 @@ Cursor manifest (upstream): `commands: "./commands/"`, `skills: "./skills/"` —
 - npx project install: `.cursor/rules/*.mdc` = **fallback activation** for `.ai-harness/`
 - Marketplace publish: **pending** — packaging-ready
 
-## OpenCode
+## OpenCode (removed from active scope v0.11.0)
 
-**Source:** [OpenCode — Commands](https://opencode.ai/docs/commands)
-
-| Mechanism | Path | Invocation |
-|-----------|------|------------|
-| Project markdown command | `.opencode/commands/test.md` | `/test` |
-
-**ai-engineering-harness:**
-
-- Project install: `.opencode/commands/harness-plan.md` → **`/harness-plan`**
-- `opencode.json` may include `"plugin": ["ai-engineering-harness@git+..."]` per [.opencode/INSTALL.md](../.opencode/INSTALL.md)
+Was experimental; no longer in wizard or `install-runtime.js`. Legacy projects may still have `.opencode/` — uninstall with `aih.sh uninstall --runtime opencode`.
 
 ## Gemini CLI
 
