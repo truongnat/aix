@@ -2,6 +2,21 @@
 
 Triage dogfood findings from [pack-dogfood-friction-log.md](pack-dogfood-friction-log.md) and completed [pack-dogfood reports](pack-dogfood-report-template.md).
 
+## v0.9.2 Blockers (Installer UX + Git Hygiene)
+
+From real Cursor install feedback — **active**; see [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md).
+
+| Item | Doc |
+|---|---|
+| Git hygiene / ignore generated files | [git-hygiene-policy.md](git-hygiene-policy.md) |
+| `install` / `uninstall` / `update` command model | [install-command-model.md](install-command-model.md), [uninstall-update-design.md](uninstall-update-design.md) |
+| Provider multi-select | [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md) |
+| Project private vs shared visibility | [git-hygiene-policy.md](git-hygiene-policy.md) |
+| One-command install wizard | [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md) |
+| Antigravity provider | [antigravity-provider-research.md](antigravity-provider-research.md) — planned until impl |
+
+Implementation order: gitignore → verbs → multi-select → visibility → uninstall → update → Antigravity.
+
 ## v0.9.x Patch Candidates
 
 - One-line install: improve `install.js` next steps to mention `curl | sh` install path and validate-from-source-pack ([scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md))

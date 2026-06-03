@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.9.2] - Unreleased
+
+### Added
+
+- v0.9.2 installer UX and git hygiene design — [installer-ux-v0.9.2-plan.md](docs/installer-ux-v0.9.2-plan.md)
+- git hygiene policy — [git-hygiene-policy.md](docs/git-hygiene-policy.md)
+- install command model (`install` / `uninstall` / `update`) — [install-command-model.md](docs/install-command-model.md)
+- uninstall and update design — [uninstall-update-design.md](docs/uninstall-update-design.md)
+- Antigravity provider research — [antigravity-provider-research.md](docs/antigravity-provider-research.md) (planned runtime, not implemented)
+
+### Planned (implementation)
+
+- delimited `.gitignore` block for project private installs
+- provider multi-select and install wizard
+- `install.sh` verbs: install, uninstall, update
+- Antigravity runtime paths after verification
+
 ## [Unreleased]
 
 ### Changed

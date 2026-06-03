@@ -54,9 +54,22 @@ See:
 - [interactive-installer-design.md](interactive-installer-design.md)
 - [project-state-policy.md](project-state-policy.md)
 
+## v0.9.2 Direction (Installer UX + Git Hygiene)
+
+**Active milestone** — address real install feedback before wider promotion. Design: [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md).
+
+| Topic | v0.9.2 target |
+|---|---|
+| Install wizard | One command; multi-provider; scope + shared/private |
+| Git hygiene | Delimited `.gitignore` block when user chooses private — [git-hygiene-policy.md](git-hygiene-policy.md) |
+| Commands | `install` / `uninstall` / `update` — [install-command-model.md](install-command-model.md) |
+| Antigravity | Researched; **planned** until paths verified — [antigravity-provider-research.md](antigravity-provider-research.md) |
+
+`v0.9.1` remains **experimental**; real Cursor install showed Git dirty state and no ignore policy — fix in `v0.9.2`, not deferred.
+
 ## Installer Status (v0.9.x)
 
-**Runtime-native installer exists.** All primary runtimes are **experimental** (file/install dogfooded; **stable support: No**). See [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
+**Runtime-native installer exists (`v0.9.1` tag).** All primary runtimes are **experimental** (file/install dogfooded; **stable support: No**). See [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
 
 Recommended consumer path:
 
@@ -96,7 +109,7 @@ Piping `curl | sh` without flags still defaults to **manual** fallback (with a w
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh
 ```
 
-Copies the harness installed surface into the current directory (legacy behavior). Prefer runtime-native install once available.
+Copies the harness installed surface into the current directory (legacy behavior). Prefer runtime-native `install` verb with `--visibility` (v0.9.2).
 
 ### Explicit target install
 

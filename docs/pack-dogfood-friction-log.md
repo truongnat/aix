@@ -55,6 +55,20 @@ Do not paste secrets, tokens, customer data, or private business details. Summar
 - **v1 blocker**: must resolve before `v1.0.0`
 - **later optional work**: automation, adapters, marketplace—explicitly deferred
 
+## Real Install Feedback (post–v0.9.1, product repo)
+
+Feedback from installing into a **real** product repository with Cursor (not disposable dogfood-only repo):
+
+| Date | Source | Friction | Severity | Proposed fix | Classification |
+|---|---|---|---|---|---|
+| 2026-06-02 | Real Cursor install | `.harness/` created but not gitignored — unclear local vs team state | medium | `--visibility private` + delimited `.gitignore` block | **v0.9.2 blocker** |
+| 2026-06-02 | Real Cursor install | `.cursor/rules/ai-engineering-harness.mdc` dirties Git working tree | medium | Ask shared vs private; private → gitignore | **v0.9.2 blocker** |
+| 2026-06-02 | Real install | Antigravity provider not in installer | medium | Research + planned runtime — [antigravity-provider-research.md](antigravity-provider-research.md) | **v0.9.2 blocker** |
+| 2026-06-02 | Real install | No uninstall / update commands | medium | `install.sh uninstall` / `update` — [uninstall-update-design.md](uninstall-update-design.md) | **v0.9.2 blocker** |
+| 2026-06-02 | Real install | Installer too complex — want one wizard, multi-provider, scope detection | medium | [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md) | **v0.9.2 blocker** |
+
+**Conclusion:** `v0.9.1` file/install dogfood is not enough for wide promotion; `v0.9.2` must ship git hygiene + command UX first.
+
 ## Runtime Native Dogfood Summary (C, D1–D6)
 
 Cross-scenario themes after runtime-native dogfood:

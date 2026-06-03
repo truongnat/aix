@@ -55,21 +55,33 @@ or use project-scope install with --init-harness
 
 | Artifact | Typical commit? |
 |---|---|
-| `.harness/` profile + goals | **Team choice** — often yes for shared operating model |
+| `.harness/` profile + goals | **Team choice** — shared (commit) or private (gitignore) per install |
 | `.harness/*.local` or secrets | **Never** |
-| Runtime project config (`.claude/settings.json`, `.cursor/rules/`, `opencode.json`) | Often yes when project-scoped |
+| Runtime project config (`.claude/settings.json`, `.cursor/rules/`, `opencode.json`) | Shared install: often yes; private install: gitignored per [git-hygiene-policy.md](git-hygiene-policy.md) |
 | Global runtime config | Usually **not** in product repo (lives in home dir) |
 | Full pack mirror (`commands/`, `skills/` at root) | **Discouraged** — not default |
 
+Installer must **not** assume one policy for all teams. Ask: commit harness/runtime files to this repo, or keep private?
+
+## Team-Shared vs Private Project State
+
+| Mode | `.harness/` | Runtime project files | `.gitignore` |
+|---|---|---|---|
+| **Team-shared** (`--visibility shared`) | Intended for commit | Intended for commit | Installer does not edit |
+| **Project private** (`--visibility private`) | Local trial / personal | Local | Installer may append delimited block (with consent) |
+
+See [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md).
+
 ## What Should Be Ignored
 
-Teams may add to `.gitignore` (their choice):
+Teams may add to `.gitignore` (their choice), or use installer **private** mode:
 
+- `.harness/` when not team-shared
+- harness-created runtime paths (Cursor rule, Claude bootstrap, etc.)
 - personal experiment files under `.harness/`
-- local-only overrides
 - machine-specific paths in MEMORY.md content (policy: [memory-safety.md](memory-safety.md))
 
-Installer should not auto-edit `.gitignore` without explicit future flag.
+**v0.9.1:** installer does not edit `.gitignore`. **v0.9.2:** private mode with explicit consent — [git-hygiene-policy.md](git-hygiene-policy.md). Global install never edits project `.gitignore`.
 
 ## Team-shared vs Personal State
 
