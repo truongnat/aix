@@ -8,10 +8,11 @@
 ![CI](https://github.com/truongnat/ai-engineering-harness/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-16a34a)
 ![Markdown First](https://img.shields.io/badge/markdown-first-7c3aed)
+![Landing Page](https://img.shields.io/badge/site-truongnat.github.io-818cf8)
 
 Give your repo a repeatable engineering loop — plan, build, verify, ship, and remember — using markdown contracts, command docs, skills, and quality gates instead of scattering workflow files at the project root.
 
-[Quickstart](#quickstart) · [Demo](#demo) · [Why](#why) · [Providers](#providers) · [Commands](#commands)
+[Quickstart](#quickstart) · [Demo](#demo) · [Why](#why) · [Providers](#providers) · [Commands](#commands) · [Landing Page](https://truongnat.github.io/ai-engineering-harness/)
 
 </div>
 
