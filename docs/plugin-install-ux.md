@@ -71,11 +71,17 @@ See:
 
 **Runtime-native installer exists (`v0.9.1` tag).** All primary runtimes are **experimental** (file/install dogfooded; **stable support: No**). See [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
 
-Recommended consumer path:
+Recommended consumer path (private project — no git noise):
 
 ```bash
-sh install.sh --runtime <name> --scope project --init-harness --yes
+sh install.sh install --runtime cursor --scope project --visibility private --ignore-strategy info-exclude --init-harness --yes
 node validate.js --target <repo> --runtime <name> --profile-only   # from source pack
+```
+
+Team-shared (files visible in `git status`):
+
+```bash
+sh install.sh install --runtime <name> --scope project --visibility shared --init-harness --yes
 ```
 
 - `<name>`: `generic`, `codex`, `cursor`, `windsurf`, `opencode`, `gemini`, `claude`

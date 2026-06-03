@@ -484,6 +484,8 @@ runTest("install.sh includes runtime selector flags", () => {
   assert.match(script, /--yes/);
   assert.match(script, /--init-harness/);
   assert.match(script, /--legacy-root/);
+  assert.match(script, /--visibility/);
+  assert.match(script, /--ignore-strategy/);
 });
 
 runTest("install.sh includes runtime option names", () => {
@@ -771,6 +773,203 @@ runTest("install-runtime cursor project creates rule file", () => {
     force: false
   });
   assert.ok(fs.existsSync(path.join(tmp, ".cursor", "rules", "ai-engineering-harness.mdc")));
+});
+
+function initFakeGitWorkTree(dir) {
+  fs.mkdirSync(path.join(dir, ".git", "info"), { recursive: true });
+}
+
+function readInfoExclude(targetDir) {
+  const excludePath = path.join(targetDir, ".git", "info", "exclude");
+  return fs.existsSync(excludePath) ? fs.readFileSync(excludePath, "utf8") : "";
+}
+
+runTest("install.sh private cursor dry-run prints WOULD UPDATE .git/info/exclude", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-private-dry-"));
+  initFakeGitWorkTree(tmp);
+  const result = runInstallSh(
+    [
+      "install",
+      "--runtime",
+      "cursor",
+      "--scope",
+      "project",
+      "--visibility",
+      "private",
+      "--ignore-strategy",
+      "info-exclude",
+      "--init-harness",
+      "--dry-run",
+      "--yes",
+      "--target",
+      tmp
+    ],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /WOULD UPDATE \.git\/info\/exclude/);
+  assert.match(result.stdout, /\.cursor\/rules\/ai-engineering-harness\.mdc/);
+  assert.match(result.stdout, /\.harness\//);
+});
+
+runTest("install.sh private cursor install writes .git/info/exclude block", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-private-write-"));
+  initFakeGitWorkTree(tmp);
+  const result = runInstallSh(
+    [
+      "--runtime",
+      "cursor",
+      "--scope",
+      "project",
+      "--visibility",
+      "private",
+      "--init-harness",
+      "--yes",
+      "--target",
+      tmp
+    ],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const exclude = readInfoExclude(tmp);
+  assert.match(exclude, /# ai-engineering-harness start/);
+  assert.match(exclude, /# ai-engineering-harness end/);
+  assert.match(exclude, /\.cursor\/rules\/ai-engineering-harness\.mdc/);
+  assert.match(exclude, /\.harness\//);
+  assert.equal(exclude.includes(".gitignore"), false);
+  assert.ok(fs.existsSync(path.join(tmp, ".cursor", "rules", "ai-engineering-harness.mdc")));
+});
+
+runTest("install.sh shared cursor install does not modify .git/info/exclude", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-shared-"));
+  initFakeGitWorkTree(tmp);
+  const result = runInstallSh(
+    [
+      "--runtime",
+      "cursor",
+      "--scope",
+      "project",
+      "--visibility",
+      "shared",
+      "--yes",
+      "--target",
+      tmp
+    ],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const exclude = readInfoExclude(tmp);
+  assert.doesNotMatch(exclude, /ai-engineering-harness start/);
+});
+
+runTest("install.sh private non-git install warns and does not fail", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-private-nogit-"));
+  const result = runInstallSh(
+    [
+      "--runtime",
+      "cursor",
+      "--scope",
+      "project",
+      "--visibility",
+      "private",
+      "--yes",
+      "--target",
+      tmp
+    ],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const combined = `${result.stdout}\n${result.stderr}`;
+  assert.match(combined, /not a Git repository|\.git\/info\/exclude/i);
+  assert.equal(fs.existsSync(path.join(tmp, ".git", "info", "exclude")), false);
+});
+
+runTest("install.sh private cursor install is idempotent for exclude block", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-private-idem-"));
+  initFakeGitWorkTree(tmp);
+  const args = [
+    "--runtime",
+    "cursor",
+    "--scope",
+    "project",
+    "--visibility",
+    "private",
+    "--yes",
+    "--target",
+    tmp
+  ];
+  assert.equal(runInstallSh(args, { env: { PATH: process.env.PATH } }).status, 0);
+  assert.equal(runInstallSh(args, { env: { PATH: process.env.PATH } }).status, 0);
+  const exclude = readInfoExclude(tmp);
+  const starts = (exclude.match(/# ai-engineering-harness start/g) || []).length;
+  assert.equal(starts, 1);
+});
+
+runTest("install.sh private all runtime block includes union paths without opencode.json", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-private-all-"));
+  initFakeGitWorkTree(tmp);
+  const result = runInstallSh(
+    [
+      "--runtime",
+      "all",
+      "--scope",
+      "project",
+      "--visibility",
+      "private",
+      "--init-harness",
+      "--yes",
+      "--target",
+      tmp
+    ],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const exclude = readInfoExclude(tmp);
+  assert.match(exclude, /\.cursor\/rules\/ai-engineering-harness\.mdc/);
+  assert.match(exclude, /\.opencode\/plugins\/ai-engineering-harness\.js/);
+  assert.doesNotMatch(exclude, /^opencode\.json$/m);
+  assert.match(exclude, /AGENTS\.md/);
+});
+
+runTest("install.sh private opencode block does not ignore opencode.json", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-private-opencode-"));
+  initFakeGitWorkTree(tmp);
+  runInstallSh(
+    ["--runtime", "opencode", "--scope", "project", "--visibility", "private", "--yes", "--target", tmp],
+    { env: { PATH: process.env.PATH } }
+  );
+  const exclude = readInfoExclude(tmp);
+  assert.match(exclude, /\.opencode\/plugins\/ai-engineering-harness\.js/);
+  assert.doesNotMatch(exclude, /^opencode\.json$/m);
+});
+
+runTest("install.sh rejects gitignore strategy in Step 1", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "harness-gitignore-reject-"));
+  initFakeGitWorkTree(tmp);
+  const result = runInstallSh(
+    [
+      "--runtime",
+      "cursor",
+      "--scope",
+      "project",
+      "--visibility",
+      "private",
+      "--ignore-strategy",
+      "gitignore",
+      "--yes",
+      "--target",
+      tmp
+    ],
+    { env: { PATH: process.env.PATH } }
+  );
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stdout + result.stderr, /not implemented in v0\.9\.2 Step 1/i);
 });
 
 runTest("install-runtime opencode project creates plugin file", () => {

@@ -61,9 +61,9 @@ Feedback from installing into a **real** product repository with Cursor (not dis
 
 | Date | Source | Friction | Severity | Proposed fix | Classification |
 |---|---|---|---|---|---|
-| 2026-06-02 | Real Cursor install | `.harness/` created but not locally ignored — unclear local vs team state | medium | `--visibility private` + `.git/info/exclude` block | **v0.9.2 blocker** |
-| 2026-06-02 | Real Cursor install | `.cursor/rules/ai-engineering-harness.mdc` dirties Git working tree | medium | Ask shared vs private; private → info-exclude | **v0.9.2 blocker** |
-| 2026-06-02 | Real install UX | `.gitignore` wrong default — tracked file, edit creates repo change | medium | Prefer `.git/info/exclude`; gitignore explicit only | **v0.9.2 blocker** |
+| 2026-06-02 | Real Cursor install | `.harness/` created but not locally ignored — unclear local vs team state | medium | **addressed** — `--visibility private` + `.git/info/exclude` (Step 1) | v0.9.2 fix |
+| 2026-06-02 | Real Cursor install | `.cursor/rules/ai-engineering-harness.mdc` dirties Git working tree | medium | **addressed** — private + info-exclude | v0.9.2 fix |
+| 2026-06-02 | Real install UX | `.gitignore` wrong default — tracked file, edit creates repo change | medium | **addressed** — info-exclude default; gitignore rejected in Step 1 | v0.9.2 fix |
 | 2026-06-02 | Real install | Antigravity provider not in installer | medium | Research + planned runtime — [antigravity-provider-research.md](antigravity-provider-research.md) | **v0.9.2 blocker** |
 | 2026-06-02 | Real install | No uninstall / update commands | medium | `install.sh uninstall` / `update` — [uninstall-update-design.md](uninstall-update-design.md) | **v0.9.2 blocker** |
 | 2026-06-02 | Real install | Installer too complex — want one wizard, multi-provider, scope detection | medium | [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md) | **v0.9.2 blocker** |

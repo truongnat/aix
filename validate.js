@@ -111,6 +111,7 @@ const requiredFiles = [
   "docs/install-command-model.md",
   "docs/uninstall-update-design.md",
   "docs/antigravity-provider-research.md",
+  "docs/private-install-git-hygiene.md",
   "docs/runtime-aware-validation.md",
   "docs/packaging-model.md",
   "docs/pack-manifest-spec.md",

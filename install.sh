@@ -11,18 +11,28 @@ RUNTIME=""
 SCOPE=""
 INIT_HARNESS=0
 YES=0
+VERB=install
+VISIBILITY=""
+IGNORE_STRATEGY=auto
+EFFECTIVE_IGNORE_STRATEGY=none
+
+HARNES_IGNORE_BLOCK_START='# ai-engineering-harness start'
+HARNES_IGNORE_BLOCK_END='# ai-engineering-harness end'
 
 usage() {
   cat <<'EOF'
 ai-engineering-harness installer
 
 Usage:
-  install.sh [options]
+  install.sh [install] [options]
+  install.sh install [options]
 
 Options:
   --target <path>       Target repository (default: current directory)
   --runtime <name>      claude | codex | cursor | gemini | opencode | generic | all | manual
   --scope <name>        global | project (required for non-manual non-interactive)
+  --visibility <name>   private | shared (project scope; private uses .git/info/exclude)
+  --ignore-strategy <name>  info-exclude | none | auto (private project; default auto → info-exclude)
   --init-harness        Scaffold project-local .harness/ profile files
   --legacy-root         Alias for --runtime manual (root copy fallback)
   --dry-run             Show plan or preview without writing
@@ -31,13 +41,13 @@ Options:
   --yes                 Skip interactive confirmation
   --help                Show this help
 
-Runtime-native install: claude, codex, cursor, windsurf, gemini, opencode, generic, all. Manual = legacy root copy.
-Project .harness/ init works with --scope project --init-harness (or interactive confirm).
+Git hygiene (v0.9.2): project + --visibility private writes .git/info/exclude (not .gitignore).
+Project + --visibility shared leaves generated files visible in git status.
 
 Examples:
+  install.sh install --runtime cursor --scope project --visibility private --ignore-strategy info-exclude --init-harness --yes
   install.sh --runtime claude --scope project --init-harness --dry-run --yes
   install.sh --runtime manual --target . --init-harness --dry-run
-  install.sh --legacy-root --target ../my-project
 
 Remote one-line install (non-interactive; defaults to manual fallback with warning):
   curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh
@@ -64,6 +74,213 @@ validate_scope() {
   case "$1" in
     global|project) return 0 ;;
     *) return 1 ;;
+  esac
+}
+
+validate_visibility() {
+  case "$1" in
+    private|shared) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+validate_ignore_strategy() {
+  case "$1" in
+    info-exclude|none|auto|gitignore) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+is_git_repo() {
+  [ -d "${TARGET_ABS}/.git" ] || [ -f "${TARGET_ABS}/.git" ]
+}
+
+git_info_exclude_path() {
+  printf '%s' "${TARGET_ABS}/.git/info/exclude"
+}
+
+harness_ignore_paths_for_runtime() {
+  _rt="$1"
+  _init="$2"
+
+  if [ "$_init" -eq 1 ]; then
+    printf '%s\n' '.harness/'
+  fi
+
+  case "$_rt" in
+    cursor|windsurf)
+      printf '%s\n' '.cursor/rules/ai-engineering-harness.mdc'
+      ;;
+    claude)
+      printf '%s\n' '.claude/CLAUDE.md' '.claude/settings.json'
+      ;;
+    gemini)
+      printf '%s\n' '.gemini/extensions/ai-engineering-harness/'
+      ;;
+    opencode)
+      printf '%s\n' '.opencode/plugins/ai-engineering-harness.js'
+      ;;
+    codex|generic|manual)
+      printf '%s\n' 'AGENTS.md'
+      ;;
+    all)
+      printf '%s\n' \
+        '.cursor/rules/ai-engineering-harness.mdc' \
+        '.claude/CLAUDE.md' \
+        '.claude/settings.json' \
+        '.gemini/extensions/ai-engineering-harness/' \
+        '.opencode/plugins/ai-engineering-harness.js' \
+        'AGENTS.md'
+      ;;
+    *)
+      ;;
+  esac
+}
+
+collect_ignore_paths() {
+  harness_ignore_paths_for_runtime "$RUNTIME" "$INIT_HARNESS" | awk '!seen[$0]++'
+}
+
+build_exclude_block_content() {
+  _paths_file="$1"
+  _out="$2"
+  {
+    printf '%s\n' "$HARNES_IGNORE_BLOCK_START"
+    while IFS= read -r _line; do
+      [ -n "$_line" ] && printf '%s\n' "$_line"
+    done < "$_paths_file"
+    printf '%s\n' "$HARNES_IGNORE_BLOCK_END"
+  } > "$_out"
+}
+
+append_or_update_info_exclude_block() {
+  _exclude_file=$(git_info_exclude_path)
+  _paths_file=$(mktemp "${TMPDIR:-/tmp}/harness-ignore-paths.XXXXXX")
+  _block_file=$(mktemp "${TMPDIR:-/tmp}/harness-ignore-block.XXXXXX")
+  collect_ignore_paths > "$_paths_file"
+  build_exclude_block_content "$_paths_file" "$_block_file"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    printf 'WOULD UPDATE .git/info/exclude\n'
+    while IFS= read -r _p; do
+      [ -n "$_p" ] && printf '  ignore: %s\n' "$_p"
+    done < "$_paths_file"
+    rm -f "$_paths_file" "$_block_file"
+    return 0
+  fi
+
+  mkdir -p "${TARGET_ABS}/.git/info"
+  if [ ! -f "$_exclude_file" ]; then
+    cat "$_block_file" > "$_exclude_file"
+    printf 'UPDATE .git/info/exclude\n'
+  elif ! grep -qxF "$HARNES_IGNORE_BLOCK_START" "$_exclude_file" 2>/dev/null; then
+    printf '\n' >> "$_exclude_file"
+    cat "$_block_file" >> "$_exclude_file"
+    printf 'UPDATE .git/info/exclude\n'
+  else
+    awk -v blockfile="$_block_file" '
+      BEGIN {
+        while ((getline line < blockfile) > 0) {
+          block = block line "\n"
+        }
+        close(blockfile)
+      }
+      $0 == "# ai-engineering-harness start" { skip = 1; printf "%s", block; next }
+      $0 == "# ai-engineering-harness end" { skip = 0; next }
+      skip == 0 { print }
+    ' "$_exclude_file" > "${_exclude_file}.tmp"
+    mv "${_exclude_file}.tmp" "$_exclude_file"
+    printf 'UPDATE .git/info/exclude\n'
+  fi
+
+  rm -f "$_paths_file" "$_block_file"
+}
+
+print_manual_ignore_instructions() {
+  printf '%s\n' \
+    'ai-engineering-harness installer: not a Git repository (or no .git/info/exclude).' \
+    '  Generated files may appear as untracked. To ignore locally, add to .git/info/exclude:' \
+    '  # ai-engineering-harness start'
+  collect_ignore_paths | while IFS= read -r _p; do
+    [ -n "$_p" ] && printf '  %s\n' "$_p"
+  done
+  printf '%s\n' '  # ai-engineering-harness end'
+}
+
+apply_private_ignore() {
+  if [ "$SCOPE" != project ] || [ "$VISIBILITY" != private ]; then
+    return 0
+  fi
+  if [ "$EFFECTIVE_IGNORE_STRATEGY" != info-exclude ]; then
+    return 0
+  fi
+
+  if ! is_git_repo; then
+    print_manual_ignore_instructions >&2
+    return 0
+  fi
+
+  printf '%s\n' '' '--- Git exclude (private) ---'
+  append_or_update_info_exclude_block
+  printf '%s\n' '--- Git exclude complete ---' ''
+}
+
+pick_visibility_interactive() {
+  printf '%s\n' '' 'Harness files in this repo:'
+  printf '%s\n' \
+    '  1) Private to this checkout — add rules to .git/info/exclude (not committed)' \
+    '  2) Shared with team — leave files visible in git status for commit'
+  while true; do
+    printf '%s' 'Select visibility [1-2]: '
+    read -r choice || fail 'could not read visibility selection'
+    case "$choice" in
+      1) VISIBILITY=private; break ;;
+      2) VISIBILITY=shared; break ;;
+      *) printf '%s\n' '  Invalid choice. Enter 1-2.' ;;
+    esac
+  done
+}
+
+resolve_git_hygiene_settings() {
+  if [ "$IGNORE_STRATEGY" = gitignore ]; then
+    fail '.gitignore editing is not implemented in v0.9.2 Step 1; use info-exclude or none'
+  fi
+
+  if [ "$SCOPE" = global ] || [ -z "$SCOPE" ]; then
+    EFFECTIVE_IGNORE_STRATEGY=none
+    return 0
+  fi
+
+  if [ -z "$VISIBILITY" ]; then
+    if is_interactive; then
+      pick_visibility_interactive
+    else
+      VISIBILITY=shared
+      printf '%s\n' \
+        'ai-engineering-harness installer: warning: no --visibility; defaulting to shared.' \
+        '  Generated files may appear in git status. Use --visibility private for .git/info/exclude.' >&2
+    fi
+  fi
+
+  if ! validate_visibility "$VISIBILITY"; then
+    fail "invalid --visibility: $VISIBILITY (try private or shared)"
+  fi
+
+  if [ "$VISIBILITY" = shared ]; then
+    EFFECTIVE_IGNORE_STRATEGY=none
+    return 0
+  fi
+
+  case "$IGNORE_STRATEGY" in
+    auto|'')
+      EFFECTIVE_IGNORE_STRATEGY=info-exclude
+      ;;
+    info-exclude|none)
+      EFFECTIVE_IGNORE_STRATEGY=$IGNORE_STRATEGY
+      ;;
+    *)
+      fail "invalid --ignore-strategy: $IGNORE_STRATEGY (try info-exclude, none, or auto)"
+      ;;
   esac
 }
 
@@ -168,9 +385,34 @@ print_install_plan() {
   printf '  target:        %s\n' "$TARGET_ABS"
   printf '  ref:           %s\n' "$REF"
   printf '  init-harness:  %s\n' "$([ "$INIT_HARNESS" -eq 1 ] && printf yes || printf no)"
+  if [ "$SCOPE" = project ]; then
+    if [ -n "$VISIBILITY" ]; then
+      printf '  visibility:    %s\n' "$VISIBILITY"
+    else
+      printf '  visibility:    (not set)\n'
+    fi
+    printf '  ignore:        %s\n' "$EFFECTIVE_IGNORE_STRATEGY"
+    if [ "$VISIBILITY" = private ] && [ "$EFFECTIVE_IGNORE_STRATEGY" = info-exclude ]; then
+      if is_git_repo; then
+        printf '  exclude file:  %s\n' "$(git_info_exclude_path)"
+      else
+        printf '  exclude file:  (none — not a Git repo; manual instructions only)\n'
+      fi
+    fi
+  fi
   printf '  dry-run:       %s\n' "$([ "$DRY_RUN" -eq 1 ] && printf yes || printf no)"
   printf '  force:         %s\n' "$([ "$FORCE" -eq 1 ] && printf yes || printf no)"
   printf '%s\n' '' 'What will happen:'
+  if [ "$SCOPE" = project ] && [ "$VISIBILITY" = private ] && [ "$EFFECTIVE_IGNORE_STRATEGY" = info-exclude ]; then
+    if is_git_repo; then
+      printf '%s\n' '  - Update .git/info/exclude with harness paths (private/local; not committed)'
+    else
+      printf '%s\n' '  - Print manual .git/info/exclude instructions (target is not a Git repo)'
+    fi
+  fi
+  if [ "$SCOPE" = project ] && [ "$VISIBILITY" = shared ]; then
+    printf '%s\n' '  - Generated files remain visible in git status (team-shared)'
+  fi
   if [ "$SCOPE" = global ]; then
     printf '%s\n' '  - No project-local .harness/ state will be created'
   fi
@@ -543,6 +785,10 @@ run_manual_install() {
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
+    install|uninstall|update|help)
+      VERB="$1"
+      shift
+      ;;
     --target)
       [ "$#" -ge 2 ] || fail "missing value for --target"
       TARGET="$2"
@@ -583,6 +829,16 @@ while [ "$#" -gt 0 ]; do
       YES=1
       shift
       ;;
+    --visibility)
+      [ "$#" -ge 2 ] || fail "missing value for --visibility"
+      VISIBILITY="$2"
+      shift 2
+      ;;
+    --ignore-strategy)
+      [ "$#" -ge 2 ] || fail "missing value for --ignore-strategy"
+      IGNORE_STRATEGY="$2"
+      shift 2
+      ;;
     --help|-h)
       usage
       exit 0
@@ -599,6 +855,28 @@ while [ "$#" -gt 0 ]; do
       ;;
   esac
 done
+
+case "$VERB" in
+  help)
+    usage
+    exit 0
+    ;;
+  uninstall|update)
+    fail "$VERB is not implemented in v0.9.2 Step 1 (install and git exclude only)"
+    ;;
+  install) ;;
+  *)
+    fail "unknown command: $VERB (try install, --help)"
+    ;;
+esac
+
+if [ -n "$IGNORE_STRATEGY" ] && ! validate_ignore_strategy "$IGNORE_STRATEGY"; then
+  fail "invalid --ignore-strategy: $IGNORE_STRATEGY (try info-exclude, none, or auto)"
+fi
+
+if [ -n "$VISIBILITY" ] && ! validate_visibility "$VISIBILITY"; then
+  fail "invalid --visibility: $VISIBILITY (try private or shared)"
+fi
 
 if [ -n "$RUNTIME" ] && ! validate_runtime "$RUNTIME"; then
   fail "invalid --runtime: $RUNTIME (try claude, codex, cursor, gemini, opencode, generic, all, manual)"
@@ -647,16 +925,13 @@ fi
 
 maybe_prompt_init_harness
 
+resolve_git_hygiene_settings
+
 printf '%s\n' 'ai-engineering-harness installer'
 print_install_plan
 confirm_plan
 
-if [ "$INIT_HARNESS" -eq 1 ] && [ "$RUNTIME" != manual ]; then
-  if [ "$SCOPE" = global ]; then
-    fail 'Global install cannot create shared .harness state. Run project install inside each repo.'
-  fi
-  init_harness_profile
-fi
+apply_private_ignore
 
 if [ "$RUNTIME" != manual ]; then
   if [ -z "$SCOPE" ] && [ "$RUNTIME" != all ]; then
@@ -664,6 +939,12 @@ if [ "$RUNTIME" != manual ]; then
   fi
   if [ "$RUNTIME" = all ] && [ -z "$SCOPE" ]; then
     SCOPE=project
+  fi
+  if [ "$INIT_HARNESS" -eq 1 ]; then
+    if [ "$SCOPE" = global ]; then
+      fail 'Global install cannot create shared .harness state. Run project install inside each repo.'
+    fi
+    init_harness_profile
   fi
   printf '%s\n' '' '--- Runtime-native install ---'
   run_runtime_native_install
@@ -677,6 +958,6 @@ fi
 
 run_manual_install
 
-if [ "$INIT_HARNESS" -eq 1 ] && [ "$RUNTIME" = manual ]; then
+if [ "$INIT_HARNESS" -eq 1 ]; then
   init_harness_profile
 fi

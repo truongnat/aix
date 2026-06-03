@@ -6,6 +6,8 @@ Define how `ai-engineering-harness` installs interact with Git in product reposi
 
 **v0.9.2 principle:** `.gitignore` is usually **tracked** — editing it creates a repo change. Private/local installs should prefer **`.git/info/exclude`**, which is local to the checkout and **not committed**.
 
+**Implementation (Step 1):** [install.sh](../install.sh) writes `.git/info/exclude` when `--visibility private` (default strategy `info-exclude`). See [private-install-git-hygiene.md](private-install-git-hygiene.md).
+
 ## Problem
 
 After real Cursor project install (`v0.9.1`):

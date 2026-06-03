@@ -4,7 +4,7 @@
 
 Define the `install.sh` **verb** model for `v0.9.2`: `install`, `uninstall`, and `update`, with backward compatibility for `v0.9.1` flags.
 
-Design only — implementation follows [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md).
+**Partially implemented (v0.9.2 Step 1):** `install` verb alias, `--visibility`, `--ignore-strategy`, private `.git/info/exclude`. `uninstall` / `update` remain design-only. See [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md).
 
 ## Commands
 

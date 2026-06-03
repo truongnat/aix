@@ -14,9 +14,16 @@
 
 - private-mode ignore policy: do **not** edit `.gitignore` by default (tracked file); use `.git/info/exclude` instead
 
+### Added (implementation)
+
+- private project install via `.git/info/exclude` in [install.sh](install.sh)
+- `--visibility private|shared` and `--ignore-strategy info-exclude|none|auto`
+- `install` verb alias; warning when `--visibility` omitted (defaults shared)
+- [private-install-git-hygiene.md](docs/private-install-git-hygiene.md)
+
 ### Planned (implementation)
 
-- **Step 1:** private project ignore via `.git/info/exclude`
+- **Step 2+:** install/uninstall/update verbs beyond exclude
 - provider multi-select and install wizard
 - `install.sh` verbs: install, uninstall, update
 - Antigravity runtime paths after verification

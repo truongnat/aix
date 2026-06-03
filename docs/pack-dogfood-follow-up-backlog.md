@@ -2,20 +2,21 @@
 
 Triage dogfood findings from [pack-dogfood-friction-log.md](pack-dogfood-friction-log.md) and completed [pack-dogfood reports](pack-dogfood-report-template.md).
 
-## v0.9.2 Blockers (Installer UX + Git Hygiene)
+## Addressed In v0.9.2 Step 1 (private git exclude)
 
-From real Cursor install feedback — **active**; see [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md).
+- Git hygiene via `.git/info/exclude` for `--visibility private` — [private-install-git-hygiene.md](private-install-git-hygiene.md)
+- `--visibility` / `--ignore-strategy` flags in [install.sh](../install.sh)
+
+## v0.9.2 Blockers (remaining)
 
 | Item | Doc |
 |---|---|
-| Git hygiene via `.git/info/exclude` (private mode) | [git-hygiene-policy.md](git-hygiene-policy.md) |
-| `install` / `uninstall` / `update` command model | [install-command-model.md](install-command-model.md), [uninstall-update-design.md](uninstall-update-design.md) |
-| Provider multi-select | [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md) |
-| Project private vs shared visibility | [git-hygiene-policy.md](git-hygiene-policy.md) |
-| One-command install wizard | [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md) |
-| Antigravity provider | [antigravity-provider-research.md](antigravity-provider-research.md) — planned until impl |
+| `uninstall` / `update` commands | [uninstall-update-design.md](uninstall-update-design.md) |
+| Provider multi-select + wizard | [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md) |
+| Antigravity provider impl | [antigravity-provider-research.md](antigravity-provider-research.md) |
+| `--ignore-strategy gitignore` (explicit team policy) | future step |
 
-Implementation order: **info-exclude (Step 1)** → verbs → multi-select → visibility → uninstall → update → Antigravity.
+Implementation order: ~~info-exclude~~ → full verb model → multi-select → uninstall → update → Antigravity.
 
 ## v0.9.x Patch Candidates
 
