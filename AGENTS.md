@@ -103,6 +103,30 @@ Rules:
 - `harness-ship` requires verification evidence, not optimistic prose.
 - `harness-remember` stores only durable, non-sensitive lessons.
 
+## Session Start
+
+Before doing project work, establish session state.
+
+Run the Session Start protocol (`harness-start`) when:
+
+- no active session is known
+- the user says "continue"
+- the user asks "what next"
+- the requested command depends on `.harness/` state
+- `.harness/BLOCKED.md` or active session `BLOCKED.md` may exist
+
+Session Start must determine:
+
+- active session
+- current goal
+- current phase
+- unresolved blocked state
+- next allowed command
+
+Do not implement, verify, or ship before session state is established.
+
+See `docs/session-start.md`.
+
 ## Phase Preconditions
 
 - `harness-plan` requires a current goal.

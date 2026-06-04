@@ -119,6 +119,13 @@ No verification status was marked as passed.
 
 ## Critical Rules
 
+### Session Start Requirement
+
+- Read `.harness/STATE.md` and confirm active session before verification.
+- Check unresolved blockers in root or active session `BLOCKED.md`.
+- If session state is unknown, return `### Blocked` and ask to run `harness-start`.
+- Do not verify until Session Start has established routing.
+
 ### Hooks & Skills
 
 - Prefer skills: `tool-discovery`, `verification`, optional delegated `reviewer`/`verifier` workers.

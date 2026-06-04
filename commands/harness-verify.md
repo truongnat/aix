@@ -21,6 +21,10 @@ Gather fresh evidence that the implemented work meets the goal before any comple
 - The goal and plan define what evidence should prove success.
 - The operator is ready to run checks fresh instead of inferring success.
 
+## Session Start Requirement
+
+If active session is unknown or `.harness/STATE.md` has not been established for this chat, stop and run or redirect to `harness-start`. Do not verify until Session Start completes.
+
 ## When To Use
 
 - after implementation changes

@@ -19,6 +19,10 @@ Translate the agreed goal into an explicit, reviewable implementation plan.
 - Goal and scope are explicit enough to break into ordered work.
 - Implementation has not started for the current scope.
 
+## Session Start Requirement
+
+If active session or `.harness/STATE.md` routing is unknown for this chat, stop and run or redirect to `harness-start` (Session Start protocol). Do not plan until session state is established.
+
 ## When To Use
 
 - after `harness-discuss`

@@ -109,6 +109,13 @@ No implementation plan was produced.
 
 ## Critical Rules
 
+### Session Start Requirement
+
+- Read `.harness/STATE.md` and confirm active session before planning.
+- Check root `.harness/BLOCKED.md` and active session `BLOCKED.md` if present.
+- If session state is unknown, return `### Blocked` and ask to run `harness-start`.
+- Do not plan until Session Start has established routing.
+
 ### Hooks & Skills
 
 - Read `docs/hooks-and-skills-layer.md` and `docs/skill-lifecycle.md` for this module.

@@ -26,6 +26,10 @@ current_plan:
 
 updated_at:
 
+## Last Session Start
+
+last_session_start:
+
 ## Next Allowed Commands
 
 - 

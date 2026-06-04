@@ -19,6 +19,10 @@ Capture durable, reusable, non-sensitive lessons after verified work or a meanin
 - There is either a shipped result, a failed attempt, or a lesson worth preserving.
 - The lesson can be written safely without storing secrets or private business data.
 
+## Session Start Requirement
+
+If active session is unknown or `.harness/STATE.md` has not been established for this chat, stop and run or redirect to `harness-start`. Do not write durable memory until Session Start completes.
+
 ## When To Use
 
 - after verified work ships

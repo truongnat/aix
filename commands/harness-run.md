@@ -19,6 +19,10 @@ Execute the approved plan in small, surgical steps without silent scope drift.
 - the active session plan includes **Approval Status** with `status: approved` (not `draft` or `blocked`).
 - active session `TASKS.md` contains at least one actionable task when task tracking is in use.
 
+## Session Start Requirement
+
+If active session is unknown or `.harness/STATE.md` has not been established for this chat, stop and run or redirect to `harness-start`. Do not implement until Session Start completes.
+
 ## When To Use
 
 - after the active session current `PLAN-*.md` is approved

@@ -108,6 +108,13 @@ Run `harness-verify`.
 
 ## Critical Rules
 
+### Session Start Requirement
+
+- Read `.harness/STATE.md` and confirm active session before implementation.
+- Check unresolved blockers in root or active session `BLOCKED.md`.
+- If session state is unknown, return `### Blocked` and ask to run `harness-start`.
+- Do not implement until Session Start has established routing.
+
 ### Hooks & Skills
 
 - Run `node hooks/core/guard-phase.js --command harness-run --session <active-session> --json` before implementation when hooks are available.

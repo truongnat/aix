@@ -2,6 +2,10 @@
 
 Use this checklist at the beginning of a session with any **active** provider (Claude Code, Cursor, Codex, or Gemini CLI).
 
+Canonical protocol: [session-start.md](session-start.md)
+
+Run `harness-start` to execute Session Start.
+
 ## Minimum Artifact Read Order
 
 Read these in order when they exist:

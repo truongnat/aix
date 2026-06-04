@@ -17,6 +17,13 @@
 
 - Session path:
 - Session summary:
+- Last Session Start:
+
+## Session Start
+
+- Protocol doc: `docs/session-start.md`
+- Latest summary: active session `SESSION_START.md`
+- Next allowed command: see `.harness/STATE.md`
 
 ## Durable Memory
 

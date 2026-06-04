@@ -134,6 +134,13 @@ No ship summary, PR message, or report artifacts were created.
 
 ## Critical Rules
 
+### Session Start Requirement
+
+- Read `.harness/STATE.md` and confirm active session before shipping or writing report artifacts.
+- Check unresolved blockers in root or active session `BLOCKED.md`.
+- If session state is unknown, return `### Blocked` and ask to run `harness-start`.
+- Do not ship or generate PR/report notes until Session Start has established routing.
+
 ### Hooks & Skills
 
 - Run `node hooks/core/guard-phase.js --command harness-ship --session <active-session> --json` before any ship claim.

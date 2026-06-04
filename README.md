@@ -12,6 +12,8 @@
 
 Give your repo a repeatable engineering loop — plan, build, verify, ship, and remember — using markdown contracts, command docs, skills, and quality gates instead of scattering workflow files at the project root.
 
+Every workflow begins with **Session Start**: a boot sequence that loads active session, memory, blocked state, and next allowed command. See [docs/session-start.md](docs/session-start.md).
+
 [Quickstart](#quickstart) · [Demo](#demo) · [Why](#why) · [Providers](#providers) · [Commands](#commands) · [Landing Page](https://truongnat.github.io/ai-engineering-harness/)
 
 </div>

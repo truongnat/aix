@@ -18,6 +18,10 @@ Finalize verified work, summarize the result, and prepare a clean handoff withou
 - active session `VERIFY.md` contains non-empty tests run or equivalent evidence.
 - Failures and known gaps are explicitly documented instead of implied away.
 
+## Session Start Requirement
+
+If active session is unknown or `.harness/STATE.md` has not been established for this chat, stop and run or redirect to `harness-start`. Do not ship or generate PR/report notes until Session Start completes.
+
 ## When To Use
 
 - after `harness-verify`

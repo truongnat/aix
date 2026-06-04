@@ -489,6 +489,33 @@ runTest("harness-ship references report artifacts", () => {
   }
 });
 
+runTest("session start protocol surface exists", () => {
+  for (const relativePath of [
+    "docs/session-start.md",
+    "templates/SESSION_START.md",
+    "commands/harness-start.md"
+  ]) {
+    assert.ok(fs.existsSync(path.join(repoRoot, relativePath)), `${relativePath} must exist`);
+  }
+  const start = fs.readFileSync(path.join(repoRoot, "commands", "harness-start.md"), "utf8");
+  assert.match(start, /Session Start/i);
+  const agents = fs.readFileSync(path.join(repoRoot, "AGENTS.md"), "utf8");
+  assert.match(agents, /## Session Start/i);
+});
+
+runTest("workflow commands require session start when state unknown", () => {
+  for (const fileName of [
+    "harness-plan.md",
+    "harness-run.md",
+    "harness-verify.md",
+    "harness-ship.md",
+    "harness-remember.md"
+  ]) {
+    const content = fs.readFileSync(path.join(repoRoot, "commands", fileName), "utf8");
+    assert.match(content, /Session Start|harness-start/i, `${fileName} must mention Session Start`);
+  }
+});
+
 if (process.exitCode) {
   process.exit(process.exitCode);
 }
