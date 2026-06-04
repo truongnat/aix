@@ -34,6 +34,7 @@
     "install-cache.js",
     "install-runtime.js",
     "scripts/discover-tools.js",
+    "scripts/generate-report-context.js",
     "runtime-command-catalog.js",
     "install.js",
     "validate.js",

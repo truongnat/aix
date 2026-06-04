@@ -31,6 +31,7 @@ Your job is to prepare a ship summary only if verification evidence supports it.
 - Is the active session `VERIFY.md` status different from `pending`?
 - Is the active session `VERIFY.md` status different from `blocked`?
 - Does the active session `VERIFY.md` contain real evidence?
+- Can git changes be inspected with `node scripts/generate-report-context.js --json` or equivalent git commands?
 - Are known gaps explicit?
 - Does the summary avoid claiming more than the evidence proves?
 
@@ -42,10 +43,30 @@ Your job is to prepare a ship summary only if verification evidence supports it.
 
 ### Tool Routing
 
+- Prefer `node scripts/generate-report-context.js --json` for changed files and diff stats.
 - Prefer `git diff` and `git log` for release scope context.
 - Prefer `rg` before `grep` when locating evidence.
 - Treat optional tools as best-effort.
 - If a required capability is unavailable and there is no safe fallback, return `### Blocked`.
+
+### Daily Report / PR Notes
+
+Before completing this command, produce or update in the active session:
+
+- `REPORT.md`
+- `PR_MESSAGE.md`
+- `CHANGE_SUMMARY.md`
+
+Use the `report-writer` skill and `workflows/daily-dev-report.md`.
+
+Only write PR-ready text when:
+
+- VERIFY exists
+- VERIFY status is not `pending` or `blocked`
+- verification evidence exists
+- git changes can be inspected
+
+Do not overwrite user-authored report content without preserving intentional sections.
 
 ### Blocking Conditions
 
@@ -55,6 +76,7 @@ Return `### Blocked` if:
 - the active session `VERIFY.md` status is `pending`
 - the active session `VERIFY.md` status is `blocked`
 - the active session `VERIFY.md` has no real evidence
+- git diff or changed files cannot be inspected truthfully
 - known gaps require user acceptance
 
 ### Blocked
@@ -64,16 +86,16 @@ Return `### Blocked` if:
 **Reason:** [Why shipping cannot continue.]
 
 **Missing Preconditions:**
-- [Missing verification, status, evidence, or acceptance]
+- [Missing verification, status, evidence, git diff context, or acceptance]
 
 **Questions:**
 1. [Minimum question required]
 
 **Next allowed action:**
-Run `harness-verify` or provide explicit gap acceptance.
+Run `harness-verify`, provide git diff context, or provide explicit gap acceptance.
 
 **Stopped:**
-No ship summary was created.
+No ship summary, PR message, or report artifacts were created.
 
 ### Ship Summary
 
@@ -90,6 +112,11 @@ No ship summary was created.
 
 **User-facing summary:**
 ...
+
+**Report artifacts:**
+- `REPORT.md`
+- `PR_MESSAGE.md`
+- `CHANGE_SUMMARY.md`
 
 **Next allowed command:**
 `harness-remember`
@@ -110,6 +137,7 @@ No ship summary was created.
 ### Hooks & Skills
 
 - Run `node hooks/core/guard-phase.js --command harness-ship --session <active-session> --json` before any ship claim.
+- Use `report-writer` skill to generate `REPORT.md`, `PR_MESSAGE.md`, and `CHANGE_SUMMARY.md`.
 - Use `gatekeeper` skill or worker output as gate evidence.
 - Stop if gate decision is block or VERIFY evidence is insufficient.
 

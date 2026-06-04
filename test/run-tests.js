@@ -454,6 +454,41 @@ runTest("install cache includes hooks directory", () => {
   assert.ok(installCacheApi.cacheExportPaths.includes("hooks/"));
 });
 
+runTest("daily dev report layer surface exists", () => {
+  for (const relativePath of [
+    "templates/REPORT.md",
+    "templates/PR_MESSAGE.md",
+    "templates/CHANGE_SUMMARY.md",
+    "skills/report-writer/SKILL.md",
+    "workflows/daily-dev-report.md",
+    "docs/daily-dev-report.md",
+    "scripts/generate-report-context.js"
+  ]) {
+    assert.ok(fs.existsSync(path.join(repoRoot, relativePath)), `${relativePath} must exist`);
+  }
+});
+
+runTest("generate-report-context supports --help and --json", () => {
+  const script = path.join(repoRoot, "scripts", "generate-report-context.js");
+  const help = runNode([script, "--help"]);
+  assert.equal(help.status, 0, help.stderr || help.stdout);
+  const json = runNode([script, "--json"], { cwd: repoRoot });
+  assert.equal(json.status, 0, json.stderr || json.stdout);
+  const parsed = JSON.parse(json.stdout);
+  assert.equal(typeof parsed.ok, "boolean");
+  assert.equal(parsed.ok, true);
+  assert.ok(Array.isArray(parsed.files));
+});
+
+runTest("harness-ship references report artifacts", () => {
+  const command = fs.readFileSync(path.join(repoRoot, "commands", "harness-ship.md"), "utf8");
+  const prompt = fs.readFileSync(path.join(repoRoot, "prompt-templates", "harness-ship.md"), "utf8");
+  for (const artifact of ["REPORT.md", "PR_MESSAGE.md", "CHANGE_SUMMARY.md"]) {
+    assert.match(command, new RegExp(artifact));
+    assert.match(prompt, new RegExp(artifact));
+  }
+});
+
 if (process.exitCode) {
   process.exit(process.exitCode);
 }
