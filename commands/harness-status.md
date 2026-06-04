@@ -35,8 +35,8 @@ Summarize harness install and project state for this repository only.
 
 ## Redirect Behavior
 
-- If the harness is not installed, redirect to install or `harness-build` as appropriate.
-- If the harness is installed but project state is missing, redirect to `harness-build` or `harness-start`.
+- If the harness is not installed, redirect to install.
+- If the harness is installed but project state is missing, redirect to `harness-start`.
 
 ## Failure Conditions
 

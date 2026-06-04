@@ -14,7 +14,7 @@ Do not paste secrets, tokens, customer data, or private business details. Summar
 | 2026-06-02 | A | validate.js runs from source pack only, not installed into target | low | Scenario A validation flow | Add prominent callout in install next-steps and target-repo-validation | v0.8.x fix |
 | 2026-06-02 | A | No blocking friction beyond minor doc/output clarity | none | Profile and goal validation passed | No action required | no action |
 | 2026-06-02 | B | flutter-google-login example SKILLS/HARNESS shape differs from validator `.harness/` contract | medium | Scenario B artifact drafting | Add bridge doc or tighten example to validator headings | v0.8.x fix |
-| 2026-06-02 | B | Example goals under examples/ path vs `.harness/goals/` in target repos | low | Scenario B report | Clarify in harness-build README | v0.8.x fix |
+| 2026-06-02 | B | Example goals under examples/ path vs `.harness/goals/` in target repos | low | Scenario B report | Clarify setup docs and target layout guidance | v0.8.x fix |
 | 2026-06-02 | B | Install summary absolute target path (repeat) | low | Scenario B install | Same as Scenario A | v0.8.x fix |
 | 2026-06-02 | B | No blocking friction for install or validation | none | Profile and goal validation passed | No action required | no action |
 | 2026-06-02 | C | One-line install works without manual clone | none | Scenario C dry-run and write install | No action required | no action |

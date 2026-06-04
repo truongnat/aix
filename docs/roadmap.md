@@ -15,7 +15,7 @@
 - `v0.2.0`: Harness Design System
 - `v0.2.0` includes design and docs for target repository validation
 - full target repository validator implementation is a later optional step
-- add `harness-build` as the entry point for project-specific harness design
+- strengthen `harness-start` and adoption guidance as the entry point for project setup
 - add harness profile templates for workflow, team, skills, gates, memory, and harness context
 - document team architecture selection for project-specific collaboration shape
 - document memory model and memory safety for durable, sanitized recall
@@ -23,9 +23,9 @@
 - document a skill authoring system for compact reusable capability contracts
 - add a skill template for future project-specific skills
 - enforce anti-bloat rules for future skill growth
-- add a demo harness build that shows project-specific profile output end to end
-- add harness build contract validation for profile and goal artifacts
-- add harness-build usage guidance for real host repositories
+- expand workflow examples that show project-specific artifact output end to end
+- add stronger profile and goal artifact validation for target repositories
+- keep adoption guidance lightweight and command-loop focused
 - add target repository validation design for adopted host repos
 - document system positioning so each layer has a clear role and boundary
 - close the highest-value gaps identified in relation to [TARGET.md](../TARGET.md)

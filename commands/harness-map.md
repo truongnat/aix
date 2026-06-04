@@ -32,6 +32,19 @@ Map the host repository, active `.harness/` artifacts, affected code areas, and 
 - `mapping-codebase`
 - `remembering` when prior durable decisions affect the task
 
+## Tool Discovery
+
+- Read `.harness/TOOL_CONTEXT.md` first when it exists.
+- Otherwise run `node scripts/discover-tools.js --markdown` when available.
+- If the script is unavailable, manually check `git`, `rg`, `grep`, and any task-specific tools.
+
+## Tool Routing
+
+- use `rg` before `grep` when available
+- use `git diff` and `git log` for repository context before asking the user for pasted context
+- use code graph tools only when they are installed or configured
+- if a required capability is unavailable, stop and return `Blocked` with a concrete fallback question
+
 ## Step-By-Step Workflow
 
 1. Read the active `.harness/` artifacts before inspecting code, with `.harness/HAZARDS.md` first when present.

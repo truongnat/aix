@@ -40,6 +40,19 @@ For execution-facing dispatch, read `.ai-harness/prompt-templates/harness-verify
 
 Use this command doc as the reference contract for phase behavior and artifact discipline. Use the prompt template as the execution instruction. Do not execute `harness-verify` freestyle when the prompt template is available.
 
+## Tool Discovery
+
+- Read `.harness/TOOL_CONTEXT.md` first when it exists.
+- Otherwise run `node scripts/discover-tools.js --markdown` when available.
+- If the script is unavailable, manually check the tools needed for verification.
+
+## Tool Routing
+
+- use `git diff` for scoped review context
+- use `rg` before `grep` when locating evidence or changed behavior
+- use code graph tools only when installed or configured
+- if verification requires a missing capability with no safe fallback, stop and return `Blocked`
+
 ## Step-By-Step Workflow
 
 1. Identify the exact checks that prove the claim, using `.harness/INDEX.md` for reusable verification recipes and `.harness/HAZARDS.md` for regression focus when present.

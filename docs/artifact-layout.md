@@ -47,7 +47,7 @@ Host repositories should keep harness artifacts in `.harness/`.
 
 ## Memory Split
 
-- `MEMORY.md` remains the profile-level memory policy when a repository uses the harness-build profile flow.
+- `MEMORY.md` remains the profile-level memory policy when a repository uses the harness workflow.
 - `DECISIONS.md`, `HAZARDS.md`, and `INDEX.md` are the operational shared-memory artifacts that command workflows should recall directly.
 - goal-level `REMEMBER.md` remains the place for per-goal lessons before promoting durable items upward.
 

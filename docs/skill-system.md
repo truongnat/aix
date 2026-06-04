@@ -31,9 +31,9 @@ Skill packs are routing aids. They help an agent choose a relevant domain starti
 
 A future domain skill is a narrowly justified deep capability for a recurring domain need. It should only be added when a core skill or pack is not enough.
 
-## How `harness-build` Should Select Skills
+## How Initial Harness Setup Should Select Skills
 
-`harness-build` should select the smallest sufficient set of core skills and skill packs for the host repository.
+Initial harness setup should select the smallest sufficient set of core skills and skill packs for the host repository.
 
 It should:
 

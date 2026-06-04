@@ -34,6 +34,19 @@ Review the implementation against the plan, changed files, and expected verifica
 - scope drift
 - unclear risk or handoff notes
 
+### Tool Discovery
+
+- Read `.harness/TOOL_CONTEXT.md` if it exists.
+- Otherwise run `node scripts/discover-tools.js --markdown` if available.
+- Otherwise manually check `git`, `rg`, `grep`, and any review-specific tools.
+
+### Tool Routing
+
+- prefer `git diff` for review ranges
+- prefer `git log` and `git blame` for history context
+- prefer `rg` before `grep`
+- if a required review capability is unavailable and there is no safe fallback, return a blocked review result instead of guessing
+
 ### Calibration
 
 Prefer concrete bugs, risks, regressions, and missing tests over style feedback.

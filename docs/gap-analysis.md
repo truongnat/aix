@@ -85,7 +85,7 @@ Still missing:
 
 `v0.2.0` must begin closing these gaps by introducing the first project-specific harness design surfaces:
 
-- a harness build command
+- a clearer harness-start and adoption flow
 - harness profile templates
 - system layer positioning
 - clearer memory, workflow, and team design surfaces

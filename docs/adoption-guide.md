@@ -156,13 +156,13 @@ Recommended adoption pattern:
 - update `.harness/TASKS.md`, `.harness/VERIFY.md`, and `.harness/SHIP.md` as work progresses
 - save only durable lessons in `.harness/REMEMBER.md`
 
-## After Adoption: Run `harness-build`
+## After Adoption: Start The Harness Workflow
 
 After the base harness files are in place, build a repository-specific harness profile before feature work starts.
 
-- run [`commands/harness-build.md`](../commands/harness-build.md)
-- follow [docs/harness-build-usage.md](harness-build-usage.md)
-- review the output with [docs/harness-build-review-checklist.md](harness-build-review-checklist.md)
+- run [`commands/harness-start.md`](../commands/harness-start.md)
+- validate the repo shape with [docs/target-repo-validation.md](target-repo-validation.md)
+- continue with the command loop once `.harness/` state is explicit
 
 ## What Should And Should Not Be Committed
 
@@ -216,7 +216,7 @@ After install, follow the printed next-step guidance inside the target repositor
 
 - [docs/install-output-example.md](install-output-example.md)
 - [docs/install-to-profile-walkthrough.md](install-to-profile-walkthrough.md)
-- [docs/harness-build-usage.md](harness-build-usage.md)
+- [docs/target-repo-validation.md](target-repo-validation.md)
 - [docs/target-repo-validation.md](target-repo-validation.md)
 
 Recommended first follow-up validation:

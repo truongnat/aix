@@ -39,6 +39,20 @@ For execution-facing dispatch, read `.ai-harness/prompt-templates/harness-plan.m
 
 Use this command doc as the reference contract for phase behavior and artifact discipline. Use the prompt template as the execution instruction. Do not execute `harness-plan` freestyle when the prompt template is available.
 
+## Tool Discovery
+
+- Read `.harness/TOOL_CONTEXT.md` first when it exists.
+- Otherwise run `node scripts/discover-tools.js --markdown` when available.
+- If the script is unavailable, manually check `git`, `rg`, `grep`, and task-specific tooling.
+
+## Tool Routing
+
+- use `rg` before `grep` for code search
+- use `git diff` or `git log` when planning depends on repository context
+- use `markitdown` for rich documents only when available
+- use code graph tools only if installed or configured
+- if a required capability is unavailable, stop and ask a concrete fallback question
+
 ## Step-By-Step Workflow
 
 1. Restate the approved goal and scope after recalling relevant decisions, hazards, and reusable commands.

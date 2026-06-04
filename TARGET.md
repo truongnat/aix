@@ -130,13 +130,13 @@ And the agent should produce:
 
 ## Definition Of Done For v0.2.0
 
-- `commands/harness-build.md` exists
+- `commands/harness-start.md` exists
 - harness profile templates exist
 - team architecture selection is documented
 - memory model is documented
 - SDLC execution model is documented
 - skill system is documented
-- demo harness build exists
+- workflow dogfood example exists
 - README links the target architecture
 - validate.js checks the new required files
 - `node validate.js` passes

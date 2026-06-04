@@ -40,6 +40,20 @@ For execution-facing dispatch, read `.ai-harness/prompt-templates/harness-run.md
 
 Use this command doc as the reference contract for phase behavior and artifact discipline. Use the prompt template as the execution instruction. Do not execute `harness-run` freestyle when the prompt template is available.
 
+## Tool Discovery
+
+- Read `.harness/TOOL_CONTEXT.md` first when it exists.
+- Otherwise run `node scripts/discover-tools.js --markdown` when available.
+- If the script is unavailable, manually check `git`, search tools, and any required local tooling before choosing an execution strategy.
+
+## Tool Routing
+
+- use `rg` before `grep` for search
+- use `git diff` for review ranges and change inspection
+- use `git worktree` only when parallel isolation is useful and safe
+- use `markitdown` for rich docs only when available
+- if a required capability is unavailable, stop and return `Blocked`
+
 ## Step-By-Step Workflow
 
 1. Re-read `.harness/PLAN.md` before making changes.

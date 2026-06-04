@@ -8,7 +8,7 @@ Record the target repository `.harness/` profile artifact contract frozen for `v
 
 **Frozen for v1.0.0** (v0.9.0 Step 3).
 
-Authoring guide: [harness-build-contract.md](harness-build-contract.md). Validation design: [target-repo-validation.md](target-repo-validation.md). Templates: `templates/HARNESS.md` through `templates/MEMORY.md`.
+Authoring guide: [target-repo-validation.md](target-repo-validation.md). Validation design: [target-repo-validation.md](target-repo-validation.md). Templates: `templates/HARNESS.md` through `templates/MEMORY.md`.
 
 ## Required Target Directory
 
@@ -103,7 +103,7 @@ Enforced in `validate.js` as `harnessHeadings`, `teamHeadings`, `selectedSkillsH
 ## What Is Not Guaranteed
 
 - body semantics, quality, or correctness of profile content
-- automatic profile generation from `harness-build` or tooling
+- automatic profile generation from setup tooling
 - consistency between profile files beyond structural headings
 - optional project context files under `.harness/` (for example `PROJECT.md`) unless a future contract adds them
 
@@ -111,7 +111,7 @@ Enforced in `validate.js` as `harnessHeadings`, `teamHeadings`, `selectedSkillsH
 
 - additional `##` sections not listed above if required headings remain
 - richer examples under `examples/` that still satisfy heading contracts when mapped to `.harness/`
-- documentation clarifications in [harness-build-contract.md](harness-build-contract.md)
+- documentation clarifications in [target-repo-validation.md](target-repo-validation.md)
 
 ## Breaking Changes
 
@@ -140,9 +140,9 @@ node validate.js --target <path> --profile-only
 
 `templates/HARNESS.md`, `TEAM.md`, `SKILLS.md`, `WORKFLOW.md`, `GATES.md`, and `MEMORY.md` are the authoring templates. Target repos should copy or adapt them into `.harness/` with the same heading contract.
 
-## Relationship To harness-build-contract.md
+## Relationship To Target Validation
 
-[harness-build-contract.md](harness-build-contract.md) describes what `harness-build` should produce. This document is the **freeze record** for v1.0.0 target profile structure.
+[target-repo-validation.md](target-repo-validation.md) describes the target repository validation posture. This document is the **freeze record** for v1.0.0 target profile structure.
 
 ## Relationship To target-repo-validation.md
 

@@ -50,7 +50,7 @@ Evidence to capture:
 | Expected profile artifacts | full `.harness/` profile set tuned to mobile/frontend scope |
 | Expected goal artifacts | goal folder with acceptance criteria and verification plan |
 
-Reference: [examples/harness-build/flutter-google-login/](../examples/harness-build/flutter-google-login/) for artifact shape only.
+Reference: [examples/dogfood-tiny-node-api/](../examples/dogfood-tiny-node-api/) for workflow artifact shape.
 
 Validation commands:
 
@@ -61,7 +61,7 @@ node validate.js --target <target-repo> --goal <goal-id>
 
 Evidence to capture:
 
-- whether installed docs were enough for harness-build flow
+- whether installed docs were enough for setup and workflow entry
 - skill pack / team pattern selection friction
 - runtime guide accuracy (read-first list, validation flow)
 - missing optional docs from installed surface

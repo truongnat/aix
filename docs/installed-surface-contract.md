@@ -36,7 +36,7 @@ Required installed files include:
 
 - `AGENTS.md`
 - `docs/adoption-guide.md`
-- `docs/harness-build-usage.md`
+- `docs/tool-discovery-and-routing.md`
 - `docs/target-repo-validation.md`
 - `docs/install-to-profile-walkthrough.md`
 - `docs/validation-troubleshooting.md`
@@ -56,8 +56,8 @@ Required installed directories include:
 
 Optional but useful installed files can include:
 
-- `docs/harness-build-review-checklist.md`
-- `docs/harness-build-prompts.md`
+- `tool-capabilities/`
+- `scripts/discover-tools.js`
 - `docs/target-repo-validation-checklist.md`
 - `docs/target-repo-validation-prompts.md`
 - `docs/install-output-example.md`

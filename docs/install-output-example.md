@@ -40,7 +40,7 @@ Next steps:
 1. Open the target repository.
 2. Read AGENTS.md.
 3. Create .harness/HARNESS.md, TEAM.md, SKILLS.md, WORKFLOW.md, GATES.md, and MEMORY.md.
-4. Use docs/harness-build-usage.md for the profile creation flow.
+4. Use docs/adoption-guide.md and docs/target-repo-validation.md for setup guidance.
 5. Validate: node validate.js --target /path/to/my-project --profile-only
 ```
 
@@ -49,7 +49,7 @@ Next steps:
 - open the target repository
 - read `AGENTS.md`
 - create the six required `.harness/` profile artifacts
-- follow [docs/harness-build-usage.md](harness-build-usage.md)
+- follow [docs/adoption-guide.md](adoption-guide.md)
 - run target profile validation
 
 ## Common Confusion

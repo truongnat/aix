@@ -14,7 +14,7 @@ This project uses the ai-engineering-harness capability pack.
 3. Use `.ai-harness/skills/` for capabilities and skill packs.
 4. Use `.ai-harness/workflows/` for process templates.
 5. Use `.ai-harness/patterns/` and `.ai-harness/templates/` when planning work.
-6. Use `.ai-harness/docs/` for adoption, validation, and harness-build guidance.
+6. Use `.ai-harness/docs/` for adoption, validation, and workflow guidance.
 
 If `.ai-harness/` is missing, ask the user to reinstall with project capability cache:
 

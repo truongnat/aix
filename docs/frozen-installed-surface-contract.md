@@ -41,7 +41,7 @@ Directories copied recursively (all files under each tree):
 These `docs/` files are part of the frozen default install (`exportPaths`):
 
 - `docs/adoption-guide.md`
-- `docs/harness-build-usage.md`
+- `docs/tool-discovery-and-routing.md`
 - `docs/target-repo-validation.md`
 - `docs/install-to-profile-walkthrough.md`
 - `docs/validation-troubleshooting.md`
@@ -64,8 +64,8 @@ The following are copied by **default** install today but are adoption guidance 
 - `docs/artifact-layout.md`
 - `docs/quality-gates.md`
 - `docs/install-output-example.md`
-- `docs/harness-build-review-checklist.md`
-- `docs/harness-build-prompts.md`
+- `tool-capabilities/`
+- `scripts/discover-tools.js`
 - `docs/usage-examples.md`
 - `docs/host-repo-checklist.md`
 - `docs/runtime-compatibility.md`
@@ -135,9 +135,9 @@ docs/artifact-layout.md
 docs/quality-gates.md
 docs/adoption-guide.md
 docs/install-output-example.md
-docs/harness-build-usage.md
-docs/harness-build-review-checklist.md
-docs/harness-build-prompts.md
+docs/tool-discovery-and-routing.md
+tool-capabilities/
+scripts/discover-tools.js
 docs/install-to-profile-walkthrough.md
 docs/validation-troubleshooting.md
 docs/small-repo-memory.md

@@ -37,7 +37,7 @@ Inside the target repository, Claude Code should read:
 - `AGENTS.md`
 - `docs/consume-as-pack.md`
 - `docs/install-to-profile-walkthrough.md`
-- `docs/harness-build-usage.md`
+- `docs/target-repo-validation.md`
 - `.harness/HARNESS.md`
 - `.harness/TEAM.md`
 - `.harness/SKILLS.md`
@@ -48,11 +48,11 @@ Inside the target repository, Claude Code should read:
 
 ## First Prompt
 
-> Read `AGENTS.md`, `docs/consume-as-pack.md`, `docs/install-to-profile-walkthrough.md`, and `docs/harness-build-usage.md`. Treat this repository as the target product repository. Do not use the `ai-engineering-harness` source repo as the product repo. Then inspect the existing `.harness/` artifacts and summarize the current harness state before making any changes.
+> Read `AGENTS.md`, `docs/consume-as-pack.md`, `docs/install-to-profile-walkthrough.md`, and `docs/target-repo-validation.md`. Treat this repository as the target product repository. Do not use the `ai-engineering-harness` source repo as the product repo. Then inspect the existing `.harness/` artifacts and summarize the current harness state before making any changes.
 
 ## Harness-Build Prompt
 
-> Run the harness-build process for this target repository. Create or update `.harness/HARNESS.md`, `TEAM.md`, `SKILLS.md`, `WORKFLOW.md`, `GATES.md`, and `MEMORY.md`. Use the smallest sufficient skill and workflow set. Do not implement application code.
+> Start the harness workflow for this target repository. Create or update only the `.harness/` artifacts needed by the current workflow stage, keep them repository-specific, and do not implement application code until the command loop is ready.
 
 ## Goal Execution Prompt
 
@@ -73,7 +73,7 @@ Inside the target repository, Claude Code should read:
 
 - opening Claude Code in the source pack repo and treating it like the product repo
 - skipping the read-first pass over installed docs and `.harness/` artifacts
-- jumping into implementation before the harness-build or goal artifacts are clear
+- jumping into implementation before the harness or goal artifacts are clear
 - treating validation as the same thing as product verification
 
 ## Completion Checklist

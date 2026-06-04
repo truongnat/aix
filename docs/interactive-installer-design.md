@@ -110,7 +110,7 @@ Create or update `.harness/` when:
 
 Scaffold includes empty templates with **required headings** per [frozen-target-profile-contract.md](frozen-target-profile-contract.md). Do not auto-fill business content.
 
-Goals are **not** created by default — user runs harness-build flow or `ai-harness init --goal <id>` (future).
+Goals are **not** created by default — user initializes the workflow artifacts manually or uses `ai-harness init --goal <id>` (future).
 
 ## Commit Policy
 

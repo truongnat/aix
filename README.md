@@ -155,6 +155,7 @@ If you need one runtime to orchestrate everything, use a framework. If you want 
 | Command behavior | [docs/harness-command-behavior.md](docs/harness-command-behavior.md) |
 | Guardrails | [docs/command-guardrails.md](docs/command-guardrails.md), [docs/workflow-visualization.md](docs/workflow-visualization.md) |
 | Dispatch templates | [docs/dispatch-prompt-templates.md](docs/dispatch-prompt-templates.md) |
+| Tool discovery | [docs/tool-discovery-and-routing.md](docs/tool-discovery-and-routing.md) |
 | Distillation choices | [docs/distillation-superpowers-gsd.md](docs/distillation-superpowers-gsd.md), [docs/forensics-lite.md](docs/forensics-lite.md) |
 | Capability cache | [docs/private-capability-cache.md](docs/private-capability-cache.md) |
 | v0.11.0 release | [docs/v0.11.0-release-notes.md](docs/v0.11.0-release-notes.md) |

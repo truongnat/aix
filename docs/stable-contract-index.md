@@ -61,7 +61,7 @@ Enforced by: `install.js` `exportPaths` + tests; structural target validation fr
 ## Target Profile Contract
 
 - **Frozen record:** [frozen-target-profile-contract.md](frozen-target-profile-contract.md)
-- **Stable source:** [harness-build-contract.md](harness-build-contract.md), templates under `templates/`
+- **Stable source:** [frozen-target-profile-contract.md](frozen-target-profile-contract.md), templates under `templates/`
 - **What is frozen:** `.harness/` profile files and heading sets; `AGENTS.md` required for `--profile-only`
 - **May still change before v1.0.0:** additive optional sections if validator unchanged; example richness under `examples/`
 - **Not guaranteed:** semantic quality of profile content; automatic profile generation
@@ -73,7 +73,7 @@ Enforced by: `node validate.js --target <path> --profile-only`.
 ## Goal Artifact Contract
 
 - **Frozen record:** [frozen-goal-artifact-contract.md](frozen-goal-artifact-contract.md)
-- **Stable source:** [harness-build-contract.md](harness-build-contract.md), goal templates
+- **Stable source:** [frozen-goal-artifact-contract.md](frozen-goal-artifact-contract.md), goal templates
 - **What is frozen:** `.harness/goals/<goal-id>/` with five required files and heading sets per file; path-based goal id
 - **May still change before v1.0.0:** optional goal files only if not added to validator without migration
 - **Not guaranteed:** application correctness; CI integration; automatic goal generation

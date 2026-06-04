@@ -37,6 +37,19 @@ For execution-facing dispatch, read `.ai-harness/prompt-templates/harness-ship.m
 
 Use this command doc as the reference contract for phase behavior and artifact discipline. Use the prompt template as the execution instruction. Do not execute `harness-ship` freestyle when the prompt template is available.
 
+## Tool Discovery
+
+- Read `.harness/TOOL_CONTEXT.md` first when it exists.
+- Otherwise run `node scripts/discover-tools.js --markdown` when available.
+- If the script is unavailable, manually check the tools needed for release evidence and final review.
+
+## Tool Routing
+
+- use `git diff` and `git log` for release scope context
+- use `rg` before `grep` when locating ship evidence
+- treat missing optional tools as degraded routing, not failure
+- if shipping depends on unavailable required evidence tooling, stop and return `Blocked`
+
 ## Step-By-Step Workflow
 
 1. Confirm that `.harness/VERIFY.md` supports the current status.

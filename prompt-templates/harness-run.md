@@ -35,6 +35,19 @@ Your job is to execute the approved plan exactly enough to satisfy the acceptanc
 - Are acceptance criteria clear?
 - Does `.harness/BLOCKED.md` exist in an unresolved blocked state?
 
+### Tool Discovery
+
+- Read `.harness/TOOL_CONTEXT.md` if it exists.
+- Otherwise run `node scripts/discover-tools.js --markdown` if available.
+- Otherwise manually check `git`, `rg`, `grep`, and required local tools.
+
+### Tool Routing
+
+- Prefer `rg` before `grep`.
+- Use `git diff` for review ranges and current change context.
+- Use `git worktree` only when parallel isolation is useful and safe.
+- If a required capability is unavailable and there is no safe fallback, return `### Blocked`.
+
 ### Blocking Conditions
 
 Return `### Blocked` instead of implementing if:

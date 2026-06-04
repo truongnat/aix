@@ -39,7 +39,7 @@ This includes install health and workflow-validity signals for the local `.harne
 ## Redirect Behavior
 
 - If the harness is not installed correctly, redirect to install or update.
-- If project state is missing but the install is healthy, redirect to `harness-build` or `harness-start`.
+- If project state is missing but the install is healthy, redirect to `harness-start`.
 - If `PLAN.md` is still draft or blocked, redirect to `harness-discuss` or `harness-plan` before `harness-run`.
 - If `VERIFY.md` is missing, pending, or weak, redirect to `harness-verify` before `harness-ship`.
 

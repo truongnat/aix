@@ -76,7 +76,7 @@ Record a real local dogfood pass of the released `ai-engineering-harness` on a s
 
 ### v0.3.x patch candidate
 
-- add a short post-install hint in documentation that points directly to `docs/adoption-guide.md` and `docs/harness-build-usage.md`
+- add a short post-install hint in documentation that points directly to `docs/adoption-guide.md` and `docs/target-repo-validation.md`
 - add one compact install-output example to help first-time users understand expected copy volume
 
 ### v0.4.0 candidate

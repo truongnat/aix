@@ -35,6 +35,19 @@ Your job is to verify completed work against the approved plan and acceptance cr
 - Is manual review required?
 - Did the commands actually run with real exit codes?
 
+### Tool Discovery
+
+- Read `.harness/TOOL_CONTEXT.md` if it exists.
+- Otherwise run `node scripts/discover-tools.js --markdown` if available.
+- Otherwise manually check the tools needed for verification.
+
+### Tool Routing
+
+- Prefer `git diff` for scoped verification context.
+- Prefer `rg` before `grep` when locating evidence.
+- Use optional tools only when installed.
+- If required verification tooling is unavailable and there is no safe fallback, return `### Blocked`.
+
 ### Blocking Conditions
 
 Return `### Blocked` instead of verification if:

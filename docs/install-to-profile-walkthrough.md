@@ -50,7 +50,7 @@ Inside the target repository, start with:
 
 - `AGENTS.md`
 - `docs/adoption-guide.md`
-- `docs/harness-build-usage.md`
+- `docs/target-repo-validation.md`
 - `docs/target-repo-validation.md`
 
 If the repository is very small, also read:

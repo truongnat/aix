@@ -4,7 +4,7 @@
 
 This guide helps an agent choose the smallest team architecture pattern that still gives enough planning, review, verification, and risk control for a host repository.
 
-Use this document during `harness-build` when selecting the initial team pattern for `.harness/TEAM.md`.
+Use this document during initial harness setup when selecting the team pattern for `.harness/TEAM.md`.
 
 ## Decision Table
 

@@ -33,6 +33,19 @@ Your job is to create or update an implementation plan for the active goal.
 - Can verification strategy be named concretely?
 - Is approval ownership clear enough for `PLAN.md`?
 
+### Tool Discovery
+
+- Read `.harness/TOOL_CONTEXT.md` if it exists.
+- Otherwise run `node scripts/discover-tools.js --markdown` if available.
+- Otherwise manually check `git`, `rg`, `grep`, and relevant task-specific tools.
+
+### Tool Routing
+
+- Use the strongest available tool for each capability.
+- Prefer `rg` before `grep`.
+- Use `git diff` and `git log` before asking for repository context.
+- If a required capability is unavailable and there is no safe fallback, return `### Blocked`.
+
 ### Blocking Conditions
 
 Return `### Blocked` instead of planning if:

@@ -34,6 +34,19 @@ Your job is to prepare a ship summary only if verification evidence supports it.
 - Are known gaps explicit?
 - Does the summary avoid claiming more than the evidence proves?
 
+### Tool Discovery
+
+- Read `.harness/TOOL_CONTEXT.md` if it exists.
+- Otherwise run `node scripts/discover-tools.js --markdown` if available.
+- Otherwise manually check the tools needed for release evidence and review context.
+
+### Tool Routing
+
+- Prefer `git diff` and `git log` for release scope context.
+- Prefer `rg` before `grep` when locating evidence.
+- Treat optional tools as best-effort.
+- If a required capability is unavailable and there is no safe fallback, return `### Blocked`.
+
 ### Blocking Conditions
 
 Return `### Blocked` if:

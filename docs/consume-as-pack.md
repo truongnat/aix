@@ -38,7 +38,7 @@ Inside the target repository, start with:
 
 - `AGENTS.md`
 - `docs/adoption-guide.md`
-- `docs/harness-build-usage.md`
+- `docs/target-repo-validation.md`
 - `docs/install-to-profile-walkthrough.md`
 - `docs/target-repo-validation.md`
 

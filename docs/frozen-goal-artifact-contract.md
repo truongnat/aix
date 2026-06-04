@@ -8,7 +8,7 @@ Record the target repository goal artifact contract frozen for `v1.0.0` as part 
 
 **Frozen for v1.0.0** (v0.9.0 Step 3).
 
-Authoring guide: [harness-build-contract.md](harness-build-contract.md). Validation design: [target-repo-validation.md](target-repo-validation.md). Example shape: `examples/harness-build/flutter-google-login/goals/google-login/`.
+Authoring guide: [target-repo-validation.md](target-repo-validation.md). Validation design: [target-repo-validation.md](target-repo-validation.md). Goal artifact shape: `.harness/goals/<goal-id>/`.
 
 ## Required Goal Directory
 
@@ -85,7 +85,7 @@ Enforced in `validate.js` as `goalTemplateHeadings` (derived from `goalArtifactH
 - application correctness or that acceptance criteria are met
 - CI integration or automated test execution
 - semantic validation of task lists or verification evidence
-- automatic goal generation from `harness-build` or tooling
+- automatic goal generation from setup tooling
 
 ## Allowed Additive Changes
 
@@ -120,9 +120,9 @@ node validate.js --target <path> --goal <goal-id>
 
 Goal templates under `templates/` (`GOAL.md`, `PLAN.md`, `TASKS.md`, `VERIFY.md`, `REMEMBER.md`) guide authoring. Target repos place adapted copies under `.harness/goals/<goal-id>/`.
 
-## Relationship To harness-build-contract.md
+## Relationship To Target Validation
 
-[harness-build-contract.md](harness-build-contract.md) lists expected goal artifacts per goal. This document is the **freeze record** for v1.0.0 goal structure and headings.
+[target-repo-validation.md](target-repo-validation.md) describes the target repository validation posture. This document is the **freeze record** for v1.0.0 goal structure and headings.
 
 ## Relationship To target-repo-validation.md
 
@@ -130,7 +130,7 @@ Goal templates under `templates/` (`GOAL.md`, `PLAN.md`, `TASKS.md`, `VERIFY.md`
 
 ## Relationship To harness-example-to-target-layout.md
 
-[harness-example-to-target-layout.md](harness-example-to-target-layout.md) maps `examples/harness-build/flutter-google-login/goals/google-login/*` to `.harness/goals/<goal-id>/*` in target repos.
+These files map directly to `.harness/goals/<goal-id>/*` in target repos.
 
 ## v1.0.0 Notes
 

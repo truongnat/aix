@@ -37,7 +37,7 @@ Inside the target repository, Gemini CLI should read:
 - `AGENTS.md`
 - `docs/consume-as-pack.md`
 - `docs/install-to-profile-walkthrough.md`
-- `docs/harness-build-usage.md`
+- `docs/target-repo-validation.md`
 - `.harness/HARNESS.md`
 - `.harness/TEAM.md`
 - `.harness/SKILLS.md`
@@ -56,11 +56,11 @@ Inside the target repository, Gemini CLI should read:
 
 ## First Prompt
 
-> Read `AGENTS.md`, `docs/consume-as-pack.md`, `docs/install-to-profile-walkthrough.md`, and `docs/harness-build-usage.md`. Treat this directory as the target product repository. Do not use the `ai-engineering-harness` source repo as the product repo. Inspect `.harness/` artifacts and summarize the current harness state before making changes.
+> Read `AGENTS.md`, `docs/consume-as-pack.md`, `docs/install-to-profile-walkthrough.md`, and `docs/target-repo-validation.md`. Treat this directory as the target product repository. Do not use the `ai-engineering-harness` source repo as the product repo. Inspect `.harness/` artifacts and summarize the current harness state before making changes.
 
 ## Harness-Build Prompt
 
-> Run the harness-build process for this target repository. Create or update `.harness/HARNESS.md`, `TEAM.md`, `SKILLS.md`, `WORKFLOW.md`, `GATES.md`, and `MEMORY.md`. Use the smallest sufficient skill and workflow set. Do not implement application code.
+> Start the harness workflow for this target repository. Create or update only the `.harness/` artifacts needed by the current workflow stage, keep them repository-specific, and do not implement application code until the command loop is ready.
 
 ## Goal Execution Prompt
 

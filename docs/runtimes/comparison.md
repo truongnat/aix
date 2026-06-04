@@ -43,7 +43,7 @@ If unsure, choose the runtime you already use reliably and apply the shared cons
 
 Use this prompt skeleton across runtimes:
 
-> Read `AGENTS.md`, `docs/consume-as-pack.md`, `docs/install-to-profile-walkthrough.md`, and `docs/harness-build-usage.md`. Treat this repository as the target product repository. Do not treat the `ai-engineering-harness` source repo as the product repo. Inspect `.harness/` artifacts and summarize the current harness state before making changes.
+> Read `AGENTS.md`, `docs/consume-as-pack.md`, `docs/install-to-profile-walkthrough.md`, and `docs/target-repo-validation.md`. Treat this repository as the target product repository. Do not treat the `ai-engineering-harness` source repo as the product repo. Inspect `.harness/` artifacts and summarize the current harness state before making changes.
 
 ## Common Validation Pattern
 

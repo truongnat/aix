@@ -75,7 +75,7 @@ Use for reusable commands, verification recipes, and durable lookup pointers.
 
 ### `.harness/MEMORY.md`
 
-Use for the memory policy or profile when a repository adopts the harness-build profile flow. This file explains memory boundaries; it should not become the only operational memory sink once typed memory artifacts exist.
+Use for the memory policy or profile when a repository adopts the harness workflow. This file explains memory boundaries; it should not become the only operational memory sink once typed memory artifacts exist.
 
 ## Goal-Level Memory
 
