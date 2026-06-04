@@ -18,8 +18,8 @@ export function CTA() {
           </motion.h2>
 
           <motion.div variants={item} className="flex flex-wrap gap-4 justify-center">
-            <a href={README} target="_blank" rel="noopener noreferrer" className="btn-primary">Read the README</a>
-            <a href="#install" className="btn-secondary">Install with npx</a>
+            <a href="#install" className="btn-primary">Install with npx</a>
+            <a href={README} target="_blank" rel="noopener noreferrer" className="btn-secondary">Read the README</a>
             <a href={DEMO} target="_blank" rel="noopener noreferrer" className="btn-secondary">View dogfood demo</a>
           </motion.div>
         </motion.div>
