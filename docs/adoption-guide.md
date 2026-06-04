@@ -13,7 +13,7 @@ The installed or copied harness surface is what agents use inside that target re
 - keep markdown as the source of truth
 - copy only the harness assets you need
 - use `.harness/` for active project artifacts
-- avoid storing secrets, credentials, customer data, or private business data
+- follow the artifact content restrictions in [SECURITY.md](../SECURITY.md#artifact-content-restrictions)
 
 ## Manual Install
 
@@ -88,7 +88,7 @@ What never gets generated:
 - no `src/`
 - no server code
 - no database configuration
-- no secrets or private business data
+- no secrets or private business data (see [SECURITY.md](../SECURITY.md#artifact-content-restrictions))
 
 Overwrite behavior:
 

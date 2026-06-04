@@ -19,7 +19,7 @@ Use this before shipping or closing a session. Copy-paste into your SHIP.md or T
 - [ ] PLAN-001.md created (step-by-step, each step <1 hour)
 - [ ] Code changes follow the plan
 - [ ] TASKS.md updated with progress
-- [ ] No secrets or credentials added to code/artifacts
+- [ ] No secrets or credentials added to code/artifacts (see [SECURITY.md](SECURITY.md))
 - [ ] Tests pass locally
 
 ---
@@ -61,7 +61,7 @@ Use this before shipping or closing a session. Copy-paste into your SHIP.md or T
   - [ ] New dependencies added
   - [ ] New env vars needed
   - [ ] Test coverage changes
-- [ ] No secrets in REMEMBER.md ⚠️
+- [ ] No secrets, credentials, or customer data in artifacts (see [SECURITY.md](SECURITY.md#artifact-content-restrictions))
 - [ ] Session directory committed to version control
 
 ---
@@ -87,7 +87,7 @@ Use this before shipping or closing a session. Copy-paste into your SHIP.md or T
 → Same mistakes repeated in next session.
 
 ❌ **Secrets in Artifacts**
-→ Never commit API keys, tokens, or passwords to git.
+→ See [SECURITY.md](SECURITY.md#artifact-content-restrictions). Never commit API keys, tokens, passwords, or customer data to git.
 
 ❌ **Too Big Scope**
 → Feature should complete in <2 hours. If longer, split it.

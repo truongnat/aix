@@ -258,12 +258,4 @@ Prefer typed project-memory artifacts when the lesson applies across goals:
 - `.harness/INDEX.md` for reusable commands, verification recipes, and lookup pointers
 - `.harness/REMEMBER.md` for goal-level lessons that may later be promoted
 
-Do not store:
-
-- credentials, tokens, secrets, API keys, or `.env` values
-- customer data
-- private business data
-- temporary logs
-- transient discussion noise
-
-If a lesson is useful but sensitive, summarize the pattern without preserving the sensitive details.
+**Do not store secrets, credentials, customer data, or private business information.** See [SECURITY.md](SECURITY.md#artifact-content-restrictions) for the complete policy and rationale.

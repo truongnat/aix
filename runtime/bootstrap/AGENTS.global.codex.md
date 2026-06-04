@@ -8,4 +8,4 @@ Do not claim done without verification evidence.
 
 ## Memory Discipline
 
-Never persist secrets or customer data into memory artifacts.
+See [SECURITY.md](../../SECURITY.md#artifact-content-restrictions) — never persist secrets, credentials, customer data, or private business information into memory artifacts.

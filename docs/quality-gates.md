@@ -42,4 +42,4 @@ For phase-by-phase entry, evidence, completion, and escalation criteria, use [Qu
 
 - the lesson is durable
 - the memory is useful for future work
-- the artifact does not contain secrets, credentials, customer data, or private business data
+- see [SECURITY.md](../SECURITY.md#artifact-content-restrictions) — no secrets, credentials, customer data, or private business data

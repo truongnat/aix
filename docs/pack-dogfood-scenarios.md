@@ -106,4 +106,4 @@ For `v0.8.0` completion, satisfy:
 
 ## Safety Reminder
 
-Do not commit customer data, credentials, or private business details into this repository. Summarize friction; redact sensitive paths and names in public artifacts.
+See [SECURITY.md](../SECURITY.md#artifact-content-restrictions) — do not commit customer data, credentials, or private business details. Summarize friction; redact sensitive paths and names in public artifacts.

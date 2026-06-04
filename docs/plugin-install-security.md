@@ -43,7 +43,7 @@ The archive URL should use the same ref for tarball and documented compatibility
 ## What install.sh Must Not Do
 
 - send telemetry or analytics
-- read or write secrets, `.env`, or credentials
+- read or write secrets, `.env`, or credentials (see [SECURITY.md](../SECURITY.md))
 - modify files outside the target repo (and explicit global bin path when `--global`)
 - run arbitrary code from the network besides the documented install script and pack archive
 - require sudo unless user explicitly opts into system-wide paths
