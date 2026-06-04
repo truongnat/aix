@@ -363,6 +363,43 @@ runTest("delegated workers doc describes support levels honestly", () => {
   assert.match(text, /Codex.*adapter|adapter.*Codex/i);
 });
 
+runTest("provider rule renderer composes core fragments for each provider", () => {
+  const renderer = require(path.join(repoRoot, "lib", "provider-rule-renderer.js"));
+  const samples = [
+    [".claude/CLAUDE.md", renderer.renderClaudeProjectMd()],
+    [".cursor/rules/ai-engineering-harness.mdc", renderer.renderCursorActivationMdc()],
+    [".cursor/rules/ai-engineering-harness-commands.mdc", renderer.renderCursorCommandsMdc()],
+    ["AGENTS.md", renderer.renderCodexAgentsMd()],
+    [".gemini/extensions/ai-engineering-harness/GEMINI.md", renderer.renderGeminiMd()]
+  ];
+  const failures = [];
+  for (const [relativePath, content] of samples) {
+    renderer.assertProviderRuleContent(relativePath, content, failures);
+    assert.match(content, /harness-plan/);
+  }
+  assert.deepEqual(failures, []);
+});
+
+runTest("provider rule adapters declare honest native slash support", () => {
+  const { PROVIDER_RULE_ADAPTERS } = require(path.join(repoRoot, "lib", "provider-rule-renderer.js"));
+  assert.equal(PROVIDER_RULE_ADAPTERS.claude.nativeSlashCommands, true);
+  assert.equal(PROVIDER_RULE_ADAPTERS.claude.supportsSubagents, true);
+  assert.equal(PROVIDER_RULE_ADAPTERS.cursor.nativeSlashCommands, false);
+  assert.equal(PROVIDER_RULE_ADAPTERS.codex.nativeSlashCommands, false);
+  assert.equal(PROVIDER_RULE_ADAPTERS.gemini.nativeSlashCommands, false);
+});
+
+runTest("provider command support merges rule adapter metadata", () => {
+  const { providerCommandSupport } = require(path.join(repoRoot, "lib", "runtime-command-catalog.js"));
+  const claude = providerCommandSupport("claude");
+  const cursor = providerCommandSupport("cursor");
+  assert.equal(claude.nativeSlashCommands, true);
+  assert.ok(Array.isArray(claude.ruleEntrypoints));
+  assert.match(claude.ruleEntrypoints.join(" "), /\.claude\/agents/);
+  assert.equal(cursor.nativeSlashCommands, false);
+  assert.match(cursor.ruleEntrypoints.join(" "), /guardrails/);
+});
+
 if (process.exitCode) {
   process.exit(process.exitCode);
 }

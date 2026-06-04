@@ -19,6 +19,7 @@
     "patterns/",
     "templates/",
     "workers/",
+    "rules/",
     "tool-capabilities/",
     "docs/",
     ".cursor-plugin/",

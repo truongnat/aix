@@ -1,0 +1,30 @@
+---
+description: ai-engineering-harness command routing
+globs:
+alwaysApply: true
+---
+
+# Harness Command Routing
+
+Canonical commands:
+
+- harness-map
+- harness-start
+- harness-discuss
+- harness-plan
+- harness-run
+- harness-verify
+- harness-ship
+- harness-remember
+
+When a canonical command is requested:
+
+1. Read `.ai-harness/runtime-commands/<command>.md`
+2. Read `.ai-harness/commands/<command>.md`
+3. Read matching `.ai-harness/prompt-templates/<command>.md` if present
+4. Follow phase guards
+5. Stop and ask if blocked
+
+Cursor does **not** have verified native `/harness-*` support in this install.
+
+<!-- @core:command-naming,phase-guards,blocking -->

@@ -1,0 +1,24 @@
+---
+description: ai-engineering-harness phase and blocking guardrails
+globs:
+alwaysApply: true
+---
+
+# Harness Guardrails
+
+## Stop Conditions
+
+Stop and ask if:
+
+- plan is missing
+- plan is not approved
+- acceptance criteria are unclear
+- verification command is unknown
+- manual review is required
+- test failure needs product judgment
+- verify evidence is missing
+- current command is not allowed in this phase
+
+After asking, stop. Do not continue implementation, verification, shipping, or memory updates.
+
+<!-- @core:blocking,phase-guards -->

@@ -27,5 +27,18 @@ Per provider in `commandSurface.providers.<id>`:
 
 ## Related
 
+- [provider-rule-configuration.md](provider-rule-configuration.md)
 - [provider-native-command-research.md](provider-native-command-research.md)
 - [harness-command-behavior.md](harness-command-behavior.md)
+
+## Provider rule adapters
+
+| Provider | Rule entrypoints | Native `/harness-*` | Subagents | Rule mode |
+|----------|------------------|--------------------:|----------:|-----------|
+| Claude Code | `.claude/CLAUDE.md`, `.claude/commands/`, `.claude/agents/` | Yes | Yes | claude-project |
+| Cursor | `.cursor/rules/ai-engineering-harness*.mdc` | No | No | cursor-rules |
+| Codex | `AGENTS.md` | No | No | agents-md |
+| Gemini | `.gemini/extensions/ai-engineering-harness/GEMINI.md` | No | No | gemini-extension |
+| Generic | `AGENTS.md` | No | No | agents-md |
+
+Core fragments: `rules/core/`. Renderer: `lib/provider-rule-renderer.js`.

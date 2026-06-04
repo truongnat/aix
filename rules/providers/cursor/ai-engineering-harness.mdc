@@ -1,0 +1,34 @@
+---
+description: ai-engineering-harness activation
+globs:
+alwaysApply: true
+---
+
+# ai-engineering-harness
+
+This repository uses ai-engineering-harness.
+
+Core harness rules are provider-neutral. This file is the Cursor adapter entrypoint.
+
+## Read Order
+
+Before acting on a harness request:
+
+1. Read `.ai-harness/activation.md`
+2. Read `.harness/STATE.md`
+3. Read the active session under `.harness/sessions/`
+4. Read the relevant command contract in `.ai-harness/commands/`
+5. Read the matching prompt template in `.ai-harness/prompt-templates/`
+
+## Important
+
+Cursor project install does **not** provide native `/harness-*` slash commands.
+
+When the user says harness-plan, harness-run, harness-verify, or harness-ship, treat it as a local harness command and route through `.ai-harness/runtime-commands/`.
+
+Do not invent slash commands.
+Do not use `harness:plan`.
+
+Fallback instruction: **Use harness-plan for this repository.**
+
+<!-- @core -->
