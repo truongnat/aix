@@ -86,21 +86,22 @@ describe("CLI Arguments Parser", () => {
   });
 
   test("parseArgv throws on unknown argument", () => {
-    assert.throws(
-      () => cliArgs.parseArgv(["node", "aih.js", "--unknown"]),
-      /Unknown argument/
-    );
+    assert.throws(() => cliArgs.parseArgv(["node", "aih.js", "--unknown"]), /Unknown argument/);
   });
 
   test("parseArgv throws when --provider has no value", () => {
-    assert.throws(
-      () => cliArgs.parseArgv(["node", "aih.js", "--provider"]),
-      /Missing value/
-    );
+    assert.throws(() => cliArgs.parseArgv(["node", "aih.js", "--provider"]), /Missing value/);
   });
 
   test("parseArgv combines command with options", () => {
-    const opts = cliArgs.parseArgv(["node", "aih.js", "status", "--provider", "claude", "--verbose"]);
+    const opts = cliArgs.parseArgv([
+      "node",
+      "aih.js",
+      "status",
+      "--provider",
+      "claude",
+      "--verbose",
+    ]);
     assert.equal(opts.command, "status");
     assert.deepEqual(opts.providers, ["claude"]);
     assert.equal(opts.verbose, true);
@@ -204,7 +205,7 @@ describe("CLI Provider Detection", () => {
     createMockFileStructure(tmpDir, [
       ".claude/CLAUDE.md",
       ".cursor/rules/ai-engineering-harness.mdc",
-      ".claude/OTHER.md"
+      ".claude/OTHER.md",
     ]);
     const providers = cliDetect.detectInstalledProviders(tmpDir);
     const count = providers.filter((p) => p === "claude").length;

@@ -19,7 +19,7 @@ function runNode(args, options = {}) {
     cwd: repoRoot,
     encoding: "utf8",
     timeout: 30000,
-    ...options
+    ...options,
   });
 }
 
@@ -74,7 +74,7 @@ describe("Tool Discovery & Routing", () => {
       "find",
       "markitdown",
       "codegraph",
-      "gitNexus"
+      "gitNexus",
     ]) {
       assert.ok(Object.prototype.hasOwnProperty.call(parsed, key), `missing key ${key}`);
       assert.equal(typeof parsed[key].available, "boolean");
@@ -95,7 +95,7 @@ describe("Tool Discovery & Routing", () => {
       "## Use When",
       "## Do Not Use When",
       "## Example Commands",
-      "## Fallback"
+      "## Fallback",
     ];
     for (const fileName of [
       "git.md",
@@ -103,7 +103,7 @@ describe("Tool Discovery & Routing", () => {
       "git-worktree.md",
       "markitdown.md",
       "code-graph.md",
-      "git-nexus.md"
+      "git-nexus.md",
     ]) {
       const text = fs.readFileSync(
         path.join(repoRoot, "tool-capabilities", "tools", fileName),
@@ -127,7 +127,7 @@ describe("Tool Discovery & Routing", () => {
       "parallel-work",
       "document-to-markdown",
       "repo-structure",
-      "dependency-scan"
+      "dependency-scan",
     ]) {
       assert.match(text, new RegExp(capability));
     }
@@ -153,17 +153,14 @@ describe("Session Memory & Documentation", () => {
       "templates/NOTES.md",
       "templates/DECISION.md",
       "templates/HAZARD.md",
-      "templates/harness-config.json"
+      "templates/harness-config.json",
     ]) {
       assert.ok(fs.existsSync(path.join(repoRoot, relativePath)), `${relativePath} must exist`);
     }
   });
 
   test("session memory docs exist", () => {
-    for (const relativePath of [
-      "docs/session-memory.md",
-      "docs/memory-migration.md"
-    ]) {
+    for (const relativePath of ["docs/session-memory.md", "docs/memory-migration.md"]) {
       assert.ok(fs.existsSync(path.join(repoRoot, relativePath)), `${relativePath} must exist`);
     }
   });
@@ -178,7 +175,10 @@ describe("Session Memory & Documentation", () => {
 
   test("session memory docs say files are source of truth", () => {
     const sessionDoc = fs.readFileSync(path.join(repoRoot, "docs", "session-memory.md"), "utf8");
-    const migrationDoc = fs.readFileSync(path.join(repoRoot, "docs", "memory-migration.md"), "utf8");
+    const migrationDoc = fs.readFileSync(
+      path.join(repoRoot, "docs", "memory-migration.md"),
+      "utf8"
+    );
     assert.match(sessionDoc, /files are the source of truth/i);
     assert.match(sessionDoc, /root `?\.harness`? is an index and router/i);
     assert.match(sessionDoc, /sessions own working artifacts/i);
@@ -193,7 +193,7 @@ describe("Session Memory & Documentation", () => {
       "harness-plan.md",
       "harness-run.md",
       "harness-verify.md",
-      "harness-ship.md"
+      "harness-ship.md",
     ]) {
       const text = fs.readFileSync(path.join(repoRoot, "commands", fileName), "utf8");
       assert.match(text, /\.harness\/STATE\.md/);
@@ -209,7 +209,7 @@ describe("Workflow Command Documentation", () => {
       "harness-plan.md",
       "harness-run.md",
       "harness-verify.md",
-      "harness-ship.md"
+      "harness-ship.md",
     ]) {
       const text = fs.readFileSync(path.join(repoRoot, "commands", fileName), "utf8");
       assert.match(text, /## Tool Discovery/);
@@ -223,7 +223,7 @@ describe("Workflow Command Documentation", () => {
       "harness-run.md",
       "harness-verify.md",
       "harness-ship.md",
-      "code-reviewer.md"
+      "code-reviewer.md",
     ]) {
       const text = fs.readFileSync(path.join(repoRoot, "prompt-templates", fileName), "utf8");
       assert.match(text, /### Tool Discovery/);
@@ -237,10 +237,14 @@ describe("Workflow Command Documentation", () => {
       "harness-run.md",
       "harness-verify.md",
       "harness-ship.md",
-      "harness-remember.md"
+      "harness-remember.md",
     ]) {
       const content = fs.readFileSync(path.join(repoRoot, "commands", fileName), "utf8");
-      assert.match(content, /Session Start|harness-start/i, `${fileName} must mention Session Start`);
+      assert.match(
+        content,
+        /Session Start|harness-start/i,
+        `${fileName} must mention Session Start`
+      );
     }
   });
 });
@@ -260,7 +264,7 @@ describe("Installation & Packaging", () => {
       packRoot: repoRoot,
       target,
       dryRun: true,
-      force: false
+      force: false,
     });
     assert.ok(results.some((entry) => /tool-capabilities/.test(entry.relativePath)));
     assert.ok(results.some((entry) => /scripts\/discover-tools\.js/.test(entry.relativePath)));
@@ -271,7 +275,7 @@ describe("Installation & Packaging", () => {
     const text = installApi.formatNextSteps({
       target: path.resolve("/tmp/example"),
       targetDisplay: "../example",
-      dryRun: false
+      dryRun: false,
     });
     assert.doesNotMatch(text, /harness-build/i);
     assert.match(text, /adoption-guide/i);
@@ -294,7 +298,7 @@ describe("Delegated Workers", () => {
       "workers/gatekeeper.md",
       "workers/fixer.md",
       "templates/WORKER_RUN.md",
-      "docs/delegated-workers.md"
+      "docs/delegated-workers.md",
     ]) {
       assert.ok(fs.existsSync(path.join(repoRoot, relativePath)), `${relativePath} must exist`);
     }
@@ -321,14 +325,7 @@ describe("Delegated Workers", () => {
       const text = fs.readFileSync(path.join(repoRoot, "workers", `${workerId}.md`), "utf8");
       const frontmatter = parseFrontmatter(text);
       assert.ok(frontmatter, `${workerId}.md must include frontmatter`);
-      for (const field of [
-        "id",
-        "role",
-        "mode",
-        "writeAccess",
-        "canDispatch",
-        "resultSchema"
-      ]) {
+      for (const field of ["id", "role", "mode", "writeAccess", "canDispatch", "resultSchema"]) {
         assert.ok(frontmatter[field], `${workerId}.md frontmatter must include ${field}`);
       }
       assert.ok(Array.isArray(frontmatter.requiredInputs) && frontmatter.requiredInputs.length > 0);
@@ -341,7 +338,10 @@ describe("Delegated Workers", () => {
     const registry = require(path.join(repoRoot, "workers", "registry.js"));
     for (const worker of registry.workers) {
       for (const value of Object.values(worker.providerSupport)) {
-        assert.ok(registry.VALID_PROVIDER_SUPPORT.includes(value), `invalid support value: ${value}`);
+        assert.ok(
+          registry.VALID_PROVIDER_SUPPORT.includes(value),
+          `invalid support value: ${value}`
+        );
       }
       assert.equal(worker.providerSupport.claude, "native");
       assert.equal(worker.providerSupport.cursor, "adapter");
@@ -363,8 +363,12 @@ describe("Delegated Workers", () => {
 
 describe("Provider Rules & Adapters", () => {
   test("claude worker adapter renders native agent files", () => {
-    const { renderClaudeAgentFile } = require(path.join(repoRoot, "lib", "worker-claude-adapter.js"));
-    const body = fs.readFileSync(path.join(repoRoot, "workers", "reviewer.md"), "utf8").replace(/^---[\s\S]*?---\s*/, "");
+    const { renderClaudeAgentFile } = require(
+      path.join(repoRoot, "lib", "worker-claude-adapter.js")
+    );
+    const body = fs
+      .readFileSync(path.join(repoRoot, "workers", "reviewer.md"), "utf8")
+      .replace(/^---[\s\S]*?---\s*/, "");
     const rendered = renderClaudeAgentFile("reviewer", body);
     assert.match(rendered, /^---\nname: harness-reviewer/);
     assert.match(rendered, /tools: Read, Grep, Glob, Bash/);
@@ -388,7 +392,7 @@ describe("Provider Rules & Adapters", () => {
       [".cursor/rules/ai-engineering-harness.mdc", renderer.renderCursorActivationMdc()],
       [".cursor/rules/ai-engineering-harness-commands.mdc", renderer.renderCursorCommandsMdc()],
       ["AGENTS.md", renderer.renderCodexAgentsMd()],
-      [".gemini/extensions/ai-engineering-harness/GEMINI.md", renderer.renderGeminiMd()]
+      [".gemini/extensions/ai-engineering-harness/GEMINI.md", renderer.renderGeminiMd()],
     ];
     const failures = [];
     for (const [relativePath, content] of samples) {
@@ -399,7 +403,9 @@ describe("Provider Rules & Adapters", () => {
   });
 
   test("provider rule adapters declare honest native slash support", () => {
-    const { PROVIDER_RULE_ADAPTERS } = require(path.join(repoRoot, "lib", "provider-rule-renderer.js"));
+    const { PROVIDER_RULE_ADAPTERS } = require(
+      path.join(repoRoot, "lib", "provider-rule-renderer.js")
+    );
     assert.equal(PROVIDER_RULE_ADAPTERS.claude.nativeSlashCommands, true);
     assert.equal(PROVIDER_RULE_ADAPTERS.claude.supportsSubagents, true);
     assert.equal(PROVIDER_RULE_ADAPTERS.cursor.nativeSlashCommands, false);
@@ -410,7 +416,9 @@ describe("Provider Rules & Adapters", () => {
 
 describe("Provider Command Support", () => {
   test("provider command support merges rule adapter metadata", () => {
-    const { providerCommandSupport } = require(path.join(repoRoot, "lib", "runtime-command-catalog.js"));
+    const { providerCommandSupport } = require(
+      path.join(repoRoot, "lib", "runtime-command-catalog.js")
+    );
     const claude = providerCommandSupport("claude");
     const cursor = providerCommandSupport("cursor");
     assert.equal(claude.nativeSlashCommands, true);
@@ -436,7 +444,7 @@ describe("Hooks & Skills Layer", () => {
       "workflows/create-skill.md",
       "workflows/compose-skills.md",
       "workflows/review-and-verify.md",
-      "templates/SKILL_DISPOSAL.md"
+      "templates/SKILL_DISPOSAL.md",
     ]) {
       assert.ok(fs.existsSync(path.join(repoRoot, relativePath)), `${relativePath} must exist`);
     }
@@ -449,7 +457,7 @@ describe("Hooks & Skills Layer", () => {
       "hooks/core/record-subagent-result.js",
       "hooks/core/record-skill-run.js",
       "hooks/core/archive-session-skill.js",
-      "hooks/core/compact-session-memory.js"
+      "hooks/core/compact-session-memory.js",
     ]) {
       const result = runNode([path.join(repoRoot, script), "--help"]);
       assert.equal(result.status, 0, result.stderr || result.stdout);
@@ -459,14 +467,17 @@ describe("Hooks & Skills Layer", () => {
   test("guard-phase passes for approved fixture session on harness-verify", () => {
     const fixture = path.join(repoRoot, "test", "fixtures", "valid-target-goal");
     const session = ".harness/sessions/2026-06-04-google-login";
-    const result = runNode([
-      path.join(repoRoot, "hooks", "core", "guard-phase.js"),
-      "--command",
-      "harness-verify",
-      "--session",
-      path.join(fixture, session),
-      "--json"
-    ], { cwd: fixture });
+    const result = runNode(
+      [
+        path.join(repoRoot, "hooks", "core", "guard-phase.js"),
+        "--command",
+        "harness-verify",
+        "--session",
+        path.join(fixture, session),
+        "--json",
+      ],
+      { cwd: fixture }
+    );
     assert.equal(result.status, 0, result.stderr || result.stdout);
     const parsed = JSON.parse(result.stdout);
     assert.equal(parsed.ok, true);
@@ -486,7 +497,7 @@ describe("Daily Dev Report Layer", () => {
       "skills/report-writer/SKILL.md",
       "workflows/daily-dev-report.md",
       "docs/daily-dev-report.md",
-      "scripts/generate-report-context.js"
+      "scripts/generate-report-context.js",
     ]) {
       assert.ok(fs.existsSync(path.join(repoRoot, relativePath)), `${relativePath} must exist`);
     }
@@ -506,7 +517,10 @@ describe("Daily Dev Report Layer", () => {
 
   test("harness-ship references report artifacts", () => {
     const command = fs.readFileSync(path.join(repoRoot, "commands", "harness-ship.md"), "utf8");
-    const prompt = fs.readFileSync(path.join(repoRoot, "prompt-templates", "harness-ship.md"), "utf8");
+    const prompt = fs.readFileSync(
+      path.join(repoRoot, "prompt-templates", "harness-ship.md"),
+      "utf8"
+    );
     for (const artifact of ["REPORT.md", "PR_MESSAGE.md", "CHANGE_SUMMARY.md"]) {
       assert.match(command, new RegExp(artifact));
       assert.match(prompt, new RegExp(artifact));
@@ -519,7 +533,7 @@ describe("Session Start Protocol", () => {
     for (const relativePath of [
       "docs/session-start.md",
       "templates/SESSION_START.md",
-      "commands/harness-start.md"
+      "commands/harness-start.md",
     ]) {
       assert.ok(fs.existsSync(path.join(repoRoot, relativePath)), `${relativePath} must exist`);
     }
