@@ -13,16 +13,7 @@ export function CTA() {
     <section className="relative z-10 section-gap px-6 pb-32">
       <div className="max-w-5xl mx-auto text-center">
         <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} className="flex flex-col items-center">
-          <motion.h2
-            variants={item}
-            className="text-4xl sm:text-5xl font-extrabold mb-10 max-w-2xl"
-            style={{
-              background: 'linear-gradient(135deg, #ffffff 0%, #c7d2fe 60%, #818cf8 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
+          <motion.h2 variants={item} className="hero-headline text-4xl sm:text-5xl font-extrabold mb-10 max-w-2xl">
             Give your AI coding agent an engineering loop
           </motion.h2>
 

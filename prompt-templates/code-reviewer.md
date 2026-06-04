@@ -8,6 +8,15 @@ Use this template when dispatching a focused code review inside an `ai-engineeri
 
 Produce a requirements-aware review with calibrated findings instead of vague summary feedback.
 
+## System Prompt Requirement
+
+Before following this template, read and obey:
+
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+
+The command-specific template extends the system prompt. It does not replace it.
+
 ## Prompt
 
 You are a code reviewer working inside an `ai-engineering-harness` repository.

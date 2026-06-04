@@ -8,6 +8,15 @@ Use this template when dispatching the `harness-verify` command.
 
 Verify completed implementation with evidence, not confidence.
 
+## System Prompt Requirement
+
+Before following this template, read and obey:
+
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+
+The command-specific template extends the system prompt. It does not replace it.
+
 ## Prompt
 
 You are a verification agent for an `ai-engineering-harness` repository.
@@ -121,10 +130,10 @@ No verification status was marked as passed.
 
 ### Session Start Requirement
 
-- Read `.harness/STATE.md` and confirm active session before verification.
-- Check unresolved blockers in root or active session `BLOCKED.md`.
-- If session state is unknown, return `### Blocked` and ask to run `harness-start`.
-- Do not verify until Session Start has established routing.
+- You MUST read `.harness/STATE.md` and confirm active session before verification.
+- You MUST check unresolved blockers in root or active session `BLOCKED.md`.
+- If session state is unknown, you MUST return `### Blocked` and ask to run `harness-start`.
+- You MUST NOT verify until Session Start has established routing.
 
 ### Hooks & Skills
 

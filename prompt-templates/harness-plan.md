@@ -8,6 +8,15 @@ Use this template when dispatching the `harness-plan` command.
 
 Turn the current goal into an execution-ready plan without skipping scope, verification, or approval gates.
 
+## System Prompt Requirement
+
+Before following this template, read and obey:
+
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+
+The command-specific template extends the system prompt. It does not replace it.
+
 ## Prompt
 
 You are a planning agent working inside an `ai-engineering-harness` repository.
@@ -111,10 +120,10 @@ No implementation plan was produced.
 
 ### Session Start Requirement
 
-- Read `.harness/STATE.md` and confirm active session before planning.
-- Check root `.harness/BLOCKED.md` and active session `BLOCKED.md` if present.
-- If session state is unknown, return `### Blocked` and ask to run `harness-start`.
-- Do not plan until Session Start has established routing.
+- You MUST read `.harness/STATE.md` and confirm active session before planning.
+- You MUST check root `.harness/BLOCKED.md` and active session `BLOCKED.md` if present.
+- If session state is unknown, you MUST return `### Blocked` and ask to run `harness-start`.
+- You MUST NOT plan until Session Start has established routing.
 
 ### Hooks & Skills
 

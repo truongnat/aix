@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { stagger, fadeUp, motionVariants } from '../lib/animations'
+import { SiteBrand } from './SiteBrand'
 
 const GITHUB = 'https://github.com/truongnat/ai-engineering-harness'
 
@@ -29,31 +30,23 @@ export function Hero() {
       <div className="max-w-6xl mx-auto w-full">
         <motion.div variants={container} initial="hidden" animate="show" className="flex flex-col lg:flex-row gap-12 lg:items-center">
           <div className="flex-1 min-w-0">
-            <motion.div variants={item} className="mb-6 flex flex-wrap gap-2">
-              <span
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest text-indigo-300"
-                style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)' }}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 pulse-dot" style={{ boxShadow: '0 0 6px #818cf8' }} />
+            <motion.div variants={item}>
+              <SiteBrand variant="hero" showPackageId />
+            </motion.div>
+
+            <motion.div variants={item} className="mb-6 mt-5 flex flex-wrap gap-2">
+              <span className="badge-release">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-400 pulse-dot" />
                 v1.0.0
               </span>
-              <span
-                className="inline-flex px-4 py-1.5 rounded-full text-xs font-medium text-slate-400"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
-              >
+              <span className="badge-muted">
                 Markdown-first · Provider adapters · Evidence-based shipping
               </span>
             </motion.div>
 
             <motion.h1
               variants={item}
-              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] mb-5"
-              style={{
-                background: 'linear-gradient(135deg, #ffffff 0%, #c7d2fe 50%, #818cf8 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
+              className="hero-headline text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold tracking-tight leading-[1.1] mb-5"
             >
               Engineering discipline for AI coding agents
             </motion.h1>
@@ -72,21 +65,13 @@ export function Hero() {
 
           <motion.div variants={item} className="flex-1 min-w-0 w-full max-w-lg lg:max-w-none">
             <p className="text-xs uppercase tracking-widest text-slate-600 mb-3">Operating loop</p>
-            <div
-              className="rounded-2xl p-5 sm:p-6"
-              style={{
-                background: 'linear-gradient(145deg, rgba(99,102,241,0.12), rgba(15,23,42,0.6))',
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 24px 80px rgba(15,23,42,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
-                backdropFilter: 'blur(20px)',
-              }}
-            >
+            <div className="rounded-2xl p-5 sm:p-6 hero-panel">
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-5">
                 {PIPELINE.map((step, i) => (
                   <div key={step.cmd} className="flex items-center gap-1.5">
                     <div className="cmd-card px-3 py-2.5 sm:px-4 sm:py-3 text-center min-w-[88px] sm:min-w-[100px]">
                       <div className="text-[10px] sm:text-xs font-semibold text-slate-300 mb-0.5">{step.id}</div>
-                      <div className="font-mono text-[10px] sm:text-xs text-indigo-300/90">{step.cmd}</div>
+                      <div className="font-mono text-[10px] sm:text-xs text-sky-300/90">{step.cmd}</div>
                       <div className="flex items-center justify-center gap-1 mt-1.5">
                         <span
                           className="w-1 h-1 rounded-full"

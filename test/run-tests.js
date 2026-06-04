@@ -238,6 +238,7 @@ runTest("install surface includes tool discovery assets and excludes harness-bui
   assert.ok(installApi.exportPaths.includes("docs/tool-discovery-and-routing.md"));
   assert.ok(installCacheApi.cacheExportPaths.includes("tool-capabilities"));
   assert.ok(installCacheApi.cacheExportPaths.includes("scripts/discover-tools.js"));
+  assert.ok(installCacheApi.cacheExportPaths.includes("agent-system/"));
   assert.equal(installApi.exportPaths.includes("docs/harness-build-usage.md"), false);
 });
 
@@ -251,6 +252,7 @@ runTest("install cache dry-run includes tool assets", () => {
   });
   assert.ok(results.some((entry) => /tool-capabilities/.test(entry.relativePath)));
   assert.ok(results.some((entry) => /scripts\/discover-tools\.js/.test(entry.relativePath)));
+  assert.ok(results.some((entry) => /agent-system\/SYSTEM_PROMPT\.md/.test(entry.relativePath)));
 });
 
 runTest("install next steps no longer mention harness-build", () => {

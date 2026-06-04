@@ -29,7 +29,7 @@ export function ProblemSection() {
     <section className="relative z-10 section-gap px-6">
       <div className="max-w-5xl mx-auto">
         <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
-          <motion.p variants={item} className="text-xs uppercase tracking-widest text-indigo-400 mb-3">The problem</motion.p>
+          <motion.p variants={item} className="text-xs uppercase tracking-widest text-sky-400 mb-3">The problem</motion.p>
           <motion.h2 variants={item} className="text-3xl sm:text-4xl font-bold text-white mb-10">
             AI agents edit code well — but often skip engineering discipline
           </motion.h2>
@@ -44,7 +44,7 @@ export function ProblemSection() {
           </div>
 
           <motion.p variants={item} className="text-lg text-slate-400 leading-relaxed max-w-3xl">
-            <span className="text-indigo-300 font-medium">ai-engineering-harness</span> turns agent work into a
+            <span className="text-sky-300 font-medium">AI Engineering Harness</span> turns agent work into a
             session-based engineering loop with artifacts, gates, and evidence.
           </motion.p>
         </motion.div>

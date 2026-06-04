@@ -27,7 +27,13 @@ Cursor project install does **not** provide native `/harness-*` slash commands.
 When the user says harness-plan, harness-run, harness-verify, or harness-ship, treat it as a local harness command and route through `.ai-harness/runtime-commands/`.
 
 Do not invent slash commands.
-Do not use `harness:plan`.
+Do not use legacy colon-separated command IDs.
+
+Always follow `.ai-harness/agent-system/SYSTEM_PROMPT.md`.
+
+Use the response formats in `.ai-harness/agent-system/RESPONSE_CONTRACT.md`.
+
+Cursor does **not** have verified native `/harness-*` slash support in this install.
 
 Fallback instruction: **Use harness-plan for this repository.**
 

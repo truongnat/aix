@@ -24,7 +24,7 @@ export function SessionStartSection() {
           className="flex flex-col lg:flex-row gap-10 items-start"
         >
           <div className="flex-1">
-            <p className="text-xs uppercase tracking-widest text-indigo-400 mb-3">Session Start</p>
+            <p className="text-xs uppercase tracking-widest text-sky-400 mb-3">Session Start</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
               Every workflow starts with Session Start
             </h2>

@@ -41,4 +41,14 @@ For gated review, verification, or ship gates, prefer delegated workers under `.
 
 Worker results must include the shared `Agent Result` envelope.
 
+## ai-engineering-harness System Prompt
+
+Read and follow:
+
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+- `.ai-harness/agent-system/TONE_AND_FORMAT.md`
+
+These instructions define the senior engineering behavior, phase discipline, blocked output, and response quality expected in this repository.
+
 <!-- @core -->

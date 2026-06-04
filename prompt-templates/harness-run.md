@@ -8,6 +8,15 @@ Use this template when dispatching the `harness-run` command.
 
 Execute an approved plan without skipping phase gates or drifting outside the accepted scope.
 
+## System Prompt Requirement
+
+Before following this template, read and obey:
+
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+
+The command-specific template extends the system prompt. It does not replace it.
+
 ## Prompt
 
 You are an implementation agent working inside an `ai-engineering-harness` repository.
@@ -110,10 +119,10 @@ Run `harness-verify`.
 
 ### Session Start Requirement
 
-- Read `.harness/STATE.md` and confirm active session before implementation.
-- Check unresolved blockers in root or active session `BLOCKED.md`.
-- If session state is unknown, return `### Blocked` and ask to run `harness-start`.
-- Do not implement until Session Start has established routing.
+- You MUST read `.harness/STATE.md` and confirm active session before implementation.
+- You MUST check unresolved blockers in root or active session `BLOCKED.md`.
+- If session state is unknown, you MUST return `### Blocked` and ask to run `harness-start`.
+- You MUST NOT implement until Session Start has established routing.
 
 ### Hooks & Skills
 
@@ -122,13 +131,13 @@ Run `harness-verify`.
 - Record skill runs with `hooks/core/record-skill-run.js`.
 - Stop if a skill returns blocked.
 
-**DO:**
+**MUST:**
 - check approval before editing
 - keep changes inside the approved plan
-- stop when scope or acceptance criteria become unclear
+- STOP when scope or acceptance criteria become unclear
 - record meaningful implementation notes
 
-**DON'T:**
+**MUST NOT:**
 - implement from an unapproved or missing plan
 - invent acceptance criteria
 - continue after asking a blocking question

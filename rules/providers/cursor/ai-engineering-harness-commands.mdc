@@ -6,6 +6,8 @@ alwaysApply: true
 
 # Harness Command Routing
 
+Always follow `.ai-harness/agent-system/SYSTEM_PROMPT.md` and response formats in `.ai-harness/agent-system/RESPONSE_CONTRACT.md`.
+
 Canonical commands:
 
 - harness-map

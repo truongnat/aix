@@ -19,7 +19,7 @@ export function PowerLayersSection() {
     <section className="relative z-10 section-gap px-6">
       <div className="max-w-5xl mx-auto">
         <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
-          <motion.p variants={item} className="text-xs uppercase tracking-widest text-indigo-400 mb-3">Power layers</motion.p>
+          <motion.p variants={item} className="text-xs uppercase tracking-widest text-sky-400 mb-3">Power layers</motion.p>
           <motion.h2 variants={item} className="text-3xl sm:text-4xl font-bold text-white mb-10">
             Guardrails, not a heavy runtime
           </motion.h2>

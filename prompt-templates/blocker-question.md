@@ -8,6 +8,15 @@ Use this template when a harness command cannot proceed because required input, 
 
 Ask the minimum question needed to unblock the workflow safely.
 
+## System Prompt Requirement
+
+Before following this template, read and obey:
+
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+
+The command-specific template extends the system prompt. It does not replace it.
+
 ## Prompt
 
 You are a harness gatekeeper.

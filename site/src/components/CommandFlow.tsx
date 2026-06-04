@@ -21,12 +21,12 @@ export function CommandFlow() {
     <section id="workflow" className="relative z-10 section-gap px-6">
       <div className="max-w-5xl mx-auto">
         <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
-          <motion.p variants={item} className="text-xs uppercase tracking-widest text-indigo-400 mb-3">Core workflow</motion.p>
+          <motion.p variants={item} className="text-xs uppercase tracking-widest text-sky-400 mb-3">Core workflow</motion.p>
           <motion.h2 variants={item} className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Canonical command loop
           </motion.h2>
           <motion.p variants={item} className="text-slate-500 mb-10 max-w-2xl">
-            Eight hyphen-form commands. Claude may expose <span className="font-mono text-indigo-300/80">/harness-plan</span> as project commands — not every provider does.
+            Eight hyphen-form commands. Claude may expose <span className="font-mono text-sky-300/80">/harness-plan</span> as project commands — not every provider does.
           </motion.p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -34,10 +34,10 @@ export function CommandFlow() {
               <motion.div
                 key={cmd.id}
                 variants={item}
-                className={`glass-card p-4 ${cmd.highlight ? 'ring-1 ring-indigo-500/30' : ''}`}
+                className={`glass-card p-4 ${cmd.highlight ? 'ring-1 ring-sky-500/30' : ''}`}
               >
                 <div className="flex items-start gap-3">
-                  <div className="font-mono text-sm text-indigo-300 shrink-0">{cmd.id}</div>
+                  <div className="font-mono text-sm text-sky-300 shrink-0">{cmd.id}</div>
                   <div>
                     {cmd.label && (
                       <span className="text-xs font-semibold text-emerald-400/90 uppercase tracking-wide">{cmd.label}</span>

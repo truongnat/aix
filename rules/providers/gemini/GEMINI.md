@@ -28,4 +28,8 @@ Do **not** claim native `/harness-*` support.
 
 Use natural language routing: **Use harness-plan for this repository.**
 
+Use `.ai-harness/agent-system/SYSTEM_PROMPT.md` as the primary harness behavior contract.
+
+Use `.ai-harness/agent-system/RESPONSE_CONTRACT.md` for structured outputs.
+
 <!-- @core -->

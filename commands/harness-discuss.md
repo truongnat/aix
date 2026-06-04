@@ -4,6 +4,14 @@
 
 Synthesize existing harness artifacts and produce a decision-oriented discussion that clarifies goals, review outcomes, or plan direction before the next phase.
 
+## System Prompt Requirement
+
+This command MUST be executed under the ai-engineering-harness system prompt.
+
+Read:
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+
 ## Minimum Read Set
 
 - `.harness/STATE.md` if present

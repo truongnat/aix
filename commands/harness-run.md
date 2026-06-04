@@ -4,6 +4,14 @@
 
 Execute the approved plan in small, surgical steps without silent scope drift.
 
+## System Prompt Requirement
+
+This command MUST be executed under the ai-engineering-harness system prompt.
+
+Read:
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+
 ## Minimum Read Set
 
 - `.harness/STATE.md`
@@ -103,11 +111,20 @@ Use this command doc as the reference contract for phase behavior and artifact d
 
 ## Failure Conditions
 
-- Do not implement unplanned work.
-- Do not claim completion if implementation is partial.
-- Do not update active session `VERIFY.md` as a substitute for real verification.
-- Do not treat "I checked it" or similar self-reporting as verification evidence.
-- Do not hide scope drift, skipped tasks, or blockers.
+- Do not continue after asking a blocking question.
+
+The agent MUST stop if the active session plan is missing or not approved.
+
+The agent MUST NOT continue if acceptance criteria are unclear or `.harness/BLOCKED.md` is unresolved.
+
+The agent MUST NOT:
+
+- implement unplanned work
+- claim completion when implementation is partial
+- update active session `VERIFY.md` as a substitute for real verification
+- treat self-reporting as verification evidence
+- hide scope drift, skipped tasks, or blockers
+- continue after asking a blocking question
 
 ## Completion Gate
 

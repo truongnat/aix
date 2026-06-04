@@ -56,6 +56,7 @@ Wizard details: [docs/npx-cli-ux.md](docs/npx-cli-ux.md), [docs/terminal-wizard-
 
 | Layer | Purpose |
 | --- | --- |
+| Agent system prompt | Senior role, MUST/MUST NOT rules, response formats |
 | Session Start | Restore active session, memory, blockers, next command |
 | Commands | Canonical workflow contracts |
 | Prompt templates | Structured execution with blocked/ready branches |
@@ -105,6 +106,26 @@ No implementation, verification, or shipping should happen before session state 
 
 ---
 
+## Agent System Prompt
+
+The harness includes a provider-neutral system prompt that makes agents behave like disciplined senior engineering agents.
+
+It defines:
+
+- senior engineering role
+- phase discipline
+- MUST / MUST NOT rules
+- blocked output
+- evidence standard
+- response formats
+- report quality
+
+This is what turns the harness from passive docs into an operating contract.
+
+Source: [agent-system/SYSTEM_PROMPT.md](agent-system/SYSTEM_PROMPT.md) (installed to `.ai-harness/agent-system/`).
+
+---
+
 ## Ship means PR-ready
 
 `harness-ship` does not just say "done".
@@ -139,7 +160,7 @@ Matrix: [docs/provider-command-matrix.md](docs/provider-command-matrix.md), [doc
 ## File layout
 
 ```text
-.ai-harness/           capability cache (commands, templates, skills)
+.ai-harness/           capability cache (commands, templates, skills, agent-system)
 .harness/              project router and durable memory
 .harness/sessions/     working artifacts per session
 .claude/               Claude provider adapter (when installed)
@@ -179,6 +200,7 @@ Transcript: [TRANSCRIPT.md](examples/dogfood-tiny-node-api/TRANSCRIPT.md).
 
 | Topic | Doc |
 | --- | --- |
+| Agent system prompt | [agent-system/SYSTEM_PROMPT.md](agent-system/SYSTEM_PROMPT.md) |
 | Session Start | [docs/session-start.md](docs/session-start.md) |
 | Daily dev report | [docs/daily-dev-report.md](docs/daily-dev-report.md) |
 | Provider rules | [docs/provider-rule-configuration.md](docs/provider-rule-configuration.md) |

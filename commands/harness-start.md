@@ -4,6 +4,14 @@
 
 Run the **Session Start** protocol: the mandatory boot sequence that restores context, routes the active session, checks blocked state, loads memory, and determines the next allowed harness command before any implementation work begins.
 
+## System Prompt Requirement
+
+This command MUST be executed under the ai-engineering-harness system prompt.
+
+Read:
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+
 `harness-start` executes Session Start. It is not a casual opener — it is the entrypoint for establishing session state.
 
 ## Session Start Protocol

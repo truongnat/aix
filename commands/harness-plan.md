@@ -4,6 +4,14 @@
 
 Translate the agreed goal into an explicit, reviewable implementation plan.
 
+## System Prompt Requirement
+
+This command MUST be executed under the ai-engineering-harness system prompt.
+
+Read:
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+
 ## Minimum Read Set
 
 - `.harness/STATE.md`
@@ -86,9 +94,18 @@ Use this command doc as the reference contract for phase behavior and artifact d
 
 ## Failure Conditions
 
-- Do not write a vague plan with no verification strategy.
 - Do not mix planning with implementation.
-- Do not mark the plan execution-ready if approval status is still unclear.
+
+The agent MUST stop if the goal is unclear or required session artifacts are missing.
+
+The agent MUST NOT continue if the user has not approved scope that requires human sign-off.
+
+The agent MUST NOT:
+
+- write a vague plan with no verification strategy
+- mix planning with implementation
+- mark the plan execution-ready if approval status is still unclear
+- continue after asking a blocking question
 
 ## Completion Gate
 

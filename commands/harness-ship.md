@@ -4,6 +4,14 @@
 
 Finalize verified work, summarize the result, and prepare a clean handoff without overstating confidence.
 
+## System Prompt Requirement
+
+This command MUST be executed under the ai-engineering-harness system prompt.
+
+Read:
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+
 ## Minimum Read Set
 
 - `.harness/STATE.md`

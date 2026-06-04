@@ -16,7 +16,7 @@ export function EvidenceBlockedSection() {
     <section className="relative z-10 section-gap px-6">
       <div className="max-w-5xl mx-auto">
         <motion.div variants={item} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
-          <p className="text-xs uppercase tracking-widest text-indigo-400 mb-3">Evidence gates</p>
+          <p className="text-xs uppercase tracking-widest text-sky-400 mb-3">Evidence gates</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-10">Stop guessing. Show evidence.</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

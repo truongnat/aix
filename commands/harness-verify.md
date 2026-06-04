@@ -4,6 +4,14 @@
 
 Gather fresh evidence that the implemented work meets the goal before any completion or shipping claim.
 
+## System Prompt Requirement
+
+This command MUST be executed under the ai-engineering-harness system prompt.
+
+Read:
+- `.ai-harness/agent-system/SYSTEM_PROMPT.md`
+- `.ai-harness/agent-system/RESPONSE_CONTRACT.md`
+
 ## Minimum Read Set
 
 - `.harness/STATE.md`
@@ -104,9 +112,18 @@ Use this command doc as the reference contract for phase behavior and artifact d
 ## Failure Conditions
 
 - Do not assume success because the change looks correct.
-- Do not record only passing checks and omit skipped or blocked evidence.
-- Do not reuse stale verification output as if it were fresh.
-- Do not hide required human verification behind a passed status.
+
+The agent MUST stop if verification commands were not run or evidence is missing.
+
+The agent MUST NOT mark verification as passed without command output, exit codes, or explicit manual evidence.
+
+The agent MUST NOT:
+
+- assume success because the change looks correct
+- record only passing checks and omit skipped or blocked evidence
+- reuse stale verification output as if it were fresh
+- hide required human verification behind a passed status
+- continue after asking a blocking question
 
 ## Completion Gate
 

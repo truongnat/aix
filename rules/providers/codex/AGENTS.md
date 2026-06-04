@@ -23,4 +23,8 @@ Use the local command catalog and AGENTS.md instructions.
 
 Fallback instruction: **Use harness-plan for this repository.**
 
+Follow `.ai-harness/agent-system/SYSTEM_PROMPT.md` as the repository-level operating prompt.
+
+Follow `.ai-harness/agent-system/RESPONSE_CONTRACT.md` for blocked and evidence formats.
+
 <!-- @core -->
