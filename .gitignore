@@ -11,6 +11,7 @@ harness-dogfood-*/
 # Always track required repository contracts even if a global gitignore ignores them
 !AGENTS.md
 !rules/providers/claude/CLAUDE.md
+!agent-system/provider-adapters/claude.md
 
 # Local harness runtime data
 .harness/goals/
