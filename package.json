@@ -72,7 +72,7 @@
   ],
   "scripts": {
     "install:harness": "node install.js",
-    "test": "node test/run-tests.js",
+    "test": "node --test test/run-tests.js",
     "validate": "node validate.js"
   },
   "dependencies": {
