@@ -8,8 +8,8 @@ Map the host repository, active `.harness/` artifacts, affected code areas, and 
 
 - `AGENTS.md`
 - `.harness/STATE.md` if present
-- `.harness/GOAL.md` if present
-- `.harness/CONTEXT.md` if present
+- active session `GOAL.md` if present
+- active session `DISCUSSION.md` if present
 - `.harness/HAZARDS.md` if present
 - `.harness/INDEX.md` if present
 - `.harness/REMEMBER.md` if present
@@ -47,7 +47,7 @@ Map the host repository, active `.harness/` artifacts, affected code areas, and 
 
 ## Step-By-Step Workflow
 
-1. Read the active `.harness/` artifacts before inspecting code, with `.harness/HAZARDS.md` first when present.
+1. Read root router artifacts first, then read the active session artifacts before inspecting code, with `.harness/HAZARDS.md` first when present.
 2. Inventory the repository structure and identify likely entry points, boundaries, or ownership areas.
 3. Determine which code, docs, or configs are likely to be affected by the active goal.
 4. Separate observed facts from inferred structure.
@@ -56,7 +56,7 @@ Map the host repository, active `.harness/` artifacts, affected code areas, and 
 
 ## Required Outputs
 
-- `.harness/CONTEXT.md` or `.harness/STATE.md` updated with observed facts, impact zones, and open questions
+- active session discussion or notes updated with observed facts, impact zones, and open questions
 - an explicit statement of what should run next: `harness-discuss`, `harness-plan`, or `harness-start`
 
 ## Redirect Behavior
@@ -76,8 +76,8 @@ The command is complete when the relevant repository areas, active artifacts, li
 
 ## Artifact Paths
 
-- Read: `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/CONTEXT.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/REMEMBER.md`
-- Write: `.harness/CONTEXT.md`, `.harness/STATE.md`
+- Read: `.harness/INDEX.md`, `.harness/STATE.md`, `.harness/sessions/<active-session>/GOAL.md`, `.harness/sessions/<active-session>/DISCUSSION.md`, `.harness/HAZARDS.md`, `.harness/REMEMBER.md`
+- Write: `.harness/sessions/<active-session>/DISCUSSION.md`, `.harness/sessions/<active-session>/NOTES.md`, `.harness/STATE.md`
 
 ## Human Approval
 

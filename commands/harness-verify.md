@@ -6,13 +6,14 @@ Gather fresh evidence that the implemented work meets the goal before any comple
 
 ## Minimum Read Set
 
-- `.harness/PLAN.md`
-- `.harness/GOAL.md`
-- `.harness/TASKS.md` if present
+- `.harness/STATE.md`
+- active session current `PLAN-*.md`
+- active session `GOAL.md`
+- active session `TASKS.md` if present
 - `.harness/HAZARDS.md` if present
 - `.harness/INDEX.md` if present
 - changed files
-- `.harness/VERIFY.md` if present
+- active session `VERIFY.md` if present
 
 ## Preconditions
 
@@ -57,14 +58,14 @@ Use this command doc as the reference contract for phase behavior and artifact d
 
 1. Identify the exact checks that prove the claim, using `.harness/INDEX.md` for reusable verification recipes and `.harness/HAZARDS.md` for regression focus when present.
 2. Run the checks fresh.
-3. Record automated checks, manual checks, evidence, deferred human checks, known gaps, and ship blockers in `.harness/VERIFY.md`.
+3. Record automated checks, manual checks, evidence, deferred human checks, known gaps, and ship blockers in the active session `VERIFY.md`.
 4. Compare the evidence against the goal and plan.
-5. Write `passed`, `failed`, `blocked`, or `pending human verification` status into `.harness/VERIFY.md`.
+5. Write `passed`, `failed`, `blocked`, or `pending human verification` status into the active session `VERIFY.md`.
 6. Stop if evidence is missing, contradictory, or failed.
 
 ## Required Outputs
 
-- `.harness/VERIFY.md` with status, tests run, manual checks, evidence, known gaps, deferred human checks when needed, and ship blockers
+- active session `VERIFY.md` with status, tests run, manual checks, evidence, known gaps, deferred human checks when needed, and ship blockers
 - `.harness/STATE.md` updated with verification status
 - optional `.harness/REVIEW.md` if inspection findings are required
 
@@ -77,7 +78,7 @@ Use this command doc as the reference contract for phase behavior and artifact d
 ## Blocking Questions
 
 - If the required verification command is unknown, the acceptance criteria are ambiguous, or manual review is required, the agent must stop and ask the user.
-- If a failing check needs product judgment, record `status: blocked` in `.harness/VERIFY.md` or write `.harness/BLOCKED.md` before continuing.
+- If a failing check needs product judgment, record `status: blocked` in `.harness/sessions/<active-session>/VERIFY.md` or write `.harness/sessions/<active-session>/BLOCKED.md` before continuing.
 - Do not upgrade missing evidence into a pass by assumption.
 
 ## Failure Conditions
@@ -89,12 +90,12 @@ Use this command doc as the reference contract for phase behavior and artifact d
 
 ## Completion Gate
 
-The command is complete when `.harness/VERIFY.md` contains fresh evidence that clearly supports a pass, fail, blocked, or pending-human-verification result, with explicit blockers and no chance of mistaking missing evidence for a pass.
+The command is complete when the active session `VERIFY.md` contains fresh evidence that clearly supports a pass, fail, blocked, or pending-human-verification result, with explicit blockers and no chance of mistaking missing evidence for a pass.
 
 ## Artifact Paths
 
-- Read: `.harness/PLAN.md`, `.harness/GOAL.md`, `.harness/TASKS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/VERIFY.md`
-- Write: `.harness/VERIFY.md`, `.harness/STATE.md`, optional `.harness/REVIEW.md`
+- Read: `.harness/STATE.md`, `.harness/sessions/<active-session>/PLAN-*.md`, `.harness/sessions/<active-session>/GOAL.md`, `.harness/sessions/<active-session>/TASKS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/sessions/<active-session>/VERIFY.md`
+- Write: `.harness/sessions/<active-session>/VERIFY.md`, `.harness/STATE.md`, optional `.harness/REVIEW.md`
 
 ## Human Approval
 

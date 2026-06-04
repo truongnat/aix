@@ -20,8 +20,8 @@ Your job is to create or update an implementation plan for the active goal.
 
 ### Required Inputs
 
-- Goal file path
-- Discussion or review artifacts if present
+- Active session goal file path
+- Active session discussion or review artifacts if present
 - Current state artifact
 - Relevant decisions, hazards, and reusable verification recipes
 
@@ -81,8 +81,8 @@ No implementation plan was produced.
 [What plan was created or updated.]
 
 **Artifacts updated:**
-- `.harness/PLAN.md`
-- `.harness/TASKS.md` when needed
+- `.harness/sessions/<active-session>/PLAN-001.md` or the next numbered plan
+- `.harness/sessions/<active-session>/TASKS.md` when needed
 
 **Verification strategy:**
 - [Concrete commands or checks]
@@ -95,8 +95,8 @@ No implementation plan was produced.
 
 ## Placeholders
 
-- `{GOAL_PATH}` — usually `.harness/GOAL.md`
-- `{DISCUSSION_PATH}` — usually `.harness/DISCUSSION.md`
+- `{GOAL_PATH}` — usually `.harness/sessions/<active-session>/GOAL.md`
+- `{DISCUSSION_PATH}` — usually `.harness/sessions/<active-session>/DISCUSSION.md`
 - `{STATE_PATH}` — usually `.harness/STATE.md`
 - `{DECISIONS_PATH}` — usually `.harness/DECISIONS.md`
 - `{HAZARDS_PATH}` — usually `.harness/HAZARDS.md`

@@ -21,8 +21,8 @@ Your job is to verify completed work against the approved plan and acceptance cr
 ### Required Inputs
 
 - implementation summary or changed files
-- approved plan artifact
-- goal artifact
+- active session approved plan artifact
+- active session goal artifact
 - candidate verification commands
 - relevant hazards and verification recipes when present
 
@@ -107,8 +107,8 @@ No verification status was marked as passed.
 ## Placeholders
 
 - `{IMPLEMENTATION_SUMMARY}` — summary from `harness-run`
-- `{PLAN_PATH}` — usually `.harness/PLAN.md`
-- `{GOAL_PATH}` — usually `.harness/GOAL.md`
+- `{PLAN_PATH}` — usually `.harness/sessions/<active-session>/PLAN-001.md`
+- `{GOAL_PATH}` — usually `.harness/sessions/<active-session>/GOAL.md`
 - `{CHANGED_FILES}` — changed files from git state
 - `{CANDIDATE_COMMANDS}` — commands found in scripts, docs, or plan
 

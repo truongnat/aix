@@ -7,10 +7,12 @@ Start a session by loading the active `.harness/` state and deciding which comma
 ## Minimum Read Set
 
 - `AGENTS.md`
+- `.harness/INDEX.md` if present
 - `.harness/STATE.md` if present
-- `.harness/GOAL.md` if present
-- `.harness/PLAN.md` if present
-- `.harness/CONTEXT.md` if present
+- active session `SESSION.md` if present
+- active session `GOAL.md` if present
+- active session current `PLAN-*.md` if present
+- active session `DISCUSSION.md` if present
 
 ## Preconditions
 
@@ -31,15 +33,17 @@ Start a session by loading the active `.harness/` state and deciding which comma
 
 ## Step-By-Step Workflow
 
-1. Read the active goal, state, context, and plan artifacts before touching code.
-2. Confirm whether the task is new, resumed, blocked, or ready for verification.
-3. Decide which harness command should run next.
-4. Refresh `.harness/STATE.md` if the recorded status is stale.
-5. Stop with a clear next action instead of drifting into implementation.
+1. Read `.harness/INDEX.md` and `.harness/STATE.md` before touching code.
+2. Detect whether an active session already exists under `.harness/sessions/<active-session>/`.
+3. If an active session exists, read its `SESSION.md`, `GOAL.md`, current `PLAN-*.md`, and related artifacts before deciding what to do next.
+4. Decide whether to continue the active session, start a new session, or archive the old session and start a new one.
+5. Refresh `.harness/STATE.md` and `.harness/INDEX.md` if the recorded routing state is stale.
+6. Stop with a clear next action instead of drifting into implementation.
 
 ## Required Outputs
 
 - `.harness/STATE.md` updated if stale
+- `.harness/INDEX.md` updated if stale
 - a short session-start summary
 - one explicit next command
 
@@ -53,7 +57,8 @@ Start a session by loading the active `.harness/` state and deciding which comma
 
 - Do not treat `harness-start` as implementation.
 - Do not claim the next command is clear if the goal or state is still ambiguous.
-- Do not assume the previous session ended cleanly without checking artifacts.
+- Do not assume the previous session ended cleanly without checking active session artifacts.
+- Do not continue if both flat root working artifacts and session-local working artifacts appear active.
 
 ## Completion Gate
 
@@ -61,8 +66,8 @@ The command is complete when the session has a clear current state, the relevant
 
 ## Artifact Paths
 
-- Read: `.harness/STATE.md`, `.harness/GOAL.md`, `.harness/PLAN.md`, `.harness/CONTEXT.md`
-- Write: `.harness/STATE.md`
+- Read: `.harness/INDEX.md`, `.harness/STATE.md`, `.harness/sessions/<active-session>/SESSION.md`, `.harness/sessions/<active-session>/GOAL.md`, `.harness/sessions/<active-session>/PLAN-*.md`
+- Write: `.harness/STATE.md`, `.harness/INDEX.md`
 
 ## Human Approval
 
@@ -70,4 +75,4 @@ Ask for approval if the previously recorded plan is invalid and a materially dif
 
 ## Notes
 
-Use `harness-start` to restore discipline at session boundaries. It should be short and explicit.
+Use `harness-start` to restore discipline at session boundaries. Root `.harness` is the router; sessions own working artifacts.

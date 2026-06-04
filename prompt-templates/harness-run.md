@@ -20,16 +20,16 @@ Your job is to execute the approved plan exactly enough to satisfy the acceptanc
 
 ### Required Inputs
 
-- active goal artifact
-- approved plan artifact
-- task tracking artifact if present
+- active session goal artifact
+- active session approved plan artifact
+- active session task tracking artifact if present
 - current git status
 - relevant implementation files
 
 ### Required Checks
 
-- Does `.harness/PLAN.md` exist?
-- Does `PLAN.md` include `## Approval Status`?
+- Does the active session plan exist?
+- Does the active session plan include `## Approval Status`?
 - Is `status: approved` present?
 - Are implementation tasks and target files identifiable?
 - Are acceptance criteria clear?
@@ -52,8 +52,8 @@ Your job is to execute the approved plan exactly enough to satisfy the acceptanc
 
 Return `### Blocked` instead of implementing if:
 
-- `PLAN.md` is missing
-- `PLAN.md` approval status is not `approved`
+- the active session plan is missing
+- the active session plan approval status is not `approved`
 - acceptance criteria are unclear
 - `.harness/BLOCKED.md` is unresolved
 
@@ -70,7 +70,7 @@ Return `### Blocked` instead of implementing if:
 1. [Minimum question required to unblock execution]
 
 **Next allowed action:**
-Approve `PLAN.md`, update planning artifacts, or run `harness-plan`.
+Approve the active session plan, update planning artifacts, or run `harness-plan`.
 
 **Stopped:**
 No implementation was performed.
@@ -96,9 +96,9 @@ Run `harness-verify`.
 
 ## Placeholders
 
-- `{GOAL_PATH}` — usually `.harness/GOAL.md`
-- `{PLAN_PATH}` — usually `.harness/PLAN.md`
-- `{TASKS_PATH}` — usually `.harness/TASKS.md`
+- `{GOAL_PATH}` — usually `.harness/sessions/<active-session>/GOAL.md`
+- `{PLAN_PATH}` — usually `.harness/sessions/<active-session>/PLAN-001.md`
+- `{TASKS_PATH}` — usually `.harness/sessions/<active-session>/TASKS.md`
 - `{GIT_STATUS}` — output of `git status --short`
 
 ## Returns

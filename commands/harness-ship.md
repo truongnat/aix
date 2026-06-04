@@ -6,16 +6,16 @@ Finalize verified work, summarize the result, and prepare a clean handoff withou
 
 ## Minimum Read Set
 
-- `.harness/PLAN.md`
-- `.harness/VERIFY.md`
 - `.harness/STATE.md`
+- active session current `PLAN-*.md`
+- active session `VERIFY.md`
 - `.harness/REVIEW.md` if present
 
 ## Preconditions
 
-- `.harness/VERIFY.md` exists.
-- `.harness/VERIFY.md` contains a real status.
-- `.harness/VERIFY.md` contains non-empty tests run or equivalent evidence.
+- active session `VERIFY.md` exists.
+- active session `VERIFY.md` contains a real status.
+- active session `VERIFY.md` contains non-empty tests run or equivalent evidence.
 - Failures and known gaps are explicitly documented instead of implied away.
 
 ## When To Use
@@ -52,21 +52,21 @@ Use this command doc as the reference contract for phase behavior and artifact d
 
 ## Step-By-Step Workflow
 
-1. Confirm that `.harness/VERIFY.md` supports the current status.
+1. Confirm that the active session `VERIFY.md` supports the current status.
 2. Summarize what changed, why it changed, and what was actually verified.
 3. Record follow-ups, deferred work, and residual risk honestly.
-4. Write the handoff summary into `.harness/SHIP.md`.
+4. Write the handoff summary into the active session `SHIP.md`.
 5. Transition to `harness-remember` for durable lessons.
 
 ## Required Outputs
 
-- `.harness/SHIP.md`
+- active session `SHIP.md`
 - `.harness/STATE.md` updated with ship or handoff state
 - explicit follow-ups or known gaps when verification is not a full pass
 
 ## Redirect Behavior
 
-- If `.harness/VERIFY.md` is missing, stale, or lacks evidence, stop and redirect to `harness-verify`.
+- If the active session `VERIFY.md` is missing, stale, or lacks evidence, stop and redirect to `harness-verify`.
 - If the plan or goal is no longer the right frame for the work, stop and redirect to `harness-discuss` or `harness-plan`.
 - If implementation is still incomplete, stop and redirect to `harness-run`.
 
@@ -84,12 +84,12 @@ Use this command doc as the reference contract for phase behavior and artifact d
 
 ## Completion Gate
 
-The command is complete when the handoff summary matches the evidence in `.harness/VERIFY.md`, follow-ups are explicit, and no hidden assumptions remain about status, risk, or next steps.
+The command is complete when the handoff summary matches the evidence in the active session `VERIFY.md`, follow-ups are explicit, and no hidden assumptions remain about status, risk, or next steps.
 
 ## Artifact Paths
 
-- Read: `.harness/PLAN.md`, `.harness/VERIFY.md`, `.harness/STATE.md`, `.harness/REVIEW.md`
-- Write: `.harness/SHIP.md`, `.harness/STATE.md`
+- Read: `.harness/STATE.md`, `.harness/sessions/<active-session>/PLAN-*.md`, `.harness/sessions/<active-session>/VERIFY.md`, `.harness/REVIEW.md`
+- Write: `.harness/sessions/<active-session>/SHIP.md`, `.harness/STATE.md`
 
 ## Human Approval
 

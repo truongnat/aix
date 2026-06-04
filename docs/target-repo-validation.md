@@ -5,6 +5,8 @@ This document defines the current lightweight validation mode for a host reposit
 Profile validation is the first implemented target-repository step.
 Goal-level validation is the second implemented target-repository step.
 
+For the session-memory architecture, root `.harness/` should behave as the index/router while active working artifacts live under `.harness/sessions/<active-session>/`.
+
 ## Run Validation From The Source Pack
 
 `validate.js` normally runs from the **harness source pack** repository with `--target <target-repo>`.
@@ -100,6 +102,8 @@ The validator may recognize these as optional but useful project context in a la
 - `.harness/ROADMAP.md`
 
 Missing optional context artifacts should not fail validation by default unless a future mode explicitly requires them.
+
+When a repository adopts session memory, `.harness/STATE.md` becomes the routing entrypoint for active work and session-local files remain the source of truth.
 
 ## Optional Goal-Level Artifacts
 

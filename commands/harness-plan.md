@@ -6,10 +6,9 @@ Translate the agreed goal into an explicit, reviewable implementation plan.
 
 ## Minimum Read Set
 
-- `.harness/GOAL.md`
-- `.harness/DISCUSSION.md` if present
 - `.harness/STATE.md`
-- `.harness/CONTEXT.md` if present
+- active session `GOAL.md`
+- active session `DISCUSSION.md` if present
 - `.harness/DECISIONS.md` if present
 - `.harness/HAZARDS.md` if present
 - `.harness/INDEX.md` if present
@@ -60,13 +59,13 @@ Use this command doc as the reference contract for phase behavior and artifact d
 3. Break the work into small ordered tasks that are easy to verify independently.
 4. Define verification strategy for each task cluster, approval checkpoints, and not-run risks.
 5. Record assumptions, dependencies, rollback considerations, and scope boundaries.
-6. Write the plan to `.harness/PLAN.md` and update `.harness/TASKS.md` if task tracking is needed.
+6. Write the plan to `.harness/sessions/<active-session>/PLAN-001.md` or the next numbered plan and update session `TASKS.md` if task tracking is needed.
 7. Stop before implementation.
 
 ## Required Outputs
 
-- `.harness/PLAN.md`
-- `.harness/TASKS.md` when tasks need tracking
+- active session `PLAN-*.md`
+- active session `TASKS.md` when tasks need tracking
 - `.harness/STATE.md` updated with planning status
 
 ## Redirect Behavior
@@ -89,12 +88,12 @@ Use this command doc as the reference contract for phase behavior and artifact d
 
 ## Completion Gate
 
-The command is complete when `.harness/PLAN.md` contains concrete ordered work, explicit scope, affected areas, task-sized verification expectations, approval checkpoints, an **Approval Status** block (`status: draft` until human approval, then `status: approved`), and implementation has not yet started.
+The command is complete when the active session plan contains concrete ordered work, explicit scope, affected areas, task-sized verification expectations, approval checkpoints, an **Approval Status** block (`status: draft` until human approval, then `status: approved`), and implementation has not yet started.
 
 ## Artifact Paths
 
-- Read: `.harness/GOAL.md`, `.harness/DISCUSSION.md`, `.harness/STATE.md`, `.harness/CONTEXT.md`, `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`
-- Write: `.harness/PLAN.md`, `.harness/TASKS.md`, `.harness/STATE.md`
+- Read: `.harness/STATE.md`, `.harness/sessions/<active-session>/GOAL.md`, `.harness/sessions/<active-session>/DISCUSSION.md`, `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`
+- Write: `.harness/sessions/<active-session>/PLAN-*.md`, `.harness/sessions/<active-session>/TASKS.md`, `.harness/STATE.md`
 
 ## Human Approval
 

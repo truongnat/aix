@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Define what this project should remember before planning and after shipping.
+Define durable project memory. Sessions own working artifacts; this file stores only reusable high-value memory.
 
 ## Current Status
 
@@ -16,6 +16,7 @@ Define what this project should remember before planning and after shipping.
 
 - Read before planning:
 - Recall these categories first:
+- Check the active session before reusing old assumptions.
 
 ## Remember After Shipping
 
@@ -42,9 +43,9 @@ Define what this project should remember before planning and after shipping.
 
 ## Storage Boundaries
 
-- Shared durable memory:
-- Goal-level memory:
-- Local-only memory:
+- Shared durable memory: root `.harness/MEMORY.md`, `memory/`, `decisions/`, `hazards/`
+- Session memory: `.harness/sessions/<active-session>/`
+- Files are the source of truth:
 
 ## Assumptions
 

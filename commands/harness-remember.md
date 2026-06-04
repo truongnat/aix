@@ -6,9 +6,9 @@ Capture durable, reusable, non-sensitive lessons after verified work or a meanin
 
 ## Minimum Read Set
 
-- `.harness/VERIFY.md`
-- `.harness/SHIP.md` if present
-- `.harness/PLAN.md` if present
+- active session `VERIFY.md`
+- active session `SHIP.md` if present
+- active session current `PLAN-*.md` if present
 - `.harness/DECISIONS.md` if present
 - `.harness/HAZARDS.md` if present
 - `.harness/INDEX.md` if present
@@ -41,7 +41,7 @@ Capture durable, reusable, non-sensitive lessons after verified work or a meanin
 
 ## Required Outputs
 
-- updated typed memory artifact(s) and/or `.harness/REMEMBER.md`
+- updated typed memory artifact(s) and/or active session `REMEMBER.md`
 - `.harness/STATE.md` updated if memory affects future execution
 - a concise durable lesson or hazard note
 
@@ -62,8 +62,8 @@ The command is complete when a future operator can recover the important lesson 
 
 ## Artifact Paths
 
-- Read: `.harness/VERIFY.md`, `.harness/SHIP.md`, `.harness/PLAN.md`, `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/REMEMBER.md`
-- Write: `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/REMEMBER.md`, optional `.harness/STATE.md`
+- Read: `.harness/STATE.md`, `.harness/sessions/<active-session>/VERIFY.md`, `.harness/sessions/<active-session>/SHIP.md`, `.harness/sessions/<active-session>/PLAN-*.md`, `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/sessions/<active-session>/REMEMBER.md`
+- Write: `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/sessions/<active-session>/REMEMBER.md`, optional `.harness/STATE.md`
 
 ## Human Approval
 

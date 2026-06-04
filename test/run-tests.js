@@ -140,6 +140,72 @@ runTest("tool routing docs define expected capabilities", () => {
   }
 });
 
+runTest("session memory templates exist", () => {
+  for (const relativePath of [
+    "templates/INDEX.md",
+    "templates/STATE.md",
+    "templates/MEMORY.md",
+    "templates/TOOL_CONTEXT.md",
+    "templates/SESSION.md",
+    "templates/GOAL.md",
+    "templates/DISCUSSION.md",
+    "templates/PLAN.md",
+    "templates/TASKS.md",
+    "templates/VERIFY.md",
+    "templates/SHIP.md",
+    "templates/REMEMBER.md",
+    "templates/BLOCKED.md",
+    "templates/NOTES.md",
+    "templates/DECISION.md",
+    "templates/HAZARD.md",
+    "templates/harness-config.json"
+  ]) {
+    assert.ok(fs.existsSync(path.join(repoRoot, relativePath)), `${relativePath} must exist`);
+  }
+});
+
+runTest("session memory docs exist", () => {
+  for (const relativePath of [
+    "docs/session-memory.md",
+    "docs/memory-migration.md"
+  ]) {
+    assert.ok(fs.existsSync(path.join(repoRoot, relativePath)), `${relativePath} must exist`);
+  }
+});
+
+runTest("session memory config template parses as JSON", () => {
+  const config = JSON.parse(
+    fs.readFileSync(path.join(repoRoot, "templates", "harness-config.json"), "utf8")
+  );
+  assert.equal(config.memory.backend, "files");
+  assert.equal(config.memory.sourceOfTruth, "files");
+});
+
+runTest("session memory docs say files are source of truth", () => {
+  const sessionDoc = fs.readFileSync(path.join(repoRoot, "docs", "session-memory.md"), "utf8");
+  const migrationDoc = fs.readFileSync(path.join(repoRoot, "docs", "memory-migration.md"), "utf8");
+  assert.match(sessionDoc, /files are the source of truth/i);
+  assert.match(sessionDoc, /root `?\.harness`? is an index and router/i);
+  assert.match(sessionDoc, /sessions own working artifacts/i);
+  assert.match(migrationDoc, /legacy/i);
+  assert.match(migrationDoc, /preserve/i);
+});
+
+runTest("workflow command docs route through STATE and active sessions", () => {
+  for (const fileName of [
+    "harness-start.md",
+    "harness-map.md",
+    "harness-plan.md",
+    "harness-run.md",
+    "harness-verify.md",
+    "harness-ship.md"
+  ]) {
+    const text = fs.readFileSync(path.join(repoRoot, "commands", fileName), "utf8");
+    assert.match(text, /\.harness\/STATE\.md/);
+    assert.match(text, /sessions\/<active-session>|active session/i);
+  }
+});
+
 runTest("workflow command docs include tool discovery and routing guidance", () => {
   for (const fileName of [
     "harness-map.md",

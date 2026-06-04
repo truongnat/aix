@@ -1,27 +1,32 @@
-# Memory Index
+# Harness Index
 
-> Index reusable project memory here. Do not include credentials, tokens, customer data, or private business data.
+> Root `.harness/` is an index and router. Sessions own working artifacts. Do not include credentials, tokens, customer data, or private business data.
 
-## How To Use This Artifact
+## Read Order
 
-- Capture reusable commands, verification recipes, and lookup pointers that future work can apply safely.
-- Use this file as the first stop for repeatable checks before re-deriving commands from scratch.
-- Link out to `DECISIONS.md`, `HAZARDS.md`, goal artifacts, or repo docs when that is more durable than copying content.
+1. `.harness/STATE.md`
+2. Active session `SESSION.md`
+3. Active session `GOAL.md`
+4. Active session current `PLAN-*.md`
+5. Active session `TASKS.md`
+6. `.harness/MEMORY.md`
+7. Relevant files under `.harness/memory/`
+8. Relevant files under `.harness/decisions/` and `.harness/hazards/`
 
-## Reusable Commands
+## Active Session
 
-| Name | Command | When To Use | Notes |
-| --- | --- | --- | --- |
-|  |  |  |  |
+- Session path:
+- Session summary:
 
-## Verification Recipes
+## Durable Memory
 
-| Area | Check | Evidence To Capture | Notes |
-| --- | --- | --- | --- |
-|  |  |  |  |
+- Root summary: `.harness/MEMORY.md`
+- Project memory:
+- Decisions:
+- Hazards:
 
-## Useful References
+## Rules
 
-| Topic | Artifact Or Doc | Why It Matters |
-| --- | --- | --- |
-|  |  |  |
+- Do not write new working artifacts directly into root `.harness/` unless updating router files.
+- Use `.harness/sessions/<active-session>/` for current working state.
+- Files are the source of truth.

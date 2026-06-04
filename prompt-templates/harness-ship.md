@@ -20,17 +20,17 @@ Your job is to prepare a ship summary only if verification evidence supports it.
 
 ### Required Inputs
 
-- approved plan artifact
-- verification artifact
+- active session approved plan artifact
+- active session verification artifact
 - changed files summary
 
 ### Required Checks
 
-- Does `VERIFY.md` exist?
-- Does `VERIFY.md` have explicit status?
-- Is `VERIFY.md` status different from `pending`?
-- Is `VERIFY.md` status different from `blocked`?
-- Does `VERIFY.md` contain real evidence?
+- Does the active session `VERIFY.md` exist?
+- Does the active session `VERIFY.md` have explicit status?
+- Is the active session `VERIFY.md` status different from `pending`?
+- Is the active session `VERIFY.md` status different from `blocked`?
+- Does the active session `VERIFY.md` contain real evidence?
 - Are known gaps explicit?
 - Does the summary avoid claiming more than the evidence proves?
 
@@ -51,10 +51,10 @@ Your job is to prepare a ship summary only if verification evidence supports it.
 
 Return `### Blocked` if:
 
-- `VERIFY.md` is missing
-- `VERIFY.md` status is `pending`
-- `VERIFY.md` status is `blocked`
-- `VERIFY.md` has no real evidence
+- the active session `VERIFY.md` is missing
+- the active session `VERIFY.md` status is `pending`
+- the active session `VERIFY.md` status is `blocked`
+- the active session `VERIFY.md` has no real evidence
 - known gaps require user acceptance
 
 ### Blocked
@@ -96,8 +96,8 @@ No ship summary was created.
 
 ## Placeholders
 
-- `{PLAN_PATH}` — usually `.harness/PLAN.md`
-- `{VERIFY_PATH}` — usually `.harness/VERIFY.md`
+- `{PLAN_PATH}` — usually `.harness/sessions/<active-session>/PLAN-001.md`
+- `{VERIFY_PATH}` — usually `.harness/sessions/<active-session>/VERIFY.md`
 - `{CHANGED_FILES}` — changed files from git state
 
 ## Returns

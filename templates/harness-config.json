@@ -1,0 +1,14 @@
+{
+  "memory": {
+    "backend": "files",
+    "sessionStrategy": "date-title",
+    "sourceOfTruth": "files",
+    "graph": {
+      "enabled": false,
+      "provider": "neo4j",
+      "uriEnv": "NEO4J_URI",
+      "userEnv": "NEO4J_USER",
+      "passwordEnv": "NEO4J_PASSWORD"
+    }
+  }
+}

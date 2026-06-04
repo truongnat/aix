@@ -1,29 +1,36 @@
-# State
+# Harness State
 
-> Do not include credentials, tokens, customer data, or private business data.
+> Root `.harness/STATE.md` is the machine-readable router for active work. Do not include credentials, tokens, customer data, or private business data.
+
+## Active Session
+
+session:
 
 ## Current Goal
 
--
+goal:
 
-## Current Status
+## Current Phase
 
-- Status: not started | in progress | blocked | ready for verify | shipped
-- Owner:
-- Last Updated:
+phase:
 
-## What Changed Since Last Update
+## Current Command
 
-- [ ]
+command:
 
-## Open Questions
+## Current Plan
 
-- [ ]
+current_plan:
 
-## Current Risks
+## Last Updated
 
-- [ ]
+updated_at:
 
-## Next Recommended Action
+## Next Allowed Commands
 
--
+- 
+
+## Blocked
+
+blocked: false
+blocked_file:
