@@ -32,6 +32,21 @@ You get provider-specific rules, prompt templates, session memory, blocking gate
 
 ---
 
+## Who is this for?
+
+**Perfect for:**
+- Individual developers using Claude Code, Cursor, or Codex who want more structured workflows
+- Tech leads introducing AI coding agents to their team and need process guardrails
+- Teams frustrated by agent hallucination, skipped verification, or lost context between sessions
+- Projects where code quality and traceability matter (not throwaway scripts)
+
+**Not a fit for:**
+- One-off code generation (use raw prompts instead)
+- Projects that don't need documentation or team discipline
+- Autonomous, unattended agent systems (this requires human judgment at gates)
+
+---
+
 ## Quickstart
 
 **First time?** Read [Your First 5 Minutes](docs/first-5-minutes.md) — a complete walk-through from install to shipping your first loop.
@@ -62,13 +77,26 @@ Wizard details: [docs/npx-cli-ux.md](docs/npx-cli-ux.md), [docs/terminal-wizard-
 | --- | --- |
 | Agent system prompt | Senior role, MUST/MUST NOT rules, response formats |
 | Session Start | Restore active session, memory, blockers, next command |
-| Commands | Canonical workflow contracts |
+| Commands | Canonical workflow contracts (map, start, discuss, plan, run, verify, ship, remember) |
 | Prompt templates | Structured execution with blocked/ready branches |
 | Session memory | Store work by session instead of flat root dumps |
 | Tool discovery | Route to git, rg, worktree, markitdown, code-graph fallback |
 | Hooks | Guard phase transitions and record evidence |
 | Skills | Package reusable or session-specific capability |
 | Reports | Generate `REPORT.md` and `PR_MESSAGE.md` from real changes |
+
+## Comparison: With vs Without
+
+| Scenario | Without Harness | With Harness |
+|---|---|---|
+| **Agent starts a task** | Reads goal, starts coding | Reads goal, maps context, writes discussion, plans, codes |
+| **Agent finishes coding** | Says "done" and ships | Runs tests, writes verify.md with evidence, ships with report |
+| **Session ends** | Context lost, no memory | Saves decisions, lessons, and state for next session |
+| **Next session** | Starts from scratch | Restores context and continues where you left off |
+| **You review PR** | Code only, no plan/evidence | See plan, discussion, verification evidence, change summary |
+| **A bug is found** | No idea why code was written this way | Decisions and rationale are in session memory |
+
+**The difference:** Without the harness, your agent is a code generator. With the harness, it's an engineer who documents its work.
 
 ---
 
