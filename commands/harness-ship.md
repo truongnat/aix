@@ -51,6 +51,12 @@ Finalize verified work, summarize the result, and prepare a clean handoff withou
 - If the plan or goal is no longer the right frame for the work, stop and redirect to `harness-discuss` or `harness-plan`.
 - If implementation is still incomplete, stop and redirect to `harness-run`.
 
+## Blocking Questions
+
+- If verification status is blocked, pending, contradictory, or missing required evidence, the agent must stop and ask the user before shipping.
+- If residual risk, deferred verification, or manual acceptance needs a human decision, record the blocker and stop instead of writing an optimistic ship summary.
+- Use `.harness/BLOCKED.md` when the next allowed command is known but shipping cannot proceed yet.
+
 ## Failure Conditions
 
 - Do not make a success claim without evidence.

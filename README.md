@@ -65,9 +65,9 @@ Plan → Build → Verify → Ship → Remember
 | Ship | `harness-ship` | `.harness/SHIP.md` |
 | Remember | `harness-remember` | `.harness/REMEMBER.md` |
 
-Where a provider supports native slash commands, use `/harness-plan` (and the same pattern for other IDs). Elsewhere, invoke the hyphen form via rules, AGENTS.md, or `.ai-harness/runtime-commands/`. Deprecated: legacy colon-separated command IDs in older docs and changelogs.
+Native slash commands are provider-specific. Today the concrete local example is Claude project command files exposing `/harness-plan`; elsewhere use the hyphen form via rules, AGENTS.md, or `.ai-harness/runtime-commands/`. Deprecated: legacy colon-separated command IDs in older docs and changelogs.
 
-Command policy (artifacts first): [docs/harness-command-behavior.md](docs/harness-command-behavior.md). Provider matrix: [docs/provider-command-matrix.md](docs/provider-command-matrix.md).
+Command policy (artifacts first): [docs/harness-command-behavior.md](docs/harness-command-behavior.md). Provider matrix: [docs/provider-command-matrix.md](docs/provider-command-matrix.md). Guardrails: [docs/command-guardrails.md](docs/command-guardrails.md). Workflow map: [docs/workflow-visualization.md](docs/workflow-visualization.md).
 
 ---
 
@@ -152,6 +152,7 @@ If you need one runtime to orchestrate everything, use a framework. If you want 
 | NPX / wizard | [docs/npx-cli-ux.md](docs/npx-cli-ux.md), [docs/terminal-wizard-ux.md](docs/terminal-wizard-ux.md) |
 | Slash / runtime commands | [docs/runtime-command-surface.md](docs/runtime-command-surface.md) |
 | Command behavior | [docs/harness-command-behavior.md](docs/harness-command-behavior.md) |
+| Guardrails | [docs/command-guardrails.md](docs/command-guardrails.md), [docs/workflow-visualization.md](docs/workflow-visualization.md) |
 | Distillation choices | [docs/distillation-superpowers-gsd.md](docs/distillation-superpowers-gsd.md), [docs/forensics-lite.md](docs/forensics-lite.md) |
 | Capability cache | [docs/private-capability-cache.md](docs/private-capability-cache.md) |
 | v0.11.0 release | [docs/v0.11.0-release-notes.md](docs/v0.11.0-release-notes.md) |

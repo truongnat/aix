@@ -376,6 +376,175 @@ doctor_verify_status() {
   ' "$_verify_file"
 }
 
+workflow_phase_line() {
+  _label="$1"
+  _state="$2"
+  case "$_state" in
+    ready)
+      _icon='✅'
+      _text='ready'
+      ;;
+    approved)
+      _icon='✅'
+      _text='approved'
+      ;;
+    passed)
+      _icon='✅'
+      _text='passed'
+      ;;
+    draft)
+      _icon='⚠️'
+      _text='draft'
+      ;;
+    required)
+      _icon='⛔'
+      _text='required'
+      ;;
+    blocked)
+      _icon='⛔'
+      _text='blocked'
+      ;;
+    failed)
+      _icon='⛔'
+      _text='failed'
+      ;;
+    missing)
+      _icon='⚠️'
+      _text='missing'
+      ;;
+    partial)
+      _icon='⚠️'
+      _text='partial'
+      ;;
+    *)
+      _icon='⚠️'
+      _text="$_state"
+      ;;
+  esac
+  printf '  %-12s %s %s\n' "$_label" "$_icon" "$_text"
+}
+
+print_workflow_summary() {
+  _goal_state='missing'
+  _plan_phase='missing'
+  _approval_state='required'
+  _run_state='blocked'
+  _verify_phase='blocked'
+  _ship_state='blocked'
+  _remember_state='blocked'
+  _next_command='harness-start'
+  _blocking_reason='GOAL.md is missing.'
+
+  if [ -f "${TARGET_ABS}/.harness/GOAL.md" ]; then
+    _goal_state='ready'
+    _next_command='harness-plan'
+    _blocking_reason='PLAN.md is missing.'
+  fi
+
+  _plan_status=$(doctor_plan_status)
+  case "${_plan_status:-missing}" in
+    approved)
+      _plan_phase='approved'
+      _approval_state='ready'
+      _run_state='ready'
+      _next_command='harness-verify'
+      _blocking_reason='VERIFY.md evidence is missing or incomplete.'
+      ;;
+    draft)
+      _plan_phase='draft'
+      _approval_state='required'
+      _next_command='harness-plan'
+      _blocking_reason='PLAN.md is not approved.'
+      ;;
+    blocked)
+      _plan_phase='blocked'
+      _approval_state='required'
+      _next_command='harness-plan'
+      _blocking_reason='PLAN.md is blocked.'
+      ;;
+    missing|'')
+      _plan_phase='missing'
+      ;;
+    *)
+      _plan_phase='draft'
+      _approval_state='required'
+      _next_command='harness-plan'
+      _blocking_reason="PLAN.md approval status is ${_plan_status}."
+      ;;
+  esac
+
+  _verify_status=$(doctor_verify_status)
+  if [ "$_run_state" = 'ready' ]; then
+    case "${_verify_status:-missing}" in
+      passed)
+        if doctor_verify_has_concrete_tests && doctor_verify_has_concrete_evidence; then
+          _verify_phase='passed'
+          _ship_state='ready'
+          _next_command='harness-ship'
+          _blocking_reason='No blocker recorded. Shipping summary is the next step.'
+        else
+          _verify_phase='blocked'
+          _next_command='harness-verify'
+          _blocking_reason='VERIFY.md evidence is missing or incomplete.'
+        fi
+        ;;
+      failed)
+        _verify_phase='failed'
+        _ship_state='blocked'
+        _next_command='harness-verify'
+        _blocking_reason='VERIFY.md records failed checks.'
+        ;;
+      blocked)
+        _verify_phase='blocked'
+        _ship_state='blocked'
+        _next_command='harness-verify'
+        _blocking_reason='VERIFY.md is blocked pending more input or evidence.'
+        ;;
+      partial)
+        _verify_phase='partial'
+        _ship_state='blocked'
+        _next_command='harness-verify'
+        _blocking_reason='VERIFY.md is partial and cannot support shipping yet.'
+        ;;
+      pending)
+        _verify_phase='blocked'
+        _ship_state='blocked'
+        _next_command='harness-verify'
+        _blocking_reason='VERIFY.md is pending and verification evidence is not complete.'
+        ;;
+      missing|'')
+        _verify_phase='blocked'
+        _ship_state='blocked'
+        _next_command='harness-verify'
+        _blocking_reason='VERIFY.md evidence is missing or incomplete.'
+        ;;
+      *)
+        _verify_phase='blocked'
+        _ship_state='blocked'
+        _next_command='harness-verify'
+        _blocking_reason="VERIFY.md status is ${_verify_status}."
+        ;;
+    esac
+  fi
+
+  printf '%s\n' ''
+  printf '%s\n' 'Harness workflow'
+  printf '%s\n' ''
+  workflow_phase_line 'Goal' "$_goal_state"
+  workflow_phase_line 'Plan' "$_plan_phase"
+  workflow_phase_line 'Approval' "$_approval_state"
+  workflow_phase_line 'Run' "$_run_state"
+  workflow_phase_line 'Verify' "$_verify_phase"
+  workflow_phase_line 'Ship' "$_ship_state"
+  workflow_phase_line 'Remember' "$_remember_state"
+  printf '%s\n' ''
+  printf '%s\n' 'Next allowed command:'
+  printf '  %s\n' "$_next_command"
+  printf '%s\n' ''
+  printf '%s\n' 'Blocking reason:'
+  printf '  %s\n' "$_blocking_reason"
+}
+
 build_exclude_block_content() {
   _paths_file="$1"
   _out="$2"
@@ -1097,6 +1266,9 @@ print_status() {
     _provider_cmds=yes
   fi
   printf '  provider commands:     %s\n' "$_provider_cmds"
+  if [ -d "${TARGET_ABS}/.harness" ]; then
+    print_workflow_summary
+  fi
   _harness_root=$(cd "$(dirname "$0")" && pwd)
   if command -v node >/dev/null 2>&1 && [ -f "${_harness_root}/lib/command-surface-report.js" ]; then
     node "${_harness_root}/lib/command-surface-report.js" status "${TARGET_ABS}" 2>/dev/null || true
@@ -1188,6 +1360,8 @@ run_doctor() {
   fi
 
   if [ -d "${TARGET_ABS}/.harness" ]; then
+    print_workflow_summary
+
     _plan_status=$(doctor_plan_status)
     case "${_plan_status:-missing}" in
       approved)

@@ -58,6 +58,12 @@ Execute the approved plan in small, surgical steps without silent scope drift.
 - If the goal is unclear, stop and redirect to `harness-discuss`.
 - If implementation is complete enough to verify, stop and redirect to `harness-verify`.
 
+## Blocking Questions
+
+- If `PLAN.md` is not approved, the agent must stop and ask the user instead of starting implementation.
+- If the next task is unclear, missing, or contradicted by new findings, ask for clarification or re-planning and stop.
+- Record execution blockers in `.harness/BLOCKED.md` when the correct next step is known but preconditions are missing.
+
 ## Failure Conditions
 
 - Do not implement unplanned work.

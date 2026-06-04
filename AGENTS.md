@@ -128,6 +128,29 @@ Typical redirects:
 - incomplete implementation -> `harness-run`
 - missing verification evidence -> `harness-verify`
 
+## Stop Conditions
+
+The agent must stop and ask the user when:
+
+- required approval is missing
+- acceptance criteria are unclear
+- the required verification command is unknown
+- manual review is required
+- a failing test needs product or risk judgment
+- current command preconditions are not satisfied
+
+The agent must not continue by guessing.
+
+## Wrong Phase Behavior
+
+If the requested command is not allowed in the current phase:
+
+1. Stop.
+2. Explain the missing precondition.
+3. Name the correct next command.
+4. Ask for confirmation or required input.
+5. Do not execute later-phase work.
+
 ## Skill Discipline
 
 - Use the smallest set of relevant skills that covers the task.

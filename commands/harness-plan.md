@@ -55,6 +55,12 @@ Translate the agreed goal into an explicit, reviewable implementation plan.
 - If the affected area is not understood well enough to plan safely, redirect to `harness-map`.
 - If implementation has already begun without a plan, stop, document the gap, and return to planning before further edits.
 
+## Blocking Questions
+
+- If the goal is still ambiguous, approval expectations are unclear, or verification requirements cannot be named concretely, the agent must ask the user and stop.
+- If a missing artifact or unresolved tradeoff prevents an execution-ready plan, record the blocker in `.harness/BLOCKED.md` and redirect to the earliest safe command.
+- Do not continue by assuming acceptance criteria, approval ownership, or verification commands.
+
 ## Failure Conditions
 
 - Do not write a vague plan with no verification strategy.

@@ -216,6 +216,35 @@ runTest("command docs include execution contract headings", () => {
   }
 });
 
+runTest("phase command docs include Blocking Questions sections", () => {
+  for (const fileName of [
+    "harness-plan.md",
+    "harness-run.md",
+    "harness-verify.md",
+    "harness-ship.md"
+  ]) {
+    const text = fs.readFileSync(path.join(repoRoot, "commands", fileName), "utf8");
+    assert.match(text, /## Blocking Questions/);
+    assert.match(text, /must ask the user and stop|must stop and ask/i);
+  }
+});
+
+runTest("BLOCKED template exists with required headings", () => {
+  const text = fs.readFileSync(path.join(repoRoot, "templates", "BLOCKED.md"), "utf8");
+  for (const heading of [
+    "# Blocked",
+    "## Status",
+    "## Current Command",
+    "## Missing Preconditions",
+    "## Blocking Questions",
+    "## Suggested Next Command",
+    "## Notes"
+  ]) {
+    assert.match(text, new RegExp(heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+  assert.match(text, /status:\s*blocked/i);
+});
+
 runTest("validated skills include contract headings", () => {
   const skillDirs = [
     "using-harness",
@@ -2169,7 +2198,7 @@ runTest("README primary quickstart is npx ai-engineering-harness install", () =>
 runTest("README does not present curl aih.sh as primary quickstart", () => {
   const readme = fs.readFileSync(path.join(repoRoot, "README.md"), "utf8");
   const quickstart = readme.slice(readme.indexOf("## Quickstart"), readme.indexOf("## The loop"));
-  const firstFence = quickstart.match(/```bash\n([\s\S]*?)```/);
+  const firstFence = quickstart.match(/```bash\r?\n([\s\S]*?)```/);
   assert.ok(firstFence);
   assert.match(firstFence[1], /npx ai-engineering-harness install/);
   assert.doesNotMatch(firstFence[1], /curl -fsSL/);
@@ -2400,7 +2429,16 @@ runTest("README does not claim universal native slash commands", () => {
   assert.match(readme, /Plugin-ready|plugin packaging|marketplace pending|Slash commands vary/i);
   assert.match(readme, /harness-plan/);
   assert.doesNotMatch(readme, /Native `\/harness-\*`.*Yes/i);
-  assert.doesNotMatch(readme, /harness:plan|\/harness:plan/i);
+  assert.doesNotMatch(readme, /harness:plan|\/harness:plan|harness_plan|\/harness plan/i);
+});
+
+runTest("active docs validation rejects forbidden workflow alias forms", () => {
+  const tmp = makeTempDir();
+  fs.mkdirSync(path.join(tmp, "docs"), { recursive: true });
+  fs.writeFileSync(path.join(tmp, "README.md"), "Use /harness:plan or harness_plan.\n", "utf8");
+  const failures = [];
+  assertHyphenCommandNamingInActiveDocs(tmp, failures);
+  assert.ok(failures.some((failure) => /hyphen-form command IDs/i.test(failure)));
 });
 
 runTest("pack contains provider plugin manifests", () => {
@@ -2646,6 +2684,7 @@ runTest("aih.sh doctor reports workflow PASS for approved plan, verification evi
     ).status,
     0
   );
+  fs.writeFileSync(path.join(tmp, ".harness", "GOAL.md"), "# Goal\n", "utf8");
 
   fs.writeFileSync(
     path.join(tmp, ".harness", "PLAN.md"),
@@ -2689,6 +2728,10 @@ summary: focused checks passed
   const result = runAihSh(["doctor", "--target", tmp], { env: { PATH: process.env.PATH } });
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /Harness workflow/i);
+  assert.match(result.stdout, /Goal\s+✅ ready/i);
+  assert.match(result.stdout, /Plan\s+✅ approved/i);
+  assert.match(result.stdout, /Next allowed command:\s*\n\s*harness-ship/i);
   assert.match(result.stdout, /PASS \.harness\/PLAN\.md approval status approved/);
   assert.match(result.stdout, /PASS \.harness\/VERIFY\.md contains verification evidence/);
   assert.match(result.stdout, /PASS typed memory artifacts present/);
@@ -2704,6 +2747,7 @@ runTest("aih.sh doctor warns on unapproved plan, fails weak verification evidenc
     ).status,
     0
   );
+  fs.writeFileSync(path.join(tmp, ".harness", "GOAL.md"), "# Goal\n", "utf8");
 
   fs.writeFileSync(
     path.join(tmp, ".harness", "PLAN.md"),
@@ -2748,6 +2792,11 @@ summary: claimed pass without real evidence
   const result = runAihSh(["doctor", "--target", tmp], { env: { PATH: process.env.PATH } });
 
   assert.notEqual(result.status, 0);
+  assert.match(result.stdout, /Harness workflow/i);
+  assert.match(result.stdout, /Approval\s+⛔ required/i);
+  assert.match(result.stdout, /Run\s+⛔ blocked/i);
+  assert.match(result.stdout, /Next allowed command:\s*\n\s*harness-plan/i);
+  assert.match(result.stdout, /Blocking reason:\s*\n\s*PLAN\.md is not approved\./i);
   assert.match(result.stdout, /WARN \.harness\/PLAN\.md approval status is draft/);
   assert.match(result.stdout, /FAIL \.harness\/VERIFY\.md claims completed verification without concrete evidence/);
   assert.match(result.stdout, /WARN typed memory artifacts missing: DECISIONS\.md, HAZARDS\.md, INDEX\.md/);

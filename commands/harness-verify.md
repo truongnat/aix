@@ -55,6 +55,12 @@ Gather fresh evidence that the implemented work meets the goal before any comple
 - If the plan does not define what success means, stop and redirect to `harness-plan`.
 - If the goal itself is unclear, stop and redirect to `harness-discuss`.
 
+## Blocking Questions
+
+- If the required verification command is unknown, the acceptance criteria are ambiguous, or manual review is required, the agent must stop and ask the user.
+- If a failing check needs product judgment, record `status: blocked` in `.harness/VERIFY.md` or write `.harness/BLOCKED.md` before continuing.
+- Do not upgrade missing evidence into a pass by assumption.
+
 ## Failure Conditions
 
 - Do not assume success because the change looks correct.

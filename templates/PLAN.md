@@ -78,3 +78,11 @@ notes:
 Use **Approval Status** above as the canonical approval record. Legacy notes may appear here during migration.
 
 - Notes:
+
+## Blocking Questions
+
+If this plan cannot proceed safely, stop and record the blocker instead of improvising.
+
+1. What approval or decision is still missing?
+2. Which command should the operator run next?
+3. What artifact or evidence is required before execution?

@@ -43,3 +43,9 @@ summary:
 ## Ship Blockers
 
 - None recorded yet. Replace this line with explicit blockers or an intentional no-blocker statement backed by evidence.
+
+## Blocking Questions
+
+1. Which verification command is required before status can change from pending or blocked?
+2. Is any manual review or product judgment still required?
+3. What next command should run once the blocker is resolved?

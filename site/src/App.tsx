@@ -9,6 +9,7 @@ import { ProviderCards } from './components/ProviderCards'
 import { FeatureGrid } from './components/FeatureGrid'
 import { InstallSection } from './components/InstallSection'
 import { CTA } from './components/CTA'
+import { WorkflowGuardrails } from './components/WorkflowGuardrails'
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <CommandFlow />
         <ArtifactShowcase />
         <DemoTerminal />
+        <WorkflowGuardrails />
         <ProviderCards />
         <FeatureGrid />
         <InstallSection />
