@@ -33,6 +33,12 @@ Translate the agreed goal into an explicit, reviewable implementation plan.
 - `brainstorming` when the plan still depends on an unresolved approach choice
 - `mapping-codebase` when affected areas need more detail
 
+## Dispatch Template
+
+For execution-facing dispatch, read `.ai-harness/prompt-templates/harness-plan.md`.
+
+Use this command doc as the reference contract for phase behavior and artifact discipline. Use the prompt template as the execution instruction. Do not execute `harness-plan` freestyle when the prompt template is available.
+
 ## Step-By-Step Workflow
 
 1. Restate the approved goal and scope after recalling relevant decisions, hazards, and reusable commands.

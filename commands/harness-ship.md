@@ -31,6 +31,12 @@ Finalize verified work, summarize the result, and prepare a clean handoff withou
 - `remembering`
 - `code-review` when final inspection is needed
 
+## Dispatch Template
+
+For execution-facing dispatch, read `.ai-harness/prompt-templates/harness-ship.md`.
+
+Use this command doc as the reference contract for phase behavior and artifact discipline. Use the prompt template as the execution instruction. Do not execute `harness-ship` freestyle when the prompt template is available.
+
 ## Step-By-Step Workflow
 
 1. Confirm that `.harness/VERIFY.md` supports the current status.

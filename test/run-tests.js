@@ -100,6 +100,7 @@ runTest("install.js export surface includes post-install docs", () => {
 runTest("install.js exportPaths includes core required installed surface", () => {
   assert.ok(exportPaths.includes("AGENTS.md"));
   assert.ok(exportPaths.includes("commands"));
+  assert.ok(exportPaths.includes("prompt-templates"));
   assert.ok(exportPaths.includes("skills"));
   assert.ok(exportPaths.includes("workflows"));
   assert.ok(exportPaths.includes("patterns"));
@@ -216,6 +217,19 @@ runTest("command docs include execution contract headings", () => {
   }
 });
 
+runTest("major guarded commands include Dispatch Template sections", () => {
+  for (const fileName of [
+    "harness-plan.md",
+    "harness-run.md",
+    "harness-verify.md",
+    "harness-ship.md"
+  ]) {
+    const text = fs.readFileSync(path.join(repoRoot, "commands", fileName), "utf8");
+    assert.match(text, /## Dispatch Template/);
+    assert.match(text, /prompt-templates/i);
+  }
+});
+
 runTest("phase command docs include Blocking Questions sections", () => {
   for (const fileName of [
     "harness-plan.md",
@@ -243,6 +257,51 @@ runTest("BLOCKED template exists with required headings", () => {
     assert.match(text, new RegExp(heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
   assert.match(text, /status:\s*blocked/i);
+});
+
+runTest("prompt templates directory contains required guarded templates", () => {
+  const dir = path.join(repoRoot, "prompt-templates");
+  assert.ok(fs.existsSync(dir));
+  for (const fileName of [
+    "harness-plan.md",
+    "harness-run.md",
+    "harness-verify.md",
+    "harness-ship.md",
+    "blocker-question.md",
+    "code-reviewer.md"
+  ]) {
+    const fullPath = path.join(dir, fileName);
+    assert.ok(fs.existsSync(fullPath), `${fileName} must exist`);
+    const text = fs.readFileSync(fullPath, "utf8");
+    for (const heading of [
+      "## Purpose",
+      "## Prompt",
+      "## Placeholders",
+      "## Returns",
+      "## Critical Rules"
+    ]) {
+      assert.match(text, new RegExp(heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    }
+  }
+});
+
+runTest("guarded prompt templates contain blocked output branches", () => {
+  for (const fileName of [
+    "harness-run.md",
+    "harness-verify.md",
+    "harness-ship.md"
+  ]) {
+    const text = fs.readFileSync(path.join(repoRoot, "prompt-templates", fileName), "utf8");
+    assert.match(text, /### Blocked/);
+  }
+});
+
+runTest("blocker-question template stops after asking", () => {
+  const text = fs.readFileSync(
+    path.join(repoRoot, "prompt-templates", "blocker-question.md"),
+    "utf8"
+  );
+  assert.match(text, /stop after asking|workflow is paused|no further phase was executed/i);
 });
 
 runTest("validated skills include contract headings", () => {
@@ -2391,6 +2450,8 @@ runTest("runtime command catalog generates harness-plan with activation refs", (
   const manifest = JSON.parse(fs.readFileSync(path.join(tmp, ".ai-harness/manifest.json"), "utf8"));
   assert.equal(manifest.commandNamespace, "harness");
   assert.ok(manifest.canonicalCommands.includes("harness-plan"));
+  assert.ok(fs.existsSync(path.join(tmp, ".ai-harness/prompt-templates/harness-plan.md")));
+  assert.ok(fs.existsSync(path.join(tmp, ".ai-harness/prompt-templates/harness-run.md")));
   assert.deepEqual(
     WORKFLOW_COMMANDS.map((command) => command.canonical),
     [
@@ -2414,6 +2475,32 @@ runTest("runtime command catalog generates harness-plan with activation refs", (
     false
   );
   assert.match(manifest.commandSurface.providers.claude.workflowInvocation, /\/harness-plan/);
+  assert.match(text, /\.ai-harness\/prompt-templates\/harness-plan\.md/);
+  const runCatalog = fs.readFileSync(
+    path.join(tmp, ".ai-harness/runtime-commands/harness-run.md"),
+    "utf8"
+  );
+  assert.match(runCatalog, /\.ai-harness\/prompt-templates\/harness-run\.md/);
+  const verifyCatalog = fs.readFileSync(
+    path.join(tmp, ".ai-harness/runtime-commands/harness-verify.md"),
+    "utf8"
+  );
+  assert.match(verifyCatalog, /\.ai-harness\/prompt-templates\/harness-verify\.md/);
+  const shipCatalog = fs.readFileSync(
+    path.join(tmp, ".ai-harness/runtime-commands/harness-ship.md"),
+    "utf8"
+  );
+  assert.match(shipCatalog, /\.ai-harness\/prompt-templates\/harness-ship\.md/);
+});
+
+runTest("dispatch prompt templates doc exists", () => {
+  const text = fs.readFileSync(
+    path.join(repoRoot, "docs", "dispatch-prompt-templates.md"),
+    "utf8"
+  );
+  assert.match(text, /prompt templates/i);
+  assert.match(text, /command docs/i);
+  assert.match(text, /blocked output/i);
 });
 
 runTest("runtime-command-surface doc has provider capability matrix", () => {

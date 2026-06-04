@@ -34,6 +34,12 @@ Execute the approved plan in small, surgical steps without silent scope drift.
 - `test-driven-development` when behavior changes
 - `writing-skills` when adding or revising skills
 
+## Dispatch Template
+
+For execution-facing dispatch, read `.ai-harness/prompt-templates/harness-run.md`.
+
+Use this command doc as the reference contract for phase behavior and artifact discipline. Use the prompt template as the execution instruction. Do not execute `harness-run` freestyle when the prompt template is available.
+
 ## Step-By-Step Workflow
 
 1. Re-read `.harness/PLAN.md` before making changes.

@@ -34,6 +34,12 @@ Gather fresh evidence that the implemented work meets the goal before any comple
 - `verification-before-completion` when the risk of optimistic claims is high
 - `code-review` when inspection is part of the gate
 
+## Dispatch Template
+
+For execution-facing dispatch, read `.ai-harness/prompt-templates/harness-verify.md`.
+
+Use this command doc as the reference contract for phase behavior and artifact discipline. Use the prompt template as the execution instruction. Do not execute `harness-verify` freestyle when the prompt template is available.
+
 ## Step-By-Step Workflow
 
 1. Identify the exact checks that prove the claim, using `.harness/INDEX.md` for reusable verification recipes and `.harness/HAZARDS.md` for regression focus when present.

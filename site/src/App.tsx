@@ -10,6 +10,7 @@ import { FeatureGrid } from './components/FeatureGrid'
 import { InstallSection } from './components/InstallSection'
 import { CTA } from './components/CTA'
 import { WorkflowGuardrails } from './components/WorkflowGuardrails'
+import { DispatchTemplatesSection } from './components/DispatchTemplatesSection'
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         <ArtifactShowcase />
         <DemoTerminal />
         <WorkflowGuardrails />
+        <DispatchTemplatesSection />
         <ProviderCards />
         <FeatureGrid />
         <InstallSection />
