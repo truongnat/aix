@@ -3,29 +3,21 @@ import { stagger, fadeUp, motionVariants } from '../lib/animations'
 
 const PAINS = [
   {
-    icon: '⚠',
-    title: 'Agents skip planning',
-    body: 'Without a goal contract, agents jump straight to code — and build the wrong thing confidently.',
+    title: 'Stale context',
+    body: 'Agents start without restoring session, memory, or blocked state from prior work.',
   },
   {
-    icon: '✗',
-    title: 'Verification is optimistic prose',
-    body: '"Tests pass" without evidence. No exit codes, no test counts, no proof the command actually ran.',
+    title: 'Plans drift into code',
+    body: 'Implementation begins before approval, scope, or verification strategy is explicit.',
   },
   {
-    icon: '◌',
-    title: 'Context forgotten between sessions',
-    body: 'Decisions, constraints, and prior work evaporate when the context window resets.',
+    title: 'Optimistic verification',
+    body: '"Looks good" replaces command output, exit codes, and evidence in VERIFY.md.',
   },
-]
-
-const SOLUTION = [
-  { label: 'Goal', file: 'GOAL.md' },
-  { label: 'Plan', file: 'PLAN.md' },
-  { label: 'Tasks', file: 'TASKS.md' },
-  { label: 'Verify', file: 'VERIFY.md' },
-  { label: 'Ship', file: 'SHIP.md' },
-  { label: 'Remember', file: 'REMEMBER.md' },
+  {
+    title: 'Incomplete PR handoff',
+    body: 'Ship means "done" — not what changed, why, how it was verified, or reviewer notes.',
+  },
 ]
 
 export function ProblemSection() {
@@ -36,58 +28,25 @@ export function ProblemSection() {
   return (
     <section className="relative z-10 section-gap px-6">
       <div className="max-w-5xl mx-auto">
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-80px' }}
-        >
-          <motion.p variants={item} className="text-xs uppercase tracking-widest text-indigo-400 mb-3">
-            The problem
-          </motion.p>
-          <motion.h2 variants={item} className="text-3xl sm:text-4xl font-bold text-white mb-12">
-            What breaks without discipline
+        <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>
+          <motion.p variants={item} className="text-xs uppercase tracking-widest text-indigo-400 mb-3">The problem</motion.p>
+          <motion.h2 variants={item} className="text-3xl sm:text-4xl font-bold text-white mb-10">
+            AI agents edit code well — but often skip engineering discipline
           </motion.h2>
 
-          {/* Pain cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
             {PAINS.map((pain) => (
-              <motion.div key={pain.title} variants={item} className="glass-card p-6">
-                <div
-                  className="text-2xl mb-4 w-10 h-10 flex items-center justify-center rounded-lg"
-                  style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171' }}
-                >
-                  {pain.icon}
-                </div>
-                <h3 className="font-semibold text-slate-200 mb-2">{pain.title}</h3>
+              <motion.div key={pain.title} variants={item} className="glass-card p-5">
+                <h3 className="font-semibold text-slate-200 mb-2 text-sm">{pain.title}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed">{pain.body}</p>
               </motion.div>
             ))}
           </div>
 
-          {/* Solution loop */}
-          <motion.p variants={item} className="text-xs uppercase tracking-widest text-slate-600 mb-5">
-            The solution
+          <motion.p variants={item} className="text-lg text-slate-400 leading-relaxed max-w-3xl">
+            <span className="text-indigo-300 font-medium">ai-engineering-harness</span> turns agent work into a
+            session-based engineering loop with artifacts, gates, and evidence.
           </motion.p>
-          <motion.div variants={item} className="flex flex-wrap gap-2 items-center">
-            {SOLUTION.map((step, i) => (
-              <div key={step.label} className="flex items-center gap-2">
-                <div
-                  className="px-4 py-2.5 rounded-xl text-center"
-                  style={{
-                    background: 'rgba(99,102,241,0.08)',
-                    border: '1px solid rgba(99,102,241,0.2)',
-                  }}
-                >
-                  <div className="text-xs font-semibold text-indigo-300">{step.label}</div>
-                  <div className="text-xs text-slate-600 font-mono mt-0.5">{step.file}</div>
-                </div>
-                {i < SOLUTION.length - 1 && (
-                  <span className="text-slate-700 text-sm">→</span>
-                )}
-              </div>
-            ))}
-          </motion.div>
         </motion.div>
       </div>
     </section>

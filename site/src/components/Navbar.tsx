@@ -19,17 +19,11 @@ export function Navbar() {
         <span className="text-indigo-400">ai</span>-engineering-harness
       </span>
       <div className="flex items-center gap-6">
-        <a
-          href="#commands"
-          className="text-sm text-slate-500 hover:text-slate-200 transition-colors hidden sm:block"
-        >
-          Commands
+        <a href="#workflow" className="text-sm text-slate-500 hover:text-slate-200 transition-colors hidden sm:block">
+          Workflow
         </a>
-        <a
-          href="#demo"
-          className="text-sm text-slate-500 hover:text-slate-200 transition-colors hidden sm:block"
-        >
-          Demo
+        <a href="#install" className="text-sm text-slate-500 hover:text-slate-200 transition-colors hidden sm:block">
+          Install
         </a>
         <a
           href="https://github.com/truongnat/ai-engineering-harness"
