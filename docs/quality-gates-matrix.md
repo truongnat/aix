@@ -1,6 +1,10 @@
 # Quality Gates Matrix
 
-This matrix turns the harness loop into explicit, phase-by-phase gates that agents can apply before moving forward.
+This matrix operationalizes the harness loop with explicit, phase-by-phase entry/completion/failure gates.
+
+**See the canonical phase discipline rules:** [`phase-discipline.md`](./phase-discipline.md)
+
+This document provides a detailed gate checklist for each phase. Use it during `harness-run` to verify you're ready to move forward.
 
 ## Map
 

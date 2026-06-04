@@ -104,41 +104,40 @@ Default minimum read sets by command:
 - `harness-ship`: `.harness/PLAN.md`, `.harness/VERIFY.md`, `.harness/STATE.md`, `.harness/REVIEW.md`
 - `harness-remember`: `.harness/VERIFY.md`, `.harness/SHIP.md`, `.harness/PLAN.md`, `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`, `.harness/REMEMBER.md`
 
-## Command Discipline
+## Command Discipline & Phase Discipline
 
-Use the command loop intentionally:
+**Read the canonical phase discipline rules:** [`docs/phase-discipline.md`](../docs/phase-discipline.md)
 
-1. `harness-map`
-2. `harness-start`
-3. `harness-discuss`
-4. `harness-plan`
-5. `harness-run`
-6. `harness-verify`
-7. `harness-ship`
-8. `harness-remember`
+That document defines:
 
-Rules:
+- The command loop sequence
+- Phase preconditions (what blocks each phase)
+- Hard stops (no exceptions)
+- Blocked state behavior
+- Evidence standards
+- Common phase failures
 
-- Do not jump to `harness-run` without a clear goal and an approved plan.
-- `harness-plan` stops before implementation.
-- `harness-run` follows the approved plan and must not drift scope silently.
-- `harness-verify` gathers evidence and must not assume success.
-- `harness-ship` requires verification evidence, not optimistic prose.
-- `harness-remember` stores only durable, non-sensitive lessons.
+This section summarizes the key points:
 
-## Session Start
+**The Command Loop:**
 
-Before doing project work, establish session state.
+```
+Session Start → Map → Discuss → Plan → Run → Verify → Ship → Remember
+```
 
-Run the Session Start protocol (`harness-start`) when:
+**Never skip phases.** Never jump to `harness-run` without an approved plan.
 
-- no active session is known
-- the user says "continue"
-- the user asks "what next"
-- the requested command depends on `.harness/` state
-- `.harness/BLOCKED.md` or active session `BLOCKED.md` may exist
+**Key Rules:**
 
-Session Start must determine:
+- `harness-plan` stops before implementation
+- `harness-run` follows the approved plan; must not drift scope silently
+- `harness-verify` gathers real evidence; must not assume success
+- `harness-ship` requires verification evidence, not optimistic prose
+- All phases stop when preconditions fail
+
+**Session Start Protocol:**
+
+Before doing project work, establish session state through `harness-start`. This determines:
 
 - active session
 - current goal
@@ -146,57 +145,30 @@ Session Start must determine:
 - unresolved blocked state
 - next allowed command
 
-Do not implement, verify, or ship before session state is established.
+Never implement, verify, or ship before session state is established.
 
-See `docs/session-start.md`.
+See [`docs/session-start.md`](../docs/session-start.md) for details.
 
-## Phase Preconditions
+**Preconditions:**
 
-- `harness-plan` requires a current goal.
-- `harness-run` requires an approved plan and actionable implementation work.
-- `harness-verify` requires completed or inspectable implementation work.
-- `harness-ship` requires a verification artifact with real evidence.
-- `harness-remember` requires either a shipped result, a failed attempt, or a lesson worth preserving.
+- `harness-map`: Affected area is not yet understood
+- `harness-discuss`: Goal, scope, or alternatives are ambiguous
+- `harness-plan`: Goal is understood; stop before implementation
+- `harness-run`: Approved plan exists
+- `harness-verify`: Change is ready to check; gather real evidence
+- `harness-ship`: Verification complete or gaps are documented
+- `harness-remember`: Verified work produced a durable lesson
 
-## Redirect Behavior
+**Redirect Behavior:**
 
-When a command's preconditions are not met:
+When preconditions fail:
 
-- stop immediately
-- state which precondition failed
-- redirect to the correct earlier command
-- do not pretend success
+1. Stop immediately
+2. Name the missing artifact or state
+3. Name the correct next command
+4. Do not pretend success
 
-Typical redirects:
-
-- unclear repo or impact zone -> `harness-map`
-- unclear goal or conflicting artifacts -> `harness-discuss`
-- missing or stale plan -> `harness-plan`
-- incomplete implementation -> `harness-run`
-- missing verification evidence -> `harness-verify`
-
-## Stop Conditions
-
-The agent must stop and ask the user when:
-
-- required approval is missing
-- acceptance criteria are unclear
-- the required verification command is unknown
-- manual review is required
-- a failing test needs product or risk judgment
-- current command preconditions are not satisfied
-
-The agent must not continue by guessing.
-
-## Wrong Phase Behavior
-
-If the requested command is not allowed in the current phase:
-
-1. Stop.
-2. Explain the missing precondition.
-3. Name the correct next command.
-4. Ask for confirmation or required input.
-5. Do not execute later-phase work.
+See [`docs/phase-discipline.md`](../docs/phase-discipline.md) for complete rules.
 
 ## Skill Discipline
 

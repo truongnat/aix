@@ -10,6 +10,7 @@ Welcome! This directory contains the complete documentation for **ai-engineering
 - **[Architecture](architecture.md)** — System design and component relationships
 
 ### 📖 Using the Harness
+- **[Phase Discipline Rules](phase-discipline.md)** ⭐ **START HERE** — The canonical source for phase discipline, preconditions, hard stops, and evidence standards
 - **[Harness Commands](harness-command-behavior.md)** — Reference for all 10 harness commands (map, start, discuss, plan, run, verify, ship, remember, doctor, status)
 - **[Workflows](../workflows/README.md)** — Pre-built workflows for features, bugfixes, incidents, refactoring, code review
 - **[Patterns](../patterns/README.md)** — Team collaboration patterns (hierarchical delegation, producer-reviewer, supervisor, etc.)

@@ -2,43 +2,57 @@
 
 `ai-engineering-harness` uses command docs as execution contracts, not just suggestions.
 
-## Phase Order
+**→ Read the complete rules: [`phase-discipline.md`](./phase-discipline.md)**
 
-`harness-map` / `harness-start` / `harness-discuss` -> `harness-plan` -> approved `PLAN.md` -> `harness-run` -> `harness-verify` -> `harness-ship` -> `harness-remember`
+## Quick Reference
 
-## Hard Stops
+### Phase Order
 
-- `harness-run` must not start if `PLAN.md` is missing or not approved.
-- `harness-verify` must not pass on "looks right" confidence.
-- `harness-ship` must not claim success without explicit verification evidence.
-- `harness-remember` must not run before there is a shipped result, failed attempt, or durable lesson.
+```
+Session Start → Map → Discuss → Plan → Run → Verify → Ship → Remember
+```
 
-## Blocking Questions
+See `phase-discipline.md` for preconditions and what blocks each phase.
 
-When a command lacks required input, the agent must stop and ask instead of guessing.
+### Hard Stops (No Exceptions)
+
+- `harness-run` **must not** start if `PLAN.md` is missing or not approved
+- `harness-verify` **must not** pass on "looks right" confidence — require real evidence
+- `harness-ship` **must not** claim success without explicit verification evidence
+- `harness-remember` **must not** run without a shipped result, failed attempt, or durable lesson
+
+See `phase-discipline.md` for complete hard stops.
+
+### Blocking Questions
+
+When a command lacks required input, stop and ask instead of guessing.
 
 Typical blockers:
+- Approval missing
+- Acceptance criteria unclear
+- Verification command unknown
+- Manual review required
+- Failed test needs human judgment
 
-- approval missing
-- acceptance criteria unclear
-- verification command unknown
-- manual review required
-- failed test needs human judgment
+Record blocked state in `.harness/BLOCKED.md` or `VERIFY.md`.
 
-Record blocked state in `.harness/BLOCKED.md` or `VERIFY.md` with `status: blocked`.
+See `phase-discipline.md` → "Blocked State" for complete rules.
 
-## Redirect Pattern
+### Redirect Pattern
 
 When preconditions fail:
 
-1. Stop.
-2. Name the missing artifact or state.
-3. Name the correct next command.
-4. Ask for the missing input when needed.
+1. **Stop immediately**
+2. **Name the missing condition** (e.g., "PLAN.md not approved")
+3. **Name the correct next command** (e.g., "Run harness-plan first")
+4. **Ask for missing input if needed** (stop after asking)
 
-Expected phrasing:
-
-```text
+Example:
+```
 Blocked: precondition failed.
 Run harness-plan first.
 ```
+
+---
+
+**For complete rules, see [`phase-discipline.md`](./phase-discipline.md)**
