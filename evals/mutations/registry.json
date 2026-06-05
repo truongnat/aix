@@ -1,0 +1,332 @@
+{
+  "sample-bugfix": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 7,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/math.js": "\"use strict\";\n\nfunction add(a, b) {\n  return a + b;\n}\n\nmodule.exports = {\n  add,\n};\n",
+      "final-response.txt": "Fixed add() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted task without harness."
+    }
+  },
+  "sample-string-trim": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 7,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/string.js": "\"use strict\";\n\nfunction trim(value) {\n  return value.trim();\n}\n\nmodule.exports = {\n  trim,\n};\n",
+      "final-response.txt": "Fixed trim() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted trim fix without harness."
+    }
+  },
+  "sample-config-patch": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "config.json": "{\n  \"name\": \"demo\",\n  \"enabled\": true\n}\n",
+      "final-response.txt": "Patched config.json enabled flag."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted config patch."
+    }
+  },
+  "example-health-report": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 10,
+      "phases": [
+        "plan",
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "HEALTH_REPORT.md": "# Health Report\n\nStatus: ready\nSummary: deterministic fixture generated.\n",
+      "final-response.txt": "Generated health report."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted report generation."
+    }
+  },
+  "sample-response-contract": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 9,
+      "phases": [
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "final-response.txt": "Status: complete\nSummary: Wrote final-response.txt per response contract.\n"
+    },
+    "withoutHarness": {
+      "final-response.txt": "Done."
+    }
+  },
+  "sample-divide": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/math.js": "\"use strict\";\n\nfunction divide(a, b) {\n  return a / b;\n}\n\nmodule.exports = { divide };\n",
+      "final-response.txt": "Fixed divide() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted divide fix without harness."
+    }
+  },
+  "sample-max": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/math.js": "\"use strict\";\n\nfunction max(a, b) {\n  return a > b ? a : b;\n}\n\nmodule.exports = { max };\n",
+      "final-response.txt": "Fixed max() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted max fix without harness."
+    }
+  },
+  "sample-min": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/math.js": "\"use strict\";\n\nfunction min(a, b) {\n  return a < b ? a : b;\n}\n\nmodule.exports = { min };\n",
+      "final-response.txt": "Fixed min() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted min fix without harness."
+    }
+  },
+  "sample-abs": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/math.js": "\"use strict\";\n\nfunction abs(value) {\n  return value < 0 ? -value : value;\n}\n\nmodule.exports = { abs };\n",
+      "final-response.txt": "Fixed abs() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted abs fix without harness."
+    }
+  },
+  "sample-clamp": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/math.js": "\"use strict\";\n\nfunction clamp(value, min, max) {\n  return Math.min(max, Math.max(min, value));\n}\n\nmodule.exports = { clamp };\n",
+      "final-response.txt": "Fixed clamp() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted clamp fix without harness."
+    }
+  },
+  "sample-is-even": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/parity.js": "\"use strict\";\n\nfunction isEven(value) {\n  return value % 2 === 0;\n}\n\nmodule.exports = { isEven };\n",
+      "final-response.txt": "Fixed isEven() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted isEven fix without harness."
+    }
+  },
+  "sample-reverse-string": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/string.js": "\"use strict\";\n\nfunction reverseString(value) {\n  return value.split(\"\").reverse().join(\"\");\n}\n\nmodule.exports = { reverseString };\n",
+      "final-response.txt": "Fixed reverseString() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted reverseString fix without harness."
+    }
+  },
+  "sample-sum-array": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/array.js": "\"use strict\";\n\nfunction sumArray(values) {\n  return values.reduce((total, value) => total + value, 0);\n}\n\nmodule.exports = { sumArray };\n",
+      "final-response.txt": "Fixed sumArray() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted sumArray fix without harness."
+    }
+  },
+  "sample-unique-count": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/array.js": "\"use strict\";\n\nfunction uniqueCount(values) {\n  return new Set(values).size;\n}\n\nmodule.exports = { uniqueCount };\n",
+      "final-response.txt": "Fixed uniqueCount() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted uniqueCount fix without harness."
+    }
+  },
+  "sample-default-value": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/value.js": "\"use strict\";\n\nfunction defaultValue(value, fallback) {\n  return value === undefined || value === null ? fallback : value;\n}\n\nmodule.exports = { defaultValue };\n",
+      "final-response.txt": "Fixed defaultValue() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted defaultValue fix without harness."
+    }
+  },
+  "sample-plan-md": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 9,
+      "phases": [
+        "plan",
+        "verify",
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "PLAN.md": "# Plan\n\n## Goal\n\nShip deterministic fixture plan.\n",
+      "final-response.txt": "Generated PLAN.md."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted PLAN.md without harness."
+    }
+  },
+  "sample-verify-md": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 9,
+      "phases": [
+        "plan",
+        "verify",
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "VERIFY.md": "# Verify\n\nEvidence: npm test passed in fixture.\n",
+      "final-response.txt": "Generated VERIFY.md."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted VERIFY.md without harness."
+    }
+  },
+  "sample-ship-md": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 9,
+      "phases": [
+        "plan",
+        "verify",
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "SHIP.md": "# Ship\n\nStatus: ready\nSummary: deterministic ship artifact.\n",
+      "final-response.txt": "Generated SHIP.md."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted SHIP.md without harness."
+    }
+  },
+  "sample-context-md": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 9,
+      "phases": [
+        "plan",
+        "verify",
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "CONTEXT.md": "# Context\n\nActive goal: complete workflow fixture.\n",
+      "final-response.txt": "Generated CONTEXT.md."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted CONTEXT.md without harness."
+    }
+  },
+  "sample-blockers-md": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 9,
+      "phases": [
+        "plan",
+        "verify",
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "BLOCKERS.md": "# Blockers\n\nBlockers: none\n",
+      "final-response.txt": "Generated BLOCKERS.md."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted BLOCKERS.md without harness."
+    }
+  }
+}

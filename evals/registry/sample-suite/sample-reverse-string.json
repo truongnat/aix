@@ -1,0 +1,39 @@
+{
+  "id": "sample-reverse-string",
+  "suite": "sample-suite",
+  "title": "Fix broken reverseString() helper",
+  "goal": "Repair reverseString() in a deterministic Node fixture.",
+  "mode": "bugfix",
+  "fixture": {
+    "path": "evals/fixtures/sample-reverse-string"
+  },
+  "prompt": "Fix the bug so tests pass without changing the checks.",
+  "successChecks": [
+    {
+      "type": "command",
+      "command": "npm test",
+      "cwd": "."
+    }
+  ],
+  "behaviorChecks": [
+    {
+      "type": "artifact-exists",
+      "path": "final-response.txt"
+    }
+  ],
+  "rubric": "evals/rubrics/deterministic-v1.json",
+  "metrics": {
+    "withHarnessSteps": 3,
+    "withoutHarnessSteps": 8,
+    "phases": [
+      "verify"
+    ]
+  },
+  "tags": [
+    "sample",
+    "bugfix",
+    "deterministic",
+    "node",
+    "p1-corpus"
+  ]
+}

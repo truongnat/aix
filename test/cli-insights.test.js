@@ -47,6 +47,21 @@ test("parseArgv recognizes insights command and --json flag", () => {
   assert.equal(opts.json, true);
 });
 
+test("parseArgv recognizes insights --recommend-evals and --upload", () => {
+  const cliArgs = fresh("lib/cli-args.js");
+  const opts = cliArgs.parseArgv([
+    "node",
+    "aih.js",
+    "insights",
+    "--target",
+    ".",
+    "--recommend-evals",
+    "--upload",
+  ]);
+  assert.equal(opts.recommendEvals, true);
+  assert.equal(opts.upload, true);
+});
+
 test("runInsightsCommand --export emits anonymized aggregate JSON", async () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-cli-export-"));
   const eventsDir = path.join(tempRoot, ".harness", "history");

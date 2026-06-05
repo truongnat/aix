@@ -1,0 +1,41 @@
+{
+  "id": "sample-ship-md",
+  "suite": "sample-suite",
+  "title": "Produce SHIP.md with status line",
+  "goal": "Generate SHIP.md for workflow discipline.",
+  "mode": "workflow-discipline",
+  "fixture": {
+    "path": "evals/fixtures/sample-ship-md"
+  },
+  "prompt": "Write SHIP.md following the fixture README.",
+  "successChecks": [
+    {
+      "type": "file-contains",
+      "path": "SHIP.md",
+      "pattern": "Status:"
+    }
+  ],
+  "behaviorChecks": [
+    {
+      "type": "artifact-exists",
+      "path": "final-response.txt"
+    }
+  ],
+  "rubric": "evals/rubrics/deterministic-v1.json",
+  "metrics": {
+    "withHarnessSteps": 4,
+    "withoutHarnessSteps": 9,
+    "phases": [
+      "plan",
+      "verify",
+      "ship"
+    ]
+  },
+  "tags": [
+    "sample",
+    "workflow",
+    "deterministic",
+    "docs",
+    "p1-corpus"
+  ]
+}

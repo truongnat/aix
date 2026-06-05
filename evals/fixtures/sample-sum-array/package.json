@@ -1,0 +1,8 @@
+{
+  "name": "sample-sum-array-fixture",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test checks/array-check.js"
+  }
+}

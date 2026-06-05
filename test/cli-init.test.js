@@ -18,6 +18,13 @@ test("parseArgv recognizes init command", () => {
   assert.equal(opts.yes, true);
 });
 
+test("parseArgv recognizes --skip-demo-eval", () => {
+  const cliArgs = fresh("lib/cli-args.js");
+  const opts = cliArgs.parseArgv(["node", "aih.js", "init", "--skip-demo-eval", "--yes"]);
+  assert.equal(opts.command, "init");
+  assert.equal(opts.skipDemoEval, true);
+});
+
 test("renderHelp includes init quickstart", () => {
   const { renderHelp } = fresh("lib/cli-help.js");
   const help = renderHelp();

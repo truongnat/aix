@@ -1,0 +1,8 @@
+{
+  "name": "sample-is-even-fixture",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test checks/parity-check.js"
+  }
+}

@@ -24,6 +24,38 @@ test("runDeterministicRubric evaluates response-contract behavior checks", () =>
   assert.equal(result.checks.length, 1);
 });
 
+test("judgeWithLlmFallback uses LLM response when endpoint is configured", async () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-judge-llm-"));
+  fs.writeFileSync(path.join(tempRoot, "final-response.txt"), "Status: ok\n");
+
+  const originalFetch = global.fetch;
+  const originalEndpoint = process.env.EVAL_JUDGE_ENDPOINT;
+  process.env.EVAL_JUDGE_ENDPOINT = "https://example.test/judge";
+  global.fetch = async () => ({
+    ok: true,
+    json: async () => ({ passed: true, score: 0.95, reason: "contract satisfied" }),
+  });
+
+  try {
+    const result = await judgeWithLlmFallback(
+      repoRoot,
+      tempRoot,
+      { rubric: "evals/rubrics/response-contract-v1.json" },
+      { useLlmJudge: true }
+    );
+    assert.equal(result.llm.attempted, true);
+    assert.equal(result.llm.passed, true);
+    assert.equal(result.llm.score, 0.95);
+  } finally {
+    global.fetch = originalFetch;
+    if (originalEndpoint === undefined) {
+      delete process.env.EVAL_JUDGE_ENDPOINT;
+    } else {
+      process.env.EVAL_JUDGE_ENDPOINT = originalEndpoint;
+    }
+  }
+});
+
 test("judgeWithLlmFallback uses deterministic rubric when LLM endpoint unset", async () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-judge-"));
   fs.writeFileSync(path.join(tempRoot, "final-response.txt"), "Status: ok\n");

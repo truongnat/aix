@@ -53,3 +53,16 @@ test("runTask passes sample-config-patch with harness", async () => {
   const summary = JSON.parse(fs.readFileSync(result.summaryPath, "utf8"));
   assert.equal(summary.modes["with-harness"].outcome.passed, 1);
 });
+
+test("runTask passes sample-divide with harness comparison metrics", async () => {
+  const result = await runTask(repoRoot, "sample-divide");
+  assert.equal(result.exitCode, 0);
+  const summary = JSON.parse(fs.readFileSync(result.summaryPath, "utf8"));
+  assert.equal(summary.comparison.selfCorrectionDemonstrated, true);
+  assert.ok(summary.modes["with-harness"].extended.efficiency.improvement > 0);
+});
+
+test("runTask passes sample-plan-md workflow task", async () => {
+  const result = await runTask(repoRoot, "sample-plan-md");
+  assert.equal(result.exitCode, 0);
+});

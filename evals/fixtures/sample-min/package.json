@@ -1,0 +1,8 @@
+{
+  "name": "sample-min-fixture",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test checks/math-check.js"
+  }
+}

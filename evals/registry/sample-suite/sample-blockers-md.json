@@ -1,0 +1,41 @@
+{
+  "id": "sample-blockers-md",
+  "suite": "sample-suite",
+  "title": "Produce BLOCKERS.md with none sentinel",
+  "goal": "Generate BLOCKERS.md for workflow discipline.",
+  "mode": "workflow-discipline",
+  "fixture": {
+    "path": "evals/fixtures/sample-blockers-md"
+  },
+  "prompt": "Write BLOCKERS.md following the fixture README.",
+  "successChecks": [
+    {
+      "type": "file-contains",
+      "path": "BLOCKERS.md",
+      "pattern": "Blockers:"
+    }
+  ],
+  "behaviorChecks": [
+    {
+      "type": "artifact-exists",
+      "path": "final-response.txt"
+    }
+  ],
+  "rubric": "evals/rubrics/deterministic-v1.json",
+  "metrics": {
+    "withHarnessSteps": 4,
+    "withoutHarnessSteps": 9,
+    "phases": [
+      "plan",
+      "verify",
+      "ship"
+    ]
+  },
+  "tags": [
+    "sample",
+    "workflow",
+    "deterministic",
+    "docs",
+    "p1-corpus"
+  ]
+}

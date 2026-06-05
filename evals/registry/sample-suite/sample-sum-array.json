@@ -1,0 +1,39 @@
+{
+  "id": "sample-sum-array",
+  "suite": "sample-suite",
+  "title": "Fix broken sumArray() helper",
+  "goal": "Repair sumArray() in a deterministic Node fixture.",
+  "mode": "bugfix",
+  "fixture": {
+    "path": "evals/fixtures/sample-sum-array"
+  },
+  "prompt": "Fix the bug so tests pass without changing the checks.",
+  "successChecks": [
+    {
+      "type": "command",
+      "command": "npm test",
+      "cwd": "."
+    }
+  ],
+  "behaviorChecks": [
+    {
+      "type": "artifact-exists",
+      "path": "final-response.txt"
+    }
+  ],
+  "rubric": "evals/rubrics/deterministic-v1.json",
+  "metrics": {
+    "withHarnessSteps": 3,
+    "withoutHarnessSteps": 8,
+    "phases": [
+      "verify"
+    ]
+  },
+  "tags": [
+    "sample",
+    "bugfix",
+    "deterministic",
+    "node",
+    "p1-corpus"
+  ]
+}

@@ -16,7 +16,13 @@ aih insights
 aih insights --target <path>
 aih insights --target <path> --json
 aih insights --export
+aih insights --recommend-evals
+aih insights --upload
 ```
+
+`--recommend-evals` closes the telemetry→eval loop by mapping guard blocks and tool failures to suggested golden tasks.
+
+`--upload` posts the anonymized export payload to `HARNESS_TELEMETRY_ENDPOINT` when `.harness/config.json` sets `telemetry.export.remoteUpload.enabled` to `true`.
 
 ## Opt-in export
 

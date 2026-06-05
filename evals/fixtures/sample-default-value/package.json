@@ -1,0 +1,8 @@
+{
+  "name": "sample-default-value-fixture",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test checks/value-check.js"
+  }
+}

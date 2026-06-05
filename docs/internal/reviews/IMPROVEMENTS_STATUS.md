@@ -1,61 +1,48 @@
 # IMPROVEMENTS_EVALUATION_VI — Completion Status
 
-> Tracker for `IMPROVEMENTS_EVALUATION_VI.md` (2026-06-05). Updated after implementation pass.
+> Tracker for `IMPROVEMENTS_EVALUATION_VI.md` (2026-06-05). Updated after P1 pass.
 
 ## Summary
 
 | Trục | Before | After | Notes |
 | --- | :---: | :---: | --- |
-| A Evals | 1/5 | **4/5** | 5 golden tasks + rubric judge stub; 15–30 corpus & live LLM judge deferred |
-| B Telemetry | 2/5 | **4/5** | `aih insights --export` + config opt-in; remote upload deferred |
+| A Evals | 1/5 | **4.5/5** | 20 golden tasks, extended A/B metrics, live LLM judge hook; 30-task corpus deferred |
+| B Telemetry | 2/5 | **4.5/5** | `--upload`, `--recommend-evals`, telemetry hints in eval summary |
 | C Architecture | 3/5 | **4/5** | Provider manifests + catalog split (`lib/catalog/`) |
-| D CI/CD | 3/5 | **4.5/5** | Coverage, dependabot, changesets, smoke install, branch protection doc |
+| D CI/CD | 3/5 | **4.5/5** | Coverage, dependabot, changesets, smoke install, branch protection active |
 | E Docs | 2/5 | **4/5** | 3-tier layout, ADRs, Diátaxis index, v0 archive |
-| F Adoption | 2/5 | **3.5/5** | `aih init`, README moat, compatibility matrix |
+| F Adoption | 2/5 | **4/5** | `aih init` runs demo eval; matrix lists 20 tasks |
 | G DX | 3/5 | **4/5** | Husky, CONTRIBUTING DoD, coverage gate; full TS migrate deferred |
 
-## P0 ✅
+## P1 ✅ (completed)
 
-- [x] Eval harness + A/B baseline
-- [x] CI required checks documented (`.github/BRANCH_PROTECTION.md`)
-
-## P1 ✅ / partial
-
-- [x] `aih insights`
-- [x] Changesets + coverage gate
-- [x] Docs 3-tier + archive v0 + ADRs
-
-## P2 ✅ / partial
-
-- [x] Provider declarative manifests (`providers/*.json`)
-- [x] `runtime-command-catalog.js` split → `lib/catalog/{provider-command-metadata,command-rendering,command-installation}.js`
-- [x] `aih init` quickstart
+- [x] Eval corpus expanded to **20** tasks (`scripts/seed-p1-eval-corpus.js`)
+- [x] LLM-as-judge via `EVAL_JUDGE_ENDPOINT` with deterministic fallback
+- [x] Extended eval metrics: efficiency, phase discipline, self-correction delta
+- [x] Remote telemetry upload (`aih insights --upload`)
+- [x] Telemetry → eval loop (`--recommend-evals`, hints in `eval list` / run summary)
+- [x] Compatibility matrix regenerated (20 tasks)
+- [x] `aih init` auto-runs `sample-bugfix` demo eval (`--skip-demo-eval` to opt out)
 
 ## P3 — deferred
 
 - [ ] Migrate `lib/` to TypeScript
-- [ ] 15–30 golden eval tasks (5 sample tasks seeded)
-- [ ] Live LLM-as-judge (deterministic rubric + stub fallback shipped)
-- [ ] Remote anonymized telemetry upload (`HARNESS_TELEMETRY_ENDPOINT`)
+- [ ] Expand to 30 golden eval tasks
+- [ ] Hosted LLM judge service (endpoint contract only; no bundled server)
+- [ ] Rules engine vs rules content split
 
 ## Commands added
 
 ```bash
 aih eval list|run|report
-aih insights [--json] [--export]
-aih init [--provider <id>] [--yes]
-npm run test:coverage
+aih insights [--json] [--export] [--upload] [--recommend-evals]
+aih init [--provider <id>] [--yes] [--skip-demo-eval]
+node scripts/seed-p1-eval-corpus.js
 node scripts/generate-compatibility-matrix.js
-node scripts/sync-site-version.js
-node scripts/split-catalog.js   # one-time catalog split helper
 ```
 
-## Eval tasks (sample-suite)
+## Eval tasks (sample-suite) — 20 total
 
-| Task | Mode |
-| --- | --- |
-| `sample-bugfix` | bugfix |
-| `sample-string-trim` | bugfix |
-| `sample-config-patch` | bugfix |
-| `example-health-report` | workflow-discipline |
-| `sample-response-contract` | workflow-discipline |
+Bugfix: `sample-bugfix`, `sample-string-trim`, `sample-config-patch`, `sample-divide`, `sample-max`, `sample-min`, `sample-abs`, `sample-clamp`, `sample-is-even`, `sample-reverse-string`, `sample-sum-array`, `sample-unique-count`, `sample-default-value`
+
+Workflow: `example-health-report`, `sample-response-contract`, `sample-plan-md`, `sample-verify-md`, `sample-ship-md`, `sample-context-md`, `sample-blockers-md`

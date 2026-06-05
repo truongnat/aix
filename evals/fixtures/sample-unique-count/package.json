@@ -1,0 +1,8 @@
+{
+  "name": "sample-unique-count-fixture",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test checks/array-check.js"
+  }
+}
