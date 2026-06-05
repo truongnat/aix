@@ -8,7 +8,7 @@ Test-first discipline ensures that code changes are validated by tests before im
 
 Source file edits require corresponding test file with failing assertion
 
-**When enforced:** file_pattern matches src/**/*
+**When enforced:** file_pattern matches src/**
 **Action:** block - Test-first discipline violated: editing source without corresponding test
 
 ## Requirements

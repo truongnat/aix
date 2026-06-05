@@ -64,6 +64,65 @@ test("policy engine allows when conditions not met", () => {
   assert.ok(!blocked, "Should allow commands not covered by policies");
 });
 
+test("policy engine lazily loads policy set when shouldBlock is called without explicit load", () => {
+  const { PolicyEngine } = require(path.join(repoRoot, "lib", "policy", "engine.js"));
+  const policyPath = path.join(repoRoot, ".harness", "policies.json");
+
+  // Intentionally do NOT call loadPolicySet() — engine must auto-load.
+  const engine = new PolicyEngine(policyPath);
+
+  const context = {
+    command: "harness-run",
+    sessionDir: "/tmp/session",
+    repoRoot: "/tmp/repo",
+    state: {},
+  };
+
+  const { blocked } = engine.shouldBlock(context);
+  assert.ok(
+    blocked,
+    "Engine should auto-load policies and block harness-run without approved plan"
+  );
+});
+
+test("globToRegExp converts glob patterns to correct anchored regexes", () => {
+  const { PolicyEngine } = require(path.join(repoRoot, "lib", "policy", "engine.js"));
+
+  const srcGlob = PolicyEngine.globToRegExp("src/**");
+  assert.ok(srcGlob.test("src/foo/bar.ts"), "src/** should match nested source file");
+  assert.ok(srcGlob.test("src/feature.ts"), "src/** should match a top-level src file");
+  assert.ok(!srcGlob.test("lib/foo.ts"), "src/** should not match files outside src");
+
+  const tsGlob = PolicyEngine.globToRegExp("lib/*.ts");
+  assert.ok(tsGlob.test("lib/engine.ts"), "lib/*.ts should match a direct .ts file");
+  assert.ok(!tsGlob.test("lib/policy/engine.ts"), "single * should not cross directory boundary");
+  assert.ok(!tsGlob.test("lib/engine.js"), "lib/*.ts should not match .js");
+});
+
+test("policy file_pattern condition matches files in execution context", () => {
+  const { PolicyEngine } = require(path.join(repoRoot, "lib", "policy", "engine.js"));
+  const policyPath = path.join(repoRoot, ".harness", "policies.json");
+
+  const engine = new PolicyEngine(policyPath);
+  engine.loadPolicySet();
+
+  // test-first rule targets src/**/* — supplying such a file must trigger it.
+  const context = {
+    command: "edit",
+    sessionDir: "/tmp/session",
+    repoRoot: "/tmp/repo",
+    state: {},
+    files: ["src/feature.ts"],
+  };
+
+  const actions = engine.checkAll(context);
+  const triggeredMessages = actions.map((a) => a.message).join(" ");
+  assert.ok(
+    triggeredMessages.includes("Test-first"),
+    "Editing a src/ file should trigger the test-first policy"
+  );
+});
+
 test("policy documentation is generated from policies", () => {
   const docsDir = path.join(repoRoot, "docs");
 

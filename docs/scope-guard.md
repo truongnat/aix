@@ -8,7 +8,7 @@ Scope guard ensures that edits stay within the approved scope defined in the goa
 
 Edits must stay within scope defined in goal artifact or plan
 
-**When enforced:** file_pattern matches **/*
+**When enforced:** file_pattern matches **
 **Action:** warn - Edit may be outside approved scope
 
 ## Scope Definition

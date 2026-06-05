@@ -88,7 +88,7 @@ Source file edits require corresponding test file with failing assertion
 
 | Type | Operator | Value |
 |------|----------|-------|
-| file_pattern | matches | `src/**/*` |
+| file_pattern | matches | `src/**` |
 
 #### Action
 
@@ -110,7 +110,7 @@ Edits must stay within scope defined in goal artifact or plan
 
 | Type | Operator | Value |
 |------|----------|-------|
-| file_pattern | matches | `**/*` |
+| file_pattern | matches | `**` |
 
 #### Action
 

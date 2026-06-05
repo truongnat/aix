@@ -86,7 +86,10 @@ function isFileInScope(filePath, referencedFiles) {
 function guardScope(options) {
   const sessionDir = resolveSessionDir(options.session);
   const repoRoot = findHarnessRoot(sessionDir);
-  const files = options.files || [];
+  const files = String(options.files || "")
+    .split(",")
+    .map((f) => f.trim())
+    .filter(Boolean);
 
   const referencedFiles = extractReferencedFiles(sessionDir);
   const outOfScopeFiles = [];

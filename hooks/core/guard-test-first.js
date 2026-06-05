@@ -58,7 +58,10 @@ function hasFailingAssertion(testContent) {
 function guardTestFirst(options) {
   const sessionDir = resolveSessionDir(options.session);
   const repoRoot = findHarnessRoot(sessionDir);
-  const files = options.files || [];
+  const files = String(options.files || "")
+    .split(",")
+    .map((f) => f.trim())
+    .filter(Boolean);
 
   const violations = [];
 

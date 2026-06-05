@@ -12,7 +12,6 @@ import {
   PolicyCondition,
   PolicyAction,
   ExecutionContext,
-  PolicyConditionType,
   PolicyOperator,
 } from "./schema";
 
@@ -22,6 +21,27 @@ export class PolicyEngine {
 
   constructor(policyPath: string = ".harness/policies.json") {
     this.policyPath = policyPath;
+  }
+
+  /**
+   * Convert a glob pattern (supporting ** , * and ?) into an anchored RegExp.
+   * Escapes regex metacharacters first, then translates glob tokens via
+   * placeholders so already-inserted regex fragments are not re-processed.
+   */
+  static globToRegExp(pattern: string): RegExp {
+    const DOUBLE = "\u0000";
+    const SINGLE = "\u0001";
+    const QUESTION = "\u0002";
+
+    let out = pattern.replace(/\*\*/g, DOUBLE).replace(/\*/g, SINGLE).replace(/\?/g, QUESTION);
+
+    // Escape remaining regex metacharacters in literal segments.
+    out = out.replace(/[.+^${}()|[\]\\]/g, "\\$&");
+
+    // Restore glob tokens as regex fragments.
+    out = out.split(DOUBLE).join(".*").split(SINGLE).join("[^/]*").split(QUESTION).join(".");
+
+    return new RegExp(`^${out}$`);
   }
 
   /**
@@ -39,13 +59,13 @@ export class PolicyEngine {
   }
 
   /**
-   * Get the currently loaded policy set
+   * Get the currently loaded policy set, lazily loading from disk if needed
    */
   getPolicySet(): PolicySet {
     if (!this.policySet) {
-      throw new Error("Policy set not loaded. Call loadPolicySet() first.");
+      this.loadPolicySet();
     }
-    return this.policySet;
+    return this.policySet as PolicySet;
   }
 
   /**
@@ -127,14 +147,7 @@ export class PolicyEngine {
     pattern: string,
     files: string[]
   ): boolean {
-    // Convert glob pattern to regex
-    const regexPattern = pattern
-      .replace(/\*\*/g, ".*") // ** -> .*
-      .replace(/\*/g, "[^/]*") // * -> [^/]*
-      .replace(/\?/g, ".") // ? -> .
-      .replace(/\./g, "\\."); // escape dots
-
-    const regex = new RegExp(regexPattern);
+    const regex = PolicyEngine.globToRegExp(pattern);
     const matchingFiles = files.filter((file) => regex.test(file));
 
     switch (operator) {

@@ -88,7 +88,7 @@
         {
           "type": "file_pattern",
           "operator": "matches",
-          "value": "src/**/*"
+          "value": "src/**"
         }
       ],
       "action": {
@@ -108,7 +108,7 @@
         {
           "type": "file_pattern",
           "operator": "matches",
-          "value": "**/*"
+          "value": "**"
         }
       ],
       "action": {
