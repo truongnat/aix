@@ -1,0 +1,9 @@
+{
+  "id": "deterministic-v1",
+  "outcomeWeights": {
+    "successChecks": 1
+  },
+  "behaviorWeights": {
+    "behaviorChecks": 1
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "sample-bugfix",
+  "suite": "sample-suite",
+  "title": "Fix the broken add() helper",
+  "goal": "Repair a simple bug in a deterministic Node fixture.",
+  "mode": "bugfix",
+  "fixture": {
+    "path": "evals/fixtures/sample-bugfix"
+  },
+  "prompt": "Fix the bug so the sample fixture test suite passes without changing the tests.",
+  "successChecks": [
+    {
+      "type": "command",
+      "command": "npm test",
+      "cwd": "."
+    }
+  ],
+  "behaviorChecks": [
+    {
+      "type": "artifact-exists",
+      "path": "final-response.txt"
+    }
+  ],
+  "rubric": "evals/rubrics/deterministic-v1.json",
+  "tags": ["sample", "bugfix", "deterministic", "node"]
+}

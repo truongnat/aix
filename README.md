@@ -112,6 +112,20 @@ See [docs/typescript-usage.md](docs/typescript-usage.md) for the full API refere
 
 ---
 
+## Evals
+
+The harness includes an eval subsystem for deterministic A/B comparisons between `with-harness` and `without-harness` task runs.
+
+```bash
+npx ai-engineering-harness eval list
+npx ai-engineering-harness eval run sample-bugfix --provider codex --yes
+npx ai-engineering-harness eval report <run-id>
+```
+
+See [docs/evals.md](docs/evals.md) for the benchmark model and report format.
+
+---
+
 ## Comparison: with vs without
 
 | Scenario | Without harness | With harness |

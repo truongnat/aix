@@ -1,12 +1,19 @@
 const { test, describe } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const Module = require("node:module");
 const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
 const cliArgs = require(path.join(repoRoot, "lib", "cli-args.js"));
 const cliDetect = require(path.join(repoRoot, "lib", "cli-detect.js"));
+
+function fresh(modulePath) {
+  const resolved = require.resolve(path.join(repoRoot, modulePath));
+  delete require.cache[resolved];
+  return require(resolved);
+}
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-cli-test-"));
@@ -28,10 +35,42 @@ describe("CLI Arguments Parser", () => {
   });
 
   test("parseArgv recognizes valid commands", () => {
-    for (const cmd of ["install", "status", "doctor", "update", "uninstall", "help"]) {
+    for (const cmd of ["install", "status", "doctor", "update", "uninstall", "help", "eval"]) {
       const opts = cliArgs.parseArgv(["node", "aih.js", cmd]);
       assert.equal(opts.command, cmd);
     }
+  });
+
+  test("parseArgv captures eval subcommand and target", () => {
+    const opts = cliArgs.parseArgv([
+      "node",
+      "aih.js",
+      "eval",
+      "run",
+      "sample-bugfix",
+      "--provider",
+      "codex",
+    ]);
+    assert.equal(opts.command, "eval");
+    assert.equal(opts.evalCommand, "run");
+    assert.equal(opts.evalTarget, "sample-bugfix");
+    assert.deepEqual(opts.providers, ["codex"]);
+  });
+
+  test("parseArgv supports eval flags before subcommand and target", () => {
+    const opts = cliArgs.parseArgv([
+      "node",
+      "aih.js",
+      "eval",
+      "--provider",
+      "codex",
+      "run",
+      "sample-bugfix",
+    ]);
+    assert.equal(opts.command, "eval");
+    assert.equal(opts.evalCommand, "run");
+    assert.equal(opts.evalTarget, "sample-bugfix");
+    assert.deepEqual(opts.providers, ["codex"]);
   });
 
   test("parseArgv parses --provider flag", () => {
@@ -105,6 +144,16 @@ describe("CLI Arguments Parser", () => {
     assert.equal(opts.command, "status");
     assert.deepEqual(opts.providers, ["claude"]);
     assert.equal(opts.verbose, true);
+  });
+});
+
+describe("CLI Help", () => {
+  test("renderHelp includes eval commands", () => {
+    const { renderHelp } = fresh("lib/cli-help.js");
+    const help = renderHelp();
+    assert.match(help, /ai-engineering-harness eval list/);
+    assert.match(help, /ai-engineering-harness eval run <task-or-suite>/);
+    assert.match(help, /ai-engineering-harness eval report <run-id>/);
   });
 });
 
@@ -281,5 +330,110 @@ describe("CLI Non-Interactive Detection", () => {
     const result = cliArgs.isNonInteractive(opts);
     // In test environment, should be non-interactive
     assert.equal(typeof result, "boolean");
+  });
+});
+
+describe("CLI Main", () => {
+  test("main dispatches eval commands to runEvalCommand", async () => {
+    const originalLoad = Module._load;
+    const calls = [];
+
+    Module._load = function patchedLoader(request, parent, isMain) {
+      if (request === "./cli-commands/eval") {
+        return {
+          runEvalCommand: async (_packRoot, options) => {
+            calls.push(options);
+            return 0;
+          },
+        };
+      }
+      return originalLoad.call(this, request, parent, isMain);
+    };
+
+    try {
+      const { main } = fresh("lib/cli-main.js");
+      const status = await main(
+        ["node", "aih.js", "eval", "list"],
+        path.join(repoRoot, "bin", "aih.js")
+      );
+      assert.equal(status, 0);
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0].command, "eval");
+      assert.equal(calls[0].evalCommand, "list");
+    } finally {
+      Module._load = originalLoad;
+    }
+  });
+
+  test("runEvalCommand rejects missing target for eval run before downstream dispatch", async () => {
+    const originalLoad = Module._load;
+    let downstreamCalls = 0;
+
+    Module._load = function patchedLoader(request, parent, isMain) {
+      if (request === "../evals") {
+        return {
+          listTasks: () => {
+            downstreamCalls += 1;
+            return 0;
+          },
+          runTask: () => {
+            downstreamCalls += 1;
+            return 0;
+          },
+          readReport: () => {
+            downstreamCalls += 1;
+            return 0;
+          },
+        };
+      }
+      return originalLoad.call(this, request, parent, isMain);
+    };
+
+    try {
+      const { runEvalCommand } = fresh("lib/cli-commands/eval.js");
+      await assert.rejects(
+        () => runEvalCommand(repoRoot, { evalCommand: "run", evalTarget: "" }),
+        /Missing eval target for `aih eval run`\./
+      );
+      assert.equal(downstreamCalls, 0);
+    } finally {
+      Module._load = originalLoad;
+    }
+  });
+
+  test("runEvalCommand rejects missing target for eval report before downstream dispatch", async () => {
+    const originalLoad = Module._load;
+    let downstreamCalls = 0;
+
+    Module._load = function patchedLoader(request, parent, isMain) {
+      if (request === "../evals") {
+        return {
+          listTasks: () => {
+            downstreamCalls += 1;
+            return 0;
+          },
+          runTask: () => {
+            downstreamCalls += 1;
+            return 0;
+          },
+          readReport: () => {
+            downstreamCalls += 1;
+            return 0;
+          },
+        };
+      }
+      return originalLoad.call(this, request, parent, isMain);
+    };
+
+    try {
+      const { runEvalCommand } = fresh("lib/cli-commands/eval.js");
+      await assert.rejects(
+        () => runEvalCommand(repoRoot, { evalCommand: "report", evalTarget: "" }),
+        /Missing eval target for `aih eval report`\./
+      );
+      assert.equal(downstreamCalls, 0);
+    } finally {
+      Module._load = originalLoad;
+    }
   });
 });

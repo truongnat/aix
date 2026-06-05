@@ -1,0 +1,26 @@
+{
+  "id": "example-health-report",
+  "suite": "sample-suite",
+  "title": "Produce a concise health report from repo context",
+  "goal": "Generate a markdown summary file from a deterministic fixture.",
+  "mode": "workflow-discipline",
+  "fixture": {
+    "path": "evals/fixtures/example-health-report"
+  },
+  "prompt": "Write a HEALTH_REPORT.md file summarizing the repo state using the fixture instructions.",
+  "successChecks": [
+    {
+      "type": "file-contains",
+      "path": "HEALTH_REPORT.md",
+      "pattern": "Status:"
+    }
+  ],
+  "behaviorChecks": [
+    {
+      "type": "artifact-exists",
+      "path": "final-response.txt"
+    }
+  ],
+  "rubric": "evals/rubrics/deterministic-v1.json",
+  "tags": ["sample", "workflow", "deterministic", "docs"]
+}

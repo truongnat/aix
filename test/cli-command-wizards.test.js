@@ -260,3 +260,27 @@ test("runStatusOrDoctor forwards status to aih.sh", () => {
   assert.equal(status, 0);
   assert.deepEqual(calls, [["status", "--target", path.resolve(target), "--scope", "project"]]);
 });
+
+test("runEvalCommand lists registry tasks", async () => {
+  const { runEvalCommand } = fresh("lib/cli-commands/eval.js");
+  let output = "";
+  const originalWrite = process.stdout.write;
+  process.stdout.write = (chunk) => {
+    output += chunk;
+    return true;
+  };
+
+  try {
+    const status = await runEvalCommand(repoRoot, {
+      evalCommand: "list",
+      evalTarget: "",
+      target: repoRoot,
+      providers: [],
+      verbose: false,
+    });
+    assert.equal(status, 0);
+    assert.match(output, /sample-bugfix/);
+  } finally {
+    process.stdout.write = originalWrite;
+  }
+});

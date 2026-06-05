@@ -39,6 +39,7 @@
   "files": [
     "bin/",
     "lib/",
+    "evals/",
     "runtime/",
     "agent-system/",
     "commands/",
