@@ -1,10 +1,9 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { fadeUp, motionVariants, stagger } from '../lib/animations'
+import { WALKTHROUGH_VIDEO_URL } from '../lib/walkthrough-video'
 
 const GITHUB = 'https://github.com/truongnat/ai-engineering-harness'
 const README = 'https://github.com/truongnat/ai-engineering-harness#readme'
-const WALKTHROUGH_VIDEO =
-  'https://raw.githubusercontent.com/truongnat/ai-engineering-harness/v1.0.1/AI_Engineering_Harness.mp4'
 
 const HIGHLIGHTS = [
   'What the command loop looks like in practice',
@@ -41,7 +40,7 @@ export function VideoWalkthroughSection() {
                 playsInline
                 aria-label="AI Engineering Harness product walkthrough video"
               >
-                <source src={WALKTHROUGH_VIDEO} type="video/mp4" />
+                <source src={WALKTHROUGH_VIDEO_URL} type="video/mp4" />
               </video>
             </motion.div>
 

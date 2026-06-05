@@ -12,7 +12,6 @@ const targets = [
   "site/src/components/Hero.tsx",
   "site/src/components/Footer.tsx",
   "site/src/components/ProviderCards.tsx",
-  "site/src/components/VideoWalkthroughSection.tsx",
 ];
 
 for (const relativePath of targets) {

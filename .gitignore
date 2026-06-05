@@ -25,3 +25,6 @@ artifacts/
 # Coverage output
 coverage/
 .nyc_output/
+
+# Large media — publish via GitHub Releases (see docs/walkthrough-video.md)
+*.mp4

@@ -84,11 +84,11 @@ Wizard details: [docs/npx-cli-ux.md](docs/npx-cli-ux.md), [docs/terminal-wizard-
 
 ## Watch the walkthrough
 
-Walkthrough video: [AI_Engineering_Harness.mp4](https://raw.githubusercontent.com/truongnat/ai-engineering-harness/v1.0.1/AI_Engineering_Harness.mp4)
+Walkthrough video: [AI_Engineering_Harness.mp4](https://github.com/truongnat/ai-engineering-harness/releases/latest/download/AI_Engineering_Harness.mp4)
 
 Landing page with embedded player: [truongnat.github.io/ai-engineering-harness](https://truongnat.github.io/ai-engineering-harness/)
 
-> GitHub's README renderer does not reliably provide an inline player for an MP4, so the video is linked here and embedded on the landing page instead.
+> The MP4 is hosted as a GitHub Release asset (not in git). README links here; the landing page embeds the same URL.
 
 ---
 
