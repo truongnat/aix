@@ -7,6 +7,7 @@ Use this checklist to prepare a manual release without adding release automation
 ## npm package (v0.10.x+)
 
 - run `npm pack --dry-run` and confirm `test/` and `examples/` are **not** in the tarball
+- run `npm publish --dry-run` to catch registry or packaging issues before the real publish
 - run `node bin/aih.js --help`
 - run `npm test` and `node validate.js`
 - bump `package.json` version; align `PACK.md` pack version
@@ -184,3 +185,14 @@ Use this checklist to prepare a manual release without adding release automation
 - `git status`
 - `git tag v0.9.2`
 - `git push origin v0.9.2`
+
+## v1.0.1 Final Manual Commands
+
+- `node validate.js`
+- `npm test`
+- `npm run build --prefix site`
+- `npm pack --dry-run`
+- `npm publish --dry-run`
+- `git status`
+- `git tag v1.0.1`
+- `git push origin v1.0.1`

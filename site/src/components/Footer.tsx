@@ -35,7 +35,7 @@ export function Footer() {
         </nav>
       </div>
       <div className="max-w-5xl mx-auto px-6 pb-8 text-xs text-slate-600">
-        MIT · v1.0.0 · Install with{' '}
+        MIT · v1.0.1 · Install with{' '}
         <code className="text-slate-500 font-mono">npx ai-engineering-harness</code>
       </div>
     </footer>

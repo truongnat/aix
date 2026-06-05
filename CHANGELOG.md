@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.0.1] - 2026-06-05
+
+### Added
+
+- walkthrough video integration in the README and GitHub Pages landing page
+- `v1.0.1` release notes — [v1.0.1-release-notes.md](docs/v1.0.1-release-notes.md)
+- release metadata regression test for package/docs/site version alignment
+
+### Changed
+
+- README positioning, quickstart flow, and walkthrough visibility
+- landing page onboarding flow, embedded product walkthrough section, and open-source presentation polish
+- release metadata aligned to `v1.0.1` across package manifests, docs index, and user-facing site labels
+
+### Notes
+
+- `v1.0.1` is a patch release focused on docs, demo, and release polish.
+- Core workflow contracts and provider support posture are unchanged.
+
 ## [1.0.0] - 2026-06-04
 
 ### Added

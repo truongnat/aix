@@ -6,7 +6,7 @@
 
 A markdown-first, open-source kit that helps agents restore context, plan before coding, verify with evidence, ship reviewer-ready summaries, and preserve durable project knowledge.
 
-![Version](https://img.shields.io/badge/version-v1.0.0-2563eb)
+![Version](https://img.shields.io/badge/version-v1.0.1-2563eb)
 ![CI](https://github.com/truongnat/ai-engineering-harness/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-16a34a)
 ![Open Source](https://img.shields.io/badge/open-source-0f172a)
@@ -261,7 +261,7 @@ Transcript: [TRANSCRIPT.md](examples/dogfood-tiny-node-api/TRANSCRIPT.md)
 | Session memory | [docs/session-memory.md](docs/session-memory.md) |
 | Command guardrails | [docs/command-guardrails.md](docs/command-guardrails.md) |
 
-Release notes: [docs/v1.0.0-release-notes.md](docs/v1.0.0-release-notes.md)
+Release notes: [docs/v1.0.1-release-notes.md](docs/v1.0.1-release-notes.md)
 
 ---
 
@@ -289,6 +289,6 @@ Publish: [docs/npm-publish.md](docs/npm-publish.md)
 
 ## Status
 
-**v1.0.0**: workflow guardrails foundation. Core command loop, session layout, and provider adapters are stable enough for real dogfooding; per-provider behavior still varies.
+**v1.0.1**: patch release for README clarity, landing-page polish, walkthrough integration, and release metadata alignment. Core workflow contracts and provider support posture are unchanged.
 
 MIT · [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md)

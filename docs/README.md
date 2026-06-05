@@ -52,7 +52,8 @@ Welcome! This directory contains the complete documentation for **ai-engineering
 ### 📚 Release Notes & History
 | Version | Notes |
 |---|---|
-| **v1.0.0** | [Release Notes](v1.0.0-release-notes.md) |
+| **v1.0.1** | [Release Notes](v1.0.1-release-notes.md) |
+| v1.0.0 | [Release Notes](v1.0.0-release-notes.md) |
 | v0.11.0 | [Release Notes](v0.11.0-release-notes.md) |
 | v0.10.8 | [Release Notes](v0.10.8-release-notes.md) |
 | [Older versions...](versioning.md) | See version history |

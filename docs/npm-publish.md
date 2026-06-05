@@ -23,12 +23,16 @@ npm pack --dry-run
 npm publish --dry-run
 ```
 
+If npm reports `You cannot publish over the previously published versions`, the fix is to bump `package.json` to a new version first. Republishing the same version is not allowed.
+
 ## Publish (maintainers)
 
 ```bash
 node validate.js
 npm test
 npm version patch   # or minor, as appropriate
+npm pack --dry-run
+npm publish --dry-run
 npm publish --access public --auth-type=web
 npm view ai-engineering-harness version
 ```

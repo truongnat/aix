@@ -29,7 +29,7 @@ export function ProviderCards() {
               <thead>
                 <tr className="text-slate-500 border-b border-white/10" style={{ background: 'rgba(255,255,255,0.02)' }}>
                   <th className="px-5 py-3 font-medium">Provider</th>
-                  <th className="px-5 py-3 font-medium">1.0.0 support</th>
+                  <th className="px-5 py-3 font-medium">1.0.1 support</th>
                 </tr>
               </thead>
               <tbody>

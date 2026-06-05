@@ -37,7 +37,7 @@ export function Hero() {
             <motion.div variants={item} className="mb-6 mt-5 flex flex-wrap gap-2">
               <span className="badge-release">
                 <span className="w-1.5 h-1.5 rounded-full bg-sky-400 pulse-dot" />
-                v1.0.0
+                v1.0.1
               </span>
               <span className="badge-muted">
                 Open source · Markdown-first · Evidence-based workflow
