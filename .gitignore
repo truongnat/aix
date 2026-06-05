@@ -1,6 +1,15 @@
 node_modules/
 dist/
 
+# TypeScript compiled output (keep .ts source files)
+lib/**/*.js
+lib/**/*.js.map
+lib/**/*.d.ts
+workers/**/*.js
+workers/**/*.js.map
+workers/**/*.d.ts
+!lib/validate.js
+
 # Local dogfood target repos (create beside pack; never commit)
 harness-dogfood-*/
 .env

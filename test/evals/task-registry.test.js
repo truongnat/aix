@@ -10,9 +10,11 @@ const { listTasks } = require(path.join(repoRoot, "lib", "evals", "index.js"));
 
 test("loadRegistry returns task manifests with ids, fixtures, and checks", () => {
   const registry = loadRegistry(repoRoot);
-  assert.ok(registry.tasks.length >= 15);
+  assert.equal(registry.tasks.length, 30);
   assert.ok(registry.tasks.some((task) => task.id === "sample-divide"));
   assert.ok(registry.tasks.some((task) => task.id === "sample-plan-md"));
+  assert.ok(registry.tasks.some((task) => task.id === "sample-multiply"));
+  assert.ok(registry.tasks.some((task) => task.id === "sample-report-md"));
 
   const bugfix = registry.tasks.find((task) => task.id === "sample-bugfix");
   assert.ok(bugfix);
@@ -44,10 +46,14 @@ test("listTasks returns registry and formatted output through the public boundar
   assert.ok(result.registry);
   assert.ok(Array.isArray(result.registry.tasks));
   assert.equal(typeof result.output, "string");
-  assert.ok(result.registry.tasks.length >= 15);
+  assert.equal(result.registry.tasks.length, 30);
   assert.match(
     result.output,
     /^example-health-report \| Produce a concise health report from repo context \| workflow-discipline/m
   );
   assert.match(result.output, /^sample-bugfix \| Fix the broken add\(\) helper \| bugfix/m);
+  assert.match(
+    result.output,
+    /^sample-report-md \| Produce REPORT\.md with status evidence \| workflow-discipline/m
+  );
 });

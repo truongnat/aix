@@ -46,7 +46,7 @@ test("runInstallWizard non-interactive install calls backend with selected provi
     };
   });
 
-  patchModule("lib/cli-ui.js", (mod) => {
+  patchModule("lib/cli-ui", (mod) => {
     const originalShowInstallPlan = mod.showInstallPlan;
     mod.showInstallPlan = () => {};
     return () => {
@@ -119,7 +119,7 @@ test("runUpdateWizard non-interactive update calls backend for each provider", a
     };
   });
 
-  patchModule("lib/cli-ui.js", (mod) => {
+  patchModule("lib/cli-ui", (mod) => {
     const originalShowUpdatePlan = mod.showUpdatePlan;
     mod.showUpdatePlan = () => {};
     return () => {
@@ -189,7 +189,7 @@ test("runUninstallWizard non-interactive uninstall calls backend with full clean
     };
   });
 
-  patchModule("lib/cli-ui.js", (mod) => {
+  patchModule("lib/cli-ui", (mod) => {
     const originalShowUninstallPlan = mod.showUninstallPlan;
     mod.showUninstallPlan = () => {};
     return () => {
@@ -240,7 +240,7 @@ test("runStatusOrDoctor forwards status to aih.sh", () => {
     };
   });
 
-  patchModule("lib/cli-ui.js", (mod) => {
+  patchModule("lib/cli-ui", (mod) => {
     const originalFormatStatus = mod.formatStatus;
     mod.formatStatus = () => {};
     return () => {

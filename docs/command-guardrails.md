@@ -9,7 +9,7 @@
 ### Phase Order
 
 ```
-Session Start → Map → Discuss → Plan → Run → Verify → Ship → Remember
+Session Start → Discuss → Plan → Run → Verify → Ship → Remember
 ```
 
 See `phase-discipline.md` for preconditions and what blocks each phase.

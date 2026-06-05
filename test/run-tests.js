@@ -14,6 +14,35 @@ function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-test-"));
 }
 
+function makeTempRepoCopy() {
+  const target = makeTempDir();
+  fs.cpSync(repoRoot, target, {
+    recursive: true,
+    filter(source) {
+      const relative = path.relative(repoRoot, source);
+      if (!relative) {
+        return true;
+      }
+      const topLevel = relative.split(path.sep)[0];
+      return ![".git", "node_modules", "artifacts"].includes(topLevel);
+    },
+  });
+  childProcess.spawnSync("git", ["init", "-q"], { cwd: target });
+  return target;
+}
+
+function writeRepoFile(baseDir, relativePath, updater) {
+  const fullPath = path.join(baseDir, relativePath);
+  const current = fs.readFileSync(fullPath, "utf8");
+  fs.writeFileSync(fullPath, updater(current));
+}
+
+function assertRepositoryFailure(baseDir, expectedPattern) {
+  const failures = validateApi.validateRepository(baseDir);
+  assert.notEqual(failures.length, 0, "expected validation failures");
+  assert.match(failures.join("\n"), expectedPattern);
+}
+
 function runNode(args, options = {}) {
   return childProcess.spawnSync(process.execPath, args, {
     cwd: repoRoot,
@@ -165,74 +194,71 @@ describe("Session Memory & Documentation", () => {
     }
   });
 
-  test("session memory config template parses as JSON", () => {
-    const config = JSON.parse(
-      fs.readFileSync(path.join(repoRoot, "templates", "harness-config.json"), "utf8")
+  test("validate repository fails when session-memory source-of-truth language is removed", () => {
+    const tempRepo = makeTempRepoCopy();
+    writeRepoFile(tempRepo, "docs/session-memory.md", (content) =>
+      content.replace(/files are the source of truth/gi, "memory is handled automatically")
     );
-    assert.equal(config.memory.backend, "files");
-    assert.equal(config.memory.sourceOfTruth, "files");
+    assertRepositoryFailure(
+      tempRepo,
+      /docs\/session-memory\.md must state that files are the source of truth/
+    );
   });
 
-  test("session memory docs say files are source of truth", () => {
-    const sessionDoc = fs.readFileSync(path.join(repoRoot, "docs", "session-memory.md"), "utf8");
-    const migrationDoc = fs.readFileSync(
-      path.join(repoRoot, "docs", "memory-migration.md"),
-      "utf8"
+  test("validate repository fails when harness config no longer uses file-backed memory", () => {
+    const tempRepo = makeTempRepoCopy();
+    const configPath = path.join(tempRepo, "templates", "harness-config.json");
+    const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+    config.memory.backend = "sqlite";
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+    assertRepositoryFailure(
+      tempRepo,
+      /templates\/harness-config\.json must set memory\.backend to "files"/
     );
-    assert.match(sessionDoc, /files are the source of truth/i);
-    assert.match(sessionDoc, /root `?\.harness`? is an index and router/i);
-    assert.match(sessionDoc, /sessions own working artifacts/i);
-    assert.match(migrationDoc, /legacy/i);
-    assert.match(migrationDoc, /preserve/i);
   });
 
-  test("workflow command docs route through STATE and active sessions", () => {
-    for (const fileName of [
-      "harness-start.md",
-      "harness-map.md",
-      "harness-plan.md",
-      "harness-run.md",
-      "harness-verify.md",
-      "harness-ship.md",
-    ]) {
-      const text = fs.readFileSync(path.join(repoRoot, "commands", fileName), "utf8");
-      assert.match(text, /\.harness\/STATE\.md/);
-      assert.match(text, /sessions\/<active-session>|active session/i);
-    }
+  test("validate repository fails when a session-aware command drops STATE routing", () => {
+    const tempRepo = makeTempRepoCopy();
+    writeRepoFile(tempRepo, "commands/harness-plan.md", (content) =>
+      content.replace(/\.harness\/STATE\.md/g, ".harness/ROUTER.md")
+    );
+    assertRepositoryFailure(
+      tempRepo,
+      /commands\/harness-plan\.md must reference \.harness\/STATE\.md/
+    );
   });
 });
 
 describe("Workflow Command Documentation", () => {
-  test("start and map docs describe merged start and compatibility map semantics", () => {
-    const start = fs.readFileSync(path.join(repoRoot, "commands", "harness-start.md"), "utf8");
-    const map = fs.readFileSync(path.join(repoRoot, "commands", "harness-map.md"), "utf8");
-    assert.match(start, /Session Start/i);
-    assert.match(start, /session-scoped/i);
-    assert.match(start, /important paths|quality gates|provider entrypoints|context mapping/i);
-    assert.match(map, /compatibility|manual context refresh/i);
-    assert.match(
-      map,
-      /not required in the normal workflow|not teach it as part of the primary workflow/i
+  test("validate repository fails when start and map docs drift from their command semantics", () => {
+    const tempRepo = makeTempRepoCopy();
+    writeRepoFile(tempRepo, "commands/harness-map.md", (content) =>
+      content
+        .replace(/manual context refresh/gi, "full workflow entrypoint")
+        .replace(/compatibility/gi, "replacement")
+    );
+    assertRepositoryFailure(
+      tempRepo,
+      /commands\/harness-map\.md must describe compatibility or manual context refresh semantics/
     );
   });
 
-  test("workflow docs use canonical start -> discuss order without required map", () => {
-    const expected =
-      /harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember/;
-    for (const relativePath of [
-      "workflows/core-loop.md",
-      "workflows/feature.md",
-      "workflows/bugfix.md",
-      "workflows/refactor.md",
-      "workflows/incident.md",
-    ]) {
-      const text = fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
-      assert.match(text, expected, `${relativePath} must use canonical workflow order`);
-    }
+  test("validate repository fails when a workflow doc breaks canonical phase order", () => {
+    const tempRepo = makeTempRepoCopy();
+    writeRepoFile(tempRepo, "workflows/feature.md", (content) =>
+      content.replace(
+        /harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember/,
+        "harness-start -> harness-map -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember"
+      )
+    );
+    assertRepositoryFailure(
+      tempRepo,
+      /workflows\/feature\.md must use canonical harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember order/
+    );
   });
 
   test("command metadata keeps start and map with updated descriptions and no brief", () => {
-    const { WORKFLOW_COMMANDS } = require(path.join(repoRoot, "lib", "runtime-command-catalog.js"));
+    const { WORKFLOW_COMMANDS } = require(path.join(repoRoot, "lib", "runtime-command-catalog"));
     const byId = new Map(WORKFLOW_COMMANDS.map((spec) => [spec.id, spec]));
     assert.equal(byId.get("start").canonical, "harness-start");
     assert.match(byId.get("start").description, /Session Start|restore|context/i);
@@ -244,32 +270,26 @@ describe("Workflow Command Documentation", () => {
     assert.equal(byId.has("brief"), false);
   });
 
-  test("workflow command docs include tool discovery and routing guidance", () => {
-    for (const fileName of [
-      "harness-map.md",
-      "harness-plan.md",
-      "harness-run.md",
-      "harness-verify.md",
-      "harness-ship.md",
-    ]) {
-      const text = fs.readFileSync(path.join(repoRoot, "commands", fileName), "utf8");
-      assert.match(text, /## Tool Discovery/);
-      assert.match(text, /## Tool Routing/);
-    }
+  test("validate repository fails when a command doc drops tool discovery guidance", () => {
+    const tempRepo = makeTempRepoCopy();
+    writeRepoFile(tempRepo, "commands/harness-run.md", (content) =>
+      content.replace("## Tool Discovery", "## Discovery")
+    );
+    assertRepositoryFailure(
+      tempRepo,
+      /commands\/harness-run\.md must include ## Tool Discovery and ## Tool Routing sections/
+    );
   });
 
-  test("prompt templates include tool discovery and routing guidance", () => {
-    for (const fileName of [
-      "harness-plan.md",
-      "harness-run.md",
-      "harness-verify.md",
-      "harness-ship.md",
-      "code-reviewer.md",
-    ]) {
-      const text = fs.readFileSync(path.join(repoRoot, "prompt-templates", fileName), "utf8");
-      assert.match(text, /### Tool Discovery/);
-      assert.match(text, /### Tool Routing/);
-    }
+  test("validate repository fails when a prompt template drops tool routing guidance", () => {
+    const tempRepo = makeTempRepoCopy();
+    writeRepoFile(tempRepo, "prompt-templates/harness-run.md", (content) =>
+      content.replace("### Tool Routing", "### Routing")
+    );
+    assertRepositoryFailure(
+      tempRepo,
+      /prompt-templates\/harness-run\.md must include ### Tool Discovery and ### Tool Routing sections/
+    );
   });
 
   test("workflow commands require session start when state unknown", () => {
@@ -443,6 +463,26 @@ describe("Provider Rules & Adapters", () => {
     assert.deepEqual(failures, []);
   });
 
+  test("provider rule renderer renders Claude command files from a provider template", () => {
+    const renderer = require(path.join(repoRoot, "lib", "provider-rule-renderer.js"));
+    const templatePath = path.join(repoRoot, "rules", "providers", "claude", "command.md");
+    assert.ok(fs.existsSync(templatePath), "rules/providers/claude/command.md must exist");
+
+    const content = renderer.renderClaudeCommandFile({
+      canonical: "harness-plan",
+      title: "Harness Plan",
+      sourceCommand: "commands/harness-plan.md",
+    });
+
+    const template = fs.readFileSync(templatePath, "utf8");
+    assert.match(template, /\{\{COMMAND_TITLE\}\}/);
+    assert.match(template, /\{\{COMMAND_CANONICAL\}\}/);
+    assert.match(content, /Read:/);
+    assert.match(content, /\.ai-harness\/prompt-templates\/harness-plan\.md/);
+    assert.match(content, /Then follow the harness command contract/);
+    assert.doesNotMatch(content, /\{\{[A-Z_]+\}\}/);
+  });
+
   test("provider rule adapters declare honest native slash support", () => {
     const { PROVIDER_RULE_ADAPTERS } = require(
       path.join(repoRoot, "lib", "provider-rule-renderer.js")
@@ -458,7 +498,7 @@ describe("Provider Rules & Adapters", () => {
 describe("Provider Command Support", () => {
   test("provider command support merges rule adapter metadata", () => {
     const { providerCommandSupport } = require(
-      path.join(repoRoot, "lib", "runtime-command-catalog.js")
+      path.join(repoRoot, "lib", "runtime-command-catalog")
     );
     const claude = providerCommandSupport("claude");
     const cursor = providerCommandSupport("cursor");
@@ -584,24 +624,36 @@ describe("Session Start Protocol", () => {
     assert.match(agents, /## Session Start/i);
   });
 
-  test("canonical docs describe start map brief semantics", () => {
-    const readme = fs.readFileSync(path.join(repoRoot, "README.md"), "utf8");
-    const phase = fs.readFileSync(path.join(repoRoot, "docs", "phase-discipline.md"), "utf8");
-    const quick = fs.readFileSync(
-      path.join(repoRoot, "docs", "internal", "process-artifacts", "QUICK_REFERENCE.md"),
-      "utf8"
+  test("validate repository fails when canonical Session Start flow disappears from docs", () => {
+    const tempRepo = makeTempRepoCopy();
+    writeRepoFile(tempRepo, "docs/phase-discipline.md", (content) =>
+      content.replace(
+        /Session Start → Discuss → Plan → Run → Verify → Ship → Remember/,
+        "Discuss → Plan → Run → Verify → Ship → Remember"
+      )
     );
-    assert.match(readme, /Session Start → Discuss → Plan → Run → Verify → Ship → Remember/);
-    assert.match(phase, /Session Start → Discuss → Plan → Run → Verify → Ship → Remember/);
-    assert.match(quick, /START → DISCUSS → PLAN → RUN → VERIFY → SHIP → REMEMBER/);
+    assertRepositoryFailure(
+      tempRepo,
+      /docs\/phase-discipline\.md must include the canonical Session Start → Discuss → Plan → Run → Verify → Ship → Remember flow/
+    );
   });
 
-  test("storage architecture docs describe context history and memory locations", () => {
-    const readme = fs.readFileSync(path.join(repoRoot, "README.md"), "utf8");
-    const agents = fs.readFileSync(path.join(repoRoot, "AGENTS.md"), "utf8");
-    assert.match(readme, /\.harness\/context\.md/);
-    assert.match(readme, /\.harness\/history\/events\.jsonl/);
-    assert.match(readme, /\.harness\/memory\//);
-    assert.match(agents, /\.harness\/context\.md/);
+  test("validate repository fails when README drops storage architecture references", () => {
+    const tempRepo = makeTempRepoCopy();
+    writeRepoFile(tempRepo, "README.md", (content) =>
+      content.replace(/\.harness\/history\/events\.jsonl/g, ".harness/history/log.txt")
+    );
+    assertRepositoryFailure(
+      tempRepo,
+      /README\.md must reference \.harness\/context\.md, \.harness\/history\/events\.jsonl, and \.harness\/memory\//
+    );
+  });
+
+  test("validate repository fails when AGENTS drops the Session Start section", () => {
+    const tempRepo = makeTempRepoCopy();
+    writeRepoFile(tempRepo, "AGENTS.md", (content) =>
+      content.replace("## Session Start", "## Start")
+    );
+    assertRepositoryFailure(tempRepo, /AGENTS\.md must include Session Start section/);
   });
 });

@@ -4,7 +4,11 @@
 
 Define the `aih.sh` CLI model for `v0.9.2`: simple verbs with smart defaults, plus backward compatibility for the explicit `v0.9.1` flag surface through `install.sh`.
 
-**Implemented (v0.9.2 Step 5):** simple `install` / `update` / `uninstall` defaults, runtime auto-detection, lightweight `status` / `doctor`, private `.git/info/exclude` hygiene, project uninstall, and project update. Global update remains planned-only. See [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md).
+Canonical scope: `aih.sh` lifecycle commands, defaults, and flags.
+
+Use this document as the command/flag source of truth. For remote `install.sh` wrapper behavior, review-before-run flows, and manual fallback entrypoints, see [install-sh-usage.md](install-sh-usage.md). For per-runtime payload paths and follow-up actions after runtime-native install, see [runtime-native-install.md](runtime-native-install.md).
+
+**Implemented (v0.9.2 Step 5):** simple `install` / `update` / `uninstall` defaults, runtime auto-detection, lightweight `status` / `doctor`, private `.git/info/exclude` hygiene, project uninstall, and project update. Global update remains planned-only.
 
 ## Commands
 
@@ -147,11 +151,12 @@ sh aih.sh uninstall --all
 curl -fsSL .../aih.sh | sh -s -- install
 ```
 
-`install.sh` remains available as a compatibility wrapper.
+`install.sh` remains available as a compatibility wrapper. See [install-sh-usage.md](install-sh-usage.md) for remote wrapper behavior and safety guidance.
 
 ## Related Docs
 
 - [git-hygiene-policy.md](git-hygiene-policy.md)
+- [install-sh-usage.md](install-sh-usage.md)
+- [runtime-native-install.md](runtime-native-install.md)
 - [simple-cli-ux.md](simple-cli-ux.md)
 - [uninstall-update-design.md](uninstall-update-design.md)
-- [installer-ux-v0.9.2-plan.md](installer-ux-v0.9.2-plan.md)

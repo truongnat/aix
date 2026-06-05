@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Polished `@clack/prompts` wizard for `npx ai-engineering-harness install|update|uninstall`. UI lives in `lib/cli-ui.js` (re-exported from `bin/cli-ui.js`); business logic stays in `lib/cli-main.js` and `lib/cli-backend.js`.
+Polished `@clack/prompts` wizard for `npx ai-engineering-harness install|update|uninstall`. UI lives in `lib/cli-ui.js`; business logic stays in `lib/cli-main.js` and `lib/cli-backend.js`.
 
 Inspired by modern CLIs: shadcn, create-t3-app, `npx skills add`.
 

@@ -107,6 +107,56 @@ const BUGFIX_TASKS = [
     checkFile: "checks/value-check.js",
     exportName: "defaultValue",
   },
+  {
+    id: "sample-multiply",
+    title: "Fix broken multiply() helper",
+    srcFile: "src/math.js",
+    broken: `"use strict";\n\nfunction multiply(a, b) {\n  return a + b;\n}\n\nmodule.exports = { multiply };\n`,
+    fixed: `"use strict";\n\nfunction multiply(a, b) {\n  return a * b;\n}\n\nmodule.exports = { multiply };\n`,
+    check: `const test = require("node:test");\nconst assert = require("node:assert/strict");\nconst { multiply } = require("../src/math");\n\ntest("multiply combines factors", () => {\n  assert.equal(multiply(6, 7), 42);\n});\n`,
+    checkFile: "checks/math-check.js",
+    exportName: "multiply",
+  },
+  {
+    id: "sample-subtract",
+    title: "Fix broken subtract() helper",
+    srcFile: "src/math.js",
+    broken: `"use strict";\n\nfunction subtract(a, b) {\n  return a + b;\n}\n\nmodule.exports = { subtract };\n`,
+    fixed: `"use strict";\n\nfunction subtract(a, b) {\n  return a - b;\n}\n\nmodule.exports = { subtract };\n`,
+    check: `const test = require("node:test");\nconst assert = require("node:assert/strict");\nconst { subtract } = require("../src/math");\n\ntest("subtract removes the second value", () => {\n  assert.equal(subtract(10, 3), 7);\n});\n`,
+    checkFile: "checks/math-check.js",
+    exportName: "subtract",
+  },
+  {
+    id: "sample-first-item",
+    title: "Fix broken firstItem() helper",
+    srcFile: "src/array.js",
+    broken: `"use strict";\n\nfunction firstItem(values) {\n  return values[values.length - 1];\n}\n\nmodule.exports = { firstItem };\n`,
+    fixed: `"use strict";\n\nfunction firstItem(values) {\n  return values[0];\n}\n\nmodule.exports = { firstItem };\n`,
+    check: `const test = require("node:test");\nconst assert = require("node:assert/strict");\nconst { firstItem } = require("../src/array");\n\ntest("firstItem returns the first element", () => {\n  assert.equal(firstItem([3, 5, 8]), 3);\n});\n`,
+    checkFile: "checks/array-check.js",
+    exportName: "firstItem",
+  },
+  {
+    id: "sample-last-item",
+    title: "Fix broken lastItem() helper",
+    srcFile: "src/array.js",
+    broken: `"use strict";\n\nfunction lastItem(values) {\n  return values[0];\n}\n\nmodule.exports = { lastItem };\n`,
+    fixed: `"use strict";\n\nfunction lastItem(values) {\n  return values[values.length - 1];\n}\n\nmodule.exports = { lastItem };\n`,
+    check: `const test = require("node:test");\nconst assert = require("node:assert/strict");\nconst { lastItem } = require("../src/array");\n\ntest("lastItem returns the final element", () => {\n  assert.equal(lastItem([3, 5, 8]), 8);\n});\n`,
+    checkFile: "checks/array-check.js",
+    exportName: "lastItem",
+  },
+  {
+    id: "sample-uppercase",
+    title: "Fix broken uppercase() helper",
+    srcFile: "src/string.js",
+    broken: `"use strict";\n\nfunction uppercase(value) {\n  return value.toLowerCase();\n}\n\nmodule.exports = { uppercase };\n`,
+    fixed: `"use strict";\n\nfunction uppercase(value) {\n  return value.toUpperCase();\n}\n\nmodule.exports = { uppercase };\n`,
+    check: `const test = require("node:test");\nconst assert = require("node:assert/strict");\nconst { uppercase } = require("../src/string");\n\ntest("uppercase capitalizes text", () => {\n  assert.equal(uppercase("Harness"), "HARNESS");\n});\n`,
+    checkFile: "checks/string-check.js",
+    exportName: "uppercase",
+  },
 ];
 
 const WORKFLOW_TASKS = [
@@ -145,22 +195,60 @@ const WORKFLOW_TASKS = [
     pattern: "Blockers:",
     withContent: "# Blockers\n\nBlockers: none\n",
   },
+  {
+    id: "sample-discussion-md",
+    title: "Produce DISCUSSION.md with explicit constraints",
+    artifact: "DISCUSSION.md",
+    pattern: "Constraints:",
+    withContent: "# Discussion\n\nConstraints: stay within the approved fixture scope.\n",
+  },
+  {
+    id: "sample-review-md",
+    title: "Produce REVIEW.md with findings section",
+    artifact: "REVIEW.md",
+    pattern: "Findings:",
+    withContent: "# Review\n\nFindings: deterministic fixture review completed.\n",
+  },
+  {
+    id: "sample-remember-md",
+    title: "Produce REMEMBER.md with durable lesson",
+    artifact: "REMEMBER.md",
+    pattern: "Lesson:",
+    withContent: "# Remember\n\nLesson: preserve the verified workflow evidence.\n",
+  },
+  {
+    id: "sample-report-md",
+    title: "Produce REPORT.md with status evidence",
+    artifact: "REPORT.md",
+    pattern: "Status:",
+    withContent: "# Report\n\nStatus: ready\nEvidence: fixture checks passed.\n",
+  },
+  {
+    id: "sample-pr-message-md",
+    title: "Produce PR_MESSAGE.md with summary line",
+    artifact: "PR_MESSAGE.md",
+    pattern: "Summary:",
+    withContent: "# PR Message\n\nSummary: deterministic fixture prepared for review.\n",
+  },
 ];
 
 function writeBugfixTask(task) {
   const fixtureRoot = path.join(repoRoot, "evals", "fixtures", task.id);
   fs.mkdirSync(path.dirname(path.join(fixtureRoot, task.srcFile)), { recursive: true });
   fs.mkdirSync(path.dirname(path.join(fixtureRoot, task.checkFile)), { recursive: true });
-  fs.writeFileSync(path.join(fixtureRoot, "package.json"), `${JSON.stringify(
-    {
-      name: `${task.id}-fixture`,
-      private: true,
-      type: "commonjs",
-      scripts: { test: `node --test ${task.checkFile}` },
-    },
-    null,
-    2
-  )}\n`);
+  fs.writeFileSync(
+    path.join(fixtureRoot, "package.json"),
+    `${JSON.stringify(
+      {
+        name: `${task.id}-fixture`,
+        private: true,
+        type: "commonjs",
+        scripts: { test: `node --test ${task.checkFile}` },
+      },
+      null,
+      2
+    )}\n`
+  );
   fs.writeFileSync(path.join(fixtureRoot, task.srcFile), task.broken);
   fs.writeFileSync(path.join(fixtureRoot, task.checkFile), task.check);
   fs.writeFileSync(
@@ -204,12 +292,14 @@ function writeWorkflowTask(task) {
         mode: "workflow-discipline",
         fixture: { path: `evals/fixtures/${task.id}` },
         prompt: `Write ${task.artifact} following the fixture README.`,
-        successChecks: [
-          { type: "file-contains", path: task.artifact, pattern: task.pattern },
-        ],
+        successChecks: [{ type: "file-contains", path: task.artifact, pattern: task.pattern }],
         behaviorChecks: [{ type: "artifact-exists", path: "final-response.txt" }],
         rubric: "evals/rubrics/deterministic-v1.json",
-        metrics: { withHarnessSteps: 4, withoutHarnessSteps: 9, phases: ["plan", "verify", "ship"] },
+        metrics: {
+          withHarnessSteps: 4,
+          withoutHarnessSteps: 9,
+          phases: ["plan", "verify", "ship"],
+        },
         tags: ["sample", "workflow", "deterministic", "docs", "p1-corpus"],
       },
       null,
@@ -249,7 +339,8 @@ function buildMutations() {
     "example-health-report": {
       metrics: { withHarnessSteps: 4, withoutHarnessSteps: 10, phases: ["plan", "ship"] },
       withHarness: {
-        "HEALTH_REPORT.md": "# Health Report\n\nStatus: ready\nSummary: deterministic fixture generated.\n",
+        "HEALTH_REPORT.md":
+          "# Health Report\n\nStatus: ready\nSummary: deterministic fixture generated.\n",
         "final-response.txt": "Generated health report.",
       },
       withoutHarness: { "final-response.txt": "Attempted report generation." },
@@ -257,7 +348,8 @@ function buildMutations() {
     "sample-response-contract": {
       metrics: { withHarnessSteps: 4, withoutHarnessSteps: 9, phases: ["ship"] },
       withHarness: {
-        "final-response.txt": "Status: complete\nSummary: Wrote final-response.txt per response contract.\n",
+        "final-response.txt":
+          "Status: complete\nSummary: Wrote final-response.txt per response contract.\n",
       },
       withoutHarness: { "final-response.txt": "Done." },
     },

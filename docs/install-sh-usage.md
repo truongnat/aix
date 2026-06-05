@@ -4,6 +4,10 @@
 
 Document the one-line remote installer for `ai-engineering-harness` into a target repository without manual clone.
 
+Canonical scope: remote `install.sh` wrapper behavior, review-before-run flow, and manual fallback entrypoints.
+
+Use [install-command-model.md](install-command-model.md) as the source of truth for `aih.sh` command defaults and flags. Use [runtime-native-install.md](runtime-native-install.md) for the per-runtime payload matrix and follow-up actions after runtime-native install.
+
 ## Recommended: Runtime-native Install
 
 `install.sh` supports **runtime** + **scope** selection and calls [install-runtime.js](../install-runtime.js) for non-`manual` runtimes. Modes are **experimental** until manual session checks pass — see [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
@@ -21,30 +25,14 @@ Validate from the source pack: `node validate.js --target <repo> --runtime <name
 
 Non-interactive `curl | sh` **without** `--runtime` defaults to **`manual`**: downloads the pack and runs `install.js`, which **copies** the default installed surface into the target repo root (`AGENTS.md`, `commands/`, `skills/`, …). Use only when runtime-native install is not suitable — [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md).
 
-## Runtime Selector
+## Wrapper Scope
 
-`install.sh` accepts **runtime** and **scope** and prints an install plan before executing.
+`install.sh` is the compatibility wrapper for remote installs and advanced explicit flows.
 
-| Flag | Purpose |
-|---|---|
-| `--runtime <name>` | `claude`, `codex`, `cursor`, `gemini`, `generic`, `all`, `manual` (`opencode` legacy uninstall only via `aih.sh`) |
-| `--scope <name>` | `global` or `project` (required for non-manual when non-interactive) |
-| `--init-harness` | Scaffold project `.harness/` profile files (project scope; see [harness-init-usage.md](harness-init-usage.md)) |
-| `--legacy-root` | Alias for `--runtime manual` |
-| `--yes` | Skip confirmation prompt |
-
-**Experimental:** Non-`manual` runtimes call [install-runtime.js](../install-runtime.js). File/install dogfood complete (D1–D6); **stable support: No** — see [runtime-native-install-audit.md](runtime-native-install-audit.md).
-
-**Only `--runtime manual`** performs legacy root copy (`install.js`). Other runtimes write runtime-specific paths only (no `commands/`/`skills/` at repo root):
-
-- **Dry-run:** prints `WOULD CREATE` / `UPDATE` lines; no root pack copy (uses local pack when `install.sh` is run from clone)
-- **Write:** creates runtime-specific files only
-
-Non-interactive install without `--runtime` defaults to `manual` and prints a **fallback warning**.
-
-Windsurf is not exposed as a separate runtime until its native payload and docs are verified. Use the `cursor` runtime only when you intentionally want the Cursor rule path.
-
-See [interactive-installer-design.md](interactive-installer-design.md), [runtime-install-matrix-research.md](runtime-install-matrix-research.md), [project-state-policy.md](project-state-policy.md).
+- It accepts the same install-oriented flags documented in [install-command-model.md](install-command-model.md).
+- It delegates runtime-native writes to [install-runtime.js](../install-runtime.js) and runtime-specific payload paths documented in [runtime-native-install.md](runtime-native-install.md).
+- It keeps legacy root copy available only through `--runtime manual` / `--legacy-root`.
+- Non-interactive install without `--runtime` defaults to `manual` and prints a fallback warning.
 
 ## Quick Install (manual fallback only)
 
@@ -134,6 +122,12 @@ When `--runtime manual` (or default non-interactive fallback):
 5. Removes the temporary directory on exit
 
 Copy behavior is defined by [install.js](../install.js). Root bulk copy is **fallback only**, not the v1 default install model.
+
+## Runtime-Native Notes
+
+- Runtime-native modes remain **experimental** until manual session checks pass — see [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
+- Windsurf is not exposed as a separate documented path until its native payload is verified; use the `cursor` runtime only when you intentionally want the Cursor rule path.
+- `--runtime manual` is the only mode that performs legacy root copy.
 
 ## What It Does Not Do
 

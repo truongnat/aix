@@ -1,0 +1,41 @@
+{
+  "id": "sample-remember-md",
+  "suite": "sample-suite",
+  "title": "Produce REMEMBER.md with durable lesson",
+  "goal": "Generate REMEMBER.md for workflow discipline.",
+  "mode": "workflow-discipline",
+  "fixture": {
+    "path": "evals/fixtures/sample-remember-md"
+  },
+  "prompt": "Write REMEMBER.md following the fixture README.",
+  "successChecks": [
+    {
+      "type": "file-contains",
+      "path": "REMEMBER.md",
+      "pattern": "Lesson:"
+    }
+  ],
+  "behaviorChecks": [
+    {
+      "type": "artifact-exists",
+      "path": "final-response.txt"
+    }
+  ],
+  "rubric": "evals/rubrics/deterministic-v1.json",
+  "metrics": {
+    "withHarnessSteps": 4,
+    "withoutHarnessSteps": 9,
+    "phases": [
+      "plan",
+      "verify",
+      "ship"
+    ]
+  },
+  "tags": [
+    "sample",
+    "workflow",
+    "deterministic",
+    "docs",
+    "p1-corpus"
+  ]
+}

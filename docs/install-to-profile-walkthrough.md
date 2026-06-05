@@ -4,7 +4,11 @@
 
 Show the shortest practical path from install to validated profile and goal artifacts for a first-time adopter.
 
+Canonical scope: step-by-step first-time adoption from install through validated profile and goal artifacts.
+
 This is the recommended current consumption flow, not the only possible future mode.
+
+For raw installer output snippets and compact dry-run/write examples, see [install-output-example.md](install-output-example.md).
 
 ## When To Use
 
@@ -43,6 +47,8 @@ node install.js --target ../my-project
 ```
 
 Read the printed next-step guidance at the end of the install output. The install copies the markdown operating surface into the target repository.
+
+If you want a compact example of the output shape before running the command, see [install-output-example.md](install-output-example.md).
 
 ## Step 3: Read The Installed Entry Points
 

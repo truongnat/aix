@@ -111,6 +111,8 @@
 
 ## Later Optional Work
 
+- potential long-term shift toward a policy engine / deterministic enforcement model, as explored in [internal review notes](internal/reviews/CORE_BREAKTHROUGH_VI.md)
+- optional codebase-derived guardrails and closed-loop policy tuning if they can be proven without breaking the markdown-first operating contract
 - optional archive generation automation
 - optional installed surface hash or checksum validation
 - optional manifest body or version value validation

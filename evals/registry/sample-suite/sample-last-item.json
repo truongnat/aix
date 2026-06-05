@@ -1,0 +1,39 @@
+{
+  "id": "sample-last-item",
+  "suite": "sample-suite",
+  "title": "Fix broken lastItem() helper",
+  "goal": "Repair lastItem() in a deterministic Node fixture.",
+  "mode": "bugfix",
+  "fixture": {
+    "path": "evals/fixtures/sample-last-item"
+  },
+  "prompt": "Fix the bug so tests pass without changing the checks.",
+  "successChecks": [
+    {
+      "type": "command",
+      "command": "npm test",
+      "cwd": "."
+    }
+  ],
+  "behaviorChecks": [
+    {
+      "type": "artifact-exists",
+      "path": "final-response.txt"
+    }
+  ],
+  "rubric": "evals/rubrics/deterministic-v1.json",
+  "metrics": {
+    "withHarnessSteps": 3,
+    "withoutHarnessSteps": 8,
+    "phases": [
+      "verify"
+    ]
+  },
+  "tags": [
+    "sample",
+    "bugfix",
+    "deterministic",
+    "node",
+    "p1-corpus"
+  ]
+}

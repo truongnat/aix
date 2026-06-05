@@ -239,6 +239,86 @@
       "final-response.txt": "Attempted defaultValue fix without harness."
     }
   },
+  "sample-multiply": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/math.js": "\"use strict\";\n\nfunction multiply(a, b) {\n  return a * b;\n}\n\nmodule.exports = { multiply };\n",
+      "final-response.txt": "Fixed multiply() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted multiply fix without harness."
+    }
+  },
+  "sample-subtract": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/math.js": "\"use strict\";\n\nfunction subtract(a, b) {\n  return a - b;\n}\n\nmodule.exports = { subtract };\n",
+      "final-response.txt": "Fixed subtract() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted subtract fix without harness."
+    }
+  },
+  "sample-first-item": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/array.js": "\"use strict\";\n\nfunction firstItem(values) {\n  return values[0];\n}\n\nmodule.exports = { firstItem };\n",
+      "final-response.txt": "Fixed firstItem() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted firstItem fix without harness."
+    }
+  },
+  "sample-last-item": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/array.js": "\"use strict\";\n\nfunction lastItem(values) {\n  return values[values.length - 1];\n}\n\nmodule.exports = { lastItem };\n",
+      "final-response.txt": "Fixed lastItem() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted lastItem fix without harness."
+    }
+  },
+  "sample-uppercase": {
+    "metrics": {
+      "withHarnessSteps": 3,
+      "withoutHarnessSteps": 8,
+      "phases": [
+        "verify"
+      ]
+    },
+    "withHarness": {
+      "src/string.js": "\"use strict\";\n\nfunction uppercase(value) {\n  return value.toUpperCase();\n}\n\nmodule.exports = { uppercase };\n",
+      "final-response.txt": "Fixed uppercase() and verified tests."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted uppercase fix without harness."
+    }
+  },
   "sample-plan-md": {
     "metrics": {
       "withHarnessSteps": 4,
@@ -327,6 +407,96 @@
     },
     "withoutHarness": {
       "final-response.txt": "Attempted BLOCKERS.md without harness."
+    }
+  },
+  "sample-discussion-md": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 9,
+      "phases": [
+        "plan",
+        "verify",
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "DISCUSSION.md": "# Discussion\n\nConstraints: stay within the approved fixture scope.\n",
+      "final-response.txt": "Generated DISCUSSION.md."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted DISCUSSION.md without harness."
+    }
+  },
+  "sample-review-md": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 9,
+      "phases": [
+        "plan",
+        "verify",
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "REVIEW.md": "# Review\n\nFindings: deterministic fixture review completed.\n",
+      "final-response.txt": "Generated REVIEW.md."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted REVIEW.md without harness."
+    }
+  },
+  "sample-remember-md": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 9,
+      "phases": [
+        "plan",
+        "verify",
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "REMEMBER.md": "# Remember\n\nLesson: preserve the verified workflow evidence.\n",
+      "final-response.txt": "Generated REMEMBER.md."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted REMEMBER.md without harness."
+    }
+  },
+  "sample-report-md": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 9,
+      "phases": [
+        "plan",
+        "verify",
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "REPORT.md": "# Report\n\nStatus: ready\nEvidence: fixture checks passed.\n",
+      "final-response.txt": "Generated REPORT.md."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted REPORT.md without harness."
+    }
+  },
+  "sample-pr-message-md": {
+    "metrics": {
+      "withHarnessSteps": 4,
+      "withoutHarnessSteps": 9,
+      "phases": [
+        "plan",
+        "verify",
+        "ship"
+      ]
+    },
+    "withHarness": {
+      "PR_MESSAGE.md": "# PR Message\n\nSummary: deterministic fixture prepared for review.\n",
+      "final-response.txt": "Generated PR_MESSAGE.md."
+    },
+    "withoutHarness": {
+      "final-response.txt": "Attempted PR_MESSAGE.md without harness."
     }
   }
 }

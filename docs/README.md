@@ -101,7 +101,9 @@ Welcome! User-facing documentation for **ai-engineering-harness**, organized wit
 The following subdirectories contain internal development notes, planning documents, and release archives. Most users do not need these:
 
 - **`docs/internal/superpowers/`** — Planning and design notes for major features
+- **`docs/internal/archive/install/`** — Historical install UX plans, installer design notes, and provider research
 - **`docs/internal/archive/v0/`** — Historical v0 release/plan/readiness notes
+- **`docs/internal/archive/runtime/`** — Historical runtime-install research, audits, and dogfood plans
 - **`docs/internal/archive/`** — Frozen contracts, gap analysis, positioning
 - **`docs/internal/reviews/`** — Improvement and review reports
 - **`docs/architecture/`** — ADRs for major technical decisions

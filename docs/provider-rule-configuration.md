@@ -40,7 +40,7 @@ Provider templates include `<!-- @core -->` markers. The renderer expands them a
 | Gemini | `.gemini/extensions/ai-engineering-harness/GEMINI.md` | No | No |
 | Generic | `AGENTS.md` | No | No |
 
-Source templates live under `rules/providers/<provider>/`.
+Source templates live under `rules/providers/<provider>/`, including `rules/providers/claude/command.md` for project-native Claude command files.
 
 ## Install Mapping
 

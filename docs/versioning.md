@@ -1,8 +1,8 @@
 # Versioning
 
-## Current Meaning Of `v0.x`
+## Current Meaning Of `v1.x`
 
-`v0.x` means the operating model is still stabilizing. The repository is usable, but the documentation structure, guidance, and operating contract may continue to evolve as the harness is refined.
+`v1.x` means the core capability-pack operating contract is stable. Patch and minor releases should harden docs, validation, packaging, and adoption guidance without breaking the frozen `v1.0.0` baseline for adopters.
 
 ## Patch Changes
 
@@ -26,6 +26,10 @@ Minor releases can include additive improvements such as:
 ## Major Changes Later
 
 Major version changes are for future breaking changes to the operating contract, artifact model, or core harness expectations.
+
+## Historical Meaning Of `v0.x`
+
+`v0.x` covered the contract-freeze and release-hardening path that led to the first stable capability pack release. The version boundaries below remain as historical scope records for those pre-`v1.0.0` milestones.
 
 ## Scope Boundary For `v0.1.0`
 
@@ -81,4 +85,4 @@ Heavy runtime systems are not part of `v0.1.0`. The first release is the markdow
 
 ## Scope Boundary For `v1.0.0`
 
-`v1.0.0` should be the first stable capability pack release using the `v0.9.0` frozen contracts as a baseline. It must **not** claim stable runtime-native support until manual runtime checks pass for selected runtimes or v1 scope is explicitly reduced. Prefer release hardening and documentation finalization over new contract surface. Expand contracts only if a documented blocker appears; follow [breaking-change-policy.md](breaking-change-policy.md).
+`v1.0.0` is the first stable capability pack release using the `v0.9.0` frozen contracts as a baseline. It does **not** claim stable runtime-native support; those paths stay explicitly manual or experimental until selected runtimes pass release-quality checks or the contract is expanded in a documented future major/minor scope. Prefer release hardening and documentation finalization over new contract surface. Expand contracts only if a documented blocker appears; follow [breaking-change-policy.md](breaking-change-policy.md).

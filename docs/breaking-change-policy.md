@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define what counts as a breaking change for `ai-engineering-harness` contracts on the path to and after `v1.0.0`.
+Define what counts as a breaking change for `ai-engineering-harness` contracts now that `v1.0.0` has established the stable capability-pack baseline.
 
 ## What Counts As Breaking
 
@@ -46,7 +46,7 @@ These are generally **non-breaking** if contracts above stay satisfied:
 
 ## Pre-v1 Rules
 
-Before `v1.0.0`:
+Historical notes for work before `v1.0.0`:
 
 - prefer additive changes
 - align [stable-contract-index.md](stable-contract-index.md) and `validate.js` in the same release when freezing behavior
@@ -55,7 +55,7 @@ Before `v1.0.0`:
 
 ## Post-v1 Rules
 
-After `v1.0.0`:
+For the current `v1.x` line:
 
 - follow semantic versioning intent: breaking contract changes require a major version
 - provide migration notes for installed surface, validator, or artifact heading changes

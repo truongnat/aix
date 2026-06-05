@@ -1,0 +1,8 @@
+{
+  "name": "sample-last-item-fixture",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node --test checks/array-check.js"
+  }
+}

@@ -1,9 +1,6 @@
 {
-  "lib/**/*.{js,md}": ["prettier --write"],
-  "bin/**/*.js": ["prettier --write"],
-  "test/**/*.js": ["prettier --write"],
-  "*.{js,md}": ["prettier --write"],
-  "lib/**/*.js": ["eslint --max-warnings 0"],
-  "bin/**/*.js": ["eslint --max-warnings 0"],
-  "test/**/*.js": ["eslint --max-warnings 0"]
+  "lib/**/*.{ts,md}": ["prettier --write"],
+  "bin/**/*.js": ["prettier --write", "eslint --max-warnings 0"],
+  "test/**/*.js": ["prettier --write", "eslint --max-warnings 0"],
+  "*.{js,md}": ["prettier --write"]
 }

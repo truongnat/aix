@@ -1,0 +1,41 @@
+{
+  "id": "sample-review-md",
+  "suite": "sample-suite",
+  "title": "Produce REVIEW.md with findings section",
+  "goal": "Generate REVIEW.md for workflow discipline.",
+  "mode": "workflow-discipline",
+  "fixture": {
+    "path": "evals/fixtures/sample-review-md"
+  },
+  "prompt": "Write REVIEW.md following the fixture README.",
+  "successChecks": [
+    {
+      "type": "file-contains",
+      "path": "REVIEW.md",
+      "pattern": "Findings:"
+    }
+  ],
+  "behaviorChecks": [
+    {
+      "type": "artifact-exists",
+      "path": "final-response.txt"
+    }
+  ],
+  "rubric": "evals/rubrics/deterministic-v1.json",
+  "metrics": {
+    "withHarnessSteps": 4,
+    "withoutHarnessSteps": 9,
+    "phases": [
+      "plan",
+      "verify",
+      "ship"
+    ]
+  },
+  "tags": [
+    "sample",
+    "workflow",
+    "deterministic",
+    "docs",
+    "p1-corpus"
+  ]
+}
