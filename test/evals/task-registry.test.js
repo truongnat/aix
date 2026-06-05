@@ -11,13 +11,16 @@ const { listTasks } = require(path.join(repoRoot, "lib", "evals", "index.js"));
 test("loadRegistry returns task manifests with ids, fixtures, and checks", () => {
   const registry = loadRegistry(repoRoot);
   assert.ok(registry.tasks.length >= 5);
-  assert.deepEqual(registry.tasks.map((task) => task.id), [
-    "example-health-report",
-    "sample-bugfix",
-    "sample-config-patch",
-    "sample-response-contract",
-    "sample-string-trim",
-  ]);
+  assert.deepEqual(
+    registry.tasks.map((task) => task.id),
+    [
+      "example-health-report",
+      "sample-bugfix",
+      "sample-config-patch",
+      "sample-response-contract",
+      "sample-string-trim",
+    ]
+  );
 
   const bugfix = registry.tasks.find((task) => task.id === "sample-bugfix");
   assert.ok(bugfix);
@@ -49,13 +52,16 @@ test("listTasks returns registry and formatted output through the public boundar
   assert.ok(result.registry);
   assert.ok(Array.isArray(result.registry.tasks));
   assert.equal(typeof result.output, "string");
-  assert.deepEqual(result.registry.tasks.map((task) => task.id), [
-    "example-health-report",
-    "sample-bugfix",
-    "sample-config-patch",
-    "sample-response-contract",
-    "sample-string-trim",
-  ]);
+  assert.deepEqual(
+    result.registry.tasks.map((task) => task.id),
+    [
+      "example-health-report",
+      "sample-bugfix",
+      "sample-config-patch",
+      "sample-response-contract",
+      "sample-string-trim",
+    ]
+  );
   assert.match(
     result.output,
     /^example-health-report \| Produce a concise health report from repo context \| workflow-discipline/m

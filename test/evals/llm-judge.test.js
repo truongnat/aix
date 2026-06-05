@@ -5,10 +5,9 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const {
-  judgeWithLlmFallback,
-  runDeterministicRubric,
-} = require(path.join(repoRoot, "lib", "evals", "llm-judge.js"));
+const { judgeWithLlmFallback, runDeterministicRubric } = require(
+  path.join(repoRoot, "lib", "evals", "llm-judge.js")
+);
 
 test("runDeterministicRubric evaluates response-contract behavior checks", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-rubric-"));
