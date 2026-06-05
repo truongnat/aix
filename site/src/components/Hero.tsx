@@ -40,7 +40,7 @@ export function Hero() {
                 v1.0.0
               </span>
               <span className="badge-muted">
-                Markdown-first · Provider adapters · Evidence-based shipping
+                Open source · Markdown-first · Evidence-based workflow
               </span>
             </motion.div>
 
@@ -52,14 +52,25 @@ export function Hero() {
             </motion.h1>
 
             <motion.p variants={item} className="text-lg text-slate-400 max-w-xl leading-relaxed mb-8">
-              A markdown-first workflow guardrail kit that helps AI agents restore context, plan changes,
-              verify with evidence, ship honest reports, and remember what matters.
+              An open-source workflow guardrail kit that helps AI agents restore context, plan before they code,
+              verify with evidence, ship honest reports, and leave behind artifacts a human team can trust.
             </motion.p>
+
+            <motion.div variants={item} className="hero-trust-grid mb-8">
+              <div className="hero-trust-card">
+                <div className="hero-trust-label">Why it feels professional</div>
+                <div className="hero-trust-value">Explicit phases, artifacts, and stop conditions</div>
+              </div>
+              <div className="hero-trust-card">
+                <div className="hero-trust-label">Why it stays easy to use</div>
+                <div className="hero-trust-value">Repo-native markdown files and simple `npx` install</div>
+              </div>
+            </motion.div>
 
             <motion.div variants={item} className="flex gap-3 flex-wrap">
               <a href="#install" className="btn-primary">Get started</a>
               <a href={GITHUB} target="_blank" rel="noopener noreferrer" className="btn-secondary">View on GitHub</a>
-              <a href="#workflow" className="btn-secondary">See workflow</a>
+              <a href="#walkthrough" className="btn-secondary">Watch walkthrough</a>
             </motion.div>
           </div>
 

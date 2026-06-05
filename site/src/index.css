@@ -332,6 +332,36 @@ body {
   backdrop-filter: blur(20px);
 }
 
+.hero-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.875rem;
+  max-width: 44rem;
+}
+
+.hero-trust-card {
+  padding: 1rem 1.125rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.hero-trust-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+  margin-bottom: 0.45rem;
+}
+
+.hero-trust-value {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #cbd5e1;
+}
+
 .badge-release {
   display: inline-flex;
   align-items: center;
@@ -356,6 +386,25 @@ body {
   color: #94a3b8;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.walkthrough-panel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)),
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 38%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  box-shadow: 0 30px 90px rgba(2, 6, 23, 0.5);
+  backdrop-filter: blur(18px);
+}
+
+.walkthrough-video {
+  display: block;
+  width: 100%;
+  border-radius: 1rem;
+  background: #020617;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 60px rgba(2, 6, 23, 0.5);
 }
 
 /* ── Scroll to top ── */
@@ -389,6 +438,10 @@ body {
 }
 
 @media (max-width: 640px) {
+  .hero-trust-grid {
+    grid-template-columns: 1fr;
+  }
+
   .scroll-to-top {
     right: 1rem;
     bottom: 1rem;

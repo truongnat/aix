@@ -14,11 +14,12 @@ export function CTA() {
       <div className="max-w-5xl mx-auto text-center">
         <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }} className="flex flex-col items-center">
           <motion.h2 variants={item} className="hero-headline text-4xl sm:text-5xl font-extrabold mb-10 max-w-2xl">
-            Give your AI coding agent an engineering loop
+            Give your open-source workflow a disciplined agent loop
           </motion.h2>
 
           <motion.div variants={item} className="flex flex-wrap gap-4 justify-center">
             <a href="#install" className="btn-primary">Install with npx</a>
+            <a href="#walkthrough" className="btn-secondary">Watch the walkthrough</a>
             <a href={README} target="_blank" rel="noopener noreferrer" className="btn-secondary">Read the README</a>
             <a href={DEMO} target="_blank" rel="noopener noreferrer" className="btn-secondary">View dogfood demo</a>
           </motion.div>

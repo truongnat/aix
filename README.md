@@ -2,25 +2,30 @@
 
 # ai-engineering-harness
 
-**Engineering discipline for AI coding agents.**
+**Professional workflow guardrails for AI coding agents.**
 
-A markdown-first workflow guardrail kit that helps AI agents restore context, plan changes, verify with evidence, ship PR-ready reports, and remember durable project knowledge.
+A markdown-first, open-source kit that helps agents restore context, plan before coding, verify with evidence, ship reviewer-ready summaries, and preserve durable project knowledge.
 
 ![Version](https://img.shields.io/badge/version-v1.0.0-2563eb)
 ![CI](https://github.com/truongnat/ai-engineering-harness/actions/workflows/ci.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-16a34a)
-![Markdown First](https://img.shields.io/badge/markdown-first-7c3aed)
+![Open Source](https://img.shields.io/badge/open-source-0f172a)
 ![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-818cf8)
 
-[Quickstart](#quickstart) · [Session Start](#session-start) · [Ship & reports](#ship-means-pr-ready) · [Providers](#provider-support) · [Demo](#demo) · [Landing page](https://truongnat.github.io/ai-engineering-harness/)
+[Quickstart](#quickstart) · [Walkthrough](#watch-the-walkthrough) · [Commands](#canonical-commands) · [Providers](#provider-support) · [Demo](#demo) · [Landing page](https://truongnat.github.io/ai-engineering-harness/)
 
 </div>
 
 ---
 
-## In 10 seconds
+## In 30 seconds
 
-AI coding agents are good at editing code, but they often skip engineering discipline: stale context, weak plans, wrong-phase execution, optimistic verification, and incomplete handoff notes.
+AI coding agents are fast at editing files, but they often skip engineering discipline:
+
+- They start with stale context.
+- They code before the plan is clear.
+- They claim success without real evidence.
+- They end sessions without durable handoff artifacts.
 
 `ai-engineering-harness` gives them a repeatable operating contract:
 
@@ -28,28 +33,22 @@ AI coding agents are good at editing code, but they often skip engineering disci
 Session Start → Map → Discuss → Plan → Run → Verify → Ship → Remember
 ```
 
-You get provider-specific rules, prompt templates, session memory, blocking gates, tool discovery, hooks, skills, delegated workers, and daily dev reports — not a heavy runtime platform.
+The result is a lighter-weight, easier-to-audit workflow for real software work, not just prompt-driven code generation.
 
 ---
 
-## Who is this for?
+## Why teams use it
 
-**Perfect for:**
-- Individual developers using Claude Code, Cursor, or Codex who want more structured workflows
-- Tech leads introducing AI coding agents to their team and need process guardrails
-- Teams frustrated by agent hallucination, skipped verification, or lost context between sessions
-- Projects where code quality and traceability matter (not throwaway scripts)
-
-**Not a fit for:**
-- One-off code generation (use raw prompts instead)
-- Projects that don't need documentation or team discipline
-- Autonomous, unattended agent systems (this requires human judgment at gates)
+- **Professional workflow:** command contracts, phase guards, and explicit stop conditions
+- **Easy to inspect:** markdown artifacts live in the repo and are readable without a special UI
+- **Honest verification:** `VERIFY.md`, `REPORT.md`, and `PR_MESSAGE.md` are grounded in real evidence
+- **Open-source friendly:** works as a repo-level discipline layer, not a closed orchestration platform
 
 ---
 
 ## Quickstart
 
-**First time?** Read [Your First 5 Minutes](docs/first-5-minutes.md) — a complete walk-through from install to shipping your first loop.
+**First time?** Start with [Your First 5 Minutes](docs/first-5-minutes.md).
 
 Inside your target project:
 
@@ -59,7 +58,7 @@ npx ai-engineering-harness status
 npx ai-engineering-harness doctor
 ```
 
-Non-interactive (recommended for Claude):
+Non-interactive install:
 
 ```bash
 npx ai-engineering-harness install --provider claude --yes
@@ -67,7 +66,17 @@ npx ai-engineering-harness install --provider claude --yes
 
 **Note:** `--provider` is preferred; `--runtime` is a deprecated alias.
 
-Wizard details: [docs/npx-cli-ux.md](docs/npx-cli-ux.md), [docs/terminal-wizard-ux.md](docs/terminal-wizard-ux.md).
+Wizard details: [docs/npx-cli-ux.md](docs/npx-cli-ux.md), [docs/terminal-wizard-ux.md](docs/terminal-wizard-ux.md)
+
+---
+
+## Watch the walkthrough
+
+Walkthrough video file: [AI_Engineering_Harness.mp4](./AI_Engineering_Harness.mp4)
+
+Landing page with embedded player: [truongnat.github.io/ai-engineering-harness](https://truongnat.github.io/ai-engineering-harness/)
+
+> GitHub's README renderer does not reliably provide an inline player for a repo-local MP4, so the video is linked here and embedded on the landing page instead.
 
 ---
 
@@ -76,11 +85,11 @@ Wizard details: [docs/npx-cli-ux.md](docs/npx-cli-ux.md), [docs/terminal-wizard-
 | Layer | Purpose |
 | --- | --- |
 | Agent system prompt | Senior role, MUST/MUST NOT rules, response formats |
-| Session Start | Restore active session, memory, blockers, next command |
-| Commands | Canonical workflow contracts (map, start, discuss, plan, run, verify, ship, remember) |
-| Prompt templates | Structured execution with blocked/ready branches |
+| Session Start | Restore active session, memory, blockers, and next command |
+| Commands | Canonical workflow contracts for map, discuss, plan, run, verify, ship, and remember |
+| Prompt templates | Structured execution with blocked and ready branches |
 | Session memory | Store work by session instead of flat root dumps |
-| Tool discovery | Route to git, rg, worktree, markitdown, code-graph fallback |
+| Tool discovery | Route to git, rg, worktree, markitdown, and code-graph fallbacks |
 | Hooks | Guard phase transitions and record evidence |
 | Skills | Package reusable or session-specific capability |
 | Reports | Generate `REPORT.md` and `PR_MESSAGE.md` from real changes |
@@ -90,31 +99,30 @@ Wizard details: [docs/npx-cli-ux.md](docs/npx-cli-ux.md), [docs/terminal-wizard-
 Full type definitions and JSDoc comments for IDE autocomplete:
 
 ```typescript
-import type { InstallOptions } from 'ai-engineering-harness';
+import type { InstallOptions } from 'ai-engineering-harness'
 
 const options: InstallOptions = {
   target: './my-project',
   dryRun: true,
-  force: false
-};
+  force: false,
+}
 ```
 
-See [docs/typescript-usage.md](docs/typescript-usage.md) for full API reference.
+See [docs/typescript-usage.md](docs/typescript-usage.md) for the full API reference.
 
 ---
 
-## Comparison: With vs Without
+## Comparison: with vs without
 
-| Scenario | Without Harness | With Harness |
-|---|---|---|
-| **Agent starts a task** | Reads goal, starts coding | Reads goal, maps context, writes discussion, plans, codes |
-| **Agent finishes coding** | Says "done" and ships | Runs tests, writes verify.md with evidence, ships with report |
-| **Session ends** | Context lost, no memory | Saves decisions, lessons, and state for next session |
-| **Next session** | Starts from scratch | Restores context and continues where you left off |
-| **You review PR** | Code only, no plan/evidence | See plan, discussion, verification evidence, change summary |
-| **A bug is found** | No idea why code was written this way | Decisions and rationale are in session memory |
+| Scenario | Without harness | With harness |
+| --- | --- | --- |
+| Agent starts a task | Reads goal, starts coding | Restores context, maps scope, writes discussion, then plans |
+| Agent finishes coding | Says "done" and ships | Runs checks, writes evidence, prepares report artifacts |
+| Session ends | Context disappears | Decisions, state, and lessons are preserved |
+| Next session | Starts from scratch | Continues from explicit session state |
+| PR review | Code only | Plan, rationale, verification evidence, and change summary |
 
-**The difference:** Without the harness, your agent is a code generator. With the harness, it's an engineer who documents its work.
+**The difference:** without the harness, your agent is mostly a code editor. With the harness, it behaves more like an engineer operating inside a process.
 
 ---
 
@@ -131,11 +139,11 @@ harness-ship
 harness-remember
 ```
 
-Canonical command IDs use hyphen form, e.g. `harness-plan`.
+Canonical command IDs use hyphen form only, for example `harness-plan`.
 
 Claude project commands may expose them as `/harness-plan`.
 
-Do not use legacy colon-separated or underscore command ID forms. Use hyphen form only (`harness-plan`).
+Do not use legacy colon-separated or underscore forms.
 
 ---
 
@@ -158,29 +166,25 @@ No implementation, verification, or shipping should happen before session state 
 
 ## Agent System Prompt
 
-The harness includes a provider-neutral system prompt that makes agents behave like disciplined senior engineering agents.
+The harness includes a provider-neutral system prompt that pushes agents toward senior-engineering behavior instead of optimistic assistant behavior.
 
 It defines:
 
-- senior engineering role
 - phase discipline
-- MUST / MUST NOT rules
-- blocked output
-- evidence standard
-- response formats
-- report quality
+- MUST and MUST NOT rules
+- blocked-state behavior
+- evidence standards
+- response and report expectations
 
-This is what turns the harness from passive docs into an operating contract.
-
-Source: [agent-system/SYSTEM_PROMPT.md](agent-system/SYSTEM_PROMPT.md) (installed to `.ai-harness/agent-system/`).
+Source: [agent-system/SYSTEM_PROMPT.md](agent-system/SYSTEM_PROMPT.md)
 
 ---
 
 ## Ship means PR-ready
 
-`harness-ship` does not just say "done".
+`harness-ship` does more than say "done".
 
-It prepares, when verification supports it:
+When verification supports it, it prepares:
 
 - `REPORT.md`
 - `PR_MESSAGE.md`
@@ -194,22 +198,23 @@ See [docs/daily-dev-report.md](docs/daily-dev-report.md).
 
 ## Provider support
 
-**Support tiers vary significantly.** Understand what your provider can do before you build on it.
+**Support tiers vary significantly.** Understand what your provider can do before relying on advanced features.
 
 | Capability | Claude | Cursor | Codex | Gemini |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Slash commands | 8 native | Rules fallback | Rules fallback | Rules fallback |
 | Workers/subagents | 4 native | Manual setup | Manual setup | Manual setup |
 | Lifecycle hooks | 4 events | Manual setup | Manual setup | Manual setup |
-| **Grade** | ⭐⭐⭐ **A** | ⭐⭐ **C+** | ⭐⭐ **C+** | ⭐⭐ **C+** |
+| Grade | ⭐⭐⭐ A | ⭐⭐ C+ | ⭐⭐ C+ | ⭐⭐ C+ |
 
 **What this means:**
-- **Claude (Primary):** Full native support. All commands, workers, and hooks work out of the box.
-- **Cursor, Codex, Gemini (Secondary):** Core phase discipline works. But you must manually configure hooks and cannot use native commands/workers.
 
-**Recommendation:** Start with Claude. If using another provider, see [docs/provider-rule-configuration.md](docs/provider-rule-configuration.md) and [docs/adoption-guide.md](docs/adoption-guide.md) for provider-specific setup.
+- **Claude:** strongest path, with native command and worker support
+- **Cursor, Codex, Gemini:** core discipline works, but hooks and advanced behavior need manual setup or fallbacks
 
-The **phase discipline itself** (plan → verify → ship → remember) is platform-agnostic and works everywhere.
+Provider-specific setup: [docs/provider-rule-configuration.md](docs/provider-rule-configuration.md), [docs/adoption-guide.md](docs/adoption-guide.md)
+
+The phase discipline itself is platform-agnostic and works everywhere.
 
 ---
 
@@ -224,31 +229,22 @@ The **phase discipline itself** (plan → verify → ship → remember) is platf
 AGENTS.md              generic / Codex fallback
 ```
 
-Details: [docs/session-memory.md](docs/session-memory.md), [docs/private-capability-cache.md](docs/private-capability-cache.md).
+Details: [docs/session-memory.md](docs/session-memory.md), [docs/private-capability-cache.md](docs/private-capability-cache.md)
 
 ---
 
 ## Demo
 
-End-to-end workflow-artifact dogfood: [examples/dogfood-tiny-node-api](examples/dogfood-tiny-node-api).
+End-to-end workflow-artifact dogfood: [examples/dogfood-tiny-node-api](examples/dogfood-tiny-node-api)
 
 ```bash
-cd examples/dogfood-tiny-node-api && npm test
+cd examples/dogfood-tiny-node-api
+npm test
 ```
 
 The demo shows workflow artifacts and verification evidence in [VERIFY.md](examples/dogfood-tiny-node-api/.harness/VERIFY.md). It is not a claim that every provider behaves identically.
 
-Transcript: [TRANSCRIPT.md](examples/dogfood-tiny-node-api/TRANSCRIPT.md).
-
----
-
-## Limitations
-
-- Provider-native command support differs; Claude is the strongest path.
-- Hooks are provider-specific; Claude has the richest examples.
-- Optional tools (rg, markitdown, codegraph) are best-effort.
-- Human approval is still required for risky or ambiguous decisions.
-- This is a **guardrail kit**, not an autonomous software engineer, agent framework, or orchestration server.
+Transcript: [TRANSCRIPT.md](examples/dogfood-tiny-node-api/TRANSCRIPT.md)
 
 ---
 
@@ -261,11 +257,21 @@ Transcript: [TRANSCRIPT.md](examples/dogfood-tiny-node-api/TRANSCRIPT.md).
 | Daily dev report | [docs/daily-dev-report.md](docs/daily-dev-report.md) |
 | Provider rules | [docs/provider-rule-configuration.md](docs/provider-rule-configuration.md) |
 | Tool discovery | [docs/tool-discovery-and-routing.md](docs/tool-discovery-and-routing.md) |
-| Hooks & skills | [docs/hooks-and-skills-layer.md](docs/hooks-and-skills-layer.md) |
+| Hooks and skills | [docs/hooks-and-skills-layer.md](docs/hooks-and-skills-layer.md) |
 | Session memory | [docs/session-memory.md](docs/session-memory.md) |
 | Command guardrails | [docs/command-guardrails.md](docs/command-guardrails.md) |
 
-Release: [docs/v1.0.0-release-notes.md](docs/v1.0.0-release-notes.md)
+Release notes: [docs/v1.0.0-release-notes.md](docs/v1.0.0-release-notes.md)
+
+---
+
+## Limitations
+
+- Provider-native command support differs; Claude is the strongest path.
+- Hooks are provider-specific.
+- Optional tools such as `rg`, `markitdown`, and code-graph integrations are best-effort.
+- Human approval is still required for risky or ambiguous decisions.
+- This is a **guardrail kit**, not an autonomous software engineer or orchestration server.
 
 ---
 
@@ -283,6 +289,6 @@ Publish: [docs/npm-publish.md](docs/npm-publish.md)
 
 ## Status
 
-**v1.0.0** — Workflow guardrails foundation. Core command loop, session layout, and provider adapters are stable enough for real dogfooding; per-provider behavior still varies.
+**v1.0.0**: workflow guardrails foundation. Core command loop, session layout, and provider adapters are stable enough for real dogfooding; per-provider behavior still varies.
 
 MIT · [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md)
