@@ -1,6 +1,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
@@ -121,6 +122,92 @@ test("policy file_pattern condition matches files in execution context", () => {
     triggeredMessages.includes("Test-first"),
     "Editing a src/ file should trigger the test-first policy"
   );
+});
+
+test("policy generator functions produce expected markdown sections", () => {
+  const generator = require(path.join(repoRoot, "lib", "policy", "generator.js"));
+  const policyPath = path.join(repoRoot, ".harness", "policies.json");
+  const policies = JSON.parse(fs.readFileSync(policyPath, "utf8"));
+
+  const fullDoc = generator.generatePolicyDocs(policies);
+  assert.ok(fullDoc.includes("# Policy Documentation"), "full doc must have title");
+  assert.ok(fullDoc.includes("Phase Gate Policies"), "full doc must group phase gate policies");
+
+  const ruleDoc = generator.generateRuleMarkdown(policies.rules[0]);
+  assert.ok(ruleDoc.includes(policies.rules[0].name), "rule markdown must include rule name");
+  assert.ok(ruleDoc.includes("#### Conditions"), "rule markdown must include conditions section");
+
+  const phaseDoc = generator.generatePhaseDisciplineDoc(policies);
+  assert.ok(
+    phaseDoc.includes("Session Start") && phaseDoc.includes("Remember"),
+    "phase doc must include canonical workflow"
+  );
+
+  const testFirstDoc = generator.generateTestFirstDoc(policies);
+  assert.ok(testFirstDoc.includes("Test-First Discipline"), "test-first doc must have title");
+
+  const scopeDoc = generator.generateScopeGuardDoc(policies);
+  assert.ok(scopeDoc.includes("Scope Guard"), "scope doc must have title");
+});
+
+test("regenerateDocsFromPolicy writes discipline docs into a target repo", () => {
+  const generator = require(path.join(repoRoot, "lib", "policy", "generator.js"));
+  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "policy-docs-"));
+  fs.mkdirSync(path.join(tmpRoot, ".harness"), { recursive: true });
+  fs.copyFileSync(
+    path.join(repoRoot, ".harness", "policies.json"),
+    path.join(tmpRoot, ".harness", "policies.json")
+  );
+
+  generator.regenerateDocsFromPolicy(tmpRoot);
+
+  for (const file of ["phase-discipline.md", "test-first.md", "scope-guard.md", "policies.md"]) {
+    assert.ok(
+      fs.existsSync(path.join(tmpRoot, "docs", file)),
+      `regenerateDocsFromPolicy must write docs/${file}`
+    );
+  }
+
+  fs.rmSync(tmpRoot, { recursive: true, force: true });
+});
+
+test("policy engine evaluates phase and file_pattern operators", () => {
+  const { PolicyEngine } = require(path.join(repoRoot, "lib", "policy", "engine.js"));
+
+  // phase condition: equals on a present phase
+  const phaseRule = {
+    id: "x-phase",
+    name: "x",
+    description: "d",
+    severity: "error",
+    conditions: [{ type: "phase", operator: "equals", value: "run" }],
+    action: { type: "block", message: "blocked-phase" },
+  };
+  const engine = new PolicyEngine(path.join(repoRoot, ".harness", "policies.json"));
+  assert.equal(
+    engine.evaluate(phaseRule, { command: "x", sessionDir: "", repoRoot: "", currentPhase: "run" })
+      .type,
+    "block"
+  );
+  assert.equal(
+    engine.evaluate(phaseRule, { command: "x", sessionDir: "", repoRoot: "", currentPhase: "plan" })
+      .type,
+    "allow"
+  );
+
+  // file_pattern operators: exists / not_exists / equals
+  const mk = (operator) => ({
+    id: "x-file",
+    name: "x",
+    description: "d",
+    severity: "error",
+    conditions: [{ type: "file_pattern", operator, value: "lib/*.ts" }],
+    action: { type: "block", message: "blocked-file" },
+  });
+  const ctx = (files) => ({ command: "x", sessionDir: "", repoRoot: "", files });
+  assert.equal(engine.evaluate(mk("exists"), ctx(["lib/a.ts"])).type, "block");
+  assert.equal(engine.evaluate(mk("not_exists"), ctx(["src/a.ts"])).type, "block");
+  assert.equal(engine.evaluate(mk("equals"), ctx(["lib/a.ts"])).type, "block");
 });
 
 test("policy documentation is generated from policies", () => {

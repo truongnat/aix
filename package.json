@@ -95,6 +95,7 @@
   "scripts": {
     "install:harness": "node install.js",
     "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
     "test": "npm run build && node --test",
     "test:evals": "npm run build && node --test test/evals/",
     "test:coverage": "c8 --include=lib/** --check-coverage --lines 65 --functions 65 --branches 55 --statements 65 node --test",
