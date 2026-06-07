@@ -1,17 +1,4 @@
 import type * as ClackPrompts from "@clack/prompts";
-
-const {
-  intro,
-  outro,
-  cancel,
-  confirm: clackConfirm,
-  select,
-  multiselect,
-  spinner,
-  note,
-  isCancel,
-} = require("@clack/prompts") as typeof ClackPrompts;
-
 import { formatCommandSupportForPlan } from "./runtime-command-catalog";
 
 interface ParseOptions {
@@ -49,6 +36,21 @@ interface UninstallContext {
   fullCleanup: boolean;
 }
 
+type ClackModule = typeof ClackPrompts;
+
+let clackModulePromise: Promise<ClackModule> | null = null;
+
+async function loadClackPrompts(): Promise<ClackModule> {
+  if (!clackModulePromise) {
+    clackModulePromise = import("@clack/prompts");
+  }
+  return clackModulePromise;
+}
+
+function isCancel(_value: unknown): boolean {
+  return false;
+}
+
 function useInteractiveUi(options: ParseOptions): boolean {
   return (
     process.stdin.isTTY && process.stdout.isTTY && !options.yes && options.providers.length === 0
@@ -56,21 +58,23 @@ function useInteractiveUi(options: ParseOptions): boolean {
 }
 
 function introBanner(meta: IntroMeta): void {
-  intro("ai-engineering-harness");
-  note(
+  console.log("ai-engineering-harness");
+  console.log("");
+  console.log("Target");
+  console.log(
     [
-      "Interactive engineering harness for AI coding agents",
+      "  Interactive engineering harness for AI coding agents",
       "",
-      `Version     ai-engineering-harness@${meta.version}`,
-      `Target      ${meta.target}`,
-      `Git repo    ${meta.gitRepo ? "yes" : "no"}`,
-      "Status      experimental (stable runtime support: no)",
-    ].join("\n"),
-    "Target"
+      `  Version     ai-engineering-harness@${meta.version}`,
+      `  Target      ${meta.target}`,
+      `  Git repo    ${meta.gitRepo ? "yes" : "no"}`,
+      "  Status      experimental (stable runtime support: no)",
+    ].join("\n")
   );
 }
 
 async function selectProviders(providerItems: ProviderItem[]): Promise<string[] | null> {
+  const { multiselect, cancel, isCancel } = await loadClackPrompts();
   const initial = providerItems.filter((p) => p.implemented && p.recommended).map((p) => p.id);
   const value = await multiselect({
     message: "Select provider(s)",
@@ -101,6 +105,7 @@ async function selectProviders(providerItems: ProviderItem[]): Promise<string[] 
 }
 
 async function selectInstallMode(): Promise<InstallMode | null> {
+  const { select, cancel, isCancel } = await loadClackPrompts();
   const value = await select<InstallMode>({
     message: "Install mode",
     options: [
@@ -130,7 +135,8 @@ async function selectInstallMode(): Promise<InstallMode | null> {
 }
 
 async function confirmInitHarness(defaultYes: boolean): Promise<boolean | null> {
-  const value = await clackConfirm({
+  const { confirm, cancel, isCancel } = await loadClackPrompts();
+  const value = await confirm({
     message: "Initialize .harness project state?",
     initialValue: defaultYes,
   });
@@ -142,7 +148,8 @@ async function confirmInitHarness(defaultYes: boolean): Promise<boolean | null> 
 }
 
 async function confirmInstallCache(defaultYes: boolean): Promise<boolean | null> {
-  const value = await clackConfirm({
+  const { confirm, cancel, isCancel } = await loadClackPrompts();
+  const value = await confirm({
     message: "Install .ai-harness capability cache?",
     initialValue: defaultYes,
   });
@@ -154,7 +161,8 @@ async function confirmInstallCache(defaultYes: boolean): Promise<boolean | null>
 }
 
 async function confirmRemoveState(defaultYes = false): Promise<boolean | null> {
-  const value = await clackConfirm({
+  const { confirm, cancel, isCancel } = await loadClackPrompts();
+  const value = await confirm({
     message: "Remove .harness/?",
     initialValue: defaultYes,
   });
@@ -166,7 +174,8 @@ async function confirmRemoveState(defaultYes = false): Promise<boolean | null> {
 }
 
 async function confirmFullCleanup(defaultYes = false): Promise<boolean | null> {
-  const value = await clackConfirm({
+  const { confirm, cancel, isCancel } = await loadClackPrompts();
+  const value = await confirm({
     message: "Full cleanup (runtime + cache + state + exclude block)?",
     initialValue: defaultYes,
   });
@@ -178,7 +187,8 @@ async function confirmFullCleanup(defaultYes = false): Promise<boolean | null> {
 }
 
 async function confirmProceed(message = "Proceed with install?"): Promise<boolean | null> {
-  const value = await clackConfirm({ message, initialValue: true });
+  const { confirm, cancel, isCancel } = await loadClackPrompts();
+  const value = await confirm({ message, initialValue: true });
   if (isCancel(value)) {
     cancel("Cancelled.");
     return null;
@@ -214,7 +224,9 @@ function showInstallPlan(
     console.log(body);
     return;
   }
-  note(body, "Plan");
+  console.log("");
+  console.log("Plan");
+  console.log(body);
 }
 
 function showUpdatePlan(providers: string[], { compact = false } = {}): void {
@@ -231,7 +243,9 @@ function showUpdatePlan(providers: string[], { compact = false } = {}): void {
     console.log(body);
     return;
   }
-  note(body, "Update plan");
+  console.log("");
+  console.log("Update plan");
+  console.log(body);
 }
 
 function showUninstallPlan(ctx: UninstallContext, { compact = false } = {}): void {
@@ -248,11 +262,13 @@ function showUninstallPlan(ctx: UninstallContext, { compact = false } = {}): voi
     console.log(body);
     return;
   }
-  note(body, "Uninstall plan");
+  console.log("");
+  console.log("Uninstall plan");
+  console.log(body);
 }
 
 function showWarning(message: string): void {
-  note(message, "Warning");
+  console.warn(`Warning\n${message}`);
 }
 
 function showSuccess(kind: string, extraLines: string[] = []): void {
@@ -263,11 +279,11 @@ function showSuccess(kind: string, extraLines: string[] = []): void {
     "  npx ai-engineering-harness doctor",
     ...extraLines,
   ].join("\n");
-  outro(`${kind} successfully.\n${next}`);
+  console.log(`${kind} successfully.\n${next}`);
 }
 
 function showCancel(message = "Cancelled."): void {
-  cancel(message);
+  console.log(message);
 }
 
 function showError(title: string, reason: string, hints: string[] = []): void {
@@ -279,7 +295,7 @@ function showError(title: string, reason: string, hints: string[] = []): void {
     "  npx ai-engineering-harness install --provider cursor --yes --verbose",
     ...hints,
   ];
-  note(lines.join("\n"), title);
+  console.error(`${title}\n${lines.join("\n")}`);
 }
 
 interface SpinnerResult {
@@ -292,6 +308,7 @@ async function runWithSpinner(
   message: string,
   fn: () => Promise<SpinnerResult>
 ): Promise<SpinnerResult> {
+  const { spinner } = await loadClackPrompts();
   const s = spinner();
   s.start(message);
   try {
@@ -331,13 +348,8 @@ function formatDoctorLine(line: string): string {
 function formatDoctor(rawOutput: string, { compact = false } = {}): void {
   const lines = parseDoctorLines(rawOutput);
   const body = ["Checks", ...lines.map(formatDoctorLine)].join("\n");
-  if (compact) {
-    console.log("\nai-engineering-harness doctor\n");
-    console.log(body);
-    return;
-  }
-  intro("ai-engineering-harness doctor");
-  note(body, "Checks");
+  console.log("\nai-engineering-harness doctor\n");
+  console.log(body);
 }
 
 function formatStatus(rawOutput: string, { compact = false } = {}): void {
@@ -369,13 +381,8 @@ function formatStatus(rawOutput: string, { compact = false } = {}): void {
     .map(([title, content]) => `${title}\n  ${(content as string).replace(/\n/g, "\n  ")}`)
     .join("\n\n");
 
-  if (compact) {
-    console.log("\nai-engineering-harness status\n");
-    console.log(body);
-    return;
-  }
-  intro("ai-engineering-harness status");
-  note(body, "Summary");
+  console.log("\nai-engineering-harness status\n");
+  console.log(body);
 }
 
 const ui = {

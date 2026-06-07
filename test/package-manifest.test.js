@@ -231,7 +231,8 @@ test("cli-ui uses typed imports without ts-ignore suppressions", () => {
   const cliUi = fs.readFileSync(path.join(repoRoot, "lib", "cli-ui.ts"), "utf8");
 
   assert.match(cliUi, /import type \* as ClackPrompts from "@clack\/prompts"/);
-  assert.match(cliUi, /require\("@clack\/prompts"\) as typeof ClackPrompts/);
+  assert.match(cliUi, /clackModulePromise = import\("@clack\/prompts"\)/);
+  assert.match(cliUi, /async function loadClackPrompts/);
   assert.match(
     cliUi,
     /import \{ formatCommandSupportForPlan \} from "\.\/runtime-command-catalog"/
