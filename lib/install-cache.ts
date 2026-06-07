@@ -194,7 +194,7 @@ function installCapabilityCache(
     });
 
     if (!options.dryRun) {
-      ensureDirectory(destinationPath, false);
+      ensureDirectory(path.dirname(destinationPath), false);
       fs.copyFileSync(sourcePath, destinationPath);
     }
   }
