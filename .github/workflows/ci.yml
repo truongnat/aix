@@ -34,7 +34,7 @@ jobs:
         run: npx prettier --check lib/ bin/ test/ *.js *.md --no-error-on-unmatched-pattern
 
       - name: Validate pack contracts
-        run: node bin/validate.js
+        run: npm run build && node bin/validate.js
 
       - name: Run repository tests
         run: npm test
