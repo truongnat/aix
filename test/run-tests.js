@@ -70,7 +70,7 @@ function writeRepoFile(baseDir, relativePath, updater) {
 function assertRepositoryFailure(baseDir, expectedPattern) {
   const failures = validateApi.validateRepository(baseDir);
   assert.notEqual(failures.length, 0, "expected validation failures");
-  assert.match(failures.join("\n"), expectedPattern);
+  assert.match(failures.join("\n").replace(/[\\/]+/g, "/"), expectedPattern);
 }
 
 function runNode(args, options = {}) {
