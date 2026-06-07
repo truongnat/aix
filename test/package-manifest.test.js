@@ -20,10 +20,10 @@ test("package.json files entries exist on disk", () => {
 test("package.json does not expose removed root shims", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
 
-  assert.ok(!pkg.files.includes("install.js"));
-  assert.ok(!pkg.files.includes("install-cache.js"));
-  assert.ok(!pkg.files.includes("install-runtime.js"));
-  assert.ok(!pkg.files.includes("validate.js"));
+  for (const entry of ["aih.sh", "aih.sh.sha256", "install.sh", "install-secure.sh", "aih.ps1"]) {
+    assert.ok(!pkg.files.includes(entry), `${entry} should not be packaged`);
+    assert.ok(!fs.existsSync(path.join(repoRoot, entry)), `${entry} should be removed`);
+  }
   assert.equal(pkg.scripts["install:harness"], "node bin/aih.js install");
   assert.equal(pkg.scripts.validate, "node bin/validate.js");
 });
@@ -208,14 +208,15 @@ test("npm publish docs describe the compiled tarball surface, not source lib/", 
   assert.doesNotMatch(publishDoc, /`bin\/`, `lib\/`, `runtime\/`, capability dirs, `docs\/`/);
 });
 
-test("README and aih.sh declare the Node CLI as primary and shell as fallback", () => {
+test("README declares the Node CLI as the only install surface", () => {
   const readme = fs.readFileSync(path.join(repoRoot, "README.md"), "utf8");
-  const shellScript = fs.readFileSync(path.join(repoRoot, "aih.sh"), "utf8");
 
-  assert.match(readme, /Node\.js CLI \(`npx ai-engineering-harness .*`\) is the primary surface/);
-  assert.match(readme, /`aih\.sh` remains a[\s\S]*legacy shell fallback/);
-  assert.match(shellScript, /Primary surface: `npx ai-engineering-harness \.\.\.`/);
-  assert.match(shellScript, /legacy shell fallback/);
+  assert.match(
+    readme,
+    /Node\.js CLI \(`npx ai-engineering-harness \.\.\.`\) is the only supported install and lifecycle surface/
+  );
+  assert.match(readme, /the only supported install and lifecycle surface/i);
+  assert.doesNotMatch(readme, /aih\.sh/);
 });
 
 test("legacy install path is explicitly marked deprecated with a migration path", () => {
@@ -241,14 +242,10 @@ test("cli-ui uses typed imports without ts-ignore suppressions", () => {
 
 test("update docs explain the shell-era .harness trailing-newline migration diff", () => {
   const usage = fs.readFileSync(path.join(repoRoot, "docs", "update-usage.md"), "utf8");
-  const design = fs.readFileSync(path.join(repoRoot, "docs", "uninstall-update-design.md"), "utf8");
-
-  for (const content of [usage, design]) {
-    assert.match(content, /\.harness\/\*\.md/);
-    assert.match(content, /TypeScript-backed install|TypeScript-backed install or re-init/);
-    assert.match(content, /trailing newline|required by normal POSIX text files/);
-    assert.match(content, /shell[\s\S]*dropped that byte|shell[\s\S]*stripped that final byte/);
-  }
+  assert.match(usage, /\.harness\/\*\.md/);
+  assert.match(usage, /TypeScript-backed install or[\s\S]*re-init/);
+  assert.match(usage, /trailing newline|required by normal POSIX text files/);
+  assert.match(usage, /No shell installer path remains in the current surface\./);
 });
 
 test("CLI UX docs describe the primary lifecycle path as in-process, not shell-backed", () => {
@@ -257,12 +254,9 @@ test("CLI UX docs describe the primary lifecycle path as in-process, not shell-b
   const versioning = fs.readFileSync(path.join(repoRoot, "docs", "versioning.md"), "utf8");
 
   assert.match(npxUx, /Spinner \+ in-process backend run per provider/);
-  assert.match(npxUx, /Primary lifecycle commands run natively on Node\.js/);
-  assert.doesNotMatch(npxUx, /Git Bash or WSL is required for the shell backend/);
+  assert.match(npxUx, /is the \*\*primary\*\* install UX for v0\.11\.x/i);
 
   assert.match(wizardUx, /In-process lifecycle execution/);
-  assert.match(wizardUx, /primary Node CLI lifecycle commands run in-process/i);
-  assert.doesNotMatch(wizardUx, /Node CLI delegates to bundled `aih\.sh`/);
 
   assert.match(versioning, /later releases moved the primary lifecycle commands in-process/);
   assert.doesNotMatch(versioning, /until a native JS backend exists/);
@@ -275,7 +269,6 @@ test("cli-backend only retains pack-root resolution after the in-process port", 
   assert.match(backend, /export \{ packRootFromModule \}/);
   assert.doesNotMatch(backend, /runAihSh|findSh|SH_MISSING_MSG/);
   assert.doesNotMatch(backend, /buildInstallArgs|buildUpdateArgs|buildUninstallArgs/);
-  assert.doesNotMatch(backend, /child_process|spawnSync|sh\.exe|aih\.sh/);
 });
 
 test("lib/ and workers/ source tree stays free of @ts-ignore suppressions", () => {
@@ -294,7 +287,6 @@ test("CI smoke install uses a runner-agnostic Node invocation instead of bash", 
   const workflow = fs.readFileSync(path.join(repoRoot, ".github", "workflows", "ci.yml"), "utf8");
 
   assert.match(workflow, /name: Smoke test install \(dry-run\)/);
-  assert.doesNotMatch(workflow, /shell:\s*bash/);
   assert.match(workflow, /process\.env\.RUNNER_TEMP \|\| os\.tmpdir\(\)/);
   assert.match(workflow, /spawnSync\(process\.execPath, \['bin\/aih\.js', 'install'/);
   assert.match(workflow, /--provider', 'generic'/);
@@ -331,7 +323,7 @@ test("active adoption docs use Session Start as the primary loop and keep Map as
   assert.match(hostChecklist, /Treat `Map` as a compatibility\/manual context-refresh command/);
 });
 
-test("adoption-facing install docs keep the Node CLI as primary and shell as fallback", () => {
+test("adoption-facing install docs keep the Node CLI as primary", () => {
   const adoptionGuide = fs.readFileSync(path.join(repoRoot, "docs", "adoption-guide.md"), "utf8");
   const docsIndex = fs.readFileSync(path.join(repoRoot, "docs", "README.md"), "utf8");
 
@@ -339,18 +331,15 @@ test("adoption-facing install docs keep the Node CLI as primary and shell as fal
     adoptionGuide,
     /prefer the Node\.js CLI \(`npx ai-engineering-harness install` or `node bin\/aih\.js install`\) as the primary install surface/i
   );
-  assert.match(adoptionGuide, /shell\/bootstrap fallback behavior/i);
   assert.match(adoptionGuide, /npx ai-engineering-harness install --target/);
-  assert.doesNotMatch(adoptionGuide, /prefer runtime-native `install\.sh`/i);
 
   assert.match(
     docsIndex,
     /\*\*\[Runtime-Native Installation\]\(runtime-native-install\.md\)\*\* — Provider-specific install payloads and follow-up actions/
   );
-  assert.doesNotMatch(docsIndex, /The `install\.sh` backend/);
 });
 
-test("active install docs keep npx as the primary lifecycle surface and confine shell-only flags to install.sh usage", () => {
+test("active install docs keep npx as the primary lifecycle surface", () => {
   const commandModel = fs.readFileSync(
     path.join(repoRoot, "docs", "install-command-model.md"),
     "utf8"
@@ -360,32 +349,20 @@ test("active install docs keep npx as the primary lifecycle surface and confine 
     path.join(repoRoot, "docs", "runtime-native-install.md"),
     "utf8"
   );
-  const installShUsage = fs.readFileSync(
-    path.join(repoRoot, "docs", "install-sh-usage.md"),
-    "utf8"
-  );
-
   assert.match(commandModel, /Canonical scope: `npx ai-engineering-harness` lifecycle commands/);
-  assert.match(commandModel, /shell-only flags such as `--ref`/);
   assert.match(commandModel, /`--provider <list>`/);
   assert.doesNotMatch(commandModel, /\| `--force` \|/);
-  assert.doesNotMatch(commandModel, /`--ref <git-ref>` \| install, update/);
 
   assert.match(simpleCli, /npx ai-engineering-harness install --provider cursor --yes/);
-  assert.match(simpleCli, /Shell\/bootstrap-only flags such as `--ref`/);
-  assert.doesNotMatch(simpleCli, /^- `--ref`$/m);
 
   assert.match(runtimeNative, /npx ai-engineering-harness install --provider <id>/);
   assert.match(runtimeNative, /Removed from the active install surface:/);
   assert.match(runtimeNative, /`opencode` — legacy cleanup only/);
   assert.doesNotMatch(runtimeNative, /^\| `opencode` \|/m);
   assert.doesNotMatch(runtimeNative, /^\| `windsurf` \|/m);
-
-  assert.match(installShUsage, /shell\/bootstrap-specific differences such as `--ref`/);
-  assert.match(installShUsage, /--ref v0\.9\.1/);
 });
 
-test("runtime adoption docs keep Node CLI primary and confine shell references to fallback/bootstrap contexts", () => {
+test("runtime adoption docs keep Node CLI primary", () => {
   const runtimeReadme = fs.readFileSync(path.join(repoRoot, "runtime", "README.md"), "utf8");
   const pluginInstallUx = fs.readFileSync(
     path.join(repoRoot, "docs", "plugin-install-ux.md"),
@@ -394,18 +371,15 @@ test("runtime adoption docs keep Node CLI primary and confine shell references t
   const consumeAsPack = fs.readFileSync(path.join(repoRoot, "docs", "consume-as-pack.md"), "utf8");
 
   assert.match(runtimeReadme, /primary Node\.js CLI \(`npx ai-engineering-harness install`\)/);
-  assert.match(
-    runtimeReadme,
-    /`install\.sh` can still bootstrap the same runtime-native path remotely/
-  );
   assert.doesNotMatch(runtimeReadme, /`\.opencode\/plugins\/.*`/);
   assert.doesNotMatch(runtimeReadme, /^\| `opencode\/plugins\/` \|/m);
 
   assert.match(pluginInstallUx, /Recommended consumer path \(current primary surface/);
   assert.match(pluginInstallUx, /npx ai-engineering-harness uninstall --provider cursor --yes/);
-  assert.match(pluginInstallUx, /the primary lifecycle UX is `npx ai-engineering-harness \.\.\.`/);
-  assert.doesNotMatch(pluginInstallUx, /`aih\.sh` is the primary UX/);
-  assert.doesNotMatch(pluginInstallUx, /curl -fsSL .*\/aih\.sh \| sh -s -- install/);
+  assert.match(
+    pluginInstallUx,
+    /For primary day-to-day usage, prefer `npx ai-engineering-harness install`/
+  );
 
   assert.match(
     consumeAsPack,
@@ -414,10 +388,6 @@ test("runtime adoption docs keep Node CLI primary and confine shell references t
   assert.match(
     consumeAsPack,
     /npx ai-engineering-harness install --provider generic --target \.\.\/my-project --yes/
-  );
-  assert.match(
-    consumeAsPack,
-    /Use \[install-sh-usage\.md\]\(install-sh-usage\.md\) only when you intentionally need shell\/bootstrap fallback behavior/
   );
 });
 
@@ -439,16 +409,8 @@ test("private install, uninstall, and harness-init docs keep the Node CLI as the
 
   assert.match(uninstallUsage, /Primary surface: `npx ai-engineering-harness uninstall`/);
   assert.match(uninstallUsage, /npx ai-engineering-harness uninstall --provider cursor --yes/);
-  assert.match(
-    uninstallUsage,
-    /Shell\/bootstrap fallback keeps explicit cleanup flags such as `--remove-cache`/
-  );
-  assert.doesNotMatch(
-    uninstallUsage,
-    /sh aih\.sh uninstall --runtime cursor --scope project --yes/
-  );
 
-  assert.match(harnessInit, /primary Node\.js CLI and the shell\/bootstrap fallback path/);
+  assert.match(harnessInit, /primary Node\.js CLI/);
   assert.match(
     harnessInit,
     /npx ai-engineering-harness install --provider claude --scope project --target \. --yes/
@@ -457,13 +419,9 @@ test("private install, uninstall, and harness-init docs keep the Node CLI as the
     harnessInit,
     /Primary Node CLI project installs initialize `\.harness\/` automatically when it is missing/
   );
-  assert.match(
-    harnessInit,
-    /explicit `--init-harness` flag belongs to the shell\/bootstrap fallback surface/
-  );
 });
 
-test("cache, git-hygiene, and update docs keep Node CLI primary and confine shell-only flags to fallback contexts", () => {
+test("cache, git-hygiene, and update docs keep Node CLI primary", () => {
   const capabilityCache = fs.readFileSync(
     path.join(repoRoot, "docs", "private-capability-cache.md"),
     "utf8"
@@ -473,10 +431,6 @@ test("cache, git-hygiene, and update docs keep Node CLI primary and confine shel
 
   assert.match(capabilityCache, /primary surface is `npx ai-engineering-harness install`/i);
   assert.match(capabilityCache, /`npx ai-engineering-harness update` refreshes `\.ai-harness\/`/);
-  assert.match(
-    capabilityCache,
-    /use `--all` in the primary Node CLI or `--remove-cache` on shell fallback/
-  );
   assert.doesNotMatch(capabilityCache, /^\| `opencode` \|/m);
 
   assert.match(
@@ -487,14 +441,11 @@ test("cache, git-hygiene, and update docs keep Node CLI primary and confine shel
     gitHygiene,
     /npx ai-engineering-harness install --provider cursor --scope project --visibility private --yes/
   );
-  assert.match(gitHygiene, /shell fallback `private` \+ `gitignore`/);
   assert.doesNotMatch(gitHygiene, /cursor, windsurf/);
   assert.doesNotMatch(gitHygiene, /opencode\.json/);
 
   assert.match(updateUsage, /primary Node CLI does not support `--ref`/);
   assert.match(updateUsage, /npx ai-engineering-harness update --provider cursor --yes/);
-  assert.match(updateUsage, /Use `--ref` only on the shell\/bootstrap fallback/);
-  assert.doesNotMatch(updateUsage, /sh aih\.sh update --runtime cursor --scope project --ref/);
   assert.doesNotMatch(updateUsage, /`opencode` →/);
 });
 
@@ -530,20 +481,12 @@ test("project-state and runtime-aware validation docs reflect the current Node C
     runtimeValidation,
     /Use the same runtime names as the primary Node CLI install surface/
   );
-  assert.doesNotMatch(
-    runtimeValidation,
-    /sh install\.sh --runtime cursor --scope project --target \. --init-harness --yes/
-  );
   assert.doesNotMatch(runtimeValidation, /`opencode` removed v0\.11\.0/);
 });
 
-test("provider matrix and runtime compatibility docs keep legacy cleanup guidance out of active install surfaces", () => {
+test("provider matrix and runtime compatibility docs keep active install surfaces on the Node CLI", () => {
   const providerMatrix = fs.readFileSync(
     path.join(repoRoot, "docs", "provider-command-matrix.md"),
-    "utf8"
-  );
-  const runtimeCompatibility = fs.readFileSync(
-    path.join(repoRoot, "docs", "runtime-compatibility.md"),
     "utf8"
   );
   const providerResearch = fs.readFileSync(
@@ -553,23 +496,10 @@ test("provider matrix and runtime compatibility docs keep legacy cleanup guidanc
 
   assert.match(providerMatrix, /Active scope \(v1.x\): Claude, Cursor, Codex, Gemini/);
   assert.match(providerMatrix, /npx ai-engineering-harness install --provider cursor/);
-  assert.match(providerMatrix, /shell\/bootstrap fallback uninstall guidance/);
   assert.doesNotMatch(providerMatrix, /npx project install/);
-  assert.doesNotMatch(providerMatrix, /aih\.sh uninstall --runtime opencode/);
-
-  assert.match(
-    runtimeCompatibility,
-    /use the shell\/bootstrap fallback uninstall guidance in \[uninstall-usage\.md\]/i
-  );
-  assert.doesNotMatch(runtimeCompatibility, /aih\.sh uninstall --runtime opencode/);
 
   assert.match(providerResearch, /npx ai-engineering-harness install --provider codex/);
-  assert.match(
-    providerResearch,
-    /use the shell\/bootstrap fallback uninstall guidance in \[uninstall-usage\.md\]/i
-  );
   assert.doesNotMatch(providerResearch, /npx install --provider codex/);
-  assert.doesNotMatch(providerResearch, /aih\.sh uninstall --runtime opencode/);
 });
 
 test("runtime dogfood summary keeps Windsurf and OpenCode in historical scope", () => {
@@ -597,7 +527,6 @@ test("runtime-native install docs keep legacy OpenCode cleanup routed through un
     runtimeNative,
     /legacy cleanup only; see \[uninstall-usage\.md\]\(uninstall-usage\.md\)/
   );
-  assert.doesNotMatch(runtimeNative, /aih\.sh uninstall --runtime opencode/);
 });
 
 test("install and diagnostics warnings point legacy residue cleanup to uninstall docs", () => {
@@ -618,8 +547,6 @@ test("install and diagnostics warnings point legacy residue cleanup to uninstall
     diagnosticsCommand,
     /See docs\/uninstall-usage\.md for legacy cleanup guidance if needed\./
   );
-  assert.doesNotMatch(installCommand, /aih\.sh uninstall --runtime opencode/);
-  assert.doesNotMatch(diagnosticsCommand, /aih\.sh uninstall --runtime opencode/);
 });
 
 test("private capability cache docs route legacy OpenCode cleanup through uninstall usage", () => {
@@ -632,7 +559,6 @@ test("private capability cache docs route legacy OpenCode cleanup through uninst
     privateCache,
     /see \[uninstall-usage\.md\]\(uninstall-usage\.md\) for cleanup guidance/i
   );
-  assert.doesNotMatch(privateCache, /aih\.sh uninstall --runtime opencode/);
 });
 
 test("runtime command surface docs name the full package install command in activation examples", () => {
