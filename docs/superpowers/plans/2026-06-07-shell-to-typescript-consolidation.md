@@ -68,7 +68,9 @@ node bin/aih.js status --target "$T" > /tmp/parity-status-before.txt 2>&1
 node bin/aih.js doctor --target "$T" > /tmp/parity-doctor-before.txt 2>&1
 node bin/aih.js uninstall --provider claude --yes --target "$T" > /tmp/parity-uninstall-before.txt 2>&1
 ```
-Expected: files created under `.cursor/`, `.claude/`, `.ai-harness/`; `.git/info/exclude` contains a block delimited by `# ai-engineering-harness start` / `# ai-engineering-harness end`. Keep `/tmp/parity-*-before.txt` for diffing after migration.
+Expected: `.git/info/exclude` contains a block delimited by `# ai-engineering-harness start` / `# ai-engineering-harness end`. Keep `/tmp/parity-*-before.txt` for diffing after migration.
+
+> ⚠️ **KNOWN PRE-EXISTING BUG (discovered during A0):** current `install` writes ONLY `.harness/` + the git exclude block — provider files (`.claude/`, `.cursor/`, `.ai-harness/`) are NOT written, because `dist/lib/install-runtime.js|install-cache.js|install-legacy.js` lack a `main()` invocation (lost when root shims were removed in the TS migration). `aih.sh` runs them as scripts → no-ops. The in-process migration FIXES this (verified: `installRuntime()` called as a function writes all provider files). Therefore the `install`/`status`/`doctor`/`uninstall` baselines are the BROKEN state. Post-migration MUST write provider files and will NOT match those broken baselines bit-for-bit. Real parity targets: exclude-block format, `.harness/` skeleton, and status/doctor report text format once provider files exist.
 
 - [ ] **Step 4: Commit baseline note**
 
@@ -466,16 +468,17 @@ Port `aih.sh:341-436,1234-1463` (`print_status`, `run_doctor`, `workflow_phase_l
 
 - [ ] **Step 3: Run, verify fails.**
 
-- [ ] **Step 4: Implement** `runStatus(ctx)` / `runDoctor(ctx)` returning report text (printed by caller), matching `/tmp/parity-status-before.txt` & `/tmp/parity-doctor-before.txt` from A0.
+- [ ] **Step 4: Implement** `runStatus(ctx)` / `runDoctor(ctx)` returning report text (printed by caller). Match the report TEXT FORMAT (the PASS/FAIL line structure) of `/tmp/parity-status-before.txt` & `/tmp/parity-doctor-before.txt`, but note the VALUES will differ now that install correctly writes provider files (e.g. `.ai-harness: yes`, fewer doctor failures). Format parity, not value parity.
 
-- [ ] **Step 5: Diff against baseline**
+- [ ] **Step 5: Sanity check status/doctor after a real (now-fixed) install**
 
 ```bash
 T=$(mktemp -d); git -C "$T" init -q
 node bin/aih.js install --provider claude --yes --target "$T" >/dev/null
-node bin/aih.js status --target "$T" | diff - /tmp/parity-status-before.txt || echo "REVIEW DIFF"
+node bin/aih.js status --target "$T"
+node bin/aih.js doctor --target "$T"
 ```
-Expected: no diff (or explainable, intentional diffs only).
+Expected: status now reports provider files present (`.claude/` etc.); doctor failures reduced vs the broken A0 baseline. The report text structure (labels, PASS/FAIL columns) matches A0's format.
 
 - [ ] **Step 6: Commit** `git commit -m "feat(backend): port status/doctor reporting to TypeScript"`.
 
@@ -497,10 +500,10 @@ Expected: no diff (or explainable, intentional diffs only).
 Run: `npm run build && tsc -p tsconfig.lib.json`
 Expected: exit 0.
 
-- [ ] **Step 4: Run full suite + diff installs against baseline**
+- [ ] **Step 4: Run full suite + verify install now writes provider files**
 
-Run: `npm test` then re-run the A0 install snapshot and `diff /tmp/parity-install-before.txt` against a fresh capture.
-Expected: tests green; install side effects identical.
+Run: `npm test` then a fresh install into a temp git repo.
+Expected: tests green; install now writes `.claude/CLAUDE.md`, `.claude/commands/*`, `.claude/settings.json`, `.cursor/rules/*`, and `.ai-harness/` (the bug fix). The `.git/info/exclude` block matches the A0 format. Do NOT expect a clean diff against `/tmp/parity-install-before.txt` — that baseline was the broken no-op install; the new output is a superset (provider files now present).
 
 - [ ] **Step 5: Commit** `git commit -m "refactor(cli): call TypeScript backend in-process, drop shell spawn"`.
 

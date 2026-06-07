@@ -7,6 +7,21 @@
 
 ---
 
+## ⚠️ CRITICAL CORRECTION (added 2026-06-07 after root-cause analysis)
+
+**The `install` baseline captured here reflects a PRE-EXISTING BUG, not correct behavior.**
+
+Current `install` on `main` writes only `.harness/` skeleton + `.git/info/exclude`; it does **NOT** write any provider files (`.claude/`, `.cursor/`, `.ai-harness/`). Root cause: the TypeScript migration deleted the root shims (`install-runtime.js` etc.) that invoked `api.main()` via `require.main === module`, and that `main()` call was never added to `dist/lib/install-runtime.js` / `install-cache.js` / `install-legacy.js`. `aih.sh` invokes those as scripts (`node dist/lib/install-runtime.js …`), so they define exports and exit 0 as **no-ops**.
+
+Verified: calling `installRuntime(opts)` **in-process** correctly writes `.claude/CLAUDE.md`, `.claude/agents/*`, `.claude/commands/*`, `.claude/settings.json`.
+
+**Implication for parity:**
+- `install`, `status`, `doctor`, `uninstall` baselines below are the BROKEN state.
+- The migration (calling backend functions in-process) FIXES this bug. Post-migration install MUST write provider files — it will NOT (and must not) match the broken `install`/`status`/`doctor` baseline bit-for-bit.
+- Genuine parity still applies to: git-hygiene exclude block format, `.harness/` skeleton contents, and the report TEXT FORMAT of status/doctor (the PASS/FAIL lines), once provider files exist.
+
+---
+
 ## (a) /tmp files created
 
 | File | What it captures |
