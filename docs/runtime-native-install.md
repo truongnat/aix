@@ -6,7 +6,7 @@ Document what the primary Node.js CLI installs per provider **without** copying 
 
 Canonical scope: per-runtime payload paths and follow-up actions after runtime-native install.
 
-Use [install-command-model.md](install-command-model.md) for primary CLI command defaults and flag semantics. Use [install-sh-usage.md](install-sh-usage.md) for remote wrapper behavior, shell-only flags such as `--ref`, review-before-run flows, and manual fallback entrypoints.
+Use [install-command-model.md](install-command-model.md) for primary CLI command defaults and flag semantics. Historical shell-installer notes live under `docs/internal/archive/install/`.
 
 **Status:** Experimental until dogfooded. See [runtime-native-install-audit.md](runtime-native-install-audit.md) and [runtime-native-install-dogfood-plan.md](runtime-native-install-dogfood-plan.md). Do not claim stable support in production adoption guides yet.
 
@@ -16,7 +16,7 @@ Use [install-command-model.md](install-command-model.md) for primary CLI command
 npx ai-engineering-harness install --provider <id> [--scope <global|project>] [--target <path>] [--dry-run] [--yes]
 ```
 
-`--runtime <id>` remains accepted as a deprecated alias for `--provider <id>`. Shell/bootstrap fallback examples live in [install-sh-usage.md](install-sh-usage.md).
+`--runtime <id>` remains accepted as a deprecated alias for `--provider <id>`.
 
 | Runtime | Alias | Project scope | Global scope |
 |---|---|---|---|
@@ -25,7 +25,7 @@ npx ai-engineering-harness install --provider <id> [--scope <global|project>] [-
 | `codex` | — | `AGENTS.md` bootstrap | `~/.codex/AGENTS.md` |
 | `gemini` | — | `.gemini/extensions/ai-engineering-harness/` | `~/.gemini/extensions/...` |
 | `generic` | — | `AGENTS.md` bootstrap | (skip; use codex global) |
-| `manual` | shell/bootstrap fallback only | full root copy via `node bin/aih.js install` (fallback) | N/A |
+| `manual` | legacy flat-root install path | full root copy via `node bin/aih.js install` | N/A |
 
 Removed from the active install surface:
 
@@ -59,11 +59,3 @@ npx ai-engineering-harness install --provider claude --scope project --target . 
 ## Payload Source
 
 Files live under `runtime/` in the pack. See [runtime/README.md](../runtime/README.md).
-
-## Manual Fallback
-
-```bash
-sh install.sh --runtime manual --target .
-```
-
-Copies default installed surface (`commands/`, `skills/`, …) — not recommended as the long-term default. See [install-sh-usage.md](install-sh-usage.md) for remote wrapper behavior and manual fallback examples.

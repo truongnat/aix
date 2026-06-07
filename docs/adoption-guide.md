@@ -39,7 +39,7 @@ Recommended manual steps:
 
 The source pack includes a dependency-free installer.
 
-**Consumers:** prefer the Node.js CLI (`npx ai-engineering-harness install` or `node bin/aih.js install`) as the primary install surface. Use [install-sh-usage.md](install-sh-usage.md) only when you intentionally need shell/bootstrap fallback behavior, and use [plugin-install-ux.md](plugin-install-ux.md) for runtime-native provider UX details.
+**Consumers:** prefer the Node.js CLI (`npx ai-engineering-harness install` or `node bin/aih.js install`) as the primary install surface. Historical shell-installer notes live in the archived install docs. Use [plugin-install-ux.md](plugin-install-ux.md) for runtime-native provider UX details.
 
 ### Basic Copy
 

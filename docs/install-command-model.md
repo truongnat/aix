@@ -2,13 +2,13 @@
 
 ## Purpose
 
-Define the primary Node.js lifecycle CLI model for `v1.0.x`: simple verbs with smart defaults for `npx ai-engineering-harness`, with shell/bootstrap fallback documented separately.
+Define the primary Node.js lifecycle CLI model for `v1.0.x`: simple verbs with smart defaults for `npx ai-engineering-harness`.
 
 Canonical scope: `npx ai-engineering-harness` lifecycle commands, defaults, and flags.
 
-Use this document as the primary CLI command/flag source of truth. For remote `install.sh` wrapper behavior, shell-only flags such as `--ref`, review-before-run flows, and manual fallback entrypoints, see [install-sh-usage.md](install-sh-usage.md). For per-runtime payload paths and follow-up actions after runtime-native install, see [runtime-native-install.md](runtime-native-install.md).
+Use this document as the primary CLI command/flag source of truth. For historical installer design notes, see the archived install docs under `docs/internal/archive/install/`. For per-runtime payload paths and follow-up actions after runtime-native install, see [runtime-native-install.md](runtime-native-install.md).
 
-**Current surface (v1.0.x):** primary lifecycle commands run in-process on Node.js. `aih.sh` / `install.sh` remain available only as shell/bootstrap fallback surfaces.
+**Current surface (v1.0.x):** primary lifecycle commands run in-process on Node.js.
 
 ## Commands
 
@@ -26,8 +26,7 @@ npx ai-engineering-harness help
 | Surface | Notes |
 |---|---|
 | `--runtime <id>` | Deprecated alias for `--provider <id>` in the Node CLI |
-| `aih.sh` / `install.sh` | Shell/bootstrap fallback; see [install-sh-usage.md](install-sh-usage.md) |
-| `--legacy-root` | Shell/manual fallback behavior; equivalent to `manual` runtime in shell flows |
+| `--legacy-root` | Deprecated alias for the legacy flat-root install path |
 
 ## Recommended Commands
 
@@ -93,7 +92,7 @@ If a provider cannot be detected:
 | `--yes` | all | Skip prompts |
 | `--verbose` | install, update, uninstall, status, doctor | Show raw backend output |
 
-The primary Node CLI does **not** expose shell-era lifecycle flags such as `--ref`, `--init-harness`, `--install-cache`, `--remove-cache`, or `--remove-state`. Those remain shell/bootstrap concerns documented in [install-sh-usage.md](install-sh-usage.md). In the Node CLI, `.harness/` init and capability-cache install are inferred from the selected mode and current repo state.
+The primary Node CLI does **not** expose shell-era lifecycle flags such as `--ref`, `--init-harness`, `--install-cache`, `--remove-cache`, or `--remove-state`. In the Node CLI, `.harness/` init and capability-cache install are inferred from the selected mode and current repo state.
 
 ### Install mode behavior
 
@@ -103,7 +102,7 @@ The primary Node CLI infers ignore behavior from install mode:
 - project + shared -> no ignore/edit
 - global -> no project ignore/edit
 
-The CLI does not expose `--ignore-strategy`; `.gitignore` edits are a shell/bootstrap fallback concern.
+The CLI does not expose `--ignore-strategy`; `.gitignore` edits are handled internally by the Node CLI when private install mode requires them.
 
 ## Project Visibility
 
@@ -129,18 +128,9 @@ npx ai-engineering-harness uninstall --provider cursor --yes
 npx ai-engineering-harness uninstall --all --yes
 ```
 
-## Remote One-Line
-
-```bash
-curl -fsSL .../install.sh | sh -s --
-```
-
-`install.sh` remains available as the remote/bootstrap wrapper. See [install-sh-usage.md](install-sh-usage.md) for shell-only flags such as `--ref`, review-before-run guidance, and manual fallback behavior.
-
 ## Related Docs
 
 - [git-hygiene-policy.md](git-hygiene-policy.md)
-- [install-sh-usage.md](install-sh-usage.md)
 - [runtime-native-install.md](runtime-native-install.md)
 - [simple-cli-ux.md](simple-cli-ux.md)
 - [uninstall-update-design.md](uninstall-update-design.md)

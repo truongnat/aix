@@ -13,7 +13,7 @@ Active scope (v1.x): Claude, Cursor, Codex, Gemini. The primary install surface 
 
 | Provider | Notes |
 |----------|-------|
-| OpenCode | Removed v0.11.0 — was experimental; use the shell/bootstrap fallback uninstall guidance in [uninstall-usage.md](uninstall-usage.md) for legacy cleanup |
+| OpenCode | Removed v0.11.0 — was experimental; legacy cleanup history is documented separately |
 
 ## Manifest fields (project `.ai-harness/manifest.json`)
 

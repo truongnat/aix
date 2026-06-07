@@ -17,24 +17,13 @@ Refresh project runtime-native harness files without touching project state in `
 - does not edit `.gitignore`
 - does not support global update in this step
 - does not support manual runtime update
-- primary Node CLI does not support `--ref`; ref-pinned bootstrap remains a shell/install.sh concern
+- primary Node CLI does not support `--ref`
 
 ## Commands
 
 ```bash
 npx ai-engineering-harness update
 npx ai-engineering-harness update --provider cursor --yes
-```
-
-## Shell/bootstrap ref pinning
-
-Use `--ref` only on the shell/bootstrap fallback when you intentionally need to fetch a pinned GitHub branch or tag.
-
-Examples:
-
-```bash
-sh install.sh --runtime cursor --scope project --ref v0.9.2 --yes
-sh install.sh --runtime cursor --scope project --ref main --yes
 ```
 
 ## Cache Update
@@ -63,13 +52,12 @@ Update preserves `.harness/` completely.
 - no `.harness` removal
 - no `--init-harness` support during update
 
-### Shell-era skeleton note
+### Skeleton note
 
-If your repo was initialized by the older `aih.sh` shell path, the first TypeScript-backed install or
+If your repo was initialized by an older install path, the first TypeScript-backed install or
 re-init can treat existing `.harness/*.md` skeleton files as overwrite candidates. The current
-generator keeps the trailing newline required by normal POSIX text files, while the old shell command
-substitution stripped that final byte. The content is otherwise the same; review the diff and keep or
-overwrite intentionally.
+generator keeps the trailing newline required by normal POSIX text files, while older generators
+could differ by one byte. Review the diff and keep or overwrite intentionally.
 
 ## Git Hygiene
 
@@ -103,8 +91,4 @@ Refresh Cursor non-interactively:
 npx ai-engineering-harness update --provider cursor --yes
 ```
 
-Shell/bootstrap fallback with explicit ref pinning:
-
-```bash
-sh install.sh --runtime cursor --scope project --ref main --yes
-```
+No shell installer path remains in the current surface.

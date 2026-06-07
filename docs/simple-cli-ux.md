@@ -14,20 +14,6 @@ See [npx-cli-ux.md](npx-cli-ux.md) and [terminal-wizard-ux.md](terminal-wizard-u
 
 After install, use the local command catalog (`harness-plan`, `harness-verify`, …). Cursor and Claude expose native project commands; Codex uses plugin packaging plus `AGENTS.md` fallback; Gemini uses extension packaging plus `GEMINI.md` context — [runtime-command-surface.md](runtime-command-surface.md).
 
-## Shell fallback
-
-`aih.sh` / `install.sh` still exist for remote bootstrap, shell-only ref pinning, and legacy/manual fallback flows. They are not the primary day-to-day lifecycle UX. For the shell wrapper contract, see [install-sh-usage.md](install-sh-usage.md).
-
-## Problem (shell advanced)
-
-The installer worked, but the user-facing command was exposing too many internal switches:
-
-```bash
-sh install.sh install --runtime cursor --scope project --visibility private --ignore-strategy info-exclude --init-harness --yes
-```
-
-That is useful for debugging, not as the main adoption UX.
-
 ## Primary commands
 
 ```bash
@@ -39,18 +25,10 @@ npx ai-engineering-harness status
 npx ai-engineering-harness doctor
 ```
 
-Remote one-line usage is a bootstrap fallback, not the primary lifecycle loop:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh -s -- --runtime cursor --scope project --yes
-```
-
 Windows notes:
 
 - Primary lifecycle commands run natively on Node.js; PowerShell can use `npx ai-engineering-harness ...` directly.
 - In Windows PowerShell, `curl` is usually an alias for `Invoke-WebRequest`, so shell pipeline examples need `curl.exe`.
-- Use Git Bash or WSL only when you intentionally want the shell/bootstrap fallback.
-- `aih.ps1` remains an experimental bootstrap helper for the shell path.
 - Private git hygiene (`.git/info/exclude`) requires the target to be a Git repo; run `git init` or install inside a cloned repository.
 - PowerShell profile warnings (for example PSReadLine prediction) are unrelated to ai-engineering-harness.
 
@@ -58,17 +36,6 @@ Windows PowerShell examples:
 
 ```powershell
 npx ai-engineering-harness install --provider cursor --yes
-irm https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.ps1 | iex
-```
-
-Recommended explicit PowerShell execution:
-
-```powershell
-$script = "$env:TEMP\aih.ps1"
-Invoke-WebRequest https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.ps1 -OutFile $script
-powershell -ExecutionPolicy Bypass -File $script install -Runtime cursor -Yes
-powershell -ExecutionPolicy Bypass -File $script status
-powershell -ExecutionPolicy Bypass -File $script doctor
 ```
 
 Dogfood evidence: [scenario-f1-simple-cli-lifecycle.md](pack-dogfood-reports/scenario-f1-simple-cli-lifecycle.md).
@@ -129,9 +96,7 @@ Manual fallback is still supported explicitly with `--runtime manual` or `--lega
 ## Entrypoints
 
 - `npx ai-engineering-harness` / `bin/aih.js` — **primary** interactive CLI (v0.11.x)
-- `aih.sh` — legacy shell fallback
-- `install.sh` — remote/bootstrap compatibility wrapper
-- `aih.ps1` — experimental Windows bootstrap helper for the shell path
+- legacy shell bootstrap docs live in the archive
 - npm bin aliases: `ai-engineering-harness`, `aih`
 
 ## Install
@@ -195,18 +160,6 @@ Primary CLI flags:
 - `--yes`
 - `--verbose`
 - `--all`
-
-Shell/bootstrap-only flags such as `--ref`, `--init-harness`, `--install-cache`, `--remove-cache`, and `--remove-state` belong to [install-sh-usage.md](install-sh-usage.md), not the primary `npx` surface.
-
-## Backward Compatibility
-
-Existing explicit commands still work:
-
-```bash
-sh aih.sh install --runtime cursor --scope project --visibility private --ignore-strategy info-exclude --init-harness --yes
-```
-
-The simplified CLI is an additive UX improvement, not a breaking change.
 
 ## Examples
 

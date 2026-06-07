@@ -11,7 +11,6 @@
 Controlled by `files` in `package.json`:
 
 - `bin/`, `dist/`, `runtime/`, capability dirs, `docs/`
-- `aih.sh`, `install.sh`, `aih.ps1`, install scripts
 - `README.md`, `PACK.md`, `LICENSE`, etc.
 
 **Not** included: `test/`, `examples/`, local dogfood directories.

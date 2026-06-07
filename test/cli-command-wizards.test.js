@@ -548,7 +548,7 @@ test("runUninstallWizard surfaces backend failure status", async () => {
   assert.equal(status, 1);
 });
 
-test("runStatusOrDoctor forwards status to aih.sh", () => {
+test("runStatusOrDoctor forwards status to the in-process backend", () => {
   const calls = [];
   const target = makeTempDir();
 

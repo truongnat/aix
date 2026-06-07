@@ -45,7 +45,7 @@ Heavy runtime systems are not part of `v0.1.0`. The first release is the markdow
 
 ## Scope Boundary For `v0.10.x`
 
-`v0.10.x` marked the historical **npm-published** interactive CLI (`npx ai-engineering-harness install`) as the primary consumer UX. Shell scripts remained fallbacks. Stable per-runtime support was still **not** claimed. At that stage the Node CLI still delegated install/update/uninstall to bundled `aih.sh`; later releases moved the primary lifecycle commands in-process.
+`v0.10.x` marked the historical **npm-published** interactive CLI (`npx ai-engineering-harness install`) as the primary consumer UX. Stable per-runtime support was still **not** claimed. At that stage the Node CLI still delegated install/update/uninstall to a bundled shell backend; later releases moved the primary lifecycle commands in-process.
 
 ## Scope Boundary For `v0.4.0`
 
@@ -73,15 +73,15 @@ Heavy runtime systems are not part of `v0.1.0`. The first release is the markdow
 
 ## Scope Boundary For `v0.9.1`
 
-`v0.9.1` was the **Experimental Runtime-Native Installer** release. It introduced `install.sh` runtime/scope selection, `install-runtime.js`, project `.harness/` init, runtime-aware validation, and dogfood evidence (Scenarios C, D1–D6) without claiming stable runtime-native support, npm publishing, marketplace automation, or semantic validation. Manual fallback (root copy) remained available but was not the recommended UX. See [v0.9.1-release-notes.md](v0.9.1-release-notes.md) and [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
+`v0.9.1` was the **Experimental Runtime-Native Installer** release. It introduced runtime/scope selection, `install-runtime.js`, project `.harness/` init, runtime-aware validation, and dogfood evidence (Scenarios C, D1–D6) without claiming stable runtime-native support, npm publishing, marketplace automation, or semantic validation. See [v0.9.1-release-notes.md](v0.9.1-release-notes.md) and [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
 
 ## Scope Boundary For `v0.9.2`
 
-`v0.9.2` was the **Experimental Simple Lifecycle CLI + Capability Cache + Git Hygiene** release. It introduced `aih.sh` as the preferred lifecycle dispatcher, kept `install.sh` as a compatibility wrapper, installed `.ai-harness/` as the provider-agnostic capability source for project runtime-native installs, added private `.git/info/exclude` hygiene, shipped project `update` and safe `uninstall`, and included F1 simple lifecycle dogfood evidence. It did **not** claim stable runtime support, did **not** add Antigravity, and did **not** add marketplace automation, npm publishing, or semantic validation.
+`v0.9.2` was the **Experimental Simple Lifecycle CLI + Capability Cache + Git Hygiene** release. It introduced the lifecycle dispatcher, installed `.ai-harness/` as the provider-agnostic capability source for project runtime-native installs, added private `.git/info/exclude` hygiene, shipped project `update` and safe `uninstall`, and included F1 simple lifecycle dogfood evidence. It did **not** claim stable runtime support, did **not** add Antigravity, and did **not** add marketplace automation, npm publishing, or semantic validation.
 
 ## Scope Boundary For `v0.10.x`
 
-`v0.10.x` was the **Experimental NPX CLI** release. Primary UX: `npx ai-engineering-harness install` with interactive provider selection (detection recommends only). npm package shipped `bin/aih.js`, bundled shell fallbacks, and a trimmed `files` list (no `test/` or `examples/`). Shell (`aih.sh`, `install.sh`, `aih.ps1`) remained fallback. It did **not** claim stable runtime support or ship Antigravity install.
+`v0.10.x` was the **Experimental NPX CLI** release. Primary UX: `npx ai-engineering-harness install` with interactive provider selection (detection recommends only). npm package shipped `bin/aih.js` and a trimmed `files` list (no `test/` or `examples/`). It did **not** claim stable runtime support or ship Antigravity install.
 
 ## Scope Boundary For `v1.0.0`
 

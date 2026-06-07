@@ -4,7 +4,7 @@
 
 Safely remove `ai-engineering-harness` project runtime-native files without deleting unrelated user content.
 
-Primary surface: `npx ai-engineering-harness uninstall`. Shell/bootstrap-only cleanup knobs stay on the fallback path.
+Primary surface: `npx ai-engineering-harness uninstall`.
 
 ## Safe Defaults
 
@@ -25,8 +25,6 @@ npx ai-engineering-harness uninstall --provider cursor --yes
 npx ai-engineering-harness uninstall --all --yes
 ```
 
-Shell/bootstrap fallback keeps explicit cleanup flags such as `--remove-cache` and `--remove-state`; see [install-sh-usage.md](install-sh-usage.md) for that surface.
-
 ## Runtime Entrypoints
 
 | Runtime | Paths removed |
@@ -44,14 +42,12 @@ Shell/bootstrap fallback keeps explicit cleanup flags such as `--remove-cache` a
 `.ai-harness/` is kept by default because multiple runtime entrypoints may share it.
 
 - Primary Node CLI: use `--all` for full cleanup
-- Shell/bootstrap fallback: `--remove-cache` removes `.ai-harness/`
 
 ## State Removal
 
 `.harness/` is kept by default because it may contain user project goals, memory, and workflow state.
 
 - Primary Node CLI: use `--all` for full cleanup
-- Shell/bootstrap fallback: `--remove-state` removes `.harness/`
 
 ## Git Exclude Cleanup
 
@@ -101,8 +97,4 @@ Remove only the Cursor runtime bootstrap with explicit advanced flags:
 npx ai-engineering-harness uninstall --provider cursor --yes
 ```
 
-Shell/bootstrap fallback: remove Cursor bootstrap plus cache and project state:
-
-```bash
-sh aih.sh uninstall --runtime cursor --scope project --remove-cache --remove-state --yes
-```
+Legacy cleanup flags were removed from the current surface.

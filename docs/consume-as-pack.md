@@ -23,7 +23,7 @@ npx ai-engineering-harness install --provider generic --target ../my-project --y
 node bin/validate.js --target ../my-project --runtime generic --profile-only   # from source pack
 ```
 
-Use [install-sh-usage.md](install-sh-usage.md) only when you intentionally need shell/bootstrap fallback behavior such as remote `curl | sh` or `--ref` pinning.
+Historical shell-installer notes live in the archived install docs.
 
 **Maintainers (source pack):**
 

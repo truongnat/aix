@@ -6,8 +6,6 @@
 
 **Active providers:** Claude Code, Cursor, Codex, Gemini. OpenCode is not offered in the wizard (v0.11.0).
 
-**Fallbacks:** `aih.sh`, `install.sh`, `aih.ps1` — see [simple-cli-ux.md](simple-cli-ux.md).
-
 ## Primary command
 
 ```bash
@@ -82,13 +80,6 @@ npx ai-engineering-harness uninstall --all --yes
 | `--target`, `--dry-run`, `--yes`, `--all`, `--verbose` | See `npx ai-engineering-harness --help` |
 
 Without `--provider` in non-interactive mode: `No provider selected. Pass --provider cursor or run interactively.`
-
-## Windows
-
-- Primary: `npx ai-engineering-harness install`
-- Primary lifecycle commands run natively on Node.js
-- `aih.sh` / `install.sh` / `aih.ps1` remain fallback or bootstrap paths when you explicitly choose them
-- `aih.ps1` is experimental fallback only
 
 ## npm package
 

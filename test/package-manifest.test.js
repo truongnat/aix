@@ -2,7 +2,6 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const childProcess = require("node:child_process");
 
 const repoRoot = path.resolve(__dirname, "..");
 
@@ -272,15 +271,29 @@ test("cli-backend only retains pack-root resolution after the in-process port", 
 });
 
 test("lib/ and workers/ source tree stays free of @ts-ignore suppressions", () => {
-  const result = childProcess.spawnSync("rg", ["-n", "@ts-ignore", "lib", "workers"], {
-    cwd: repoRoot,
-    encoding: "utf8",
-  });
+  const roots = [path.join(repoRoot, "lib"), path.join(repoRoot, "workers")];
+  const matches = [];
+  const pending = [...roots];
 
-  assert.ok(
-    result.status === 1 || !result.stdout.trim(),
-    `Unexpected @ts-ignore suppression(s):\n${result.stdout || result.stderr}`
-  );
+  while (pending.length > 0) {
+    const current = pending.pop();
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const fullPath = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        pending.push(fullPath);
+        continue;
+      }
+      if (!entry.isFile() || !/\.(ts|js|md)$/.test(entry.name)) {
+        continue;
+      }
+      const text = fs.readFileSync(fullPath, "utf8");
+      if (text.includes("@ts-ignore")) {
+        matches.push(path.relative(repoRoot, fullPath));
+      }
+    }
+  }
+
+  assert.deepEqual(matches, [], `Unexpected @ts-ignore suppression(s):\n${matches.join("\n")}`);
 });
 
 test("CI smoke install uses a runner-agnostic Node invocation instead of bash", () => {

@@ -44,7 +44,7 @@ Cursor manifest (upstream): `commands: "./commands/"`, `skills: "./skills/"` —
 
 ## OpenCode (removed from active scope v0.11.0)
 
-Was experimental; no longer in wizard or `install-runtime.js`. Legacy projects may still have `.opencode/` — use the shell/bootstrap fallback uninstall guidance in [uninstall-usage.md](uninstall-usage.md) for cleanup.
+Was experimental; no longer in wizard or `install-runtime.js`. Legacy projects may still have `.opencode/` — cleanup history is documented separately.
 
 ## Gemini CLI
 

@@ -6,7 +6,7 @@ Define how `ai-engineering-harness` installs interact with Git in product reposi
 
 **v0.9.2 principle:** `.gitignore` is usually **tracked** — editing it creates a repo change. Private/local installs should prefer **`.git/info/exclude`**, which is local to the checkout and **not committed**.
 
-**Current implementation:** the primary Node CLI (`npx ai-engineering-harness install --visibility private`) writes `.git/info/exclude` for private project installs. Shell/bootstrap fallback keeps the older explicit `--ignore-strategy` controls. See [private-install-git-hygiene.md](private-install-git-hygiene.md).
+**Current implementation:** the primary Node CLI (`npx ai-engineering-harness install --visibility private`) writes `.git/info/exclude` for private project installs. See [private-install-git-hygiene.md](private-install-git-hygiene.md).
 
 ## Problem
 
@@ -68,15 +68,15 @@ Priority order for **private** project installs:
 2. Not a Git repo, or exclude unavailable
    → print manual ignore instructions; still install files
 
-3. Shell/bootstrap fallback user explicitly chooses .gitignore (interactive or --ignore-strategy gitignore)
+3. User explicitly chooses `.gitignore` (interactive or `--ignore-strategy gitignore`)
    → ask/confirm; then append delimited block to .gitignore only with consent
 ```
 
 | Mode | Ignore target | Tracked repo change from ignore policy? |
 |---|---|---|
 | primary Node CLI private install | `.git/info/exclude` | **No** |
-| shell fallback `private` + `info-exclude` | `.git/info/exclude` | **No** |
-| shell fallback `private` + `gitignore` (explicit only) | `.gitignore` | **Yes** (`.gitignore` diff) |
+| private project install | `.git/info/exclude` | **No** |
+| private project install with explicit `gitignore` | `.gitignore` | **Yes** (`.gitignore` diff) |
 | `shared` | none | N/A — files visible in status |
 | `global` | none (project) | N/A |
 
@@ -125,8 +125,8 @@ Same delimited marker format as exclude file.
 
 | File | When |
 |---|---|
-| `.git/info/exclude` | Primary Node CLI private install, or shell fallback private/local + `info-exclude` strategy + Git repo |
-| `.gitignore` | Shell/bootstrap fallback private + explicit `gitignore` strategy only |
+| `.git/info/exclude` | Primary Node CLI private install + Git repo |
+| `.gitignore` | Explicit `gitignore` strategy only |
 | Runtime/harness paths | Per [runtime-native-install-audit.md](runtime-native-install-audit.md) |
 
 ## What Installer Must Never Edit
@@ -160,13 +160,13 @@ Before write install:
 | Context | Visibility | Ignore strategy |
 |---|---|---|
 | Primary Node CLI project install | **Ask** or explicit `--visibility` | `.git/info/exclude` when private |
-| Shell fallback interactive project | **Ask** | `auto` → `info-exclude` if private |
-| Shell fallback `--visibility private --yes` | private | `info-exclude` |
+| Interactive project | **Ask** | `info-exclude` if private |
+| `--visibility private --yes` | private | `info-exclude` |
 | `--visibility shared` | shared | `none` |
-| Shell fallback `--ignore-strategy none` | either | No exclude/gitignore edits |
+| `--ignore-strategy none` | either | No exclude/gitignore edits |
 | Global | N/A | ignored |
 
-Primary Node CLI defaults project installs to `private`. Shell fallback without `--visibility` should fail or warn rather than guess when explicit hygiene behavior matters.
+Primary Node CLI defaults project installs to `private`. Without `--visibility`, the CLI should fail or warn rather than guess when explicit hygiene behavior matters.
 
 ## Examples
 
@@ -191,10 +191,6 @@ npx ai-engineering-harness install --provider cursor --scope project --visibilit
 Expected: files created; exclude and `.gitignore` unchanged; paths visible in `git status`.
 
 **Explicit `.gitignore` (team policy, user opted in):**
-
-```bash
-sh install.sh install --runtime cursor --scope project --visibility private --ignore-strategy gitignore --init-harness --yes
-```
 
 Expected: delimited block in `.gitignore` — user knows `.gitignore` will show as modified.
 

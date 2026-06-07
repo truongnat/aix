@@ -46,7 +46,6 @@ After **global** install, user message should say:
 Global harness capability installed for <runtime>.
 In each product repo, run:
   npx ai-engineering-harness install --target <repo>
-or use shell/bootstrap fallback when you intentionally need remote bootstrap behavior
 ```
 
 ## What Gets Committed
@@ -118,7 +117,7 @@ cd ~/projects/other-app
 
 ## Project `.harness` Init (implemented)
 
-`npx ai-engineering-harness install` scaffolds minimal profile files under `<repo>/.harness/` when the project install needs them. Shell/bootstrap fallback may still expose explicit `--init-harness`. See [harness-init-usage.md](harness-init-usage.md).
+`npx ai-engineering-harness install` scaffolds minimal profile files under `<repo>/.harness/` when the project install needs them.
 
 - Generated files are **structural skeletons** only (required headings + TODO placeholders).
 - Teams fill content after init.
@@ -127,7 +126,7 @@ cd ~/projects/other-app
 ## Rules (normative)
 
 1. Global install **never** creates shared project state by itself.
-2. Project install **may** create `.harness/` when the primary Node CLI detects a missing scaffold or when shell/bootstrap fallback passes `--init-harness`.
+2. Project install **may** create `.harness/` when the primary Node CLI detects a missing scaffold.
 3. Each repo gets **its own** `.harness/`.
 4. Runtime plugins should **not** duplicate the full pack in every repo unless that runtime requires project-local files (then install **only** what that runtime needs).
 5. Commit vs ignore `.harness/` is a **team workflow** decision; document in profile README or adoption guide.

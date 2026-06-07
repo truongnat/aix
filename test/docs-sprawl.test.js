@@ -19,11 +19,6 @@ const canonicalInstallDocs = [
       /Canonical scope: `npx ai-engineering-harness` lifecycle commands, defaults, and flags\./,
   },
   {
-    fileName: "install-sh-usage.md",
-    expectedScope:
-      /Canonical scope: remote `install\.sh` wrapper behavior, review-before-run flow, and manual fallback entrypoints\./,
-  },
-  {
     fileName: "runtime-native-install.md",
     expectedScope:
       /Canonical scope: per-runtime payload paths and follow-up actions after runtime-native install\./,
@@ -72,6 +67,11 @@ test("install design docs are archived behind stable top-level stubs", () => {
       `archived copy for ${fileName} should retain the original detailed content`
     );
   }
+
+  assert.ok(
+    !fs.existsSync(path.join(REPO_ROOT, "docs/install-sh-usage.md")),
+    "docs/install-sh-usage.md should be removed from the top-level docs surface"
+  );
 });
 
 test("canonical install docs declare distinct responsibilities and cross-reference each other", () => {
@@ -83,25 +83,8 @@ test("canonical install docs declare distinct responsibilities and cross-referen
   const installCommandModel = readRepoFile("docs/install-command-model.md");
   assert.match(
     installCommandModel,
-    /install-sh-usage\.md/,
-    "install-command-model should delegate remote wrapper details to install-sh-usage.md"
-  );
-  assert.match(
-    installCommandModel,
     /runtime-native-install\.md/,
     "install-command-model should delegate payload-path details to runtime-native-install.md"
-  );
-
-  const installShUsage = readRepoFile("docs/install-sh-usage.md");
-  assert.match(
-    installShUsage,
-    /install-command-model\.md/,
-    "install-sh-usage should point command semantics back to install-command-model.md"
-  );
-  assert.match(
-    installShUsage,
-    /runtime-native-install\.md/,
-    "install-sh-usage should point payload-path details to runtime-native-install.md"
   );
 
   const runtimeNativeInstall = readRepoFile("docs/runtime-native-install.md");
@@ -109,11 +92,6 @@ test("canonical install docs declare distinct responsibilities and cross-referen
     runtimeNativeInstall,
     /install-command-model\.md/,
     "runtime-native-install should point flag semantics back to install-command-model.md"
-  );
-  assert.match(
-    runtimeNativeInstall,
-    /install-sh-usage\.md/,
-    "runtime-native-install should point remote wrapper usage back to install-sh-usage.md"
   );
 });
 

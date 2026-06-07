@@ -95,10 +95,7 @@ test("writeTargetFile docstring explains shell-era newline drift and first re-in
 });
 
 test("generated harness skeleton sources do not contain placeholder TODO or FIXME markers", () => {
-  const sources = [
-    path.join(__dirname, "..", "..", "lib", "backend", "harness-skeleton.ts"),
-    path.join(__dirname, "..", "..", "aih.sh"),
-  ];
+  const sources = [path.join(__dirname, "..", "..", "lib", "backend", "harness-skeleton.ts")];
 
   for (const file of sources) {
     const source = fs.readFileSync(file, "utf8");
@@ -107,12 +104,11 @@ test("generated harness skeleton sources do not contain placeholder TODO or FIXM
   }
 });
 
-test("shell and TypeScript policy skeletons stay aligned without a default scope guard rule", () => {
+test("policy skeleton stays aligned without a default scope guard rule", () => {
   const tsSource = fs.readFileSync(
     path.join(__dirname, "..", "..", "lib", "backend", "harness-skeleton.ts"),
     "utf8"
   );
-  const shellSource = fs.readFileSync(path.join(__dirname, "..", "..", "aih.sh"), "utf8");
   const policyGenerator = fs.readFileSync(
     path.join(__dirname, "..", "..", "lib", "policy", "generator.ts"),
     "utf8"
@@ -120,17 +116,18 @@ test("shell and TypeScript policy skeletons stay aligned without a default scope
 
   assert.doesNotMatch(tsSource, /"id": "scope-guard"/);
   assert.doesNotMatch(tsSource, /"value": "\*\*"/);
-  assert.doesNotMatch(shellSource, /"id": "scope-guard"/);
-  assert.doesNotMatch(shellSource, /"value": "\*\*"/);
   assert.match(policyGenerator, /No default scope-guard rule is enabled\./);
 });
 
-test("legacy manual install path emits the same deprecation warning in the shell fallback", () => {
-  const shellSource = fs.readFileSync(path.join(__dirname, "..", "..", "aih.sh"), "utf8");
+test("legacy manual install path emits the deprecation warning in TypeScript", () => {
+  const legacySource = fs.readFileSync(
+    path.join(__dirname, "..", "..", "lib", "install-legacy.ts"),
+    "utf8"
+  );
 
-  assert.match(shellSource, /DEPRECATION WARNING/);
-  assert.match(shellSource, /This install path \(flat-root\) is deprecated\./);
-  assert.match(shellSource, /It will be removed in v1\.1\.0\./);
-  assert.match(shellSource, /npx ai-engineering-harness install --provider claude --yes/);
-  assert.match(shellSource, /node bin\/aih\.js install for provider-aware installation/);
+  assert.match(legacySource, /DEPRECATION WARNING/);
+  assert.match(legacySource, /This install path \(flat-root\) is deprecated\./);
+  assert.match(legacySource, /It will be removed in v1\.1\.0\./);
+  assert.match(legacySource, /npx ai-engineering-harness install --provider claude --yes/);
+  assert.match(legacySource, /node bin\/aih\.js install for provider-aware installation/);
 });

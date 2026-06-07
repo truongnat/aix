@@ -6,7 +6,7 @@ Consolidate evidence from Scenario **C** (manual one-line fallback), Scenarios *
 
 ## Scope
 
-- [install.sh](../install.sh) + [lib/install-runtime.ts](../lib/install-runtime.ts) runtime-native paths
+- [lib/install-runtime.ts](../lib/install-runtime.ts) runtime-native paths
 - Project `.harness/` init via `--init-harness`
 - [Runtime-aware validation](runtime-aware-validation.md)
 - External disposable target repos (not committed to this pack)
@@ -23,7 +23,7 @@ Consolidate evidence from Scenario **C** (manual one-line fallback), Scenarios *
 | D4 | [scenario-d4-opencode-project.md](pack-dogfood-reports/scenario-d4-opencode-project.md) | `opencode` + project |
 | D5 | [scenario-d5-gemini.md](pack-dogfood-reports/scenario-d5-gemini.md) | `gemini` project + global write |
 | D6 | [scenario-d6-claude.md](pack-dogfood-reports/scenario-d6-claude.md) | `claude` project + global dry-run |
-| F1 | [scenario-f1-simple-cli-lifecycle.md](pack-dogfood-reports/scenario-f1-simple-cli-lifecycle.md) | `aih.sh` install/status/doctor/update/uninstall/uninstall --all |
+| F1 | [scenario-f1-simple-cli-lifecycle.md](pack-dogfood-reports/scenario-f1-simple-cli-lifecycle.md) | Node CLI install/status/doctor/update/uninstall/uninstall --all |
 
 Post-D2 patch: `.harness/` init no longer creates `AGENTS.md`; runtime owns bootstrap ([runtime-native-install-audit.md](runtime-native-install-audit.md)).
 
@@ -38,7 +38,7 @@ Post-D2 patch: `.harness/` init no longer creates `AGENTS.md`; runtime owns boot
 | D4 | opencode | project | PASS | PASS | Not run (CLI absent) | Clean | experimental PASS | **No** |
 | D5 | gemini | project + global | PASS (global safe CREATE) | PASS (project) | **Inconclusive** (`extensions list` empty) | Clean (project) | experimental PASS | **No** |
 | D6 | claude | project; global dry-run | PASS (project); global write **not run** | PASS (project) | Not run (`/plugin install` not run) | Clean (project) | experimental PASS | **No** |
-| F1 | simple lifecycle (`aih.sh`) | project | PASS | PASS | N/A (shell lifecycle) | Clean after install/full uninstall; noisy after default uninstall if cache/state kept | experimental PASS | **No** |
+| F1 | simple lifecycle (Node CLI) | project | PASS | PASS | N/A | Clean after install/full uninstall; noisy after default uninstall if cache/state kept | experimental PASS | **No** |
 
 **Windsurf:** historical alias of `cursor` in older installer flows; not separately dogfooded.
 
@@ -53,7 +53,7 @@ Post-D2 patch: `.harness/` init no longer creates `AGENTS.md`; runtime owns boot
 - Runtime-aware `bin/validate.js --runtime <name> --profile-only` for dogfooded runtimes.
 - D2 patch: `generic`/`codex` receive full `AGENTS.project.md` when using `--init-harness`.
 - Manual legacy fallback (C) still works for adopters who need bulk copy.
-- Simple lifecycle dispatcher `aih.sh` works end-to-end for install/status/doctor/update/uninstall/uninstall --all (F1).
+- Simple lifecycle dispatcher works end-to-end for install/status/doctor/update/uninstall/uninstall --all (F1).
 
 ## What Remains Experimental
 

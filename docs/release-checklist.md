@@ -194,8 +194,6 @@ records for earlier tags. They are not the primary v1.x release instructions.
 - `node bin/validate.js --target test/fixtures/valid-target-profile --profile-only`
 - `node bin/validate.js --target test/fixtures/valid-target-goal --goal google-login`
 - `node bin/validate.js --target test/fixtures/valid-target-profile-cursor --runtime cursor --profile-only`
-- `sh aih.sh --help`
-- `sh aih.sh status --target <dogfood target>`
 - `git status`
 - `git tag v0.9.2`
 - `git push origin v0.9.2`

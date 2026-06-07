@@ -61,10 +61,7 @@ Active providers:
 Advanced fallback targets:
   generic, manual
 
-Shell backend fallback:
-  sh aih.sh install --runtime cursor --scope project --visibility private --yes
-
-Primary lifecycle commands run in-process on Node.js. Shell fallback is kept for legacy or remote bootstrap flows.`;
+Primary lifecycle commands run in-process on Node.js.`;
 }
 
 function printHelp(): void {

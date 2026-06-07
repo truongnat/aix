@@ -65,10 +65,6 @@ Default: hide raw backend stdout/stderr unless the command fails.
 npx ai-engineering-harness install --provider cursor --yes --verbose
 ```
 
-## Shell fallback unchanged
-
-`aih.sh`, `install.sh`, and `aih.ps1` remain supported as fallback/bootstrap surfaces. The primary Node CLI lifecycle commands run in-process.
-
 ## Windows
 
-Interactive wizard requires a TTY. Non-interactive `--yes` flows work in CI and PowerShell without clack. Shell prerequisites matter only when you intentionally use the shell fallback surfaces.
+Interactive wizard requires a TTY. Non-interactive `--yes` flows work in CI and PowerShell without clack.

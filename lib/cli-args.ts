@@ -135,9 +135,7 @@ function parseArgv(argv: string[]): ParseOptions {
       continue;
     }
     if (arg === "--ref") {
-      throw new Error(
-        "--ref is not supported by the npx CLI. Use install.sh/aih.sh if you need ref-pinned bootstrap."
-      );
+      throw new Error("--ref is not supported by the npx CLI.");
     }
     if (arg === "--all") {
       options.all = true;
