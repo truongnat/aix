@@ -74,7 +74,7 @@ function spawnCommand(
   return childProcess.spawnSync(executable, args, {
     cwd,
     encoding: "utf8",
-    shell: false,
+    shell: process.platform === "win32",
     timeout: 15000,
     env: isolatedCommandEnv(),
   });
