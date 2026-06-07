@@ -1,18 +1,24 @@
 import fs from "node:fs";
 import path from "node:path";
 
-interface ModeArtifactsPayload {
-  summary: Record<string, unknown>;
-  metrics: Record<string, unknown>;
+interface ModeArtifactsPayload<
+  TSummary extends object = Record<string, unknown>,
+  TMetrics extends object = Record<string, unknown>,
+> {
+  summary: TSummary;
+  metrics: TMetrics;
   transcript: string;
   report: string;
 }
 
-interface RunSummaryPayload {
+interface RunSummaryPayload<
+  TModes extends object = Record<string, unknown>,
+  TComparison extends object = Record<string, unknown>,
+> {
   runId: string;
   taskId: string;
-  modes: Record<string, unknown>;
-  comparison: Record<string, unknown>;
+  modes: TModes;
+  comparison: TComparison;
   telemetryHints: unknown;
 }
 
@@ -23,7 +29,10 @@ interface ModeArtifactsPaths {
   reportPath: string;
 }
 
-function writeModeArtifacts(modeDir: string, payload: ModeArtifactsPayload): ModeArtifactsPaths {
+function writeModeArtifacts<TSummary extends object, TMetrics extends object>(
+  modeDir: string,
+  payload: ModeArtifactsPayload<TSummary, TMetrics>
+): ModeArtifactsPaths {
   const summaryPath = path.join(modeDir, "summary.json");
   const metricsPath = path.join(modeDir, "metrics.json");
   const transcriptPath = path.join(modeDir, "transcript.md");
@@ -37,7 +46,10 @@ function writeModeArtifacts(modeDir: string, payload: ModeArtifactsPayload): Mod
   return { summaryPath, metricsPath, transcriptPath, reportPath };
 }
 
-function writeRunSummary(runRoot: string, payload: RunSummaryPayload): string {
+function writeRunSummary<TModes extends object, TComparison extends object>(
+  runRoot: string,
+  payload: RunSummaryPayload<TModes, TComparison>
+): string {
   const summaryPath = path.join(runRoot, "summary.json");
   fs.writeFileSync(summaryPath, JSON.stringify(payload, null, 2));
   return summaryPath;

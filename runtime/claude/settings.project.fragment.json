@@ -1,4 +1,48 @@
 {
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/core/guard-phase.js --command harness-run --session .harness/sessions/<active-session> --json"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/core/record-tool-output.js --session .harness/sessions/<active-session> --command \"$COMMAND\" --exit-code \"$EXIT_CODE\" --summary \"Recorded by Claude hook adapter\" --used-by harness-verify"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/core/record-subagent-result.js --session .harness/sessions/<active-session> --agent \"$AGENT\" --status completed --summary \"Subagent completed\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node hooks/core/compact-session-memory.js --session .harness/sessions/<active-session>"
+          }
+        ]
+      }
+    ]
+  },
   "extraKnownMarketplaces": {
     "ai-engineering-harness": {
       "source": {

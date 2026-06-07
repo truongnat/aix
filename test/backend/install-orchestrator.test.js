@@ -39,6 +39,17 @@ test("runInstall provisions a claude provider surface in-process (bug-fix regres
     "harness skeleton written"
   );
   assert.equal(fs.existsSync(path.join(dir, ".harness", "policies.json")), true);
+  const settings = JSON.parse(fs.readFileSync(path.join(dir, ".claude", "settings.json"), "utf8"));
+  assert.match(settings.hooks.PreToolUse[0].hooks[0].command, /hooks\/core\/guard-phase\.js/);
+  assert.match(
+    settings.hooks.PostToolUse[0].hooks[0].command,
+    /hooks\/core\/record-tool-output\.js/
+  );
+  assert.match(
+    settings.hooks.SubagentStop[0].hooks[0].command,
+    /hooks\/core\/record-subagent-result\.js/
+  );
+  assert.match(settings.hooks.Stop[0].hooks[0].command, /compact-session-memory\.js/);
   // private+project => git exclude block present
   assert.match(
     fs.readFileSync(path.join(dir, ".git", "info", "exclude"), "utf8"),
@@ -85,4 +96,32 @@ test("runInstall with shared visibility writes no git exclude block", () => {
   if (fs.existsSync(excl)) {
     assert.doesNotMatch(fs.readFileSync(excl, "utf8"), /ai-engineering-harness/);
   }
+});
+
+test("runInstall warns when manual legacy install path is used", () => {
+  const dir = tmpRepo();
+  const warnings = [];
+  const originalWarn = console.warn;
+  console.warn = (...args) => warnings.push(args.join(" "));
+
+  try {
+    const r = runInstall({
+      packRoot: PACK_ROOT,
+      target: dir,
+      provider: "manual",
+      scope: "project",
+      visibility: "private",
+      dryRun: true,
+      initHarness: false,
+      installCache: false,
+      force: false,
+    });
+    assert.equal(r.ok, true);
+  } finally {
+    console.warn = originalWarn;
+  }
+
+  assert.match(warnings.join("\n"), /DEPRECATION WARNING/);
+  assert.match(warnings.join("\n"), /flat-root/);
+  assert.match(warnings.join("\n"), /removed in v1\.1\.0/);
 });

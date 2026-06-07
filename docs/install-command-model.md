@@ -2,43 +2,42 @@
 
 ## Purpose
 
-Define the `aih.sh` CLI model for `v0.9.2`: simple verbs with smart defaults, plus backward compatibility for the explicit `v0.9.1` flag surface through `install.sh`.
+Define the primary Node.js lifecycle CLI model for `v1.0.x`: simple verbs with smart defaults for `npx ai-engineering-harness`, with shell/bootstrap fallback documented separately.
 
-Canonical scope: `aih.sh` lifecycle commands, defaults, and flags.
+Canonical scope: `npx ai-engineering-harness` lifecycle commands, defaults, and flags.
 
-Use this document as the command/flag source of truth. For remote `install.sh` wrapper behavior, review-before-run flows, and manual fallback entrypoints, see [install-sh-usage.md](install-sh-usage.md). For per-runtime payload paths and follow-up actions after runtime-native install, see [runtime-native-install.md](runtime-native-install.md).
+Use this document as the primary CLI command/flag source of truth. For remote `install.sh` wrapper behavior, shell-only flags such as `--ref`, review-before-run flows, and manual fallback entrypoints, see [install-sh-usage.md](install-sh-usage.md). For per-runtime payload paths and follow-up actions after runtime-native install, see [runtime-native-install.md](runtime-native-install.md).
 
-**Implemented (v0.9.2 Step 5):** simple `install` / `update` / `uninstall` defaults, runtime auto-detection, lightweight `status` / `doctor`, private `.git/info/exclude` hygiene, project uninstall, and project update. Global update remains planned-only.
+**Current surface (v1.0.x):** primary lifecycle commands run in-process on Node.js. `aih.sh` / `install.sh` remain available only as shell/bootstrap fallback surfaces.
 
 ## Commands
 
 ```bash
-aih.sh install
-aih.sh uninstall
-aih.sh update
-aih.sh status
-aih.sh doctor
-aih.sh help
+npx ai-engineering-harness install
+npx ai-engineering-harness uninstall
+npx ai-engineering-harness update
+npx ai-engineering-harness status
+npx ai-engineering-harness doctor
+npx ai-engineering-harness help
 ```
 
 ### Backward compatibility
 
-| Legacy (v0.9.1) | Maps to |
+| Surface | Notes |
 |---|---|
-| `install.sh --runtime cursor ...` | `aih.sh install --runtime cursor ...` via wrapper |
-| `install.sh` (no args, interactive) | `aih.sh install` wizard via wrapper |
-| `curl \| sh` on `install.sh` (no args) | fetch `aih.sh` and run `install` flow |
-| `--legacy-root` | `install --runtime manual` |
+| `--runtime <id>` | Deprecated alias for `--provider <id>` in the Node CLI |
+| `aih.sh` / `install.sh` | Shell/bootstrap fallback; see [install-sh-usage.md](install-sh-usage.md) |
+| `--legacy-root` | Shell/manual fallback behavior; equivalent to `manual` runtime in shell flows |
 
 ## Recommended Commands
 
 ```bash
-sh aih.sh install
-sh aih.sh update
-sh aih.sh uninstall
-sh aih.sh uninstall --all
-sh aih.sh status
-sh aih.sh doctor
+npx ai-engineering-harness install
+npx ai-engineering-harness update
+npx ai-engineering-harness uninstall
+npx ai-engineering-harness uninstall --all
+npx ai-engineering-harness status
+npx ai-engineering-harness doctor
 ```
 
 ## Defaults
@@ -46,22 +45,22 @@ sh aih.sh doctor
 ### Install
 
 - target: current directory
-- runtime: auto-detect from provider hints in the repo
+- provider: auto-detect from repo hints
 - scope: `project`
 - visibility: `private`
 - ignore strategy: `info-exclude`
 - init harness: enabled when `.harness/` does not exist
 - install cache: enabled for project runtime-native install
 
-If runtime cannot be detected:
+If a provider cannot be detected:
 
-- interactive shell: prompt for provider
-- non-interactive shell: fail clearly and require `--runtime`
+- interactive CLI: prompt for provider
+- non-interactive CLI: fail clearly and require `--provider`
 
 ### Update
 
 - target: current directory
-- runtime: auto-detect from installed runtime entrypoints
+- provider: auto-detect from installed runtime entrypoints
 - scope: `project`
 - refresh `.ai-harness/`
 - refresh runtime entrypoint
@@ -71,52 +70,40 @@ If runtime cannot be detected:
 ### Uninstall
 
 - target: current directory
-- runtime: auto-detect from installed runtime entrypoints
+- provider: auto-detect from installed runtime entrypoints
 - scope: `project`
 - remove runtime entrypoint
 - remove harness block from `.git/info/exclude` when present
 - keep `.ai-harness/`
 - keep `.harness/`
 
-`--all` is shorthand for full project cleanup: runtime `all` + remove cache + remove state.
+`--all` is shorthand for full project cleanup: runtime entrypoints + cache + state + exclude cleanup.
 
 ## Flags
 
 | Flag | Applies to | Meaning |
 |---|---|---|
 | `--target <path>` | all | Product repo or cwd (default `.`) |
-| `--runtime <list>` | all | Comma-separated providers |
+| `--provider <list>` | install, update, uninstall | Comma-separated providers |
+| `--runtime <list>` | install, update, uninstall | Deprecated alias for `--provider` |
 | `--scope <name>` | install, uninstall, update | `global` \| `project` |
 | `--visibility <name>` | install, update | `private` \| `shared` |
-| `--ignore-strategy <name>` | install, update | `info-exclude` \| `gitignore` \| `none` \| `auto` |
-| `--init-harness` | install | Scaffold `.harness/` (project scope) |
-| `--install-cache` | install | Force capability cache install |
-| `--no-install-cache` | install, update | Disable cache install for `install`; rejected for `update` |
-| `--remove-cache` | uninstall | Remove `.ai-harness/` |
-| `--remove-state` | uninstall | Remove `.harness/` |
-| `--all` | uninstall | Runtime `all` + `--remove-cache` + `--remove-state` |
+| `--all` | uninstall | Full project cleanup (runtime entrypoints + cache + state + exclude block) |
 | `--dry-run` | all | Plan only |
-| `--force` | all | Overwrite harness-owned files |
 | `--yes` | all | Skip prompts |
-| `--ref <git-ref>` | install, update | Pack tarball ref |
+| `--verbose` | install, update, uninstall, status, doctor | Show raw backend output |
 
-Removed / deprecated aliases:
+The primary Node CLI does **not** expose shell-era lifecycle flags such as `--ref`, `--init-harness`, `--install-cache`, `--remove-cache`, or `--remove-state`. Those remain shell/bootstrap concerns documented in [install-sh-usage.md](install-sh-usage.md). In the Node CLI, `.harness/` init and capability-cache install are inferred from the selected mode and current repo state.
 
-- `--ignore-generated` → use `--visibility private --ignore-strategy info-exclude`
-- `--no-ignore` → `--ignore-strategy none`
+### Install mode behavior
 
-### `--ignore-strategy`
+The primary Node CLI infers ignore behavior from install mode:
 
-| Value | Behavior |
-|---|---|
-| `info-exclude` | Append delimited block to `.git/info/exclude` (private + Git repo) |
-| `gitignore` | Append delimited block to `.gitignore` — **explicit only** |
-| `none` | No exclude/gitignore edits |
-| `auto` | Interactive: private → `info-exclude`; shared → `none` |
+- project + private -> `.git/info/exclude`
+- project + shared -> no ignore/edit
+- global -> no project ignore/edit
 
-Global install: ignore strategy **ignored** for project files.
-
-**Do not** default to editing `.gitignore`.
+The CLI does not expose `--ignore-strategy`; `.gitignore` edits are a shell/bootstrap fallback concern.
 
 ## Project Visibility
 
@@ -129,29 +116,26 @@ Global install: ignore strategy **ignored** for project files.
 
 ```bash
 # Simple install with provider detection
-sh aih.sh install
+npx ai-engineering-harness install
 
-# Private Cursor — explicit advanced form
-sh aih.sh install --runtime cursor --scope project --visibility private --ignore-strategy info-exclude --init-harness --yes
+# Private Cursor — explicit non-interactive form
+npx ai-engineering-harness install --provider cursor --scope project --visibility private --yes
 
 # Shared team install
-sh aih.sh install --runtime cursor --scope project --visibility shared --init-harness --yes
+npx ai-engineering-harness install --provider cursor --scope project --visibility shared --yes
 
-# Explicit .gitignore (user opted in — creates .gitignore diff)
-sh aih.sh install --runtime cursor --scope project --visibility private --ignore-strategy gitignore --init-harness --yes
-
-sh aih.sh update
-sh aih.sh uninstall
-sh aih.sh uninstall --all
+npx ai-engineering-harness update --provider cursor --yes
+npx ai-engineering-harness uninstall --provider cursor --yes
+npx ai-engineering-harness uninstall --all --yes
 ```
 
 ## Remote One-Line
 
 ```bash
-curl -fsSL .../aih.sh | sh -s -- install
+curl -fsSL .../install.sh | sh -s --
 ```
 
-`install.sh` remains available as a compatibility wrapper. See [install-sh-usage.md](install-sh-usage.md) for remote wrapper behavior and safety guidance.
+`install.sh` remains available as the remote/bootstrap wrapper. See [install-sh-usage.md](install-sh-usage.md) for shell-only flags such as `--ref`, review-before-run guidance, and manual fallback behavior.
 
 ## Related Docs
 

@@ -131,11 +131,12 @@ See [docs/release-archive-model.md](release-archive-model.md) and [PACK.md](../P
 ### Cons
 
 - archive shape needs design discipline
-- not yet a first-class documented release workflow
+- archive assembly still requires manual maintainer steps
 
 ### Current Status
 
-Designed as a later distribution-friendly mode, but not automated yet.
+Documented and supported as a manual distribution-friendly mode, but not
+automated yet.
 
 ## Mode 5: Future Plugin Registry
 

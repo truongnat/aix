@@ -5,7 +5,6 @@
  */
 
 import * as fs from "node:fs";
-import * as path from "node:path";
 import {
   PolicySet,
   PolicyRule,
@@ -44,6 +43,48 @@ export class PolicyEngine {
     return new RegExp(`^${out}$`);
   }
 
+  private static compileRegex(pattern: string, context: string): RegExp {
+    try {
+      return new RegExp(pattern);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Invalid regex for ${context}: ${pattern} (${message})`);
+    }
+  }
+
+  private validateCondition(rule: PolicyRule, condition: PolicyCondition): void {
+    if (condition.operator !== "matches") {
+      return;
+    }
+
+    const value = String(condition.value);
+    const context = `rule ${rule.id} ${condition.type} condition`;
+
+    if (condition.type === "state") {
+      const [key, pattern] = value.split(":");
+      if (!key) {
+        throw new Error(`Invalid state matcher for rule ${rule.id}: missing state key`);
+      }
+      if (!pattern) {
+        throw new Error(`Invalid state matcher for rule ${rule.id}: missing regex pattern`);
+      }
+      PolicyEngine.compileRegex(pattern, context);
+      return;
+    }
+
+    if (condition.type === "command" || condition.type === "phase") {
+      PolicyEngine.compileRegex(value, context);
+    }
+  }
+
+  private validatePolicySet(policySet: PolicySet): void {
+    for (const rule of policySet.rules) {
+      for (const condition of rule.conditions) {
+        this.validateCondition(rule, condition);
+      }
+    }
+  }
+
   /**
    * Load policy set from JSON file
    */
@@ -54,7 +95,9 @@ export class PolicyEngine {
     }
 
     const content = fs.readFileSync(pathToLoad, "utf8");
-    this.policySet = JSON.parse(content) as PolicySet;
+    const policySet = JSON.parse(content) as PolicySet;
+    this.validatePolicySet(policySet);
+    this.policySet = policySet;
     return this.policySet;
   }
 
@@ -104,7 +147,7 @@ export class PolicyEngine {
       case "equals":
         return command === value;
       case "matches":
-        return new RegExp(value).test(command);
+        return PolicyEngine.compileRegex(value, "command matcher").test(command);
       case "exists":
         return command !== "";
       case "not_exists":
@@ -133,7 +176,9 @@ export class PolicyEngine {
       case "not_exists":
         return actualValue === undefined || actualValue === null;
       case "matches":
-        return expectedValue ? new RegExp(expectedValue).test(String(actualValue)) : false;
+        return expectedValue
+          ? PolicyEngine.compileRegex(expectedValue, "state matcher").test(String(actualValue))
+          : false;
       default:
         throw new Error(`Unknown operator for state: ${operator}`);
     }
@@ -180,7 +225,7 @@ export class PolicyEngine {
       case "equals":
         return currentPhase === value;
       case "matches":
-        return new RegExp(value).test(currentPhase);
+        return PolicyEngine.compileRegex(value, "phase matcher").test(currentPhase);
       case "exists":
         return currentPhase !== "";
       case "not_exists":

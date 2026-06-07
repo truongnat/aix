@@ -77,3 +77,43 @@ test("runDoctor flags failures on an empty (non-installed) repo", () => {
   assert.match(text, /FAIL \.ai-harness missing/);
   assert.equal(ok, false);
 });
+
+test("runDoctor fails VERIFY passed claims that lack concrete evidence", () => {
+  const dir = tmpRepo();
+  installClaude(dir);
+
+  fs.writeFileSync(
+    path.join(dir, ".harness", "PLAN.md"),
+    "# PLAN\n\n## Approval Status\nstatus: approved\n"
+  );
+  fs.writeFileSync(path.join(dir, ".harness", "VERIFY.md"), "# VERIFY\n\nstatus: passed\n");
+
+  const { text, ok } = runDoctor({ targetAbs: dir });
+  assert.equal(ok, false);
+  assert.match(text, /PASS \.harness\/PLAN\.md approval status approved/);
+  assert.match(
+    text,
+    /FAIL \.harness\/VERIFY\.md claims completed verification without concrete evidence/
+  );
+});
+
+test("runDoctor warns when VERIFY is pending and typed memory artifacts are missing", () => {
+  const dir = tmpRepo();
+  installClaude(dir);
+
+  fs.rmSync(path.join(dir, ".harness", "DECISIONS.md"));
+  fs.rmSync(path.join(dir, ".harness", "HAZARDS.md"));
+  fs.rmSync(path.join(dir, ".harness", "INDEX.md"));
+  fs.writeFileSync(
+    path.join(dir, ".harness", "PLAN.md"),
+    "# PLAN\n\n## Approval Status\nstatus: approved\n"
+  );
+  fs.writeFileSync(path.join(dir, ".harness", "VERIFY.md"), "# VERIFY\n\nstatus: pending\n");
+
+  const { text } = runDoctor({ targetAbs: dir });
+  assert.match(
+    text,
+    /WARN \.harness\/VERIFY\.md status is pending and verification evidence is not recorded yet/
+  );
+  assert.match(text, /WARN typed memory artifacts missing: DECISIONS\.md, HAZARDS\.md, INDEX\.md/);
+});

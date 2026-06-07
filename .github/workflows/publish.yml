@@ -1,4 +1,4 @@
-name: Publish to npm
+name: Create GitHub Release from tag
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         run: npm ci
 
       - name: Validate pack contracts
-        run: node validate.js
+        run: node bin/validate.js
 
       - name: Run tests
         run: npm test
@@ -47,10 +47,17 @@ jobs:
             exit 1
           fi
 
-      - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Check whether npm version already exists
+        id: npm_version
+        run: |
+          PKG_NAME=$(node -p "require('./package.json').name")
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if npm view "$PKG_NAME@$PKG_VERSION" version >/dev/null 2>&1; then
+            echo "already_published=true" >> $GITHUB_OUTPUT
+            echo "npm version already published; skipping npm publish"
+          else
+            echo "already_published=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
@@ -63,6 +70,7 @@ jobs:
 
             See [CHANGELOG.md](https://github.com/truongnat/ai-engineering-harness/blob/main/CHANGELOG.md) for release notes.
 
-            Published to npm: https://www.npmjs.com/package/ai-engineering-harness/v${{ steps.version.outputs.VERSION }}
+            npm publish is handled by the main-branch changesets release workflow.
+            Package version: https://www.npmjs.com/package/ai-engineering-harness/v${{ steps.version.outputs.VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

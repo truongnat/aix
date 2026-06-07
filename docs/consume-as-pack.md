@@ -16,12 +16,14 @@ That is where agents should read the installed harness surface, create `.harness
 
 ## The Shortest Current Flow
 
-**Consumers (recommended, experimental):** [install-sh-usage.md](install-sh-usage.md)
+**Consumers (recommended):** install with the primary Node.js CLI, then validate from the source pack.
 
 ```bash
-sh install.sh --runtime generic --scope project --init-harness --yes
+npx ai-engineering-harness install --provider generic --target ../my-project --yes
 node bin/validate.js --target ../my-project --runtime generic --profile-only   # from source pack
 ```
+
+Use [install-sh-usage.md](install-sh-usage.md) only when you intentionally need shell/bootstrap fallback behavior such as remote `curl | sh` or `--ref` pinning.
 
 **Maintainers (source pack):**
 

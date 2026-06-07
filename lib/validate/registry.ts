@@ -39,8 +39,7 @@ import {
   assertWorkerContract,
   validateRuntimeCommandSurface,
 } from "./contracts";
-// @ts-ignore - JS file with checkJs
-import { assertRepositoryProviderRules } from "../provider-rule-renderer.js";
+import { assertRepositoryProviderRules } from "../provider-rule-renderer";
 import { assertHooksAndSkillsLayer } from "./hooks-skills";
 import { assertDailyDevReportLayer } from "./daily-dev-report";
 import { assertSessionStartLayer } from "./session-start";

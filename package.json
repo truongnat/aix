@@ -32,6 +32,15 @@
     "node": ">=18"
   },
   "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts"
+    },
+    "./cli-main": "./dist/lib/cli-main.js",
+    "./file-operations": "./dist/lib/file-operations.js",
+    "./validate": "./dist/lib/validate/index.js",
+    "./package.json": "./package.json"
+  },
   "bin": {
     "ai-engineering-harness": "./bin/aih.js",
     "aih": "./bin/aih.js"
@@ -90,17 +99,18 @@
   ],
   "scripts": {
     "install:harness": "node bin/aih.js install",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json",
+    "build:watch": "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json --watch",
     "prepack": "npm run build",
-    "test": "npm run build && node --test",
-    "test:evals": "npm run build && node --test test/evals/",
-    "test:coverage": "npm run build && c8 --include=dist/lib/** --check-coverage --lines 65 --functions 65 --branches 55 --statements 65 node --test",
+    "test": "npm run build && node scripts/verify-dist.js && node --test",
+    "test:evals": "npm run build && node scripts/verify-dist.js && node --test test/evals/",
+    "test:coverage": "npm run build && node scripts/verify-dist.js && c8 --include=dist/lib/** --check-coverage --lines 75 --functions 70 --branches 65 --statements 75 node --test",
     "telemetry:server": "node bin/telemetry-server.js",
     "version-packages": "changeset version",
-    "release": "npm publish",
+    "release": "npm publish --provenance",
     "prepare": "husky",
     "validate": "node bin/validate.js",
-    "typecheck": "tsc -p tsconfig.lib.json",
+    "typecheck": "node ./node_modules/typescript/bin/tsc -p tsconfig.lib.json",
     "lint": "eslint bin/ test/ *.js --max-warnings 0",
     "lint:fix": "eslint bin/ test/ *.js --fix",
     "format": "prettier --write lib/ bin/ test/ *.js *.md",

@@ -16,6 +16,8 @@ interface CheckResult {
   detail: string;
 }
 
+const FORBIDDEN_SHELL_PATTERN = /[|&;<>()`$\\]/;
+
 function isolatedCommandEnv(): Record<string, string | undefined> {
   const env = { ...process.env };
   for (const key of Object.keys(env)) {
@@ -27,11 +29,41 @@ function isolatedCommandEnv(): Record<string, string | undefined> {
   return env;
 }
 
+function tokenizeCommand(command: string): string[] {
+  const trimmed = command.trim();
+  if (!trimmed) {
+    throw new Error("Command check requires a non-empty command.");
+  }
+  if (FORBIDDEN_SHELL_PATTERN.test(trimmed)) {
+    throw new Error(`Command check contains unsupported shell syntax: ${command}`);
+  }
+
+  const tokens: string[] = [];
+  const pattern = /"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'|[^\s]+/g;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(trimmed)) !== null) {
+    if (match[1] !== undefined) {
+      tokens.push(match[1].replace(/\\(["\\])/g, "$1"));
+    } else if (match[2] !== undefined) {
+      tokens.push(match[2].replace(/\\(['\\])/g, "$1"));
+    } else {
+      tokens.push(match[0]);
+    }
+  }
+
+  if (tokens.length === 0) {
+    throw new Error(`Unable to parse command check: ${command}`);
+  }
+
+  return tokens;
+}
+
 function runCommand(command: string, cwd: string): childProcess.SpawnSyncReturns<string> {
-  return childProcess.spawnSync(command, {
+  const [executable, ...args] = tokenizeCommand(command);
+  return childProcess.spawnSync(executable, args, {
     cwd,
     encoding: "utf8",
-    shell: true,
+    shell: false,
     timeout: 15000,
     env: isolatedCommandEnv(),
   });

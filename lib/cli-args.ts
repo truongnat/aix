@@ -21,7 +21,6 @@ interface ParseOptions {
   scope: string;
   visibility: string;
   target: string;
-  ref: string;
   dryRun: boolean;
   yes: boolean;
   help: boolean;
@@ -61,7 +60,6 @@ function parseArgv(argv: string[]): ParseOptions {
     scope: "",
     visibility: "",
     target: ".",
-    ref: "main",
     dryRun: false,
     yes: false,
     help: false,
@@ -137,8 +135,9 @@ function parseArgv(argv: string[]): ParseOptions {
       continue;
     }
     if (arg === "--ref") {
-      options.ref = args[++i] || "main";
-      continue;
+      throw new Error(
+        "--ref is not supported by the npx CLI. Use install.sh/aih.sh if you need ref-pinned bootstrap."
+      );
     }
     if (arg === "--all") {
       options.all = true;

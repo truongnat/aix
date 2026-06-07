@@ -97,3 +97,30 @@ test("update global scope dryRun returns ok with notice; real returns not-ok", (
     false
   );
 });
+
+test("update prints update banner from caller-owned label", () => {
+  const dir = tmpRepo();
+  const writes = [];
+  const originalWrite = process.stdout.write;
+  process.stdout.write = (chunk, ...args) => {
+    writes.push(String(chunk));
+    return originalWrite.call(process.stdout, chunk, ...args);
+  };
+
+  try {
+    const r = runUpdate({
+      packRoot: PACK_ROOT,
+      target: dir,
+      provider: "claude",
+      scope: "project",
+      visibility: "shared",
+      dryRun: true,
+    });
+    assert.equal(r.ok, true);
+  } finally {
+    process.stdout.write = originalWrite;
+  }
+
+  const output = writes.join("");
+  assert.match(output, /Runtime-native update/);
+});

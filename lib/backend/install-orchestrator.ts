@@ -30,13 +30,15 @@ export interface InstallContext {
   initHarness: boolean;
   installCache: boolean;
   force?: boolean;
-  /** Controls the runtime-native banner verb: "install" (default) or "update". */
-  bannerVerb?: "install" | "update";
 }
 
 export interface InstallResult {
   ok: boolean;
   messages: string[];
+}
+
+interface InstallRunOptions {
+  runtimeBannerVerb?: "install" | "update";
 }
 
 /**
@@ -66,7 +68,7 @@ function resolveIgnoreStrategy(scope: string, visibility: string): string {
  * Step 4a: runtime-native install (cursor/claude/codex/gemini/generic).
  * Step 4b: manual install (legacy root-copy fallback).
  */
-export function runInstall(ctx: InstallContext): InstallResult {
+export function runInstall(ctx: InstallContext, options: InstallRunOptions = {}): InstallResult {
   const messages: string[] = [];
   const force = ctx.force ?? false;
 
@@ -120,7 +122,7 @@ export function runInstall(ctx: InstallContext): InstallResult {
     }
 
     // Step 4: Provider install
-    const verb = ctx.bannerVerb ?? "install";
+    const verb = options.runtimeBannerVerb ?? "install";
     if (isRuntimeNative(ctx.provider)) {
       // Runtime-native path: cursor/claude/codex/gemini/generic
       process.stdout.write(`\n--- Runtime-native ${verb} ---\n`);

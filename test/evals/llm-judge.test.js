@@ -73,3 +73,39 @@ test("judgeWithLlmFallback uses deterministic rubric when LLM endpoint unset", a
   assert.equal(result.passed, true);
   assert.equal(result.llm.attempted, false);
 });
+
+test("judgeWithLlmFallback reports timeout and falls back to deterministic result", async () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-judge-timeout-"));
+  fs.writeFileSync(path.join(tempRoot, "final-response.txt"), "Status: ok\n");
+
+  const originalFetch = global.fetch;
+  const originalEndpoint = process.env.EVAL_JUDGE_ENDPOINT;
+  process.env.EVAL_JUDGE_ENDPOINT = "https://example.test/judge";
+  global.fetch = async (_endpoint, options = {}) =>
+    new Promise((_, reject) => {
+      options.signal.addEventListener("abort", () => {
+        const error = new Error("aborted");
+        error.name = "AbortError";
+        reject(error);
+      });
+    });
+
+  try {
+    const result = await judgeWithLlmFallback(
+      repoRoot,
+      tempRoot,
+      { rubric: "evals/rubrics/response-contract-v1.json" },
+      { useLlmJudge: true, llmJudgeTimeoutMs: 10 }
+    );
+    assert.equal(result.passed, true);
+    assert.equal(result.llm.attempted, true);
+    assert.match(result.llm.reason, /timed out/i);
+  } finally {
+    global.fetch = originalFetch;
+    if (originalEndpoint === undefined) {
+      delete process.env.EVAL_JUDGE_ENDPOINT;
+    } else {
+      process.env.EVAL_JUDGE_ENDPOINT = originalEndpoint;
+    }
+  }
+});

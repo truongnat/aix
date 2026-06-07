@@ -42,7 +42,7 @@ Core scripts:
 
 | Provider | Support |
 |----------|---------|
-| Claude | native hook adapter example |
+| Claude | native hook adapter installed into `.claude/settings.json` for project installs |
 | Cursor | rules/prompt fallback |
 | Codex | AGENTS/prompt fallback |
 | Gemini | extension context / prompt fallback |

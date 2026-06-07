@@ -41,10 +41,9 @@ Options:
   --scope project|global
   --visibility private|shared
   --target <path>     Target directory (default: .)
-  --ref <git-ref>     Git ref for tarball/bootstrap (default: main)
   --dry-run           Preview without writing
   --yes               Skip confirmation prompts
-  --verbose           Show raw shell backend output
+  --verbose           Show raw backend output
   --json              Emit machine-readable JSON (insights)
   --export            Emit anonymized aggregate telemetry (opt-in sharing)
   --upload            Upload anonymized telemetry when remoteUpload is enabled
@@ -65,7 +64,7 @@ Advanced fallback targets:
 Shell backend fallback:
   sh aih.sh install --runtime cursor --scope project --visibility private --yes
 
-Windows: Git Bash or WSL required for the bundled shell backend fallback.`;
+Primary lifecycle commands run in-process on Node.js. Shell fallback is kept for legacy or remote bootstrap flows.`;
 }
 
 function printHelp(): void {

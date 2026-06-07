@@ -25,6 +25,8 @@ interface JudgeResult {
   };
 }
 
+const DEFAULT_LLM_JUDGE_TIMEOUT_MS = 30_000;
+
 function loadRubric(packRoot: string, rubricPath: string | undefined): Rubric | null {
   if (!rubricPath) {
     return null;
@@ -59,12 +61,30 @@ function runDeterministicRubric(cwd: string, rubric: Rubric | null): JudgeResult
   };
 }
 
-async function callLlmJudge(endpoint: string, payload: Record<string, unknown>): Promise<any> {
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+async function callLlmJudge(
+  endpoint: string,
+  payload: Record<string, unknown>,
+  timeoutMs: number = DEFAULT_LLM_JUDGE_TIMEOUT_MS
+): Promise<any> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  let response;
+  try {
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if ((error as Error).name === "AbortError") {
+      throw new Error(`LLM judge request timed out after ${timeoutMs}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (!response.ok) {
     const body = await response.text();
@@ -76,6 +96,7 @@ async function callLlmJudge(endpoint: string, payload: Record<string, unknown>):
 
 interface JudgeOptions {
   useLlmJudge?: boolean;
+  llmJudgeTimeoutMs?: number;
 }
 
 async function judgeWithLlmFallback(
@@ -97,12 +118,16 @@ async function judgeWithLlmFallback(
   }
 
   try {
-    const llmResult = await callLlmJudge(endpoint!, {
-      taskId: task.id,
-      rubricId: deterministic.rubricId ?? "",
-      content: readJudgeContent(cwd),
-      deterministicPassed: deterministic.passed,
-    });
+    const llmResult = await callLlmJudge(
+      endpoint!,
+      {
+        taskId: task.id,
+        rubricId: deterministic.rubricId ?? "",
+        content: readJudgeContent(cwd),
+        deterministicPassed: deterministic.passed,
+      },
+      options.llmJudgeTimeoutMs
+    );
     const passed = typeof llmResult.passed === "boolean" ? llmResult.passed : deterministic.passed;
     return {
       ...deterministic,
@@ -126,5 +151,11 @@ async function judgeWithLlmFallback(
   }
 }
 
-export { judgeWithLlmFallback, loadRubric, runDeterministicRubric, callLlmJudge };
+export {
+  DEFAULT_LLM_JUDGE_TIMEOUT_MS,
+  judgeWithLlmFallback,
+  loadRubric,
+  runDeterministicRubric,
+  callLlmJudge,
+};
 export type { Rubric, Task, JudgeResult, JudgeOptions };

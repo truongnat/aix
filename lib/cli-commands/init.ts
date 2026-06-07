@@ -1,12 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-
-// @ts-ignore - JS file with checkJs
 import { detectRecommendedProviders } from "../cli-detect";
 import { resolveTargetAbs } from "../cli-command-helpers";
-// @ts-ignore - JS file with checkJs
 import { runInstallWizard } from "./install";
 import type { ParseOptions } from "../cli-args";
+import { runTask } from "../evals";
 
 const INIT_DEMO_GOAL = `# Init Demo Goal
 
@@ -62,8 +60,6 @@ async function runInitWizard(packRoot: string, options: ParseOptions): Promise<n
 
   if (!options.skipDemoEval) {
     process.stdout.write("\nRunning init demo eval (sample-bugfix)...\n");
-    // @ts-ignore - JS file with checkJs
-    const { runTask } = require("../evals");
     const evalResult = await runTask(packRoot, "sample-bugfix", {
       provider: "deterministic-local",
       targetRoot: targetAbs,

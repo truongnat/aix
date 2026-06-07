@@ -39,18 +39,18 @@ Recommended manual steps:
 
 The source pack includes a dependency-free installer.
 
-**Consumers:** prefer runtime-native `install.sh` (`v0.9.1`, experimental) — [install-sh-usage.md](install-sh-usage.md), [plugin-install-ux.md](plugin-install-ux.md). The flows below are the **maintainer** CLI install surface (`node bin/aih.js install`), which matches the legacy manual-copy behavior without a root shim.
+**Consumers:** prefer the Node.js CLI (`npx ai-engineering-harness install` or `node bin/aih.js install`) as the primary install surface. Use [install-sh-usage.md](install-sh-usage.md) only when you intentionally need shell/bootstrap fallback behavior, and use [plugin-install-ux.md](plugin-install-ux.md) for runtime-native provider UX details.
 
 ### Basic Copy
 
 ```bash
-node bin/aih.js install --target ../my-project
+npx ai-engineering-harness install --target ../my-project
 ```
 
 ### Dry Run
 
 ```bash
-node bin/aih.js install --target ../my-project --dry-run
+npx ai-engineering-harness install --target ../my-project --dry-run
 ```
 
 Use this first to see exactly which capability-pack files would be copied and which files would be skipped.
@@ -58,7 +58,7 @@ Use this first to see exactly which capability-pack files would be copied and wh
 ### Force Overwrite
 
 ```bash
-node bin/aih.js install --target ../my-project --force
+npx ai-engineering-harness install --target ../my-project --force
 ```
 
 The installer will not overwrite existing files unless `--force` is passed.
@@ -141,14 +141,15 @@ Typical usage:
 
 Run the installed harness surface as a working loop inside the target repository, not as static documentation:
 
-1. `Map`
-2. `Start`
-3. `Discuss`
-4. `Plan`
-5. `Run`
-6. `Verify`
-7. `Ship`
-8. `Remember`
+1. `Start`
+2. `Discuss`
+3. `Plan`
+4. `Run`
+5. `Verify`
+6. `Ship`
+7. `Remember`
+
+`Map` remains a compatibility or manual context-refresh command. It is not part of the primary command loop for normal sessions.
 
 Recommended adoption pattern:
 

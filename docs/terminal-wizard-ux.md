@@ -13,7 +13,7 @@ Inspired by modern CLIs: shadcn, create-t3-app, `npx skills add`.
 | Entry | `bin/aih.js` | Node shebang, delegates to `cli-main` |
 | Logic | `lib/cli-main.js` | Args, validation, plan, backend orchestration |
 | UI | `lib/cli-ui.js` | `@clack/prompts` intro, multiselect, confirm, spinner, outro |
-| Backend | `lib/cli-backend.js` | Bundled `aih.sh` spawn; `--verbose` streams raw output |
+| Backend | `lib/backend/*.js` + helpers | In-process lifecycle execution; `--verbose` streams raw backend output |
 | Fallback prompts | `lib/cli-prompts.js` | Readline TUI (legacy; interactive path uses clack when TTY) |
 
 ## Interactive install flow
@@ -24,7 +24,7 @@ Inspired by modern CLIs: shadcn, create-t3-app, `npx skills add`.
 4. **Confirm** — init `.harness/`, install `.ai-harness/` cache
 5. **Plan** — `Will install` / `Will not modify` blocks + slash command preview
 6. **Proceed** — confirm before writes
-7. **Spinner** — `Installing harness…` while `aih.sh` runs per provider
+7. **Spinner** — `Installing harness…` while the in-process backend runs per provider
 8. **Outro** — success + next steps (use `harness-plan` for this repo, `doctor`)
 
 Detection **recommends and preselects** only; it never auto-installs without explicit selection.
@@ -59,7 +59,7 @@ npx ai-engineering-harness uninstall --all --yes
 
 ## Verbose backend
 
-Default: hide raw `aih.sh` stdout/stderr unless the command fails.
+Default: hide raw backend stdout/stderr unless the command fails.
 
 ```bash
 npx ai-engineering-harness install --provider cursor --yes --verbose
@@ -67,8 +67,8 @@ npx ai-engineering-harness install --provider cursor --yes --verbose
 
 ## Shell fallback unchanged
 
-`aih.sh`, `install.sh`, and `aih.ps1` remain supported. The Node CLI delegates to bundled `aih.sh` on all platforms where Git Bash / WSL `sh` is available.
+`aih.sh`, `install.sh`, and `aih.ps1` remain supported as fallback/bootstrap surfaces. The primary Node CLI lifecycle commands run in-process.
 
 ## Windows
 
-Interactive wizard requires a TTY. Non-interactive `--yes` flows work in CI and PowerShell without clack. Git Bash or WSL required for shell backend in v0.10.x.
+Interactive wizard requires a TTY. Non-interactive `--yes` flows work in CI and PowerShell without clack. Shell prerequisites matter only when you intentionally use the shell fallback surfaces.

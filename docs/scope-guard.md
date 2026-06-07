@@ -4,12 +4,8 @@ Scope guard ensures that edits stay within the approved scope defined in the goa
 
 ## Policy
 
-### Scope Guard
-
-Edits must stay within scope defined in goal artifact or plan
-
-**When enforced:** file_pattern matches **
-**Action:** warn - Edit may be outside approved scope
+No default scope-guard rule is enabled.
+Add a custom scope policy in `.harness/policies.json` when a repository needs it.
 
 ## Scope Definition
 

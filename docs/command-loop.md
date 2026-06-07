@@ -2,13 +2,10 @@
 
 The harness loop is:
 
-`Map -> Start -> Discuss -> Plan -> Run -> Verify -> Ship -> Remember`
+`Session Start -> Discuss -> Plan -> Run -> Verify -> Ship -> Remember`
 
+`Map` remains a compatibility/manual context-refresh command outside the primary loop.
 Not every task needs every command, but skipping a command should be deliberate, not accidental.
-
-## Map
-
-Understand the workspace, active artifacts, affected areas, and constraints.
 
 ## Start
 
@@ -37,6 +34,10 @@ Summarize the verified outcome, note follow-ups, and prepare handoff.
 ## Remember
 
 Capture only durable, non-sensitive lessons for future sessions.
+
+## Map
+
+Use `Map` only when a manual context refresh is needed outside normal Session Start flow.
 
 ## Loop Discipline
 

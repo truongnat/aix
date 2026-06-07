@@ -78,7 +78,8 @@ const FALLBACK_PROVIDER_IDS = Object.freeze(FALLBACK_TARGETS.map((provider) => p
 const SUPPORTED_PROVIDER_IDS = Object.freeze([...ACTIVE_PROVIDER_IDS, ...FALLBACK_PROVIDER_IDS]);
 const PROVIDERS = Object.freeze([...ACTIVE_PROVIDERS, ...FALLBACK_TARGETS, ...PLANNED_PROVIDERS]);
 
-const RUNTIME_NATIVE_IDS = new Set([...ACTIVE_PROVIDER_IDS, "generic"]);
+const RUNTIME_NATIVE_PROVIDER_IDS = Object.freeze([...ACTIVE_PROVIDER_IDS, "generic"]);
+const RUNTIME_NATIVE_IDS = new Set(RUNTIME_NATIVE_PROVIDER_IDS);
 
 function getProvider(id: string): ProviderDescriptor | null {
   return PROVIDERS.find((provider) => provider.id === id) || null;
@@ -126,6 +127,7 @@ export {
   PLANNED_PROVIDERS,
   LEGACY_PROVIDER_IDS,
   SUPPORTED_PROVIDER_IDS,
+  RUNTIME_NATIVE_PROVIDER_IDS,
   RUNTIME_NATIVE_IDS,
   getProvider,
   isActiveProvider,

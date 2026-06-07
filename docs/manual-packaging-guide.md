@@ -10,7 +10,7 @@ Use this guide when:
 
 - cutting a packaging release such as `v0.7.x`
 - preparing a manual release archive for distribution
-- verifying pack identity before tagging the source repository
+- verifying pack identity before the release workflow runs or before you cut an archive-only tag
 
 Do not use this guide as application deployment or npm publishing instructions.
 
@@ -89,9 +89,12 @@ If distributing a manual archive:
 - align README release status when the release ships
 - confirm release notes match what `PACK.md` claims
 
-## Step 8: Tag Source Repository
+## Step 8: Follow The Release Or Archive Tagging Flow
 
 After validation passes and docs are aligned:
+
+- For npm package releases, follow [release-checklist.md](release-checklist.md) and let the `changesets` release workflow own package publication.
+- For archive-only distribution snapshots, create and push a tag after final validation:
 
 ```bash
 git status
@@ -99,9 +102,9 @@ git tag v0.7.0
 git push origin v0.7.0
 ```
 
-Replace `v0.7.0` with the actual releasing version.
+Replace `v0.7.0` with the actual archive tag.
 
-See also [release-checklist.md](release-checklist.md) for general release discipline.
+See also [release-checklist.md](release-checklist.md) for the npm release flow and general release discipline.
 
 ## Step 9: Optional Manual Archive Assembly
 

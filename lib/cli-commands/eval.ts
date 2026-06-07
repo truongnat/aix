@@ -1,4 +1,5 @@
 import type { ParseOptions } from "../cli-args";
+import { listTasks, readReport, runTask } from "../evals";
 
 interface RunTaskOptions {
   provider: string;
@@ -29,8 +30,6 @@ async function runEvalCommand(packRoot: string, options: ParseOptions): Promise<
 
   switch (evalCommand) {
     case "list": {
-      // @ts-ignore - JS file with checkJs
-      const { listTasks } = require("../evals");
       const result = listTasks(packRoot, { targetRoot: options.target }) as ListTasksResult;
       process.stdout.write(`${result.output}\n`);
       return 0;
@@ -39,8 +38,6 @@ async function runEvalCommand(packRoot: string, options: ParseOptions): Promise<
       if (!options.evalTarget) {
         throw new Error("Missing eval target for `aih eval run`.");
       }
-      // @ts-ignore - JS file with checkJs
-      const { runTask } = require("../evals");
       const result = (await runTask(packRoot, options.evalTarget, {
         provider: options.providers[0] || "codex",
         verbose: options.verbose,
@@ -55,8 +52,6 @@ async function runEvalCommand(packRoot: string, options: ParseOptions): Promise<
       if (!options.evalTarget) {
         throw new Error("Missing eval target for `aih eval report`.");
       }
-      // @ts-ignore - JS file with checkJs
-      const { readReport } = require("../evals");
       const result = readReport(packRoot, options.evalTarget) as ReadReportResult;
       process.stdout.write(`${result.output}\n`);
       return 0;

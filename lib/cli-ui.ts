@@ -1,4 +1,5 @@
-// @ts-ignore - ES module in CommonJS context
+import type * as ClackPrompts from "@clack/prompts";
+
 const {
   intro,
   outro,
@@ -9,9 +10,8 @@ const {
   spinner,
   note,
   isCancel,
-} = require("@clack/prompts");
+} = require("@clack/prompts") as typeof ClackPrompts;
 
-// @ts-ignore - JS file with checkJs
 import { formatCommandSupportForPlan } from "./runtime-command-catalog";
 
 interface ParseOptions {
@@ -32,6 +32,8 @@ interface ProviderItem {
   recommended?: boolean;
   priorityLabel?: string;
 }
+
+type InstallMode = "project-private" | "project-shared" | "global";
 
 interface InstallPlan {
   willInstall: string[];
@@ -98,8 +100,8 @@ async function selectProviders(providerItems: ProviderItem[]): Promise<string[] 
   return value;
 }
 
-async function selectInstallMode(): Promise<string | null> {
-  const value = await select({
+async function selectInstallMode(): Promise<InstallMode | null> {
+  const value = await select<InstallMode>({
     message: "Install mode",
     options: [
       {
@@ -282,6 +284,7 @@ function showError(title: string, reason: string, hints: string[] = []): void {
 
 interface SpinnerResult {
   ok?: boolean;
+  status?: number;
   spinnerMessage?: string;
 }
 
@@ -375,7 +378,7 @@ function formatStatus(rawOutput: string, { compact = false } = {}): void {
   note(body, "Summary");
 }
 
-module.exports = {
+const ui = {
   useInteractiveUi,
   introBanner,
   selectProviders,
@@ -397,4 +400,27 @@ module.exports = {
   formatDoctor,
   isCancel,
 };
-export type { IntroMeta, ProviderItem, InstallPlan, UninstallContext, SpinnerResult };
+export {
+  useInteractiveUi,
+  introBanner,
+  selectProviders,
+  selectInstallMode,
+  confirmInitHarness,
+  confirmInstallCache,
+  confirmRemoveState,
+  confirmFullCleanup,
+  confirmProceed,
+  showInstallPlan,
+  showUpdatePlan,
+  showUninstallPlan,
+  showSuccess,
+  showCancel,
+  showWarning,
+  showError,
+  runWithSpinner,
+  formatStatus,
+  formatDoctor,
+  isCancel,
+};
+export default ui;
+export type { IntroMeta, ProviderItem, InstallMode, InstallPlan, UninstallContext, SpinnerResult };

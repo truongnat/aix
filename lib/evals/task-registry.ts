@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import type { Check } from "./checks";
 
 const REQUIRED_FIELDS = ["id", "suite", "title", "goal", "mode", "fixture", "prompt"];
 
@@ -9,12 +10,18 @@ interface Task {
   title: string;
   goal: string;
   mode: string;
+  rubric?: string;
   fixture: {
     path: string;
   };
   prompt: string;
-  successChecks?: any[];
-  behaviorChecks?: any[];
+  successChecks: Check[];
+  behaviorChecks: Check[];
+  metrics?: {
+    withHarnessSteps: number;
+    withoutHarnessSteps: number;
+    phases: string[];
+  };
   tags?: string[];
 }
 

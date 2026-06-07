@@ -1,15 +1,12 @@
-// @ts-ignore - JS file with checkJs
 import { isNonInteractive, type ParseOptions } from "../cli-args";
-// @ts-ignore - JS file with checkJs
 import { ACTIVE_PROVIDERS, FALLBACK_TARGETS } from "../cli-providers";
-// @ts-ignore - JS file with checkJs
 import { detectInstalledProviders, isGitRepo } from "../cli-detect";
-import { runAihSh, buildUninstallArgs, type UninstallContext } from "../cli-backend";
+import * as ui from "../cli-ui";
+import { runUninstall } from "../backend/uninstall";
 import {
   readPackageVersion,
   resolveTargetAbs,
   validateProviderSelection,
-  backendOpts,
   failWithBackendError,
 } from "../cli-command-helpers";
 
@@ -21,9 +18,6 @@ async function runUninstallWizard(packRoot: string, options: ParseOptions): Prom
   let removeCache = false;
   let removeState = false;
   let fullCleanup = options.all;
-
-  // @ts-ignore - ui will be available when this is called from CLI context
-  const ui = require("../cli-ui");
 
   if (isNonInteractive(options)) {
     if (installed.length === 0 && providers.length === 0) {
@@ -53,24 +47,28 @@ async function runUninstallWizard(packRoot: string, options: ParseOptions): Prom
           implemented: true,
           recommended: true,
         }));
-      providers = await ui.selectProviders(items);
-      if (!providers) {
+      const selectedProviders = await ui.selectProviders(items);
+      if (!selectedProviders) {
         return 1;
       }
+      providers = selectedProviders;
     }
     if (!options.all) {
-      removeCache = await ui.confirmInstallCache(false);
-      if (removeCache === null) {
+      const removeCacheChoice = await ui.confirmInstallCache(false);
+      if (removeCacheChoice === null) {
         return 1;
       }
-      removeState = await ui.confirmRemoveState(false);
-      if (removeState === null) {
+      removeCache = removeCacheChoice;
+      const removeStateChoice = await ui.confirmRemoveState(false);
+      if (removeStateChoice === null) {
         return 1;
       }
-      fullCleanup = await ui.confirmFullCleanup(false);
-      if (fullCleanup === null) {
+      removeState = removeStateChoice;
+      const fullCleanupChoice = await ui.confirmFullCleanup(false);
+      if (fullCleanupChoice === null) {
         return 1;
       }
+      fullCleanup = fullCleanupChoice;
     }
     ui.showUninstallPlan({ providers, removeCache, removeState, fullCleanup });
     const proceed = await ui.confirmProceed("Proceed with uninstall?");
@@ -85,29 +83,40 @@ async function runUninstallWizard(packRoot: string, options: ParseOptions): Prom
     { compact: isNonInteractive(options) }
   );
 
-  const ctx: UninstallContext = {
-    target: targetAbs,
+  const ctx = {
+    targetAbs,
     scope: options.scope || "project",
     dryRun: options.dryRun,
-    yes: true,
     removeCache,
     removeState,
-    fullCleanup,
+    all: fullCleanup,
   };
 
   const run = () => {
-    let lastResult: { status: number | null; combined: string } = { status: 0, combined: "" };
+    let lastResult: { ok: boolean; messages: string[] } = { ok: true, messages: [] };
     for (const provider of providers) {
-      lastResult = runAihSh(packRoot, buildUninstallArgs(provider, ctx), {
-        cwd: process.cwd(),
-        ...backendOpts(options),
+      lastResult = runUninstall({
+        targetAbs: ctx.targetAbs,
+        provider,
+        scope: ctx.scope,
+        dryRun: ctx.dryRun,
+        removeCache: ctx.removeCache,
+        removeState: ctx.removeState,
+        all: ctx.all,
       });
-      if ((lastResult.status ?? 0) !== 0) {
+      if (!lastResult.ok) {
         break;
       }
     }
-    if ((lastResult.status ?? 0) !== 0) {
-      return { ok: false, status: failWithBackendError("Uninstall", lastResult, options) };
+    if (!lastResult.ok) {
+      return {
+        ok: false,
+        status: failWithBackendError(
+          "Uninstall",
+          { status: 1, combined: lastResult.messages.join("\n") },
+          options
+        ),
+      };
     }
     return { ok: true, status: 0, spinnerMessage: "Uninstalled" };
   };

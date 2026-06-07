@@ -7,11 +7,37 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
 const validateApi = require(path.join(repoRoot, "dist", "lib", "validate", "index.js"));
+const validateConstants = require(path.join(repoRoot, "dist", "lib", "validate", "constants.js"));
 const installApi = require(path.join(repoRoot, "dist", "lib", "install-legacy.js"));
 const installCacheApi = require(path.join(repoRoot, "dist", "lib", "install-cache.js"));
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-test-"));
+}
+
+const VALIDATION_REPO_COPY_PATHS = new Set([
+  ...validateConstants.requiredFiles,
+  ...validateConstants.commandFiles,
+  ...validateConstants.skillFiles,
+  ...validateConstants.templateFiles,
+  ...validateConstants.promptTemplateFiles,
+  ...validateConstants.sessionMemoryDocFiles,
+  ...validateConstants.sessionAwareCommandFiles,
+  "docs/phase-discipline.md",
+  "workflows/core-loop.md",
+  "workflows/feature.md",
+  "workflows/bugfix.md",
+  "workflows/refactor.md",
+  "workflows/incident.md",
+]);
+
+function shouldCopyValidationPath(relative) {
+  for (const allowed of VALIDATION_REPO_COPY_PATHS) {
+    if (relative === allowed || allowed.startsWith(`${relative}${path.sep}`)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function makeTempRepoCopy() {
@@ -23,8 +49,7 @@ function makeTempRepoCopy() {
       if (!relative) {
         return true;
       }
-      const topLevel = relative.split(path.sep)[0];
-      return ![".git", "node_modules", "artifacts"].includes(topLevel);
+      return shouldCopyValidationPath(relative);
     },
   });
   childProcess.spawnSync("git", ["init", "-q"], { cwd: target });

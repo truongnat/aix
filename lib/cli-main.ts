@@ -1,5 +1,4 @@
 import { parseArgv, type ParseOptions } from "./cli-args";
-// @ts-ignore - JS file with checkJs
 import { printHelp } from "./cli-help";
 import { packRootFromModule } from "./cli-backend";
 import { runInstallWizard } from "./cli-commands/install";
@@ -9,7 +8,6 @@ import { runStatusOrDoctor } from "./cli-commands/diagnostics";
 import { runEvalCommand } from "./cli-commands/eval";
 import { runInsightsCommand } from "./cli-commands/insights";
 import { runInitWizard } from "./cli-commands/init";
-// @ts-ignore - JS file with checkJs
 import ui from "./cli-ui";
 
 const SOURCE_URL = "https://github.com/truongnat/ai-engineering-harness";

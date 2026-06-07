@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import * as ui from "./cli-ui";
 
-// @ts-ignore - JS file with checkJs, will migrate in batch 3
 import { getProvider, isRuntimeNative, isSupportedProvider } from "./cli-providers";
 
 function readPackageVersion(packRoot: string): string {
@@ -66,8 +66,6 @@ function failWithBackendError(kind: string, result: SpawnResult, options: ParseO
   if (options.verbose && result.combined) {
     process.stdout.write(result.combined);
   }
-  // @ts-ignore - ui will be available when this is called from CLI context
-  const ui = require("./cli-ui");
   if (ui.useInteractiveUi(options)) {
     ui.showError(`${kind} failed`, reason.trim());
   } else {

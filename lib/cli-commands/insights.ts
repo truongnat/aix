@@ -1,18 +1,14 @@
 import path from "node:path";
 import type { ParseOptions } from "../cli-args";
+import { buildInsights, buildInsightsExport } from "../insights";
+import {
+  buildEvalRecommendations,
+  formatEvalRecommendations,
+} from "../insights/eval-recommendations";
+import { runRecommendedEvalRegression } from "../insights/eval-regression";
+import { uploadInsightsExport } from "../insights/remote-upload";
 
 async function runInsightsCommand(_packRoot: string, options: ParseOptions): Promise<number> {
-  // @ts-ignore - JS file with checkJs
-  const { buildInsights, buildInsightsExport } = require("../insights");
-  // @ts-ignore - JS file with checkJs
-  const {
-    buildEvalRecommendations,
-    formatEvalRecommendations,
-  } = require("../insights/eval-recommendations");
-  // @ts-ignore - JS file with checkJs
-  const { runRecommendedEvalRegression } = require("../insights/eval-regression");
-  // @ts-ignore - JS file with checkJs
-  const { uploadInsightsExport } = require("../insights/remote-upload");
   const target = path.resolve(options.target || ".");
 
   if (options.recommendEvals) {

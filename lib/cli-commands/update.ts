@@ -1,15 +1,12 @@
-// @ts-ignore - JS file with checkJs
 import { isNonInteractive, type ParseOptions } from "../cli-args";
-// @ts-ignore - JS file with checkJs
 import { ACTIVE_PROVIDERS, FALLBACK_TARGETS } from "../cli-providers";
-// @ts-ignore - JS file with checkJs
 import { detectInstalledProviders, isGitRepo } from "../cli-detect";
-import { runAihSh, buildUpdateArgs, type UpdateContext } from "../cli-backend";
+import * as ui from "../cli-ui";
+import { runUpdate } from "../backend/update";
 import {
   readPackageVersion,
   resolveTargetAbs,
   validateProviderSelection,
-  backendOpts,
   failWithBackendError,
 } from "../cli-command-helpers";
 
@@ -17,9 +14,6 @@ async function runUpdateWizard(packRoot: string, options: ParseOptions): Promise
   const targetAbs = resolveTargetAbs(options.target);
   let providers = [...options.providers];
   const installed = detectInstalledProviders(targetAbs);
-
-  // @ts-ignore - ui will be available when this is called from CLI context
-  const ui = require("../cli-ui");
 
   if (isNonInteractive(options)) {
     if (installed.length === 0 && providers.length === 0) {
@@ -46,10 +40,11 @@ async function runUpdateWizard(packRoot: string, options: ParseOptions): Promise
           implemented: true,
           recommended: true,
         }));
-      providers = await ui.selectProviders(items);
-      if (!providers) {
+      const selectedProviders = await ui.selectProviders(items);
+      if (!selectedProviders) {
         return 1;
       }
+      providers = selectedProviders;
     }
     ui.showUpdatePlan(providers);
     const proceed = await ui.confirmProceed("Proceed with update?");
@@ -63,28 +58,38 @@ async function runUpdateWizard(packRoot: string, options: ParseOptions): Promise
     ui.showUpdatePlan(providers, { compact: true });
   }
 
-  const ctx: UpdateContext = {
+  const ctx = {
+    packRoot,
     target: targetAbs,
-    ref: options.ref,
     scope: options.scope || "project",
     visibility: options.visibility || "private",
     dryRun: options.dryRun,
-    yes: true,
   };
 
   const run = () => {
-    let lastResult: { status: number | null; combined: string } = { status: 0, combined: "" };
+    let lastResult: { ok: boolean; messages: string[] } = { ok: true, messages: [] };
     for (const provider of providers) {
-      lastResult = runAihSh(packRoot, buildUpdateArgs(provider, ctx), {
-        cwd: process.cwd(),
-        ...backendOpts(options),
+      lastResult = runUpdate({
+        packRoot: ctx.packRoot,
+        target: ctx.target,
+        provider,
+        scope: ctx.scope,
+        visibility: ctx.visibility,
+        dryRun: ctx.dryRun,
       });
-      if ((lastResult.status ?? 0) !== 0) {
+      if (!lastResult.ok) {
         break;
       }
     }
-    if ((lastResult.status ?? 0) !== 0) {
-      return { ok: false, status: failWithBackendError("Update", lastResult, options) };
+    if (!lastResult.ok) {
+      return {
+        ok: false,
+        status: failWithBackendError(
+          "Update",
+          { status: 1, combined: lastResult.messages.join("\n") },
+          options
+        ),
+      };
     }
     return { ok: true, status: 0, spinnerMessage: "Updated" };
   };

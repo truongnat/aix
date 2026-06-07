@@ -53,17 +53,20 @@ export function runUpdate(ctx: UpdateContext): UpdateResult {
   //   initHarness: false  — update must NOT touch the .harness skeleton
   //   installCache: true  — mirrors run_capability_cache_install 1
   //   force: true         — mirrors the shell '1' arg (force overwrite)
-  //   bannerVerb: "update" — prints "--- Runtime-native update ---" instead of install
-  return runInstall({
-    packRoot: ctx.packRoot,
-    target: ctx.target,
-    provider: ctx.provider,
-    scope: ctx.scope,
-    visibility: ctx.visibility,
-    dryRun: ctx.dryRun,
-    initHarness: false,
-    installCache: true,
-    force: true,
-    bannerVerb: "update",
-  });
+  return runInstall(
+    {
+      packRoot: ctx.packRoot,
+      target: ctx.target,
+      provider: ctx.provider,
+      scope: ctx.scope,
+      visibility: ctx.visibility,
+      dryRun: ctx.dryRun,
+      initHarness: false,
+      installCache: true,
+      force: true,
+    },
+    {
+      runtimeBannerVerb: "update",
+    }
+  );
 }

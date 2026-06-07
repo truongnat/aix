@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-// @ts-ignore - JS file with checkJs
-import { renderClaudeCommandFile } from "../provider-rule-renderer.js";
+import { renderClaudeCommandFile } from "../provider-rule-renderer";
 import {
   COMMAND_NAMESPACE,
   CACHE_DIR,

@@ -4,12 +4,9 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-// @ts-ignore - JS file with checkJs
-import { ensureDirectory, logAction } from "./file-operations.js";
-// @ts-ignore - JS file with checkJs
-import { installProviderCommandSurface } from "./runtime-command-catalog.js";
-// @ts-ignore - JS file with checkJs
-import { installClaudeWorkers } from "./worker-claude-adapter.js";
+import { ensureDirectory, logAction } from "./file-operations";
+import { installProviderCommandSurface } from "./runtime-command-catalog";
+import { installClaudeWorkers } from "./worker-claude-adapter";
 import {
   renderClaudeProjectMd,
   renderCodexAgentsMd,
@@ -18,11 +15,12 @@ import {
   renderCursorGuardrailsMdc,
   renderGeminiMd,
 } from "./provider-rule-renderer";
+import { RUNTIME_NATIVE_PROVIDER_IDS } from "./cli-providers";
 
 const HARNESS_REPO = "truongnat/ai-engineering-harness";
 const HARNESS_GIT_URL = `https://github.com/${HARNESS_REPO}`;
 
-const ALL_RUNTIMES = ["cursor", "claude", "codex", "gemini", "generic"];
+const ALL_RUNTIMES = RUNTIME_NATIVE_PROVIDER_IDS;
 
 type RuntimeId = "cursor" | "claude" | "codex" | "gemini" | "generic" | "all";
 type InstallScope = "global" | "project";
@@ -34,7 +32,6 @@ interface InstallRuntimeOptions {
   target: string;
   dryRun: boolean;
   force: boolean;
-  help?: boolean;
 }
 
 interface ProviderCommandEntry {
@@ -43,46 +40,6 @@ interface ProviderCommandEntry {
 }
 
 type JsonObject = Record<string, unknown>;
-
-function parseArgs(argv: string[]): InstallRuntimeOptions {
-  const options: InstallRuntimeOptions = {
-    packRoot: "",
-    runtime: "" as RuntimeId,
-    scope: "project",
-    target: process.cwd(),
-    dryRun: false,
-    force: false,
-  };
-
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    if (arg === "--pack-root") {
-      options.packRoot = argv[++i];
-    } else if (arg === "--runtime") {
-      options.runtime = argv[++i] as RuntimeId;
-    } else if (arg === "--scope") {
-      options.scope = argv[++i] as InstallScope;
-    } else if (arg === "--target") {
-      options.target = argv[++i];
-    } else if (arg === "--dry-run") {
-      options.dryRun = true;
-    } else if (arg === "--force") {
-      options.force = true;
-    } else if (arg === "--help" || arg === "-h") {
-      options.help = true;
-    } else {
-      throw new Error(`Unknown argument: ${arg}`);
-    }
-  }
-
-  return options;
-}
-
-function usage(): void {
-  console.log(`Usage: node install-runtime.js --pack-root <path> --runtime <name> --scope <global|project> --target <path> [--dry-run] [--force]
-
-Runtimes: claude, codex, cursor, gemini, generic, all`);
-}
 
 function packPath(packRoot: string, relativePath: string): string {
   return path.join(packRoot, "runtime", relativePath);
@@ -386,40 +343,5 @@ function installRuntime(options: InstallRuntimeOptions): void {
   console.log("\n--- Runtime install complete ---");
 }
 
-function main(): void {
-  let options: InstallRuntimeOptions;
-  try {
-    options = parseArgs(process.argv.slice(2));
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error(`install-runtime.js: error: ${message}`);
-    process.exit(1);
-  }
-
-  if (options.help) {
-    usage();
-    process.exit(0);
-  }
-
-  if (!options.packRoot || !options.runtime) {
-    console.error("install-runtime.js: error: --pack-root and --runtime are required");
-    usage();
-    process.exit(1);
-  }
-
-  if (options.scope !== "global" && options.scope !== "project") {
-    console.error("install-runtime.js: error: --scope must be global or project");
-    process.exit(1);
-  }
-
-  try {
-    installRuntime(options);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error(`install-runtime.js: error: ${message}`);
-    process.exit(1);
-  }
-}
-
-export { ALL_RUNTIMES, deepMerge, installRuntime, installProviderCommands, parseArgs, main };
+export { ALL_RUNTIMES, deepMerge, installRuntime, installProviderCommands };
 export type { RuntimeId, InstallScope, InstallRuntimeOptions, ProviderCommandEntry, JsonObject };

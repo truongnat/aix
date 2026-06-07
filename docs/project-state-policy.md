@@ -8,7 +8,7 @@ Define how **global plugin/capability install** relates to **per-repository `.ha
 
 | Layer | What it is | Where it lives | Shared across repos? |
 |---|---|---|---|
-| Global capability | Runtime plugin, extension, rules, or bootstrap | `~/.claude/`, `~/.config/opencode/`, `~/.gemini/extensions/`, etc. | Yes (same machine / user) |
+| Global capability | Runtime plugin, extension, rules, or bootstrap | `~/.claude/`, `~/.cursor/`, `~/.gemini/extensions/`, `~/.codex/`, etc. | Yes (same machine / user) |
 | Project state | Harness profile + goals for one product | `<repo>/.harness/` | No (one repo only) |
 | Runtime bootstrap | Agent/tool entry files (e.g. `AGENTS.md`, `.cursor/rules/`) | Repo root or runtime paths | Per runtime; not `.harness/` state |
 
@@ -45,11 +45,9 @@ After **global** install, user message should say:
 ```txt
 Global harness capability installed for <runtime>.
 In each product repo, run:
-  ai-harness init --project
-or use project-scope install with --init-harness
+  npx ai-engineering-harness install --target <repo>
+or use shell/bootstrap fallback when you intentionally need remote bootstrap behavior
 ```
-
-(Future CLI names; concept is required today.)
 
 ## What Gets Committed
 
@@ -57,7 +55,7 @@ or use project-scope install with --init-harness
 |---|---|
 | `.harness/` profile + goals | **Team choice** — shared (commit) or private (gitignore) per install |
 | `.harness/*.local` or secrets | **Never** |
-| Runtime project config (`.claude/settings.json`, `.cursor/rules/`, `opencode.json`) | Shared install: often yes; private install: gitignored per [git-hygiene-policy.md](git-hygiene-policy.md) |
+| Runtime project config (`.claude/settings.json`, `.cursor/rules/`, `.gemini/extensions/…`) | Shared install: often yes; private install: gitignored per [git-hygiene-policy.md](git-hygiene-policy.md) |
 | Global runtime config | Usually **not** in product repo (lives in home dir) |
 | Full pack mirror (`commands/`, `skills/` at root) | **Discouraged** — not default |
 
@@ -120,7 +118,7 @@ cd ~/projects/other-app
 
 ## Project `.harness` Init (implemented)
 
-[install.sh](../install.sh) with `--scope project --init-harness` scaffolds minimal profile files under `<repo>/.harness/`. See [harness-init-usage.md](harness-init-usage.md).
+`npx ai-engineering-harness install` scaffolds minimal profile files under `<repo>/.harness/` when the project install needs them. Shell/bootstrap fallback may still expose explicit `--init-harness`. See [harness-init-usage.md](harness-init-usage.md).
 
 - Generated files are **structural skeletons** only (required headings + TODO placeholders).
 - Teams fill content after init.
@@ -129,7 +127,7 @@ cd ~/projects/other-app
 ## Rules (normative)
 
 1. Global install **never** creates shared project state by itself.
-2. Project install **may** create `.harness/` when `--init-harness` is passed (or confirmed interactively).
+2. Project install **may** create `.harness/` when the primary Node CLI detects a missing scaffold or when shell/bootstrap fallback passes `--init-harness`.
 3. Each repo gets **its own** `.harness/`.
 4. Runtime plugins should **not** duplicate the full pack in every repo unless that runtime requires project-local files (then install **only** what that runtime needs).
 5. Commit vs ignore `.harness/` is a **team workflow** decision; document in profile README or adoption guide.

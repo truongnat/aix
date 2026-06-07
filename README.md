@@ -78,6 +78,9 @@ npx ai-engineering-harness install --provider claude --yes
 
 **Note:** `--provider` is preferred; `--runtime` is a deprecated alias.
 
+The Node.js CLI (`npx ai-engineering-harness ...`) is the primary surface. `aih.sh` remains a
+legacy shell fallback for curl-pipe/bootstrap flows and environments that need POSIX `sh`.
+
 Wizard details: [docs/npx-cli-ux.md](docs/npx-cli-ux.md), [docs/terminal-wizard-ux.md](docs/terminal-wizard-ux.md)
 
 ---
@@ -111,6 +114,13 @@ const options: InstallOptions = {
 ```
 
 See [docs/typescript-usage.md](docs/typescript-usage.md) for the full API reference.
+
+Shell fallback remains available when needed:
+
+```bash
+sh aih.sh status
+sh aih.sh doctor
+```
 
 ---
 

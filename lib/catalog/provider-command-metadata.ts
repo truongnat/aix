@@ -1,5 +1,4 @@
-// @ts-ignore - JS file with checkJs
-import { PROVIDER_RULE_ADAPTERS } from "../provider-rule-renderer.js";
+import { PROVIDER_RULE_ADAPTERS } from "../provider-rule-renderer";
 
 const COMMAND_NAMESPACE = "harness";
 const CACHE_DIR = ".ai-harness";

@@ -124,6 +124,13 @@ describe("CLI Arguments Parser", () => {
     assert.equal(opts.target, "/tmp/project");
   });
 
+  test("parseArgv rejects --ref for the npx CLI", () => {
+    assert.throws(
+      () => cliArgs.parseArgv(["node", "aih.js", "install", "--ref", "v1.0.1"]),
+      /--ref is not supported by the npx CLI/
+    );
+  });
+
   test("parseArgv parses --all flag", () => {
     const opts = cliArgs.parseArgv(["node", "aih.js", "--all"]);
     assert.equal(opts.all, true);
@@ -145,6 +152,18 @@ describe("CLI Arguments Parser", () => {
       "node fake-provider.js",
     ]);
     assert.equal(opts.liveProviderCommand, "node fake-provider.js");
+  });
+
+  test("parseArgv parses --no-llm-judge flag", () => {
+    const opts = cliArgs.parseArgv([
+      "node",
+      "aih.js",
+      "eval",
+      "run",
+      "sample-bugfix",
+      "--no-llm-judge",
+    ]);
+    assert.equal(opts.useLlmJudge, false);
   });
 
   test("parseArgv throws on unknown argument", () => {
@@ -186,6 +205,15 @@ describe("CLI Help", () => {
     assert.match(help, /ai-engineering-harness insights/);
     assert.match(help, /--json/);
     assert.match(help, /--run-recommended-evals/);
+  });
+
+  test("renderHelp reflects in-process primary lifecycle commands", () => {
+    const { renderHelp } = fresh("dist/lib/cli-help.js");
+    const help = renderHelp();
+    assert.match(help, /--verbose\s+Show raw backend output/);
+    assert.match(help, /Primary lifecycle commands run in-process on Node\.js/);
+    assert.doesNotMatch(help, /Git Bash or WSL required for the bundled shell backend fallback/);
+    assert.doesNotMatch(help, /raw shell backend output/);
   });
 });
 
@@ -307,6 +335,13 @@ describe("CLI Provider Detection", () => {
     assert.ok(legacy.includes("opencode"));
   });
 
+  test("detectInstalledProviders can include legacy runtimes when requested", () => {
+    const tmpDir = makeTempDir();
+    createMockFileStructure(tmpDir, [".opencode/plugins/ai-engineering-harness.js"]);
+    const providers = cliDetect.detectInstalledProviders(tmpDir, { includeLegacy: true });
+    assert.ok(providers.includes("opencode"));
+  });
+
   test("detectLegacyProviderResidue returns empty for clean project", () => {
     const tmpDir = makeTempDir();
     const legacy = cliDetect.detectLegacyProviderResidue(tmpDir);
@@ -324,6 +359,13 @@ describe("CLI Provider Detection", () => {
     const tmpDir = makeTempDir();
     const result = cliDetect.isGitRepo(tmpDir);
     assert.equal(result, false);
+  });
+
+  test("isGitRepo detects .git file used by worktrees", () => {
+    const tmpDir = makeTempDir();
+    fs.writeFileSync(path.join(tmpDir, ".git"), "gitdir: /tmp/fake-worktree\n");
+    const result = cliDetect.isGitRepo(tmpDir);
+    assert.equal(result, true);
   });
 
   test("fileContainsHarnessMarker detects marker string", () => {

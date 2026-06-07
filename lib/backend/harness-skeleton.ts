@@ -49,7 +49,7 @@ function skeletonHarnessMd(): string {
 
 ## Purpose
 
-(TODO: describe this repository harness operating model.)
+Describe the repository-specific harness operating model, the artifacts it owns, and the workflow it enforces.
 
 ## Current Status
 
@@ -59,23 +59,23 @@ function skeletonHarnessMd(): string {
 
 ## Scope
 
-(TODO)
+List the commands, artifacts, and validation gates this harness owns in this repository.
 
 ## Operating Model
 
-(TODO)
+Describe the command loop, artifact update rules, and any repository-specific exceptions.
 
 ## Assumptions
 
-(TODO)
+Record assumptions that affect planning, implementation, or verification.
 
 ## Unknowns
 
-(TODO)
+Record open questions that still need human input or future investigation.
 
 ## Human Review
 
-(TODO)
+Record anything that should be reviewed by a human before shipping.
 `;
 }
 
@@ -85,31 +85,31 @@ function skeletonTeamMd(): string {
 
 ## Purpose
 
-(TODO)
+Describe who owns the repository, who reviews changes, and how handoffs work.
 
 ## Current Status
 
-(TODO)
+Record whether the team profile is draft, adopted, or needs attention.
 
 ## Selected Pattern
 
-(TODO)
+Describe the operating pattern the team follows by default.
 
 ## Roles
 
-(TODO)
+List the roles and responsibilities that matter for this repository.
 
 ## Handoff Rules
 
-(TODO)
+Describe what must be handed off in markdown before work changes owners.
 
 ## Escalation Rules
 
-(TODO)
+Describe when a human must be consulted or a decision must be escalated.
 
 ## Human Review
 
-(TODO)
+Record the specific items that need human review before shipping.
 `;
 }
 
@@ -119,27 +119,27 @@ function skeletonSkillsMd(): string {
 
 ## Purpose
 
-(TODO)
+Describe which skills or skill packs are available in this repository.
 
 ## Current Status
 
-(TODO)
+Record whether the selected skills are complete, partial, or still being defined.
 
 ## Selected Core Skills
 
-(TODO)
+List the core skills that are actively expected in this workspace.
 
 ## Selected Skill Packs
 
-(TODO)
+List any broader skill packs that are intentionally enabled.
 
 ## Excluded Skills Or Packs
 
-(TODO)
+List capabilities that are intentionally not part of this repository setup.
 
 ## Human Review
 
-(TODO)
+Record any missing or pending skill decisions for human review.
 `;
 }
 
@@ -149,27 +149,27 @@ function skeletonWorkflowMd(): string {
 
 ## Purpose
 
-(TODO)
+Describe the workflow stages, command loop, and how the repository uses them.
 
 ## Current Status
 
-(TODO)
+Record whether the workflow is draft, adopted, or needs review.
 
 ## Selected Workflow
 
-(TODO)
+Describe the workflow pattern in use for this repository.
 
 ## Command Sequence
 
-(TODO)
+List the command sequence that the repository expects operators to follow.
 
 ## Execution Rules
 
-(TODO)
+Describe how state changes, plan approval, verification, and shipping are handled.
 
 ## Human Review
 
-(TODO)
+Record workflow exceptions or unresolved process questions for human review.
 `;
 }
 
@@ -179,27 +179,27 @@ function skeletonGatesMd(): string {
 
 ## Purpose
 
-(TODO)
+Describe the quality gates that protect repository changes.
 
 ## Current Status
 
-(TODO)
+Record whether the gate set is draft, adopted, or needs review.
 
 ## Quality Gates
 
-(TODO)
+List the gates that must pass before shipping or remembering lessons.
 
 ## Evidence Requirements
 
-(TODO)
+Describe the evidence required for verification and shipping decisions.
 
 ## Stop Conditions
 
-(TODO)
+Describe the conditions that force the workflow to stop.
 
 ## Human Review
 
-(TODO)
+Record gate exceptions or missing evidence that still need human review.
 `;
 }
 
@@ -209,31 +209,31 @@ function skeletonMemoryMd(): string {
 
 ## Purpose
 
-(TODO)
+Describe what long-lived memory this repository should retain.
 
 ## Current Status
 
-(TODO)
+Record whether memory capture is draft, active, or needs review.
 
 ## Recall Before Planning
 
-(TODO)
+Describe what should be reviewed before planning new work.
 
 ## Remember After Shipping
 
-(TODO)
+Describe what durable lessons should be recorded after shipping work.
 
 ## Memory Types
 
-(TODO)
+List the types of memory this repository captures.
 
 ## Forbidden Content
 
-(TODO)
+Describe what must never be written into repository memory.
 
 ## Human Review
 
-(TODO)
+Record memory items that need human review before they are committed.
 `;
 }
 
@@ -391,20 +391,6 @@ function skeletonPoliciesJson(): string {
         "message": "Test-first discipline violated: editing source without corresponding test",
         "questions": ["Create or update the corresponding test file first"]
       }
-    },
-    {
-      "id": "scope-guard",
-      "name": "Scope Guard",
-      "description": "Edits must stay within scope defined in goal artifact or plan",
-      "severity": "warning",
-      "conditions": [
-        { "type": "file_pattern", "operator": "matches", "value": "**" }
-      ],
-      "action": {
-        "type": "warn",
-        "message": "Edit may be outside approved scope",
-        "questions": ["Is this edit within the approved goal scope?"]
-      }
     }
   ]
 }
@@ -439,8 +425,12 @@ const SKELETON_FILES: Array<{ rel: string; content: () => string }> = [
  * NOTE: All skeleton file content strings end with a trailing `\n` (POSIX text
  * file convention). The original shell functions in aih.sh use `$()` command
  * substitution which silently strips the final newline. A byte-for-byte diff
- * against shell-generated output will therefore show a 1-byte difference; this
- * is intentional and an improvement over the shell behaviour.
+ * against shell-generated output will therefore show a 1-byte difference.
+ *
+ * That means a repository initialized by the shell-era path can see the first
+ * TypeScript-backed install or re-init treat those files as changed/overwrite
+ * candidates even when the visible markdown content is otherwise identical.
+ * This is intentional and an improvement over the shell behaviour.
  */
 function writeTargetFile(
   rel: string,

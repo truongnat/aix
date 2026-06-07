@@ -15,7 +15,8 @@ const archivedInstallDocs = [
 const canonicalInstallDocs = [
   {
     fileName: "install-command-model.md",
-    expectedScope: /Canonical scope: `aih\.sh` lifecycle commands, defaults, and flags\./,
+    expectedScope:
+      /Canonical scope: `npx ai-engineering-harness` lifecycle commands, defaults, and flags\./,
   },
   {
     fileName: "install-sh-usage.md",

@@ -1,8 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import childProcess from "node:child_process";
-// @ts-ignore - JS file with checkJs
-import { fileReferencesActivation } from "../runtime-command-catalog.js";
+import { fileReferencesActivation } from "../runtime-command-catalog";
 import {
   promptTemplateHeadings,
   sessionAwareCommandFiles,
@@ -21,10 +20,8 @@ import {
   readFile,
   resolvePath,
 } from "./utils";
-// @ts-ignore - JS file with checkJs
-import { workers, VALID_PROVIDER_SUPPORT, WORKER_IDS } from "../../workers/registry.js";
-// @ts-ignore - JS file with checkJs
-import { assertClaudeWorkerSurface } from "../worker-claude-adapter.js";
+import { workers, VALID_PROVIDER_SUPPORT, WORKER_IDS } from "../../workers/registry";
+import { assertClaudeWorkerSurface } from "../worker-claude-adapter";
 
 const skillContractSubstanceHeadings = [
   "## When Not To Use",

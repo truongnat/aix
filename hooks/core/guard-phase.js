@@ -140,6 +140,26 @@ function buildExecutionContext(sessionDir, repoRoot, command) {
   };
 }
 
+function readyWithPolicyWarnings(command, actions) {
+  const warnings = actions
+    .filter((action) => action.type === "warn")
+    .map((action) => action.message)
+    .filter(Boolean);
+
+  if (warnings.length === 0) {
+    return null;
+  }
+
+  return {
+    ok: true,
+    status: "ready",
+    command,
+    nextCommand: command,
+    warnings,
+    summary: `ready with warnings: ${warnings.join("; ")}`,
+  };
+}
+
 function guardPhase(options) {
   const sessionDir = resolveSessionDir(options.session);
   const repoRoot = findHarnessRoot(sessionDir);
@@ -176,6 +196,11 @@ function guardPhase(options) {
           nextCommand: action.nextCommand || command,
           questions: action.questions || [],
         };
+      }
+
+      const readyResult = readyWithPolicyWarnings(command, actions);
+      if (readyResult) {
+        return readyResult;
       }
     } catch (error) {
       console.error(`Policy engine error: ${error.message}. Falling back to legacy logic.`);
@@ -248,6 +273,7 @@ function main() {
         ok: result.ok,
         reason: result.reason || null,
         next_command: result.nextCommand || null,
+        warnings: result.warnings || [],
       });
     } catch {
       // Event logging is best-effort when harness root cannot be resolved.

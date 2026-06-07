@@ -105,3 +105,14 @@ test("runTask can execute a live provider command and tag live evidence", async 
   assert.ok(summary.modes["with-harness"].outcome.passed >= 1);
   assert.equal(summary.modes["without-harness"].outcome.passed, 0);
 });
+
+test("runTask rejects live provider commands with shell metacharacters", async () => {
+  await assert.rejects(
+    () =>
+      runTask(repoRoot, "sample-bugfix", {
+        provider: "codex",
+        liveProviderCommand: "node -e \"console.log('ok')\" && echo pwned",
+      }),
+    /unsupported shell syntax/
+  );
+});

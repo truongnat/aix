@@ -1,21 +1,6 @@
-// @ts-ignore - JS file with checkJs
 import { mutationMetrics } from "./mode-mutations";
-
-interface Task {
-  id: string;
-  metrics?: {
-    withHarnessSteps: number;
-    withoutHarnessSteps: number;
-    phases: string[];
-  };
-}
-
-interface Score {
-  behavior: {
-    percent: number;
-    failed: number;
-  };
-}
+import type { Task } from "./task-registry";
+import type { Score } from "./scoring";
 
 interface ExtendedMetrics {
   steps: number;

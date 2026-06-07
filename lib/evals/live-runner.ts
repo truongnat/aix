@@ -2,6 +2,8 @@ import childProcess from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
+const FORBIDDEN_SHELL_PATTERN = /[|&;<>()`$\\]/;
+
 interface Task {
   id: string;
   title: string;
@@ -32,6 +34,35 @@ interface LiveRunResult {
   guidePath?: string;
   statePath?: string;
   transcript: string;
+}
+
+function tokenizeProviderCommand(command: string): string[] {
+  const trimmed = command.trim();
+  if (!trimmed) {
+    throw new Error("Missing live provider command for eval run.");
+  }
+  if (FORBIDDEN_SHELL_PATTERN.test(trimmed)) {
+    throw new Error(`Live provider command contains unsupported shell syntax: ${command}`);
+  }
+
+  const tokens: string[] = [];
+  const pattern = /"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'|[^\s]+/g;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(trimmed)) !== null) {
+    if (match[1] !== undefined) {
+      tokens.push(match[1].replace(/\\(["\\])/g, "$1"));
+    } else if (match[2] !== undefined) {
+      tokens.push(match[2].replace(/\\(['\\])/g, "$1"));
+    } else {
+      tokens.push(match[0]);
+    }
+  }
+
+  if (tokens.length === 0) {
+    throw new Error(`Unable to parse live provider command: ${command}`);
+  }
+
+  return tokens;
 }
 
 function ensureParentDir(filePath: string): void {
@@ -79,9 +110,7 @@ function writeLiveHarnessFiles(
 }
 
 function runLiveProviderCommand(options: LiveRunOptions): LiveRunResult {
-  if (!options.providerCommand.trim()) {
-    throw new Error("Missing live provider command for eval run.");
-  }
+  const [executable, ...args] = tokenizeProviderCommand(options.providerCommand);
 
   const paths = writeLiveHarnessFiles(options.workspace, options.task, options);
   const env = {
@@ -98,12 +127,12 @@ function runLiveProviderCommand(options: LiveRunOptions): LiveRunResult {
     AIH_EVAL_MODE: options.mode,
   };
 
-  const result = childProcess.spawnSync(options.providerCommand, {
+  const result = childProcess.spawnSync(executable, args, {
     cwd: options.workspace.cwd,
     encoding: "utf8",
     env,
     input: `${options.task.prompt}\n`,
-    shell: true,
+    shell: false,
     timeout: 10 * 60 * 1000,
     maxBuffer: 10 * 1024 * 1024,
   });

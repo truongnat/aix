@@ -22,6 +22,7 @@ interface TelemetryServerOptions {
   routePath?: string;
   storageDir?: string;
   maxBodyBytes?: number;
+  maxStorageBytes?: number;
 }
 
 interface TelemetryIngestResult {
@@ -34,6 +35,8 @@ interface TelemetryWriteResult {
   storagePath: string;
   bytesWritten: number;
 }
+
+const DEFAULT_MAX_STORAGE_BYTES = 50 * 1024 * 1024;
 
 function defaultStoragePath(storageDir: string): string {
   return path.join(storageDir, "harness-telemetry.ndjson");
@@ -91,15 +94,23 @@ function readRequestBody(req: IncomingMessage, maxBodyBytes: number): Promise<st
 
 function writeTelemetryExport(
   storageDir: string,
-  payload: TelemetryExportPayload
+  payload: TelemetryExportPayload,
+  maxStorageBytes = DEFAULT_MAX_STORAGE_BYTES
 ): TelemetryWriteResult {
   fs.mkdirSync(storageDir, { recursive: true });
   const storagePath = defaultStoragePath(storageDir);
   const line = `${JSON.stringify(payload)}\n`;
+  const existingSize = fs.existsSync(storagePath) ? fs.statSync(storagePath).size : 0;
+  const lineBytes = Buffer.byteLength(line);
+
+  if (existingSize + lineBytes > maxStorageBytes) {
+    throw new Error(`Telemetry storage limit exceeded (${maxStorageBytes} bytes)`);
+  }
+
   fs.appendFileSync(storagePath, line, "utf8");
   return {
     storagePath,
-    bytesWritten: Buffer.byteLength(line),
+    bytesWritten: lineBytes,
   };
 }
 
@@ -120,6 +131,7 @@ async function handleTelemetryRequest(
 ): Promise<TelemetryIngestResult> {
   const routePath = options.routePath || "/api/telemetry";
   const maxBodyBytes = options.maxBodyBytes || 1_048_576;
+  const maxStorageBytes = options.maxStorageBytes || DEFAULT_MAX_STORAGE_BYTES;
   const storageDir = options.storageDir || path.join(process.cwd(), ".harness", "telemetry");
   const method = (req.method || "GET").toUpperCase();
   const urlPath = (req.url || "/").split("?")[0];
@@ -158,7 +170,7 @@ async function handleTelemetryRequest(
       };
     }
 
-    const record = writeTelemetryExport(storageDir, payload);
+    const record = writeTelemetryExport(storageDir, payload, maxStorageBytes);
     jsonResponse(res, 202, {
       ok: true,
       accepted: true,
@@ -181,7 +193,12 @@ async function handleTelemetryRequest(
     };
   } catch (error) {
     const message = (error as Error).message || "Telemetry ingest failed";
-    const statusCode = message === "Request body too large" ? 413 : 400;
+    const statusCode =
+      message === "Request body too large"
+        ? 413
+        : message.startsWith("Telemetry storage limit exceeded")
+          ? 507
+          : 400;
     jsonResponse(res, statusCode, { ok: false, error: message });
     return {
       accepted: false,
@@ -198,6 +215,7 @@ function createTelemetryServer(options: TelemetryServerOptions = {}) {
 }
 
 export {
+  DEFAULT_MAX_STORAGE_BYTES,
   createTelemetryServer,
   defaultStoragePath,
   handleTelemetryRequest,

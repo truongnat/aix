@@ -53,7 +53,7 @@ Welcome! User-facing documentation for **ai-engineering-harness**, organized wit
 
 ### 📦 Installation & Deployment
 - **[Install Command Model](install-command-model.md)** — How `npx ai-engineering-harness install` works
-- **[Runtime-Native Installation](runtime-native-install.md)** — The `install.sh` backend
+- **[Runtime-Native Installation](runtime-native-install.md)** — Provider-specific install payloads and follow-up actions
 - **[Consumption Modes](consumption-modes.md)** — Different ways to use the harness
 
 ### 📚 Release Notes & History

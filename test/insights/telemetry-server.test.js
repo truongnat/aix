@@ -6,9 +6,12 @@ const path = require("node:path");
 const { Readable } = require("node:stream");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const { handleTelemetryRequest, validateTelemetryPayload, defaultStoragePath } = require(
-  path.join(repoRoot, "dist", "lib", "insights", "telemetry-server.js")
-);
+const {
+  DEFAULT_MAX_STORAGE_BYTES,
+  handleTelemetryRequest,
+  validateTelemetryPayload,
+  defaultStoragePath,
+} = require(path.join(repoRoot, "dist", "lib", "insights", "telemetry-server.js"));
 
 function makeResponse() {
   let body = "";
@@ -93,4 +96,36 @@ test("telemetry ingest handler rejects invalid exports without writing", async (
   assert.equal(result.statusCode, 422);
   assert.equal(res.statusCode, 422);
   assert.ok(!fs.existsSync(defaultStoragePath(tempRoot)));
+});
+
+test("telemetry ingest handler rejects writes once storage cap is exceeded", async () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-telemetry-cap-"));
+  const storagePath = defaultStoragePath(tempRoot);
+  const payload = makePayload();
+  const encoded = `${JSON.stringify(payload)}\n`;
+  const maxStorageBytes = Buffer.byteLength(encoded);
+
+  fs.mkdirSync(tempRoot, { recursive: true });
+  fs.writeFileSync(storagePath, encoded, "utf8");
+
+  const req = Readable.from([JSON.stringify(payload)]);
+  req.method = "POST";
+  req.url = "/api/telemetry";
+
+  const res = makeResponse();
+  const result = await handleTelemetryRequest(req, res, {
+    storageDir: tempRoot,
+    routePath: "/api/telemetry",
+    maxStorageBytes,
+  });
+
+  assert.equal(result.accepted, false);
+  assert.equal(result.statusCode, 507);
+  assert.equal(res.statusCode, 507);
+  assert.match(res.body, /Telemetry storage limit exceeded/);
+  assert.equal(fs.readFileSync(storagePath, "utf8"), encoded);
+});
+
+test("telemetry storage default cap remains 50 MB", () => {
+  assert.equal(DEFAULT_MAX_STORAGE_BYTES, 50 * 1024 * 1024);
 });

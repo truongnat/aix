@@ -4,6 +4,8 @@
 
 Safely remove `ai-engineering-harness` project runtime-native files without deleting unrelated user content.
 
+Primary surface: `npx ai-engineering-harness uninstall`. Shell/bootstrap-only cleanup knobs stay on the fallback path.
+
 ## Safe Defaults
 
 Default `uninstall` removes only the selected runtime entrypoint.
@@ -18,12 +20,12 @@ If cache/state are kept, they may become visible in `git status` after uninstall
 ## Commands
 
 ```bash
-sh aih.sh uninstall
-sh aih.sh uninstall --runtime cursor --scope project --yes
-sh aih.sh uninstall --all
-sh aih.sh uninstall --runtime cursor --scope project --remove-cache --remove-state --yes
-sh aih.sh uninstall --runtime all --scope project --remove-cache --remove-state --yes
+npx ai-engineering-harness uninstall
+npx ai-engineering-harness uninstall --provider cursor --yes
+npx ai-engineering-harness uninstall --all --yes
 ```
+
+Shell/bootstrap fallback keeps explicit cleanup flags such as `--remove-cache` and `--remove-state`; see [install-sh-usage.md](install-sh-usage.md) for that surface.
 
 ## Runtime Entrypoints
 
@@ -34,7 +36,6 @@ sh aih.sh uninstall --runtime all --scope project --remove-cache --remove-state 
 | `claude` | `.claude/CLAUDE.md`; `.claude/settings.json` is skipped unless future safe ownership logic is added |
 | `gemini` | `.gemini/extensions/ai-engineering-harness/` |
 | `opencode` | `.opencode/plugins/ai-engineering-harness.js` (legacy uninstall only; not an active install target since v0.11.0) |
-| `all` | union of active runtime entrypoints above |
 
 `opencode.json` is kept when uninstalling legacy OpenCode installs.
 
@@ -42,15 +43,15 @@ sh aih.sh uninstall --runtime all --scope project --remove-cache --remove-state 
 
 `.ai-harness/` is kept by default because multiple runtime entrypoints may share it.
 
-- `--remove-cache` removes `.ai-harness/`
-- `--keep-cache` keeps `.ai-harness/` explicitly
+- Primary Node CLI: use `--all` for full cleanup
+- Shell/bootstrap fallback: `--remove-cache` removes `.ai-harness/`
 
 ## State Removal
 
 `.harness/` is kept by default because it may contain user project goals, memory, and workflow state.
 
-- `--remove-state` removes `.harness/`
-- `--keep-state` keeps `.harness/` explicitly
+- Primary Node CLI: use `--all` for full cleanup
+- Shell/bootstrap fallback: `--remove-state` removes `.harness/`
 
 ## Git Exclude Cleanup
 
@@ -69,7 +70,7 @@ Unrelated exclude lines are preserved.
 Use `--dry-run` to preview removals:
 
 ```bash
-sh aih.sh uninstall --runtime cursor --scope project --dry-run
+npx ai-engineering-harness uninstall --provider cursor --dry-run --yes
 ```
 
 Expected output includes `WOULD REMOVE`, `WOULD KEEP`, `WOULD UPDATE`, or `SKIP`.
@@ -85,22 +86,22 @@ Expected output includes `WOULD REMOVE`, `WOULD KEEP`, `WOULD UPDATE`, or `SKIP`
 Remove only the Cursor runtime bootstrap:
 
 ```bash
-sh aih.sh uninstall
+npx ai-engineering-harness uninstall
 ```
 
 Remove all runtime entrypoints plus cache and project state:
 
 ```bash
-sh aih.sh uninstall --all
+npx ai-engineering-harness uninstall --all --yes
 ```
 
 Remove only the Cursor runtime bootstrap with explicit advanced flags:
 
 ```bash
-sh aih.sh uninstall --runtime cursor --scope project --yes
+npx ai-engineering-harness uninstall --provider cursor --yes
 ```
 
-Remove Cursor bootstrap plus cache and project state:
+Shell/bootstrap fallback: remove Cursor bootstrap plus cache and project state:
 
 ```bash
 sh aih.sh uninstall --runtime cursor --scope project --remove-cache --remove-state --yes

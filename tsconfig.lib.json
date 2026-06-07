@@ -29,6 +29,7 @@
     "lib/catalog/command-rendering.ts",
     "lib/catalog/command-installation.ts",
     "lib/cli-detect.ts",
+    "lib/provider-detection.ts",
     "lib/cli-help.ts",
     "lib/cli-plan.ts",
     "lib/cli-providers.ts",

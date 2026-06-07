@@ -104,6 +104,15 @@ test("versioning and release policy docs reflect the current v1.x stability post
   assert.match(versioning, /## Current Meaning Of `v1\.x`/);
   assert.match(versioning, /`v1\.0\.0` is the first stable capability pack release/i);
   assert.doesNotMatch(versioning, /`v1\.0\.0` should be the first stable capability pack release/i);
+  assert.match(
+    versioning,
+    /`v0\.9\.1` was the \*\*Experimental Runtime-Native Installer\*\* release/
+  );
+  assert.match(
+    versioning,
+    /`v0\.9\.2` was the \*\*Experimental Simple Lifecycle CLI \+ Capability Cache \+ Git Hygiene\*\* release/
+  );
+  assert.match(versioning, /`v0\.10\.x` was the \*\*Experimental NPX CLI\*\* release/);
 
   assert.match(breakingPolicy, /after `v1\.0\.0`|post-v1/i);
   assert.match(breakingPolicy, /major version/i);
@@ -117,4 +126,75 @@ test("versioning and release policy docs reflect the current v1.x stability post
     /Session Start → Map → Discuss → Plan → Run → Verify → Ship → Remember/
   );
   assert.match(notes, /Session Start → Discuss → Plan → Run → Verify → Ship → Remember/);
+});
+
+test("release workflow owns npm publish and tag workflow only creates the GitHub release", () => {
+  const workflow = fs.readFileSync(
+    path.join(repoRoot, ".github", "workflows", "publish.yml"),
+    "utf8"
+  );
+  const releaseWorkflow = fs.readFileSync(
+    path.join(repoRoot, ".github", "workflows", "release.yml"),
+    "utf8"
+  );
+
+  assert.match(workflow, /name: Create GitHub Release from tag/);
+  assert.match(workflow, /name: Check whether npm version already exists/);
+  assert.match(workflow, /npm view "\$PKG_NAME@\$PKG_VERSION" version/);
+  assert.match(workflow, /already_published=true/);
+  assert.doesNotMatch(workflow, /run: npm publish --provenance/);
+  assert.match(workflow, /Create GitHub Release/);
+
+  assert.match(releaseWorkflow, /uses: changesets\/action@v1/);
+  assert.match(releaseWorkflow, /publish: npm run release/);
+  assert.match(releaseWorkflow, /NPM_TOKEN:/);
+  assert.equal(pkg.scripts.release, "npm publish --provenance");
+});
+
+test("release docs describe changesets as the primary publish path", () => {
+  const publishDoc = fs.readFileSync(path.join(repoRoot, "docs", "npm-publish.md"), "utf8");
+  const checklist = fs.readFileSync(path.join(repoRoot, "docs", "release-checklist.md"), "utf8");
+  const consumptionModes = fs.readFileSync(
+    path.join(repoRoot, "docs", "consumption-modes.md"),
+    "utf8"
+  );
+  const packagingModel = fs.readFileSync(path.join(repoRoot, "docs", "packaging-model.md"), "utf8");
+  const manualPackagingGuide = fs.readFileSync(
+    path.join(repoRoot, "docs", "manual-packaging-guide.md"),
+    "utf8"
+  );
+
+  assert.match(publishDoc, /`changesets` release workflow/i);
+  assert.match(publishDoc, /npm publish --provenance/);
+  assert.match(publishDoc, /GitHub Release on `v\*` tags/);
+  assert.doesNotMatch(publishDoc, /Do not publish automatically from CI/);
+
+  assert.match(checklist, /changesets release workflow/i);
+  assert.match(checklist, /Merge the changesets release PR/);
+  assert.match(checklist, /published npm with provenance/);
+  assert.match(checklist, /## Current v1\.x Validation Commands/);
+  assert.match(checklist, /npx ai-engineering-harness --help/);
+  assert.match(checklist, /## Historical Release Snapshots/);
+  assert.doesNotMatch(checklist, /no release automation/);
+  assert.doesNotMatch(checklist, /no package publishing automation/);
+
+  assert.match(
+    consumptionModes,
+    /Documented and supported as a manual distribution-friendly mode, but not\s+automated yet\./
+  );
+  assert.doesNotMatch(consumptionModes, /not yet a first-class documented release workflow/);
+
+  assert.match(packagingModel, /release flow documented in \[release-checklist\.md\]/);
+  assert.doesNotMatch(packagingModel, /tag the source repository manually/);
+
+  assert.match(
+    manualPackagingGuide,
+    /follow \[release-checklist\.md\]\(release-checklist\.md\) and let the `changesets` release workflow own package publication/i
+  );
+  assert.match(manualPackagingGuide, /archive-only distribution snapshots/i);
+  assert.doesNotMatch(manualPackagingGuide, /## Step 8: Tag Source Repository/);
+  assert.doesNotMatch(
+    manualPackagingGuide,
+    /verifying pack identity before tagging the source repository/
+  );
 });

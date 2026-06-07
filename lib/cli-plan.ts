@@ -1,6 +1,4 @@
-// @ts-ignore - JS file with checkJs
 import { isRuntimeNative } from "./cli-providers";
-// @ts-ignore - JS file with checkJs
 import {
   runtimeCommandCatalogPathsForPlan,
   formatCommandSupportForPlan,

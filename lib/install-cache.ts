@@ -1,9 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-// @ts-ignore - JS file with checkJs
-import { installRuntimeCommandCatalog } from "./runtime-command-catalog.js";
-// @ts-ignore - JS file with checkJs
-import { ensureDirectory } from "./file-operations.js";
+import { installRuntimeCommandCatalog } from "./runtime-command-catalog";
+import { ensureDirectory } from "./file-operations";
 
 const CACHE_DIR = ".ai-harness";
 

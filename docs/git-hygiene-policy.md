@@ -6,7 +6,7 @@ Define how `ai-engineering-harness` installs interact with Git in product reposi
 
 **v0.9.2 principle:** `.gitignore` is usually **tracked** — editing it creates a repo change. Private/local installs should prefer **`.git/info/exclude`**, which is local to the checkout and **not committed**.
 
-**Implementation (Step 1):** [install.sh](../install.sh) writes `.git/info/exclude` when `--visibility private` (default strategy `info-exclude`). See [private-install-git-hygiene.md](private-install-git-hygiene.md).
+**Current implementation:** the primary Node CLI (`npx ai-engineering-harness install --visibility private`) writes `.git/info/exclude` for private project installs. Shell/bootstrap fallback keeps the older explicit `--ignore-strategy` controls. See [private-install-git-hygiene.md](private-install-git-hygiene.md).
 
 ## Problem
 
@@ -23,13 +23,11 @@ Files the installer may create (project scope):
 | Path | Runtime | Notes |
 |---|---|---|
 | `.harness/` | init | Profile + goals scaffold |
-| `.cursor/rules/ai-engineering-harness.mdc` | cursor, windsurf | Project rule file |
+| `.cursor/rules/ai-engineering-harness.mdc` | cursor | Project rule file |
 | `AGENTS.md` | generic, codex, manual | Bootstrap |
 | `.claude/CLAUDE.md` | claude | Project bootstrap |
 | `.claude/settings.json` | claude | Merge or create |
 | `.gemini/extensions/ai-engineering-harness/` | gemini | Project-local extension (best-effort) |
-| `.opencode/plugins/ai-engineering-harness.js` | opencode | Plugin file |
-| `opencode.json` | opencode | May be **shared project config** — see below |
 
 Global scope writes under home directories only — see [project-state-policy.md](project-state-policy.md).
 
@@ -67,17 +65,18 @@ Priority order for **private** project installs:
    → append delimited block to .git/info/exclude
    → no tracked file changes from ignore policy
 
-2. Not a Git repo, or exclude unavailable, or user chose --ignore-strategy none
+2. Not a Git repo, or exclude unavailable
    → print manual ignore instructions; still install files
 
-3. User explicitly chooses .gitignore (interactive or --ignore-strategy gitignore)
+3. Shell/bootstrap fallback user explicitly chooses .gitignore (interactive or --ignore-strategy gitignore)
    → ask/confirm; then append delimited block to .gitignore only with consent
 ```
 
 | Mode | Ignore target | Tracked repo change from ignore policy? |
 |---|---|---|
-| `private` + `info-exclude` (default for private) | `.git/info/exclude` | **No** |
-| `private` + `gitignore` (explicit only) | `.gitignore` | **Yes** (`.gitignore` diff) |
+| primary Node CLI private install | `.git/info/exclude` | **No** |
+| shell fallback `private` + `info-exclude` | `.git/info/exclude` | **No** |
+| shell fallback `private` + `gitignore` (explicit only) | `.gitignore` | **Yes** (`.gitignore` diff) |
 | `shared` | none | N/A — files visible in status |
 | `global` | none (project) | N/A |
 
@@ -96,7 +95,6 @@ When user chooses **private/local** and strategy is `info-exclude` (default for 
 .claude/CLAUDE.md
 .claude/settings.json
 .gemini/extensions/ai-engineering-harness/
-.opencode/plugins/ai-engineering-harness.js
 # ai-engineering-harness end
 ```
 
@@ -123,17 +121,12 @@ Team-wide “nobody commits `.harness/`” is a **project policy** decision — 
 
 Same delimited marker format as exclude file.
 
-### `opencode.json` exception
-
-- **Private + info-exclude:** ignore `.opencode/plugins/ai-engineering-harness.js` only; not whole `opencode.json` unless user opts in.
-- **Shared:** do not ignore.
-
 ## What Installer May Edit
 
 | File | When |
 |---|---|
-| `.git/info/exclude` | Private/local + `info-exclude` strategy + Git repo + user consent (flag or interactive) |
-| `.gitignore` | Private + explicit `gitignore` strategy only |
+| `.git/info/exclude` | Primary Node CLI private install, or shell fallback private/local + `info-exclude` strategy + Git repo |
+| `.gitignore` | Shell/bootstrap fallback private + explicit `gitignore` strategy only |
 | Runtime/harness paths | Per [runtime-native-install-audit.md](runtime-native-install-audit.md) |
 
 ## What Installer Must Never Edit
@@ -166,20 +159,21 @@ Before write install:
 
 | Context | Visibility | Ignore strategy |
 |---|---|---|
-| Interactive project | **Ask** | `auto` → `info-exclude` if private |
-| `--visibility private --yes` | private | `info-exclude` (require explicit flags; warn if strategy omitted in CI) |
+| Primary Node CLI project install | **Ask** or explicit `--visibility` | `.git/info/exclude` when private |
+| Shell fallback interactive project | **Ask** | `auto` → `info-exclude` if private |
+| Shell fallback `--visibility private --yes` | private | `info-exclude` |
 | `--visibility shared` | shared | `none` |
-| `--ignore-strategy none` | either | No exclude/gitignore edits |
+| Shell fallback `--ignore-strategy none` | either | No exclude/gitignore edits |
 | Global | N/A | ignored |
 
-Non-interactive without `--visibility`: **fail or warn** — do not guess.
+Primary Node CLI defaults project installs to `private`. Shell fallback without `--visibility` should fail or warn rather than guess when explicit hygiene behavior matters.
 
 ## Examples
 
 **Private Cursor + harness (preferred — no tracked ignore change):**
 
 ```bash
-sh install.sh install --runtime cursor --scope project --visibility private --ignore-strategy info-exclude --init-harness --yes
+npx ai-engineering-harness install --provider cursor --scope project --visibility private --yes
 ```
 
 Expected:
@@ -191,7 +185,7 @@ Expected:
 **Shared team install:**
 
 ```bash
-sh install.sh install --runtime cursor --scope project --visibility shared --init-harness --yes
+npx ai-engineering-harness install --provider cursor --scope project --visibility shared --yes
 ```
 
 Expected: files created; exclude and `.gitignore` unchanged; paths visible in `git status`.

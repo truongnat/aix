@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-// @ts-ignore - JS file with checkJs
-import { ensureDirectory } from "./file-operations.js";
+import { ensureDirectory } from "./file-operations";
 
 /**
  * DEPRECATED: Use node bin/aih.js install instead.
@@ -23,7 +22,19 @@ import { ensureDirectory } from "./file-operations.js";
  * 2. Or use the npx CLI: npx ai-engineering-harness install
  */
 
-const root = path.resolve(__dirname, "..");
+function resolvePackRoot(): string {
+  const candidates = [path.resolve(__dirname, ".."), path.resolve(__dirname, "..", "..")];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(path.join(candidate, "AGENTS.md"))) {
+      return candidate;
+    }
+  }
+
+  return candidates[0];
+}
+
+const root = resolvePackRoot();
 
 interface LegacyInstallOptions {
   target: string;
@@ -140,6 +151,19 @@ function parseArgs(argv: string[]): LegacyInstallOptions {
   };
 }
 
+function emitDeprecationWarning(): void {
+  console.warn("\n⚠️  DEPRECATION WARNING");
+  console.warn("────────────────────────────────────────────────────");
+  console.warn("This install path (flat-root) is deprecated.");
+  console.warn("It will be removed in v1.1.0.");
+  console.warn("");
+  console.warn("Recommended: Use the CLI instead");
+  console.warn("  npx ai-engineering-harness install --provider claude --yes");
+  console.warn("");
+  console.warn("Or use node bin/aih.js install for provider-aware installation.");
+  console.warn("────────────────────────────────────────────────────\n");
+}
+
 function listFiles(
   relativePath: string,
   depth = 0,
@@ -186,7 +210,12 @@ function listFiles(
   return files;
 }
 
+/**
+ * @deprecated Use `npx ai-engineering-harness install` or `node bin/aih.js install` instead.
+ * This flat-root manual install path remains only for backward compatibility and will be removed in v1.1.0.
+ */
 function installHarness(options: LegacyInstallOptions): LegacyInstallResult[] {
+  emitDeprecationWarning();
   const files = exportPaths.flatMap((relativePath) => listFiles(relativePath)).sort();
   const results: LegacyInstallResult[] = [];
 
@@ -273,18 +302,6 @@ function formatNextSteps(options: LegacyInstallOptions): string {
 }
 
 function main(argv = process.argv.slice(2)): LegacyInstallResult[] {
-  // Deprecation warning
-  console.warn("\n⚠️  DEPRECATION WARNING");
-  console.warn("────────────────────────────────────────────────────");
-  console.warn("This install path (flat-root) is deprecated.");
-  console.warn("It will be removed in v1.1.0.");
-  console.warn("");
-  console.warn("Recommended: Use the CLI instead");
-  console.warn("  npx ai-engineering-harness install --provider claude --yes");
-  console.warn("");
-  console.warn("Or use node bin/aih.js install for provider-aware installation.");
-  console.warn("────────────────────────────────────────────────────\n");
-
   const options = parseArgs(argv);
   const results = installHarness(options);
   const summary = summarizeResults(results);
@@ -302,6 +319,7 @@ export {
   formatTargetDisplay,
   formatNextSteps,
   formatSummary,
+  emitDeprecationWarning,
   installHarness,
   listFiles,
   main,

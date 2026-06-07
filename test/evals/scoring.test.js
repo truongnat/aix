@@ -5,7 +5,9 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const { runChecks } = require(path.join(repoRoot, "dist", "lib", "evals", "checks.js"));
+const { runChecks, runSingleCheck } = require(
+  path.join(repoRoot, "dist", "lib", "evals", "checks.js")
+);
 const { scoreRun } = require(path.join(repoRoot, "dist", "lib", "evals", "scoring.js"));
 
 test("scoreRun separates outcome and behavior results", async () => {
@@ -51,4 +53,17 @@ test("runChecks passes file-contains checks", async () => {
 
   const score = scoreRun(checks);
   assert.equal(score.outcome.passed, 1);
+});
+
+test("runSingleCheck rejects shell metacharacters in command checks", () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-eval-shell-"));
+  assert.throws(
+    () =>
+      runSingleCheck(tempRoot, {
+        type: "command",
+        command: "npm test && echo pwned",
+        cwd: ".",
+      }),
+    /unsupported shell syntax/
+  );
 });

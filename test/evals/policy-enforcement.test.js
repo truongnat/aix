@@ -25,6 +25,9 @@ test("policy engine loads and validates schema", () => {
     assert.ok(rule.action, "Rule must have action");
     assert.ok(rule.action.type, "Rule action must have type");
   }
+
+  const scopeRules = policies.rules.filter((rule) => rule.id.includes("scope"));
+  assert.equal(scopeRules.length, 0, "Default policy set should not enable scope guard");
 });
 
 test("policy engine evaluates phase gate conditions correctly", () => {
@@ -84,6 +87,42 @@ test("policy engine lazily loads policy set when shouldBlock is called without e
     blocked,
     "Engine should auto-load policies and block harness-run without approved plan"
   );
+});
+
+test("policy engine rejects invalid regex patterns when loading policy set", () => {
+  const { PolicyEngine } = require(path.join(repoRoot, "dist", "lib", "policy", "engine.js"));
+  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "policy-invalid-"));
+  const policyPath = path.join(tmpRoot, "policies.json");
+
+  fs.writeFileSync(
+    policyPath,
+    JSON.stringify(
+      {
+        version: "1.0.0",
+        rules: [
+          {
+            id: "invalid-command-regex",
+            name: "Invalid command regex",
+            description: "should fail during load",
+            severity: "error",
+            conditions: [{ type: "command", operator: "matches", value: "(" }],
+            action: { type: "block", message: "bad regex" },
+          },
+        ],
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+
+  const engine = new PolicyEngine(policyPath);
+  assert.throws(
+    () => engine.loadPolicySet(),
+    /Invalid regex.*invalid-command-regex.*command condition/
+  );
+
+  fs.rmSync(tmpRoot, { recursive: true, force: true });
 });
 
 test("globToRegExp converts glob patterns to correct anchored regexes", () => {
@@ -233,6 +272,10 @@ test("policy documentation is generated from policies", () => {
 
   const scopeContent = fs.readFileSync(scopeDoc, "utf8");
   assert.ok(scopeContent.includes("Scope Guard"), "Scope doc must have title");
+  assert.ok(
+    scopeContent.includes("No default scope-guard rule is enabled."),
+    "Scope doc must explain that no default scope rule is active"
+  );
 });
 
 test("policy hooks exist and are executable", () => {

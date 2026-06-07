@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { buildEvalRecommendations, type EvalRecommendationsResult } from "./eval-recommendations";
+import { runTask } from "../evals";
 
 interface RegressionRunOptions {
   provider?: string;
@@ -40,7 +41,6 @@ async function runRecommendedEvalRegression(
 ): Promise<EvalRegressionResult> {
   const recommendationResult = buildEvalRecommendations(targetRoot);
   const reportPath = buildRegressionReportPath(targetRoot);
-  const { runTask } = require("../evals");
   const runs: RegressionRunEntry[] = [];
 
   for (const recommendation of recommendationResult.recommendations) {

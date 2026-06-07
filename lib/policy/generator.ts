@@ -197,16 +197,24 @@ export function generateScopeGuardDoc(policies: PolicySet): string {
   lines.push(`## Policy`);
   lines.push(``);
 
-  for (const rule of scopeRules) {
-    lines.push(`### ${rule.name}`);
-    lines.push(``);
-    lines.push(rule.description);
-    lines.push(``);
+  if (scopeRules.length === 0) {
+    lines.push(`No default scope-guard rule is enabled.`);
     lines.push(
-      `**When enforced:** ${rule.conditions.map((c) => `${c.type} ${c.operator} ${c.value}`).join(" AND ")}`
+      `Add a custom scope policy in \`.harness/policies.json\` when a repository needs it.`
     );
-    lines.push(`**Action:** ${rule.action.type} - ${rule.action.message}`);
     lines.push(``);
+  } else {
+    for (const rule of scopeRules) {
+      lines.push(`### ${rule.name}`);
+      lines.push(``);
+      lines.push(rule.description);
+      lines.push(``);
+      lines.push(
+        `**When enforced:** ${rule.conditions.map((c) => `${c.type} ${c.operator} ${c.value}`).join(" AND ")}`
+      );
+      lines.push(`**Action:** ${rule.action.type} - ${rule.action.message}`);
+      lines.push(``);
+    }
   }
 
   lines.push(`## Scope Definition`);

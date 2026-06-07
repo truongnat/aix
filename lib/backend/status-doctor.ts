@@ -20,6 +20,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { EXCLUDE_BLOCK_START } from "./constants";
+import { detectInstalledProviders, isGitRepo } from "../provider-detection";
 import { readInstalledCommandSurface } from "../runtime-command-catalog";
 import { formatStatusCommandLines, formatDoctorCommandLines } from "../command-surface-report";
 
@@ -45,68 +46,13 @@ function runtimeListCount(list: string[]): number {
   return list.filter((r) => r.trim().length > 0).length;
 }
 
-/** Mirrors aih.sh file_contains_harness_marker (667-671). */
-function fileContainsHarnessMarker(filePath: string): boolean {
-  if (!fs.existsSync(filePath)) return false;
-  try {
-    return fs.readFileSync(filePath, "utf8").includes("ai-engineering-harness");
-  } catch {
-    return false;
-  }
-}
-
 /** Mirrors aih.sh detect_runtimes_from_target (154-175). */
 function detectRuntimesFromTarget(targetAbs: string): string[] {
   const installedProviders = readInstalledCommandSurface(targetAbs)?.installedProviders || [];
   if (installedProviders.length > 0) {
     return [...installedProviders];
   }
-
-  const detected: string[] = [];
-  const seen = new Set<string>();
-
-  const add = (rt: string) => {
-    if (!seen.has(rt)) {
-      seen.add(rt);
-      detected.push(rt);
-    }
-  };
-
-  if (
-    fs.existsSync(path.join(targetAbs, ".cursor/commands")) ||
-    fs.existsSync(path.join(targetAbs, ".cursor/rules/ai-engineering-harness.mdc"))
-  ) {
-    add("cursor");
-  }
-  if (fs.existsSync(path.join(targetAbs, ".claude/CLAUDE.md"))) {
-    add("claude");
-  }
-  if (fs.existsSync(path.join(targetAbs, ".gemini/extensions/ai-engineering-harness/GEMINI.md"))) {
-    add("gemini");
-  }
-  if (fs.existsSync(path.join(targetAbs, ".opencode/plugins/ai-engineering-harness.js"))) {
-    add("opencode");
-  }
-  if (fileContainsHarnessMarker(path.join(targetAbs, "AGENTS.md"))) {
-    add("generic");
-  }
-
-  return detected;
-}
-
-/** Mirrors aih.sh is_git_repo (200-202). */
-function isGitRepo(targetAbs: string): boolean {
-  return (
-    fs.existsSync(path.join(targetAbs, ".git")) ||
-    // .git can be a file (worktrees)
-    (() => {
-      try {
-        return fs.statSync(path.join(targetAbs, ".git")).isFile();
-      } catch {
-        return false;
-      }
-    })()
-  );
+  return detectInstalledProviders(targetAbs, { includeLegacy: true });
 }
 
 /** Mirrors aih.sh has_harness_exclude_block (208-211). */

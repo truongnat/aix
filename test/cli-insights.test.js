@@ -141,3 +141,29 @@ test("runInsightsCommand --recommend-evals --run-recommended-evals emits regress
     process.stdout.write = originalWrite;
   }
 });
+
+test("runInsightsCommand --upload --json returns failure payload when upload is skipped", async () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-cli-upload-json-"));
+  let output = "";
+  const originalWrite = process.stdout.write;
+  process.stdout.write = (chunk) => {
+    output += chunk;
+    return true;
+  };
+
+  try {
+    const { runInsightsCommand } = fresh("dist/lib/cli-commands/insights.js");
+    const status = await runInsightsCommand(repoRoot, {
+      target: tempRoot,
+      upload: true,
+      json: true,
+      forceUpload: false,
+    });
+    assert.equal(status, 1);
+    const payload = JSON.parse(output);
+    assert.equal(payload.uploaded, false);
+    assert.equal(typeof payload.reason, "string");
+  } finally {
+    process.stdout.write = originalWrite;
+  }
+});

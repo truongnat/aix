@@ -1,11 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-// @ts-ignore - JS file with checkJs
 import {
   renderCursorActivationMdc,
   renderCursorCommandsMdc,
   renderCursorGuardrailsMdc,
-} from "../provider-rule-renderer.js";
+} from "../provider-rule-renderer";
 import {
   CACHE_DIR,
   RUNTIME_COMMANDS_DIR,

@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        node-version: [18, 20]
+        node-version: [18, 20, 22]
 
     steps:
       - name: Checkout
@@ -40,18 +40,15 @@ jobs:
         run: npm test
 
       - name: Run eval regression
-        run: node bin/aih.js eval run sample-bugfix --yes
+        run: node bin/aih.js eval run sample-bugfix --yes --no-llm-judge
 
       - name: Check lib coverage gate
-        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 20
+        if: matrix.node-version == 20 && (matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest')
         run: npm run test:coverage
 
       - name: Smoke test install (dry-run)
-        shell: bash
         run: |
-          TARGET="${RUNNER_TEMP:-/tmp}/aih-smoke-install"
-          mkdir -p "$TARGET"
-          node bin/aih.js install --provider generic --yes --target "$TARGET" --dry-run
+          node -e "const fs=require('node:fs'); const os=require('node:os'); const path=require('node:path'); const childProcess=require('node:child_process'); const target=path.join(process.env.RUNNER_TEMP || os.tmpdir(), 'aih-smoke-install'); fs.mkdirSync(target, { recursive: true }); const result=childProcess.spawnSync(process.execPath, ['bin/aih.js', 'install', '--provider', 'generic', '--yes', '--target', target, '--dry-run'], { stdio: 'inherit' }); process.exit(result.status ?? 1);"
 
       - name: Run dogfood demo tests
         working-directory: examples/dogfood-tiny-node-api

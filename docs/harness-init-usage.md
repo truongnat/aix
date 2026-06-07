@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Document **project-local** `.harness/` scaffolding via [install.sh](../install.sh). This is shared across all runtimes before runtime-native install modes land.
+Document **project-local** `.harness/` scaffolding for the primary Node.js CLI and the shell/bootstrap fallback path.
 
 ## Project Scope Only
 
@@ -15,22 +15,22 @@ Document **project-local** `.harness/` scaffolding via [install.sh](../install.s
 Dry-run (no writes, no network for non-manual runtimes):
 
 ```bash
-sh install.sh --runtime claude --scope project --target . --init-harness --dry-run --yes
+npx ai-engineering-harness install --provider claude --scope project --target . --dry-run --yes
 ```
 
 Write scaffold:
 
 ```bash
-sh install.sh --runtime claude --scope project --target . --init-harness --yes
+npx ai-engineering-harness install --provider claude --scope project --target . --yes
 ```
 
-Manual fallback + harness init (downloads pack, then scaffolds `.harness/`):
+Shell/bootstrap fallback with explicit harness init:
 
 ```bash
 sh install.sh --runtime manual --target . --init-harness --dry-run
 ```
 
-Non-interactive **requires** explicit `--init-harness` (no silent scaffold). Interactive **project** scope may prompt to init after scope selection.
+Primary Node CLI project installs initialize `.harness/` automatically when it is missing. The explicit `--init-harness` flag belongs to the shell/bootstrap fallback surface.
 
 ## Generated Files
 
@@ -51,9 +51,9 @@ Init does **not** create runtime bootstrap files such as `AGENTS.md`. Those belo
 To get both `.harness/` and `AGENTS.md` from `runtime/bootstrap/AGENTS.project.md`:
 
 ```bash
-sh install.sh --runtime generic --scope project --target . --init-harness --yes
+npx ai-engineering-harness install --provider generic --scope project --target . --yes
 # or
-sh install.sh --runtime codex --scope project --target . --init-harness --yes
+npx ai-engineering-harness install --provider codex --scope project --target . --yes
 ```
 
 Runtimes that do not write `AGENTS.md` (e.g. `cursor`, `claude`) require `AGENTS.md` from another runtime or `manual` install before `--profile-only` validation passes.
@@ -106,7 +106,7 @@ Checks `.harness/` paths and required headings per [frozen-target-profile-contra
 
 ## Commit Policy
 
-**v0.9.1:** Installer does **not** modify ignore files. **v0.9.2:** project **private** mode prefers `.git/info/exclude` (not tracked); `.gitignore` only with `--ignore-strategy gitignore` — [git-hygiene-policy.md](git-hygiene-policy.md). See [project-state-policy.md](project-state-policy.md).
+Project **private** mode prefers `.git/info/exclude` (not tracked). Shell/bootstrap fallback may expose explicit ignore-strategy controls; the primary Node CLI does not. See [git-hygiene-policy.md](git-hygiene-policy.md) and [project-state-policy.md](project-state-policy.md).
 
 ## Related
 

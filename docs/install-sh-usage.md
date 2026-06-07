@@ -6,7 +6,7 @@ Document the one-line remote installer for `ai-engineering-harness` into a targe
 
 Canonical scope: remote `install.sh` wrapper behavior, review-before-run flow, and manual fallback entrypoints.
 
-Use [install-command-model.md](install-command-model.md) as the source of truth for `aih.sh` command defaults and flags. Use [runtime-native-install.md](runtime-native-install.md) for the per-runtime payload matrix and follow-up actions after runtime-native install.
+Use [install-command-model.md](install-command-model.md) as the source of truth for the primary `npx ai-engineering-harness` lifecycle commands and shared defaults. This document covers the shell/bootstrap-specific differences such as `--ref`, remote download behavior, and manual fallback entrypoints. Use [runtime-native-install.md](runtime-native-install.md) for the per-runtime payload matrix and follow-up actions after runtime-native install.
 
 ## Recommended: Runtime-native Install
 

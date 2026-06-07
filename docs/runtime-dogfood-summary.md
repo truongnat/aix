@@ -40,7 +40,7 @@ Post-D2 patch: `.harness/` init no longer creates `AGENTS.md`; runtime owns boot
 | D6 | claude | project; global dry-run | PASS (project); global write **not run** | PASS (project) | Not run (`/plugin install` not run) | Clean (project) | experimental PASS | **No** |
 | F1 | simple lifecycle (`aih.sh`) | project | PASS | PASS | N/A (shell lifecycle) | Clean after install/full uninstall; noisy after default uninstall if cache/state kept | experimental PASS | **No** |
 
-**Windsurf:** alias of `cursor` in installer; not separately dogfooded.
+**Windsurf:** historical alias of `cursor` in older installer flows; not separately dogfooded.
 
 **`all`:** not dogfooded; do not treat as stable.
 

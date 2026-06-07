@@ -12,7 +12,7 @@ See also: [provider-command-matrix.md](provider-command-matrix.md), [provider-na
    gemini-extension.json
    commands/  skills/  hooks/
 
-2. Project-local activation (npx install)
+2. Project-local activation (npx ai-engineering-harness install)
    .ai-harness/runtime-commands/   ← local command catalog (always)
    .harness/
    provider entrypoints + native paths where supported
@@ -56,8 +56,8 @@ How a command runs after routing is defined in `.ai-harness/commands/` — same 
 
 | Provider | Preferred | Fallback |
 |----------|-----------|----------|
-| Cursor | npx + project commands/rules | `/add-plugin ai-engineering-harness` when published |
-| Claude | `/plugin install …` | npx + `.claude/commands/` |
+| Cursor | `npx ai-engineering-harness install` + project commands/rules | `/add-plugin ai-engineering-harness` when published |
+| Claude | `/plugin install …` | `npx ai-engineering-harness install` + `.claude/commands/` |
 | Gemini | `gemini extensions install <url>` | ask harness-plan via `GEMINI.md` context |
 
 ## Troubleshooting

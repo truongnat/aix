@@ -1,14 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 
-// @ts-ignore - JS file with checkJs
 import { modeToScopeVisibility, isNonInteractive, type ParseOptions } from "../cli-args";
-// @ts-ignore - JS file with checkJs
 import { ACTIVE_PROVIDERS, providerPriorityLabel, isRuntimeNative } from "../cli-providers";
-// @ts-ignore - JS file with checkJs
 import { detectRecommendedProviders, detectLegacyProviderResidue, isGitRepo } from "../cli-detect";
-// @ts-ignore - JS file with checkJs
-import { buildInstallPlan } from "../cli-plan";
+import { buildInstallPlan, type PlanProviderId } from "../cli-plan";
+import * as ui from "../cli-ui";
 import {
   readPackageVersion,
   resolveTargetAbs,
@@ -26,7 +23,6 @@ interface InstallWizardOptions extends ParseOptions {
 
 interface InstallContextExtended {
   target: string;
-  ref: string;
   dryRun: boolean;
   yes: boolean;
   providers: string[];
@@ -34,6 +30,10 @@ interface InstallContextExtended {
   visibility: string;
   initHarness: boolean;
   installCache: boolean;
+}
+
+function toPlanProviders(providers: string[]): PlanProviderId[] {
+  return providers as PlanProviderId[];
 }
 
 async function runInstallBackend(
@@ -74,8 +74,6 @@ async function runInstallBackend(
     return { ok: true, status: 0, spinnerMessage: ctx.dryRun ? "Dry-run complete" : "Installed" };
   };
 
-  // @ts-ignore - ui will be available when this is called from CLI context
-  const ui = require("../cli-ui");
   if (ui.useInteractiveUi(options)) {
     const result = await ui.runWithSpinner(
       ctx.dryRun ? "Previewing install…" : "Installing harness…",
@@ -98,11 +96,9 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
   }
 
   const legacyProviders = detectLegacyProviderResidue(targetAbs);
-  // @ts-ignore - ui will be available when this is called from CLI context
-  const ui = require("../cli-ui");
   if (legacyProviders.length > 0 && !ui.useInteractiveUi(options)) {
     console.error(
-      `warning: legacy provider residue detected: ${legacyProviders.join(", ")}. Clean up with aih.sh uninstall --runtime opencode if this is stale.`
+      `warning: legacy provider residue detected: ${legacyProviders.join(", ")}. See docs/uninstall-usage.md for legacy cleanup guidance if this is stale.`
     );
   }
 
@@ -126,9 +122,8 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     const initHarness = !fs.existsSync(path.join(targetAbs, ".harness"));
     const installCache =
       scopeVis.scope === "project" && providers.some((id) => isRuntimeNative(id));
-    // @ts-ignore - cli-plan is JS with checkJs
     const plan = buildInstallPlan({
-      providers: providers as any,
+      providers: toPlanProviders(providers),
       initHarness,
       installCache,
       mode: scopeVis.visibility === "shared" ? "project-shared" : "project-private",
@@ -146,7 +141,6 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
       {
         providers,
         target: targetAbs,
-        ref: options.ref,
         scope: scopeVis.scope,
         visibility: scopeVis.visibility,
         dryRun: options.dryRun,
@@ -177,10 +171,11 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     priorityLabel: providerPriorityLabel(p),
   }));
 
-  providers = await ui.selectProviders(providerItems);
-  if (!providers) {
+  const selectedProviders = await ui.selectProviders(providerItems);
+  if (!selectedProviders) {
     return 1;
   }
+  providers = selectedProviders;
   validateProviderSelection(providers);
   validateManualMix(providers);
 
@@ -197,15 +192,15 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
 
   const { scope } = modeToScopeVisibility(mode);
   const defaultCache = scope === "project" && providers.some((id) => isRuntimeNative(id));
-  const installCache = await ui.confirmInstallCache(defaultCache);
-  if (installCache === null) {
+  const installCacheChoice = await ui.confirmInstallCache(defaultCache);
+  if (installCacheChoice === null) {
     return 1;
   }
+  const installCache = installCacheChoice;
 
   const { scope: resolvedScope, visibility } = modeToScopeVisibility(mode);
-  // @ts-ignore - cli-plan is JS with checkJs
   const plan = buildInstallPlan({
-    providers: providers as any,
+    providers: toPlanProviders(providers),
     initHarness,
     installCache,
     mode,
@@ -228,7 +223,6 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     {
       providers,
       target: targetAbs,
-      ref: options.ref,
       scope: resolvedScope,
       visibility,
       dryRun: options.dryRun,

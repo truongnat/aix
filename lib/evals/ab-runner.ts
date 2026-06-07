@@ -1,25 +1,21 @@
 import { materializeFixture } from "./fixture-manager";
+import type { Workspace } from "./fixture-manager";
 import { runChecks } from "./checks";
+import type { CheckResults } from "./checks";
 import { judgeWithLlmFallback } from "./llm-judge";
+import type { JudgeResult } from "./llm-judge";
 import { compareAbMetrics, scoreExtendedMetrics } from "./extended-metrics";
+import type { ExtendedMetrics, ComparisonMetrics } from "./extended-metrics";
 import { applyModeMutation } from "./mode-mutations";
 import { scoreRun } from "./scoring";
+import type { Score } from "./scoring";
 import { createRunContext, type RunContext } from "./run-context";
 import { runLiveProviderCommand } from "./live-runner";
+import type { LiveRunResult } from "./live-runner";
 import { writeModeArtifacts, writeRunSummary } from "./reporter";
+import type { ModeArtifactsPaths } from "./reporter";
 import { buildEvalRecommendations } from "../insights/eval-recommendations";
-
-interface Task {
-  id: string;
-  title: string;
-  goal: string;
-  prompt: string;
-  fixture: {
-    path: string;
-  };
-  successChecks?: any[];
-  behaviorChecks?: any[];
-}
+import type { Task } from "./task-registry";
 
 interface RunOptions {
   provider?: string;
@@ -31,10 +27,10 @@ interface RunOptions {
 
 interface ModeResult {
   mode: string;
-  workspace: any;
-  checks: any;
-  score: any;
-  artifacts: any;
+  workspace: Workspace;
+  checks: CheckResults;
+  score: Score;
+  artifacts: ModeArtifactsPaths;
   evidenceKind: string;
   liveProviderCommand: string;
   liveExitCode: number | null;
@@ -44,7 +40,7 @@ interface AbTaskResult {
   runId: string;
   runRoot: string;
   summaryPath: string;
-  comparison: any;
+  comparison: ComparisonMetrics;
   exitCode: number;
 }
 
@@ -58,7 +54,7 @@ async function runMode(
   const workspace = materializeFixture(packRoot, task);
   const provider = options.provider || "deterministic-local";
   const liveProviderCommand = options.liveProviderCommand?.trim();
-  let liveRun: ReturnType<typeof runLiveProviderCommand> | null = null;
+  let liveRun: LiveRunResult | null = null;
 
   if (liveProviderCommand) {
     liveRun = runLiveProviderCommand({
@@ -72,12 +68,10 @@ async function runMode(
   } else {
     applyModeMutation(mode, workspace.cwd, task, packRoot);
   }
-  // @ts-ignore - Task type compatibility between modules
   const checks = await runChecks(workspace.cwd, task);
-  const rubric = await judgeWithLlmFallback(packRoot, workspace.cwd, task, options);
+  const rubric: JudgeResult = await judgeWithLlmFallback(packRoot, workspace.cwd, task, options);
   const score = scoreRun(checks, rubric);
-  // @ts-ignore - Task type compatibility between modules
-  const extended = scoreExtendedMetrics(task, mode, score, packRoot);
+  const extended: ExtendedMetrics = scoreExtendedMetrics(task, mode, score, packRoot);
   score.extended = extended;
 
   const modeDir = runContext.modeDir(mode);
@@ -94,7 +88,6 @@ async function runMode(
       behavior: score.behavior,
       extended,
     },
-    // @ts-ignore - Score assignable to Record<string, unknown>
     metrics: score,
     transcript: liveRun
       ? liveRun.transcript
@@ -124,7 +117,6 @@ async function runAbTask(
   const runContext = createRunContext(packRoot, task.id);
   const withHarness = await runMode(packRoot, task, runContext, "with-harness", options);
   const withoutHarness = await runMode(packRoot, task, runContext, "without-harness", options);
-  // @ts-ignore - Task type compatibility between modules
   const comparison = compareAbMetrics(task, withHarness.score, withoutHarness.score, packRoot);
 
   let telemetryHints = null;
@@ -153,7 +145,6 @@ async function runAbTask(
         liveExitCode: withoutHarness.liveExitCode,
       },
     },
-    // @ts-ignore - ComparisonMetrics assignable to Record<string, unknown>
     comparison,
     telemetryHints,
   });
