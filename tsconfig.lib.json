@@ -3,6 +3,8 @@
     "target": "ES2022",
     "module": "CommonJS",
     "moduleResolution": "node",
+    "rootDir": ".",
+    "outDir": "dist",
     "allowJs": true,
     "checkJs": true,
     "noEmit": true,
@@ -41,6 +43,7 @@
     "lib/runtime-command-catalog.ts",
     "lib/worker-claude-adapter.ts",
     "lib/policy/*.ts",
+    "lib/backend/*.ts",
     "workers/registry.ts"
   ]
 }
