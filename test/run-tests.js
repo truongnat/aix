@@ -32,7 +32,7 @@ const VALIDATION_REPO_COPY_PATHS = new Set([
 ]);
 
 function shouldCopyValidationPath(relative) {
-  const normalized = relative.split(path.sep).join("/");
+  const normalized = relative.replace(/[\\/]+/g, "/");
   for (const allowed of VALIDATION_REPO_COPY_PATHS) {
     if (normalized === allowed || allowed.startsWith(`${normalized}/`)) {
       return true;
@@ -59,6 +59,10 @@ function makeTempRepoCopy() {
 
 function writeRepoFile(baseDir, relativePath, updater) {
   const fullPath = path.join(baseDir, relativePath);
+  if (!fs.existsSync(fullPath)) {
+    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+    fs.copyFileSync(path.join(repoRoot, relativePath), fullPath);
+  }
   const current = fs.readFileSync(fullPath, "utf8");
   fs.writeFileSync(fullPath, updater(current));
 }
