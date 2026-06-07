@@ -33,8 +33,10 @@ interface ParseOptions {
   upload: boolean;
   forceUpload: boolean;
   recommendEvals: boolean;
+  runRecommendedEvals: boolean;
   useLlmJudge: boolean;
   skipDemoEval: boolean;
+  liveProviderCommand: string;
 }
 
 function parseArgv(argv: string[]): ParseOptions {
@@ -71,8 +73,10 @@ function parseArgv(argv: string[]): ParseOptions {
     upload: false,
     forceUpload: false,
     recommendEvals: false,
+    runRecommendedEvals: false,
     useLlmJudge: true,
     skipDemoEval: false,
+    liveProviderCommand: "",
   };
 
   for (; i < args.length; i++) {
@@ -168,6 +172,10 @@ function parseArgv(argv: string[]): ParseOptions {
       options.recommendEvals = true;
       continue;
     }
+    if (arg === "--run-recommended-evals") {
+      options.runRecommendedEvals = true;
+      continue;
+    }
     if (arg === "--use-llm-judge") {
       options.useLlmJudge = true;
       continue;
@@ -178,6 +186,13 @@ function parseArgv(argv: string[]): ParseOptions {
     }
     if (arg === "--skip-demo-eval") {
       options.skipDemoEval = true;
+      continue;
+    }
+    if (arg === "--live-provider-command") {
+      options.liveProviderCommand = args[++i] || "";
+      if (!options.liveProviderCommand) {
+        throw new Error(`Missing value for ${arg}`);
+      }
       continue;
     }
     throw new Error(`Unknown argument: ${arg}`);

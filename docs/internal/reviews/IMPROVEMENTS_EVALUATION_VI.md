@@ -136,7 +136,7 @@ Tức đã có "hộp đen" ghi lại agent làm gì, nhưng **không có lớp 
 | **P1** | Tái cấu trúc docs 3 tầng + dọn root | E | Giảm nhiễu, tăng độ tin cậy ngay lập tức. |
 | **P2** | Provider schema khai báo + tách god module | C | Moat kỹ thuật; dễ thêm provider; dễ test. |
 | **P2** | `aih init` chạy demo task thật trong 5 phút | F | Giảm ma sát adoption; "show, don't tell". |
-| **P3** | Migrate `lib/` sang TypeScript | C/G | Chất lượng dài hạn. |
+| **P3** | Migrate `lib/` sang TypeScript | C/G | Chất lượng dài hạn; gate typecheck và dist-first runtime đã ship, còn phần JS→TS toàn diện. |
 
 ---
 

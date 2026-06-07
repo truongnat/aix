@@ -5,6 +5,7 @@ interface RunTaskOptions {
   verbose: boolean;
   useLlmJudge: boolean;
   targetRoot: string;
+  liveProviderCommand: string;
 }
 
 interface RunTaskResult {
@@ -45,6 +46,7 @@ async function runEvalCommand(packRoot: string, options: ParseOptions): Promise<
         verbose: options.verbose,
         useLlmJudge: options.useLlmJudge,
         targetRoot: options.target,
+        liveProviderCommand: options.liveProviderCommand || process.env.EVAL_PROVIDER_COMMAND || "",
       })) as RunTaskResult;
       process.stdout.write(`${result.summaryPath}\n`);
       return result.exitCode;

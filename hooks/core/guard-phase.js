@@ -107,6 +107,39 @@ function verifyReady(sessionDir) {
   return { ok: true };
 }
 
+function buildExecutionContext(sessionDir, repoRoot, command) {
+  const statePath = path.join(repoRoot, ".harness", "STATE.md");
+  let state = {};
+
+  if (fs.existsSync(statePath)) {
+    const stateContent = readText(statePath);
+
+    const planName = extractField(stateContent, "current_plan") || "PLAN-001.md";
+    const planPath = path.join(sessionDir, planName);
+    if (fs.existsSync(planPath)) {
+      const planContent = readText(planPath);
+      state.current_plan = /status:\s*approved/i.test(planContent) ? "approved" : "pending";
+    }
+
+    const verifyPath = path.join(sessionDir, "VERIFY.md");
+    if (fs.existsSync(verifyPath)) {
+      const verify = readText(verifyPath);
+      const statusMatch = verify.match(/status:\s*(\S+)/i);
+      const status = statusMatch ? statusMatch[1].toLowerCase() : "";
+      state.verify = /approved|passed/i.test(status) ? "approved" : status;
+    }
+
+    state.implementation_evidence = hasImplementationEvidence(sessionDir) ? "exists" : null;
+  }
+
+  return {
+    command,
+    sessionDir,
+    repoRoot,
+    state,
+  };
+}
+
 function guardPhase(options) {
   const sessionDir = resolveSessionDir(options.session);
   const repoRoot = findHarnessRoot(sessionDir);
@@ -124,6 +157,30 @@ function guardPhase(options) {
 
   const stateContent = readText(statePath);
   const command = options.command;
+
+  const policyPath = path.join(repoRoot, ".harness", "policies.json");
+  if (fs.existsSync(policyPath)) {
+    try {
+      const { PolicyEngine } = require("../../dist/lib/policy/engine.js");
+      const engine = new PolicyEngine(policyPath);
+      const context = buildExecutionContext(sessionDir, repoRoot, command);
+      const { blocked, reason, actions } = engine.shouldBlock(context);
+
+      if (blocked) {
+        const action = actions[0];
+        return {
+          ok: false,
+          status: "blocked",
+          command,
+          reason,
+          nextCommand: action.nextCommand || command,
+          questions: action.questions || [],
+        };
+      }
+    } catch (error) {
+      console.error(`Policy engine error: ${error.message}. Falling back to legacy logic.`);
+    }
+  }
 
   if (command === "harness-run") {
     const plan = planApproved(sessionDir, stateContent);

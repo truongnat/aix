@@ -10,7 +10,7 @@ Design `install.sh` for remote, dependency-free installation into a target repos
 2. Verify `node` is available
 3. Download a pinned or default ref of the pack (GitHub archive tarball)
 4. Extract to a temporary directory
-5. Run `node install.js --target <resolved-target>` with forwarded flags (`--dry-run`, `--force`)
+5. Run `node bin/aih.js install --target <resolved-target>` with forwarded flags (`--dry-run`, `--force`)
 6. Remove temporary directory on success or failure
 7. Print next steps (profile, validate from downloaded pack or global CLI when available)
 
@@ -58,7 +58,7 @@ Alternative for review-only flows: clone is not required; users may download tar
 
 - create `mktemp -d` (or platform equivalent)
 - extract archive under temp dir
-- `cd` to extracted pack root before `node install.js`
+- `cd` to extracted pack root before `node bin/aih.js install`
 - `trap` cleanup on EXIT
 
 ## Node Requirement

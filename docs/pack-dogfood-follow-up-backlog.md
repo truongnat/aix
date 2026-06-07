@@ -10,7 +10,7 @@ Triage dogfood findings from [pack-dogfood-friction-log.md](pack-dogfood-frictio
 
 ## Addressed In v0.9.2 Step 2 (private capability cache)
 
-- `.ai-harness/` capability cache — [private-capability-cache.md](private-capability-cache.md), [install-cache.js](../install-cache.js)
+- `.ai-harness/` capability cache — [private-capability-cache.md](private-capability-cache.md), [lib/install-cache.ts](../lib/install-cache.ts)
 - Default cache for private project runtime-native; bootstraps point to `.ai-harness/` + `.harness/`
 - Real-install friction: Cursor rule alone insufficient without local capability source
 
@@ -48,7 +48,7 @@ Implementation order: ~~info-exclude~~ → ~~full verb model~~ → ~~uninstall~~
 
 ## v0.9.x Patch Candidates
 
-- One-line install: improve `install.js` next steps to mention `curl | sh` install path and validate-from-source-pack ([scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md))
+- One-line install: improve `bin/aih.js install` next steps to mention `curl | sh` install path and validate-from-source-pack ([scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md))
 - Repeat: install summary relative target display when invoked via `install.sh` with relative `--target`
 - D2: document `codex exec --skip-git-repo-check` for non-git throwaway targets
 - D6: document global Claude dry-run when `~/.claude/settings.json` exists ([scenario-d6-claude.md](pack-dogfood-reports/scenario-d6-claude.md))
@@ -73,7 +73,7 @@ Doc clarifications, scenario fixes, and small guidance updates that do not chang
 
 ## Addressed In v0.9.x Patch (runtime-aware validation)
 
-- D3: `validate.js --runtime` for target profile/goal validation ([runtime-aware-validation.md](runtime-aware-validation.md))
+- D3: `bin/validate.js --runtime` for target profile/goal validation ([runtime-aware-validation.md](runtime-aware-validation.md))
 
 ## Addressed In v0.9.x Patch (D2 AGENTS.md ownership)
 
@@ -81,7 +81,7 @@ Doc clarifications, scenario fixes, and small guidance updates that do not chang
 
 ## Addressed In v0.8.0 Fix Pass
 
-- Document that `node validate.js --target` runs from the source pack (Scenarios A, B)
+- Document that `node bin/validate.js --target` runs from the source pack (Scenarios A, B)
 - Install summary prefers `--target` argument / safe relative display (Scenarios A, B)
 - [harness-example-to-target-layout.md](harness-example-to-target-layout.md) for example → `.harness/` mapping (Scenario B)
 - flutter-google-login README layout vs target layout (Scenario B)
@@ -126,7 +126,7 @@ Artifacts: [runtime-dogfood-summary.md](runtime-dogfood-summary.md), [v0.9.x-rea
 ## Post-v1 Optional Work
 
 - minimal install tier for tiny repositories ([minimal-install-tier-decision.md](minimal-install-tier-decision.md) — deferred; not a v1 blocker)
-- In-target copy of `validate.js` (only if contract changes; currently deferred)
+- In-target copy of `bin/validate.js` (only if contract changes; currently deferred)
 
 ## v1.x Candidates
 
@@ -144,4 +144,4 @@ Automation, adapters, marketplace, semantic validation, archive generation, chec
 
 Ideas considered and intentionally declined.
 
-- Adding `validate.js` to default install surface for Scenario A alone (current `--target` from source pack is sufficient)
+- Adding `bin/validate.js` to default install surface for Scenario A alone (current `--target` from source pack is sufficient)

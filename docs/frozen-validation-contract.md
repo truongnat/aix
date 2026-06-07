@@ -2,24 +2,24 @@
 
 ## Purpose
 
-Record the `validate.js` structural behavior contract frozen for `v1.0.0` as part of `v0.9.0` Stable Contract Freeze.
+Record the `bin/validate.js` structural behavior contract frozen for `v1.0.0` as part of `v0.9.0` Stable Contract Freeze.
 
 ## Contract Status
 
 **Frozen for v1.0.0** (v0.9.0 Step 4).
 
-Implementation: [validate.js](../validate.js). Usage guide: [target-repo-validation.md](target-repo-validation.md).
+Implementation: [bin/validate.js](../bin/validate.js). Usage guide: [target-repo-validation.md](target-repo-validation.md).
 
 ## Validation Modes
 
 | Mode | CLI | `parseValidateArgs` mode |
 |---|---|---|
-| Source pack validation | `node validate.js` | `harness-repository` |
-| Target profile validation | `node validate.js --target <path>` | `target-profile` |
-| Target profile (explicit) | `node validate.js --target <path> --profile-only` | `target-profile` |
-| Target goal validation | `node validate.js --target <path> --goal <goal-id>` | `target-goal` |
-| Runtime-aware profile | `node validate.js --target <path> --runtime <name> --profile-only` | `target-profile` (+ `runtime`) |
-| Runtime-aware goal | `node validate.js --target <path> --runtime <name> --goal <goal-id>` | `target-goal` (+ `runtime`) |
+| Source pack validation | `node bin/validate.js` | `harness-repository` |
+| Target profile validation | `node bin/validate.js --target <path>` | `target-profile` |
+| Target profile (explicit) | `node bin/validate.js --target <path> --profile-only` | `target-profile` |
+| Target goal validation | `node bin/validate.js --target <path> --goal <goal-id>` | `target-goal` |
+| Runtime-aware profile | `node bin/validate.js --target <path> --runtime <name> --profile-only` | `target-profile` (+ `runtime`) |
+| Runtime-aware goal | `node bin/validate.js --target <path> --runtime <name> --goal <goal-id>` | `target-goal` (+ `runtime`) |
 
 **Extension (v0.9.x):** [runtime-aware-validation.md](runtime-aware-validation.md) adds `--runtime` for target validation. Legacy AGENTS.md-only profile mode remains the default without `--runtime`; that is **not** the final v1 behavior for all runtime-native install modes.
 
@@ -35,12 +35,12 @@ Rules:
 Command:
 
 ```bash
-node validate.js
+node bin/validate.js
 ```
 
 Guaranteed checks include:
 
-- required source-pack files in `validate.js` `requiredFiles`
+- required source-pack files in `bin/validate.js` `requiredFiles`
 - command and skill heading contracts
 - template non-empty and heading contracts
 - example harness profile and goal heading contracts
@@ -64,8 +64,8 @@ Harness validation failed:
 Commands:
 
 ```bash
-node validate.js --target <path>
-node validate.js --target <path> --profile-only
+node bin/validate.js --target <path>
+node bin/validate.js --target <path> --profile-only
 ```
 
 Validates [frozen target profile contract](frozen-target-profile-contract.md):
@@ -86,7 +86,7 @@ Target repository validation passed. Checked profile contract.
 Command:
 
 ```bash
-node validate.js --target <path> --goal <goal-id>
+node bin/validate.js --target <path> --goal <goal-id>
 ```
 
 Validates:
@@ -136,7 +136,7 @@ Cross-contract:
 - PACK.md headings → [frozen-pack-contract.md](frozen-pack-contract.md)
 - target profile → [frozen-target-profile-contract.md](frozen-target-profile-contract.md)
 - target goals → [frozen-goal-artifact-contract.md](frozen-goal-artifact-contract.md)
-- default install surface is separate; `validate.js` is **not** installed into targets by default → [frozen-installed-surface-contract.md](frozen-installed-surface-contract.md)
+- default install surface is separate; `bin/validate.js` is **not** installed into targets by default → [frozen-installed-surface-contract.md](frozen-installed-surface-contract.md)
 
 ## Failure Message Contract
 
@@ -160,7 +160,7 @@ Adopters and tooling may rely on these shapes for v1.0.0.
 - application or feature correctness
 - heading **order** validation
 - `PACK.md` body or version value validation
-- `validate.js` present inside target repositories
+- `bin/validate.js` present inside target repositories
 - validation of installed surface file list beyond structural contracts checked in source pack mode
 
 ## Allowed Additive Changes
@@ -182,9 +182,9 @@ Breaking for this contract:
 - requiring `validate.js` inside target repos by default
 - making `--profile-only` + `--goal` accepted when they conflict today
 
-## Relationship To validate.js
+## Relationship To bin/validate.js
 
-This document describes behavior implemented in [validate.js](../validate.js):
+This document describes behavior implemented in [bin/validate.js](../bin/validate.js):
 
 - `parseValidateArgs`
 - `validateHarnessRepository` / `validateRepository`
@@ -196,7 +196,7 @@ This document describes behavior implemented in [validate.js](../validate.js):
 
 | Frozen contract | Validation entry |
 |---|---|
-| PACK.md | source pack `node validate.js` |
+| PACK.md | source pack `node bin/validate.js` |
 | Installed surface | not validated as a diff; install uses `exportPaths` |
 | Target profile | `--target` / `--profile-only` |
 | Goal artifacts | `--target` + `--goal` |

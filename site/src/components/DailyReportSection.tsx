@@ -8,7 +8,7 @@ const MOCK_PR = `## Summary
 - Added report artifacts for ship handoff
 
 ## Verification
-- [x] node validate.js
+- [x] node bin/validate.js
 - [x] npm test
 
 ## Risks / Rollback

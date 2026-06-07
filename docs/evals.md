@@ -1,6 +1,6 @@
 # Evals
 
-The eval subsystem provides benchmark-style comparisons between:
+The eval subsystem provides benchmark-style comparisons between synthetic fixture modes:
 
 - `with-harness`
 - `without-harness`
@@ -15,7 +15,7 @@ aih eval report <run-id>
 
 ## First milestone
 
-The first milestone is deterministic and local-only. It uses fixtures, rule-based scoring, and artifact reports to prove harness behavior changes in a repeatable way.
+The first milestone is deterministic and local-only. It uses fixtures, rule-based scoring, and artifact reports to document harness behavior changes in a repeatable way. Run summaries are tagged `synthetic-fixture` by default, and can switch to `live-provider-command` when `--live-provider-command "<cmd>"` or `EVAL_PROVIDER_COMMAND` is set.
 
 ### Task registry
 
@@ -30,7 +30,7 @@ Task manifests live in `evals/registry/<suite>/*.json`. Each manifest defines:
 
 Each run writes artifacts under `artifacts/runs/<run-id>/`:
 
-- `summary.json` — A/B score comparison
+- `summary.json` — A/B score comparison plus evidence kind
 - `<mode>/report.md` — human-readable mode report
 - `<mode>/metrics.json` — structured check results
 

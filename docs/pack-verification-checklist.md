@@ -14,14 +14,14 @@ Use this checklist when:
 
 - preparing a `v0.7.x` or later packaging release
 - assembling a manual release archive
-- auditing manifest drift after changing `install.js` or distribution docs
+- auditing manifest drift after changing install surface docs
 - confirming an extracted archive matches the source pack contract
 
 Do not treat this checklist as application correctness validation. It verifies pack identity and surface consistency only.
 
 ## Manifest Checks
 
-- [ ] `node validate.js` passes PACK.md required heading checks for the source pack
+- [ ] `node bin/validate.js` passes PACK.md required heading checks for the source pack
 - [ ] `PACK.md` exists at the repository or archive root
 - [ ] **Pack Name** is stable (`ai-engineering-harness`)
 - [ ] **Pack Version** matches the release intent (for example `v0.7.0`, not an old tag)
@@ -49,28 +49,28 @@ Confirm the source pack or archive contains the distributable capability-pack su
 - [ ] `patterns/`
 - [ ] `templates/`
 - [ ] selected adoption and validation docs under `docs/` (per release archive checklist)
-- [ ] `install.js`
-- [ ] `validate.js`
+- [ ] `bin/aih.js`
+- [ ] `bin/validate.js`
 - [ ] `README.md`
 - [ ] `LICENSE`
 - [ ] `PACK.md` (required for source pack and release archive; optional in target repos)
 
 ## Installed Surface Checks
 
-- [ ] compare `install.js` `exportPaths` with [installed-surface-contract.md](installed-surface-contract.md)
-- [ ] required installed files in the contract are covered by `exportPaths`
-- [ ] required installed directories (`commands/`, `skills/`, `workflows/`, `patterns/`, `templates/`) are in `exportPaths`
+- [ ] compare `bin/aih.js install` surface with [installed-surface-contract.md](installed-surface-contract.md)
+- [ ] required installed files in the contract are covered by the supported installer surface
+- [ ] required installed directories (`commands/`, `skills/`, `workflows/`, `patterns/`, `templates/`) are in the installer surface
 - [ ] `PACK.md` is not required in target repos by default (per installed-surface contract)
 - [ ] target repos do not receive maintenance-only files (release notes, CI-only files, private artifacts) unless explicitly intended
-- [ ] optional installed docs in the contract match optional paths in `exportPaths` when present
+- [ ] optional installed docs in the contract match optional paths in the installer surface when present
 
-Current `install.js` exports: `AGENTS.md`, `commands`, `skills`, `workflows`, `patterns`, `templates`, and the adoption or validation docs listed in `install.js`.
+Current installer surface copies `AGENTS.md`, `commands`, `skills`, `workflows`, `patterns`, `templates`, and the adoption or validation docs listed in the installer implementation.
 
 ## Release Archive Checks
 
 - [ ] compare archive contents with [release-archive-checklist.md](release-archive-checklist.md)
 - [ ] `PACK.md` travels with the archive root
-- [ ] archive includes `install.js` and `validate.js`
+- [ ] archive includes `bin/aih.js` and `bin/validate.js`
 - [ ] archive excludes private, local, or generated artifacts
 - [ ] archive excludes maintenance-only repository files unless explicitly useful
 - [ ] archive does not imply runtime adapters or server behavior
@@ -87,10 +87,10 @@ Current `install.js` exports: `AGENTS.md`, `commands`, `skills`, `workflows`, `p
 Run from the source pack repository root:
 
 ```bash
-node validate.js
+node bin/validate.js
 npm test
-node validate.js --target test/fixtures/valid-target-profile --profile-only
-node validate.js --target test/fixtures/valid-target-goal --goal google-login
+node bin/validate.js --target test/fixtures/valid-target-profile --profile-only
+node bin/validate.js --target test/fixtures/valid-target-goal --goal google-login
 ```
 
 After install into a target repository, run target validation there as documented in `PACK.md`.

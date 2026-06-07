@@ -84,13 +84,13 @@ const taskHeadings = [
  * @example
  * ```bash
  * # Validate harness repository
- * node validate.js
+ * node bin/validate.js
  *
  * # Validate target profile
- * node validate.js --target /path/to/project --profile-only
+ * node bin/validate.js --target /path/to/project --profile-only
  *
  * # Validate target goal
- * node validate.js --target /path/to/project --goal SESSION_ID
+ * node bin/validate.js --target /path/to/project --goal SESSION_ID
  * ```
  */
 function main(): void {

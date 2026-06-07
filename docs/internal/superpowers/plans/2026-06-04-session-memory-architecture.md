@@ -49,11 +49,11 @@ Not included:
 3. Update command and prompt-template contracts to route through `.harness/STATE.md` and session-local artifact paths.
 4. Add docs for session memory and migration, and refresh related validation docs where needed.
 5. Extend validation to require the new memory templates and command-doc routing behavior.
-6. Run `node validate.js`, `npm test`, dogfood test, and site build; fix regressions until green.
+6. Run `node bin/validate.js`, `npm test`, dogfood test, and site build; fix regressions until green.
 
 ## Verification Strategy
 
-- `node validate.js`
+- `node bin/validate.js`
 - `npm test`
 - `cd examples/dogfood-tiny-node-api && npm test`
 - `cd ../../site && npm run build`

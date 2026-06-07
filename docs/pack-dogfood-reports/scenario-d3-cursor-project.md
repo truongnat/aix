@@ -24,7 +24,7 @@ sh install.sh --runtime cursor --scope project --target ../harness-dogfood-curso
 
 sh install.sh --runtime cursor --scope project --target ../harness-dogfood-cursor --init-harness --yes
 
-node validate.js --target ../harness-dogfood-cursor --profile-only
+node bin/validate.js --target ../harness-dogfood-cursor --profile-only
 
 # Idempotency (no --force)
 sh install.sh --runtime cursor --scope project --target ../harness-dogfood-cursor --init-harness --yes
@@ -46,7 +46,7 @@ Pre-existing in target (unchanged): `README.md`, `package.json`.
 
 | Command | Result | Notes |
 |---|---|---|
-| `node validate.js --target ../harness-dogfood-cursor --profile-only` | **FAIL** | `Missing required path: AGENTS.md` |
+| `node bin/validate.js --target ../harness-dogfood-cursor --profile-only` | **FAIL** | `Missing required path: AGENTS.md` |
 
 **Interpretation:** Cursor install path succeeded; structural profile validator still hard-requires root `AGENTS.md` per [frozen-target-profile-contract.md](../frozen-target-profile-contract.md). This is a **validation contract gap**, not a Cursor runtime write failure. Cursor project mode is not required to create `AGENTS.md` unless product policy changes.
 
@@ -135,12 +135,12 @@ Do **not** claim stable Cursor support until manual check confirms rule visibili
 
 ## Post-D3 Patch Note (runtime-aware validation)
 
-Original dogfood used `node validate.js --target ../harness-dogfood-cursor --profile-only`, which failed because the legacy validator required `AGENTS.md`.
+Original dogfood used `node bin/validate.js --target ../harness-dogfood-cursor --profile-only`, which failed because the legacy validator required `AGENTS.md`.
 
 **Patch:** `validate.js` supports `--runtime cursor` for target validation. Re-check with:
 
 ```bash
-node validate.js --target ../harness-dogfood-cursor --runtime cursor --profile-only
+node bin/validate.js --target ../harness-dogfood-cursor --runtime cursor --profile-only
 ```
 
 See [runtime-aware-validation.md](../runtime-aware-validation.md).

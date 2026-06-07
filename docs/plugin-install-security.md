@@ -22,7 +22,7 @@ less install-harness.sh
 sh install-harness.sh --target . --ref v0.9.1
 ```
 
-Or download the release tarball and run `node install.js` from the extracted pack without piping to shell.
+Or download the release tarball and run `node bin/aih.js install` from the extracted pack without piping to shell.
 
 ## Pin To Tag
 
@@ -30,13 +30,13 @@ Prefer `--ref v0.9.1` (latest experimental runtime-native tag) over default bran
 
 The archive URL should use the same ref for tarball and documented compatibility.
 
-`install.sh` downloads `https://github.com/truongnat/ai-engineering-harness/archive/<ref>.tar.gz` then runs `node install.js` from the extracted pack. See [install-sh-usage.md](install-sh-usage.md).
+`install.sh` downloads `https://github.com/truongnat/ai-engineering-harness/archive/<ref>.tar.gz` then runs `node bin/aih.js install` from the extracted pack. See [install-sh-usage.md](install-sh-usage.md).
 
 ## What install.sh Is Allowed To Do
 
 - download pack archive from GitHub (or documented mirror)
 - extract to a temp directory
-- run `node install.js` with user-provided flags
+- run `node bin/aih.js install` with user-provided flags
 - optionally install a small `ai-harness` shim under `--global` (user bin only)
 - print stdout/stderr from install steps
 
@@ -54,7 +54,7 @@ Install flow must not embed tokens. Private repos are out of scope for the publi
 
 ## No Telemetry
 
-No phone-home, analytics, or usage tracking in `install.sh` or `install.js`.
+No phone-home, analytics, or usage tracking in `install.sh` or `bin/aih.js`.
 
 ## No Hidden Network Calls
 
@@ -67,4 +67,4 @@ document any future mirror URL in this file before use.
 
 ## Relationship To Frozen Contracts
 
-Installing into a target repo still follows [frozen-installed-surface-contract.md](frozen-installed-surface-contract.md) copy behavior via `install.js`. Security doc does not change installed surface; it governs **how** the pack arrives on disk.
+Installing into a target repo still follows [frozen-installed-surface-contract.md](frozen-installed-surface-contract.md) copy behavior via `bin/aih.js install`. Security doc does not change installed surface; it governs **how** the pack arrives on disk.

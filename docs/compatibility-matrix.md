@@ -2,12 +2,12 @@
 
 Generated from pack version **v1.0.1** and eval registry.
 
-| Provider | Native slash | Subagents | Status | Eval tasks verified |
-| --- | --- | --- | --- | --- |
-| Claude Code | yes | yes | native-plugin | deterministic local (30 tasks) |
-| Codex | rules/fallback | adapter | plugin-packaging | deterministic local (30 tasks) |
-| Cursor | rules/fallback | adapter | plugin-ready | deterministic local (30 tasks) |
-| Gemini CLI | rules/fallback | adapter | native-command-files | deterministic local (30 tasks) |
+| Provider | Native slash | Subagents | Status | Eval tasks verified | Live evals |
+| --- | --- | --- | --- | --- | --- |
+| Claude Code | yes | yes | native-plugin | deterministic local (30 tasks) | no live evals yet |
+| Codex | rules/fallback | adapter | plugin-packaging | deterministic local (30 tasks) | 1/1 passed (100% across 1 task) |
+| Cursor | rules/fallback | adapter | plugin-ready | deterministic local (30 tasks) | no live evals yet |
+| Gemini CLI | rules/fallback | adapter | native-command-files | deterministic local (30 tasks) | no live evals yet |
 
 ## Eval tasks
 

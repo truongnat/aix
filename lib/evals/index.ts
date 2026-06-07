@@ -21,6 +21,7 @@ interface RunOptions {
   verbose?: boolean;
   useLlmJudge?: boolean;
   targetRoot?: string;
+  liveProviderCommand?: string;
 }
 
 function listTasks(packRoot: string, options: ListOptions = {}): ListResult {

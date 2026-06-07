@@ -22,8 +22,8 @@ Runtime-native install writes `.claude/CLAUDE.md` and merges `.claude/settings.j
 # Project mode
 sh install.sh --runtime claude --scope project --target ../harness-dogfood-claude --init-harness --dry-run --yes
 sh install.sh --runtime claude --scope project --target ../harness-dogfood-claude --init-harness --yes
-node validate.js --target ../harness-dogfood-claude --runtime claude --profile-only
-node validate.js --target ../harness-dogfood-claude --profile-only
+node bin/validate.js --target ../harness-dogfood-claude --runtime claude --profile-only
+node bin/validate.js --target ../harness-dogfood-claude --profile-only
 
 # Global mode (dry-run only)
 sh install.sh --runtime claude --scope global --target ../harness-dogfood-claude --dry-run --yes
@@ -58,8 +58,8 @@ Installer prints NEXT: `/plugin install ai-engineering-harness@ai-engineering-ha
 
 | Command | Result | Notes |
 |---|---|---|
-| `node validate.js --target ../harness-dogfood-claude --runtime claude --profile-only` | **pass** | `.claude/CLAUDE.md`, `.claude/settings.json`, `.harness/` |
-| `node validate.js --target ../harness-dogfood-claude --profile-only` | **FAIL** (expected) | `Missing required path: AGENTS.md` |
+| `node bin/validate.js --target ../harness-dogfood-claude --runtime claude --profile-only` | **pass** | `.claude/CLAUDE.md`, `.claude/settings.json`, `.harness/` |
+| `node bin/validate.js --target ../harness-dogfood-claude --profile-only` | **FAIL** (expected) | `Missing required path: AGENTS.md` |
 
 ## Root Pollution Check
 

@@ -48,7 +48,7 @@ sh install.sh --runtime generic --scope project --target <repo> --init-harness -
 **Validation:**
 
 ```bash
-node validate.js --target <repo> --runtime generic --profile-only
+node bin/validate.js --target <repo> --runtime generic --profile-only
 ```
 
 **Manual:** Open repo in any AGENTS.md-capable agent; confirm it mentions `.harness/`.
@@ -74,7 +74,7 @@ sh install.sh --runtime codex --scope project --target <repo> --init-harness --y
 **Validation:**
 
 ```bash
-node validate.js --target <repo> --runtime codex --profile-only
+node bin/validate.js --target <repo> --runtime codex --profile-only
 ```
 
 **Manual:** Run `codex` in target; ask it to summarize loaded instructions.
@@ -104,7 +104,7 @@ sh install.sh --runtime cursor --scope project --target <repo> --init-harness --
 **Validation:**
 
 ```bash
-node validate.js --target <repo> --runtime cursor --profile-only
+node bin/validate.js --target <repo> --runtime cursor --profile-only
 ```
 
 **Manual:** Cursor → check Rules; run Agent chat; confirm rule applies.
@@ -135,7 +135,7 @@ sh install.sh --runtime opencode --scope project --target <repo> --init-harness 
 **Validation:**
 
 ```bash
-node validate.js --target <repo> --runtime opencode --profile-only
+node bin/validate.js --target <repo> --runtime opencode --profile-only
 ```
 
 **Manual:** Start OpenCode in repo; confirm plugin loads (console bootstrap message).
@@ -174,7 +174,7 @@ Document whether project-local path loads.
 **Validation (project):**
 
 ```bash
-node validate.js --target <repo> --runtime gemini --profile-only
+node bin/validate.js --target <repo> --runtime gemini --profile-only
 ```
 
 **Evidence:** `scenario-d5-gemini.md`
@@ -201,7 +201,7 @@ sh install.sh --runtime claude --scope project --target <repo> --init-harness --
 **Validation:**
 
 ```bash
-node validate.js --target <repo> --runtime claude --profile-only
+node bin/validate.js --target <repo> --runtime claude --profile-only
 ```
 
 **Manual:** Open Claude Code; run `/plugin install ai-engineering-harness@ai-engineering-harness`; confirm plugin or document failure.

@@ -38,6 +38,7 @@ test("runInstall provisions a claude provider surface in-process (bug-fix regres
     true,
     "harness skeleton written"
   );
+  assert.equal(fs.existsSync(path.join(dir, ".harness", "policies.json")), true);
   // private+project => git exclude block present
   assert.match(
     fs.readFileSync(path.join(dir, ".git", "info", "exclude"), "utf8"),

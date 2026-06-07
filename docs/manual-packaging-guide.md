@@ -38,7 +38,7 @@ Before starting, have:
 - confirm **Pack Name**, **Pack Type**, and **Purpose** still match the release intent
 - confirm **Included Surface**, **Consumption Modes**, and **Runtime Compatibility** still match distribution docs
 
-`node validate.js` checks required `PACK.md` headings only. Update body content manually when scope changes.
+`node bin/validate.js` checks required `PACK.md` headings only. Update body content manually when scope changes.
 
 ## Step 3: Run Pack Verification Checklist
 
@@ -47,7 +47,7 @@ Complete [pack-verification-checklist.md](pack-verification-checklist.md).
 Pay special attention to:
 
 - manifest checks against [pack-manifest-spec.md](pack-manifest-spec.md)
-- installed surface alignment with [installed-surface-contract.md](installed-surface-contract.md) and `install.js` `exportPaths`
+- installed surface alignment with [installed-surface-contract.md](installed-surface-contract.md) and `bin/aih.js install` surface
 - release archive checks if you plan to distribute an archive
 
 ## Step 4: Run Validation Commands
@@ -55,20 +55,20 @@ Pay special attention to:
 From the source pack repository root:
 
 ```bash
-node validate.js
+node bin/validate.js
 npm test
-node validate.js --target test/fixtures/valid-target-profile --profile-only
-node validate.js --target test/fixtures/valid-target-goal --goal google-login
+node bin/validate.js --target test/fixtures/valid-target-profile --profile-only
+node bin/validate.js --target test/fixtures/valid-target-goal --goal google-login
 git status
 ```
 
 All commands must pass before tagging or distributing an archive.
 
-`node validate.js` includes lightweight `PACK.md` heading validation. It does not validate manifest body content, version values, or archive file lists.
+`node bin/validate.js` includes lightweight `PACK.md` heading validation. It does not validate manifest body content, version values, or archive file lists.
 
 ## Step 5: Review Installed Surface
 
-- compare `install.js` `exportPaths` with [installed-surface-contract.md](installed-surface-contract.md)
+- compare `bin/aih.js install` surface with [installed-surface-contract.md](installed-surface-contract.md)
 - confirm required installed files and directories are exported
 - confirm target repositories do not receive maintenance-only files by default
 - confirm `PACK.md` is not required inside every target repo unless explicitly intended
@@ -118,7 +118,7 @@ To assemble an archive manually:
 
 Conceptual archive contents:
 
-- `PACK.md`, `AGENTS.md`, `install.js`, `validate.js`, `LICENSE`, `README.md`
+- `PACK.md`, `AGENTS.md`, `bin/aih.js`, `bin/validate.js`, `LICENSE`, `README.md`
 - `commands/`, `skills/`, `workflows/`, `patterns/`, `templates/`
 - required adoption and validation docs under `docs/`
 

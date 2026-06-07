@@ -28,7 +28,7 @@ If npm reports `You cannot publish over the previously published versions`, the 
 ## Publish (maintainers)
 
 ```bash
-node validate.js
+node bin/validate.js
 npm test
 npm version patch   # or minor, as appropriate
 npm pack --dry-run

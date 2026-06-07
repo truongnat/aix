@@ -43,6 +43,6 @@ Use this checklist when adopting `ai-engineering-harness` in another repository.
 
 ## Validation
 
-- [ ] Run `node validate.js`
+- [ ] Run `node bin/validate.js`
 - [ ] Review `AGENTS.md` for repository-specific adjustments if needed
 - [ ] Confirm the first real task can move through `Map -> Start -> Discuss -> Plan -> Run -> Verify -> Ship -> Remember`

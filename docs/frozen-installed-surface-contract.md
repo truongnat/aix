@@ -8,14 +8,14 @@ Record the default installed surface frozen for `v1.0.0` as part of `v0.9.0` Sta
 
 **Frozen for v1.0.0** (v0.9.0 Step 2).
 
-Authoring guide: [installed-surface-contract.md](installed-surface-contract.md). Implementation: `install.js` `exportPaths`.
+Authoring guide: [installed-surface-contract.md](installed-surface-contract.md). Implementation: `bin/aih.js install` surface.
 
 ## Default Install Surface
 
 The **only** supported install contract for v1.0.0 is the default surface copied by:
 
 ```bash
-node install.js --target <path>
+node bin/aih.js install --target <path>
 ```
 
 There is **no** minimal install tier before v1.0.0 ([minimal-install-tier-decision.md](minimal-install-tier-decision.md)).
@@ -74,30 +74,30 @@ Adding more optional docs to `exportPaths` is **non-breaking** if existing paths
 
 ## What Is Not Installed By Default
 
-Not copied by `install.js` `exportPaths`:
+Not copied by `bin/aih.js install` surface:
 
 - `PACK.md` (manifest stays in source pack / release archive)
-- `validate.js` (run from source pack with `--target`)
-- `install.js` (installer stays in source pack)
+- `bin/validate.js` (run from source pack with `--target`)
+- `bin/aih.js` (installer stays in source pack)
 - `LICENSE`, `README.md` (unless team copies manually)
 - release notes, roadmap, dogfood reports, and other source-only maintenance docs
 - `examples/`, `.github/`, test fixtures, and full source repository mirror
 
 ## What Is Guaranteed
 
-- default install copies exactly the `exportPaths` trees and files in `install.js`
+- default install copies exactly the install surface trees and files in `bin/aih.js install`
 - product work and `.harness/` profile and goals live in the **target** repository
 - target structural validation runs from the **source** pack:
 
 ```bash
-node validate.js --target <path> --profile-only
-node validate.js --target <path> --goal <goal-id>
+node bin/validate.js --target <path> --profile-only
+node bin/validate.js --target <path> --goal <goal-id>
 ```
 
 ## What Is Not Guaranteed
 
 - minimal install tier or `full` vs `minimal` modes (post-v1)
-- `PACK.md` or `validate.js` inside target repos
+- `PACK.md` or `bin/validate.js` inside target repos
 - install copying the entire source repository
 - semantic validation of installed content
 
@@ -115,12 +115,12 @@ Breaking for this contract:
 
 - removing any required file or directory above from default `exportPaths`
 - requiring `PACK.md` in target repos by default
-- requiring `validate.js` inside target repos by default
-- changing validation to require target-local `validate.js` without migration
+- requiring `bin/validate.js` inside target repos by default
+- changing validation to require target-local `bin/validate.js` without migration
 
-## Relationship To install.js exportPaths
+## Relationship To `bin/aih.js install` surface
 
-The frozen contract **is** the current `exportPaths` array in [install.js](../install.js):
+The frozen contract **is** the current install surface implemented by `bin/aih.js install`:
 
 ```txt
 AGENTS.md

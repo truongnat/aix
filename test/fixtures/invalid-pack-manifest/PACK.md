@@ -31,7 +31,7 @@ Fixture pack manifest missing one required heading on purpose.
 ## Validation Commands
 
 ```bash
-node validate.js
+node bin/validate.js
 ```
 
 ## Safety Boundaries

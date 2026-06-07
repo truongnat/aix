@@ -27,7 +27,7 @@ These `##` headings must be present in every `PACK.md`:
 | Safety Boundaries |
 | Non-Goals |
 
-Enforced in `validate.js` as `packRequiredHeadings`.
+Enforced in `bin/validate.js` as `packRequiredHeadings`.
 
 ## Manifest Location
 
@@ -43,7 +43,7 @@ Enforced in `validate.js` as `packRequiredHeadings`.
 
 ## What Is Guaranteed
 
-- required heading **presence** is validated by `node validate.js` on the source pack
+- required heading **presence** is validated by `node bin/validate.js` on the source pack
 - `PACK.md` exists at source pack root for releases built from this repository
 - manifest describes pack identity, surface summary, consumption modes, validation commands, and safety boundaries at heading level
 
@@ -52,7 +52,7 @@ Enforced in `validate.js` as `packRequiredHeadings`.
 - heading **order** (not validated)
 - body **semantics** or version value correctness (not validated)
 - release archive file list hashing or checksums
-- automatic sync between manifest body and `install.js` `exportPaths` (maintainers verify manually via checklist)
+- automatic sync between manifest body and `bin/aih.js install` surface (maintainers verify manually via checklist)
 
 ## Allowed Additive Changes
 
@@ -75,7 +75,7 @@ Breaking for this contract:
 Source pack:
 
 ```bash
-node validate.js
+node bin/validate.js
 ```
 
 - checks `PACK.md` exists

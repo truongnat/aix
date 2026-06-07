@@ -8,7 +8,7 @@ Help first-time adopters understand common validation failures and fix them quic
 
 Use this guide when:
 
-- `node validate.js` fails in this harness repository
+- `node bin/validate.js` fails in this harness repository
 - target profile validation fails
 - target goal validation fails
 - you are unsure whether a failure is about a missing file or a missing heading
@@ -16,9 +16,9 @@ Use this guide when:
 ## Common Commands
 
 ```bash
-node validate.js
-node validate.js --target ../my-project --profile-only
-node validate.js --target ../my-project --goal health-check
+node bin/validate.js
+node bin/validate.js --target ../my-project --profile-only
+node bin/validate.js --target ../my-project --goal health-check
 ```
 
 ## Common Failure Messages
@@ -42,7 +42,7 @@ If profile validation fails on a required profile file:
 1. Confirm the target repository contains `.harness/`
 2. Create the missing file at the exact path named by the validator
 3. Fill it with the required heading structure
-4. Run `node validate.js --target ../my-project --profile-only` again
+4. Run `node bin/validate.js --target ../my-project --profile-only` again
 
 Required profile files:
 
@@ -65,7 +65,7 @@ If goal validation fails on a goal artifact:
 1. Confirm the goal directory matches the requested goal id exactly
 2. Create the missing file under `.harness/goals/<goal-id>/`
 3. Add the required heading structure
-4. Run `node validate.js --target ../my-project --goal <goal-id>` again
+4. Run `node bin/validate.js --target ../my-project --goal <goal-id>` again
 
 Required goal files:
 

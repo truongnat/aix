@@ -9,17 +9,17 @@ For the session-memory architecture, root `.harness/` should behave as the index
 
 ## Run Validation From The Source Pack
 
-`validate.js` normally runs from the **harness source pack** repository with `--target <target-repo>`.
+`bin/validate.js` normally runs from the **harness source pack** repository with `--target <target-repo>`.
 
 ```bash
 # From ai-engineering-harness (source pack), not from the target repo
-node validate.js --target ../my-project --profile-only
-node validate.js --target ../my-project --goal <session-id>
+node bin/validate.js --target ../my-project --profile-only
+node bin/validate.js --target ../my-project --goal <session-id>
 ```
 
-Target repositories do not receive `validate.js` in the default installed surface from `install.js`. That is intentional: one canonical validator stays with the pack source unless a future contract adds an optional in-target copy.
+Target repositories do not receive `bin/validate.js` in the default installed surface from `bin/aih.js install`. That is intentional: one canonical validator stays with the pack source unless a future contract adds an optional in-target copy.
 
-Install copies the markdown operating surface into the target repo; structural checks still use the source pack’s `validate.js` against the target path.
+Install copies the markdown operating surface into the target repo; structural checks still use the source pack’s `bin/validate.js` against the target path.
 
 ## Frozen Contracts
 
@@ -34,7 +34,7 @@ Clarifications:
 
 - validation is **structural-only** (paths and headings, not body semantics)
 - target validation runs from the **source pack** with `--target <path>`
-- `node validate.js --target <path>` without `--goal` means **profile** validation (same contract as `--profile-only`)
+- `node bin/validate.js --target <path>` without `--goal` means **profile** validation (same contract as `--profile-only`)
 
 ## What Target Repo Validation Means
 
@@ -126,22 +126,22 @@ Session validation is implemented after profile validation and remains structura
 These commands are currently implemented:
 
 ```bash
-node validate.js
-node validate.js --target ../my-project
-node validate.js --target ../my-project --profile-only
-node validate.js --target ../my-project --goal 2026-06-04-google-login
+node bin/validate.js
+node bin/validate.js --target ../my-project
+node bin/validate.js --target ../my-project --profile-only
+node bin/validate.js --target ../my-project --goal 2026-06-04-google-login
 ```
 
 ## Command Guide
 
-- `node validate.js`
+- `node bin/validate.js`
   - checks this harness repository's required files and heading contracts
   - does not check any adopted host repository
   - passing output:
     `Harness validation passed. Checked <count> required files/contracts.`
   - failing output starts with:
     `Harness validation failed:`
-- `node validate.js --target ../my-project`
+- `node bin/validate.js --target ../my-project`
   - checks the target repository root plus required `.harness/` profile artifacts
   - does not check active session artifacts unless `--goal <session-id>` is requested
   - does not check application code correctness
@@ -149,7 +149,7 @@ node validate.js --target ../my-project --goal 2026-06-04-google-login
     `Target repository validation passed. Checked profile contract.`
   - failing output starts with:
     `Target repository validation failed:`
-- `node validate.js --target ../my-project --profile-only`
+- `node bin/validate.js --target ../my-project --profile-only`
   - explicitly runs the same profile-level target validation as `--target <path>`
   - does not validate active session artifacts
   - does not check application code correctness
@@ -157,7 +157,7 @@ node validate.js --target ../my-project --goal 2026-06-04-google-login
     `Target repository validation passed. Checked profile contract.`
   - failing output starts with:
     `Target repository validation failed:`
-- `node validate.js --target ../my-project --goal 2026-06-04-google-login`
+- `node bin/validate.js --target ../my-project --goal 2026-06-04-google-login`
   - checks the target repository profile first, then validates `.harness/STATE.md` plus `.harness/sessions/2026-06-04-google-login/`
   - does not judge whether the underlying Google login implementation is correct
   - passing output:

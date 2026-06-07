@@ -4,7 +4,7 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
 const { loadProviderManifests, getProviderManifest } = require(
-  path.join(repoRoot, "lib", "provider-registry.js")
+  path.join(repoRoot, "dist", "lib", "provider-registry.js")
 );
 
 test("loadProviderManifests returns all core providers", () => {

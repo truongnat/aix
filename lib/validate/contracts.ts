@@ -53,8 +53,8 @@ const ACTIVE_COMMAND_NAMING_PATHS = [
   "docs/private-capability-cache.md",
   "docs/terminal-wizard-ux.md",
   "runtime-command-catalog.js",
-  "lib/command-surface-report.js",
-  "lib/cli-ui.js",
+  "dist/lib/command-surface-report.js",
+  "dist/lib/cli-ui.js",
 ];
 
 const FORBIDDEN_COLON_COMMAND_PATTERNS = [
@@ -618,7 +618,7 @@ function assertWorkerRunTemplateContract(baseDir: string, failures: string[]): v
 }
 
 function assertWorkerRegistryContract(baseDir: string, failures: string[]): void {
-  const relativePath = "workers/registry.js";
+  const relativePath = "dist/workers/registry.js";
   assertExists(baseDir, relativePath, failures);
   const registryPath = resolvePath(baseDir, relativePath);
   if (!fs.existsSync(registryPath)) {

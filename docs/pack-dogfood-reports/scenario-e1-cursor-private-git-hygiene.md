@@ -32,7 +32,7 @@ sh install.sh install --runtime cursor --scope project \
   --yes --target ../harness-dogfood-cursor-private
 
 # validation (from pack)
-node validate.js --target ../harness-dogfood-cursor-private --runtime cursor --profile-only
+node bin/validate.js --target ../harness-dogfood-cursor-private --runtime cursor --profile-only
 
 # git checks (from target)
 cd ../harness-dogfood-cursor-private
@@ -94,7 +94,7 @@ Only pre-existing untracked `README.md` (created before `git init` for minimal r
 ## Runtime-aware Validation Result
 
 ```bash
-node validate.js --target ../harness-dogfood-cursor-private --runtime cursor --profile-only
+node bin/validate.js --target ../harness-dogfood-cursor-private --runtime cursor --profile-only
 ```
 
 **PASS** — profile contract (cursor runtime paths + `.harness/`).

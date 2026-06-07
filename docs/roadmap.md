@@ -35,7 +35,7 @@
 
 - `v0.3.0`: Lightweight Host Repository Validation
 - implemented in this release
-- supports `node validate.js --target <path>`
+- supports `node bin/validate.js --target <path>`
 - supports `--profile-only`
 - supports `--goal <goal-id>`
 - validates only structural `.harness/` contracts
@@ -96,7 +96,7 @@
 - `v0.9.1` tag: **experimental** runtime-native installer — `install.sh` runtime/scope, `install-runtime.js`, `.harness` init, runtime-aware validation; dogfood C + D1–D6
 - **next:** `v0.10.x` manual runtime verification / stable-runtime narrowing — not immediate `v1.0.0`
 - see [plugin-install-ux.md](plugin-install-ux.md), [runtime-dogfood-summary.md](runtime-dogfood-summary.md), [v0.9.1-release-notes.md](v0.9.1-release-notes.md)
-- `install.js` root copy remains **fallback**; runtime-native is the recommended consumer path
+- legacy root-copy fallback remains **historical**; runtime-native is the recommended consumer path
 
 ## V10: Runtime Capability Folder Integration (planned)
 

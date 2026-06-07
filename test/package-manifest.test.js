@@ -16,6 +16,17 @@ test("package.json files entries exist on disk", () => {
   }
 });
 
+test("package.json does not expose removed root shims", () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
+
+  assert.ok(!pkg.files.includes("install.js"));
+  assert.ok(!pkg.files.includes("install-cache.js"));
+  assert.ok(!pkg.files.includes("install-runtime.js"));
+  assert.ok(!pkg.files.includes("validate.js"));
+  assert.equal(pkg.scripts["install:harness"], "node bin/aih.js install");
+  assert.equal(pkg.scripts.validate, "node bin/validate.js");
+});
+
 test("package includes evals and documents eval command surface", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
   const readme = fs.readFileSync(path.join(repoRoot, "README.md"), "utf8");

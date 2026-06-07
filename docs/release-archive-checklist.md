@@ -8,8 +8,8 @@ Complete [pack-verification-checklist.md](pack-verification-checklist.md) before
 
 - `PACK.md`
 - `AGENTS.md`
-- `install.js`
-- `validate.js`
+- `bin/aih.js`
+- `bin/validate.js`
 - `LICENSE`
 - `README.md`
 
@@ -40,10 +40,10 @@ Complete [pack-verification-checklist.md](pack-verification-checklist.md) before
 
 ## Validation Commands
 
-- `node validate.js`
+- `node bin/validate.js`
 - `npm test`
-- `node validate.js --target test/fixtures/valid-target-profile --profile-only`
-- `node validate.js --target test/fixtures/valid-target-goal --goal google-login`
+- `node bin/validate.js --target test/fixtures/valid-target-profile --profile-only`
+- `node bin/validate.js --target test/fixtures/valid-target-goal --goal google-login`
 
 ## Manual Release Notes
 

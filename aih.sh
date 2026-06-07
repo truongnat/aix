@@ -797,7 +797,7 @@ run_capability_cache_install() {
 
   printf '%s\n' '' '--- Capability cache (.ai-harness/) ---'
 
-  set -- node "$PACK_ROOT/install-cache.js" \
+  set -- node "$PACK_ROOT/dist/lib/install-cache.js" \
     --pack-root "$PACK_ROOT" \
     --target "$TARGET_ABS"
   if [ "$DRY_RUN" -eq 1 ]; then
@@ -863,7 +863,7 @@ runtime_label() {
     opencode) printf '%s' 'OpenCode' ;;
     generic) printf '%s' 'Generic AGENTS.md bootstrap' ;;
     all) printf '%s' 'All supported runtimes' ;;
-    manual) printf '%s' 'Manual fallback (root copy via install.js)' ;;
+    manual) printf '%s' 'Manual fallback (root copy via install-legacy.js)' ;;
     *) printf '%s' "$1" ;;
   esac
 }
@@ -1033,7 +1033,7 @@ print_harness_init_plan() {
     "  - Target: ${TARGET_ABS}/.harness/" \
     '  - Files: HARNESS.md, TEAM.md, SKILLS.md, WORKFLOW.md, GATES.md, MEMORY.md, DECISIONS.md, HAZARDS.md, INDEX.md, goals/.gitkeep' \
     '  - Does not create runtime bootstrap files (e.g. AGENTS.md); runtime or manual fallback owns those' \
-    '  - Fill profile content after init; run validate.js --target <repo> --profile-only'
+    '  - Fill profile content after init; run bin/validate.js --target <repo> --profile-only'
 }
 
 print_install_plan() {
@@ -1092,7 +1092,7 @@ print_install_plan() {
   if [ "$RUNTIME" = manual ]; then
     printf '%s\n' \
       '  - Download pack archive from GitHub' \
-      '  - Run install.js legacy root-copy fallback into target' \
+      '  - Run dist/lib/install-legacy.js legacy root-copy fallback into target' \
       '  - Root copy is fallback only, not the recommended final plugin UX'
     if [ "$INIT_HARNESS" -eq 1 ]; then
       printf '%s\n' '  - After manual copy, scaffold .harness/ if not already present (respect --force)'
@@ -1795,6 +1795,134 @@ harness_skeleton_index_md() {
 EOF
 }
 
+harness_skeleton_policies_json() {
+  cat <<'EOF'
+{
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "phase-gate-plan",
+      "name": "Plan Approval Required",
+      "description": "harness-run requires an approved plan before implementation can begin",
+      "severity": "error",
+      "conditions": [
+        {
+          "type": "command",
+          "operator": "equals",
+          "value": "harness-run"
+        },
+        {
+          "type": "state",
+          "operator": "not_exists",
+          "value": "current_plan:approved"
+        }
+      ],
+      "action": {
+        "type": "block",
+        "message": "Plan must be approved before implementation",
+        "nextCommand": "harness-plan",
+        "questions": [
+          "Which plan should be approved before implementation?"
+        ]
+      }
+    },
+    {
+      "id": "phase-gate-verify",
+      "name": "Verification Required Before Ship",
+      "description": "harness-ship requires verified VERIFY.md with explicit status and evidence",
+      "severity": "error",
+      "conditions": [
+        {
+          "type": "command",
+          "operator": "equals",
+          "value": "harness-ship"
+        },
+        {
+          "type": "state",
+          "operator": "not_exists",
+          "value": "verify:approved"
+        }
+      ],
+      "action": {
+        "type": "block",
+        "message": "Verification must be completed and approved before shipping",
+        "nextCommand": "harness-verify",
+        "questions": [
+          "What verification evidence is still missing?"
+        ]
+      }
+    },
+    {
+      "id": "phase-gate-implementation-evidence",
+      "name": "Implementation Evidence Required",
+      "description": "harness-verify requires implementation evidence (completed tasks or tool runs)",
+      "severity": "error",
+      "conditions": [
+        {
+          "type": "command",
+          "operator": "equals",
+          "value": "harness-verify"
+        },
+        {
+          "type": "state",
+          "operator": "not_exists",
+          "value": "implementation_evidence"
+        }
+      ],
+      "action": {
+        "type": "block",
+        "message": "No implementation evidence found for verification",
+        "nextCommand": "harness-run",
+        "questions": [
+          "What implementation work should be verified?"
+        ]
+      }
+    },
+    {
+      "id": "test-first-enforcement",
+      "name": "Test-First Discipline",
+      "description": "Source file edits require corresponding test file with failing assertion",
+      "severity": "error",
+      "conditions": [
+        {
+          "type": "file_pattern",
+          "operator": "matches",
+          "value": "src/**"
+        }
+      ],
+      "action": {
+        "type": "block",
+        "message": "Test-first discipline violated: editing source without corresponding test",
+        "questions": [
+          "Create or update the corresponding test file first"
+        ]
+      }
+    },
+    {
+      "id": "scope-guard",
+      "name": "Scope Guard",
+      "description": "Edits must stay within scope defined in goal artifact or plan",
+      "severity": "warning",
+      "conditions": [
+        {
+          "type": "file_pattern",
+          "operator": "matches",
+          "value": "**"
+        }
+      ],
+      "action": {
+        "type": "warn",
+        "message": "Edit may be outside approved scope",
+        "questions": [
+          "Is this edit within the approved goal scope?"
+        ]
+      }
+    }
+  ]
+}
+EOF
+}
+
 init_harness_profile() {
   printf '%s\n' '' '--- .harness/ init ---'
   write_target_file '.harness/HARNESS.md' "$(harness_skeleton_harness_md)"
@@ -1806,6 +1934,7 @@ init_harness_profile() {
   write_target_file '.harness/DECISIONS.md' "$(harness_skeleton_decisions_md)"
   write_target_file '.harness/HAZARDS.md' "$(harness_skeleton_hazards_md)"
   write_target_file '.harness/INDEX.md' "$(harness_skeleton_index_md)"
+  write_target_file '.harness/policies.json' "$(harness_skeleton_policies_json)"
   write_target_file '.harness/goals/.gitkeep' ''
   printf '%s\n' '--- .harness/ init complete ---'
 }
@@ -1814,12 +1943,12 @@ PACK_ROOT=""
 INSTALL_TMPDIR=""
 
 download_pack_root() {
-  if [ -n "$PACK_ROOT" ] && [ -f "${PACK_ROOT}/install-runtime.js" ]; then
+  if [ -n "$PACK_ROOT" ] && [ -f "${PACK_ROOT}/dist/lib/install-runtime.js" ]; then
     return 0
   fi
 
   _script_dir=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
-  if [ -f "${_script_dir}/install-runtime.js" ] && [ -f "${_script_dir}/runtime/README.md" ]; then
+  if [ -f "${_script_dir}/dist/lib/install-runtime.js" ] && [ -f "${_script_dir}/runtime/README.md" ]; then
     PACK_ROOT=$_script_dir
     return 0
   fi
@@ -1856,13 +1985,13 @@ download_pack_root() {
 
   PACK_ROOT=""
   for candidate in "$_extract"/*; do
-    if [ -f "${candidate}/install-runtime.js" ]; then
+    if [ -f "${candidate}/dist/lib/install-runtime.js" ]; then
       PACK_ROOT=$candidate
       break
     fi
   done
 
-  [ -n "$PACK_ROOT" ] || fail "could not find install-runtime.js in downloaded archive"
+  [ -n "$PACK_ROOT" ] || fail "could not find dist/lib/install-runtime.js in downloaded archive"
 }
 
 run_runtime_native_install() {
@@ -1870,7 +1999,7 @@ run_runtime_native_install() {
   command -v node >/dev/null 2>&1 || fail "node is required but was not found on PATH"
   download_pack_root
 
-  set -- node "$PACK_ROOT/install-runtime.js" \
+  set -- node "$PACK_ROOT/dist/lib/install-runtime.js" \
     --pack-root "$PACK_ROOT" \
     --runtime "$RUNTIME" \
     --scope "$SCOPE" \
@@ -1898,7 +2027,7 @@ run_manual_install() {
 
   (
     cd "$PACK_ROOT" || exit 1
-    node install.js "$@"
+    node "$PACK_ROOT/dist/lib/install-legacy.js" "$@"
   )
 }
 

@@ -22,8 +22,8 @@ A release archive should contain the capability-pack surface needed for adoption
 - `patterns/`
 - `templates/`
 - selected adoption and validation docs
-- `install.js`
-- `validate.js`
+- `bin/aih.js`
+- `bin/validate.js`
 - `LICENSE`
 - `README.md`
 
@@ -57,8 +57,9 @@ ai-engineering-harness-vX.Y.Z/
 │   ├── target-repo-validation.md
 │   ├── validation-troubleshooting.md
 │   └── small-repo-memory.md
-├── install.js
-├── validate.js
+├── bin/
+│   ├── aih.js
+│   └── validate.js
 ├── LICENSE
 └── README.md
 ```
@@ -76,15 +77,15 @@ Users would:
 1. download the versioned archive
 2. extract it locally
 3. treat the extracted folder as a pack snapshot
-4. run `install.js` or copy the installed surface into the target repository
+4. run `node bin/aih.js install` or copy the installed surface into the target repository
 5. create `.harness/` profile and goal artifacts in the target repository
 6. run target validation there
 
-## Relationship To install.js
+## Relationship To bin/aih.js install
 
-`install.js` remains the current mechanism for copying the installed surface into a target repository.
+`bin/aih.js install` remains the current mechanism for copying the installed surface into a target repository.
 
-A future release archive should contain `install.js` so users can consume the same pack snapshot without cloning the canonical source repository.
+A future release archive should contain `bin/aih.js` and `bin/validate.js` so users can consume the same pack snapshot without cloning the canonical source repository.
 
 ## Versioning Expectations
 

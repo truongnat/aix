@@ -15,6 +15,7 @@ const EXPECTED = [
   "DECISIONS.md",
   "HAZARDS.md",
   "INDEX.md",
+  "policies.json",
   "goals/.gitkeep",
 ];
 

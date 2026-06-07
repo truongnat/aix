@@ -24,7 +24,7 @@ sh install.sh --runtime codex --scope project --target ../harness-dogfood-codex 
 
 sh install.sh --runtime codex --scope project --target ../harness-dogfood-codex --init-harness --yes
 
-node validate.js --target ../harness-dogfood-codex --profile-only
+node bin/validate.js --target ../harness-dogfood-codex --profile-only
 
 # Idempotency (no --force)
 sh install.sh --runtime codex --scope project --target ../harness-dogfood-codex --init-harness --yes
@@ -49,7 +49,7 @@ Pre-existing in target (unchanged): `README.md`, `package.json`.
 
 | Command | Result | Notes |
 |---|---|---|
-| `node validate.js --target ../harness-dogfood-codex --profile-only` | pass | Structural profile contract |
+| `node bin/validate.js --target ../harness-dogfood-codex --profile-only` | pass | Structural profile contract |
 
 ## Root Pollution Check
 

@@ -37,7 +37,7 @@ See [manual-packaging-guide.md](manual-packaging-guide.md) for step-by-step main
 
 - [pack-verification-checklist.md](pack-verification-checklist.md) is the manual gate before tag/archive
 - checks manifest, installed surface alignment, runtime docs, and validation commands
-- structural `node validate.js` does not replace the checklist for body alignment
+- structural `node bin/validate.js` does not replace the checklist for body alignment
 
 ## Release Checklist
 

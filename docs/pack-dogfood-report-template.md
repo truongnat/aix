@@ -37,8 +37,8 @@ Copy this template for each executed scenario. Store completed reports under `do
 
 | Command | Result | Notes |
 |---|---|---|
-| `node validate.js --target ... --profile-only` | pass / fail | |
-| `node validate.js --target ... --goal ...` | pass / fail | |
+| `node bin/validate.js --target ... --profile-only` | pass / fail | |
+| `node bin/validate.js --target ... --goal ...` | pass / fail | |
 
 ## What Worked
 
@@ -54,7 +54,7 @@ Copy this template for each executed scenario. Store completed reports under `do
 
 ## Pack Surface Issues
 
-<!-- install.js export, PACK.md, command discoverability, broken links -->
+<!-- bin/aih.js install surface, PACK.md, command discoverability, broken links -->
 
 -
 

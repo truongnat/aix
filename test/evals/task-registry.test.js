@@ -4,9 +4,9 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const { formatTaskList, loadRegistry, validateTaskManifest } = require(
-  path.join(repoRoot, "lib", "evals", "task-registry.js")
+  path.join(repoRoot, "dist", "lib", "evals", "task-registry.js")
 );
-const { listTasks } = require(path.join(repoRoot, "lib", "evals", "index.js"));
+const { listTasks } = require(path.join(repoRoot, "dist", "lib", "evals", "index.js"));
 
 test("loadRegistry returns task manifests with ids, fixtures, and checks", () => {
   const registry = loadRegistry(repoRoot);

@@ -167,7 +167,7 @@ function guardPhase(options) {
   if (fs.existsSync(policyPath)) {
     try {
       // Load and use policy engine
-      const { PolicyEngine } = require("../../lib/policy/engine.js");
+      const { PolicyEngine } = require("../../dist/lib/policy/engine.js");
       const engine = new PolicyEngine(policyPath);
       const context = buildExecutionContext(sessionDir, repoRoot, command);
       const { blocked, reason, actions } = engine.shouldBlock(context);

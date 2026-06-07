@@ -27,7 +27,7 @@ test("main routes eval list through the eval command module", async () => {
   };
 
   try {
-    const { main } = fresh("lib/cli-main.js");
+    const { main } = fresh("dist/lib/cli-main.js");
     const code = await main(
       ["node", "aih.js", "eval", "list"],
       path.join(repoRoot, "bin", "aih.js")
@@ -40,7 +40,7 @@ test("main routes eval list through the eval command module", async () => {
 });
 
 test("runEvalCommand lists registry tasks and returns exit code 0", async () => {
-  const { runEvalCommand } = fresh("lib/cli-commands/eval.js");
+  const { runEvalCommand } = fresh("dist/lib/cli-commands/eval.js");
   let output = "";
   const originalWrite = process.stdout.write;
   process.stdout.write = (chunk) => {
@@ -65,7 +65,7 @@ test("runEvalCommand lists registry tasks and returns exit code 0", async () => 
 });
 
 test("runEvalCommand runs sample-bugfix and prints summary path", async () => {
-  const { runEvalCommand } = fresh("lib/cli-commands/eval.js");
+  const { runEvalCommand } = fresh("dist/lib/cli-commands/eval.js");
   let output = "";
   const originalWrite = process.stdout.write;
   process.stdout.write = (chunk) => {

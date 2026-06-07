@@ -10,11 +10,31 @@ async function runInsightsCommand(_packRoot: string, options: ParseOptions): Pro
     formatEvalRecommendations,
   } = require("../insights/eval-recommendations");
   // @ts-ignore - JS file with checkJs
+  const { runRecommendedEvalRegression } = require("../insights/eval-regression");
+  // @ts-ignore - JS file with checkJs
   const { uploadInsightsExport } = require("../insights/remote-upload");
   const target = path.resolve(options.target || ".");
 
   if (options.recommendEvals) {
     const result = buildEvalRecommendations(target);
+    if (options.runRecommendedEvals) {
+      const regression = await runRecommendedEvalRegression(_packRoot, target, {
+        provider: options.providers[0] || "codex",
+        liveProviderCommand: options.liveProviderCommand,
+        useLlmJudge: options.useLlmJudge,
+      });
+      if (options.json) {
+        process.stdout.write(
+          `${JSON.stringify({ recommendations: result, regression }, null, 2)}\n`
+        );
+        return 0;
+      }
+      process.stdout.write(formatEvalRecommendations(result));
+      process.stdout.write(
+        `\nExecuted ${regression.runs.length} recommended eval(s); report: ${regression.reportPath}\n`
+      );
+      return 0;
+    }
     if (options.json) {
       process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
       return 0;

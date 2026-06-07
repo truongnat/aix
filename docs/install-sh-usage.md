@@ -10,7 +10,7 @@ Use [install-command-model.md](install-command-model.md) as the source of truth 
 
 ## Recommended: Runtime-native Install
 
-`install.sh` supports **runtime** + **scope** selection and calls [install-runtime.js](../install-runtime.js) for non-`manual` runtimes. Modes are **experimental** until manual session checks pass — see [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
+`install.sh` supports **runtime** + **scope** selection and calls [lib/install-runtime.ts](../lib/install-runtime.ts) for non-`manual` runtimes. Modes are **experimental** until manual session checks pass — see [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
 
 ```bash
 sh install.sh --runtime cursor --scope project --init-harness --dry-run --yes
@@ -19,24 +19,24 @@ sh install.sh --runtime cursor --scope project --init-harness --yes
 
 Pin a release: `--ref v0.9.1` ([plugin-install-security.md](plugin-install-security.md)).
 
-Validate from the source pack: `node validate.js --target <repo> --runtime <name> --profile-only` ([runtime-aware-validation.md](runtime-aware-validation.md)).
+Validate from the source pack: `node bin/validate.js --target <repo> --runtime <name> --profile-only` ([runtime-aware-validation.md](runtime-aware-validation.md)).
 
-## Manual Fallback (root copy)
+## Manual Fallback (legacy root copy)
 
-Non-interactive `curl | sh` **without** `--runtime` defaults to **`manual`**: downloads the pack and runs `install.js`, which **copies** the default installed surface into the target repo root (`AGENTS.md`, `commands/`, `skills/`, …). Use only when runtime-native install is not suitable — [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md).
+Non-interactive `curl | sh` **without** `--runtime` defaults to **`manual`**: downloads the pack and runs `node bin/aih.js install`, which copies the default installed surface into the target repo root (`AGENTS.md`, `commands/`, `skills/`, …). Use only when runtime-native install is not suitable — [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md).
 
 ## Wrapper Scope
 
 `install.sh` is the compatibility wrapper for remote installs and advanced explicit flows.
 
 - It accepts the same install-oriented flags documented in [install-command-model.md](install-command-model.md).
-- It delegates runtime-native writes to [install-runtime.js](../install-runtime.js) and runtime-specific payload paths documented in [runtime-native-install.md](runtime-native-install.md).
-- It keeps legacy root copy available only through `--runtime manual` / `--legacy-root`.
+- It delegates runtime-native writes to [lib/install-runtime.ts](../lib/install-runtime.ts) and runtime-specific payload paths documented in [runtime-native-install.md](runtime-native-install.md).
+- It keeps legacy root copy available only through `--runtime manual` / `--legacy-root` compatibility behavior.
 - Non-interactive install without `--runtime` defaults to `manual` and prints a fallback warning.
 
 ## Quick Install (manual fallback only)
 
-From your **product repository** root (root copy — not runtime-native):
+From your **product repository** root (legacy root copy, not runtime-native):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install.sh | sh
@@ -100,7 +100,7 @@ sh install.sh --runtime claude --scope project --target . --init-harness --yes
 
 Non-interactive: pass `--init-harness` explicitly. Interactive project scope may prompt to init.
 
-Validate after init: `node validate.js --target <repo> --profile-only` from source pack.
+Validate after init: `node bin/validate.js --target <repo> --profile-only` from source pack.
 
 ## Examples (selector)
 
@@ -118,10 +118,10 @@ When `--runtime manual` (or default non-interactive fallback):
 1. Prints install plan and confirms (unless `--yes`)
 2. Downloads `https://github.com/truongnat/ai-engineering-harness/archive/<ref>.tar.gz`
 3. Extracts to a temporary directory
-4. Runs `node install.js --target <absolute-path>` from the extracted pack
+4. Runs `node bin/aih.js install --target <absolute-path>` from the extracted pack
 5. Removes the temporary directory on exit
 
-Copy behavior is defined by [install.js](../install.js). Root bulk copy is **fallback only**, not the v1 default install model.
+Copy behavior is defined by the `bin/aih.js install` surface. Legacy root bulk copy is **fallback only**, not the v1 default install model.
 
 ## Runtime-Native Notes
 
@@ -152,7 +152,7 @@ Copy behavior is defined by [install.js](../install.js). Root bulk copy is **fal
 Validate from a **downloaded pack** or maintainer clone:
 
 ```bash
-node validate.js --target <path> --profile-only
+node bin/validate.js --target <path> --profile-only
 ```
 
-Target repos do not receive `validate.js` by default; run validation from the pack source after install.
+Target repos do not receive `bin/validate.js` by default; run validation from the pack source after install.

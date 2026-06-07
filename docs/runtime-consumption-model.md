@@ -47,8 +47,8 @@ Inside the target repository, the agent should read:
 
 Use validation in the target repository:
 
-- `node validate.js --target ../my-project --profile-only`
-- `node validate.js --target ../my-project --goal <goal-id>`
+- `node bin/validate.js --target ../my-project --profile-only`
+- `node bin/validate.js --target ../my-project --goal <goal-id>`
 
 Validation remains structural-only.
 

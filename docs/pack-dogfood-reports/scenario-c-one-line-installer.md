@@ -10,7 +10,7 @@ Tiny external Node placeholder repo created for dogfood only (`harness-dogfood-o
 
 ## Runtime Used
 
-Shell (`curl | sh`) for install; structural validation from harness source pack with `node validate.js --target` (Cursor-class workflow optional; not required for this scenario).
+Shell (`curl | sh`) for install; structural validation from harness source pack with `node bin/validate.js --target` (Cursor-class workflow optional; not required for this scenario).
 
 ## Consumption Mode
 
@@ -26,8 +26,8 @@ curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/ma
 
 # Profile and goal artifacts created in target (minimal structural fixtures)
 # Validation from source pack:
-node validate.js --target ../harness-dogfood-one-line --profile-only
-node validate.js --target ../harness-dogfood-one-line --goal one-line-health-check
+node bin/validate.js --target ../harness-dogfood-one-line --profile-only
+node bin/validate.js --target ../harness-dogfood-one-line --goal one-line-health-check
 ```
 
 ## Artifacts Created
@@ -44,8 +44,8 @@ node validate.js --target ../harness-dogfood-one-line --goal one-line-health-che
 
 | Command | Result | Notes |
 |---|---|---|
-| `node validate.js --target ../harness-dogfood-one-line --profile-only` | pass | Structural profile contract |
-| `node validate.js --target ../harness-dogfood-one-line --goal one-line-health-check` | pass | Structural goal contract |
+| `node bin/validate.js --target ../harness-dogfood-one-line --profile-only` | pass | Structural profile contract |
+| `node bin/validate.js --target ../harness-dogfood-one-line --goal one-line-health-check` | pass | Structural goal contract |
 
 ## What Worked
 
@@ -58,7 +58,7 @@ node validate.js --target ../harness-dogfood-one-line --goal one-line-health-che
 
 ## What Was Confusing
 
-- `install.js` next steps still reference `node install.js --target <path>` (maintainer wording) rather than reusing the one-line `curl` command or noting validation runs from a separate pack checkout
+- `install.js` next steps still reference `node bin/aih.js install --target <path>` (maintainer wording) rather than reusing the one-line `curl` command or noting validation runs from a separate pack checkout
 - Absolute target path appears in install summary when `--target` is a relative path (known low-severity pattern from Scenarios A/B)
 - `docs/install-sh-usage.md` is **not** in default installed surface (expected per `exportPaths`; consumers discover one-line install from README/source pack only)
 

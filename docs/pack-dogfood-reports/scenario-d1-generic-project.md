@@ -24,7 +24,7 @@ sh install.sh --runtime generic --scope project --target ../harness-dogfood-gene
 
 sh install.sh --runtime generic --scope project --target ../harness-dogfood-generic --init-harness --yes
 
-node validate.js --target ../harness-dogfood-generic --profile-only
+node bin/validate.js --target ../harness-dogfood-generic --profile-only
 
 # Idempotency (no --force)
 sh install.sh --runtime generic --scope project --target ../harness-dogfood-generic --init-harness --yes
@@ -49,7 +49,7 @@ Pre-existing in target (unchanged): `README.md`, `package.json`.
 
 | Command | Result | Notes |
 |---|---|---|
-| `node validate.js --target ../harness-dogfood-generic --profile-only` | pass | Structural profile contract |
+| `node bin/validate.js --target ../harness-dogfood-generic --profile-only` | pass | Structural profile contract |
 
 ## Root Pollution Check
 

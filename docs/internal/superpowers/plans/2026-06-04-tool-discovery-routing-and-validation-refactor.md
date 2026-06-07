@@ -8,7 +8,7 @@ Implement the full `Tool Discovery & Tool Routing` capability layer and redesign
 
 - Add capability docs, discovery script, template, docs, install-cache coverage, and prompt/command integration.
 - Refactor validation from a monolithic implementation into smaller modules with a lightweight validator registry.
-- Preserve the existing CLI contract for `node validate.js`, target profile validation, and target goal validation.
+- Preserve the existing CLI contract for `node bin/validate.js`, target profile validation, and target goal validation.
 
 ## Affected Files And Systems
 
@@ -38,7 +38,7 @@ Implement the full `Tool Discovery & Tool Routing` capability layer and redesign
 ## Verification Strategy
 
 - `npm ci`
-- `node validate.js`
+- `node bin/validate.js`
 - `npm test`
 - `node scripts/discover-tools.js`
 - `node scripts/discover-tools.js --markdown`

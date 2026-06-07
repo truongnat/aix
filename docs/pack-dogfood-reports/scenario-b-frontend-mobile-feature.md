@@ -20,10 +20,10 @@ Install/copy via `install.js` from source pack (same mode as Scenario A; not ven
 
 ```bash
 # From source pack root
-node install.js --target ../harness-dogfood-mobile --dry-run
-node install.js --target ../harness-dogfood-mobile
-node validate.js --target ../harness-dogfood-mobile --profile-only
-node validate.js --target ../harness-dogfood-mobile --goal google-login
+node bin/aih.js install --target ../harness-dogfood-mobile --dry-run
+node bin/aih.js install --target ../harness-dogfood-mobile
+node bin/validate.js --target ../harness-dogfood-mobile --profile-only
+node bin/validate.js --target ../harness-dogfood-mobile --goal google-login
 ```
 
 Local bootstrap: `README.md`, `pubspec.yaml`, `lib/main.dart` placeholder only.
@@ -48,8 +48,8 @@ Local bootstrap: `README.md`, `pubspec.yaml`, `lib/main.dart` placeholder only.
 
 | Command | Result | Notes |
 |---|---|---|
-| `node validate.js --target ../harness-dogfood-mobile --profile-only` | pass | Profile contract |
-| `node validate.js --target ../harness-dogfood-mobile --goal google-login` | pass | Goal contract |
+| `node bin/validate.js --target ../harness-dogfood-mobile --profile-only` | pass | Profile contract |
+| `node bin/validate.js --target ../harness-dogfood-mobile --goal google-login` | pass | Goal contract |
 
 ## What Worked
 

@@ -6,7 +6,7 @@ Validate **target repositories** after runtime-native install without forcing ev
 
 ## Problem
 
-Legacy target profile validation (`node validate.js --target <repo> --profile-only`) always required `AGENTS.md`. That matched manual/`install.js` adoption and generic/codex project modes, but not:
+Legacy target profile validation (`node bin/validate.js --target <repo> --profile-only`) always required `AGENTS.md`. That matched manual legacy adoption and generic/codex project modes, but not:
 
 - **Cursor** — `.cursor/rules/ai-engineering-harness.mdc`
 - **Gemini** — `.gemini/extensions/ai-engineering-harness/…`
@@ -18,8 +18,8 @@ Scenario D3 showed a **validation contract gap**: Cursor install succeeded while
 
 | Command | Bootstrap checked | `.harness/` profile |
 |---|---|---|
-| `node validate.js` | Source pack (full contract) | N/A |
-| `node validate.js --target <repo>` | **`AGENTS.md` required** | Required headings |
+| `node bin/validate.js` | Source pack (full contract) | N/A |
+| `node bin/validate.js --target <repo>` | **`AGENTS.md` required** | Required headings |
 
 This remains the **default** for backward compatibility (legacy targets, generic/codex without `--runtime`).
 
@@ -37,12 +37,12 @@ Validation stays **structural only** — no semantic checks, no marketplace, no 
 
 ```bash
 # Legacy / backward compatible (AGENTS.md + .harness/)
-node validate.js --target <repo> --profile-only
+node bin/validate.js --target <repo> --profile-only
 
 # Runtime-native (bootstrap per runtime + .harness/)
-node validate.js --target <repo> --runtime cursor --profile-only
-node validate.js --target <repo> --runtime generic --profile-only
-node validate.js --target <repo> --runtime claude --goal <goal-id>
+node bin/validate.js --target <repo> --runtime cursor --profile-only
+node bin/validate.js --target <repo> --runtime generic --profile-only
+node bin/validate.js --target <repo> --runtime claude --goal <goal-id>
 ```
 
 Rules:
@@ -86,11 +86,11 @@ Structural **path existence** only:
 
 ## Relationship To Runtime Native Install Audit
 
-Use the same runtime names as [install.sh](../install.sh) / [install-runtime.js](../install-runtime.js). After install, validate with matching `--runtime`:
+Use the same runtime names as [install.sh](../install.sh) / [lib/install-runtime.ts](../lib/install-runtime.ts). After install, validate with matching `--runtime`:
 
 ```bash
 sh install.sh --runtime cursor --scope project --target . --init-harness --yes
-node validate.js --target . --runtime cursor --profile-only
+node bin/validate.js --target . --runtime cursor --profile-only
 ```
 
 See [runtime-native-install-audit.md](runtime-native-install-audit.md) for dogfood status.
@@ -99,13 +99,13 @@ See [runtime-native-install-audit.md](runtime-native-install-audit.md) for dogfo
 
 | Situation | Validation command |
 |---|---|
-| Legacy manual root copy + `.harness/` | `node validate.js --target <repo> --profile-only` |
-| Generic/codex project runtime-native | `node validate.js --target <repo> --runtime generic --profile-only` (or omit `--runtime` if `AGENTS.md` present) |
-| Cursor project runtime-native | `node validate.js --target <repo> --runtime cursor --profile-only` |
+| Legacy manual root copy + `.harness/` | `node bin/validate.js --target <repo> --profile-only` |
+| Generic/codex project runtime-native | `node bin/validate.js --target <repo> --runtime generic --profile-only` (or omit `--runtime` if `AGENTS.md` present) |
+| Cursor project runtime-native | `node bin/validate.js --target <repo> --runtime cursor --profile-only` |
 | Cursor-only repo (no `AGENTS.md`) | **Must** use `--runtime cursor` |
 
 Re-check Scenario D3 after this patch:
 
 ```bash
-node validate.js --target ../harness-dogfood-cursor --runtime cursor --profile-only
+node bin/validate.js --target ../harness-dogfood-cursor --runtime cursor --profile-only
 ```

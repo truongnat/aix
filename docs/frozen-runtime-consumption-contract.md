@@ -17,13 +17,13 @@ It does **not** mean compiled plugins, runtime adapters, or server integrations.
 ## Source Pack
 
 - this repository is the **canonical pack source**
-- authors commands, skills, workflows, patterns, templates, docs, `install.js`, `validate.js`, and `PACK.md`
+- authors commands, skills, workflows, patterns, templates, docs, `bin/aih.js`, `bin/validate.js`, and `PACK.md`
 - not the product work tree
 
 ## Target Repository
 
 - the **product work tree** where application code and delivery happen
-- receives the [frozen installed surface](frozen-installed-surface-contract.md) via `install.js` or manual copy
+- receives the [frozen installed surface](frozen-installed-surface-contract.md) via `bin/aih.js install` or manual vendoring
 - owns `.harness/` profile and goal artifacts
 
 ## Runtime

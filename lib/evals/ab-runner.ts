@@ -5,11 +5,15 @@ import { compareAbMetrics, scoreExtendedMetrics } from "./extended-metrics";
 import { applyModeMutation } from "./mode-mutations";
 import { scoreRun } from "./scoring";
 import { createRunContext, type RunContext } from "./run-context";
+import { runLiveProviderCommand } from "./live-runner";
 import { writeModeArtifacts, writeRunSummary } from "./reporter";
 import { buildEvalRecommendations } from "../insights/eval-recommendations";
 
 interface Task {
   id: string;
+  title: string;
+  goal: string;
+  prompt: string;
   fixture: {
     path: string;
   };
@@ -22,6 +26,7 @@ interface RunOptions {
   verbose?: boolean;
   useLlmJudge?: boolean;
   targetRoot?: string;
+  liveProviderCommand?: string;
 }
 
 interface ModeResult {
@@ -30,6 +35,9 @@ interface ModeResult {
   checks: any;
   score: any;
   artifacts: any;
+  evidenceKind: string;
+  liveProviderCommand: string;
+  liveExitCode: number | null;
 }
 
 interface AbTaskResult {
@@ -48,7 +56,22 @@ async function runMode(
   options: RunOptions = {}
 ): Promise<ModeResult> {
   const workspace = materializeFixture(packRoot, task);
-  applyModeMutation(mode, workspace.cwd, task, packRoot);
+  const provider = options.provider || "deterministic-local";
+  const liveProviderCommand = options.liveProviderCommand?.trim();
+  let liveRun: ReturnType<typeof runLiveProviderCommand> | null = null;
+
+  if (liveProviderCommand) {
+    liveRun = runLiveProviderCommand({
+      packRoot,
+      task,
+      mode,
+      provider,
+      providerCommand: liveProviderCommand,
+      workspace,
+    });
+  } else {
+    applyModeMutation(mode, workspace.cwd, task, packRoot);
+  }
   // @ts-ignore - Task type compatibility between modules
   const checks = await runChecks(workspace.cwd, task);
   const rubric = await judgeWithLlmFallback(packRoot, workspace.cwd, task, options);
@@ -58,20 +81,27 @@ async function runMode(
   score.extended = extended;
 
   const modeDir = runContext.modeDir(mode);
-  const provider = options.provider || "deterministic-local";
+  const evidenceKind = liveRun ? "live-provider-command" : "synthetic-fixture";
   const artifacts = writeModeArtifacts(modeDir, {
     summary: {
       taskId: task.id,
       mode,
       provider,
+      evidenceKind,
+      liveProviderCommand: liveRun?.command || "",
+      liveExitCode: liveRun?.exitCode ?? null,
       outcome: score.outcome,
       behavior: score.behavior,
       extended,
     },
     // @ts-ignore - Score assignable to Record<string, unknown>
     metrics: score,
-    transcript: `# ${task.id} ${mode}\n\nProvider: ${provider}\nSteps: ${extended.steps}\n`,
-    report: `# Eval Report\n\n- Task: ${task.id}\n- Mode: ${mode}\n- Outcome: ${score.outcome.passed}/${score.outcome.total}\n- Behavior: ${score.behavior.passed}/${score.behavior.total}\n- Steps: ${extended.steps}\n`,
+    transcript: liveRun
+      ? liveRun.transcript
+      : `# ${task.id} ${mode}\n\nProvider: ${provider}\nSteps: ${extended.steps}\n`,
+    report: liveRun
+      ? `# Eval Report\n\n- Task: ${task.id}\n- Mode: ${mode}\n- Evidence kind: live-provider-command\n- Live provider command: ${liveRun.command}\n- Live exit code: ${liveRun.exitCode}\n- Outcome: ${score.outcome.passed}/${score.outcome.total}\n- Behavior: ${score.behavior.passed}/${score.behavior.total}\n- Steps: ${extended.steps}\n`
+      : `# Eval Report\n\n- Task: ${task.id}\n- Mode: ${mode}\n- Evidence kind: synthetic-fixture\n- Outcome: ${score.outcome.passed}/${score.outcome.total}\n- Behavior: ${score.behavior.passed}/${score.behavior.total}\n- Steps: ${extended.steps}\n`,
   });
 
   return {
@@ -80,6 +110,9 @@ async function runMode(
     checks,
     score,
     artifacts,
+    evidenceKind,
+    liveProviderCommand: liveRun?.command || "",
+    liveExitCode: liveRun?.exitCode ?? null,
   };
 }
 
@@ -107,8 +140,18 @@ async function runAbTask(
     runId: runContext.runId,
     taskId: task.id,
     modes: {
-      "with-harness": withHarness.score,
-      "without-harness": withoutHarness.score,
+      "with-harness": {
+        ...withHarness.score,
+        evidenceKind: withHarness.evidenceKind,
+        liveProviderCommand: withHarness.liveProviderCommand,
+        liveExitCode: withHarness.liveExitCode,
+      },
+      "without-harness": {
+        ...withoutHarness.score,
+        evidenceKind: withoutHarness.evidenceKind,
+        liveProviderCommand: withoutHarness.liveProviderCommand,
+        liveExitCode: withoutHarness.liveExitCode,
+      },
     },
     // @ts-ignore - ComparisonMetrics assignable to Record<string, unknown>
     comparison,

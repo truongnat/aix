@@ -76,7 +76,7 @@ Do not add optional sections to `v0.7.0` unless they stay simple and dependency-
 
 ## Validation Expectations
 
-`node validate.js` checks that `PACK.md` exists and contains required section headings.
+`node bin/validate.js` checks that `PACK.md` exists and contains required section headings.
 
 Current validation is heading-only:
 

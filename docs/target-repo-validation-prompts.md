@@ -30,15 +30,15 @@ Before changing validation behavior, read [frozen-validation-contract.md](frozen
 
 ## Run Profile Validation And Explain Failures
 
-> Run `node validate.js --target ../my-project --profile-only`. If validation fails, explain each missing path or heading as a structural contract failure. Do not interpret the result as application correctness.
+> Run `node bin/validate.js --target ../my-project --profile-only`. If validation fails, explain each missing path or heading as a structural contract failure. Do not interpret the result as application correctness.
 
 ## Run Goal Validation Before Implementation
 
-> Run `node validate.js --target ../my-project --goal 2026-06-04-google-login` before implementation starts. Report whether the target profile and active session artifact set are structurally complete, and list every missing file or required heading.
+> Run `node bin/validate.js --target ../my-project --goal 2026-06-04-google-login` before implementation starts. Report whether the target profile and active session artifact set are structurally complete, and list every missing file or required heading.
 
 ## Run Goal Validation Before Ship
 
-> Run `node validate.js --target ../my-project --goal 2026-06-04-google-login` before ship. Treat the result as a structural check for harness artifacts only, and separately call out that it does not prove feature correctness or release readiness.
+> Run `node bin/validate.js --target ../my-project --goal 2026-06-04-google-login` before ship. Treat the result as a structural check for harness artifacts only, and separately call out that it does not prove feature correctness or release readiness.
 
 ## Interpret Validation As Structural Only
 

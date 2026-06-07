@@ -6,9 +6,9 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
-const validateApi = require(path.join(repoRoot, "validate.js"));
-const installApi = require(path.join(repoRoot, "install.js"));
-const installCacheApi = require(path.join(repoRoot, "install-cache.js"));
+const validateApi = require(path.join(repoRoot, "dist", "lib", "validate", "index.js"));
+const installApi = require(path.join(repoRoot, "dist", "lib", "install-legacy.js"));
+const installCacheApi = require(path.join(repoRoot, "dist", "lib", "install-cache.js"));
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-test-"));
@@ -258,7 +258,9 @@ describe("Workflow Command Documentation", () => {
   });
 
   test("command metadata keeps start and map with updated descriptions and no brief", () => {
-    const { WORKFLOW_COMMANDS } = require(path.join(repoRoot, "lib", "runtime-command-catalog"));
+    const { WORKFLOW_COMMANDS } = require(
+      path.join(repoRoot, "dist", "lib", "runtime-command-catalog")
+    );
     const byId = new Map(WORKFLOW_COMMANDS.map((spec) => [spec.id, spec]));
     assert.equal(byId.get("start").canonical, "harness-start");
     assert.match(byId.get("start").description, /Session Start|restore|context/i);
@@ -353,7 +355,7 @@ describe("Installation & Packaging", () => {
 describe("Delegated Workers", () => {
   test("delegated worker repository surface exists", () => {
     for (const relativePath of [
-      "workers/registry.js",
+      "dist/workers/registry.js",
       "workers/reviewer.md",
       "workers/verifier.md",
       "workers/gatekeeper.md",
@@ -366,7 +368,7 @@ describe("Delegated Workers", () => {
   });
 
   test("worker registry exports canonical v1 workers", () => {
-    const registry = require(path.join(repoRoot, "workers", "registry.js"));
+    const registry = require(path.join(repoRoot, "dist", "workers", "registry.js"));
     assert.deepEqual([...registry.WORKER_IDS], ["reviewer", "verifier", "gatekeeper", "fixer"]);
     assert.equal(registry.workers.length, 4);
     for (const worker of registry.workers) {
@@ -381,7 +383,9 @@ describe("Delegated Workers", () => {
   });
 
   test("worker definitions include frontmatter and agent result envelope", () => {
-    const { parseFrontmatter } = require(path.join(repoRoot, "lib", "validate", "utils.js"));
+    const { parseFrontmatter } = require(
+      path.join(repoRoot, "dist", "lib", "validate", "utils.js")
+    );
     for (const workerId of ["reviewer", "verifier", "gatekeeper", "fixer"]) {
       const text = fs.readFileSync(path.join(repoRoot, "workers", `${workerId}.md`), "utf8");
       const frontmatter = parseFrontmatter(text);
@@ -396,7 +400,7 @@ describe("Delegated Workers", () => {
   });
 
   test("worker provider support values are valid", () => {
-    const registry = require(path.join(repoRoot, "workers", "registry.js"));
+    const registry = require(path.join(repoRoot, "dist", "workers", "registry.js"));
     for (const worker of registry.workers) {
       for (const value of Object.values(worker.providerSupport)) {
         assert.ok(
@@ -425,7 +429,7 @@ describe("Delegated Workers", () => {
 describe("Provider Rules & Adapters", () => {
   test("claude worker adapter renders native agent files", () => {
     const { renderClaudeAgentFile } = require(
-      path.join(repoRoot, "lib", "worker-claude-adapter.js")
+      path.join(repoRoot, "dist", "lib", "worker-claude-adapter.js")
     );
     const body = fs
       .readFileSync(path.join(repoRoot, "workers", "reviewer.md"), "utf8")
@@ -447,7 +451,7 @@ describe("Provider Rules & Adapters", () => {
   });
 
   test("provider rule renderer composes core fragments for each provider", () => {
-    const renderer = require(path.join(repoRoot, "lib", "provider-rule-renderer.js"));
+    const renderer = require(path.join(repoRoot, "dist", "lib", "provider-rule-renderer.js"));
     const samples = [
       [".claude/CLAUDE.md", renderer.renderClaudeProjectMd()],
       [".cursor/rules/ai-engineering-harness.mdc", renderer.renderCursorActivationMdc()],
@@ -464,7 +468,7 @@ describe("Provider Rules & Adapters", () => {
   });
 
   test("provider rule renderer renders Claude command files from a provider template", () => {
-    const renderer = require(path.join(repoRoot, "lib", "provider-rule-renderer.js"));
+    const renderer = require(path.join(repoRoot, "dist", "lib", "provider-rule-renderer.js"));
     const templatePath = path.join(repoRoot, "rules", "providers", "claude", "command.md");
     assert.ok(fs.existsSync(templatePath), "rules/providers/claude/command.md must exist");
 
@@ -485,7 +489,7 @@ describe("Provider Rules & Adapters", () => {
 
   test("provider rule adapters declare honest native slash support", () => {
     const { PROVIDER_RULE_ADAPTERS } = require(
-      path.join(repoRoot, "lib", "provider-rule-renderer.js")
+      path.join(repoRoot, "dist", "lib", "provider-rule-renderer.js")
     );
     assert.equal(PROVIDER_RULE_ADAPTERS.claude.nativeSlashCommands, true);
     assert.equal(PROVIDER_RULE_ADAPTERS.claude.supportsSubagents, true);
@@ -498,7 +502,7 @@ describe("Provider Rules & Adapters", () => {
 describe("Provider Command Support", () => {
   test("provider command support merges rule adapter metadata", () => {
     const { providerCommandSupport } = require(
-      path.join(repoRoot, "lib", "runtime-command-catalog")
+      path.join(repoRoot, "dist", "lib", "runtime-command-catalog")
     );
     const claude = providerCommandSupport("claude");
     const cursor = providerCommandSupport("cursor");

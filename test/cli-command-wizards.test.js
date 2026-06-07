@@ -35,7 +35,7 @@ test("runInstallWizard non-interactive install calls backend with selected provi
   const calls = [];
   const target = makeTempDir();
 
-  patchModule("lib/cli-backend.js", (mod) => {
+  patchModule("dist/lib/cli-backend.js", (mod) => {
     const originalRunAihSh = mod.runAihSh;
     mod.runAihSh = (_packRoot, args) => {
       calls.push(args);
@@ -46,7 +46,7 @@ test("runInstallWizard non-interactive install calls backend with selected provi
     };
   });
 
-  patchModule("lib/cli-ui", (mod) => {
+  patchModule("dist/lib/cli-ui.js", (mod) => {
     const originalShowInstallPlan = mod.showInstallPlan;
     mod.showInstallPlan = () => {};
     return () => {
@@ -54,7 +54,7 @@ test("runInstallWizard non-interactive install calls backend with selected provi
     };
   });
 
-  const { runInstallWizard } = fresh("lib/cli-commands/install.js");
+  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
   const status = await runInstallWizard(repoRoot, {
     providers: ["cursor", "claude"],
     target,
@@ -108,7 +108,7 @@ test("runUpdateWizard non-interactive update calls backend for each provider", a
   const calls = [];
   const target = makeTempDir();
 
-  patchModule("lib/cli-backend.js", (mod) => {
+  patchModule("dist/lib/cli-backend.js", (mod) => {
     const originalRunAihSh = mod.runAihSh;
     mod.runAihSh = (_packRoot, args) => {
       calls.push(args);
@@ -119,7 +119,7 @@ test("runUpdateWizard non-interactive update calls backend for each provider", a
     };
   });
 
-  patchModule("lib/cli-ui", (mod) => {
+  patchModule("dist/lib/cli-ui.js", (mod) => {
     const originalShowUpdatePlan = mod.showUpdatePlan;
     mod.showUpdatePlan = () => {};
     return () => {
@@ -127,7 +127,7 @@ test("runUpdateWizard non-interactive update calls backend for each provider", a
     };
   });
 
-  const { runUpdateWizard } = fresh("lib/cli-commands/update.js");
+  const { runUpdateWizard } = fresh("dist/lib/cli-commands/update.js");
   const status = await runUpdateWizard(repoRoot, {
     providers: ["cursor", "claude"],
     target,
@@ -178,7 +178,7 @@ test("runUninstallWizard non-interactive uninstall calls backend with full clean
   const calls = [];
   const target = makeTempDir();
 
-  patchModule("lib/cli-backend.js", (mod) => {
+  patchModule("dist/lib/cli-backend.js", (mod) => {
     const originalRunAihSh = mod.runAihSh;
     mod.runAihSh = (_packRoot, args) => {
       calls.push(args);
@@ -189,7 +189,7 @@ test("runUninstallWizard non-interactive uninstall calls backend with full clean
     };
   });
 
-  patchModule("lib/cli-ui", (mod) => {
+  patchModule("dist/lib/cli-ui.js", (mod) => {
     const originalShowUninstallPlan = mod.showUninstallPlan;
     mod.showUninstallPlan = () => {};
     return () => {
@@ -197,7 +197,7 @@ test("runUninstallWizard non-interactive uninstall calls backend with full clean
     };
   });
 
-  const { runUninstallWizard } = fresh("lib/cli-commands/uninstall.js");
+  const { runUninstallWizard } = fresh("dist/lib/cli-commands/uninstall.js");
   const status = await runUninstallWizard(repoRoot, {
     providers: ["cursor"],
     target,
@@ -229,7 +229,7 @@ test("runStatusOrDoctor forwards status to aih.sh", () => {
   const calls = [];
   const target = makeTempDir();
 
-  patchModule("lib/cli-backend.js", (mod) => {
+  patchModule("dist/lib/cli-backend.js", (mod) => {
     const originalRunAihSh = mod.runAihSh;
     mod.runAihSh = (_packRoot, args) => {
       calls.push(args);
@@ -240,7 +240,7 @@ test("runStatusOrDoctor forwards status to aih.sh", () => {
     };
   });
 
-  patchModule("lib/cli-ui", (mod) => {
+  patchModule("dist/lib/cli-ui.js", (mod) => {
     const originalFormatStatus = mod.formatStatus;
     mod.formatStatus = () => {};
     return () => {
@@ -248,7 +248,7 @@ test("runStatusOrDoctor forwards status to aih.sh", () => {
     };
   });
 
-  const { runStatusOrDoctor } = fresh("lib/cli-commands/diagnostics.js");
+  const { runStatusOrDoctor } = fresh("dist/lib/cli-commands/diagnostics.js");
   const status = runStatusOrDoctor(repoRoot, "status", {
     providers: [],
     target,
@@ -262,7 +262,7 @@ test("runStatusOrDoctor forwards status to aih.sh", () => {
 });
 
 test("runEvalCommand lists registry tasks", async () => {
-  const { runEvalCommand } = fresh("lib/cli-commands/eval.js");
+  const { runEvalCommand } = fresh("dist/lib/cli-commands/eval.js");
   let output = "";
   const originalWrite = process.stdout.write;
   process.stdout.write = (chunk) => {

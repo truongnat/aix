@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Document what `install.sh` + `install-runtime.js` install per runtime **without** copying the full pack to the product repo root.
+Document what `install.sh` + `lib/install-runtime.ts` install per runtime **without** copying the full pack to the product repo root.
 
 Canonical scope: per-runtime payload paths and follow-up actions after runtime-native install.
 
@@ -28,7 +28,7 @@ Flag semantics and defaults live in [install-command-model.md](install-command-m
 | `gemini` | — | `.gemini/extensions/ai-engineering-harness/` | `~/.gemini/extensions/...` |
 | `generic` | — | `AGENTS.md` bootstrap | (skip; use codex global) |
 | `all` | — | runs all rows above in order | use `--scope global` |
-| `manual` | `--legacy-root` | full root copy via `install.js` (fallback) | N/A |
+| `manual` | `--legacy-root` | full root copy via `node bin/aih.js install` (fallback) | N/A |
 
 ## Claude Code Follow-Up
 

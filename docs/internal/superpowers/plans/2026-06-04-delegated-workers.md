@@ -146,7 +146,7 @@ When validating Claude-native support, require the generated or installed `.clau
 - [ ] **Step 4: Run validation and tests**
 
 Run:
-- `node validate.js`
+- `node bin/validate.js`
 - `npm test`
 
 Expected: core worker contract validation passes once repository surface is complete.
@@ -187,7 +187,7 @@ Document:
 - [ ] **Step 4: Run targeted verification**
 
 Run:
-- `node validate.js`
+- `node bin/validate.js`
 - `npm test`
 
 Expected: Claude worker surface is generated or validated correctly without breaking existing Claude runtime behavior.
@@ -292,7 +292,7 @@ Add only enough to explain the new core contract without turning README into a d
 
 Run:
 - `npm ci`
-- `node validate.js`
+- `node bin/validate.js`
 - `npm test`
 
 Expected: PASS

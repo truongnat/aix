@@ -51,7 +51,7 @@ Expected body:
 From the harness repo root (also runs dogfood tests via `test/run-tests.js`):
 
 ```bash
-node validate.js
+node bin/validate.js
 npm test
 ```
 

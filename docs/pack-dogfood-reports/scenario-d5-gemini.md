@@ -22,7 +22,7 @@ Runtime-native install writes extension manifest + `GEMINI.md` under `.gemini/ex
 # Project mode
 sh install.sh --runtime gemini --scope project --target ../harness-dogfood-gemini --init-harness --dry-run --yes
 sh install.sh --runtime gemini --scope project --target ../harness-dogfood-gemini --init-harness --yes
-node validate.js --target ../harness-dogfood-gemini --runtime gemini --profile-only
+node bin/validate.js --target ../harness-dogfood-gemini --runtime gemini --profile-only
 
 # Global mode
 sh install.sh --runtime gemini --scope global --target ../harness-dogfood-gemini --dry-run --yes
@@ -71,7 +71,7 @@ Installer output uses short log labels (`CREATE gemini-extension.json`) because 
 
 | Command | Result | Notes |
 |---|---|---|
-| `node validate.js --target ../harness-dogfood-gemini --runtime gemini --profile-only` | **pass** | Project paths + `.harness/` |
+| `node bin/validate.js --target ../harness-dogfood-gemini --runtime gemini --profile-only` | **pass** | Project paths + `.harness/` |
 
 ## Root Pollution Check (project target)
 

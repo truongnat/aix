@@ -22,7 +22,7 @@ Use this walkthrough when:
 
 - a local clone of `ai-engineering-harness` as the harness source pack
 - a local target repository path such as `../my-project`
-- Node.js available to run `install.js` and `validate.js`
+- Node.js available to run `bin/aih.js install` and `bin/validate.js`
 
 The source clone is only the harness source.
 
@@ -33,7 +33,7 @@ The target repository is the actual project where product work happens.
 Preview the plugin-like operating surface first:
 
 ```bash
-node install.js --target ../my-project --dry-run
+node bin/aih.js install --target ../my-project --dry-run
 ```
 
 Review the `WOULD COPY` lines and confirm the target path is correct.
@@ -43,7 +43,7 @@ Review the `WOULD COPY` lines and confirm the target path is correct.
 If the dry run looks correct, perform the real install into the target project:
 
 ```bash
-node install.js --target ../my-project
+node bin/aih.js install --target ../my-project
 ```
 
 Read the printed next-step guidance at the end of the install output. The install copies the markdown operating surface into the target repository.
@@ -86,10 +86,10 @@ Run profile validation **from the harness source pack** (not from inside the tar
 
 ```bash
 # cwd: ai-engineering-harness clone
-node validate.js --target ../my-project --profile-only
+node bin/validate.js --target ../my-project --profile-only
 ```
 
-`validate.js` is not copied into the target repo by default. Use `--target` to check the host repository’s `.harness/` artifacts.
+`bin/validate.js` is not copied into the target repo by default. Use `--target` to check the host repository’s `.harness/` artifacts.
 
 Fix any missing files or headings before moving on.
 
@@ -110,7 +110,7 @@ Create a goal artifact set such as:
 Run goal validation from the source pack:
 
 ```bash
-node validate.js --target ../my-project --goal health-check
+node bin/validate.js --target ../my-project --goal health-check
 ```
 
 Treat the result as a structural artifact check, not as proof that the application is correct.

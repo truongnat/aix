@@ -124,7 +124,7 @@ Require:
 - [ ] **Step 4: Run targeted tests and validation**
 
 Run:
-- `node validate.js`
+- `node bin/validate.js`
 - `npm test`
 
 Expected: repository contract and runtime/catalog tests pass.
@@ -181,7 +181,7 @@ Expected: PASS with the new section integrated.
 
 Run:
 - `npm ci`
-- `node validate.js`
+- `node bin/validate.js`
 - `npm test`
 
 Expected: PASS

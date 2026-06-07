@@ -6,7 +6,7 @@ Consolidate evidence from Scenario **C** (manual one-line fallback), Scenarios *
 
 ## Scope
 
-- [install.sh](../install.sh) + [install-runtime.js](../install-runtime.js) runtime-native paths
+- [install.sh](../install.sh) + [lib/install-runtime.ts](../lib/install-runtime.ts) runtime-native paths
 - Project `.harness/` init via `--init-harness`
 - [Runtime-aware validation](runtime-aware-validation.md)
 - External disposable target repos (not committed to this pack)
@@ -50,9 +50,9 @@ Post-D2 patch: `.harness/` init no longer creates `AGENTS.md`; runtime owns boot
 - Project `.harness/` skeleton + `goals/.gitkeep` with D1–D6 `--init-harness`.
 - Per-runtime bootstrap files created at documented paths (see [runtime-native-install-audit.md](runtime-native-install-audit.md)).
 - Skip/force behavior on re-install without `--force` (D1–D6).
-- Runtime-aware `validate.js --runtime <name> --profile-only` for dogfooded runtimes.
+- Runtime-aware `bin/validate.js --runtime <name> --profile-only` for dogfooded runtimes.
 - D2 patch: `generic`/`codex` receive full `AGENTS.project.md` when using `--init-harness`.
-- Manual one-line fallback (C) still works for adopters who need bulk copy.
+- Manual legacy fallback (C) still works for adopters who need bulk copy.
 - Simple lifecycle dispatcher `aih.sh` works end-to-end for install/status/doctor/update/uninstall/uninstall --all (F1).
 
 ## What Remains Experimental
@@ -78,7 +78,7 @@ These block **stable** claims, not necessarily an **experimental v0.9.x** releas
 
 ## Validation Findings
 
-- **Legacy** `node validate.js --target <repo> --profile-only` requires `AGENTS.md` — correct for manual/legacy targets; **fails** on cursor/opencode/gemini/claude-only repos (expected).
+- **Legacy** `node bin/validate.js --target <repo> --profile-only` requires `AGENTS.md` — correct for manual/legacy targets; **fails** on cursor/opencode/gemini/claude-only repos (expected).
 - **Runtime-aware** validation ([runtime-aware-validation.md](runtime-aware-validation.md)) addresses D3+ gap; use `--runtime` matching install.
 - Structural only — no semantic or IDE-load checks.
 
@@ -109,7 +109,7 @@ See [pack-dogfood-friction-log.md](pack-dogfood-friction-log.md). Common themes:
 ## v0.9.x Release Implications
 
 - May ship **experimental** runtime-native installer with honest docs and matrix in [plugin-install-ux.md](plugin-install-ux.md).
-- Recommend default documented path: `--runtime <name> --scope project --init-harness` + `validate.js --runtime <name>`.
+- Recommend default documented path: `--runtime <name> --scope project --init-harness` + `bin/validate.js --runtime <name>`.
 - Keep `manual` / `curl | sh` without flags as fallback with warning.
 - Do not market “stable runtime support.”
 

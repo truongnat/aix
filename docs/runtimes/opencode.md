@@ -23,9 +23,9 @@ The source pack is only the canonical source. Product work happens in the target
 Use the current setup flow:
 
 ```bash
-node install.js --target ../my-project --dry-run
-node install.js --target ../my-project
-node validate.js --target ../my-project --profile-only
+node bin/aih.js install --target ../my-project --dry-run
+node bin/aih.js install --target ../my-project
+node bin/validate.js --target ../my-project --profile-only
 ```
 
 Run these commands from the source pack repo, then run OpenCode from or against the target repo for product work, and keep `.harness/` artifacts in the target repo.
@@ -69,7 +69,7 @@ Inside the target repository, OpenCode should read:
 
 ## Validation Prompt
 
-> Run or ask me to run: `node validate.js --target <path> --profile-only` and `node validate.js --target <path> --goal <goal-id>`. Treat validation as structural only, not proof of application correctness. Fix exact missing paths and headings.
+> Run or ask me to run: `node bin/validate.js --target <path> --profile-only` and `node bin/validate.js --target <path> --goal <goal-id>`. Treat validation as structural only, not proof of application correctness. Fix exact missing paths and headings.
 
 ## Safety Boundaries
 

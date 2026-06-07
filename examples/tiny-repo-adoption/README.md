@@ -24,6 +24,6 @@ Add a health check endpoint without changing existing behavior.
 ## How To Validate A Similar Target Repo
 
 ```bash
-node validate.js --target ../my-project --profile-only
-node validate.js --target ../my-project --goal health-check
+node bin/validate.js --target ../my-project --profile-only
+node bin/validate.js --target ../my-project --goal health-check
 ```

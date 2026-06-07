@@ -243,7 +243,7 @@
 
 - experimental runtime-native installer ([install-runtime.js](install-runtime.js), [runtime/](runtime/)) with runtime + scope selector in [install.sh](install.sh)
 - project `.harness/` init (`--scope project --init-harness`) — [harness-init-usage.md](docs/harness-init-usage.md)
-- runtime-aware target validation — [runtime-aware-validation.md](docs/runtime-aware-validation.md); `node validate.js --target <repo> --runtime <name> --profile-only`
+- runtime-aware target validation — [runtime-aware-validation.md](docs/runtime-aware-validation.md); `node bin/validate.js --target <repo> --runtime <name> --profile-only`
 - runtime payloads for `generic`, `codex`, `cursor`, `opencode`, `gemini`, `claude` (plus `windsurf` alias, `all` sequential — **experimental**, `all` not dogfooded)
 - dogfood reports Scenario C and D1–D6 — [runtime-dogfood-summary.md](docs/runtime-dogfood-summary.md)
 - v0.9.x readiness and release scope — [v0.9.x-readiness.md](docs/v0.9.x-readiness.md), [v0.9.x-release-scope.md](docs/v0.9.x-release-scope.md)
@@ -395,7 +395,7 @@
 ### Planned
 
 - Lightweight host repository validation
-- minimal `node validate.js --target <path>` mode
+- minimal `node bin/validate.js --target <path>` mode
 - optional `--profile-only`
 - optional `--goal <goal-id>`
 - structural `.harness/` contract validation for adopted repositories

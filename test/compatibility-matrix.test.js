@@ -11,6 +11,14 @@ test("buildMatrix includes providers and eval tasks", () => {
   assert.match(markdown, /Claude Code/);
   assert.match(markdown, /sample-bugfix/);
   assert.match(markdown, /example-health-report/);
+  assert.match(
+    markdown,
+    /Codex \| rules\/fallback \| adapter \| plugin-packaging \| deterministic local \(30 tasks\) \| \d+\/\d+ passed \(100% across 1 task\)/
+  );
+  assert.match(
+    markdown,
+    /Claude Code \| yes \| yes \| native-plugin \| deterministic local \(30 tasks\) \| no live evals yet/
+  );
 });
 
 test("compatibility-matrix.md is generated on disk", () => {

@@ -1,10 +1,11 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const { runTask } = require(path.join(repoRoot, "lib", "evals", "index.js"));
+const { runTask } = require(path.join(repoRoot, "dist", "lib", "evals", "index.js"));
 
 test("runTask emits with-harness and without-harness reports", async () => {
   const result = await runTask(repoRoot, "sample-bugfix", {
@@ -17,6 +18,7 @@ test("runTask emits with-harness and without-harness reports", async () => {
   assert.ok(summary.modes["with-harness"]);
   assert.ok(summary.modes["without-harness"]);
   assert.equal(summary.taskId, "sample-bugfix");
+  assert.equal(summary.modes["with-harness"].evidenceKind, "synthetic-fixture");
   assert.ok(summary.modes["with-harness"].outcome.passed >= 1);
   assert.equal(summary.modes["without-harness"].outcome.passed, 0);
 });
@@ -29,6 +31,7 @@ test("runTask passes example-health-report with harness", async () => {
   assert.equal(result.exitCode, 0);
   const summary = JSON.parse(fs.readFileSync(result.summaryPath, "utf8"));
   assert.equal(summary.modes["with-harness"].outcome.passed, 1);
+  assert.equal(summary.modes["with-harness"].evidenceKind, "synthetic-fixture");
   assert.equal(summary.modes["without-harness"].outcome.passed, 0);
 });
 
@@ -67,4 +70,38 @@ test("runTask passes sample-divide with harness comparison metrics", async () =>
 test("runTask passes sample-plan-md workflow task", async () => {
   const result = await runTask(repoRoot, "sample-plan-md");
   assert.equal(result.exitCode, 0);
+});
+
+test("runTask can execute a live provider command and tag live evidence", async () => {
+  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-live-provider-"));
+  const providerScript = path.join(tmpRoot, "live-provider.js");
+  fs.writeFileSync(
+    providerScript,
+    `const fs = require("node:fs");\n` +
+      `const path = require("node:path");\n` +
+      `const cwd = process.cwd();\n` +
+      `const hasHarness = fs.existsSync(path.join(cwd, ".harness", "GOAL.md"));\n` +
+      `if (hasHarness) {\n` +
+      `  fs.writeFileSync(\n` +
+      `    path.join(cwd, "src", "math.js"),\n` +
+      `    '"use strict";\\n\\nfunction add(a, b) {\\n  return a + b;\\n}\\n\\nmodule.exports = { add };\\n'\n` +
+      `  );\n` +
+      `  fs.writeFileSync(path.join(cwd, "final-response.txt"), "fixed with harness");\n` +
+      `} else {\n` +
+      `  fs.writeFileSync(path.join(cwd, "final-response.txt"), "attempted without harness");\n` +
+      `}\n` +
+      `process.stdout.write(hasHarness ? "with harness\\n" : "without harness\\n");\n`
+  );
+
+  const result = await runTask(repoRoot, "sample-bugfix", {
+    provider: "codex",
+    liveProviderCommand: `${JSON.stringify(process.execPath)} ${JSON.stringify(providerScript)}`,
+  });
+
+  assert.equal(result.exitCode, 0);
+  const summary = JSON.parse(fs.readFileSync(result.summaryPath, "utf8"));
+  assert.equal(summary.modes["with-harness"].evidenceKind, "live-provider-command");
+  assert.match(summary.modes["with-harness"].liveProviderCommand, /live-provider\.js/);
+  assert.ok(summary.modes["with-harness"].outcome.passed >= 1);
+  assert.equal(summary.modes["without-harness"].outcome.passed, 0);
 });

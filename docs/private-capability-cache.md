@@ -70,7 +70,7 @@ Install order in [install.sh](../install.sh): (1) `.git/info/exclude` when priva
 
 ## Install Behavior
 
-Implemented in [install-cache.js](../install-cache.js), invoked from [install.sh](../install.sh).
+Implemented in [lib/install-cache.ts](../lib/install-cache.ts), invoked from [install.sh](../install.sh).
 
 | Flag / setting | Behavior |
 |---|---|

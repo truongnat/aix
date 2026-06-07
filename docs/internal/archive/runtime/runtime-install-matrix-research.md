@@ -6,7 +6,7 @@ Research how major agent runtimes install **plugins and capabilities** so `ai-en
 
 This document is **research only**. It does not authorize implementing copy paths without a follow-up design step and official doc verification per runtime.
 
-**Implementation note (post–Step 6):** [install-runtime.js](../install-runtime.js) and [runtime/](../runtime/) implement many modes, but support remains **best-effort and experimental** until each runtime is dogfooded. See [runtime-native-install-audit.md](runtime-native-install-audit.md) and [runtime-native-install-dogfood-plan.md](runtime-native-install-dogfood-plan.md).
+**Implementation note (post–Step 6):** [install-runtime.js](../lib/install-runtime.ts) and [runtime/](../runtime/) implement many modes, but support remains **best-effort and experimental** until each runtime is dogfooded. See [runtime-native-install-audit.md](runtime-native-install-audit.md) and [runtime-native-install-dogfood-plan.md](runtime-native-install-dogfood-plan.md).
 
 ## Research Sources
 

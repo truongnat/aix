@@ -42,13 +42,13 @@ provider entrypoint      e.g. .cursor/rules/ai-engineering-harness.mdc
 - `aih.sh` — shell lifecycle dispatcher (fallback, CI, local dev)
 - `install.sh` — wrapper around `aih.sh`
 - `aih.ps1` — experimental Windows bootstrap (still requires `sh`)
-- `install.js` + `--runtime manual` — legacy root copy only
+- `bin/aih.js install` + `--runtime manual` — legacy root copy only
 
 ## Included Surface
 
 - `AGENTS.md`, `commands/`, `skills/`, `workflows/`, `patterns/`, `templates/`
 - `bin/aih.js`, `lib/cli-*.js`, `aih.sh`, `install.sh`, `aih.ps1`
-- `install-cache.js`, `install-runtime.js`, `install.js`, `validate.js`
+- `dist/lib/install-cache.js`, `dist/lib/install-runtime.js`, `bin/validate.js`
 - selected `docs/` (see npm `files` in `package.json`)
 
 npm tarball **excludes** `test/`, `examples/`, and local dogfood dirs.
@@ -58,8 +58,8 @@ npm tarball **excludes** `test/`, `examples/`, and local dogfood dirs.
 - **Primary:** `npx ai-engineering-harness install` (interactive wizard)
 - **Shell fallback:** `aih.sh` project/global runtime-native install
 - **Compatibility:** `install.sh` wrapper; `aih.ps1` Windows bootstrap (experimental)
-- **Legacy:** `install.js` / `--runtime manual` root copy only
-- **Maintainers:** clone source repo; `node validate.js`; `npm test`
+- **Legacy:** `bin/aih.js install` / `--runtime manual` root copy only
+- **Maintainers:** clone source repo; `node bin/validate.js`; `npm test`
 - **Future:** native JS backend (planned); Antigravity (researched, not implemented)
 
 ## Runtime Compatibility
@@ -81,7 +81,7 @@ All providers support the core markdown operating model. Non-Claude providers us
 Source pack:
 
 ```bash
-node validate.js
+node bin/validate.js
 npm test
 cd examples/dogfood-tiny-node-api && npm test
 node bin/aih.js --help
@@ -92,7 +92,7 @@ Release notes: [docs/v1.0.0-release-notes.md](docs/v1.0.0-release-notes.md)
 Target profile:
 
 ```bash
-node validate.js --target test/fixtures/valid-target-profile --profile-only
+node bin/validate.js --target test/fixtures/valid-target-profile --profile-only
 ```
 
 ## Safety Boundaries

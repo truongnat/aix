@@ -50,8 +50,8 @@ Use this prompt skeleton across runtimes:
 Use the same validation flow across runtimes:
 
 ```bash
-node validate.js --target <path> --profile-only
-node validate.js --target <path> --goal <goal-id>
+node bin/validate.js --target <path> --profile-only
+node bin/validate.js --target <path> --goal <goal-id>
 ```
 
 Treat validation as structural only. It confirms required files and headings, not application correctness.

@@ -18,7 +18,7 @@ Do not paste secrets, tokens, customer data, or private business details. Summar
 | 2026-06-02 | B | Install summary absolute target path (repeat) | low | Scenario B install | Same as Scenario A | v0.8.x fix |
 | 2026-06-02 | B | No blocking friction for install or validation | none | Profile and goal validation passed | No action required | no action |
 | 2026-06-02 | C | One-line install works without manual clone | none | Scenario C dry-run and write install | No action required | no action |
-| 2026-06-02 | C | install.js next steps still say node install.js not curl one-liner | low | Scenario C install output | Mention one-line install and validate-from-pack options | v0.9.x patch |
+| 2026-06-02 | C | install.js next steps still say node bin/aih.js install not curl one-liner | low | Scenario C install output | Mention one-line install and validate-from-pack options | v0.9.x patch |
 | 2026-06-02 | C | install-sh-usage.md not in default installed surface | low | Scenario C surface check | Optional exportPaths or link from adoption-guide | later optional |
 | 2026-06-02 | C | Install summary absolute target path (repeat) | low | Scenario C install | Same as A/B | v0.9.x patch |
 | 2026-06-02 | C | No blocking friction for one-line install or validation | none | Profile and goal validation passed | No action required | no action |

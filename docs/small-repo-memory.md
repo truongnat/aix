@@ -61,7 +61,7 @@ If the file starts filling with session noise, logs, or one-off details, it has 
 Useful small-repo memory entries:
 
 - "The repo uses a single lightweight feature workflow and expects human review before ship."
-- "Use `node validate.js --target ../my-project --profile-only` after editing profile artifacts."
+- "Use `node bin/validate.js --target ../my-project --profile-only` after editing profile artifacts."
 - "Guest session behavior must not change during health-check work."
 
 ## Safety Rules

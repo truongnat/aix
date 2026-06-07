@@ -17,9 +17,9 @@ Frozen validation behavior: [frozen-validation-contract.md](frozen-validation-co
 
 ## CLI Validation Commands
 
-- [ ] run `node validate.js --target ../my-project` when the adopted repository should be checked at the profile level
-- [ ] run `node validate.js --target ../my-project --profile-only` when you want the explicit profile-only form
-- [ ] run `node validate.js --target ../my-project --goal 2026-06-04-google-login` when a specific active session artifact set should be checked
+- [ ] run `node bin/validate.js --target ../my-project` when the adopted repository should be checked at the profile level
+- [ ] run `node bin/validate.js --target ../my-project --profile-only` when you want the explicit profile-only form
+- [ ] run `node bin/validate.js --target ../my-project --goal 2026-06-04-google-login` when a specific active session artifact set should be checked
 - [ ] use the profile check after creating or revising `.harness/HARNESS.md`, `TEAM.md`, `SKILLS.md`, `WORKFLOW.md`, `GATES.md`, or `MEMORY.md`
 - [ ] use the goal check after creating or revising `.harness/STATE.md` or `.harness/sessions/<session-id>/GOAL.md`, `PLAN-###.md`, `TASKS.md`, `VERIFY.md`, or `REMEMBER.md`
 

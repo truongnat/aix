@@ -6,8 +6,8 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
-const cliArgs = require(path.join(repoRoot, "lib", "cli-args.js"));
-const cliDetect = require(path.join(repoRoot, "lib", "cli-detect.js"));
+const cliArgs = require(path.join(repoRoot, "dist", "lib", "cli-args.js"));
+const cliDetect = require(path.join(repoRoot, "dist", "lib", "cli-detect.js"));
 
 function fresh(modulePath) {
   const resolved = require.resolve(path.join(repoRoot, modulePath));
@@ -134,6 +134,19 @@ describe("CLI Arguments Parser", () => {
     assert.equal(opts.verbose, true);
   });
 
+  test("parseArgv parses --live-provider-command flag", () => {
+    const opts = cliArgs.parseArgv([
+      "node",
+      "aih.js",
+      "eval",
+      "run",
+      "sample-bugfix",
+      "--live-provider-command",
+      "node fake-provider.js",
+    ]);
+    assert.equal(opts.liveProviderCommand, "node fake-provider.js");
+  });
+
   test("parseArgv throws on unknown argument", () => {
     assert.throws(() => cliArgs.parseArgv(["node", "aih.js", "--unknown"]), /Unknown argument/);
   });
@@ -159,18 +172,20 @@ describe("CLI Arguments Parser", () => {
 
 describe("CLI Help", () => {
   test("renderHelp includes eval commands", () => {
-    const { renderHelp } = fresh("lib/cli-help.js");
+    const { renderHelp } = fresh("dist/lib/cli-help.js");
     const help = renderHelp();
     assert.match(help, /ai-engineering-harness eval list/);
     assert.match(help, /ai-engineering-harness eval run <task-or-suite>/);
     assert.match(help, /ai-engineering-harness eval report <run-id>/);
+    assert.match(help, /--live-provider-command/);
   });
 
   test("renderHelp includes insights command", () => {
-    const { renderHelp } = fresh("lib/cli-help.js");
+    const { renderHelp } = fresh("dist/lib/cli-help.js");
     const help = renderHelp();
     assert.match(help, /ai-engineering-harness insights/);
     assert.match(help, /--json/);
+    assert.match(help, /--run-recommended-evals/);
   });
 });
 
@@ -368,7 +383,7 @@ describe("CLI Main", () => {
     };
 
     try {
-      const { main } = fresh("lib/cli-main.js");
+      const { main } = fresh("dist/lib/cli-main.js");
       const status = await main(
         ["node", "aih.js", "eval", "list"],
         path.join(repoRoot, "bin", "aih.js")
@@ -407,7 +422,7 @@ describe("CLI Main", () => {
     };
 
     try {
-      const { runEvalCommand } = fresh("lib/cli-commands/eval.js");
+      const { runEvalCommand } = fresh("dist/lib/cli-commands/eval.js");
       await assert.rejects(
         () => runEvalCommand(repoRoot, { evalCommand: "run", evalTarget: "" }),
         /Missing eval target for `aih eval run`\./
@@ -443,7 +458,7 @@ describe("CLI Main", () => {
     };
 
     try {
-      const { runEvalCommand } = fresh("lib/cli-commands/eval.js");
+      const { runEvalCommand } = fresh("dist/lib/cli-commands/eval.js");
       await assert.rejects(
         () => runEvalCommand(repoRoot, { evalCommand: "report", evalTarget: "" }),
         /Missing eval target for `aih eval report`\./

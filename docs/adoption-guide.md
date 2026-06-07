@@ -39,18 +39,18 @@ Recommended manual steps:
 
 The source pack includes a dependency-free installer.
 
-**Consumers:** prefer runtime-native `install.sh` (`v0.9.1`, experimental) — [install-sh-usage.md](install-sh-usage.md), [plugin-install-ux.md](plugin-install-ux.md). The flows below are **maintainer** `install.js` root copy (same surface as manual fallback).
+**Consumers:** prefer runtime-native `install.sh` (`v0.9.1`, experimental) — [install-sh-usage.md](install-sh-usage.md), [plugin-install-ux.md](plugin-install-ux.md). The flows below are the **maintainer** CLI install surface (`node bin/aih.js install`), which matches the legacy manual-copy behavior without a root shim.
 
 ### Basic Copy
 
 ```bash
-node install.js --target ../my-project
+node bin/aih.js install --target ../my-project
 ```
 
 ### Dry Run
 
 ```bash
-node install.js --target ../my-project --dry-run
+node bin/aih.js install --target ../my-project --dry-run
 ```
 
 Use this first to see exactly which capability-pack files would be copied and which files would be skipped.
@@ -58,7 +58,7 @@ Use this first to see exactly which capability-pack files would be copied and wh
 ### Force Overwrite
 
 ```bash
-node install.js --target ../my-project --force
+node bin/aih.js install --target ../my-project --force
 ```
 
 The installer will not overwrite existing files unless `--force` is passed.
@@ -207,12 +207,12 @@ Memory-specific rule:
 After adoption, run:
 
 ```bash
-node validate.js
+node bin/validate.js
 ```
 
 If you copied the full repository surface, this confirms the required structure and key document contracts are present.
 
-## After Running `install.js`
+## After Running the Installer
 
 After install, follow the printed next-step guidance inside the target repository and then review:
 
@@ -224,7 +224,7 @@ After install, follow the printed next-step guidance inside the target repositor
 Recommended first follow-up validation:
 
 ```bash
-node validate.js --target ../my-project --profile-only
+node bin/validate.js --target ../my-project --profile-only
 ```
 
 If validation fails, use [docs/validation-troubleshooting.md](validation-troubleshooting.md).

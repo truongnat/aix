@@ -1,6 +1,16 @@
 import path from "node:path";
 import { readEvents, resolveEventsPath, type Event } from "./event-reader";
 import { buildAnonymizedExport, type ExportOptions, type ExportPayload } from "./export";
+import {
+  createTelemetryServer,
+  handleTelemetryRequest,
+  validateTelemetryPayload,
+  writeTelemetryExport,
+  type TelemetryServerOptions,
+  type TelemetryExportPayload,
+  type TelemetryIngestResult,
+  type TelemetryWriteResult,
+} from "./telemetry-server";
 import { formatInsightsText, summarizeEvents, type Summary } from "./summarize";
 
 interface Insights {
@@ -38,9 +48,23 @@ export {
   buildInsights,
   buildInsightsExport,
   buildAnonymizedExport,
+  createTelemetryServer,
   formatInsightsText,
   readEvents,
+  handleTelemetryRequest,
   resolveEventsPath,
   summarizeEvents,
+  validateTelemetryPayload,
+  writeTelemetryExport,
 };
-export type { Insights, Event, Summary, ExportOptions, ExportPayload };
+export type {
+  Insights,
+  Event,
+  Summary,
+  ExportOptions,
+  ExportPayload,
+  TelemetryServerOptions,
+  TelemetryExportPayload,
+  TelemetryIngestResult,
+  TelemetryWriteResult,
+};

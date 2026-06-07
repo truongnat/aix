@@ -13,8 +13,8 @@ summary: validation should be run in the adopted target repo before claiming com
 
 | Command | Exit Code | Result | Notes |
 |---|---:|---|---|
-| `node validate.js --target ../my-project --profile-only` | not run | pending | Run after profile artifacts are created |
-| `node validate.js --target ../my-project --goal health-check` | not run | pending | Run after goal artifacts are created |
+| `node bin/validate.js --target ../my-project --profile-only` | not run | pending | Run after profile artifacts are created |
+| `node bin/validate.js --target ../my-project --goal health-check` | not run | pending | Run after goal artifacts are created |
 
 ## Manual Checks
 

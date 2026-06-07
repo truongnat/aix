@@ -5,7 +5,9 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const { applyModeMutation } = require(path.join(repoRoot, "lib", "evals", "mode-mutations.js"));
+const { applyModeMutation } = require(
+  path.join(repoRoot, "dist", "lib", "evals", "mode-mutations.js")
+);
 
 test("applyModeMutation writes with-harness fix for sample-divide", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-mutation-"));

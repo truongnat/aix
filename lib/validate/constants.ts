@@ -1,15 +1,16 @@
 import path from "node:path";
 
-const root = path.resolve(__dirname, "..", "..");
+const isCompiledDistRuntime = path.basename(path.dirname(path.dirname(__dirname))) === "dist";
+const root = isCompiledDistRuntime
+  ? path.resolve(__dirname, "..", "..", "..")
+  : path.resolve(__dirname, "..", "..");
 
 const requiredFiles = [
   "AGENTS.md",
   "PACK.md",
   "README.md",
   "package.json",
-  "validate.js",
-  "install.js",
-  "install-cache.js",
+  "bin/validate.js",
   "agent-system/SYSTEM_PROMPT.md",
   "agent-system/RESPONSE_CONTRACT.md",
   "agent-system/TONE_AND_FORMAT.md",
@@ -54,7 +55,7 @@ const requiredFiles = [
   "docs/tool-discovery-and-routing.md",
   "docs/session-memory.md",
   "docs/memory-migration.md",
-  "workers/registry.js",
+  "dist/workers/registry.js",
   "workers/reviewer.md",
   "workers/verifier.md",
   "workers/gatekeeper.md",
@@ -67,7 +68,7 @@ const requiredFiles = [
   "rules/core/blocking.md",
   "rules/core/session-memory.md",
   "rules/core/tool-routing.md",
-  "lib/provider-rule-renderer.js",
+  "dist/lib/provider-rule-renderer.js",
   "rules/providers/claude/CLAUDE.md",
   "rules/providers/cursor/ai-engineering-harness.mdc",
   "hooks/README.md",

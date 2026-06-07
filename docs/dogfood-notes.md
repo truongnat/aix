@@ -13,14 +13,14 @@ Record a real local dogfood pass of the released `ai-engineering-harness` on a s
 
 ## Commands Run
 
-- `node install.js --target ../harness-dogfood-target --dry-run`
-- `node install.js --target ../harness-dogfood-target`
-- `node validate.js --target ../harness-dogfood-target --profile-only`
-- `node validate.js --target ../harness-dogfood-target --goal health-check`
+- `node bin/aih.js install --target ../harness-dogfood-target --dry-run`
+- `node bin/aih.js install --target ../harness-dogfood-target`
+- `node bin/validate.js --target ../harness-dogfood-target --profile-only`
+- `node bin/validate.js --target ../harness-dogfood-target --goal health-check`
 - intentional profile failure:
-  `node validate.js --target ../harness-dogfood-target --profile-only`
+  `node bin/validate.js --target ../harness-dogfood-target --profile-only`
 - intentional goal failure:
-  `node validate.js --target ../harness-dogfood-target --goal health-check`
+  `node bin/validate.js --target ../harness-dogfood-target --goal health-check`
 
 ## Results
 

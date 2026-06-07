@@ -26,7 +26,7 @@ It should receive only the installed surface needed for agents to use the harnes
 
 ## Installed Surface
 
-The installed surface is the subset copied by `install.js` or vendored manually into the target repository.
+The installed surface is the subset copied by `bin/aih.js install` or vendored manually into the target repository.
 
 It is a deliberate subset, not a mirror of the whole source repository.
 
@@ -75,7 +75,7 @@ These remain optional because different target repos may need different levels o
 - do not require `PACK.md` inside every target repository by default
 - teams may copy `PACK.md` into a target repo when they want local pack metadata for vendored or audited adoption
 
-`install.js` does not need to copy `PACK.md` unless a future release explicitly adds that as an optional install flag.
+`bin/aih.js install` does not need to copy `PACK.md` unless a future release explicitly adds that as an optional install flag.
 
 ## What Must Not Be Installed
 
@@ -91,9 +91,9 @@ Do not treat these as part of the default installed surface:
 
 The installed surface should stay focused on agent operating context, not source-repo maintenance.
 
-## How install.js Uses This Contract
+## How `bin/aih.js install` Uses This Contract
 
-`install.js` should export the required installed surface plus a small set of optional adoption-facing docs.
+`bin/aih.js install` should export the required installed surface plus a small set of optional adoption-facing docs.
 
 It should not blindly copy the full source repository.
 

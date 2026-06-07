@@ -3,7 +3,9 @@ const assert = require("node:assert/strict");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const { compareAbMetrics } = require(path.join(repoRoot, "lib", "evals", "extended-metrics.js"));
+const { compareAbMetrics } = require(
+  path.join(repoRoot, "dist", "lib", "evals", "extended-metrics.js")
+);
 
 test("compareAbMetrics reports self-correction when only with-harness passes", () => {
   const task = { id: "sample-bugfix", metrics: { withHarnessSteps: 3, withoutHarnessSteps: 8 } };

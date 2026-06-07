@@ -16,7 +16,7 @@ Pick at least two scenarios for `v0.8.0`. Complete one [pack-dogfood report](pac
 |---|---|
 | Target repo type | tiny local app or script repo (few source files) |
 | Runtime to use | Cursor or Claude Code (editor/repo-local) |
-| Install mode | `node install.js --target <path>` from source pack |
+| Install mode | `node bin/aih.js install --target <path>` from source pack |
 | Goal id | `health-check` |
 | Expected profile artifacts | `.harness/HARNESS.md`, `TEAM.md`, `SKILLS.md`, `WORKFLOW.md`, `GATES.md`, `MEMORY.md` |
 | Expected goal artifacts | `.harness/goals/health-check/GOAL.md`, `PLAN.md`, `TASKS.md`, `VERIFY.md`, `REMEMBER.md` (and others per contract) |
@@ -26,8 +26,8 @@ Reference: [examples/tiny-repo-adoption/](../examples/tiny-repo-adoption/) for s
 Validation commands:
 
 ```bash
-node validate.js --target <target-repo> --profile-only
-node validate.js --target <target-repo> --goal health-check
+node bin/validate.js --target <target-repo> --profile-only
+node bin/validate.js --target <target-repo> --goal health-check
 ```
 
 Evidence to capture:
@@ -55,8 +55,8 @@ Reference: [examples/dogfood-tiny-node-api/](../examples/dogfood-tiny-node-api/)
 Validation commands:
 
 ```bash
-node validate.js --target <target-repo> --profile-only
-node validate.js --target <target-repo> --goal <goal-id>
+node bin/validate.js --target <target-repo> --profile-only
+node bin/validate.js --target <target-repo> --goal <goal-id>
 ```
 
 Evidence to capture:
@@ -82,14 +82,14 @@ Evidence to capture:
 Validation commands:
 
 ```bash
-node validate.js --target <target-repo> --profile-only
-node validate.js --target <target-repo> --goal <goal-id>
+node bin/validate.js --target <target-repo> --profile-only
+node bin/validate.js --target <target-repo> --goal <goal-id>
 ```
 
 Evidence to capture:
 
 - terminal cwd vs target repo clarity
-- whether `validate.js` path from target repo is obvious
+- whether `bin/validate.js` path from the source pack is obvious
 - friction installing only needed docs vs full surface
 - agent tendency to edit source pack instead of target repo
 
@@ -102,7 +102,7 @@ For `v0.8.0` completion, satisfy:
 - at least **2** scenarios executed in **distinct** target repositories
 - at least **2** runtimes used across the dogfood set when practical
 - every executed scenario has a filled report and any friction logged
-- no dogfood-only changes that break source pack `node validate.js` / `npm test`
+- no dogfood-only changes that break source pack `node bin/validate.js` / `npm test`
 
 ## Safety Reminder
 

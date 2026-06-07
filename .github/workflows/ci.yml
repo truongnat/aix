@@ -34,7 +34,7 @@ jobs:
         run: npm run format:check
 
       - name: Validate pack contracts
-        run: node validate.js
+        run: node bin/validate.js
 
       - name: Run repository tests
         run: npm test

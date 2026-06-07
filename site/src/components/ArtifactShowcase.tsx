@@ -19,7 +19,7 @@ const CONTENT: Record<Tab, React.ReactNode> = {
       <div className="text-indigo-400 font-semibold mt-2">| Command          | Exit | Result  |</div>
       <div className="text-slate-700">|------------------|-----:|---------|</div>
       <div><span className="text-slate-400">| npm test         |</span> <span className="text-emerald-400">0    | passed  |</span></div>
-      <div><span className="text-slate-400">| node validate.js |</span> <span className="text-emerald-400">0    | passed  |</span></div>
+      <div><span className="text-slate-400">| node bin/validate.js |</span> <span className="text-emerald-400">0    | passed  |</span></div>
       <div className="text-slate-400">| cd dogfood &amp;&amp; npm test |</div>
       <div className="text-emerald-400">  0    | passed  |</div>
       <div className="text-slate-600 mt-3 pt-3 border-t border-white/5">tests: 2 · pass: 2 · fail: 0</div>

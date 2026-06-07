@@ -138,7 +138,7 @@ sh install.sh install --runtime cursor --scope project --visibility private --ig
 
 **Problem:** Runtime-native install only wrote provider entrypoint + `.harness/` skeleton. Every provider lacked local `commands/`, `skills/`, `workflows/`.
 
-**Fix:** Install capability surface under `.ai-harness/` via [install-cache.js](../install-cache.js). Each runtime entrypoint (Cursor, Claude, Codex/Generic, Gemini, OpenCode) points at `.ai-harness/` + `.harness/`. Do **not** copy pack dirs to product repo root.
+**Fix:** Install capability surface under `.ai-harness/` via [install-cache.js](../lib/install-cache.ts). Each runtime entrypoint (Cursor, Claude, Codex/Generic, Gemini, OpenCode) points at `.ai-harness/` + `.harness/`. Do **not** copy pack dirs to product repo root.
 
 | Piece | Role |
 |---|---|
@@ -216,7 +216,7 @@ Do **not** implement everything at once:
 - [ ] README/plugin-install-ux state experimental; no stable claim
 - [ ] Dogfood at least one real repo: Cursor private + shared paths
 - [ ] Antigravity: implemented **or** explicitly “planned” in wizard with no false writes
-- [ ] `node validate.js` + `npm test` pass
+- [ ] `node bin/validate.js` + `npm test` pass
 
 ## Related Docs
 

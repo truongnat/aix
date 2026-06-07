@@ -57,7 +57,7 @@ Generic → AGENTS.md (generic adapter)
 Implementation:
 
 - `lib/provider-rule-renderer.js` — compose core + provider templates
-- `lib/install-runtime.js` — write provider entrypoints
+- `lib/install-runtime.ts` — write provider entrypoints
 - `lib/runtime-command-catalog.js` — command catalog + merged provider metadata
 
 ## Fallback Instructions
@@ -73,7 +73,7 @@ Implementation:
 
 1. Confirm `.ai-harness/activation.md` exists.
 2. Check provider entrypoint files listed above.
-3. Run `node validate.js --target <path> --profile-only` for structural checks.
+3. Run `node bin/validate.js --target <path> --profile-only` for structural checks.
 4. For Claude workers, confirm `.claude/agents/harness-*.md` includes `### Agent Result`.
 
 ## Related Docs

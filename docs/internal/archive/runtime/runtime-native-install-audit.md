@@ -15,9 +15,9 @@ D1/D2 dogfood found `--init-harness` creating a minimal `AGENTS.md` before `gene
 | Component | Role |
 |---|---|
 | [install.sh](../install.sh) | Runtime/scope selection, `.harness/` init, dispatches non-`manual` to `install-runtime.js` |
-| [install-runtime.js](../install-runtime.js) | Writes files from [runtime/](../runtime/) only — **no** `exportPaths` / root pack copy |
+| [install-runtime.js](../lib/install-runtime.ts) | Writes files from [runtime/](../runtime/) only — **no** `exportPaths` / root pack copy |
 | [runtime/](../runtime/) | Minimal payloads (rules, plugin JS, extension manifest, AGENTS snippets) |
-| [install.js](../install.js) | **Manual fallback only** — copies installed surface to target root |
+| [install.js](../bin/aih.js) | **Manual fallback only** — copies installed surface to target root |
 
 Automated tests cover file creation and dry-run for several paths. **Scenarios D1–D6** dogfood all primary runtimes in external repos (project and/or global dry-run). Manual IDE/CLI load checks remain incomplete for several runtimes.
 
@@ -97,7 +97,7 @@ Automated tests cover file creation and dry-run for several paths. **Scenarios D
 | **global** | `~/.cursor/rules/ai-engineering-harness.mdc` |
 | **project** | `<target>/.cursor/rules/ai-engineering-harness.mdc` |
 
-**Windsurf:** `--runtime windsurf` resolves to cursor installer ([install-runtime.js](../install-runtime.js) `RUNTIME_ALIASES`). Interactive menu option 3 is labeled **Cursor / Windsurf**. No separate Windsurf payload.
+**Windsurf:** `--runtime windsurf` resolves to cursor installer ([install-runtime.js](../lib/install-runtime.ts) `RUNTIME_ALIASES`). Interactive menu option 3 is labeled **Cursor / Windsurf**. No separate Windsurf payload.
 
 **Payload:** `alwaysApply: true` rule pointing agents at `.harness/`.
 
@@ -181,7 +181,7 @@ Per runtime, capture in [pack-dogfood-reports/](pack-dogfood-reports/) (scenario
 1. Command used (dry-run + write)
 2. Files on disk (listing)
 3. Tool observes harness behavior (pass/fail/unknown)
-4. `node validate.js --target … --profile-only` when applicable
+4. `node bin/validate.js --target … --profile-only` when applicable
 5. Rollback steps
 
 See [runtime-native-install-dogfood-plan.md](runtime-native-install-dogfood-plan.md).

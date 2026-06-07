@@ -25,7 +25,7 @@ Authoring guide: [target-repo-validation.md](target-repo-validation.md). Validat
 
 ## Required Root Entry (Profile Mode)
 
-**Legacy default** (`node validate.js --target <path> --profile-only` without `--runtime`):
+**Legacy default** (`node bin/validate.js --target <path> --profile-only` without `--runtime`):
 
 - `AGENTS.md` at the target repository root
 
@@ -92,11 +92,11 @@ Heading **presence** is validated (`##` lines). Order and body content are not v
 - Forbidden Content
 - Human Review
 
-Enforced in `validate.js` as `harnessHeadings`, `teamHeadings`, `selectedSkillsHeadings`, `workflowHeadings`, `gatesHeadings`, and `memoryHeadings` on `.harness/*` paths.
+Enforced in `bin/validate.js` as `harnessHeadings`, `teamHeadings`, `selectedSkillsHeadings`, `workflowHeadings`, `gatesHeadings`, and `memoryHeadings` on `.harness/*` paths.
 
 ## What Is Guaranteed
 
-- `node validate.js --target <path> --profile-only` checks paths and headings above
+- `node bin/validate.js --target <path> --profile-only` checks paths and headings above
 - templates in the source pack use the same heading contracts for authoring consistency
 - optional extra sections may exist if all required headings remain present
 
@@ -121,14 +121,14 @@ Breaking for this contract:
 
 - removing any required profile file
 - removing or renaming any required heading above
-- making previously optional sections required in `validate.js` without migration
+- making previously optional sections required in `bin/validate.js` without migration
 
 ## Validation Behavior
 
 From the **source pack** root:
 
 ```bash
-node validate.js --target <path> --profile-only
+node bin/validate.js --target <path> --profile-only
 ```
 
 - checks `AGENTS.md` and `.harness/` exist

@@ -72,11 +72,11 @@ Heading **presence** is validated. Order and body content are not validated.
 - Reuse Guidance
 - Sensitive Data Check
 
-Enforced in `validate.js` as `goalTemplateHeadings` (derived from `goalArtifactHeadings` on the flutter-google-login example paths).
+Enforced in `bin/validate.js` as `goalTemplateHeadings` (derived from `goalArtifactHeadings` on the flutter-google-login example paths).
 
 ## What Is Guaranteed
 
-- `node validate.js --target <path> --goal <goal-id>` checks the goal directory, five files, and headings above
+- `node bin/validate.js --target <path> --goal <goal-id>` checks the goal directory, five files, and headings above
 - goal mode also runs the [frozen target profile contract](frozen-target-profile-contract.md) checks first
 - optional goal files (for example `DISCUSSION.md`, `SHIP.md`) are allowed but not required by v1.0.0
 
@@ -109,7 +109,7 @@ Breaking for this contract:
 From the **source pack** root:
 
 ```bash
-node validate.js --target <path> --goal <goal-id>
+node bin/validate.js --target <path> --goal <goal-id>
 ```
 
 - validates frozen target profile contract first

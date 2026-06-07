@@ -15,9 +15,9 @@ This repository (`ai-engineering-harness`) is the canonical source pack. It owns
 - `AGENTS.md` template contract for the pack (source copy)
 - `commands/`, `skills/`, `workflows/`, `patterns/`, `templates/`
 - adoption, validation, runtime, packaging, and release documentation
-- `install.js`, `validate.js`, `PACK.md`
+- `bin/aih.js install`, `bin/validate.js`, `PACK.md`
 - examples and dogfood evidence (not the installed layout for product repos)
-- structural self-validation: `node validate.js`
+- structural self-validation: `node bin/validate.js`
 
 The source pack is **not** the product repository.
 
@@ -33,9 +33,9 @@ The target repository is where product work happens. It owns:
 
 ## Installed Surface Boundary
 
-- target receives the [frozen default installed surface](frozen-installed-surface-contract.md) via `install.js` or manual copy
+- target receives the [frozen default installed surface](frozen-installed-surface-contract.md) via `bin/aih.js install` or manual copy
 - not a full mirror of the source repository
-- `PACK.md` and `validate.js` are **not** in default install
+- `PACK.md` and `bin/validate.js` are **not** in default install
 
 ## Product Work Boundary
 
@@ -47,8 +47,8 @@ The target repository is where product work happens. It owns:
 - target structural validation runs from the **source pack** with:
 
 ```bash
-node validate.js --target <path> --profile-only
-node validate.js --target <path> --goal <goal-id>
+node bin/validate.js --target <path> --profile-only
+node bin/validate.js --target <path> --goal <goal-id>
 ```
 
 See [frozen validation contract](frozen-validation-contract.md).
@@ -75,7 +75,7 @@ See [frozen packaging and release contract](frozen-packaging-release-contract.md
 ## Allowed Additive Changes
 
 - clearer docs and diagrams
-- optional team choice to vendor `PACK.md` or `validate.js` into a target (not default)
+- optional team choice to vendor `PACK.md` or `bin/validate.js` into a target (not default)
 
 ## Breaking Changes
 
@@ -85,7 +85,7 @@ Breaking for this contract:
 
 - moving product work or required `.harness/` authoring into the source pack as default
 - requiring target repos to be forks of the harness repository
-- changing validation to require target-local `validate.js` without migration
+- changing validation to require target-local `bin/validate.js` without migration
 
 ## Relationship To TARGET.md
 

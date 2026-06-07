@@ -20,15 +20,15 @@ Frozen docs remain **pre-v1 contract candidates** until v1 re-freeze. Runtime-na
 | Installed surface | default `exportPaths` | **obsolete / pre-pivot candidate** — root bulk copy is fallback only; not v1 default — [frozen-installed-surface-contract.md](frozen-installed-surface-contract.md) |
 | Target profile | `.harness/` profile | **pre-v1 candidate** — [frozen-target-profile-contract.md](frozen-target-profile-contract.md) |
 | Goal artifacts | `.harness/goals/` | **pre-v1 candidate** — [frozen-goal-artifact-contract.md](frozen-goal-artifact-contract.md) |
-| Validation behavior | `validate.js` CLI | **pre-v1 candidate** — [frozen-validation-contract.md](frozen-validation-contract.md) |
+| Validation behavior | `bin/validate.js` CLI | **pre-v1 candidate** — [frozen-validation-contract.md](frozen-validation-contract.md) |
 | Runtime consumption | docs-only runtimes | **pre-v1 candidate** — [frozen-runtime-consumption-contract.md](frozen-runtime-consumption-contract.md) |
 | Packaging / release | manual packaging | **pre-v1 candidate** — [frozen-packaging-release-contract.md](frozen-packaging-release-contract.md) |
 | Source vs target boundary | pack vs product repo | **pre-v1 candidate** — [frozen-source-target-boundary-contract.md](frozen-source-target-boundary-contract.md) |
 | Runtime install matrix | per-runtime paths and scopes | **experimental** — [runtime-native-install-audit.md](runtime-native-install-audit.md) |
 | Interactive installer | runtime + scope wizard | **implemented** — [interactive-installer-design.md](interactive-installer-design.md) |
-| Runtime-native writes | `install-runtime.js` | **experimental** — D1–D6 dogfood complete; stable **No** — [runtime-dogfood-summary.md](runtime-dogfood-summary.md) |
+| Runtime-native writes | `lib/install-runtime.ts` | **experimental** — D1–D6 dogfood complete; stable **No** — [runtime-dogfood-summary.md](runtime-dogfood-summary.md) |
 | Project state policy | `.harness/` per repo vs global plugin | **implemented** (scaffold) — [harness-init-usage.md](harness-init-usage.md) |
-| Plugin install UX (fallback) | one-line `install.sh` + `install.js` copy | **dogfooded; fallback only** — [install.sh](../install.sh), [install-sh-usage.md](install-sh-usage.md), [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md) |
+| Plugin install UX (fallback) | one-line `install.sh` + `bin/aih.js install` copy | **dogfooded; fallback only** — [install.sh](../install.sh), [install-sh-usage.md](install-sh-usage.md), [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md) |
 
 Breaking changes: [breaking-change-policy.md](breaking-change-policy.md).
 
@@ -42,19 +42,19 @@ Breaking changes: [breaking-change-policy.md](breaking-change-policy.md).
 - **May still change before v1.0.0:** non-heading body wording; pack version string; optional future manifest sections if additive and non-breaking
 - **Not guaranteed:** manifest body semantic validation; version value enforcement; archive file list hashing
 
-Enforced by: `node validate.js` (`packRequiredHeadings` in `validate.js`).
+Enforced by: `node bin/validate.js` (`packRequiredHeadings` in `bin/validate.js`).
 
 ---
 
 ## Installed Surface Contract
 
 - **Frozen record:** [frozen-installed-surface-contract.md](frozen-installed-surface-contract.md)
-- **Stable source:** [installed-surface-contract.md](installed-surface-contract.md), `install.js` `exportPaths`
-- **What is frozen:** default `exportPaths` install surface; required files and directories; `PACK.md` and `validate.js` not installed by default; target validation from source pack with `--target`
+- **Stable source:** [installed-surface-contract.md](installed-surface-contract.md), `bin/aih.js install` surface
+- **What is frozen:** default install surface; required files and directories; `PACK.md` and `bin/validate.js` not installed by default; target validation from source pack with `--target`
 - **May still change before v1.0.0:** additive paths in `exportPaths`; install summary display strings
 - **Not guaranteed:** minimal install tier (deferred post-v1 — [minimal-install-tier-decision.md](minimal-install-tier-decision.md))
 
-Enforced by: `install.js` `exportPaths` + tests; structural target validation from source pack.
+Enforced by: `bin/aih.js install` surface + tests; structural target validation from source pack.
 
 ---
 
@@ -66,7 +66,7 @@ Enforced by: `install.js` `exportPaths` + tests; structural target validation fr
 - **May still change before v1.0.0:** additive optional sections if validator unchanged; example richness under `examples/`
 - **Not guaranteed:** semantic quality of profile content; automatic profile generation
 
-Enforced by: `node validate.js --target <path> --profile-only`.
+Enforced by: `node bin/validate.js --target <path> --profile-only`.
 
 ---
 
@@ -78,7 +78,7 @@ Enforced by: `node validate.js --target <path> --profile-only`.
 - **May still change before v1.0.0:** optional goal files only if not added to validator without migration
 - **Not guaranteed:** application correctness; CI integration; automatic goal generation
 
-Enforced by: `node validate.js --target <path> --goal <goal-id>` (includes profile contract first).
+Enforced by: `node bin/validate.js --target <path> --goal <goal-id>` (includes profile contract first).
 
 Mapping from examples: [harness-example-to-target-layout.md](harness-example-to-target-layout.md).
 
@@ -87,10 +87,10 @@ Mapping from examples: [harness-example-to-target-layout.md](harness-example-to-
 ## Validation Contract
 
 - **Frozen record:** [frozen-validation-contract.md](frozen-validation-contract.md)
-- **Stable source:** [target-repo-validation.md](target-repo-validation.md), `validate.js`
+- **Stable source:** [target-repo-validation.md](target-repo-validation.md), `bin/validate.js`
 - **What is frozen:** CLI modes; structural-only checks; `--target` defaults to profile validation; failure message shapes; usage error rules
 - **May still change before v1.0.0:** additive `requiredFiles` in source pack; new fixtures
-- **Not guaranteed:** semantic validation; secret scanning; deep scanning; in-target `validate.js` copy
+- **Not guaranteed:** semantic validation; secret scanning; deep scanning; in-target `bin/validate.js` copy
 
 ---
 
@@ -133,4 +133,4 @@ Not part of v1.0.0 contract:
 - marketplace / package publishing
 - runtime adapters
 - semantic validation and checksums
-- optional in-target `validate.js`
+- optional in-target `bin/validate.js`

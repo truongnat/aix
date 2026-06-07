@@ -13,6 +13,7 @@
  *   - harness_skeleton_decisions_md (1709-1735)
  *   - harness_skeleton_hazards_md   (1737-1763)
  *   - harness_skeleton_index_md     (1766-1796)
+ *   - harness_policies_json         (policy engine defaults)
  *   - init_harness_profile          (1798-1811)
  */
 
@@ -325,6 +326,91 @@ function skeletonIndexMd(): string {
 `;
 }
 
+function skeletonPoliciesJson(): string {
+  return `{
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "phase-gate-plan",
+      "name": "Plan Approval Required",
+      "description": "harness-run requires an approved plan before implementation can begin",
+      "severity": "error",
+      "conditions": [
+        { "type": "command", "operator": "equals", "value": "harness-run" },
+        { "type": "state", "operator": "not_exists", "value": "current_plan:approved" }
+      ],
+      "action": {
+        "type": "block",
+        "message": "Plan must be approved before implementation",
+        "nextCommand": "harness-plan",
+        "questions": ["Which plan should be approved before implementation?"]
+      }
+    },
+    {
+      "id": "phase-gate-verify",
+      "name": "Verification Required Before Ship",
+      "description": "harness-ship requires verified VERIFY.md with explicit status and evidence",
+      "severity": "error",
+      "conditions": [
+        { "type": "command", "operator": "equals", "value": "harness-ship" },
+        { "type": "state", "operator": "not_exists", "value": "verify:approved" }
+      ],
+      "action": {
+        "type": "block",
+        "message": "Verification must be completed and approved before shipping",
+        "nextCommand": "harness-verify",
+        "questions": ["What verification evidence is still missing?"]
+      }
+    },
+    {
+      "id": "phase-gate-implementation-evidence",
+      "name": "Implementation Evidence Required",
+      "description": "harness-verify requires implementation evidence (completed tasks or tool runs)",
+      "severity": "error",
+      "conditions": [
+        { "type": "command", "operator": "equals", "value": "harness-verify" },
+        { "type": "state", "operator": "not_exists", "value": "implementation_evidence" }
+      ],
+      "action": {
+        "type": "block",
+        "message": "No implementation evidence found for verification",
+        "nextCommand": "harness-run",
+        "questions": ["What implementation work should be verified?"]
+      }
+    },
+    {
+      "id": "test-first-enforcement",
+      "name": "Test-First Discipline",
+      "description": "Source file edits require corresponding test file with failing assertion",
+      "severity": "error",
+      "conditions": [
+        { "type": "file_pattern", "operator": "matches", "value": "src/**" }
+      ],
+      "action": {
+        "type": "block",
+        "message": "Test-first discipline violated: editing source without corresponding test",
+        "questions": ["Create or update the corresponding test file first"]
+      }
+    },
+    {
+      "id": "scope-guard",
+      "name": "Scope Guard",
+      "description": "Edits must stay within scope defined in goal artifact or plan",
+      "severity": "warning",
+      "conditions": [
+        { "type": "file_pattern", "operator": "matches", "value": "**" }
+      ],
+      "action": {
+        "type": "warn",
+        "message": "Edit may be outside approved scope",
+        "questions": ["Is this edit within the approved goal scope?"]
+      }
+    }
+  ]
+}
+`;
+}
+
 /** Map of relative path (under .harness/) to content generator. */
 const SKELETON_FILES: Array<{ rel: string; content: () => string }> = [
   { rel: ".harness/HARNESS.md", content: skeletonHarnessMd },
@@ -336,6 +422,7 @@ const SKELETON_FILES: Array<{ rel: string; content: () => string }> = [
   { rel: ".harness/DECISIONS.md", content: skeletonDecisionsMd },
   { rel: ".harness/HAZARDS.md", content: skeletonHazardsMd },
   { rel: ".harness/INDEX.md", content: skeletonIndexMd },
+  { rel: ".harness/policies.json", content: skeletonPoliciesJson },
   { rel: ".harness/goals/.gitkeep", content: () => "" },
 ];
 

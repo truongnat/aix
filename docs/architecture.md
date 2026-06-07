@@ -99,8 +99,9 @@ Each target repo is self-contained. No external service needed.
 │ └─ Session memory (preserve state safely)                   │
 ├──────────────────────────────────────────────────────────────┤
 │ LAYER 8: Installation & Integration                          │
-│ ├─ install.js / install-runtime.js — Set up in target repo  │
-│ ├─ validate.js — Check harness health                       │
+│ ├─ bin/aih.js / bin/validate.js — CLI entrypoints           │
+│ ├─ lib/install-runtime.ts — Set up in target repo           │
+│ ├─ lib/validate/index.ts — Check harness health             │
 │ ├─ hooks/ — Provider-specific automation                    │
 │ └─ workers/ — Delegated subagents (Claude only)             │
 └──────────────────────────────────────────────────────────────┘
@@ -215,7 +216,7 @@ Generic Target Repo
 
 ### Why Validation in the npm Package?
 
-Validation (`validate.js`) runs locally before any work happens:
+Validation (`bin/validate.js`) runs locally before any work happens:
 - Catches configuration problems early
 - Doesn't require CI/server
 - Works offline

@@ -123,7 +123,7 @@ Dry-run prints would-remove lines for both.
 
 1. Download tarball at ref
 2. Re-run capability cache install with overwrite semantics
-3. Re-run `install-runtime.js` equivalent for listed runtimes with overwrite semantics
+3. Re-run `dist/lib/install-runtime.js` equivalent for listed runtimes with overwrite semantics
 4. Keep `.harness/` untouched
 
 Default ref: current install ref if detectable, else `main` with warning.

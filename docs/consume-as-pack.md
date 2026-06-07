@@ -20,16 +20,16 @@ That is where agents should read the installed harness surface, create `.harness
 
 ```bash
 sh install.sh --runtime generic --scope project --init-harness --yes
-node validate.js --target ../my-project --runtime generic --profile-only   # from source pack
+node bin/validate.js --target ../my-project --runtime generic --profile-only   # from source pack
 ```
 
 **Maintainers (source pack):**
 
 ```bash
-node install.js --target ../my-project --dry-run
-node install.js --target ../my-project
-node validate.js --target ../my-project --profile-only
-node validate.js --target ../my-project --goal health-check
+node bin/aih.js install --target ../my-project --dry-run
+node bin/aih.js install --target ../my-project
+node bin/validate.js --target ../my-project --profile-only
+node bin/validate.js --target ../my-project --goal health-check
 ```
 
 ## What The Agent Should Read

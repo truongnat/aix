@@ -20,10 +20,10 @@ Install/copy via `install.js` from source pack into target repo.
 
 ```bash
 # From source pack root
-node install.js --target ../harness-dogfood-tiny --dry-run
-node install.js --target ../harness-dogfood-tiny
-node validate.js --target ../harness-dogfood-tiny --profile-only
-node validate.js --target ../harness-dogfood-tiny --goal health-check
+node bin/aih.js install --target ../harness-dogfood-tiny --dry-run
+node bin/aih.js install --target ../harness-dogfood-tiny
+node bin/validate.js --target ../harness-dogfood-tiny --profile-only
+node bin/validate.js --target ../harness-dogfood-tiny --goal health-check
 ```
 
 Target repo bootstrap (local only): minimal `README.md`, `package.json`, `src/index.js` with `GET /` only.
@@ -48,8 +48,8 @@ Target repo bootstrap (local only): minimal `README.md`, `package.json`, `src/in
 
 | Command | Result | Notes |
 |---|---|---|
-| `node validate.js --target ../harness-dogfood-tiny --profile-only` | pass | Checked profile contract |
-| `node validate.js --target ../harness-dogfood-tiny --goal health-check` | pass | Checked goal contract |
+| `node bin/validate.js --target ../harness-dogfood-tiny --profile-only` | pass | Checked profile contract |
+| `node bin/validate.js --target ../harness-dogfood-tiny --goal health-check` | pass | Checked goal contract |
 
 ## What Worked
 
@@ -62,7 +62,7 @@ Target repo bootstrap (local only): minimal `README.md`, `package.json`, `src/in
 ## What Was Confusing
 
 - Install summary prints an absolute target path; easy to paste into docs but noisy for shared reports
-- New adopters may try running `node validate.js` inside the target repo before learning it lives only in the source pack
+- New adopters may try running `node bin/validate.js` inside the target repo before learning it lives only in the source pack
 
 ## Missing Docs
 

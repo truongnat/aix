@@ -30,13 +30,13 @@ Packaging does not mean:
 
 The source pack is this repository.
 
-It contains the full authored surface: commands, skills, workflows, patterns, templates, docs, examples, `install.js`, `validate.js`, and `PACK.md`.
+It contains the full authored surface: commands, skills, workflows, patterns, templates, docs, examples, `bin/aih.js`, `bin/validate.js`, and `PACK.md`.
 
 ## Installed Surface
 
 The installed surface is the deliberate subset copied into a target repository.
 
-See [installed-surface-contract.md](installed-surface-contract.md). The manifest's Included Surface section describes what belongs in a distributable pack; `install.js` defines what is copied by default into target repos.
+See [installed-surface-contract.md](installed-surface-contract.md). The manifest's Included Surface section describes what belongs in a distributable pack; `bin/aih.js install` defines what is copied by default into target repos.
 
 ## Pack Manifest
 
@@ -58,7 +58,7 @@ See [release-archive-model.md](release-archive-model.md) and [release-archive-ch
 
 Before release or manual archive distribution, run [pack-verification-checklist.md](pack-verification-checklist.md).
 
-It verifies `PACK.md`, included surface, installed surface alignment with `install.js`, release archive consistency, and structural validation commands.
+It verifies `PACK.md`, included surface, installed surface alignment with `bin/aih.js install`, release archive consistency, and structural validation commands.
 
 ## Manual Packaging Flow
 

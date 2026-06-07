@@ -8,7 +8,7 @@
 
 A contribution is **done** when:
 
-1. `npm run lint`, `npm run format:check`, `node validate.js`, and `npm test` pass locally
+1. `npm run lint`, `npm run format:check`, `node bin/validate.js`, and `npm test` pass locally
 2. Changes to `lib/` meet the coverage gate: `npm run test:coverage`
 3. PRs that change **rules, workflows, commands, or hooks** include either:
    - an eval run (`aih eval run <task> --yes`), or
@@ -51,14 +51,14 @@ When adding or editing skills:
 
 ## Validation
 
-If required files change, update `validate.js` accordingly.
+If required files change, update `bin/validate.js` accordingly.
 
 Before submitting changes, run:
 
 ```bash
 npm run lint
 npm run format:check
-node validate.js
+node bin/validate.js
 npm test
 npm run test:coverage
 ```

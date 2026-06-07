@@ -24,9 +24,9 @@ sh install.sh --runtime opencode --scope project --target ../harness-dogfood-ope
 
 sh install.sh --runtime opencode --scope project --target ../harness-dogfood-opencode --init-harness --yes
 
-node validate.js --target ../harness-dogfood-opencode --runtime opencode --profile-only
+node bin/validate.js --target ../harness-dogfood-opencode --runtime opencode --profile-only
 
-node validate.js --target ../harness-dogfood-opencode --profile-only
+node bin/validate.js --target ../harness-dogfood-opencode --profile-only
 
 # Idempotency (no --force)
 sh install.sh --runtime opencode --scope project --target ../harness-dogfood-opencode --init-harness --yes
@@ -60,8 +60,8 @@ Pre-existing in target (unchanged): `README.md`, `package.json`.
 
 | Command | Result | Notes |
 |---|---|---|
-| `node validate.js --target ../harness-dogfood-opencode --runtime opencode --profile-only` | **pass** | `.harness/` + plugin paths |
-| `node validate.js --target ../harness-dogfood-opencode --profile-only` | **FAIL** (expected) | `Missing required path: AGENTS.md` — legacy mode |
+| `node bin/validate.js --target ../harness-dogfood-opencode --runtime opencode --profile-only` | **pass** | `.harness/` + plugin paths |
+| `node bin/validate.js --target ../harness-dogfood-opencode --profile-only` | **FAIL** (expected) | `Missing required path: AGENTS.md` — legacy mode |
 
 ## Root Pollution Check
 

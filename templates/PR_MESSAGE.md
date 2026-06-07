@@ -23,7 +23,7 @@ feat(scope): short summary
 ### Verification
 
 - [ ] `npm test`
-- [ ] `node validate.js`
+- [ ] `node bin/validate.js`
 
 ### Files changed
 

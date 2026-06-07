@@ -116,7 +116,7 @@ See [docs/typescript-usage.md](docs/typescript-usage.md) for the full API refere
 
 ## Evals
 
-The harness includes an eval subsystem for deterministic A/B comparisons between `with-harness` and `without-harness` task runs.
+The harness includes an eval subsystem for deterministic A/B comparisons between `with-harness` and `without-harness` task runs. Reports are tagged as `synthetic-fixture` by default, and can be promoted to `live-provider-command` when you run a configured provider CLI via `--live-provider-command "<cmd>"` or `EVAL_PROVIDER_COMMAND`.
 
 ```bash
 npx ai-engineering-harness eval list
@@ -343,7 +343,7 @@ Release notes: [docs/v1.0.1-release-notes.md](docs/v1.0.1-release-notes.md)
 ## Maintainers
 
 ```bash
-node validate.js
+node bin/validate.js
 npm test
 cd site && npm run build
 ```

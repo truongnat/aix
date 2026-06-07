@@ -1,12 +1,12 @@
 # Runtime Install Payloads
 
-Files here are installed by `install-runtime.js` (from `install.sh`) into **provider-specific entrypoints**. They do **not** copy the full capability pack into the product repo root.
+Files here are installed by `dist/lib/install-runtime.js` (from `aih.sh` / `install.sh`) into **provider-specific entrypoints**. They do **not** copy the full capability pack into the product repo root.
 
 ## Three-layer model (project scope)
 
 ```txt
 <runtime entrypoint>  →  adapter (this directory)
-.ai-harness/          →  capability source (install-cache.js)
+.ai-harness/          →  capability source (dist/lib/install-cache.js)
 .harness/             →  project state (--init-harness)
 ```
 

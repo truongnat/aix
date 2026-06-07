@@ -76,7 +76,7 @@ Show how a host repository would use `.harness/` with safe example artifacts.
 
 - [ ] **Step 2: Add ignore and CI support**
 
-Ignore local runtime residue and validate repository structure in GitHub Actions with `node validate.js`.
+Ignore local runtime residue and validate repository structure in GitHub Actions with `node bin/validate.js`.
 
 ### Task 5: Verify
 
@@ -85,7 +85,7 @@ Ignore local runtime residue and validate repository structure in GitHub Actions
 
 - [ ] **Step 1: Run validation**
 
-Run: `node validate.js`
+Run: `node bin/validate.js`
 Expected: `Harness validation passed. Checked 57 required files.`
 
 - [ ] **Step 2: Review artifact coverage**

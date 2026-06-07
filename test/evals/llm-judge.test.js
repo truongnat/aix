@@ -6,7 +6,7 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const { judgeWithLlmFallback, runDeterministicRubric } = require(
-  path.join(repoRoot, "lib", "evals", "llm-judge.js")
+  path.join(repoRoot, "dist", "lib", "evals", "llm-judge.js")
 );
 
 test("runDeterministicRubric evaluates response-contract behavior checks", () => {

@@ -8,7 +8,7 @@ Record the v0.9.0 decision on whether to implement a minimal install tier before
 
 From `v0.8.0` Scenario A and B:
 
-- default `install.js` copies approximately 83 paths successfully
+- default `bin/aih.js install` copies approximately 83 paths successfully
 - tiny and mobile skeleton repos both completed install → profile → goal → validation
 - friction log rated large install surface as **low** severity, not blocking
 - follow-up backlog listed minimal install as v0.9 contract candidate, not v1 blocker
@@ -26,7 +26,7 @@ This decision supports freezing one default installed surface in [frozen-install
 
 - default install works end-to-end in dogfood evidence
 - introducing tiers before v1 adds contract branching (`full` vs `minimal`) without a proven adoption failure
-- `install.js` and [installed-surface-contract.md](installed-surface-contract.md) are easier to freeze with one default surface
+- `bin/aih.js install` and [installed-surface-contract.md](installed-surface-contract.md) are easier to freeze with one default surface
 - minimal tier can be designed post-v1 with explicit breaking-change and migration policy if still needed
 
 ## Consequences

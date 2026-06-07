@@ -11,7 +11,7 @@ function fresh(modulePath) {
 }
 
 test("parseArgv recognizes init command", () => {
-  const cliArgs = fresh("lib/cli-args.js");
+  const cliArgs = fresh("dist/lib/cli-args.js");
   const opts = cliArgs.parseArgv(["node", "aih.js", "init", "--provider", "cursor", "--yes"]);
   assert.equal(opts.command, "init");
   assert.deepEqual(opts.providers, ["cursor"]);
@@ -19,14 +19,14 @@ test("parseArgv recognizes init command", () => {
 });
 
 test("parseArgv recognizes --skip-demo-eval", () => {
-  const cliArgs = fresh("lib/cli-args.js");
+  const cliArgs = fresh("dist/lib/cli-args.js");
   const opts = cliArgs.parseArgv(["node", "aih.js", "init", "--skip-demo-eval", "--yes"]);
   assert.equal(opts.command, "init");
   assert.equal(opts.skipDemoEval, true);
 });
 
 test("renderHelp includes init quickstart", () => {
-  const { renderHelp } = fresh("lib/cli-help.js");
+  const { renderHelp } = fresh("dist/lib/cli-help.js");
   const help = renderHelp();
   assert.match(help, /ai-engineering-harness init/);
 });

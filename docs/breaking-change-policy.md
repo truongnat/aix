@@ -14,12 +14,12 @@ Breaking examples:
 - renaming a required `.harness/` profile artifact file
 - removing or renaming required headings in profile or goal artifacts checked by `validate.js`
 - changing `validate.js` so previously valid target repos fail structural validation without artifact updates
-- removing paths from default `install.js` `exportPaths` without migration guidance
+- removing paths from default `bin/aih.js install` `exportPaths` without migration guidance
 - changing the source-pack vs target-repo boundary so product work is expected in the source repository
 - requiring `validate.js` inside target repos when it was not previously required
-- removing a default installed surface required file or directory from `install.js` `exportPaths` without migration
+- removing a default installed surface required file or directory from `bin/aih.js install` `exportPaths` without migration
 - making `PACK.md` required in target repositories by default
-- changing from source-pack validation (`node validate.js --target`) to requiring target-local `validate.js` without migration
+- changing from source-pack validation (`node bin/validate.js --target`) to requiring target-local `validate.js` without migration
 - removing required `.harness/TEAM.md` (or any frozen profile file) from the profile contract
 - renaming `.harness/goals/<goal-id>/VERIFY.md` or other required goal files
 - removing a required heading from `.harness/goals/<goal-id>/REMEMBER.md` (or other goal files) in `validate.js`

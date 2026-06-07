@@ -22,7 +22,25 @@ aih insights --upload
 
 `--recommend-evals` closes the telemetry→eval loop by mapping guard blocks and tool failures to suggested golden tasks.
 
+`--run-recommended-evals` executes the suggested tasks immediately and writes a regression report to `.harness/telemetry/eval-regression/`.
+
 `--upload` posts the anonymized export payload to `HARNESS_TELEMETRY_ENDPOINT` when `.harness/config.json` sets `telemetry.export.remoteUpload.enabled` to `true`.
+
+## Minimal backend
+
+The repo now includes a minimal ingest backend you can run locally or deploy behind a reverse proxy:
+
+```bash
+npm run telemetry:server
+```
+
+By default it listens on `127.0.0.1:8787` and accepts `POST /api/telemetry`. Point `HARNESS_TELEMETRY_ENDPOINT` at that route:
+
+```bash
+export HARNESS_TELEMETRY_ENDPOINT=http://127.0.0.1:8787/api/telemetry
+```
+
+Accepted payloads are appended to `.harness/telemetry/harness-telemetry.ndjson` unless you override `HARNESS_TELEMETRY_STORAGE_DIR`.
 
 ## Opt-in export
 

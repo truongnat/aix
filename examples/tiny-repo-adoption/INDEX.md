@@ -8,7 +8,7 @@
 
 | Name | Command | When To Use | Notes |
 | --- | --- | --- | --- |
-| Validate profile | `node validate.js --target ../my-project --profile-only` | Check adopted profile structure | Run from the source pack |
+| Validate profile | `node bin/validate.js --target ../my-project --profile-only` | Check adopted profile structure | Run from the source pack |
 
 ## Verification Recipes
 

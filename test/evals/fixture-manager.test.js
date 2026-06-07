@@ -4,7 +4,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const { materializeFixture } = require(path.join(repoRoot, "lib", "evals", "fixture-manager.js"));
+const { materializeFixture } = require(
+  path.join(repoRoot, "dist", "lib", "evals", "fixture-manager.js")
+);
 
 test("materializeFixture copies a fixture into an isolated temp workspace", () => {
   const workspace = materializeFixture(repoRoot, {

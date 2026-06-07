@@ -23,7 +23,7 @@ Install summary:
 - failed: 0
 Next steps:
 1. Review the files marked WOULD COPY.
-2. Run: node install.js --target /path/to/my-project
+2. Run: node bin/aih.js install --target /path/to/my-project
 3. Continue with install-to-profile setup in docs/install-to-profile-walkthrough.md.
 ```
 

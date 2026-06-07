@@ -7,7 +7,7 @@ Use this smoke test to verify that the harness can be copied into another local 
 ## Prerequisites
 
 - a local clone of `ai-engineering-harness`
-- Node.js available to run `install.js` and `validate.js`
+- Node.js available to run `bin/aih.js install` and `bin/validate.js`
 - a safe local directory where a temporary smoke-test repository can be created
 
 ## Test Repository Setup
@@ -31,7 +31,7 @@ cd ../ai-engineering-harness
 Run the installer in dry-run mode first:
 
 ```bash
-node install.js --target ../harness-smoke-test --dry-run
+node bin/aih.js install --target ../harness-smoke-test --dry-run
 ```
 
 Review the output and confirm the expected files would be copied.
@@ -41,7 +41,7 @@ Review the output and confirm the expected files would be copied.
 If the dry run looks correct, perform the real copy:
 
 ```bash
-node install.js --target ../harness-smoke-test
+node bin/aih.js install --target ../harness-smoke-test
 ```
 
 ## Verify Copied Surface
@@ -94,7 +94,7 @@ The point is not to build anything. The point is to confirm that the copied harn
 Run the repository validator from the harness repository:
 
 ```bash
-node validate.js
+node bin/validate.js
 ```
 
 This confirms the source harness still satisfies its required documentation and structure checks.
@@ -104,7 +104,7 @@ This confirms the source harness still satisfies its required documentation and 
 If the temporary smoke-test repository also contains adopted `.harness/` profile artifacts, run:
 
 ```bash
-node validate.js --target ../harness-smoke-test --profile-only
+node bin/validate.js --target ../harness-smoke-test --profile-only
 ```
 
 Use this to confirm the smoke-test repository passes structural profile validation.
@@ -112,7 +112,7 @@ Use this to confirm the smoke-test repository passes structural profile validati
 If the smoke-test repository also contains `.harness/goals/<goal-id>/` artifacts, run:
 
 ```bash
-node validate.js --target ../harness-smoke-test --goal smoke-goal
+node bin/validate.js --target ../harness-smoke-test --goal smoke-goal
 ```
 
 Use this to confirm the smoke-test repository passes structural goal validation for that goal artifact set.
@@ -133,7 +133,7 @@ If you initialized git in the smoke-test directory, deleting the directory is en
 - the real install copies the expected files
 - a minimal `.harness/` directory can be created locally
 - the simulated command loop is understandable without adding runtime code
-- `node validate.js` passes in the source harness repository
+- `node bin/validate.js` passes in the source harness repository
 - optional target profile validation passes when profile artifacts are created
 - optional target goal validation passes when goal artifacts are created
 

@@ -11,7 +11,7 @@ Today many docs show:
 ```bash
 git clone ai-engineering-harness
 cd ai-engineering-harness
-node install.js --target ../my-project
+node bin/aih.js install --target ../my-project
 ```
 
 That is valid for **maintainers** and contributors. It is **not** the desired default for product teams adopting the pack because it:
@@ -21,7 +21,7 @@ That is valid for **maintainers** and contributors. It is **not** the desired de
 - feels like an SDK checkout, not a plugin install
 - blocks one-command adoption in CI or fresh machines
 
-Core assets (`AGENTS.md`, commands, skills, `.harness/` contract, `validate.js` behavior) remain sound. The gap is **installation/adoption UX**.
+Core assets (`AGENTS.md`, commands, skills, `.harness/` contract, `bin/validate.js` behavior) remain sound. The gap is **installation/adoption UX**.
 
 ## Plugin-like Install Target
 
@@ -88,7 +88,7 @@ sh aih.sh install --runtime cursor --scope project --visibility private --yes
 Maintainers validate from source pack:
 
 ```bash
-node validate.js --target <repo> --runtime <name> --profile-only
+node bin/validate.js --target <repo> --runtime <name> --profile-only
 ```
 
 If the target repo does not expose a provider hint such as `.cursor/`, `.claude/`, or `.gemini/`, use an explicit runtime in non-interactive mode.
@@ -104,7 +104,7 @@ sh aih.sh install --runtime <name> --scope project --visibility shared --init-ha
 - `<name>`: `generic`, `codex`, `cursor`, `gemini`, `claude`
 - **Manual fallback** (`manual` / `--legacy-root`): root copy only — [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md)
 
-[install.sh](../install.sh) + [install-runtime.js](../install-runtime.js) install **per runtime** without copying `commands/`, `skills/`, etc. to the product root. Capabilities live under **`.ai-harness/`** when cache is installed (private project default). See [runtime-native-install.md](runtime-native-install.md) and [private-capability-cache.md](private-capability-cache.md).
+[install.sh](../install.sh) + [lib/install-runtime.ts](../lib/install-runtime.ts) install **per runtime** without copying `commands/`, `skills/`, etc. to the product root. Capabilities live under **`.ai-harness/`** when cache is installed (private project default). See [runtime-native-install.md](runtime-native-install.md) and [private-capability-cache.md](private-capability-cache.md).
 
 Uninstall examples:
 
@@ -125,12 +125,12 @@ sh aih.sh update --runtime all --scope project --ref main --yes
 
 | Capability | Status |
 |---|---|
-| `manual` / `--legacy-root` | **Implemented** — root copy via `install.js`; dogfooded (Scenario C); **fallback only** |
+| `manual` / `--legacy-root` | **Implemented** — legacy root-copy fallback via `bin/aih.js install`; dogfooded (Scenario C); **fallback only** |
 | `.harness/` init (`--init-harness`) | **Implemented** — project scope; automated tests |
 | Runtime-native modes | **Experimental PASS** (D1–D6 file/install) — [runtime-dogfood-summary.md](runtime-dogfood-summary.md); stable **No** until manual runtime checks |
 | `generic` + `project` + `--init-harness` | **experimental PASS** (Scenario D1) — [scenario-d1-generic-project.md](pack-dogfood-reports/scenario-d1-generic-project.md) |
 | `codex` + `project` + `--init-harness` | **experimental PASS** (Scenario D2) — [scenario-d2-codex-project.md](pack-dogfood-reports/scenario-d2-codex-project.md) |
-| `cursor` + `project` + `--init-harness` | **experimental PASS** (Scenario D3) — [scenario-d3-cursor-project.md](pack-dogfood-reports/scenario-d3-cursor-project.md); validate with `node validate.js --target <repo> --runtime cursor --profile-only` |
+| `cursor` + `project` + `--init-harness` | **experimental PASS** (Scenario D3) — [scenario-d3-cursor-project.md](pack-dogfood-reports/scenario-d3-cursor-project.md); validate with `node bin/validate.js --target <repo> --runtime cursor --profile-only` |
 | OpenCode (removed v0.11.0) | Historical only — [scenario-d4-opencode-project.md](pack-dogfood-reports/scenario-d4-opencode-project.md); no longer an active install/validate runtime |
 | `gemini` + `project` or `global` | **experimental PASS** (Scenario D5) — [scenario-d5-gemini.md](pack-dogfood-reports/scenario-d5-gemini.md); project validate with `--runtime gemini`; global extension path preferred for CLI load |
 | `claude` + `project` (global dry-run only in D6) | **experimental PASS** (Scenario D6) — [scenario-d6-claude.md](pack-dogfood-reports/scenario-d6-claude.md); validate with `--runtime claude`; manual `/plugin install` required |
@@ -212,7 +212,7 @@ Per-runtime install modes (implementation after research):
 
 - not npm publish or marketplace (yet)
 - not runtime adapters or MCP plugins
-- not removing `install.js` or structural validation
+- not removing `bin/aih.js install` or structural validation
 - not merging source pack and target repo into one tree
 
 ## v1 Implications

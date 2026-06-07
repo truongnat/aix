@@ -46,7 +46,7 @@ Minimal structural skeletons (required `##` headings only):
 | `.harness/MEMORY.md` | Memory policy |
 | `.harness/goals/.gitkeep` | Goals directory placeholder |
 
-Init does **not** create runtime bootstrap files such as `AGENTS.md`. Those belong to runtime modes (e.g. `generic`, `codex`) or `manual` fallback via `install.js`.
+Init does **not** create runtime bootstrap files such as `AGENTS.md`. Those belong to runtime modes (e.g. `generic`, `codex`) or `manual` fallback via `bin/aih.js install`.
 
 To get both `.harness/` and `AGENTS.md` from `runtime/bootstrap/AGENTS.project.md`:
 
@@ -74,7 +74,7 @@ Prints `WOULD CREATE`, `WOULD SKIP`, or `WOULD OVERWRITE` per file. No filesyste
 
 ## Force
 
-`--force` applies to `.harness/` profile files only. Runtime installers and manual `install.js` fallback respect `--force` for their own files (including `AGENTS.md` when the runtime writes it).
+`--force` applies to `.harness/` profile files only. Runtime installers and the legacy manual fallback respect `--force` for their own files (including `AGENTS.md` when the runtime writes it).
 
 ## Global Scope Rejection
 
@@ -94,12 +94,12 @@ From the **source pack** (maintainer clone):
 
 ```bash
 # Legacy / AGENTS.md-based targets (manual install or default)
-node validate.js --target <path-to-product-repo> --profile-only
+node bin/validate.js --target <path-to-product-repo> --profile-only
 
 # Runtime-native (match install --runtime)
-node validate.js --target <path-to-product-repo> --runtime generic --profile-only
-node validate.js --target <path-to-product-repo> --runtime codex --profile-only
-node validate.js --target <path-to-product-repo> --runtime cursor --profile-only
+node bin/validate.js --target <path-to-product-repo> --runtime generic --profile-only
+node bin/validate.js --target <path-to-product-repo> --runtime codex --profile-only
+node bin/validate.js --target <path-to-product-repo> --runtime cursor --profile-only
 ```
 
 Checks `.harness/` paths and required headings per [frozen-target-profile-contract.md](frozen-target-profile-contract.md). Runtime bootstrap paths per [runtime-aware-validation.md](runtime-aware-validation.md).

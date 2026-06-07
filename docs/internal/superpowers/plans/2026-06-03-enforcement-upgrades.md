@@ -71,7 +71,7 @@
 **Files:**
 - No planned source edits unless verification exposes regressions
 
-- [ ] Run `node validate.js`
+- [ ] Run `node bin/validate.js`
 - [ ] Run `npm test`
 - [ ] If target-fixture behavior changed, run focused validation commands against affected fixtures as needed
 - [ ] Fix any regressions before claiming completion

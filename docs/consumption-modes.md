@@ -28,7 +28,7 @@ Use this when:
 ### How It Works
 
 - clone the source pack
-- run `install.js` against the target repository
+- run `node bin/aih.js install` against the target repository
 - create `.harness/` profile and goal artifacts there
 - validate the target repository in place
 
