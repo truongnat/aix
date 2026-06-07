@@ -29,7 +29,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Detect pending changesets
+        id: pending_changesets
+        shell: bash
+        run: |
+          shopt -s nullglob
+          files=(.changeset/*.md)
+          pending=0
+          for file in "${files[@]}"; do
+            if [ "$(basename "$file")" != "README.md" ]; then
+              pending=1
+              break
+            fi
+          done
+          echo "pending=$pending" >> "$GITHUB_OUTPUT"
+
       - name: Create release PR or publish
+        if: steps.pending_changesets.outputs.pending != '1'
         uses: changesets/action@v1
         with:
           publish: npm run release
@@ -39,3 +55,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Skip release PR automation when changesets are pending
+        if: steps.pending_changesets.outputs.pending == '1'
+        run: |
+          echo "Pending changesets detected under .changeset/."
+          echo "This repository does not allow GitHub Actions to create release PRs."
+          echo "Maintainers must run npm run version-packages locally and push the version commit."
