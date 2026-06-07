@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const FORBIDDEN_SHELL_PATTERN = /[|&;<>()`$\\]/;
+const DEFAULT_TIMEOUT_MS = 10 * 60 * 1000;
 
 interface Task {
   id: string;
@@ -23,6 +24,7 @@ interface LiveRunOptions {
   provider: string;
   providerCommand: string;
   workspace: Workspace;
+  timeoutMs?: number;
 }
 
 interface LiveRunResult {
@@ -109,6 +111,20 @@ function writeLiveHarnessFiles(
   return { promptPath, guidePath, statePath };
 }
 
+function resolveTimeoutMs(timeoutMs?: number): number {
+  if (typeof timeoutMs === "number" && Number.isFinite(timeoutMs) && timeoutMs > 0) {
+    return timeoutMs;
+  }
+
+  const rawEnvTimeout = process.env.AIH_EVAL_TIMEOUT_MS;
+  if (!rawEnvTimeout) {
+    return DEFAULT_TIMEOUT_MS;
+  }
+
+  const parsed = Number(rawEnvTimeout);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_TIMEOUT_MS;
+}
+
 function runLiveProviderCommand(options: LiveRunOptions): LiveRunResult {
   const [executable, ...args] = tokenizeProviderCommand(options.providerCommand);
 
@@ -127,13 +143,15 @@ function runLiveProviderCommand(options: LiveRunOptions): LiveRunResult {
     AIH_EVAL_MODE: options.mode,
   };
 
+  const timeoutMs = resolveTimeoutMs(options.timeoutMs);
+
   const result = childProcess.spawnSync(executable, args, {
     cwd: options.workspace.cwd,
     encoding: "utf8",
     env,
     input: `${options.task.prompt}\n`,
     shell: false,
-    timeout: 10 * 60 * 1000,
+    timeout: timeoutMs,
     maxBuffer: 10 * 1024 * 1024,
   });
 

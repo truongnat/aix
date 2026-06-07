@@ -28,6 +28,31 @@ interface CheckResults {
   behavior: CheckResult[];
 }
 
+interface ExtendedMetrics {
+  steps: number;
+  efficiency: {
+    steps: number;
+    baselineSteps: number;
+    harnessSteps: number;
+    improvement: number;
+  };
+  phaseDiscipline: {
+    phases: string[];
+    behaviorPassRate: number;
+    passed: boolean;
+  };
+  selfCorrectionReady: boolean;
+}
+
+interface ComparisonMetrics {
+  estimatedEfficiencyGain: number;
+  withHarnessSteps: number;
+  withoutHarnessSteps: number;
+  phaseDisciplineDelta: number;
+  selfCorrectionDemonstrated: boolean;
+  phases: string[];
+}
+
 interface Score {
   outcome: Summary;
   behavior: Summary;
@@ -45,7 +70,7 @@ interface Score {
       | null
       | undefined;
   } | null;
-  extended?: any;
+  extended?: ExtendedMetrics;
 }
 
 function summarize(results: CheckResult[]): Summary {
@@ -71,9 +96,9 @@ function scoreRun(checks: CheckResults, rubricJudge: RubricJudge | null): Score 
     behavior: summarize(behaviorResults),
     rubric: rubricJudge
       ? {
-          mode: rubricJudge.mode!,
-          rubricId: rubricJudge.rubricId!,
-          passed: rubricJudge.passed!,
+          mode: rubricJudge.mode ?? "none",
+          rubricId: rubricJudge.rubricId ?? "",
+          passed: rubricJudge.passed ?? false,
           llm: rubricJudge.llm,
         }
       : null,
@@ -81,4 +106,12 @@ function scoreRun(checks: CheckResults, rubricJudge: RubricJudge | null): Score 
 }
 
 export { scoreRun };
-export type { CheckResult, Summary, RubricJudge, CheckResults, Score };
+export type {
+  CheckResult,
+  Summary,
+  RubricJudge,
+  CheckResults,
+  ExtendedMetrics,
+  ComparisonMetrics,
+  Score,
+};

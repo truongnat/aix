@@ -77,11 +77,12 @@ export function generateRuleMarkdown(rule: PolicyRule): string {
 
   lines.push(`#### Conditions`);
   lines.push(``);
+  lines.push(`Logic: \`${rule.conditionLogic || "and"}\``);
+  lines.push(``);
   lines.push(`| Type | Operator | Value |`);
   lines.push(`|------|----------|-------|`);
   for (const condition of rule.conditions) {
-    const value = typeof condition.value === "string" ? condition.value : condition.value.source;
-    lines.push(`| ${condition.type} | ${condition.operator} | \`${value}\` |`);
+    lines.push(`| ${condition.type} | ${condition.operator} | \`${condition.value}\` |`);
   }
   lines.push(``);
 

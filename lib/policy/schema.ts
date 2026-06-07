@@ -13,7 +13,7 @@ export type PolicySeverity = "error" | "warning";
 export interface PolicyCondition {
   type: PolicyConditionType;
   operator: PolicyOperator;
-  value: string | RegExp;
+  value: string;
 }
 
 export interface PolicyAction {
@@ -29,6 +29,7 @@ export interface PolicyRule {
   description: string;
   severity: PolicySeverity;
   conditions: PolicyCondition[];
+  conditionLogic?: "and" | "or";
   action: PolicyAction;
 }
 

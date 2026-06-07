@@ -48,6 +48,11 @@ function copyDirectory(sourceDir: string, targetDir: string): void {
       continue;
     }
 
+    if (entry.isSymbolicLink()) {
+      fs.symlinkSync(fs.readlinkSync(sourcePath), targetPath);
+      continue;
+    }
+
     fs.copyFileSync(sourcePath, targetPath);
   }
 }
@@ -66,5 +71,9 @@ function materializeFixture(packRoot: string, task: Task): Workspace {
   };
 }
 
-export { materializeFixture };
+function cleanupWorkspace(workspace: Workspace): void {
+  fs.rmSync(workspace.root, { recursive: true, force: true });
+}
+
+export { materializeFixture, cleanupWorkspace };
 export type { Workspace };

@@ -1,10 +1,11 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const { materializeFixture } = require(
+const { cleanupWorkspace, materializeFixture } = require(
   path.join(repoRoot, "dist", "lib", "evals", "fixture-manager.js")
 );
 
@@ -30,6 +31,7 @@ test("materializeFixture copies a fixture into an isolated temp workspace", () =
   fs.writeFileSync(copiedFile, '"use strict";\n');
 
   assert.notEqual(fs.readFileSync(copiedFile, "utf8"), fs.readFileSync(sourceFile, "utf8"));
+  cleanupWorkspace(workspace);
 });
 
 test("materializeFixture rejects task ids that escape the temp root", () => {
@@ -53,3 +55,38 @@ test("materializeFixture rejects fixture paths that escape packRoot", () => {
     /Fixture source must stay within packRoot/
   );
 });
+
+test("cleanupWorkspace removes the temp root recursively", () => {
+  const workspace = materializeFixture(repoRoot, {
+    id: "sample-bugfix",
+    fixture: { path: "evals/fixtures/sample-bugfix" },
+  });
+
+  assert.ok(fs.existsSync(workspace.root));
+  cleanupWorkspace(workspace);
+  assert.equal(fs.existsSync(workspace.root), false);
+});
+
+test(
+  "materializeFixture preserves file symlinks when the platform supports them",
+  { skip: process.platform === "win32" },
+  () => {
+    const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-fixture-links-"));
+    const sourceDir = path.join(fixtureRoot, "fixture");
+    fs.mkdirSync(sourceDir, { recursive: true });
+    fs.writeFileSync(path.join(sourceDir, "original.txt"), "hello\n", "utf8");
+    fs.symlinkSync("original.txt", path.join(sourceDir, "linked.txt"));
+
+    const workspace = materializeFixture(fixtureRoot, {
+      id: "symlink-task",
+      fixture: { path: "fixture" },
+    });
+
+    const linkedCopy = path.join(workspace.cwd, "linked.txt");
+    assert.equal(fs.lstatSync(linkedCopy).isSymbolicLink(), true);
+    assert.equal(fs.readlinkSync(linkedCopy), "original.txt");
+
+    cleanupWorkspace(workspace);
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+  }
+);

@@ -136,6 +136,27 @@ function printManualIgnoreInstructions(paths: string[]): void {
   process.stderr.write("  " + EXCLUDE_BLOCK_END + "\n");
 }
 
+function resolveGitDir(targetAbs: string): string | null {
+  const gitPath = path.join(targetAbs, ".git");
+  if (!fs.existsSync(gitPath)) {
+    return null;
+  }
+
+  const stat = fs.statSync(gitPath);
+  if (stat.isDirectory()) {
+    return gitPath;
+  }
+
+  const content = fs.readFileSync(gitPath, "utf8");
+  const match = content.match(/^gitdir:\s*(.+)$/m);
+  if (!match) {
+    return null;
+  }
+
+  const resolved = path.resolve(targetAbs, match[1].trim());
+  return fs.existsSync(resolved) ? resolved : null;
+}
+
 /** Mirrors aih.sh apply_private_ignore (lines 649-665) and
  *  append_or_update_info_exclude_block (lines 569-610).
  *
@@ -156,13 +177,13 @@ export function applyPrivateIgnore(ctx: IgnoreContext): IgnoreResult {
     return { action: "skip", paths: [] };
   }
 
-  const gitDir = path.join(ctx.targetAbs, ".git");
-  if (!fs.existsSync(gitDir)) {
+  const gitDir = resolveGitDir(ctx.targetAbs);
+  if (!gitDir) {
     printManualIgnoreInstructions(paths);
     return { action: "manual", paths };
   }
 
-  const excludeFile = path.join(ctx.targetAbs, ".git", "info", "exclude");
+  const excludeFile = path.join(gitDir, "info", "exclude");
   const blockContent = buildExcludeBlockContent(paths);
 
   if (ctx.dryRun) {
@@ -176,7 +197,7 @@ export function applyPrivateIgnore(ctx: IgnoreContext): IgnoreResult {
   }
 
   // Ensure .git/info directory exists
-  fs.mkdirSync(path.join(ctx.targetAbs, ".git", "info"), { recursive: true });
+  fs.mkdirSync(path.join(gitDir, "info"), { recursive: true });
 
   if (!fs.existsSync(excludeFile)) {
     // File doesn't exist: write just the block
@@ -205,7 +226,13 @@ export function applyPrivateIgnore(ctx: IgnoreContext): IgnoreResult {
 export function removeIgnoreBlock(opts: { targetAbs: string; dryRun: boolean }): {
   action: "update" | "skip";
 } {
-  const excludeFile = path.join(opts.targetAbs, ".git", "info", "exclude");
+  const gitDir = resolveGitDir(opts.targetAbs);
+  if (!gitDir) {
+    process.stdout.write("SKIP .git/info/exclude\n");
+    return { action: "skip" };
+  }
+
+  const excludeFile = path.join(gitDir, "info", "exclude");
 
   if (!fs.existsSync(excludeFile) || !hasHarnessBlock(excludeFile)) {
     process.stdout.write("SKIP .git/info/exclude\n");

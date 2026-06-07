@@ -38,8 +38,14 @@ function writeModeArtifacts<TSummary extends object, TMetrics extends object>(
   const transcriptPath = path.join(modeDir, "transcript.md");
   const reportPath = path.join(modeDir, "report.md");
 
-  fs.writeFileSync(summaryPath, JSON.stringify(payload.summary, null, 2));
-  fs.writeFileSync(metricsPath, JSON.stringify(payload.metrics, null, 2));
+  fs.writeFileSync(
+    summaryPath,
+    JSON.stringify({ schemaVersion: "1", ...payload.summary }, null, 2)
+  );
+  fs.writeFileSync(
+    metricsPath,
+    JSON.stringify({ schemaVersion: "1", ...payload.metrics }, null, 2)
+  );
   fs.writeFileSync(transcriptPath, payload.transcript);
   fs.writeFileSync(reportPath, payload.report);
 
@@ -51,7 +57,7 @@ function writeRunSummary<TModes extends object, TComparison extends object>(
   payload: RunSummaryPayload<TModes, TComparison>
 ): string {
   const summaryPath = path.join(runRoot, "summary.json");
-  fs.writeFileSync(summaryPath, JSON.stringify(payload, null, 2));
+  fs.writeFileSync(summaryPath, JSON.stringify({ schemaVersion: "1", ...payload }, null, 2));
   return summaryPath;
 }
 

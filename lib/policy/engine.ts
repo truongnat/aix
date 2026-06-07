@@ -15,6 +15,7 @@ import {
 } from "./schema";
 
 export class PolicyEngine {
+  private static readonly regexCache = new Map<string, RegExp>();
   private policySet: PolicySet | null = null;
   private policyPath: string;
 
@@ -44,8 +45,15 @@ export class PolicyEngine {
   }
 
   private static compileRegex(pattern: string, context: string): RegExp {
+    const cached = PolicyEngine.regexCache.get(pattern);
+    if (cached) {
+      return cached;
+    }
+
     try {
-      return new RegExp(pattern);
+      const compiled = new RegExp(pattern);
+      PolicyEngine.regexCache.set(pattern, compiled);
+      return compiled;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       throw new Error(`Invalid regex for ${context}: ${pattern} (${message})`);
@@ -53,21 +61,24 @@ export class PolicyEngine {
   }
 
   private validateCondition(rule: PolicyRule, condition: PolicyCondition): void {
+    const value = condition.value;
+    const context = `rule ${rule.id} ${condition.type} condition`;
+
     if (condition.operator !== "matches") {
+      if (condition.type === "state" && condition.operator === "equals") {
+        const { key, expectedValue } = this.parseStateValue(value, rule.id, "equals");
+        if (!key) {
+          throw new Error(`Invalid state matcher for rule ${rule.id}: missing state key`);
+        }
+        if (expectedValue.length === 0) {
+          throw new Error(`Invalid state matcher for rule ${rule.id}: missing state value`);
+        }
+      }
       return;
     }
 
-    const value = String(condition.value);
-    const context = `rule ${rule.id} ${condition.type} condition`;
-
     if (condition.type === "state") {
-      const [key, pattern] = value.split(":");
-      if (!key) {
-        throw new Error(`Invalid state matcher for rule ${rule.id}: missing state key`);
-      }
-      if (!pattern) {
-        throw new Error(`Invalid state matcher for rule ${rule.id}: missing regex pattern`);
-      }
+      const { key, expectedValue: pattern } = this.parseStateValue(value, rule.id, "matches");
       PolicyEngine.compileRegex(pattern, context);
       return;
     }
@@ -75,6 +86,31 @@ export class PolicyEngine {
     if (condition.type === "command" || condition.type === "phase") {
       PolicyEngine.compileRegex(value, context);
     }
+  }
+
+  private parseStateValue(
+    value: string,
+    ruleId: string,
+    operator: "equals" | "matches"
+  ): { key: string; expectedValue: string } {
+    const separator = value.indexOf(":");
+    if (separator < 0) {
+      throw new Error(`Invalid state matcher for rule ${ruleId}: missing state key`);
+    }
+
+    const key = value.slice(0, separator);
+    const expectedValue = value.slice(separator + 1);
+
+    if (!key) {
+      throw new Error(`Invalid state matcher for rule ${ruleId}: missing state key`);
+    }
+    if (!expectedValue) {
+      throw new Error(
+        `Invalid state matcher for rule ${ruleId}: missing ${operator === "matches" ? "regex pattern" : "state value"}`
+      );
+    }
+
+    return { key, expectedValue };
   }
 
   private validatePolicySet(policySet: PolicySet): void {
@@ -165,20 +201,21 @@ export class PolicyEngine {
     value: string,
     state: Record<string, any>
   ): boolean {
-    const [key, expectedValue] = value.split(":");
-    const actualValue = state[key];
-
     switch (operator) {
-      case "equals":
+      case "equals": {
+        const { key, expectedValue } = this.parseStateValue(value, "runtime", "equals");
+        const actualValue = state[key];
         return actualValue === expectedValue;
+      }
       case "exists":
-        return actualValue !== undefined && actualValue !== null;
+        return state[value] !== undefined && state[value] !== null;
       case "not_exists":
-        return actualValue === undefined || actualValue === null;
-      case "matches":
-        return expectedValue
-          ? PolicyEngine.compileRegex(expectedValue, "state matcher").test(String(actualValue))
-          : false;
+        return state[value] === undefined || state[value] === null;
+      case "matches": {
+        const { key, expectedValue } = this.parseStateValue(value, "runtime", "matches");
+        const actualValue = state[key];
+        return PolicyEngine.compileRegex(expectedValue, "state matcher").test(String(actualValue));
+      }
       default:
         throw new Error(`Unknown operator for state: ${operator}`);
     }
@@ -239,10 +276,11 @@ export class PolicyEngine {
    * Evaluate a single policy rule against the execution context
    */
   evaluate(rule: PolicyRule, context: ExecutionContext): PolicyAction {
-    // All conditions must be satisfied for the rule to trigger
-    const conditionsMet = rule.conditions.every((condition) =>
-      this.evaluateCondition(condition, context)
-    );
+    const conditionLogic = rule.conditionLogic || "and";
+    const conditionsMet =
+      conditionLogic === "or"
+        ? rule.conditions.some((condition) => this.evaluateCondition(condition, context))
+        : rule.conditions.every((condition) => this.evaluateCondition(condition, context));
 
     if (conditionsMet) {
       return rule.action;

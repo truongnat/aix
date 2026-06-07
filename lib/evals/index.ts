@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { formatTaskList, loadRegistry, type Registry } from "./task-registry";
 import { runAbTask, type AbTaskResult } from "./ab-runner";
+import { resolveArtifactsBase } from "./run-context";
 import {
   buildEvalRecommendations,
   formatEvalRecommendations,
@@ -22,6 +23,7 @@ interface RunOptions {
   useLlmJudge?: boolean;
   targetRoot?: string;
   liveProviderCommand?: string;
+  timeoutMs?: number;
 }
 
 function listTasks(packRoot: string, options: ListOptions = {}): ListResult {
@@ -63,7 +65,7 @@ function readReport(
   packRoot: string,
   runId: string
 ): { output: string; summary: any; summaryPath: string } {
-  const summaryPath = path.join(packRoot, "artifacts", "runs", runId, "summary.json");
+  const summaryPath = path.join(resolveArtifactsBase(packRoot), "runs", runId, "summary.json");
   if (!fs.existsSync(summaryPath)) {
     throw new Error(`Eval run not found: ${runId}`);
   }

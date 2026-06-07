@@ -67,3 +67,21 @@ test("runSingleCheck rejects shell metacharacters in command checks", () => {
     /unsupported shell syntax/
   );
 });
+
+test("scoreRun normalizes missing rubric fields instead of emitting undefined", () => {
+  const score = scoreRun(
+    { outcome: [], behavior: [] },
+    {
+      mode: "none",
+      passed: true,
+      checks: [],
+    }
+  );
+
+  assert.deepEqual(score.rubric, {
+    mode: "none",
+    rubricId: "",
+    passed: true,
+    llm: undefined,
+  });
+});

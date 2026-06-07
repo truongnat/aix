@@ -170,3 +170,41 @@ test("removeIgnoreBlock dryRun reports update without mutating", () => {
   assert.equal(r.action, "update");
   assert.equal(fs.readFileSync(excl, "utf8"), before); // unchanged
 });
+
+test("applyPrivateIgnore resolves git worktree metadata files", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gh-worktree-"));
+  const actualGitDir = path.join(dir, "repo-meta", "worktrees", "feature");
+  fs.mkdirSync(path.join(actualGitDir, "info"), { recursive: true });
+  fs.writeFileSync(path.join(dir, ".git"), `gitdir: ${path.relative(dir, actualGitDir)}\n`, "utf8");
+
+  applyPrivateIgnore({
+    targetAbs: dir,
+    provider: "claude",
+    initHarness: true,
+    installCache: false,
+    scope: "project",
+    visibility: "private",
+    dryRun: false,
+  });
+
+  const content = fs.readFileSync(path.join(actualGitDir, "info", "exclude"), "utf8");
+  assert.match(content, /# ai-engineering-harness start/);
+  assert.match(content, /\.claude\/CLAUDE\.md/);
+});
+
+test("removeIgnoreBlock resolves git worktree metadata files", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gh-worktree-remove-"));
+  const actualGitDir = path.join(dir, "repo-meta", "worktrees", "feature");
+  const excludeFile = path.join(actualGitDir, "info", "exclude");
+  fs.mkdirSync(path.dirname(excludeFile), { recursive: true });
+  fs.writeFileSync(path.join(dir, ".git"), `gitdir: ${path.relative(dir, actualGitDir)}\n`, "utf8");
+  fs.writeFileSync(
+    excludeFile,
+    "node_modules/\n# ai-engineering-harness start\n.harness/\n# ai-engineering-harness end\n",
+    "utf8"
+  );
+
+  const result = removeIgnoreBlock({ targetAbs: dir, dryRun: false });
+  assert.equal(result.action, "update");
+  assert.equal(fs.readFileSync(excludeFile, "utf8"), "node_modules/\n");
+});

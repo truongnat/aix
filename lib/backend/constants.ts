@@ -47,6 +47,7 @@ export function ignorePathsForProvider(provider: string, initHarness: boolean): 
         ".claude/settings.json",
         ".claude/commands/",
         ".gemini/extensions/ai-engineering-harness/",
+        ".opencode/plugins/ai-engineering-harness.js",
         "AGENTS.md"
       );
       break;

@@ -1,31 +1,6 @@
 import { mutationMetrics } from "./mode-mutations";
 import type { Task } from "./task-registry";
-import type { Score } from "./scoring";
-
-interface ExtendedMetrics {
-  steps: number;
-  efficiency: {
-    steps: number;
-    baselineSteps: number;
-    harnessSteps: number;
-    improvement: number;
-  };
-  phaseDiscipline: {
-    phases: string[];
-    behaviorPassRate: number;
-    passed: boolean;
-  };
-  selfCorrectionReady: boolean;
-}
-
-interface ComparisonMetrics {
-  efficiencyGain: number;
-  withHarnessSteps: number;
-  withoutHarnessSteps: number;
-  phaseDisciplineDelta: number;
-  selfCorrectionDemonstrated: boolean;
-  phases: string[];
-}
+import type { ExtendedMetrics, ComparisonMetrics, Score } from "./scoring";
 
 function scoreExtendedMetrics(
   task: Task,
@@ -53,7 +28,7 @@ function scoreExtendedMetrics(
           : 0,
     },
     phaseDiscipline,
-    selfCorrectionReady: mode === "with-harness",
+    selfCorrectionReady: mode === "with-harness" && baseScore.behavior.percent >= 0.8,
   };
 }
 
@@ -72,7 +47,7 @@ function compareAbMetrics(
   );
 
   return {
-    efficiencyGain: withMetrics.efficiency.improvement,
+    estimatedEfficiencyGain: withMetrics.efficiency.improvement,
     withHarnessSteps: withMetrics.efficiency.harnessSteps,
     withoutHarnessSteps: withoutMetrics.efficiency.steps,
     phaseDisciplineDelta: withHarnessScore.behavior.percent - withoutHarnessScore.behavior.percent,

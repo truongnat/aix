@@ -49,7 +49,7 @@ test("globToRegExp treats literal regex syntax in glob input as plain text", () 
 test("loadPolicySet rejects invalid state matchers without key or pattern", () => {
   for (const [value, expected] of [
     [":approved", /missing state key/],
-    ["current_plan:", /missing regex pattern/],
+    ["current_plan:", /missing state regex pattern|missing regex pattern/],
   ]) {
     const { tempRoot, policyPath } = makePolicyFile({
       version: "1.0.0",
@@ -66,6 +66,23 @@ test("loadPolicySet rejects invalid state matchers without key or pattern", () =
     assert.throws(() => engine.loadPolicySet(), expected);
     fs.rmSync(tempRoot, { recursive: true, force: true });
   }
+});
+
+test("loadPolicySet rejects invalid state equals matchers without a value", () => {
+  const { tempRoot, policyPath } = makePolicyFile({
+    version: "1.0.0",
+    rules: [
+      makeRule({
+        id: "invalid-state-equals",
+        conditions: [{ type: "state", operator: "equals", value: "current_plan:" }],
+        action: { type: "block", message: "blocked" },
+      }),
+    ],
+  });
+
+  const engine = new PolicyEngine(policyPath);
+  assert.throws(() => engine.loadPolicySet(), /missing state value/);
+  fs.rmSync(tempRoot, { recursive: true, force: true });
 });
 
 test("evaluate handles command exists and not_exists operators", () => {
@@ -117,6 +134,52 @@ test("evaluate handles state matches and missing state values safely", () => {
       state: {},
     }).type,
     "allow"
+  );
+});
+
+test("evaluate preserves colons after the first separator in state comparisons", () => {
+  const engine = new PolicyEngine(path.join(repoRoot, ".harness", "policies.json"));
+  const matchRule = makeRule({
+    conditions: [
+      {
+        type: "state",
+        operator: "equals",
+        value: "plan_content:https://example.com/checklist",
+      },
+    ],
+    action: { type: "block", message: "full value matched" },
+  });
+
+  assert.equal(
+    engine.evaluate(matchRule, {
+      command: "harness-ship",
+      sessionDir: "",
+      repoRoot: "",
+      state: { plan_content: "https://example.com/checklist" },
+    }).type,
+    "block"
+  );
+});
+
+test("evaluate supports OR logic across rule conditions", () => {
+  const engine = new PolicyEngine(path.join(repoRoot, ".harness", "policies.json"));
+  const rule = makeRule({
+    conditionLogic: "or",
+    conditions: [
+      { type: "command", operator: "equals", value: "harness-run" },
+      { type: "phase", operator: "equals", value: "ship" },
+    ],
+    action: { type: "block", message: "matched via OR" },
+  });
+
+  assert.equal(
+    engine.evaluate(rule, {
+      command: "status",
+      sessionDir: "",
+      repoRoot: "",
+      currentPhase: "ship",
+    }).type,
+    "block"
   );
 });
 

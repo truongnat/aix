@@ -7,9 +7,16 @@ interface RunContext {
   modeDir: (mode: string) => string;
 }
 
+function resolveArtifactsBase(packRoot: string): string {
+  return process.env.AIH_EVAL_ARTIFACTS_DIR
+    ? path.resolve(process.env.AIH_EVAL_ARTIFACTS_DIR)
+    : path.join(packRoot, "artifacts");
+}
+
 function createRunContext(packRoot: string, taskId: string): RunContext {
-  const runId = `${new Date().toISOString().replace(/[:.]/g, "-")}-${taskId}`;
-  const runRoot = path.join(packRoot, "artifacts", "runs", runId);
+  const safeTaskId = taskId.replace(/[/\\:*?"<>|]/g, "-");
+  const runId = `${new Date().toISOString().replace(/[:.]/g, "-")}-${safeTaskId}`;
+  const runRoot = path.join(resolveArtifactsBase(packRoot), "runs", runId);
   fs.mkdirSync(runRoot, { recursive: true });
   return {
     runId,
@@ -22,5 +29,5 @@ function createRunContext(packRoot: string, taskId: string): RunContext {
   };
 }
 
-export { createRunContext };
+export { createRunContext, resolveArtifactsBase };
 export type { RunContext };
