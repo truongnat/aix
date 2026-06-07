@@ -25,8 +25,18 @@ export interface SkeletonContext {
   force?: boolean;
 }
 
+/**
+ * Describes the planned/performed actions for each skeleton file.
+ * These arrays are populated identically in dryRun and real mode —
+ * dryRun just does not touch disk.
+ *
+ * - `created`    – file did not exist; it was (or would be) written.
+ * - `overwritten` – file existed and force was true; it was (or would be) replaced.
+ * - `skipped`    – file existed and force was false; it was left untouched.
+ */
 export interface SkeletonResult {
   created: string[];
+  overwritten: string[];
   skipped: string[];
 }
 
@@ -338,6 +348,12 @@ const SKELETON_FILES: Array<{ rel: string; content: () => string }> = [
  * - In dryRun mode: prints "WOULD CREATE/SKIP/OVERWRITE <rel>" without writing.
  *
  * Returns "created", "skipped", or "overwritten".
+ *
+ * NOTE: All skeleton file content strings end with a trailing `\n` (POSIX text
+ * file convention). The original shell functions in aih.sh use `$()` command
+ * substitution which silently strips the final newline. A byte-for-byte diff
+ * against shell-generated output will therefore show a 1-byte difference; this
+ * is intentional and an improvement over the shell behaviour.
  */
 function writeTargetFile(
   rel: string,
@@ -389,14 +405,17 @@ function writeTargetFile(
 export function initHarnessProfile(ctx: SkeletonContext): SkeletonResult {
   const { targetAbs, dryRun, force = false } = ctx;
   const created: string[] = [];
+  const overwritten: string[] = [];
   const skipped: string[] = [];
 
   process.stdout.write("\n--- .harness/ init ---\n");
 
   for (const entry of SKELETON_FILES) {
     const outcome = writeTargetFile(entry.rel, entry.content(), targetAbs, dryRun, force);
-    if (outcome === "created" || outcome === "overwritten") {
+    if (outcome === "created") {
       created.push(entry.rel);
+    } else if (outcome === "overwritten") {
+      overwritten.push(entry.rel);
     } else {
       skipped.push(entry.rel);
     }
@@ -404,5 +423,5 @@ export function initHarnessProfile(ctx: SkeletonContext): SkeletonResult {
 
   process.stdout.write("--- .harness/ init complete ---\n");
 
-  return { created, skipped };
+  return { created, overwritten, skipped };
 }
