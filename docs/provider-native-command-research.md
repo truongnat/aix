@@ -66,9 +66,9 @@ Was experimental; no longer in wizard or `install-runtime.js`. Legacy projects m
 
 **ai-engineering-harness commands*
 
-- Pack: `.codex-plugin/plugin.json` + repo `skills/` (no fake `.codex/commands/`)
+- Pack: `.codex-plugin/plugin.json` + repo `skills/`, `hooks.json`, `agents/` (no fake `.codex/commands/`)
 - **Not** a project-local `/harness-*` slash provider
-- `npx ai-engineering-harness install --provider codex`: `AGENTS.md` + `.ai-harness/` **fallback only**
+- `npx ai-engineering-harness install --provider codex`: `AGENTS.md` + `.codex/` + `.agents/skills/`
 - Native: install plugin via Codex `/plugins` when marketplace entry exists
 
 See [codex-plugin-support.md](codex-plugin-support.md).

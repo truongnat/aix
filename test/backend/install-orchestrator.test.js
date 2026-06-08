@@ -17,6 +17,38 @@ function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "io-ng-"));
 }
 
+function captureConsole(fn) {
+  const originalLog = console.log;
+  const originalError = console.error;
+  const originalStdoutWrite = process.stdout.write;
+  const originalStderrWrite = process.stderr.write;
+  const lines = [];
+  const captureWrite = (chunk) => {
+    const text = Buffer.isBuffer(chunk) ? chunk.toString("utf8") : String(chunk);
+    lines.push(text);
+    return true;
+  };
+
+  console.log = (...args) => {
+    lines.push(args.join(" "));
+  };
+  console.error = (...args) => {
+    lines.push(args.join(" "));
+  };
+  process.stdout.write = captureWrite;
+  process.stderr.write = captureWrite;
+
+  try {
+    const result = fn();
+    return { result, lines };
+  } finally {
+    console.log = originalLog;
+    console.error = originalError;
+    process.stdout.write = originalStdoutWrite;
+    process.stderr.write = originalStderrWrite;
+  }
+}
+
 test("runInstall provisions a claude provider surface in-process (bug-fix regression)", () => {
   const dir = tmpRepo();
   const r = runInstall({
@@ -112,17 +144,19 @@ test("runInstall provisions codex skills in .agents/skills", () => {
 
 test("runInstall provisions codex native hooks, rules, and agents", () => {
   const dir = tmpRepo();
-  const r = runInstall({
-    packRoot: PACK_ROOT,
-    target: dir,
-    provider: "codex",
-    scope: "project",
-    visibility: "private",
-    dryRun: false,
-    initHarness: false,
-    installCache: false,
-    force: false,
-  });
+  const { result: r, lines } = captureConsole(() =>
+    runInstall({
+      packRoot: PACK_ROOT,
+      target: dir,
+      provider: "codex",
+      scope: "project",
+      visibility: "private",
+      dryRun: false,
+      initHarness: false,
+      installCache: false,
+      force: false,
+    })
+  );
   assert.equal(r.ok, true);
   assert.equal(fs.existsSync(path.join(dir, ".codex", "hooks.json")), true);
   assert.equal(fs.existsSync(path.join(dir, ".codex", "rules", "default.rules")), true);
@@ -136,6 +170,8 @@ test("runInstall provisions codex native hooks, rules, and agents", () => {
     fs.readFileSync(path.join(dir, ".codex", "rules", "default.rules"), "utf8"),
     /prefix_rule/
   );
+  assert.ok(lines.some((line) => /Trust the project's \.codex\/ layer/i.test(line)));
+  assert.ok(lines.some((line) => /restart the app/i.test(line)));
 });
 
 test("runInstall hard-stops on non-git project installs before writing", () => {

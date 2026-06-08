@@ -47,8 +47,11 @@ Creates:
 
 - `.ai-harness/` local command catalog
 - `.harness/` project state (if selected)
+- `.codex/` project rules, hooks, and agents
 - `.agents/skills/` Codex skill surface
 - `AGENTS.md` bootstrap pointing at harness workflows
+
+After install, trust the project `.codex/` layer in Codex and restart the app so rules and hooks load.
 
 Does **not** create native `/harness-*` slash commands in Codex.
 

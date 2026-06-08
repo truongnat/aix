@@ -605,6 +605,7 @@ function installCodex(
     console.log(
       "NEXT: Codex native support — install plugin via /plugins (marketplace pending). Package: .codex-plugin/plugin.json + skills/ + hooks/ + agents/"
     );
+    console.log("REMEMBER: Trust ~/.codex/ in Codex and restart the app so rules and hooks load.");
     return;
   }
   writeFileAction(targetRoot, "AGENTS.md", renderCodexAgentsMd(), options);
@@ -614,6 +615,9 @@ function installCodex(
   installCodexSkills(scope, targetRoot, packRoot, options);
   console.log(
     "NEXT: Codex — project install is AGENTS.md + .codex/ + .agents/skills/ fallback. Native: /plugins → ai-engineering-harness plugin (not /harness-* slash)."
+  );
+  console.log(
+    "REMEMBER: Trust the project's .codex/ layer in Codex and restart the app so rules and hooks load."
   );
 }
 

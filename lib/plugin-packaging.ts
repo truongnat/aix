@@ -103,6 +103,8 @@ const PACK_PLUGIN_PATHS = Object.freeze([
   ".cursor-plugin/plugin.json",
   ".claude-plugin/plugin.json",
   ".codex-plugin/plugin.json",
+  "agents/",
+  "hooks.json",
   "gemini-extension.json",
   "hooks/hooks-cursor.json",
 ]);
