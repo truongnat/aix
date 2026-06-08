@@ -17,6 +17,12 @@
 - backend lifecycle (install, uninstall, update, doctor, skeleton, git-hygiene) ported to in-process TypeScript
 - generated domain skills conform to the full core skill heading contract
 
+### Fixed
+
+- core review findings across git hygiene, evals, and policy enforcement
+- keep CI green when the repo no longer has root-level JavaScript files
+- build before contract validation in the tag-triggered publish workflow
+
 ### Notes
 
 - `v1.1.0` is a minor release: new capabilities are backward-compatible and opt-in.
