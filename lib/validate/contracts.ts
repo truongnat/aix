@@ -498,6 +498,22 @@ function assertTargetHarnessConfig(baseDir: string, failures: string[]): void {
           failures
         );
       }
+      if (fs.existsSync(resolvePath(baseDir, ".codex"))) {
+        assertExists(baseDir, path.join(".codex", "rules", `domain-${knownDomainId}.md`), failures);
+      }
+      if (fs.existsSync(resolvePath(baseDir, ".gemini"))) {
+        assertExists(
+          baseDir,
+          path.join(
+            ".gemini",
+            "extensions",
+            "ai-engineering-harness",
+            "rules",
+            `domain-${knownDomainId}.md`
+          ),
+          failures
+        );
+      }
     }
   } catch (error) {
     failures.push(`${relativePath} must contain valid JSON`);

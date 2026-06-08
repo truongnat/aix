@@ -917,6 +917,26 @@ Use the generated domain skill at \`.harness/skills/${definition.id}/SKILL.md\`.
     });
   }
 
+  if (fs.existsSync(path.join(targetAbs, ".codex"))) {
+    outputs.push({
+      relativePath: path.join(".codex", "rules", `domain-${definition.id}.md`),
+      content: body,
+    });
+  }
+
+  if (fs.existsSync(path.join(targetAbs, ".gemini"))) {
+    outputs.push({
+      relativePath: path.join(
+        ".gemini",
+        "extensions",
+        "ai-engineering-harness",
+        "rules",
+        `domain-${definition.id}.md`
+      ),
+      content: body,
+    });
+  }
+
   const created: string[] = [];
   const overwritten: string[] = [];
   const skipped: string[] = [];

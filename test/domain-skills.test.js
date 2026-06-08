@@ -47,6 +47,8 @@ test("writeDomainSkillSurface creates generated skill files and config selection
   const target = makeTempDir();
   fs.mkdirSync(path.join(target, ".claude"), { recursive: true });
   fs.mkdirSync(path.join(target, ".cursor"), { recursive: true });
+  fs.mkdirSync(path.join(target, ".codex"), { recursive: true });
+  fs.mkdirSync(path.join(target, ".gemini"), { recursive: true });
 
   const result = domainSkills.writeDomainSkillSurface(repoRoot, target, ["frontend", "security"], {
     packRoot: repoRoot,
@@ -63,6 +65,10 @@ test("writeDomainSkillSurface creates generated skill files and config selection
   assert.ok(result.created.includes(".harness/skills/security/SKILL.md"));
   assert.ok(result.created.includes(".claude/rules/domain-frontend.md"));
   assert.ok(result.created.includes(".cursor/rules/domain-security.mdc"));
+  assert.ok(result.created.includes(".codex/rules/domain-frontend.md"));
+  assert.ok(
+    result.created.includes(".gemini/extensions/ai-engineering-harness/rules/domain-security.md")
+  );
 
   const config = JSON.parse(fs.readFileSync(path.join(target, ".harness", "config.json"), "utf8"));
   assert.deepEqual(config.domains, ["frontend", "security"]);
