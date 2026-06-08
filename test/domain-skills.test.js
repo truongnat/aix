@@ -7,6 +7,7 @@ const path = require("node:path");
 const repoRoot = path.resolve(__dirname, "..");
 const stackDetect = require(path.join(repoRoot, "dist", "lib", "stack-detect.js"));
 const domainSkills = require(path.join(repoRoot, "dist", "lib", "domain-skill-generation.js"));
+const { skillHeadings } = require(path.join(repoRoot, "dist", "lib", "validate", "constants.js"));
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-domain-test-"));
@@ -71,4 +72,15 @@ test("writeDomainSkillSurface creates generated skill files and config selection
   assert.match(skills, /Selected Domain Skills/);
   assert.match(skills, /frontend/);
   assert.match(workflow, /Domain Selection/);
+
+  const frontendSkill = fs.readFileSync(
+    path.join(target, ".harness", "skills", "frontend", "SKILL.md"),
+    "utf8"
+  );
+  for (const heading of skillHeadings) {
+    assert.match(
+      frontendSkill,
+      new RegExp(`^${heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "m")
+    );
+  }
 });

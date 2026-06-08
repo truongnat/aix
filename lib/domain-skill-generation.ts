@@ -29,9 +29,8 @@ interface DomainDefinition {
   actionLoop: string[];
   examples: string[];
   outputContract: string[];
-  blockingConditions: string[];
+  checklist: string[];
   commonFailureModes: Array<{ failure: string; symptom: string; counter: string }>;
-  references: string[];
   commands: string[];
   checks: string[];
 }
@@ -82,7 +81,7 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
       "record selected domains in `.harness/config.json` and `.harness/SKILLS.md`",
       "create `.harness/skills/frontend/SKILL.md` and `prompt.md` when the domain is selected",
     ],
-    blockingConditions: [
+    checklist: [
       "do not generate a frontend domain skill if the repository has no browser-facing surface",
       "do not override user domain selections without explicit confirmation",
     ],
@@ -98,7 +97,6 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
         counter: "check at least one narrow and one wide viewport when visuals change",
       },
     ],
-    references: ["skills/packs/frontend.md", "skills/README.md", "docs/skill-system.md"],
     commands: ["harness-map", "harness-plan", "harness-run", "harness-verify"],
     checks: ["targeted UI tests", "responsive viewport check", "accessibility sanity check"],
   },
@@ -143,7 +141,7 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
       "record selected backend signals in the project config and skills profile",
       "generate `.harness/skills/backend/` when selected",
     ],
-    blockingConditions: [
+    checklist: [
       "do not generate if the repository has no server-side signals",
       "do not skip migration or auth checks when the change crosses those boundaries",
     ],
@@ -159,7 +157,6 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
         counter: "test on a clean database or explicit migration state",
       },
     ],
-    references: ["skills/packs/backend.md", "skills/README.md", "docs/skill-system.md"],
     commands: ["harness-map", "harness-discuss", "harness-plan", "harness-verify"],
     checks: ["contract tests", "migration validation", "auth boundary checks"],
   },
@@ -207,7 +204,7 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
       "record selected infra domains in config and skills profile",
       "generate `.harness/skills/devops/` when selected",
     ],
-    blockingConditions: [
+    checklist: [
       "do not claim success without environment-specific validation",
       "do not store secrets or access details in generated artifacts",
     ],
@@ -223,7 +220,6 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
         counter: "write the rollback command or revert path down",
       },
     ],
-    references: ["skills/packs/devops.md", "skills/README.md", "docs/skill-system.md"],
     commands: ["harness-map", "harness-plan", "harness-run", "harness-verify", "harness-remember"],
     checks: ["pipeline validation", "build verification", "health check"],
   },
@@ -267,7 +263,7 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
       "store selected mobile signals in config and the skills profile",
       "generate `.harness/skills/mobile/` when selected",
     ],
-    blockingConditions: [
+    checklist: [
       "do not generate if the repository has no mobile markers",
       "do not assume one platform proves the other",
     ],
@@ -283,7 +279,6 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
         counter: "toggle permissions and verify the deny flow",
       },
     ],
-    references: ["skills/packs/mobile.md", "skills/README.md", "docs/skill-system.md"],
     commands: ["harness-map", "harness-plan", "harness-run", "harness-verify"],
     checks: ["device/simulator flow", "navigation check", "lifecycle check"],
   },
@@ -328,7 +323,7 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
       "store selected data/AI signals in config and the skills profile",
       "generate `.harness/skills/data-ai/` when selected",
     ],
-    blockingConditions: [
+    checklist: [
       "do not generate if the repository has no data or model signals",
       "do not leave evaluation criteria implicit",
     ],
@@ -344,7 +339,6 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
         counter: "record the metric or rubric used to judge the result",
       },
     ],
-    references: ["skills/packs/README.md", "skills/README.md", "docs/skill-system.md"],
     commands: ["harness-map", "harness-plan", "harness-run", "harness-verify"],
     checks: ["fixture-based data check", "reproducible model evaluation"],
   },
@@ -393,7 +387,7 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
       "store selected security signals in config and the skills profile",
       "generate `.harness/skills/security/` when selected",
     ],
-    blockingConditions: [
+    checklist: [
       "do not generate if no security or auth signals exist",
       "do not store secrets or private business data in generated files",
     ],
@@ -409,7 +403,6 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
         counter: "grep and inspect changed artifacts for sensitive values",
       },
     ],
-    references: ["skills/packs/README.md", "skills/README.md", "docs/skill-system.md"],
     commands: ["harness-map", "harness-discuss", "harness-plan", "harness-verify"],
     checks: ["negative auth tests", "secret scan", "policy validation"],
   },
@@ -458,7 +451,7 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
       "store selected cloud signals in config and the skills profile",
       "generate `.harness/skills/cloud/` when selected",
     ],
-    blockingConditions: [
+    checklist: [
       "do not generate if no cloud or infrastructure markers exist",
       "do not hide provider-specific rollback assumptions",
     ],
@@ -474,7 +467,6 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
         counter: "write the rollback or revert path in the plan",
       },
     ],
-    references: ["skills/packs/README.md", "skills/README.md", "docs/skill-system.md"],
     commands: ["harness-map", "harness-plan", "harness-run", "harness-verify"],
     checks: ["dry-run deployment", "provider validation", "health check"],
   },
@@ -515,7 +507,7 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
       "store selected debugging signals in config and the skills profile",
       "generate `.harness/skills/debugging/` when selected",
     ],
-    blockingConditions: [
+    checklist: [
       "do not generate if there is no failing signal or debugging need",
       "do not ship a root-cause claim without evidence",
     ],
@@ -531,7 +523,6 @@ const DOMAIN_DEFINITIONS: Record<DomainId, DomainDefinition> = {
         counter: "capture a failing test or reliable repro first when possible",
       },
     ],
-    references: ["skills/packs/debugging.md", "skills/README.md", "docs/skill-system.md"],
     commands: [
       "harness-map",
       "harness-discuss",
@@ -636,19 +627,15 @@ ${bulletList(definition.examples)}
 
 ${bulletList(definition.outputContract)}
 
-## Blocking Conditions
+## Checklist Before Done
 
-${bulletList(definition.blockingConditions)}
+${bulletList(definition.checklist)}
 
 ## Common Failure Modes
 
 ${definition.commonFailureModes
   .map((item) => `- ${item.failure}: ${item.symptom}\n  - Counter: ${item.counter}`)
   .join("\n")}
-
-## References
-
-${bulletList(definition.references)}
 `;
 }
 

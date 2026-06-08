@@ -29,7 +29,6 @@ function readAnalysisFile(analysisFile: string): string {
 }
 
 async function resolveInitDomains(
-  packRoot: string,
   targetAbs: string,
   options: ParseOptions
 ): Promise<string[] | null> {
@@ -74,7 +73,7 @@ async function runInitWizard(packRoot: string, options: ParseOptions): Promise<n
         ? [recommended[0]]
         : ["cursor"];
 
-  const selectedDomains = await resolveInitDomains(packRoot, targetAbs, options);
+  const selectedDomains = await resolveInitDomains(targetAbs, options);
   if (selectedDomains === null) {
     return 1;
   }
