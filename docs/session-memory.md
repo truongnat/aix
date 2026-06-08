@@ -27,6 +27,7 @@ Recommended root folders:
 
 - `sessions/`
 - `memory/`
+- `memory/workers/`
 - `decisions/`
 - `hazards/`
 
@@ -57,6 +58,7 @@ Session-local lessons may be promoted after verification or shipping into:
 
 - `.harness/MEMORY.md`
 - `.harness/memory/`
+- `.harness/memory/workers/`
 - `.harness/decisions/`
 - `.harness/hazards/`
 

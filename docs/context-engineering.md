@@ -18,6 +18,7 @@ Describe the harness practices that keep context small, retrievable, and auditab
 - `.harness/INDEX.md` acts as the on-demand registry for reusable commands and references
 - `.harness/MEMORY.md`, `.harness/DECISIONS.md`, and `.harness/HAZARDS.md` store durable lessons
 - `workers/` return bounded worker envelopes instead of raw file dumps
+- when enabled, `record-subagent-result.js` persists compact worker notes to `.harness/memory/workers/<agent>.md`
 - `tool-capabilities/TOOL_ROUTING.md` keeps tool selection narrow and explicit
 
 ## Just-In-Time Retrieval

@@ -19,7 +19,7 @@ Hooks do **not** think for the agent. They guard phases, record evidence, and co
 |--------|---------|
 | `core/guard-phase.js` | Block run/verify/ship when phase preconditions fail |
 | `core/record-tool-output.js` | Store test/build/lint/git evidence |
-| `core/record-subagent-result.js` | Store delegated worker results |
+| `core/record-subagent-result.js` | Store delegated worker results and optional worker memory |
 | `core/record-skill-run.js` | Store skill execution records |
 | `core/archive-session-skill.js` | Archive/dispose session skills |
 | `core/compact-session-memory.js` | Suggest or apply durable memory updates |

@@ -422,6 +422,12 @@ function assertSessionConfigTemplate(baseDir: string, failures: string[]): void 
     if (config?.specs?.directory !== ".harness/specs") {
       failures.push(`${relativePath} must set specs.directory to ".harness/specs"`);
     }
+    if (config?.workerMemory?.enabled !== false) {
+      failures.push(`${relativePath} must set workerMemory.enabled to false`);
+    }
+    if (config?.workerMemory?.directory !== ".harness/memory/workers") {
+      failures.push(`${relativePath} must set workerMemory.directory to ".harness/memory/workers"`);
+    }
   } catch (error) {
     failures.push(`${relativePath} must contain valid JSON`);
   }

@@ -235,6 +235,7 @@ describe("Session Memory & Documentation", () => {
     assert.match(body, /INDEX\.md/i);
     assert.match(body, /CHANGE_SPEC\.md/);
     assert.match(body, /\.harness\/specs\//);
+    assert.match(body, /subagent isolation/i);
   });
 
   test("validate repository fails when session-memory source-of-truth language is removed", () => {
@@ -272,6 +273,32 @@ describe("Session Memory & Documentation", () => {
     assertRepositoryFailure(
       tempRepo,
       /templates\/harness-config\.json must set specs\.enabled to false/
+    );
+  });
+
+  test("validate repository fails when harness config no longer exposes worker memory opt-in", () => {
+    const tempRepo = makeTempRepoCopy();
+    writeRepoFile(tempRepo, "templates/harness-config.json", (content) => {
+      const config = JSON.parse(content);
+      config.workerMemory.enabled = true;
+      return JSON.stringify(config, null, 2);
+    });
+    assertRepositoryFailure(
+      tempRepo,
+      /templates\/harness-config\.json must set workerMemory\.enabled to false/
+    );
+  });
+
+  test("validate repository fails when harness config worker memory directory drifts", () => {
+    const tempRepo = makeTempRepoCopy();
+    writeRepoFile(tempRepo, "templates/harness-config.json", (content) => {
+      const config = JSON.parse(content);
+      config.workerMemory.directory = ".harness/memory/agents";
+      return JSON.stringify(config, null, 2);
+    });
+    assertRepositoryFailure(
+      tempRepo,
+      /templates\/harness-config\.json must set workerMemory\.directory to "\.harness\/memory\/workers"/
     );
   });
 

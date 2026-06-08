@@ -77,6 +77,14 @@ Use for reusable commands, verification recipes, and durable lookup pointers.
 
 Use for the memory policy or profile when a repository adopts the harness workflow. This file explains memory boundaries; it should not become the only operational memory sink once typed memory artifacts exist.
 
+### `.harness/memory/workers/<agent>.md`
+
+Use for optional delegated-worker notes when the worker-memory layer is enabled.
+
+- compact observations for repeated subagent runs
+- keep the notes non-sensitive and file-backed
+- prefer concise heuristics over raw transcripts
+
 ## Goal-Level Memory
 
 `.harness/goals/<goal-id>/REMEMBER.md` should hold memory learned from one goal:

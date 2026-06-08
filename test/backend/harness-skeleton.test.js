@@ -15,6 +15,7 @@ const EXPECTED = [
   "DECISIONS.md",
   "HAZARDS.md",
   "INDEX.md",
+  "memory/workers/.gitkeep",
   "specs/.gitkeep",
   "policies.json",
   "goals/.gitkeep",
@@ -133,6 +134,7 @@ test("skeleton files include concrete examples instead of empty placeholders", (
   assert.match(workflow, /\| 1 \| `harness-start` \| always \|/);
   assert.match(gates, /`npm test`/);
   assert.match(memory, /Verification impact:/);
+  assert.match(memory, /delegated worker/i);
   assert.match(decisions, /## Example/);
   assert.match(hazards, /worktree-backed repo/);
   assert.match(index, /npm test/);

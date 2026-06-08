@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 
+const fs = require("node:fs");
 const path = require("node:path");
 const {
   appendHarnessEvent,
@@ -15,6 +16,9 @@ const {
   writeMarkdownArtifact,
 } = require("./_util.js");
 
+const DEFAULT_WORKER_MEMORY_DIR = ".harness/memory/workers";
+const DEFAULT_WORKER_MEMORY_LIMIT = 8;
+
 const SPEC = {
   session: { required: true },
   agent: { required: true },
@@ -24,8 +28,90 @@ const SPEC = {
   "next-command": { required: false },
 };
 
+function loadHarnessConfig(repoRoot) {
+  const configPath = path.join(repoRoot, ".harness", "config.json");
+  if (!fs.existsSync(configPath)) {
+    return null;
+  }
+  try {
+    return JSON.parse(fs.readFileSync(configPath, "utf8"));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Invalid JSON in .harness/config.json: ${message}`);
+  }
+}
+
+function normalizeWorkerMemoryNote(options) {
+  return String(options.summary || options.status || "subagent result")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 180);
+}
+
+function parseWorkerMemoryEntries(content) {
+  const lines = content.split("\n");
+  const entries = [];
+  let inNotes = false;
+  for (const line of lines) {
+    if (line.startsWith("## Durable Notes")) {
+      inNotes = true;
+      continue;
+    }
+    if (inNotes && line.startsWith("## ")) {
+      break;
+    }
+    if (inNotes && line.startsWith("- ")) {
+      const entry = line.slice(2).trim();
+      if (entry && entry !== "No durable notes yet.") {
+        entries.push(entry);
+      }
+    }
+  }
+  return entries;
+}
+
+function renderWorkerMemory(agent, entries) {
+  return [
+    `# Worker Memory: ${agent}`,
+    "",
+    "> Compact, non-sensitive notes from delegated worker runs.",
+    "",
+    "## Durable Notes",
+    "",
+    ...(entries.length > 0 ? entries.map((entry) => `- ${entry}`) : ["- No durable notes yet."]),
+  ].join("\n");
+}
+
+function updateWorkerMemory(repoRoot, options) {
+  const config = loadHarnessConfig(repoRoot);
+  if (!config?.workerMemory?.enabled) {
+    return null;
+  }
+
+  const workerMemoryConfig = config.workerMemory || {};
+  const memoryDir =
+    typeof workerMemoryConfig.directory === "string" && workerMemoryConfig.directory.trim()
+      ? workerMemoryConfig.directory
+      : DEFAULT_WORKER_MEMORY_DIR;
+  const maxEntries =
+    Number.isInteger(workerMemoryConfig.maxEntries) && workerMemoryConfig.maxEntries > 0
+      ? workerMemoryConfig.maxEntries
+      : DEFAULT_WORKER_MEMORY_LIMIT;
+  const memoryPath = path.join(repoRoot, memoryDir, `${sanitizeSlug(options.agent)}.md`);
+  const note = `${new Date().toISOString()} | ${options.status} | ${normalizeWorkerMemoryNote(options)}`;
+  const existingEntries = fs.existsSync(memoryPath)
+    ? parseWorkerMemoryEntries(fs.readFileSync(memoryPath, "utf8"))
+    : [];
+  const entries = [note, ...existingEntries.filter((entry) => entry !== note)].slice(0, maxEntries);
+
+  writeMarkdownArtifact(memoryPath, [renderWorkerMemory(options.agent, entries)]);
+
+  return path.relative(repoRoot, memoryPath).replace(/\\/g, "/");
+}
+
 function recordSubagentResult(options) {
   const sessionDir = resolveSessionDir(options.session);
+  const repoRoot = findHarnessRoot(sessionDir);
   const slug = `${sanitizeSlug(options.agent)}-${timestampSlug()}.md`;
   const artifactPath = path.join(sessionDir, "subagents", slug);
 
@@ -48,10 +134,13 @@ function recordSubagentResult(options) {
     `next_command: ${options["next-command"] || "harness-verify"}`,
   ]);
 
+  const workerMemory = updateWorkerMemory(repoRoot, options);
+
   return {
     ok: true,
     status: "recorded",
     artifact: path.relative(process.cwd(), artifactPath).replace(/\\/g, "/"),
+    workerMemory,
   };
 }
 

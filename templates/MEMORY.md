@@ -30,6 +30,7 @@ After verified work ships, record:
 | Architecture decision | "We use event sourcing for audit history" | `DECISIONS.md` |
 | Recurring hazard | "Migrations against this DB require a maintenance window" | `HAZARDS.md` |
 | Reusable command | "Inspect queue depth: `redis-cli llen queue:jobs`" | `INDEX.md` |
+| Delegated worker note | "Reviewer repeatedly misses delta-spec validation" | `.harness/memory/workers/<agent>.md` |
 | Goal lesson | "Root cause of the rate limit bug was missing retry-after header handling" | `REMEMBER.md` |
 
 ## Forbidden Content

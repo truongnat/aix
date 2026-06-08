@@ -46,6 +46,7 @@ Describe the repository-specific harness operating model, the artifacts it owns,
 - This harness does not own production architecture decisions; document those in \`DECISIONS.md\` and source code.
 - Primary artifacts: session goal, plan, verify, blocked, ship, and remember files under \`.harness/sessions/\`
 - Optional durable behavior specs live under \`.harness/specs/\` when the spec layer is enabled.
+- Optional delegated-worker memory lives under \`.harness/memory/workers/\` when worker memory is enabled.
 
 ## Operating Model
 
@@ -303,6 +304,7 @@ Describe what long-lived memory this repository should retain.
 - Project-level decisions that affect future plans
 - Hazards that should change planning or verification next time
 - Approved delta specs that should be promoted into \`.harness/specs/\` when enabled
+- Delegated worker observations that should be compacted into \`.harness/memory/workers/<agent>.md\` when enabled
 
 ## Memory Types
 
@@ -312,6 +314,7 @@ Describe what long-lived memory this repository should retain.
 | \`HAZARDS.md\` | recurring failure modes | after confirmed incident or review |
 | \`INDEX.md\` | reusable commands and references | after a repeatable workflow is proven |
 | \`.harness/specs/\` | optional durable behavior specs | after approved delta-spec changes |
+| \`.harness/memory/workers/<agent>.md\` | optional delegated-worker notes | after enabled worker runs |
 | \`REMEMBER.md\` | goal-level lessons | after shipping verified work |
 
 ## Forbidden Content
@@ -542,6 +545,7 @@ const SKELETON_FILES: Array<{ rel: string; content: () => string }> = [
   { rel: ".harness/HAZARDS.md", content: skeletonHazardsMd },
   { rel: ".harness/INDEX.md", content: skeletonIndexMd },
   { rel: ".harness/policies.json", content: skeletonPoliciesJson },
+  { rel: ".harness/memory/workers/.gitkeep", content: () => "" },
   { rel: ".harness/specs/.gitkeep", content: () => "" },
   { rel: ".harness/goals/.gitkeep", content: () => "" },
 ];
