@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { detectRecommendedProviders } from "../cli-detect";
+import { detectProviderBinaries } from "../cli-detect";
 import { resolveTargetAbs } from "../cli-command-helpers";
 import { runInstallWizard } from "./install";
 import type { ParseOptions } from "../cli-args";
@@ -47,13 +47,16 @@ async function runInitWizard(packRoot: string, options: ParseOptions): Promise<n
     throw new Error(`Target directory does not exist: ${targetAbs}`);
   }
 
-  const recommended = detectRecommendedProviders(targetAbs);
-  const providers =
-    options.providers.length > 0
-      ? options.providers
-      : recommended.length > 0
-        ? [recommended[0]]
-        : ["cursor"];
+  const binaryStatus = detectProviderBinaries();
+  const detectedProviders = Object.entries(binaryStatus)
+    .filter(([, probe]) => probe.installed)
+    .map(([providerId]) => providerId);
+  const providers = options.providers.length > 0 ? options.providers : detectedProviders;
+  if (providers.length === 0) {
+    throw new Error(
+      "No supported provider CLI detected. Install claude, codex, cursor, or gemini first."
+    );
+  }
 
   const selectedDomains = await resolveInitDomains(options);
 
@@ -61,6 +64,7 @@ async function runInitWizard(packRoot: string, options: ParseOptions): Promise<n
     ...options,
     command: "install",
     providers,
+    plannedProviders: providers,
     domains: selectedDomains,
     yes: true,
     scope: options.scope || "project",

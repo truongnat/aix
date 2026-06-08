@@ -13,6 +13,10 @@ function tmpRepo() {
   return d;
 }
 
+function tmpDir() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), "io-ng-"));
+}
+
 test("runInstall provisions a claude provider surface in-process (bug-fix regression)", () => {
   const dir = tmpRepo();
   const r = runInstall({
@@ -55,6 +59,26 @@ test("runInstall provisions a claude provider surface in-process (bug-fix regres
     fs.readFileSync(path.join(dir, ".git", "info", "exclude"), "utf8"),
     /# ai-engineering-harness start/
   );
+});
+
+test("runInstall hard-stops on non-git project installs before writing", () => {
+  const dir = tmpDir();
+  const r = runInstall({
+    packRoot: PACK_ROOT,
+    target: dir,
+    provider: "claude",
+    scope: "project",
+    visibility: "shared",
+    dryRun: false,
+    initHarness: true,
+    installCache: true,
+    force: false,
+  });
+  assert.equal(r.ok, false);
+  assert.match(r.messages.join(" "), /Git repo/);
+  assert.equal(fs.existsSync(path.join(dir, ".claude")), false);
+  assert.equal(fs.existsSync(path.join(dir, ".harness")), false);
+  assert.equal(fs.existsSync(path.join(dir, ".ai-harness")), false);
 });
 
 test("runInstall dryRun writes no provider files", () => {

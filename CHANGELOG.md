@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+
+### Patch Changes
+
+- Improve provider binary detection, make project installs fail fast without git, and align update, uninstall, status, and doctor with the recorded install manifest.
+
 ## 1.1.2
 
 ### Patch Changes

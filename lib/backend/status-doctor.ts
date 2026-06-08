@@ -3,7 +3,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { hasHarnessExcludeBlock } from "./git-hygiene";
-import { detectInstalledProviders, isGitRepo } from "../provider-detection";
+import { detectInstalledProviders, isGitRepo, detectProviderBinaries } from "../cli-detect";
 import { readInstalledCommandSurface } from "../runtime-command-catalog";
 import { formatStatusCommandLines, formatDoctorCommandLines } from "../command-surface-report";
 
@@ -30,6 +30,16 @@ function detectRuntimesFromTarget(targetAbs: string): string[] {
     return [...installedProviders];
   }
   return detectInstalledProviders(targetAbs, { includeLegacy: true });
+}
+
+function formatBinaryAvailability(): string {
+  const binaries = detectProviderBinaries();
+  return Object.entries(binaries)
+    .map(([providerId, probe]) => {
+      const state = probe.installed ? (probe.version ? `yes (${probe.version})` : "yes") : "no";
+      return `${providerId}=${state}`;
+    })
+    .join(", ");
 }
 
 function runtimeReferencesCache(targetAbs: string, rt: string): boolean {
@@ -321,10 +331,12 @@ export function runStatus(ctx: ReportContext): StatusResult {
   const runtimeDisplay = detected.length > 0 ? detected.join(",") : "none";
   const gitRepo = isGitRepo(targetAbs) ? "yes" : "no";
   const excludeBlock = hasHarnessExcludeBlock(targetAbs) ? "yes" : "no";
+  const manifestProviders = readInstalledCommandSurface(targetAbs)?.installedProviders || [];
 
   lines.push("ai-engineering-harness status");
   lines.push(`  target:                ${targetAbs}`);
   lines.push(`  git repo:              ${gitRepo}`);
+  lines.push(`  provider binaries:     ${formatBinaryAvailability()}`);
   lines.push(`  detected runtimes:     ${runtimeDisplay}`);
   lines.push(
     `  .ai-harness exists:    ${fs.existsSync(path.join(targetAbs, ".ai-harness")) ? "yes" : "no"}`
@@ -340,8 +352,11 @@ export function runStatus(ctx: ReportContext): StatusResult {
   lines.push(
     `  manifest.json:         ${fs.existsSync(path.join(targetAbs, ".ai-harness/manifest.json")) ? "yes" : "no"}`
   );
+  lines.push(
+    `  manifest providers:    ${manifestProviders.length > 0 ? manifestProviders.join(",") : "none"}`
+  );
 
-  const installedProviders = readInstalledCommandSurface(targetAbs)?.installedProviders || [];
+  const installedProviders = manifestProviders;
   const providerCmds =
     installedProviders.length > 0 ||
     fs.existsSync(path.join(targetAbs, ".cursor/commands")) ||
@@ -433,6 +448,13 @@ export function runDoctor(ctx: ReportContext): DoctorResult {
     lines.push("PASS .ai-harness/activation.md exists");
   } else {
     lines.push("FAIL .ai-harness/activation.md missing");
+    failCount++;
+  }
+
+  if (readInstalledCommandSurface(targetAbs)) {
+    lines.push("PASS .ai-harness/manifest.json readable");
+  } else {
+    lines.push("FAIL .ai-harness/manifest.json missing or unreadable");
     failCount++;
   }
 

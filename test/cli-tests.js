@@ -28,6 +28,22 @@ function createMockFileStructure(dir, files = []) {
   });
 }
 
+function withTempPath(binDir, fn) {
+  const originalPath = process.env.PATH || "";
+  process.env.PATH = binDir;
+  try {
+    return fn();
+  } finally {
+    process.env.PATH = originalPath;
+  }
+}
+
+function createBinary(binDir, name, output) {
+  const filePath = path.join(binDir, name);
+  fs.writeFileSync(filePath, `#!/bin/sh\necho "${output}"\n`, "utf8");
+  fs.chmodSync(filePath, 0o755);
+}
+
 describe("CLI Arguments Parser", () => {
   test("parseArgv defaults to install command", () => {
     const opts = cliArgs.parseArgv(["node", "aih.js"]);
@@ -359,6 +375,22 @@ describe("CLI Provider Detection", () => {
     createMockFileStructure(tmpDir, [".opencode/plugins/ai-engineering-harness.js"]);
     const providers = cliDetect.detectInstalledProviders(tmpDir, { includeLegacy: true });
     assert.ok(providers.includes("opencode"));
+  });
+
+  test("detectProviderBinaries probes installed provider CLIs via PATH", () => {
+    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), "aih-bin-"));
+    createBinary(binDir, "claude", "claude 1.2.3");
+    createBinary(binDir, "cursor", "cursor 0.9.0");
+    createBinary(binDir, "codex", "codex 0.8.0");
+    withTempPath(binDir, () => {
+      const binaries = cliDetect.detectProviderBinaries();
+      assert.equal(binaries.claude.installed, true);
+      assert.equal(binaries.cursor.installed, true);
+      assert.equal(binaries.codex.installed, true);
+      assert.equal(binaries.gemini.installed, false);
+      assert.match(binaries.claude.version || "", /1\.2\.3/);
+      assert.match(binaries.cursor.version || "", /0\.9\.0/);
+    });
   });
 
   test("detectLegacyProviderResidue returns empty for clean project", () => {

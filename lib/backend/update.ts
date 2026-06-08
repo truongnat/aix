@@ -1,6 +1,7 @@
 /** In-process update orchestrator. */
 
 import { runInstall } from "./install-orchestrator";
+import { readInstalledCommandSurface } from "../runtime-command-catalog";
 
 export interface UpdateContext {
   packRoot: string;
@@ -20,10 +21,26 @@ export interface UpdateResult {
 
 export function runUpdate(ctx: UpdateContext): UpdateResult {
   const messages: string[] = [];
+  const installedProviders = readInstalledCommandSurface(ctx.target)?.installedProviders || [];
 
   if (ctx.provider === "manual") {
     messages.push("error: Manual fallback update is not supported. Re-run install instead.");
     return { ok: false, messages };
+  }
+
+  if (ctx.scope !== "global") {
+    if (installedProviders.length === 0) {
+      messages.push(
+        "error: No installed providers recorded in .ai-harness/manifest.json. Reinstall first."
+      );
+      return { ok: false, messages };
+    }
+    if (!installedProviders.includes(ctx.provider)) {
+      messages.push(
+        `error: Provider ${ctx.provider} is not recorded in .ai-harness/manifest.json. Reinstall first.`
+      );
+      return { ok: false, messages };
+    }
   }
 
   if (ctx.scope === "global") {

@@ -13,11 +13,14 @@ export interface InstallContext {
   packRoot: string;
   target: string; // absolute target dir
   provider: string; // provider/runtime id
+  plannedProviders?: string[];
   scope: string; // "project" | "global"
   visibility: string; // "private" | "shared"
   dryRun: boolean;
   initHarness: boolean;
+  plannedInitHarness?: boolean;
   installCache: boolean;
+  plannedInstallCache?: boolean;
   domains: string[];
   force?: boolean;
 }
@@ -48,24 +51,40 @@ export function runInstall(ctx: InstallContext, options: InstallRunOptions = {})
   const messages: string[] = [];
   const force = ctx.force ?? false;
   const domains = ctx.domains ?? [];
+  const plannedProviders = ctx.plannedProviders?.length ? ctx.plannedProviders : [ctx.provider];
+  const plannedInitHarness = ctx.plannedInitHarness ?? ctx.initHarness;
+  const plannedInstallCache = ctx.plannedInstallCache ?? ctx.installCache;
 
   try {
     const ignoreStrategy = resolveIgnoreStrategy(ctx.scope, ctx.visibility);
 
     const gitRepo = isGitRepo(ctx.target);
+    if (ctx.scope === "project" && !gitRepo) {
+      const message =
+        "Target directory is not a Git repo. Run git init first so generated files stay out of tracked content.";
+      throw new Error(message);
+    }
     if (ignoreStrategy === "info-exclude" && gitRepo) {
       process.stdout.write("\n--- Git exclude (private) ---\n");
     }
-    applyPrivateIgnore({
+    const ignoreResult = applyPrivateIgnore({
       targetAbs: ctx.target,
       provider: ctx.provider,
+      plannedProviders,
       initHarness: ctx.initHarness,
+      plannedInitHarness,
       installCache: ctx.installCache,
+      plannedInstallCache,
       scope: ctx.scope,
       visibility: ctx.visibility,
       dryRun: ctx.dryRun,
       ignoreStrategy,
     });
+    if (ignoreResult.action === "manual") {
+      throw new Error(
+        "Target directory is not a Git repo. Run git init first so generated files stay out of tracked content."
+      );
+    }
     if (ignoreStrategy === "info-exclude" && gitRepo) {
       process.stdout.write("--- Git exclude complete ---\n\n");
     }

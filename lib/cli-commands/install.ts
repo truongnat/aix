@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { modeToScopeVisibility, isNonInteractive, type ParseOptions } from "../cli-args";
 import { ACTIVE_PROVIDERS, providerPriorityLabel, isRuntimeNative } from "../cli-providers";
-import { detectRecommendedProviders, detectLegacyProviderResidue, isGitRepo } from "../cli-detect";
+import { detectProviderBinaries, detectLegacyProviderResidue, isGitRepo } from "../cli-detect";
 import { normalizeDomainSelection } from "../stack-detect";
 import {
   NON_GIT_PRIVATE_WARNING,
@@ -32,11 +32,14 @@ interface InstallContextExtended {
   dryRun: boolean;
   yes: boolean;
   providers: string[];
+  plannedProviders: string[];
   domains: string[];
   scope: string;
   visibility: string;
   initHarness: boolean;
+  plannedInitHarness: boolean;
   installCache: boolean;
+  plannedInstallCache: boolean;
 }
 
 function toPlanProviders(providers: string[]): PlanProviderId[] {
@@ -75,8 +78,11 @@ async function runInstallBackend(
         visibility: ctx.visibility,
         dryRun: ctx.dryRun,
         initHarness: ctx.initHarness && i === 0,
+        plannedInitHarness: ctx.plannedInitHarness,
         installCache: ctx.installCache && i === 0,
+        plannedInstallCache: ctx.plannedInstallCache,
         domains: ctx.initHarness && i === 0 ? ctx.domains : [],
+        plannedProviders: ctx.plannedProviders,
         force: false,
       });
       if (!lastResult.ok) {
@@ -135,6 +141,10 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     throw new Error(`Unknown domain skill(s): ${invalidDomainIds.join(", ")}`);
   }
   let domains = [...explicitDomains];
+  const binaryStatus = detectProviderBinaries();
+  const availableProviders = ACTIVE_PROVIDERS.filter(
+    (provider) => binaryStatus[provider.id]?.installed
+  );
 
   if (isNonInteractive(options)) {
     if (providers.length === 0) {
@@ -142,6 +152,17 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     }
     validateProviderSelection(providers);
     validateManualMix(providers);
+    const missingProviders = providers.filter((id) => !binaryStatus[id]?.installed);
+    if (missingProviders.length > 0) {
+      const installHints = missingProviders
+        .map((providerId) => {
+          const probe = binaryStatus[providerId];
+          const hint = probe?.commands?.length ? probe.commands.join(" or ") : providerId;
+          return `${providerId} (${hint} --version not found)`;
+        })
+        .join(", ");
+      throw new Error(`Provider binary not installed: ${installHints}`);
+    }
 
     const mode = resolveInstallMode(options);
     const scopeVis = modeToScopeVisibility(mode);
@@ -177,8 +198,11 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
         dryRun: options.dryRun,
         yes: true,
         initHarness,
+        plannedInitHarness: initHarness,
         installCache,
+        plannedInstallCache: installCache,
         domains,
+        plannedProviders: providers,
       },
       options
     );
@@ -194,17 +218,28 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     gitRepo: isGitRepo(targetAbs),
   });
 
-  const recommended = detectRecommendedProviders(targetAbs);
   const providerItems = ACTIVE_PROVIDERS.map((p) => ({
     id: p.id,
     label: p.label,
     implemented: p.implemented,
-    recommended: recommended.includes(p.id),
+    installed: binaryStatus[p.id]?.installed ?? false,
+    version: binaryStatus[p.id]?.version || null,
+    hint: binaryStatus[p.id]?.installed
+      ? binaryStatus[p.id]?.version
+        ? `detected ${binaryStatus[p.id]?.version}`
+        : "detected"
+      : `not installed — run ${p.id} --version`,
     priorityLabel: providerPriorityLabel(p),
   }));
 
-  if (recommended.length === 1) {
-    providers = [recommended[0]];
+  if (availableProviders.length === 0) {
+    throw new Error(
+      "No supported provider CLI detected. Install claude, codex, cursor, or gemini first."
+    );
+  }
+
+  if (availableProviders.length === 1) {
+    providers = [availableProviders[0].id];
     process.stdout.write(`Detected provider: ${providers[0]}\n`);
   } else {
     const selectedProviders = await ui.selectProviders(providerItems);
@@ -241,13 +276,16 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     packRoot,
     {
       providers,
+      plannedProviders: providers,
       target: targetAbs,
       scope: resolvedScope,
       visibility,
       dryRun: options.dryRun,
       yes: true,
       initHarness,
+      plannedInitHarness: initHarness,
       installCache,
+      plannedInstallCache: installCache,
       domains,
     },
     options

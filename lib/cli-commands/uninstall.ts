@@ -3,6 +3,7 @@ import { ACTIVE_PROVIDERS, FALLBACK_TARGETS } from "../cli-providers";
 import { detectInstalledProviders, isGitRepo } from "../cli-detect";
 import * as ui from "../cli-ui";
 import { runUninstall } from "../backend/uninstall";
+import { readInstalledCommandSurface } from "../runtime-command-catalog";
 import {
   readPackageVersion,
   resolveTargetAbs,
@@ -13,7 +14,12 @@ import {
 async function runUninstallWizard(packRoot: string, options: ParseOptions): Promise<number> {
   const targetAbs = resolveTargetAbs(options.target);
   let providers = [...options.providers];
-  const installed = detectInstalledProviders(targetAbs);
+  const installedSurface = readInstalledCommandSurface(targetAbs);
+  const manifestInstalledProviders = installedSurface?.installedProviders || [];
+  const installed =
+    manifestInstalledProviders.length > 0
+      ? manifestInstalledProviders
+      : detectInstalledProviders(targetAbs, { includeLegacy: true });
 
   let removeCache = false;
   let removeState = false;
@@ -24,10 +30,13 @@ async function runUninstallWizard(packRoot: string, options: ParseOptions): Prom
       throw new Error("No installed providers detected. Pass --provider or install first.");
     }
     if (providers.length === 0 && !options.all) {
-      throw new Error("No provider selected. Pass --provider cursor or run interactively.");
+      providers = [...installed];
     }
     if (options.all) {
       fullCleanup = true;
+      if (providers.length === 0) {
+        providers = [...ACTIVE_PROVIDERS, ...FALLBACK_TARGETS].map((provider) => provider.id);
+      }
     }
   } else {
     ui.introBanner({
@@ -45,7 +54,8 @@ async function runUninstallWizard(packRoot: string, options: ParseOptions): Prom
           id: p.id,
           label: p.label,
           implemented: true,
-          recommended: true,
+          installed: true,
+          hint: "installed in manifest or detected on disk",
         }));
       const selectedProviders = await ui.selectProviders(items);
       if (!selectedProviders) {
@@ -78,6 +88,14 @@ async function runUninstallWizard(packRoot: string, options: ParseOptions): Prom
   }
 
   validateProviderSelection(providers);
+  if (installed.length > 0) {
+    const unknown = providers.filter((providerId) => !installed.includes(providerId));
+    if (unknown.length > 0 && !options.all) {
+      throw new Error(
+        `Uninstall can only target providers recorded in .ai-harness/manifest.json: ${unknown.join(", ")}`
+      );
+    }
+  }
   ui.showUninstallPlan(
     { providers, removeCache, removeState, fullCleanup },
     { compact: isNonInteractive(options) }

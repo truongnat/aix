@@ -1,8 +1,9 @@
 import { isNonInteractive, type ParseOptions } from "../cli-args";
 import { ACTIVE_PROVIDERS, FALLBACK_TARGETS } from "../cli-providers";
-import { detectInstalledProviders, isGitRepo } from "../cli-detect";
+import { isGitRepo } from "../cli-detect";
 import * as ui from "../cli-ui";
 import { runUpdate } from "../backend/update";
+import { readInstalledCommandSurface } from "../runtime-command-catalog";
 import {
   readPackageVersion,
   resolveTargetAbs,
@@ -13,14 +14,17 @@ import {
 async function runUpdateWizard(packRoot: string, options: ParseOptions): Promise<number> {
   const targetAbs = resolveTargetAbs(options.target);
   let providers = [...options.providers];
-  const installed = detectInstalledProviders(targetAbs);
+  const installedSurface = readInstalledCommandSurface(targetAbs);
+  const installed = installedSurface?.installedProviders || [];
 
   if (isNonInteractive(options)) {
     if (installed.length === 0 && providers.length === 0) {
-      throw new Error("No installed providers detected. Pass --provider or install first.");
+      throw new Error(
+        "No installed providers detected in .ai-harness/manifest.json. Reinstall first."
+      );
     }
     if (providers.length === 0) {
-      throw new Error("No provider selected. Pass --provider cursor or run interactively.");
+      providers = [...installed];
     }
   } else {
     ui.introBanner({
@@ -29,7 +33,9 @@ async function runUpdateWizard(packRoot: string, options: ParseOptions): Promise
       gitRepo: isGitRepo(targetAbs),
     });
     if (installed.length === 0) {
-      throw new Error("No installed providers detected. Install first.");
+      throw new Error(
+        "No installed providers detected in .ai-harness/manifest.json. Reinstall first."
+      );
     }
     if (providers.length === 0) {
       const items = [...ACTIVE_PROVIDERS, ...FALLBACK_TARGETS]
@@ -38,7 +44,8 @@ async function runUpdateWizard(packRoot: string, options: ParseOptions): Promise
           id: p.id,
           label: p.label,
           implemented: true,
-          recommended: true,
+          installed: true,
+          hint: "installed in manifest",
         }));
       const selectedProviders = await ui.selectProviders(items);
       if (!selectedProviders) {
@@ -54,6 +61,12 @@ async function runUpdateWizard(packRoot: string, options: ParseOptions): Promise
   }
 
   validateProviderSelection(providers);
+  const invalidProviders = providers.filter((providerId) => !installed.includes(providerId));
+  if (invalidProviders.length > 0) {
+    throw new Error(
+      `Update can only refresh providers recorded in .ai-harness/manifest.json: ${invalidProviders.join(", ")}`
+    );
+  }
   if (isNonInteractive(options)) {
     ui.showUpdatePlan(providers, { compact: true });
   }

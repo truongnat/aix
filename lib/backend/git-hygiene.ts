@@ -11,8 +11,11 @@ import { EXCLUDE_BLOCK_START, EXCLUDE_BLOCK_END, ignorePathsForProvider } from "
 export interface IgnoreContext {
   targetAbs: string;
   provider: string;
+  plannedProviders?: string[];
   initHarness: boolean;
+  plannedInitHarness?: boolean;
   installCache: boolean;
+  plannedInstallCache?: boolean;
   scope: string;
   visibility: string;
   dryRun: boolean;
@@ -27,8 +30,12 @@ export interface IgnoreResult {
 
 /** Dedupes ignore paths while preserving first-seen order. */
 export function collectIgnorePaths(ctx: IgnoreContext): string[] {
-  const raw: string[] = ignorePathsForProvider(ctx.provider, ctx.initHarness);
-  if (ctx.installCache) {
+  const plannedProviders = ctx.plannedProviders?.length ? ctx.plannedProviders : [ctx.provider];
+  const raw: string[] = [];
+  for (const providerId of plannedProviders) {
+    raw.push(...ignorePathsForProvider(providerId, ctx.plannedInitHarness ?? ctx.initHarness));
+  }
+  if (ctx.plannedInstallCache ?? ctx.installCache) {
     raw.push(".ai-harness/");
   }
   // Dedupe preserving first-seen order
@@ -174,6 +181,17 @@ export function applyPrivateIgnore(ctx: IgnoreContext): IgnoreResult {
 
   const excludeFile = path.join(gitDir, "info", "exclude");
   const blockContent = buildExcludeBlockContent(paths);
+  const existing = fs.existsSync(excludeFile) ? fs.readFileSync(excludeFile, "utf8") : "";
+  const updated = fs.existsSync(excludeFile)
+    ? hasHarnessBlockInFile(excludeFile)
+      ? replaceBlock(existing, blockContent)
+      : `${existing.trimEnd()}\n\n${blockContent}`.replace(/^\n+/, "")
+    : blockContent;
+
+  if (existing === updated) {
+    process.stdout.write("SKIP .git/info/exclude\n");
+    return { action: "skip", paths };
+  }
 
   if (ctx.dryRun) {
     process.stdout.write("WOULD UPDATE .git/info/exclude\n");
@@ -190,11 +208,8 @@ export function applyPrivateIgnore(ctx: IgnoreContext): IgnoreResult {
   if (!fs.existsSync(excludeFile)) {
     fs.writeFileSync(excludeFile, blockContent, "utf8");
   } else if (!hasHarnessBlockInFile(excludeFile)) {
-    const existing = fs.readFileSync(excludeFile, "utf8");
-    fs.writeFileSync(excludeFile, existing + "\n" + blockContent, "utf8");
+    fs.writeFileSync(excludeFile, updated, "utf8");
   } else {
-    const existing = fs.readFileSync(excludeFile, "utf8");
-    const updated = replaceBlock(existing, blockContent);
     fs.writeFileSync(excludeFile, updated, "utf8");
   }
 

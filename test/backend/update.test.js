@@ -12,6 +12,25 @@ function tmpRepo() {
   return d;
 }
 
+function writeManifest(dir, providers) {
+  const harnessDir = path.join(dir, ".ai-harness");
+  fs.mkdirSync(harnessDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(harnessDir, "manifest.json"),
+    JSON.stringify(
+      {
+        installedProviders: providers,
+        providerCommandEntrypoints: Object.fromEntries(
+          providers.map((provider) => [provider, [`${provider}/entrypoint`]])
+        ),
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+}
+
 test("update refreshes provider files with force (overwrites modified file)", () => {
   const dir = tmpRepo();
   // first install to create the surface
@@ -24,7 +43,7 @@ test("update refreshes provider files with force (overwrites modified file)", ()
     visibility: "private",
     dryRun: false,
     initHarness: false,
-    installCache: false,
+    installCache: true,
     force: false,
   });
   const claudeMd = path.join(dir, ".claude", "CLAUDE.md");
@@ -47,6 +66,7 @@ test("update refreshes provider files with force (overwrites modified file)", ()
 
 test("update does NOT create the .harness skeleton", () => {
   const dir = tmpRepo();
+  writeManifest(dir, ["claude"]);
   runUpdate({
     packRoot: PACK_ROOT,
     target: dir,
@@ -60,6 +80,7 @@ test("update does NOT create the .harness skeleton", () => {
 
 test("update rejects the manual provider", () => {
   const dir = tmpRepo();
+  writeManifest(dir, ["manual"]);
   const r = runUpdate({
     packRoot: PACK_ROOT,
     target: dir,
@@ -74,6 +95,7 @@ test("update rejects the manual provider", () => {
 
 test("update global scope dryRun returns ok with notice; real returns not-ok", () => {
   const dir = tmpRepo();
+  writeManifest(dir, ["claude"]);
   assert.equal(
     runUpdate({
       packRoot: PACK_ROOT,
@@ -100,6 +122,7 @@ test("update global scope dryRun returns ok with notice; real returns not-ok", (
 
 test("update prints update banner from caller-owned label", () => {
   const dir = tmpRepo();
+  writeManifest(dir, ["claude"]);
   const writes = [];
   const originalWrite = process.stdout.write;
   process.stdout.write = (chunk, ...args) => {

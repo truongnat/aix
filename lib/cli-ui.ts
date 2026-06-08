@@ -16,7 +16,9 @@ interface ProviderItem {
   id: string;
   label: string;
   implemented: boolean;
-  recommended?: boolean;
+  installed?: boolean;
+  version?: string | null;
+  hint?: string;
   priorityLabel?: string;
 }
 
@@ -73,13 +75,13 @@ function introBanner(meta: IntroMeta): void {
 
 async function selectProviders(providerItems: ProviderItem[]): Promise<string[] | null> {
   const { multiselect, cancel, isCancel } = await loadClackPrompts();
-  const initial = providerItems.filter((p) => p.implemented && p.recommended).map((p) => p.id);
+  const initial = providerItems.filter((p) => p.implemented && p.installed).map((p) => p.id);
   const value = await multiselect({
     message: "Select provider(s)",
     options: providerItems.map((p) => {
       let label = p.label;
       const priority = p.priorityLabel ? `  ${p.priorityLabel}` : "";
-      if (p.recommended && p.implemented) {
+      if (p.installed && p.implemented) {
         label = `${p.label}  detected${priority}`;
       } else if (p.implemented && p.priorityLabel) {
         label = `${p.label}${priority}`;
@@ -89,8 +91,9 @@ async function selectProviders(providerItems: ProviderItem[]): Promise<string[] 
       return {
         value: p.id,
         label,
-        disabled: !p.implemented,
-      };
+        disabled: !p.implemented || !p.installed,
+        hint: p.hint,
+      } as any;
     }),
     required: true,
     initialValues: initial.length ? initial : undefined,

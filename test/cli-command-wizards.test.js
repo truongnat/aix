@@ -5,6 +5,7 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
+const { ACTIVE_PROVIDER_IDS } = require(path.join(repoRoot, "dist", "lib", "cli-providers.js"));
 
 const originals = [];
 
@@ -23,6 +24,58 @@ function fresh(modulePath) {
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-wizard-test-"));
+}
+
+function initGitRepo(dir) {
+  require("node:child_process").spawnSync("git", ["init", "-q"], { cwd: dir });
+}
+
+function mockProviderBinaries(installedIds) {
+  return patchModule("dist/lib/provider-binary-detect.js", (mod) => {
+    const originalDetectProviderBinaries = mod.detectProviderBinaries;
+    mod.detectProviderBinaries = () => {
+      const installed = new Set(installedIds);
+      return Object.fromEntries(
+        ACTIVE_PROVIDER_IDS.map((providerId) => [
+          providerId,
+          {
+            providerId,
+            commands: providerId === "cursor" ? ["cursor", "cursor-agent"] : [providerId],
+            commandUsed: installed.has(providerId)
+              ? providerId === "cursor"
+                ? "cursor"
+                : providerId
+              : null,
+            installed: installed.has(providerId),
+            version: installed.has(providerId) ? "1.0.0" : null,
+            output: installed.has(providerId) ? `${providerId} 1.0.0` : "",
+          },
+        ])
+      );
+    };
+    return () => {
+      mod.detectProviderBinaries = originalDetectProviderBinaries;
+    };
+  });
+}
+
+function writeManifest(dir, providers) {
+  const harnessDir = path.join(dir, ".ai-harness");
+  fs.mkdirSync(harnessDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(harnessDir, "manifest.json"),
+    JSON.stringify(
+      {
+        installedProviders: providers,
+        providerCommandEntrypoints: Object.fromEntries(
+          providers.map((provider) => [provider, [`${provider}/entrypoint`]])
+        ),
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
 }
 
 function withInteractiveTty(fn) {
@@ -60,6 +113,8 @@ afterEach(() => {
 test("runInstallWizard non-interactive install calls backend with selected providers", async () => {
   const calls = [];
   const target = makeTempDir();
+  initGitRepo(target);
+  mockProviderBinaries(["cursor", "claude"]);
 
   patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
     const originalRunInstall = mod.runInstall;
@@ -97,11 +152,14 @@ test("runInstallWizard non-interactive install calls backend with selected provi
       packRoot: repoRoot,
       target: path.resolve(target),
       provider: "cursor",
+      plannedProviders: ["cursor", "claude"],
       scope: "project",
       visibility: "private",
       dryRun: true,
       initHarness: true,
+      plannedInitHarness: true,
       installCache: true,
+      plannedInstallCache: true,
       domains: [],
       force: false,
     },
@@ -109,22 +167,27 @@ test("runInstallWizard non-interactive install calls backend with selected provi
       packRoot: repoRoot,
       target: path.resolve(target),
       provider: "claude",
+      plannedProviders: ["cursor", "claude"],
       scope: "project",
       visibility: "private",
       dryRun: true,
       initHarness: false,
+      plannedInitHarness: true,
       installCache: false,
+      plannedInstallCache: true,
       domains: [],
       force: false,
     },
   ]);
 });
 
-test("runInstallWizard interactive flow warns for non-git targets and installs selected provider", async () => {
+test("runInstallWizard interactive flow installs selected provider from binary-gated picker", async () => {
   const calls = [];
   const warnings = [];
   const successes = [];
   const target = makeTempDir();
+  initGitRepo(target);
+  mockProviderBinaries(["cursor", "claude"]);
 
   patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
     const originalRunInstall = mod.runInstall;
@@ -182,14 +245,15 @@ test("runInstallWizard interactive flow warns for non-git targets and installs s
   assert.equal(calls[0].installCache, true);
   assert.equal(calls[0].initHarness, true);
   assert.deepEqual(calls[0].domains, []);
-  assert.equal(warnings.length, 1);
-  assert.match(warnings[0], /not a Git repo/);
+  assert.equal(warnings.length, 0);
   assert.deepEqual(successes, ["Installed"]);
 });
 
 test("runInitWizard with no domain flags scaffolds empty domain config and no generated skills", async () => {
   const target = makeTempDir();
+  initGitRepo(target);
   fs.mkdirSync(target, { recursive: true });
+  mockProviderBinaries(["cursor"]);
 
   const { runInitWizard } = fresh("dist/lib/cli-commands/init.js");
   const status = await runInitWizard(repoRoot, {
@@ -214,6 +278,8 @@ test("runInitWizard with no domain flags scaffolds empty domain config and no ge
 
 test("runInstallWizard interactive cancel exits before backend calls", async () => {
   const target = makeTempDir();
+  initGitRepo(target);
+  mockProviderBinaries(["cursor", "claude"]);
   let backendCalled = false;
 
   patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
@@ -258,9 +324,83 @@ test("runInstallWizard interactive cancel exits before backend calls", async () 
   assert.equal(backendCalled, false);
 });
 
+test("runInstallWizard refuses non-git targets before backend writes", async () => {
+  const target = makeTempDir();
+  mockProviderBinaries(["cursor", "claude"]);
+
+  patchModule("dist/lib/cli-ui.js", (mod) => {
+    const originalUseInteractiveUi = mod.useInteractiveUi;
+    const originalIntroBanner = mod.introBanner;
+    const originalSelectProviders = mod.selectProviders;
+    const originalShowInstallPlan = mod.showInstallPlan;
+    mod.useInteractiveUi = () => true;
+    mod.introBanner = () => {};
+    mod.selectProviders = async () => ["cursor"];
+    mod.showInstallPlan = () => {};
+    return () => {
+      mod.useInteractiveUi = originalUseInteractiveUi;
+      mod.introBanner = originalIntroBanner;
+      mod.selectProviders = originalSelectProviders;
+      mod.showInstallPlan = originalShowInstallPlan;
+    };
+  });
+
+  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  const status = await withInteractiveTty(() =>
+    runInstallWizard(repoRoot, {
+      providers: [],
+      target,
+      scope: "",
+      visibility: "",
+      dryRun: false,
+      yes: false,
+      verbose: false,
+    })
+  );
+  assert.equal(status, 1);
+  assert.equal(fs.existsSync(path.join(target, ".ai-harness")), false);
+  assert.equal(fs.existsSync(path.join(target, ".harness")), false);
+  assert.equal(fs.existsSync(path.join(target, ".claude")), false);
+  assert.equal(fs.existsSync(path.join(target, ".cursor")), false);
+});
+
+test("runInstallWizard stops when no provider CLI is installed", async () => {
+  const target = makeTempDir();
+  initGitRepo(target);
+  mockProviderBinaries([]);
+
+  patchModule("dist/lib/cli-ui.js", (mod) => {
+    const originalUseInteractiveUi = mod.useInteractiveUi;
+    const originalIntroBanner = mod.introBanner;
+    mod.useInteractiveUi = () => true;
+    mod.introBanner = () => {};
+    return () => {
+      mod.useInteractiveUi = originalUseInteractiveUi;
+      mod.introBanner = originalIntroBanner;
+    };
+  });
+
+  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  await assert.rejects(
+    withInteractiveTty(() =>
+      runInstallWizard(repoRoot, {
+        providers: [],
+        target,
+        scope: "",
+        visibility: "",
+        dryRun: false,
+        yes: false,
+        verbose: false,
+      })
+    ),
+    /No supported provider CLI detected/
+  );
+});
+
 test("runUpdateWizard non-interactive update calls backend for each provider", async () => {
   const calls = [];
   const target = makeTempDir();
+  writeManifest(target, ["cursor", "claude"]);
 
   patchModule("dist/lib/backend/update.js", (mod) => {
     const originalRunUpdate = mod.runUpdate;
@@ -315,6 +455,7 @@ test("runUpdateWizard non-interactive update calls backend for each provider", a
 
 test("runUpdateWizard surfaces backend failure status", async () => {
   const target = makeTempDir();
+  writeManifest(target, ["cursor"]);
 
   patchModule("dist/lib/backend/update.js", (mod) => {
     const originalRunUpdate = mod.runUpdate;
@@ -352,6 +493,7 @@ test("runUpdateWizard surfaces backend failure status", async () => {
 test("runUpdateWizard interactive cancel after plan does not call backend", async () => {
   const target = makeTempDir();
   fs.mkdirSync(path.join(target, ".cursor", "commands"), { recursive: true });
+  writeManifest(target, ["cursor"]);
   let backendCalled = false;
 
   patchModule("dist/lib/backend/update.js", (mod) => {
@@ -641,6 +783,8 @@ test("runStatusOrDoctor returns doctor failure status in verbose mode", () => {
 
 test("runInitWizard defaults to cursor and skips demo eval when requested", async () => {
   const target = makeTempDir();
+  initGitRepo(target);
+  mockProviderBinaries(["cursor"]);
   const harnessDir = path.join(target, ".harness");
   const analysisFile = path.join(target, "domain-analysis.json");
   const installCalls = [];
@@ -727,6 +871,8 @@ test("runInitWizard defaults to cursor and skips demo eval when requested", asyn
 
 test("runInitWizard with no domain flags scaffolds empty domains", async () => {
   const target = makeTempDir();
+  initGitRepo(target);
+  mockProviderBinaries(["cursor"]);
   const harnessDir = path.join(target, ".harness");
   const evalCalls = [];
 
