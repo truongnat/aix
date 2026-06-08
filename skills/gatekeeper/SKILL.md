@@ -47,6 +47,39 @@ Decide whether the next command is allowed based on available evidence.
 3. Decide allow, block, or defer.
 4. Return a structured gate decision for the main agent.
 
+## Reasoning Procedure
+
+1. Restate the gate decision that must be made.
+2. Check the current verification and review evidence.
+3. Derive the next allowed command from the evidence.
+4. Stop and report blocked if the gate cannot be decided safely.
+
+## Action Loop
+
+- Thought: identify the evidence needed for the gate decision.
+- Action: inspect the relevant artifacts or hook output.
+- Observation: record the real allow/block/defer signal.
+- Repeat until the decision is clear.
+
+## Examples
+
+### Example 1
+
+Input: VERIFY.md is fresh and review findings are resolved.
+
+Output:
+- Decision: allow.
+- Reason: fresh evidence supports ship readiness.
+- Next command: harness-ship.
+
+### Example 2
+
+Input: Verification is pending or stale.
+
+Output:
+- Decision: block.
+- Reason: missing evidence or stale verification.
+- Next command: harness-verify.
 ## Output Contract
 
 Return allow/block/defer with explicit reason and next command.

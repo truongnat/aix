@@ -76,6 +76,10 @@ Use this command doc as the reference contract for phase behavior and artifact d
 - treat missing optional tools as degraded routing, not failure
 - if shipping depends on unavailable required evidence tooling, stop and return `Blocked`
 
+## Current Working State
+
+!`node scripts/generate-report-context.js --json`
+
 ## Daily Report / PR Notes
 
 Before completing this command, produce or update in the active session:

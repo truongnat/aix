@@ -1,38 +1,45 @@
 ---
-description: ai-engineering-harness — capability pack + project harness state
+description: ai-engineering-harness core operating discipline
 alwaysApply: true
 ---
 
 # ai-engineering-harness
 
-This project uses the ai-engineering-harness capability pack.
+Read `.ai-harness/AGENTS.md` before acting.
+Read `.harness/STATE.md`, the active goal, and the current plan before implementing.
+Read `.ai-harness/agent-system/SYSTEM_PROMPT.md` and `.ai-harness/agent-system/RESPONSE_CONTRACT.md` before using the harness.
 
-## Capability source (read first)
+## Phase Discipline
 
-1. Read `.ai-harness/AGENTS.md` for the operating contract.
-2. Use `.cursor/commands/` for native project slash commands.
-3. Use `.ai-harness/commands/` for command-loop flows.
-4. Use `.ai-harness/skills/` for capabilities and skill packs.
-5. Use `.ai-harness/workflows/` for process templates.
-6. Use `.ai-harness/patterns/` and `.ai-harness/templates/` when planning work.
-7. Use `.ai-harness/docs/` for adoption, validation, and workflow guidance.
+Do not skip phases.
 
-If `.ai-harness/` is missing, ask the user to reinstall with project capability cache:
+- Plan before run.
+- Approved plan before implementation.
+- Verification before ship.
+- Evidence before success claim.
+- Remember only after shipped result, failed attempt, or durable lesson.
 
-`install.sh install --runtime cursor --scope project --visibility private --init-harness --yes`
+Read `.harness/STATE.md` and the active session under `.harness/sessions/` before changing phase.
 
-(private project installs include `.ai-harness/` by default)
+## Blocked Behavior
 
-## Project state
+If required input, approval, evidence, or phase preconditions are missing:
 
-1. Read `.harness/HARNESS.md`, `TEAM.md`, `SKILLS.md`, `WORKFLOW.md`, `GATES.md`, and active goal artifacts under `.harness/goals/` when they exist.
-2. `.harness/` holds **this repo's** profile and goals — not the shared capability pack.
+1. Stop.
+2. Ask the minimum required question.
+3. Do not continue after asking.
+4. Return a blocked output.
 
-## Discipline
+After asking a blocking question, do not continue implementation, verification, shipping, or memory updates in the same turn.
 
-- Read artifacts before inventing requirements or architecture.
-- Follow the loop: map → start → discuss → plan → run → verify → ship → remember.
-- Prefer surgical changes; verify before claiming done.
-- Never store secrets or private data in `.harness/` or `.ai-harness/` files.
+Loop: harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember
 
-If `.harness/` is missing, ask the user to run with `--init-harness`.
+Routing:
+- Use `.cursor/commands/` for native project commands.
+- Use `.ai-harness/runtime-commands/` as the local catalog mirror.
+
+Never implement without an approved plan.
+Never ship without evidence in `VERIFY.md`.
+Never write secrets into `.harness/`.
+
+See `ai-engineering-harness-detail.mdc` for the on-demand routing guide.

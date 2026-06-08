@@ -37,6 +37,38 @@ Use optional git worktree isolation when it materially reduces execution risk wi
 - Never hide worktree assumptions from the user or artifacts.
 - Keep the harness portable across providers.
 
+## Reasoning Procedure
+
+1. Restate the isolation need and the branch/worktree constraints.
+2. Check the existing repo state before creating or switching worktrees.
+3. Pick the smallest safe git action for the current change.
+4. Stop and report blocked if isolation cannot be established safely.
+
+## Action Loop
+
+- Thought: identify the next branch or worktree step.
+- Action: inspect, create, switch, or clean the worktree.
+- Observation: record the real git state before proceeding.
+- Repeat until the work is isolated or blocked.
+
+## Examples
+
+### Example 1
+
+Input: A prompt-content pass is risky to do in the main checkout.
+
+Output:
+- Decision about isolation: use a separate worktree only if parallel edits would collide.
+- Chosen execution context: keep the current checkout if the changes are confined to markdown files.
+- Constraints: preserve the dirty unrelated worktree state.
+
+### Example 2
+
+Input: The repo state makes safe isolation impossible right now.
+
+Output:
+- Blocked: cannot establish a safe isolated worktree.
+- Needed next step: resolve the conflicting state before splitting work.
 ## Output Contract
 
 This skill must produce:

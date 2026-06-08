@@ -42,12 +42,16 @@ Describe the repository-specific harness operating model, the artifacts it owns,
 
 ## Scope
 
-- Commands: \`harness-start\`, \`harness-plan\`, \`harness-run\`, \`harness-verify\`, \`harness-ship\`, \`harness-remember\`
-- Primary artifacts: \`.harness/GOAL.md\`, \`.harness/PLAN.md\`, \`.harness/VERIFY.md\`, \`.harness/SHIP.md\`
-- Validation gates: unit tests, integration checks, docs review, release checks
+- This harness owns \`.harness/\` profile artifacts, session state, and verification records.
+- This harness does not own production architecture decisions; document those in \`DECISIONS.md\` and source code.
+- Primary artifacts: session goal, plan, verify, blocked, ship, and remember files under \`.harness/sessions/\`
 
 ## Operating Model
 
+This repository uses the core loop:
+\`harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember\`
+
+Working rules:
 1. Start every session by reading state and goal artifacts.
 2. Record scope and plan before editing code.
 3. Verify with commands and evidence before claiming completion.
@@ -57,14 +61,14 @@ Describe the repository-specific harness operating model, the artifacts it owns,
 
 | Assumption | Why it matters | How to verify |
 | --- | --- | --- |
-| CI is the main release gate | Local pass alone is not enough | link CI run in \`VERIFY.md\` |
-| \`.harness/\` is project-local state | Users may have multiple concurrent goals | keep artifacts scoped to one repo |
+| CI is the main release gate | local pass alone is not enough | link CI run in \`VERIFY.md\` |
+| \`.harness/\` is project-local state | users may have multiple concurrent goals | keep artifacts scoped to one repo |
 
 ## Unknowns
 
 | Question | Blocking? | Owner | Next step |
 | --- | --- | --- | --- |
-|  | yes/no |  |  |
+| What are this repo's real test, lint, and build commands? | yes/no |  | update \`GATES.md\` before first ship |
 
 ## Human Review
 
@@ -74,7 +78,7 @@ List any policy, scope, or release decisions that still need a human sign-off.
 
 - Repository: example-service
 - Purpose: keep API changes tied to written goals, explicit verification, and release notes
-- Active artifacts: \`GOAL.md\`, \`PLAN.md\`, \`VERIFY.md\`, \`SHIP.md\`
+- Active artifacts: active session \`GOAL.md\`, \`PLAN.md\`, \`VERIFY.md\`, \`SHIP.md\`
 - Default verification: \`npm test\`, contract validation, and CI confirmation before ship
 `;
 }
@@ -136,24 +140,33 @@ Describe which skills or skill packs are available in this repository.
 
 - Status: draft
 - Last reviewed: YYYY-MM-DD
+- Review before first \`harness-run\`
 
 ## Selected Core Skills
 
 | Skill | When to use it | Owner | Notes |
 | --- | --- | --- | --- |
-| repo-review | code review and risk surfacing |  |  |
-| frontend-polish | final UI pass |  | optional |
+| using-harness | every harness session |  | keep phase discipline intact |
+| mapping-codebase | before planning non-trivial code changes |  | identify impacted files first |
+| discussing-goals | when goal or scope is ambiguous |  | resolve acceptance criteria before planning |
+| writing-plans | before implementation |  | create ordered tasks and stop before coding |
+| executing-plans | after plan approval |  | make small, scoped changes only |
+| verification | after implementation |  | gather fresh evidence |
+| remembering | after verified work ships |  | promote durable lessons only |
 
 ## Selected Skill Packs
 
 | Pack | Coverage | Notes |
 | --- | --- | --- |
-| base engineering | planning, implementation, verification |  |
+| backend | APIs, services, auth, persistence | add when repository has server-side behavior |
+| frontend | UI, browser behavior, accessibility | add when repository has user-facing surfaces |
+| debugging | root-cause investigation and flaky behavior | add when diagnosis dominates implementation |
 
 ## Excluded Skills Or Packs
 
 - Release automation that requires private credentials
 - Direct production access without human approval
+- Packs with no clear repository domain owner
 
 ## Human Review
 
@@ -171,7 +184,7 @@ Describe the workflow stages, command loop, and how the repository uses them.
 ## Current Status
 
 - Status: draft
-- Primary workflow: Session Start -> Discuss -> Plan -> Run -> Verify -> Ship -> Remember
+- Primary workflow: Start -> Discuss -> Plan -> Run -> Verify -> Ship -> Remember
 
 ## Selected Workflow
 
@@ -180,19 +193,22 @@ Describe the workflow stages, command loop, and how the repository uses them.
 
 ## Command Sequence
 
-| Phase | Required artifact updates | Exit condition |
-| --- | --- | --- |
-| Start | \`STATE.md\`, session context | active goal and phase known |
-| Plan | \`GOAL.md\`, \`PLAN.md\` | approved plan exists |
-| Run | \`TASKS.md\`, changed files | scoped implementation complete |
-| Verify | \`VERIFY.md\` | evidence recorded |
-| Ship | \`SHIP.md\` | user-facing status matches evidence |
+| # | Command | Required | Purpose | Skip when |
+| --- | --- | --- | --- | --- |
+| 1 | \`harness-start\` | always | restore context and identify the next legal command | never |
+| 2 | \`harness-discuss\` | non-trivial work | clarify goal, constraints, and success criteria | truly trivial typo-only work |
+| 3 | \`harness-plan\` | implementation work | break work into ordered tasks and stop before coding | never |
+| 4 | \`harness-run\` | after plan approval | implement the approved scope in small steps | never |
+| 5 | \`harness-verify\` | after implementation | run gates and record evidence | never |
+| 6 | \`harness-ship\` | after verification | summarize outcome and remaining gaps | when no ship artifact is needed |
+| 7 | \`harness-remember\` | after verified work | capture durable lessons worth reusing | when the work produced nothing reusable |
 
 ## Execution Rules
 
 - Never skip plan approval for non-trivial changes
 - Record blocked state instead of guessing
 - Ship summary must link verification evidence
+- Return to planning if implementation discovers a real scope gap
 
 ## Human Review
 
@@ -221,27 +237,31 @@ Describe the quality gates that protect repository changes.
 
 - Status: draft
 - Last calibrated: YYYY-MM-DD
+- Replace example commands with this repository's real commands before first ship
 
 ## Quality Gates
 
-| Gate | Applies when | Evidence |
-| --- | --- | --- |
-| Build/typecheck | source or package changes | command output in \`VERIFY.md\` |
-| Tests | behavior changes | exact command + result |
-| Manual validation | UX/docs/install flows | screenshots, snippets, or notes |
-| CI | merge/release-sensitive work | linked run URL or run id |
+| Gate | Command | Pass condition | Evidence |
+| --- | --- | --- | --- |
+| Tests | \`npm test\` | exit 0, all required tests pass | command output in \`VERIFY.md\` |
+| Type check | \`tsc --noEmit\` | exit 0, no type errors | command output |
+| Lint | \`eslint .\` | exit 0 or explicitly accepted warnings | command output |
+| Build | \`npm run build\` | exit 0, no build errors | command output |
+| CI | repo CI workflow | required checks conclude success | linked run id or URL |
 
 ## Evidence Requirements
 
 - Record the exact commands executed
 - Capture pass/fail status, not intent
 - Note skipped checks and why they were skipped
+- Treat "looks good" or "should pass" as non-evidence
 
 ## Stop Conditions
 
 - Plan missing or not approved
 - Acceptance criteria unclear
 - Verification failed or is blocked
+- Required human sign-off is missing
 
 ## Human Review
 
@@ -249,10 +269,10 @@ List temporary waivers and who approved them.
 
 ## Example Gates
 
-| Gate | Applies when | Evidence |
-| --- | --- | --- |
-| Regression tests pass | source behavior changes | \`npm test\` output copied into \`VERIFY.md\` |
-| Shipping evidence is concrete | any ship step | CI run id plus exact verification commands |
+| Gate | Command | Pass condition | Evidence |
+| --- | --- | --- | --- |
+| Regression tests pass | \`npm test\` | target behavior passes without new failures | test output copied into \`VERIFY.md\` |
+| Shipping evidence is concrete | review \`VERIFY.md\` | every required check has proof or documented gap | CI run id plus exact verification commands |
 `;
 }
 
@@ -273,12 +293,14 @@ Describe what long-lived memory this repository should retain.
 - Relevant entries in \`DECISIONS.md\`
 - Known regression areas in \`HAZARDS.md\`
 - Reusable commands in \`INDEX.md\`
+- Active session remember notes if the current goal is a continuation
 
 ## Remember After Shipping
 
 - Root causes worth reusing
 - Verification recipes that saved time
 - Project-level decisions that affect future plans
+- Hazards that should change planning or verification next time
 
 ## Memory Types
 
@@ -294,6 +316,7 @@ Describe what long-lived memory this repository should retain.
 - Secrets, credentials, tokens
 - Customer data or private business data
 - One-off notes that belong only in a local scratchpad
+- Temporary task status that belongs in active session artifacts
 
 ## Human Review
 
@@ -304,6 +327,7 @@ List borderline memory items that may need promotion or deletion.
 - Lesson: release-facing doc changes must update validator assertions in the same patch
 - Why it matters: docs can drift silently while tests stay green
 - Where to store it: promote to \`INDEX.md\` if repeated across multiple goals
+- Verification impact: run \`node bin/validate.js\` whenever docs or templates move
 `;
 }
 

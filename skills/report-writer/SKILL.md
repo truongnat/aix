@@ -59,6 +59,39 @@ Do not use this skill when:
 7. Produce `CHANGE_SUMMARY.md`.
 8. Do not overclaim verification.
 
+## Reasoning Procedure
+
+1. Restate the change and the evidence available.
+2. Check the diff and verification artifacts.
+3. Derive the smallest accurate report from the evidence.
+4. Stop and report blocked if verification or diff context is missing.
+
+## Action Loop
+
+- Thought: identify the report artifact and the facts it must include.
+- Action: inspect the plan, tasks, verify output, and git diff.
+- Observation: record the real change summary and evidence.
+- Repeat until the report is ready.
+
+## Examples
+
+### Example 1
+
+Input: The prompt-standard work is complete and verified.
+
+Output:
+- Summary: prompt format standard added and enforced.
+- What changed: new standard doc, skill content pass, validator enforcement, eval conformance check.
+- Verification: node bin/validate.js and npm test passed.
+- PR title/body: ready for handoff.
+
+### Example 2
+
+Input: Verification is missing or the diff cannot be inspected.
+
+Output:
+- Blocked: missing verification or missing diff context.
+- Needed next step: gather the evidence before writing the report.
 ## Output Contract
 
 Must produce:

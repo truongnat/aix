@@ -37,6 +37,39 @@ Produce a concrete implementation plan before changes begin.
 - Verification belongs in the plan, not just at the end.
 - Plans should minimize room for interpretation and scope drift.
 
+## Reasoning Procedure
+
+1. Restate the goal and the scope that must be planned.
+2. Check the available context, constraints, and approvals.
+3. Derive a small executable plan from the evidence.
+4. Stop and report blocked if the scope or approval is unclear.
+
+## Action Loop
+
+- Thought: identify the next planning decision.
+- Action: inspect the goal, context, and constraints.
+- Observation: record the exact plan element that follows.
+- Repeat until the plan is explicit and executable.
+
+## Examples
+
+### Example 1
+
+Input: The prompt standard upgrade needs a concrete rollout plan.
+
+Output:
+- Implementation plan: add the standard doc, update authoring rules, make the examples concrete, add the eval.
+- Ordered task list: content pass, eval addition, verification.
+- Verification/rollback strategy: run validator and tests; revert only the new content layer if needed.
+- Approval status: approved for implementation.
+
+### Example 2
+
+Input: The goal or approval is too unclear to plan safely.
+
+Output:
+- Blocked: missing approval or missing decision.
+- Needed next step: clarify the scope before writing tasks.
 ## Output Contract
 
 This skill must produce:

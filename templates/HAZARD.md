@@ -17,6 +17,26 @@ status: active
 
 - 
 
+## Failure Mode
+
+- 
+
+## Early Warning Signs
+
+- 
+
 ## Mitigation
+
+- 
+
+## Verification Focus
+
+- 
+
+## Related Decisions
+
+- 
+
+## Notes
 
 - 

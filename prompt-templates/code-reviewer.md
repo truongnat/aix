@@ -73,6 +73,34 @@ Prefer concrete bugs, risks, regressions, and missing tests over style feedback.
 **Residual risks:**
 - [if no findings, name remaining uncertainty]
 
+## Reasoning Procedure
+
+1. Restate the review target and the approved scope.
+2. Check the diff, plan, and evidence against the requirements.
+3. Derive concrete findings or confirm that none are present.
+4. Stop and report blocked if the review cannot be scoped safely.
+
+## Action Loop
+
+- Thought: identify the next artifact or risk surface to inspect.
+- Action: read the diff, review context, or supporting evidence.
+- Observation: record the real finding or lack of finding.
+- Repeat until the review is complete.
+
+## Examples
+
+### Example 1
+
+Input: The diff introduces a regression risk and missing tests.
+
+Output: Review findings with severity and an explicit next command.
+
+### Example 2
+
+Input: The change is blocked because the scope is still unclear.
+
+Output: A blocked review result that names the missing review context.
+
 ## Placeholders
 
 - `{IMPLEMENTATION_SUMMARY}` — what changed

@@ -8,6 +8,14 @@ Use this as the default workflow when no more specific task workflow is a better
 
 `harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember`
 
+## Decision Tree
+
+- Is the current phase clear from `STATE.md`?
+- If no: run `harness-start` and restore context first.
+- If yes: are the next-command preconditions satisfied?
+- If no: redirect to the earlier phase instead of continuing.
+- If yes: complete the phase outputs before moving forward.
+
 ## Required Artifacts
 
 - `.harness/STATE.md`
@@ -39,6 +47,14 @@ Use this as the default workflow when no more specific task workflow is a better
 - return to `harness-discuss` if the goal or scope changes
 - return to `harness-plan` if execution reveals material plan gaps
 - stop shipping if verification is partial or failed
+
+## Artifact Checklist
+
+- `STATE.md` points to the active session and next command.
+- `GOAL.md` and `PLAN-*.md` exist before implementation.
+- `TASKS.md` reflects real progress when the work spans multiple steps.
+- `VERIFY.md` records pass, fail, or gap evidence before ship.
+- `SHIP.md` and `REMEMBER.md` are only completed when their prerequisites are met.
 
 ## Completion Criteria
 

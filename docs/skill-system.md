@@ -56,6 +56,22 @@ Skills should strengthen these layers, not compete with them.
 
 Compact skills are easier to select, read, maintain, and reuse. Long skills tend to blur boundaries, duplicate docs, and create catalog bloat.
 
+## Prompt Format Standard
+
+Skill prompts and prompt-dispatch templates should follow the canonical
+modules in [`../skills/PROMPT_FORMAT_STANDARD.md`](../skills/PROMPT_FORMAT_STANDARD.md):
+
+- Role & Persona
+- Context
+- Task
+- Reasoning Procedure
+- Action Loop
+- Constraints & Rules
+- Examples
+- Output Format
+
+Keep the format additive and compatible with the existing harness layers.
+
 ## Add A New Skill Or Update An Existing One
 
 Update an existing skill when:

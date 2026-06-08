@@ -17,6 +17,8 @@ Skills define reusable agent capabilities for this harness. Each skill has a nar
 - `verification`
 - `verification-before-completion`
 - `remembering`
+- `debugging-investigation`
+- `security-review`
 - `writing-skills`
 
 ## Design Rules
@@ -25,6 +27,8 @@ Skills define reusable agent capabilities for this harness. Each skill has a nar
 - Skills should say when they apply and when they do not.
 - Skills should avoid hidden runtime assumptions.
 - Skills should emit clear outputs that fit the templates in this repository.
+- Skills should follow the prompt format standard in
+  [`PROMPT_FORMAT_STANDARD.md`](PROMPT_FORMAT_STANDARD.md).
 
 ## Skill Packs
 

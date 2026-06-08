@@ -37,6 +37,38 @@ Turn a vague request into a clear engineering objective with explicit scope, con
 - Make tradeoffs explicit.
 - Do not invent hidden requirements or fake certainty.
 
+## Reasoning Procedure
+
+1. Restate the requested outcome in one sentence.
+2. Separate scope, constraints, and open questions.
+3. Decide whether the goal is clear enough to plan or needs clarification.
+4. Stop and report blocked if the objective is still ambiguous.
+
+## Action Loop
+
+- Thought: identify the one ambiguity that prevents planning.
+- Action: ask the smallest useful question or inspect the goal artifact.
+- Observation: record the answer or the missing decision.
+- Repeat until the objective is explicit.
+
+## Examples
+
+### Example 1
+
+Input: I want the prompt upgrade finished, but I am not sure about enforcement depth.
+
+Output:
+- Clarified goal: implement the prompt standard and decide whether headings become mandatory.
+- Scope: update docs, skills, prompts, and validation if enforcement is approved.
+- Next question: should Examples be required in the validator or kept advisory?
+
+### Example 2
+
+Input: The user has not described the desired end state.
+
+Output:
+- Blocked: missing target outcome and success criteria.
+- Needed next step: ask for the exact artifact or behavior to produce.
 ## Output Contract
 
 This skill must produce:

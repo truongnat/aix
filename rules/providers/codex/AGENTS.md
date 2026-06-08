@@ -1,8 +1,6 @@
 # ai-engineering-harness for Codex
 
-This repository uses ai-engineering-harness.
-
-Core harness rules are provider-neutral. This file is the Codex adapter entrypoint.
+This repository uses ai-engineering-harness. This file is the Codex adapter entrypoint.
 
 ## Activation
 
@@ -26,5 +24,26 @@ Fallback instruction: **Use harness-plan for this repository.**
 Follow `.ai-harness/agent-system/SYSTEM_PROMPT.md` as the repository-level operating prompt.
 
 Follow `.ai-harness/agent-system/RESPONSE_CONTRACT.md` for blocked and evidence formats.
+
+## Evidence standard
+
+Accept:
+- command output
+- exit codes
+- test results
+- direct file inspection tied to the current change
+
+Reject:
+- "looks right"
+- "probably passes"
+- commands that were not actually run
+
+## Forbidden
+
+- Implementing without a clear goal and approved plan
+- Shipping without verification evidence
+- Writing secrets or customer data into `.harness/`
+- Continuing after a blocking question
+- Inventing acceptance criteria not found in artifacts
 
 <!-- @core -->

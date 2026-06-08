@@ -21,7 +21,13 @@ tools: []
 
 ## Inputs
 
-## Procedure
+## Workflow
+
+## Reasoning Procedure
+
+## Action Loop
+
+## Examples
 
 ## Output Contract
 

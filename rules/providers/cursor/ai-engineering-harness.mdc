@@ -1,38 +1,25 @@
 ---
-description: ai-engineering-harness activation
-globs:
+description: ai-engineering-harness core operating discipline
 alwaysApply: true
 ---
 
 # ai-engineering-harness
 
-This repository uses ai-engineering-harness.
+Read `.ai-harness/activation.md` before acting.
+Read `.harness/STATE.md`, the active goal, and the current plan before implementing.
+Read `.ai-harness/agent-system/SYSTEM_PROMPT.md` and `.ai-harness/agent-system/RESPONSE_CONTRACT.md` before using the harness.
 
-Core harness rules are provider-neutral. This file is the Cursor adapter entrypoint.
+Shared fragments:
+<!-- @core:phase-guards,blocking -->
 
-## Read Order
+Loop: harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember
 
-Before acting on a harness request:
+Routing:
+- Use `.cursor/commands/` for native project commands.
+- Use `.ai-harness/runtime-commands/` as the local catalog mirror.
 
-1. Read `.ai-harness/activation.md`
-2. Read `.harness/STATE.md`
-3. Read the active session under `.harness/sessions/`
-4. Read the relevant Cursor project command in `.cursor/commands/`
-5. Read the relevant command contract in `.ai-harness/commands/`
-6. Read the matching prompt template in `.ai-harness/prompt-templates/`
+Never implement without an approved plan.
+Never ship without evidence in `VERIFY.md`.
+Never write secrets into `.harness/`.
 
-## Important
-
-Cursor project install provides native `/harness-*` commands through `.cursor/commands/`.
-Use `.cursor/rules/` for guardrails and repository activation, and keep `.ai-harness/runtime-commands/` as the local catalog mirror.
-
-Do not invent slash commands.
-Do not use legacy colon-separated command IDs.
-
-Always follow `.ai-harness/agent-system/SYSTEM_PROMPT.md`.
-
-Use the response formats in `.ai-harness/agent-system/RESPONSE_CONTRACT.md`.
-
-Fallback instruction: **Use /harness-plan for this repository.**
-
-<!-- @core -->
+See `ai-engineering-harness-detail.mdc` for the on-demand routing guide.

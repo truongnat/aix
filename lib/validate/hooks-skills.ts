@@ -116,7 +116,29 @@ function assertHooksAndSkillsLayer(baseDir: string, failures: string[]): void {
     assertHeadings(
       baseDir,
       `${dir}/SKILL.md`,
-      ["## Purpose", "## Output Contract", "## Blocking Conditions"],
+      [
+        "## Purpose",
+        "## Reasoning Procedure",
+        "## Action Loop",
+        "## Examples",
+        "## Output Contract",
+        "## Blocking Conditions",
+      ],
+      failures
+    );
+    assertHeadings(
+      baseDir,
+      `${dir}/prompt.md`,
+      [
+        "## Role & Persona",
+        "## Context",
+        "## Task",
+        "## Reasoning Procedure",
+        "## Action Loop",
+        "## Constraints & Rules",
+        "## Examples",
+        "## Output Format",
+      ],
       failures
     );
   }

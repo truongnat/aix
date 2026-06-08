@@ -37,6 +37,39 @@ Shape a vague request into an implementation-ready direction before detailed pla
 - Keep tradeoffs explicit and short.
 - Do not invent requirements to make the design feel complete.
 
+## Reasoning Procedure
+
+1. Restate the problem and the decision the user is trying to make.
+2. List the concrete constraints and what is still unknown.
+3. Compare a few viable directions and note the tradeoffs.
+4. Stop and report blocked if the decision depends on missing context.
+
+## Action Loop
+
+- Thought: identify the next constraint, risk, or option that matters.
+- Action: inspect the goal artifact or ask one clarifying question.
+- Observation: capture the new constraint or choice exactly.
+- Repeat until the direction is implementation-ready.
+
+## Examples
+
+### Example 1
+
+Input: We need to add a new eval check without slowing the suite down.
+
+Output:
+- Clarified problem: add a lightweight conformance check for prompt examples.
+- Constraints: keep validation local, avoid long-running LLM checks, preserve current test speed.
+- Recommended approach: add a deterministic eval manifest plus a small conformance test.
+- Tradeoff: broader coverage than a heading-only test, but still cheap to run.
+
+### Example 2
+
+Input: The goal is too vague and no success criteria are available.
+
+Output:
+- Blocked: missing success criteria and target artifact.
+- Needed next step: ask for the desired output shape before proposing options.
 ## Output Contract
 
 This skill must produce:

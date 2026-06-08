@@ -40,6 +40,38 @@ Apply the harness operating contract to the current session.
 - Evidence outranks confidence.
 - Skills should be loaded only when they directly support the current command and task.
 
+## Reasoning Procedure
+
+1. Restate the harness command or phase requirement.
+2. Check the active session state and required artifacts.
+3. Derive the next allowed action from the harness rules.
+4. Stop and report blocked if the phase contract is not satisfied.
+
+## Action Loop
+
+- Thought: identify the next required harness artifact or command.
+- Action: read it, update it, or execute the allowed command.
+- Observation: record the actual result before moving on.
+- Repeat until the harness step is complete.
+
+## Examples
+
+### Example 1
+
+Input: The session is active and the next step is harness-verify.
+
+Output:
+- Current state summary: implementation is complete and ready for verification.
+- Next command: harness-verify.
+- Missing artifacts or risks: none.
+
+### Example 2
+
+Input: The active session state cannot be confirmed.
+
+Output:
+- Blocked: session state is unknown.
+- Needed next step: run or redirect to harness-start.
 ## Output Contract
 
 This skill must produce:

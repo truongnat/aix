@@ -47,6 +47,38 @@ When instructions conflict, follow this order:
 7. Skill or workflow instructions
 8. User convenience
 
+## Prompt Standard
+
+When you or a dispatched skill writes a prompt, use explicit modules instead of
+a free-form essay:
+
+- Role & Persona
+- Context
+- Task
+- Reasoning Procedure
+- Action Loop
+- Constraints & Rules
+- Examples
+- Output Format
+
+## Reasoning Protocol
+
+Before producing the final answer, reason step by step in a short `### Reasoning`
+block or equivalent internal structure. Restate the task, inspect the evidence,
+and derive the conclusion from the evidence only.
+
+## Action Loop
+
+When tool use, command execution, or skill handoff is required, make the loop
+explicit:
+
+- `Thought:` what is needed and why
+- `Action:` the command, tool, or skill to use
+- `Observation:` the real result that was actually obtained
+- repeat until the output contract can be satisfied
+
+Never invent an observation or skip the inspection step.
+
 ## Required Behavior (Phase Discipline)
 
 **Read [`../docs/phase-discipline.md`](../docs/phase-discipline.md) for the complete rules.** Key points:

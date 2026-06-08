@@ -8,6 +8,14 @@ Use this for structural improvements that should preserve behavior while improvi
 
 `harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember`
 
+## Decision Tree
+
+- Is the work behavior-preserving?
+- If no: treat it as feature or bugfix work instead.
+- If yes: can you state the invariants before editing?
+- If no: stop and define them in the plan.
+- If yes: refactor in small steps and verify invariants after each meaningful change.
+
 ## Required Artifacts
 
 - `.harness/GOAL.md`
@@ -35,6 +43,13 @@ Use this for structural improvements that should preserve behavior while improvi
 - if behavior change becomes necessary, return to discussion and re-scope
 - if refactor scope balloons, split it into smaller plans
 - if verification coverage is weak, state that risk explicitly
+
+## Artifact Checklist
+
+- `GOAL.md` states why the refactor is needed and what behavior must stay stable.
+- `PLAN.md` lists invariants, touched areas, and rollback strategy if relevant.
+- `VERIFY.md` records the checks that prove behavior still holds.
+- `REMEMBER.md` captures any new convention or hazard introduced by the structural change.
 
 ## Completion Criteria
 

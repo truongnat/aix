@@ -15,6 +15,7 @@ const requiredFiles = [
   "agent-system/RESPONSE_CONTRACT.md",
   "agent-system/TONE_AND_FORMAT.md",
   "agent-system/OUTPUT_PATTERNS.md",
+  "skills/PROMPT_FORMAT_STANDARD.md",
   "agent-system/provider-adapters/claude.md",
   "agent-system/provider-adapters/cursor.md",
   "agent-system/provider-adapters/codex.md",
@@ -124,6 +125,8 @@ const skillFiles = [
   "skills/verification-before-completion/SKILL.md",
   "skills/remembering/SKILL.md",
   "skills/writing-skills/SKILL.md",
+  "skills/debugging-investigation/SKILL.md",
+  "skills/security-review/SKILL.md",
 ];
 
 const templateFiles = [
@@ -205,6 +208,9 @@ const skillHeadings = [
   "## Inputs",
   "## Workflow",
   "## Operating Principles",
+  "## Reasoning Procedure",
+  "## Action Loop",
+  "## Examples",
   "## Output Contract",
   "## Common Failure Modes",
   "## Checklist Before Done",
@@ -214,6 +220,9 @@ const promptTemplateHeadings = [
   "## Use Case",
   "## Purpose",
   "## Prompt",
+  "## Reasoning Procedure",
+  "## Action Loop",
+  "## Examples",
   "## Placeholders",
   "## Returns",
   "## Critical Rules",

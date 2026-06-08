@@ -37,6 +37,39 @@ Prove the current state of the work with fresh evidence before any completion or
 - Verification should map back to the stated goal.
 - Unverified work is not complete.
 
+## Reasoning Procedure
+
+1. Restate the claim that must be proven.
+2. Identify the smallest check that can prove it.
+3. Read the result completely before concluding.
+4. Stop and report blocked if the evidence is missing or stale.
+
+## Action Loop
+
+- Thought: identify the proof obligation.
+- Action: run the verification command or inspect the evidence.
+- Observation: record the real result and exit code.
+- Repeat until the claim is proven or blocked.
+
+## Examples
+
+### Example 1
+
+Input: node bin/validate.js and npm test both ran fresh.
+
+Output:
+- Verification summary: prompt standard changes are validated.
+- Evidence list: validator passed, tests passed, no contract regressions found.
+- Residual gaps or risk: the worktree still contains unrelated dirty files.
+
+### Example 2
+
+Input: The required test command is unknown or was not run.
+
+Output:
+- Verification summary: blocked.
+- Evidence list: none fresh.
+- Residual gaps or risk: missing proof prevents completion.
 ## Output Contract
 
 This skill must produce:

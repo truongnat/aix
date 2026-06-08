@@ -1,3 +1,13 @@
+---
+argument-hint: "[goal-id]"
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+---
 # harness-start
 
 ## Purpose
@@ -5,6 +15,8 @@
 Run the **Session Start** protocol: the mandatory boot sequence that restores context, routes the active session, checks blocked state, loads memory, maps repository/current context, and determines the next allowed harness command before any implementation work begins.
 
 `harness-start` is session-scoped. It restores or establishes active session state, checks current phase, blocked state, active goal, and the next recommended command. It also performs context mapping for the current repository by identifying important paths, conventions, commands, quality gates, provider entrypoints, harness artifacts, constraints, and likely affected areas when an active goal exists. It should not implement code.
+
+If a goal id or session id is supplied as an argument, prefer that routing hint when it matches the active artifacts.
 
 ## System Prompt Requirement
 

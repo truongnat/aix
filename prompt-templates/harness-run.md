@@ -103,6 +103,34 @@ Run `harness-verify`.
 **Notes:**
 [Any risk, assumption, or follow-up.]
 
+## Reasoning Procedure
+
+1. Restate the approved plan and the current execution step.
+2. Check the scope, blockers, and implementation artifacts.
+3. Derive the next concrete action from the plan and evidence.
+4. Stop and report blocked if the plan cannot be followed safely.
+
+## Action Loop
+
+- Thought: identify the next implementation step and proof needed.
+- Action: inspect or modify the approved target files.
+- Observation: record the actual implementation result.
+- Repeat until the plan step is complete or blocked.
+
+## Examples
+
+### Example 1
+
+Input: The plan is approved and the next step is clear.
+
+Output: A concise execution update that follows the command contract.
+
+### Example 2
+
+Input: The plan is missing approval or the next step is unsafe.
+
+Output: A blocked response naming the missing approval or blocker.
+
 ## Placeholders
 
 - `{GOAL_PATH}` — usually `.harness/sessions/<active-session>/GOAL.md`

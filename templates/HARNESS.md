@@ -1,54 +1,46 @@
 # Harness Profile
 
-> Do not include credentials, tokens, customer data, or private business data.
+> Security: never write credentials, tokens, customer data, or private business data into this file or any `.harness/` file.
 
-## Purpose
+## Project
 
-Describe the project-specific harness operating model for this repository.
-
-## Current Status
-
-- Status: draft | review | approved
-- Last updated:
-- Owner:
-
-## Scope
-
-- Product or system type:
-- Primary stack:
-- Delivery model:
-- Risk level:
+| Field | Value |
+|---|---|
+| Repository name | (this repository) |
+| Type | web app / CLI / service / library |
+| Primary language | TypeScript / Python / Go / other |
+| Status | draft — update after first harness session |
 
 ## Operating Model
 
-- Primary workflow:
-- Execution model:
-- Primary team pattern:
-- Primary skill packs:
-- Core skills:
-- Quality gate posture:
+This repository uses the `core-loop` workflow:
+`harness-start -> discuss -> plan -> run -> verify -> ship -> remember`
 
-## Operating Boundaries
+Skills: see `.harness/SKILLS.md`  
+Quality gates: see `.harness/GATES.md`  
+Durable memory: `.harness/DECISIONS.md`, `.harness/HAZARDS.md`, `.harness/INDEX.md`
 
-- The harness should guide:
-- The harness should not manage:
+## Scope
 
-## Required References
+What this harness owns in this repository:
+- `.harness/` profile and session artifacts
+- `.harness/goals/` active work tracking
+- Quality gate enforcement via `.harness/GATES.md`
 
-- Team architecture guide:
-- Memory model:
-- SDLC execution model:
-- Quality gates:
+What it does not own:
+- Production code decisions (document in DECISIONS.md, implement in source)
+- CI/CD configuration (manage separately)
 
 ## Assumptions
 
-- [ ]
+Record assumptions that affect planning or verification.
+(Start with the most important assumption about this repo's architecture or constraints.)
 
 ## Unknowns
 
-- [ ]
+Record open questions that need human input or future investigation.
 
 ## Human Review
 
-- Status: not requested | requested | approved
-- Notes:
+Record anything that should be reviewed by a human before shipping.
+(Add after first harness session runs.)

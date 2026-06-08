@@ -1,0 +1,40 @@
+{
+  "id": "sample-verify-conformance",
+  "suite": "sample-suite",
+  "title": "Produce VERIFY.md with concrete evidence and no boilerplate",
+  "goal": "Generate VERIFY.md that follows the output format with real content.",
+  "mode": "workflow-discipline",
+  "fixture": {
+    "path": "evals/fixtures/sample-verify-md"
+  },
+  "prompt": "Write VERIFY.md following the fixture README.",
+  "successChecks": [
+    {
+      "type": "command",
+      "command": "node check-conformance.js VERIFY.md"
+    }
+  ],
+  "behaviorChecks": [
+    {
+      "type": "artifact-exists",
+      "path": "final-response.txt"
+    }
+  ],
+  "rubric": "evals/rubrics/deterministic-v1.json",
+  "metrics": {
+    "withHarnessSteps": 4,
+    "withoutHarnessSteps": 9,
+    "phases": [
+      "plan",
+      "verify",
+      "ship"
+    ]
+  },
+  "tags": [
+    "sample",
+    "workflow",
+    "deterministic",
+    "docs",
+    "conformance"
+  ]
+}

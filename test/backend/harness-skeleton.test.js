@@ -117,10 +117,20 @@ test("skeleton files include concrete examples instead of empty placeholders", (
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "hs-"));
   initHarnessProfile({ targetAbs: dir, dryRun: false });
 
+  const harness = fs.readFileSync(path.join(dir, ".harness", "HARNESS.md"), "utf8");
+  const skills = fs.readFileSync(path.join(dir, ".harness", "SKILLS.md"), "utf8");
+  const workflow = fs.readFileSync(path.join(dir, ".harness", "WORKFLOW.md"), "utf8");
+  const gates = fs.readFileSync(path.join(dir, ".harness", "GATES.md"), "utf8");
+  const memory = fs.readFileSync(path.join(dir, ".harness", "MEMORY.md"), "utf8");
   const decisions = fs.readFileSync(path.join(dir, ".harness", "DECISIONS.md"), "utf8");
   const hazards = fs.readFileSync(path.join(dir, ".harness", "HAZARDS.md"), "utf8");
   const index = fs.readFileSync(path.join(dir, ".harness", "INDEX.md"), "utf8");
 
+  assert.match(harness, /harness-start -> harness-discuss -> harness-plan/);
+  assert.match(skills, /using-harness/);
+  assert.match(workflow, /\| 1 \| `harness-start` \| always \|/);
+  assert.match(gates, /`npm test`/);
+  assert.match(memory, /Verification impact:/);
   assert.match(decisions, /## Example/);
   assert.match(hazards, /worktree-backed repo/);
   assert.match(index, /npm test/);

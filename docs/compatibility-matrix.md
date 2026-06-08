@@ -4,10 +4,10 @@ Generated from pack version **v1.0.1** and eval registry.
 
 | Provider | Native slash | Subagents | Status | Eval tasks verified | Live evals |
 | --- | --- | --- | --- | --- | --- |
-| Claude Code | yes | yes | native-plugin | deterministic local (30 tasks) | no live evals yet |
-| Codex | rules/fallback | adapter | plugin-packaging | deterministic local (30 tasks) | 1/1 passed (100% across 1 task) |
-| Cursor | yes | adapter | native-command-files | deterministic local (30 tasks) | no live evals yet |
-| Gemini CLI | rules/fallback | adapter | native-command-files | deterministic local (30 tasks) | no live evals yet |
+| Claude Code | yes | yes | native-plugin | deterministic local (31 tasks) | no live evals yet |
+| Codex | rules/fallback | adapter | plugin-packaging | deterministic local (31 tasks) | 1/1 passed (100% across 1 task) |
+| Cursor | yes | adapter | native-command-files | deterministic local (31 tasks) | no live evals yet |
+| Gemini CLI | rules/fallback | adapter | native-command-files | deterministic local (31 tasks) | no live evals yet |
 
 ## Eval tasks
 

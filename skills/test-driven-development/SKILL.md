@@ -37,6 +37,38 @@ Introduce or change behavior by defining evidence first, then implementing the s
 - The smallest passing change is usually best.
 - Regression protection matters more than elegance.
 
+## Reasoning Procedure
+
+1. Restate the behavior that must be proven.
+2. Define the smallest failing check that captures it.
+3. Derive the implementation target from that check.
+4. Stop and report blocked if the behavior cannot be tested yet.
+
+## Action Loop
+
+- Thought: identify the next proof point for the behavior.
+- Action: write or run the smallest relevant test.
+- Observation: record the actual test result.
+- Repeat until the behavior is covered.
+
+## Examples
+
+### Example 1
+
+Input: A prompt example must not be boilerplate.
+
+Output:
+- Failing check: the skill example text still uses a generic example instead of a filled schema.
+- Minimal implementation: replace the placeholder example with a filled schema.
+- Passing verification: the new example names concrete fields and outputs.
+
+### Example 2
+
+Input: The behavior cannot be reproduced or tested yet.
+
+Output:
+- Blocked: no reproducible test surface yet.
+- Needed next step: define the smallest observable check before implementation.
 ## Output Contract
 
 This skill must produce:

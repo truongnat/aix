@@ -4,6 +4,14 @@
 
 Decide whether verified work is ready to ship or must remain blocked.
 
+## Decision Tree
+
+- Does `VERIFY.md` exist with explicit status and fresh evidence?
+- If no: stop and return to verification.
+- If yes: are there unresolved blockers or contradictory results?
+- If yes: block or defer ship.
+- If no: gate the release with explicit residual risk.
+
 ## Skills Used
 
 1. verification
@@ -36,6 +44,13 @@ Output:
 ## Stop Conditions
 
 Stop if VERIFY evidence is missing, stale, or contradictory.
+
+## Artifact Checklist
+
+- `VERIFY.md` has explicit status, evidence, and known gaps.
+- Gate decision cites what evidence was reviewed.
+- Ship blockers are either resolved or explicitly named.
+- The final release-ready claim matches the evidence exactly.
 
 ## Dispose Rules
 

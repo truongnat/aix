@@ -4,6 +4,14 @@
 
 Create a session-scoped or durable skill when repeated capability is worth packaging.
 
+## Decision Tree
+
+- Is the procedure repeatable enough to deserve a skill?
+- If no: keep the logic in the current plan or notes.
+- If yes: does an existing core or local skill already cover it?
+- If yes: reuse or extend that skill instead of duplicating it.
+- If no: define inputs, outputs, blocking rules, and first-use evidence before creation.
+
 ## When To Create A Skill
 
 Create a skill when:
@@ -74,6 +82,13 @@ Stop if:
 - the procedure is still unclear
 - the skill duplicates existing capability
 - required inputs/outputs are undefined
+
+## Artifact Checklist
+
+- Skill id and scope are explicit.
+- `SKILL.md` defines trigger, workflow, outputs, and blocking conditions.
+- References exist only for guidance too long for the main skill body.
+- First use is recorded and promotion reason is explicit if the skill becomes durable.
 
 ## Related
 

@@ -8,6 +8,14 @@ Use this for new capabilities, user-visible behavior changes, or meaningful inte
 
 `harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember`
 
+## Decision Tree
+
+- Are the acceptance criteria explicit?
+- If no: stay in discussion until scope and success criteria are concrete.
+- If yes: is the feature small enough for one approved plan?
+- If no: split the work or reduce scope before run.
+- If yes: implement in steps, verify each criterion directly, then ship.
+
 ## Required Artifacts
 
 - `.harness/STATE.md`
@@ -42,6 +50,14 @@ Use this for new capabilities, user-visible behavior changes, or meaningful inte
 - reduce scope if the feature is too large for one plan
 - re-plan if implementation uncovers a materially different design need
 - stop before ship if any acceptance criterion is still unknown or unverified
+
+## Artifact Checklist
+
+- `GOAL.md` states the user-visible outcome and boundaries.
+- `DISCUSSION.md` records tradeoffs or unresolved shape questions when needed.
+- `PLAN-*.md` maps changed files, tasks, and verification strategy.
+- `VERIFY.md` checks acceptance criteria directly and documents any deferred human checks.
+- `SHIP.md` summarizes what shipped versus what remains follow-up work.
 
 ## Completion Criteria
 

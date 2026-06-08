@@ -4,6 +4,14 @@
 
 Review implementation and verify it before shipping.
 
+## Decision Tree
+
+- Is the implementation ready for review?
+- If no: return to run and finish the scoped work first.
+- If yes: does code review surface findings?
+- If yes: route back to run or plan with explicit findings.
+- If no: run verification and decide whether ship can proceed or must stay blocked.
+
 ## Skills Used
 
 1. tool-discovery
@@ -69,6 +77,13 @@ Stop if any skill returns:
 - blocked
 - failed
 - requires_user_decision
+
+## Artifact Checklist
+
+- `TOOL_CONTEXT.md` exists when tool routing or environment affects the review.
+- `REVIEW.md` records findings or explicit no-findings output.
+- `VERIFY.md` records fresh evidence, not only review opinion.
+- Gate output states allow, block, or defer with reasons.
 
 ## Dispose Rules
 

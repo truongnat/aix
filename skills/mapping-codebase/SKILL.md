@@ -37,6 +37,38 @@ Understand the repository structure, active artifacts, boundaries, and likely im
 - Separate facts, inferences, and unknowns.
 - Focus on what the next command needs.
 
+## Reasoning Procedure
+
+1. Restate the area or question that needs mapping.
+2. Find the smallest set of files or artifacts that can answer it.
+3. Trace dependencies or ownership from the evidence.
+4. Stop and report blocked if the needed path or artifact is missing.
+
+## Action Loop
+
+- Thought: identify the next file, folder, or relationship to inspect.
+- Action: search, open, or trace the relevant artifact.
+- Observation: record the concrete repository fact that was found.
+- Repeat until the map answers the question.
+
+## Examples
+
+### Example 1
+
+Input: Which files enforce the new prompt format?
+
+Output:
+- Affected-area map: skills/PROMPT_FORMAT_STANDARD.md, lib/validate/constants.ts, lib/validate/hooks-skills.ts.
+- Dependencies: validator headings flow into both core skill files and capability prompt.md files.
+- Unknowns: whether an eval exists that checks example quality.
+
+### Example 2
+
+Input: The repository surface needed to answer the question does not exist.
+
+Output:
+- Blocked: missing artifact or path.
+- Next step: ask for the target file set or restore the missing surface.
 ## Output Contract
 
 This skill must produce:

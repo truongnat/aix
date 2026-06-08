@@ -1,3 +1,12 @@
+---
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+---
 # harness-plan
 
 ## Purpose

@@ -341,6 +341,40 @@ describe("Workflow Command Documentation", () => {
       );
     }
   });
+
+  test("command files expose tool frontmatter and live git context where report asks for it", () => {
+    const run = fs.readFileSync(path.join(repoRoot, "commands", "harness-run.md"), "utf8");
+    const verify = fs.readFileSync(path.join(repoRoot, "commands", "harness-verify.md"), "utf8");
+    const ship = fs.readFileSync(path.join(repoRoot, "commands", "harness-ship.md"), "utf8");
+
+    assert.match(run, /^---\nallowed_tools:/);
+    assert.match(verify, /^---\nallowed_tools:/);
+    assert.match(verify, /Current Working State/);
+    assert.match(verify, /git diff --stat HEAD/);
+    assert.match(verify, /git status --short/);
+    assert.match(ship, /Current Working State/);
+    assert.match(ship, /node scripts\/generate-report-context\.js --json/);
+  });
+
+  test("workflow docs include decision trees and artifact checklists for active flows", () => {
+    for (const relativePath of [
+      "workflows/core-loop.md",
+      "workflows/bugfix.md",
+      "workflows/feature.md",
+      "workflows/refactor.md",
+      "workflows/code-review.md",
+      "workflows/incident.md",
+      "workflows/review-and-verify.md",
+      "workflows/release-readiness.md",
+      "workflows/daily-dev-report.md",
+      "workflows/compose-skills.md",
+      "workflows/create-skill.md",
+    ]) {
+      const body = fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
+      assert.match(body, /## Decision Tree/);
+      assert.match(body, /## Artifact Checklist/);
+    }
+  });
 });
 
 describe("Installation & Packaging", () => {
@@ -490,6 +524,7 @@ describe("Provider Rules & Adapters", () => {
     for (const [relativePath, content] of samples) {
       renderer.assertProviderRuleContent(relativePath, content, failures);
       assert.match(content, /harness-plan/);
+      assert.match(content, /evidence/i);
       if (relativePath.includes(".cursor/")) {
         assert.match(content, /\.cursor\/commands\//);
       }
@@ -601,6 +636,85 @@ describe("Hooks & Skills Layer", () => {
 
   test("install cache includes hooks directory", () => {
     assert.ok(installCacheApi.cacheExportPaths.includes("hooks/"));
+  });
+
+  test("skill packs and review references include concrete failure modes and anti-shortcut guidance", () => {
+    for (const relativePath of [
+      "skills/packs/backend.md",
+      "skills/packs/debugging.md",
+      "skills/packs/devops.md",
+      "skills/packs/frontend.md",
+      "skills/packs/mobile.md",
+    ]) {
+      const body = fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
+      assert.match(body, /## Common Failure Modes/);
+      assert.match(body, /## Verification Strategy/);
+      assert.match(body, /## Anti-Rationalization/);
+    }
+
+    const severityGuide = fs.readFileSync(
+      path.join(repoRoot, "skills", "code-review", "references", "severity-guide.md"),
+      "utf8"
+    );
+    assert.match(severityGuide, /## Critical/);
+    assert.match(severityGuide, /## Important/);
+    assert.match(severityGuide, /## Minor/);
+    assert.match(severityGuide, /## No Finding/);
+
+    const gateContract = fs.readFileSync(
+      path.join(repoRoot, "skills", "gatekeeper", "references", "gate-contract.md"),
+      "utf8"
+    );
+    assert.match(gateContract, /## Decision Rules/);
+    assert.match(gateContract, /## Output Requirements/);
+    assert.match(gateContract, /allow \| block \| defer/);
+
+    const evidenceContract = fs.readFileSync(
+      path.join(repoRoot, "skills", "verification", "references", "evidence-contract.md"),
+      "utf8"
+    );
+    assert.match(evidenceContract, /## Acceptable Evidence/);
+    assert.match(evidenceContract, /## Unacceptable Evidence/);
+    assert.match(evidenceContract, /## Decision Rule/);
+  });
+
+  test("Claude path-scoped rules exist for session, memory, and policy files", () => {
+    for (const relativePath of [
+      ".claude/rules/harness-sessions.md",
+      ".claude/rules/harness-memory.md",
+      ".claude/rules/policy-files.md",
+    ]) {
+      const body = fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
+      assert.match(body, /^---/);
+      assert.match(body, /paths:/);
+    }
+  });
+
+  test("deep skills for debugging and security follow the expected reusable contract shape", () => {
+    for (const relativePath of [
+      "skills/debugging-investigation/SKILL.md",
+      "skills/security-review/SKILL.md",
+    ]) {
+      const body = fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
+      assert.match(body, /## Purpose/);
+      assert.match(body, /## When To Use/);
+      assert.match(body, /## When Not To Use/);
+      assert.match(body, /## Workflow/);
+      assert.match(body, /## Reasoning Procedure/);
+      assert.match(body, /## Action Loop/);
+      assert.match(body, /## Examples/);
+      assert.match(body, /## Output Contract/);
+      assert.match(body, /## Common Failure Modes/);
+      assert.match(body, /## Verification Requirements/);
+      assert.match(body, /## Checklist Before Done/);
+    }
+
+    const verificationPrompt = fs.readFileSync(
+      path.join(repoRoot, "skills", "verification", "prompt.md"),
+      "utf8"
+    );
+    assert.match(verificationPrompt, /## Evidence Example/);
+    assert.match(verificationPrompt, /## Stop Condition/);
   });
 });
 
