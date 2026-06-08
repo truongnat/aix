@@ -44,8 +44,21 @@ jobs:
           done
           echo "pending=$pending" >> "$GITHUB_OUTPUT"
 
+      - name: Detect published package version
+        id: published_version
+        shell: bash
+        run: |
+          PKG_NAME=$(node -p "require('./package.json').name")
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if npm view "$PKG_NAME@$PKG_VERSION" version >/dev/null 2>&1; then
+            echo "published=1" >> "$GITHUB_OUTPUT"
+            echo "Package version already published; skipping release automation."
+          else
+            echo "published=0" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create release PR or publish
-        if: steps.pending_changesets.outputs.pending != '1'
+        if: steps.pending_changesets.outputs.pending != '1' && steps.published_version.outputs.published != '1'
         uses: changesets/action@v1
         with:
           publish: npm run release
@@ -62,3 +75,9 @@ jobs:
           echo "Pending changesets detected under .changeset/."
           echo "This repository does not allow GitHub Actions to create release PRs."
           echo "Maintainers must run npm run version-packages locally and push the version commit."
+
+      - name: Skip release automation when version is already published
+        if: steps.pending_changesets.outputs.pending != '1' && steps.published_version.outputs.published == '1'
+        run: |
+          echo "Package version already published on npm."
+          echo "Skipping release automation because there is nothing left to publish."

@@ -560,6 +560,10 @@ function bulletList(lines: string[]): string {
   return lines.map((line) => `- ${line}`).join("\n");
 }
 
+function toPosixRelativePath(relativePath: string): string {
+  return relativePath.split(path.sep).join("/");
+}
+
 function renderDomainSkillMarkdown(definition: DomainDefinition): string {
   return `---
 id: ${definition.id}
@@ -905,33 +909,39 @@ Use the generated domain skill at \`.harness/skills/${definition.id}/SKILL.md\`.
 
   if (fs.existsSync(path.join(targetAbs, ".claude"))) {
     outputs.push({
-      relativePath: path.join(".claude", "rules", `domain-${definition.id}.md`),
+      relativePath: toPosixRelativePath(
+        path.join(".claude", "rules", `domain-${definition.id}.md`)
+      ),
       content: body,
     });
   }
 
   if (fs.existsSync(path.join(targetAbs, ".cursor"))) {
     outputs.push({
-      relativePath: path.join(".cursor", "rules", `domain-${definition.id}.mdc`),
+      relativePath: toPosixRelativePath(
+        path.join(".cursor", "rules", `domain-${definition.id}.mdc`)
+      ),
       content: body,
     });
   }
 
   if (fs.existsSync(path.join(targetAbs, ".codex"))) {
     outputs.push({
-      relativePath: path.join(".codex", "rules", `domain-${definition.id}.md`),
+      relativePath: toPosixRelativePath(path.join(".codex", "rules", `domain-${definition.id}.md`)),
       content: body,
     });
   }
 
   if (fs.existsSync(path.join(targetAbs, ".gemini"))) {
     outputs.push({
-      relativePath: path.join(
-        ".gemini",
-        "extensions",
-        "ai-engineering-harness",
-        "rules",
-        `domain-${definition.id}.md`
+      relativePath: toPosixRelativePath(
+        path.join(
+          ".gemini",
+          "extensions",
+          "ai-engineering-harness",
+          "rules",
+          `domain-${definition.id}.md`
+        )
       ),
       content: body,
     });
@@ -958,15 +968,19 @@ function writeGeneratedDomainSkill(
   const definition = DOMAIN_DEFINITIONS[domainId];
   const outputs: Array<{ relativePath: string; content: string }> = [
     {
-      relativePath: path.join(".harness", "skills", definition.id, "SKILL.md"),
+      relativePath: toPosixRelativePath(path.join(".harness", "skills", definition.id, "SKILL.md")),
       content: renderDomainSkillMarkdown(definition),
     },
     {
-      relativePath: path.join(".harness", "skills", definition.id, "prompt.md"),
+      relativePath: toPosixRelativePath(
+        path.join(".harness", "skills", definition.id, "prompt.md")
+      ),
       content: renderDomainPromptMarkdown(definition),
     },
     {
-      relativePath: path.join(".harness", "skills", definition.id, "references", ".gitkeep"),
+      relativePath: toPosixRelativePath(
+        path.join(".harness", "skills", definition.id, "references", ".gitkeep")
+      ),
       content: "",
     },
   ];
