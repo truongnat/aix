@@ -6,7 +6,7 @@
 
 A markdown-first, open-source kit that helps agents restore context, plan before coding, verify with evidence, ship reviewer-ready summaries, and preserve durable project knowledge.
 
-![Version](https://img.shields.io/badge/version-v1.1.0-2563eb)
+![Version](https://img.shields.io/badge/version-v1.1.1-2563eb)
 ![CI](https://github.com/truongnat/ai-engineering-harness/actions/workflows/ci.yml/badge.svg)
 ![Coverage](https://img.shields.io/badge/coverage-lib%2075%25%2B-0f766e)
 ![License](https://img.shields.io/badge/license-MIT-16a34a)
@@ -328,7 +328,7 @@ Transcript: [TRANSCRIPT.md](examples/dogfood-tiny-node-api/TRANSCRIPT.md)
 | Session memory | [docs/session-memory.md](docs/session-memory.md) |
 | Command guardrails | [docs/command-guardrails.md](docs/command-guardrails.md) |
 
-Release notes: [docs/v1.1.0-release-notes.md](docs/v1.1.0-release-notes.md)
+Release notes: [docs/v1.1.1-release-notes.md](docs/v1.1.1-release-notes.md)
 
 ---
 
@@ -356,6 +356,6 @@ Publish: [docs/npm-publish.md](docs/npm-publish.md)
 
 ## Status
 
-**v1.1.0**: minor release adding agent-driven domain skill generation, an opt-in spec layer, delegated-worker memory, and a prompt-quality standard. All new capabilities are backward-compatible and opt-in; the core workflow loop and provider support posture are unchanged.
+**v1.1.1**: patch release adding a headless `domains` command, removing interactive domain prompts from `init` and `install`, and tightening release-facing version surfaces. All changes are backward-compatible.
 
 MIT · [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md)

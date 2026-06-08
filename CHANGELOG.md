@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1
+
+### Patch Changes
+
+- Add a headless `domains` command, remove interactive domain prompts from `init` and `install`,
+  and update session-start guidance for automatic domain bootstrap.
+
 ## [1.1.0] - 2026-06-08
 
 ### Added
@@ -252,6 +259,7 @@
 ## [Unreleased]
 
 ### Changed
+
 - Windows bootstrap docs and `aih.ps1` help: recommended PowerShell install includes `-Yes` for copy-paste flows
 - `aih.ps1` warns when private project install/update targets a non-Git directory (`.git/info/exclude` unavailable)
 - `doctor` and docs: clearer non-Git target messaging (`git init` or cloned repo)
