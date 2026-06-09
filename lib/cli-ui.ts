@@ -39,12 +39,14 @@ interface UninstallContext {
 }
 
 type ClackModule = typeof ClackPrompts;
+type DynamicImport = <T>(specifier: string) => Promise<T>;
 
 let clackModulePromise: Promise<ClackModule> | null = null;
+const dynamicImport = new Function("specifier", "return import(specifier);") as DynamicImport;
 
 async function loadClackPrompts(): Promise<ClackModule> {
   if (!clackModulePromise) {
-    clackModulePromise = import("@clack/prompts");
+    clackModulePromise = dynamicImport<ClackModule>("@clack/prompts");
   }
   return clackModulePromise;
 }

@@ -273,7 +273,9 @@ test("cli-ui uses typed imports without ts-ignore suppressions", () => {
   const cliUi = fs.readFileSync(path.join(repoRoot, "lib", "cli-ui.ts"), "utf8");
 
   assert.match(cliUi, /import type \* as ClackPrompts from "@clack\/prompts"/);
-  assert.match(cliUi, /clackModulePromise = import\("@clack\/prompts"\)/);
+  assert.match(cliUi, /type DynamicImport = <T>\(specifier: string\) => Promise<T>/);
+  assert.match(cliUi, /new Function\("specifier", "return import\(specifier\);"\)/);
+  assert.match(cliUi, /clackModulePromise = dynamicImport<ClackModule>\("@clack\/prompts"\)/);
   assert.match(cliUi, /async function loadClackPrompts/);
   assert.match(
     cliUi,
