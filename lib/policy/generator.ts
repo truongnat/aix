@@ -165,7 +165,9 @@ export function generatePhaseDisciplineDoc(policies: PolicySet): string {
   lines.push(``);
   lines.push(`Skip auto-remember when:`);
   lines.push(``);
-  lines.push(`- Ship status is \`shipped-with-gaps\`, \`failed\`, or blocked pending human acceptance.`);
+  lines.push(
+    `- Ship status is \`shipped-with-gaps\`, \`failed\`, or blocked pending human acceptance.`
+  );
   lines.push(`- The user explicitly requests ship-only handoff.`);
   lines.push(`- No durable lesson exists and the outcome is purely transient.`);
   lines.push(``);

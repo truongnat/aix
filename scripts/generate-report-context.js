@@ -26,7 +26,7 @@ function runGit(args, cwd = process.cwd()) {
     cwd,
     encoding: "utf8",
     timeout: 15000,
-    shell: false
+    shell: false,
   });
 }
 
@@ -108,7 +108,7 @@ function parseDiffStat(output) {
     filesChanged: 0,
     insertions: 0,
     deletions: 0,
-    raw: (output || "").trim()
+    raw: (output || "").trim(),
   };
   const summaryLine = (output || "")
     .split(/\r?\n/)
@@ -132,7 +132,7 @@ function diffRange(base, head, cwd) {
   if (statResult.status !== 0 || nameResult.status !== 0) {
     return {
       ok: false,
-      reason: statResult.stderr || nameResult.stderr || "git diff range failed"
+      reason: statResult.stderr || nameResult.stderr || "git diff range failed",
     };
   }
   return {
@@ -140,7 +140,7 @@ function diffRange(base, head, cwd) {
     stat: parseDiffStat(statResult.stdout),
     files: parseNameStatus(nameResult.stdout),
     statRaw: (statResult.stdout || "").trim(),
-    nameStatusRaw: (nameResult.stdout || "").trim()
+    nameStatusRaw: (nameResult.stdout || "").trim(),
   };
 }
 
@@ -152,7 +152,7 @@ function diffWorkingTree(cwd) {
   if (statResult.status !== 0 || nameResult.status !== 0) {
     return {
       ok: false,
-      reason: statResult.stderr || nameResult.stderr || "git diff failed"
+      reason: statResult.stderr || nameResult.stderr || "git diff failed",
     };
   }
   const files = parseNameStatus(nameResult.stdout);
@@ -171,7 +171,7 @@ function diffWorkingTree(cwd) {
     stat,
     files,
     statRaw: [statResult.stdout, stagedStat.stdout].filter(Boolean).join("\n").trim(),
-    nameStatusRaw: [nameResult.stdout, stagedNames.stdout].filter(Boolean).join("\n").trim()
+    nameStatusRaw: [nameResult.stdout, stagedNames.stdout].filter(Boolean).join("\n").trim(),
   };
 }
 
@@ -180,7 +180,7 @@ function generateReportContext(options, cwd = process.cwd()) {
     return {
       ok: false,
       status: "blocked",
-      reason: "Not a git repository or git context cannot be inspected."
+      reason: "Not a git repository or git context cannot be inspected.",
     };
   }
 
@@ -190,7 +190,7 @@ function generateReportContext(options, cwd = process.cwd()) {
     return {
       ok: false,
       status: "blocked",
-      reason: status.reason
+      reason: status.reason,
     };
   }
 
@@ -201,7 +201,7 @@ function generateReportContext(options, cwd = process.cwd()) {
     return {
       ok: false,
       status: "blocked",
-      reason: diff.reason
+      reason: diff.reason,
     };
   }
 
@@ -232,8 +232,8 @@ function generateReportContext(options, cwd = process.cwd()) {
     stat: diff.stat,
     diff: {
       stat: diff.statRaw,
-      nameStatus: diff.nameStatusRaw
-    }
+      nameStatus: diff.nameStatusRaw,
+    },
   };
 }
 

@@ -43,7 +43,9 @@ function main() {
   if (fs.existsSync(generatedPath)) {
     const content = fs.readFileSync(generatedPath, "utf8");
     if (asJson) {
-      process.stdout.write(`${JSON.stringify({ source: "file", path: generatedPath, content }, null, 2)}\n`);
+      process.stdout.write(
+        `${JSON.stringify({ source: "file", path: generatedPath, content }, null, 2)}\n`
+      );
       return;
     }
     process.stdout.write(content);
@@ -75,7 +77,9 @@ function main() {
   }
 
   if (asJson) {
-    process.stdout.write(`${JSON.stringify({ source: "generated", content: rendered }, null, 2)}\n`);
+    process.stdout.write(
+      `${JSON.stringify({ source: "generated", content: rendered }, null, 2)}\n`
+    );
     return;
   }
   process.stdout.write(rendered);
