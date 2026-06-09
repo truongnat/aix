@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.4
+
+### Patch Changes
+
+- Remove the redundant `init` command and make `install` the single bootstrap path.
+- Fix non-git install fallback, provider prompt gating, and `flow` / install command routing.
+- Expand the Codex-native install surface with agents, hooks, domain generation, and plugin build workflow.
+- Fix CI regressions across lint, Node 18 wizard flows, and Windows smoke install.
+
 ## 1.1.3
 
 ### Patch Changes
