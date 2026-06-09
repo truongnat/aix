@@ -13,6 +13,13 @@ interface ProviderBinaryProbe {
 
 type ProviderBinaryMap = Record<string, ProviderBinaryProbe>;
 
+interface SpawnResult {
+  stdout?: string | Buffer;
+  stderr?: string | Buffer;
+  status: number | null;
+  error?: unknown;
+}
+
 function firstLine(text: string): string {
   return (
     text
@@ -24,22 +31,54 @@ function firstLine(text: string): string {
   );
 }
 
-function probeCommand(command: string, args: string[] = ["--version"]): ProviderBinaryProbe {
-  const result = childProcess.spawnSync(command, args, {
-    encoding: "utf8",
+function getErrorCode(result: SpawnResult): string {
+  return result.error && typeof result.error === "object"
+    ? ((result.error as { code?: string }).code ?? "")
+    : "";
+}
+
+function shouldRetryWithWindowsShell(result: SpawnResult): boolean {
+  const errorCode = getErrorCode(result);
+  return process.platform === "win32" && (errorCode === "ENOENT" || errorCode === "EINVAL");
+}
+
+function quoteWindowsShellArg(arg: string): string {
+  if (!/[\s"&()<>^|]/.test(arg)) {
+    return arg;
+  }
+
+  return `"${arg.replace(/"/g, '""')}"`;
+}
+
+function runProbe(command: string, args: string[]): SpawnResult {
+  const options = {
+    encoding: "utf8" as const,
     timeout: 3000,
     windowsHide: true,
     env: process.env,
-  });
+  };
+  const result = childProcess.spawnSync(command, args, options);
+
+  if (!shouldRetryWithWindowsShell(result)) {
+    return result;
+  }
+
+  const comspec = process.env.ComSpec || "cmd.exe";
+  return childProcess.spawnSync(
+    comspec,
+    ["/d", "/s", "/c", [command, ...args].map(quoteWindowsShellArg).join(" ")],
+    options
+  );
+}
+
+function probeCommand(command: string, args: string[] = ["--version"]): ProviderBinaryProbe {
+  const result = runProbe(command, args);
 
   const stdout = typeof result.stdout === "string" ? result.stdout : "";
   const stderr = typeof result.stderr === "string" ? result.stderr : "";
   const output = [stdout.trim(), stderr.trim()].filter(Boolean).join("\n");
   const version = firstLine(output);
-  const errorCode =
-    result.error && typeof result.error === "object"
-      ? (result.error as { code?: string }).code
-      : "";
+  const errorCode = getErrorCode(result);
   const installed = errorCode !== "ENOENT" && errorCode !== "ENOTFOUND" && result.status !== null;
 
   return {

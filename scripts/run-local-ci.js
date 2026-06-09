@@ -3,15 +3,16 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
 const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
-const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
 const nodeCmd = process.execPath;
+const eslintCli = path.join(repoRoot, "node_modules", "eslint", "bin", "eslint.js");
+const prettierCli = path.join(repoRoot, "node_modules", "prettier", "bin", "prettier.cjs");
 
 const steps = [
   {
     name: "Lint code",
-    command: npxCmd,
+    command: nodeCmd,
     args: [
-      "eslint",
+      eslintCli,
       "bin/",
       "test/",
       "*.js",
@@ -22,9 +23,9 @@ const steps = [
   },
   {
     name: "Check formatting",
-    command: npxCmd,
+    command: nodeCmd,
     args: [
-      "prettier",
+      prettierCli,
       "--check",
       "lib/",
       "bin/",
@@ -78,6 +79,7 @@ for (const step of steps) {
     cwd: step.cwd || repoRoot,
     stdio: "inherit",
     env: process.env,
+    shell: process.platform === "win32" && step.command.toLowerCase().endsWith(".cmd"),
   });
   if (result.status !== 0) {
     process.stderr.write(`\nLocal CI gate failed at: ${step.name}\n`);

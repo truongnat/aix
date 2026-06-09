@@ -26,7 +26,7 @@ const result = childProcess.spawnSync(
     stdio: "inherit",
     env: {
       ...process.env,
-      PATH: binDir,
+      PATH: [binDir, process.env.PATH].filter(Boolean).join(path.delimiter),
     },
   }
 );

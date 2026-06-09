@@ -1,5 +1,6 @@
 const { test, describe } = require("node:test");
 const assert = require("node:assert/strict");
+const childProcess = require("node:child_process");
 const fs = require("node:fs");
 const Module = require("node:module");
 const os = require("node:os");
@@ -26,22 +27,6 @@ function createMockFileStructure(dir, files = []) {
     fs.mkdirSync(dirPath, { recursive: true });
     fs.writeFileSync(filePath, "ai-engineering-harness");
   });
-}
-
-function withTempPath(binDir, fn) {
-  const originalPath = process.env.PATH || "";
-  process.env.PATH = binDir;
-  try {
-    return fn();
-  } finally {
-    process.env.PATH = originalPath;
-  }
-}
-
-function createBinary(binDir, name, output) {
-  const filePath = path.join(binDir, name);
-  fs.writeFileSync(filePath, `#!/bin/sh\necho "${output}"\n`, "utf8");
-  fs.chmodSync(filePath, 0o755);
 }
 
 describe("CLI Arguments Parser", () => {
@@ -406,19 +391,75 @@ describe("CLI Provider Detection", () => {
   });
 
   test("detectProviderBinaries probes installed provider CLIs via PATH", () => {
-    const binDir = fs.mkdtempSync(path.join(os.tmpdir(), "aih-bin-"));
-    createBinary(binDir, "claude", "claude 1.2.3");
-    createBinary(binDir, "cursor", "cursor 0.9.0");
-    createBinary(binDir, "codex", "codex 0.8.0");
-    withTempPath(binDir, () => {
-      const binaries = cliDetect.detectProviderBinaries();
+    const originalSpawnSync = childProcess.spawnSync;
+    childProcess.spawnSync = (command) => {
+      switch (command) {
+        case "claude":
+          return { stdout: "claude 1.2.3\n", stderr: "", status: 0, error: undefined };
+        case "cursor":
+          return { stdout: "cursor 0.9.0\n", stderr: "", status: 0, error: undefined };
+        case "codex":
+          return { stdout: "codex 0.8.0\n", stderr: "", status: 0, error: undefined };
+        default:
+          return {
+            stdout: "",
+            stderr: "",
+            status: null,
+            error: { code: "ENOENT" },
+          };
+      }
+    };
+
+    try {
+      const providerBinaryDetect = fresh("dist/lib/provider-binary-detect.js");
+      const binaries = providerBinaryDetect.detectProviderBinaries();
       assert.equal(binaries.claude.installed, true);
       assert.equal(binaries.cursor.installed, true);
       assert.equal(binaries.codex.installed, true);
       assert.equal(binaries.gemini.installed, false);
       assert.match(binaries.claude.version || "", /1\.2\.3/);
       assert.match(binaries.cursor.version || "", /0\.9\.0/);
-    });
+    } finally {
+      childProcess.spawnSync = originalSpawnSync;
+    }
+  });
+
+  test("probeCommand falls back to ComSpec for Windows command shims", () => {
+    const originalSpawnSync = childProcess.spawnSync;
+    const originalPlatform = process.platform;
+    const originalComSpec = process.env.ComSpec;
+    const calls = [];
+
+    Object.defineProperty(process, "platform", { value: "win32" });
+    process.env.ComSpec = "C:\\Windows\\System32\\cmd.exe";
+    childProcess.spawnSync = (command, args) => {
+      calls.push({ command, args });
+      if (command === "cursor") {
+        return { stdout: "", stderr: "", status: null, error: { code: "ENOENT" } };
+      }
+      if (command === process.env.ComSpec) {
+        return { stdout: "cursor 1.0.0\r\n", stderr: "", status: 0, error: undefined };
+      }
+      return { stdout: "", stderr: "", status: null, error: { code: "ENOENT" } };
+    };
+
+    try {
+      const providerBinaryDetect = fresh("dist/lib/provider-binary-detect.js");
+      const probe = providerBinaryDetect.probeCommand("cursor");
+      assert.equal(probe.installed, true);
+      assert.equal(probe.commandUsed, "cursor");
+      assert.match(probe.version || "", /1\.0\.0/);
+      assert.equal(calls[1].command, process.env.ComSpec);
+      assert.deepEqual(calls[1].args, ["/d", "/s", "/c", "cursor --version"]);
+    } finally {
+      childProcess.spawnSync = originalSpawnSync;
+      Object.defineProperty(process, "platform", { value: originalPlatform });
+      if (originalComSpec === undefined) {
+        delete process.env.ComSpec;
+      } else {
+        process.env.ComSpec = originalComSpec;
+      }
+    }
   });
 
   test("detectLegacyProviderResidue returns empty for clean project", () => {
