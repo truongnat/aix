@@ -207,7 +207,10 @@ test("runInstall on a non-git project prepares private git exclude setup for fut
   );
   assert.equal(cp.spawnSync("git", ["status", "--short"], { cwd: dir }).status, 128);
   assert.equal(cp.spawnSync("git", ["init", "-q"], { cwd: dir }).status, 0);
-  assert.equal(cp.spawnSync("git", ["status", "--short"], { cwd: dir }).status, 0);
+  assert.match(
+    fs.readFileSync(path.join(dir, ".git", "info", "exclude"), "utf8"),
+    /# ai-engineering-harness start/
+  );
 });
 
 test("runInstall dryRun writes no provider files", () => {

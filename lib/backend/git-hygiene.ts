@@ -123,23 +123,6 @@ function stripBlock(existing: string): string {
   return filterExcludeLines(existing);
 }
 
-/** Print manual ignore instructions to stderr. */
-function printManualIgnoreInstructions(paths: string[]): void {
-  process.stderr.write(
-    "ai-engineering-harness installer: not a Git repository (or no .git/info/exclude).\n"
-  );
-  process.stderr.write(
-    "  Generated files may appear as untracked. To ignore locally, add to .git/info/exclude:\n"
-  );
-  process.stderr.write("  " + EXCLUDE_BLOCK_START + "\n");
-  for (const p of paths) {
-    if (p.length > 0) {
-      process.stderr.write("  " + p + "\n");
-    }
-  }
-  process.stderr.write("  " + EXCLUDE_BLOCK_END + "\n");
-}
-
 function pendingIgnoreStatePath(targetAbs: string): string {
   return path.join(targetAbs, ".ai-harness", "pending-git-exclude.json");
 }
@@ -239,7 +222,7 @@ function resolveGitDir(targetAbs: string): string | null {
 
 /**
  * Returns early (action:"skip") if scope !== "project" or visibility !== "private".
- * Returns action:"manual" if target is not a git repo.
+ * Returns action:"update" after preparing a future `.git/info/exclude` if target is not a git repo yet.
  * On dryRun, prints but does not write.
  */
 export function applyPrivateIgnore(ctx: IgnoreContext): IgnoreResult {

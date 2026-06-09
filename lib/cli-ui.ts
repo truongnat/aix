@@ -75,9 +75,14 @@ function introBanner(meta: IntroMeta): void {
   );
 }
 
-async function selectProviders(providerItems: ProviderItem[]): Promise<string[] | null> {
+async function selectProviders(
+  providerItems: ProviderItem[],
+  initialProviders?: string[]
+): Promise<string[] | null> {
   const { multiselect, cancel, isCancel } = await loadClackPrompts();
-  const initial = providerItems.filter((p) => p.implemented && p.installed).map((p) => p.id);
+  const initial = initialProviders?.length
+    ? initialProviders
+    : providerItems.filter((p) => p.implemented && p.installed).map((p) => p.id);
   const value = await multiselect({
     message: "Select provider(s)",
     options: providerItems.map((p) => {

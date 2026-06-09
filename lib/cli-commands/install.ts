@@ -239,13 +239,14 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     );
   }
 
-  if (providers.length === 0) {
-    const selectedProviders = await ui.selectProviders(providerItems);
-    if (!selectedProviders) {
-      return 1;
-    }
-    providers = selectedProviders;
+  const selectedProviders = await ui.selectProviders(
+    providerItems,
+    providers.length > 0 ? providers : undefined
+  );
+  if (!selectedProviders) {
+    return 1;
   }
+  providers = selectedProviders;
   validateProviderSelection(providers);
   validateManualMix(providers);
 

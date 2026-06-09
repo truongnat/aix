@@ -480,18 +480,19 @@ test("runInstallWizard supports non-git targets and prepares git exclude setup f
     require("node:child_process").spawnSync("git", ["init", "-q"], { cwd: target }).status,
     0
   );
-  assert.equal(
-    require("node:child_process").spawnSync("git", ["status", "--short"], { cwd: target }).status,
-    0
+  assert.match(
+    fs.readFileSync(path.join(target, ".git", "info", "exclude"), "utf8"),
+    /# ai-engineering-harness start/
   );
 });
 
-test("runInstallWizard with explicit provider still stays interactive and asks before install", async () => {
+test("runInstallWizard with explicit provider still shows provider picker before install", async () => {
   const target = makeTempDir();
   initGitRepo(target);
   mockProviderBinaries(["cursor"]);
   let backendCalled = false;
-  let confirmCalls = 0;
+  let pickerCalls = 0;
+  let selectedInitialProviders = null;
 
   patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
     const originalRunInstall = mod.runInstall;
@@ -507,18 +508,22 @@ test("runInstallWizard with explicit provider still stays interactive and asks b
   patchModule("dist/lib/cli-ui.js", (mod) => {
     const originalUseInteractiveUi = mod.useInteractiveUi;
     const originalIntroBanner = mod.introBanner;
+    const originalSelectProviders = mod.selectProviders;
     const originalShowInstallPlan = mod.showInstallPlan;
     const originalConfirmProceed = mod.confirmProceed;
     mod.useInteractiveUi = () => true;
     mod.introBanner = () => {};
-    mod.showInstallPlan = () => {};
-    mod.confirmProceed = async () => {
-      confirmCalls += 1;
-      return false;
+    mod.selectProviders = async (_items, initialProviders) => {
+      pickerCalls += 1;
+      selectedInitialProviders = initialProviders;
+      return ["cursor"];
     };
+    mod.showInstallPlan = () => {};
+    mod.confirmProceed = async () => false;
     return () => {
       mod.useInteractiveUi = originalUseInteractiveUi;
       mod.introBanner = originalIntroBanner;
+      mod.selectProviders = originalSelectProviders;
       mod.showInstallPlan = originalShowInstallPlan;
       mod.confirmProceed = originalConfirmProceed;
     };
@@ -538,7 +543,8 @@ test("runInstallWizard with explicit provider still stays interactive and asks b
   );
 
   assert.equal(status, 1);
-  assert.equal(confirmCalls, 1);
+  assert.equal(pickerCalls, 1);
+  assert.deepEqual(selectedInitialProviders, ["cursor"]);
   assert.equal(backendCalled, false);
 });
 
