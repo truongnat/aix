@@ -28,9 +28,11 @@ jobs:
         run: npm ci
 
       - name: Lint code (ESLint)
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 20
         run: npx eslint bin/ test/ *.js --max-warnings 0 --no-error-on-unmatched-pattern
 
       - name: Check formatting (Prettier)
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 20
         run: npx prettier --check lib/ bin/ test/ *.js *.md --no-error-on-unmatched-pattern
 
       - name: Validate pack contracts
