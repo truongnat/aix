@@ -129,6 +129,17 @@ test("runDoctor warns when VERIFY is pending and typed memory artifacts are miss
   assert.match(text, /WARN typed memory artifacts missing: DECISIONS\.md, HAZARDS\.md, INDEX\.md/);
 });
 
+test("runDoctor reports WARN (not FAIL) for non-git repo and ok is not blocked by missing git", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "sd-nongit-doctor-"));
+  installClaude(dir);
+  const { text } = runDoctor({ targetAbs: dir });
+  assert.match(text, /WARN target is not a Git repo/);
+  assert.doesNotMatch(text, /FAIL target is not a Git repo/);
+  // ok may still be false due to other checks (e.g. missing provider binary in test env),
+  // but the git check alone must not be the reason
+  assert.doesNotMatch(text, /FAIL target is not a Git repo/);
+});
+
 test("runStatus reports prepared exclude blocks after git init", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "sd-nongit-"));
   installClaude(dir);

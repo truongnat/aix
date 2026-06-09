@@ -419,8 +419,7 @@ export function runDoctor(ctx: ReportContext): DoctorResult {
   if (isGitRepo(targetAbs)) {
     lines.push("PASS target is a Git repo");
   } else {
-    lines.push("FAIL target is not a Git repo — run git init or run inside a cloned repository");
-    failCount++;
+    lines.push("WARN target is not a Git repo — .git/info/exclude will be applied after git init");
   }
 
   if (fs.existsSync(path.join(targetAbs, ".ai-harness"))) {

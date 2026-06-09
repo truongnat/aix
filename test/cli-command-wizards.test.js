@@ -181,6 +181,27 @@ test("runInstallWizard non-interactive install calls backend with selected provi
   ]);
 });
 
+test("runInstallWizard non-interactive without --yes throws instead of silently installing", async () => {
+  const target = makeTempDir();
+  initGitRepo(target);
+  mockProviderBinaries(["claude"]);
+
+  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  await assert.rejects(
+    () =>
+      runInstallWizard(repoRoot, {
+        providers: ["claude"],
+        target,
+        scope: "project",
+        visibility: "private",
+        dryRun: false,
+        yes: false,
+        verbose: false,
+      }),
+    /Non-interactive install requires --yes/
+  );
+});
+
 test("runInstallWizard interactive flow installs selected provider from binary-gated picker", async () => {
   const calls = [];
   const warnings = [];

@@ -150,6 +150,11 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     if (providers.length === 0) {
       throw new Error("No provider selected. Pass --provider cursor or run interactively.");
     }
+    if (!options.yes) {
+      throw new Error(
+        "Non-interactive install requires --yes. Re-run with --yes to confirm, or run without --provider to use the interactive wizard."
+      );
+    }
     validateProviderSelection(providers);
     validateManualMix(providers);
     const missingProviders = providers.filter((id) => !binaryStatus[id]?.installed);

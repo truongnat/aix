@@ -64,8 +64,7 @@ See [compatibility matrix](docs/compatibility-matrix.md) and [evals](docs/evals.
 Inside your target project:
 
 ```bash
-npx ai-engineering-harness init
-# or: npx ai-engineering-harness install
+npx ai-engineering-harness install
 npx ai-engineering-harness status
 npx ai-engineering-harness doctor
 ```
@@ -356,6 +355,6 @@ Publish: [docs/npm-publish.md](docs/npm-publish.md)
 
 ## Status
 
-**v1.1.3**: patch release adding a headless `domains` command, removing interactive domain prompts from `init` and `install`, and tightening release-facing version surfaces. All changes are backward-compatible.
+**v1.1.3**: patch release adding a headless `domains` command, removing interactive domain prompts from `install`, and tightening release-facing version surfaces. All changes are backward-compatible.
 
 MIT · [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md)
