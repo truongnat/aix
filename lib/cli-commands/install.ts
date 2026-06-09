@@ -42,6 +42,9 @@ interface InstallContextExtended {
   plannedInstallCache: boolean;
 }
 
+const NON_GIT_TARGET_ERROR =
+  "Target directory is not a Git repo. Run git init first so generated files stay out of tracked content.";
+
 function toPlanProviders(providers: string[]): PlanProviderId[] {
   return providers as PlanProviderId[];
 }
@@ -282,6 +285,11 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
   ui.showInstallPlan(plan);
   if (plan.mode === "project-private" && !plan.isGit) {
     ui.showWarning(`${NON_GIT_PRIVATE_WARNING}\n${NON_GIT_PRIVATE_WARNING_FOLLOWUP}`);
+    return failWithBackendError(
+      "Install",
+      { status: 1, combined: `error: ${NON_GIT_TARGET_ERROR}` },
+      options
+    );
   }
 
   const status = await runInstallBackend(
