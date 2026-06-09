@@ -2,7 +2,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { hasHarnessExcludeBlock } from "./git-hygiene";
+import { hasHarnessExcludeBlock, reconcileDeferredPrivateIgnore } from "./git-hygiene";
 import { detectInstalledProviders, isGitRepo, detectProviderBinaries } from "../cli-detect";
 import { readInstalledCommandSurface } from "../runtime-command-catalog";
 import { formatStatusCommandLines, formatDoctorCommandLines } from "../command-surface-report";
@@ -345,6 +345,8 @@ export function runStatus(ctx: ReportContext): StatusResult {
   const { targetAbs } = ctx;
   const lines: string[] = [];
 
+  reconcileDeferredPrivateIgnore({ targetAbs, dryRun: false });
+
   const detected = detectRuntimesFromTarget(targetAbs);
   const runtimeDisplay = detected.length > 0 ? detected.join(",") : "none";
   const gitRepo = isGitRepo(targetAbs) ? "yes" : "no";
@@ -404,6 +406,8 @@ export function runDoctor(ctx: ReportContext): DoctorResult {
   const { targetAbs } = ctx;
   const lines: string[] = [];
   let failCount = 0;
+
+  reconcileDeferredPrivateIgnore({ targetAbs, dryRun: false });
 
   const detected = detectRuntimesFromTarget(targetAbs);
   const count = runtimeListCount(detected);

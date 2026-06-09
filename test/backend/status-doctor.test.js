@@ -128,3 +128,19 @@ test("runDoctor warns when VERIFY is pending and typed memory artifacts are miss
   );
   assert.match(text, /WARN typed memory artifacts missing: DECISIONS\.md, HAZARDS\.md, INDEX\.md/);
 });
+
+test("runStatus reports prepared exclude blocks after git init", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "sd-nongit-"));
+  installClaude(dir);
+
+  const excludePath = path.join(dir, ".git", "info", "exclude");
+  assert.equal(fs.existsSync(excludePath), true);
+  assert.equal(cp.spawnSync("git", ["status", "--short"], { cwd: dir }).status, 128);
+
+  cp.spawnSync("git", ["init", "-q"], { cwd: dir });
+
+  const { text } = runStatus({ targetAbs: dir });
+  assert.match(text, /git repo:\s+yes/);
+  assert.match(text, /exclude block exists:\s+yes/);
+  assert.match(fs.readFileSync(excludePath, "utf8"), /# ai-engineering-harness start/);
+});

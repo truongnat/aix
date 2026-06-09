@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { modeToScopeVisibility, isNonInteractive, type ParseOptions } from "../cli-args";
+import { modeToScopeVisibility, type ParseOptions } from "../cli-args";
 import { ACTIVE_PROVIDERS, providerPriorityLabel, isRuntimeNative } from "../cli-providers";
 import { detectProviderBinaries, detectLegacyProviderResidue, isGitRepo } from "../cli-detect";
 import { normalizeDomainSelection } from "../stack-detect";
@@ -41,9 +41,6 @@ interface InstallContextExtended {
   installCache: boolean;
   plannedInstallCache: boolean;
 }
-
-const NON_GIT_TARGET_ERROR =
-  "Target directory is not a Git repo. Run git init first so generated files stay out of tracked content.";
 
 function toPlanProviders(providers: string[]): PlanProviderId[] {
   return providers as PlanProviderId[];
@@ -134,7 +131,7 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     );
   }
 
-  const interactive = ui.useInteractiveUi(options);
+  const interactive = process.stdin.isTTY && process.stdout.isTTY && !options.yes;
   let providers = [...options.providers];
   const explicitDomains = normalizeDomainSelection(options.domains || []);
   const invalidDomainIds = (options.domains || []).filter(
@@ -149,7 +146,7 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     (provider) => binaryStatus[provider.id]?.installed
   );
 
-  if (isNonInteractive(options)) {
+  if (!interactive) {
     if (providers.length === 0) {
       throw new Error("No provider selected. Pass --provider cursor or run interactively.");
     }
@@ -189,6 +186,7 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     ui.showInstallPlan(plan, { compact: true });
     if (plan.mode === "project-private" && !plan.isGit) {
       console.log(`\n${NON_GIT_PRIVATE_WARNING}`);
+      console.log(NON_GIT_PRIVATE_WARNING_FOLLOWUP);
     }
 
     const status = await runInstallBackend(
@@ -241,10 +239,7 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     );
   }
 
-  if (availableProviders.length === 1) {
-    providers = [availableProviders[0].id];
-    process.stdout.write(`Detected provider: ${providers[0]}\n`);
-  } else {
+  if (providers.length === 0) {
     const selectedProviders = await ui.selectProviders(providerItems);
     if (!selectedProviders) {
       return 1;
@@ -284,12 +279,14 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
   });
   ui.showInstallPlan(plan);
   if (plan.mode === "project-private" && !plan.isGit) {
-    ui.showWarning(`${NON_GIT_PRIVATE_WARNING}\n${NON_GIT_PRIVATE_WARNING_FOLLOWUP}`);
-    return failWithBackendError(
-      "Install",
-      { status: 1, combined: `error: ${NON_GIT_TARGET_ERROR}` },
-      options
+    ui.showWarning(
+      `${NON_GIT_PRIVATE_WARNING}\nHarness will defer the .git/info/exclude update until this directory is initialized with git.\n${NON_GIT_PRIVATE_WARNING_FOLLOWUP}`
     );
+  }
+
+  const proceed = await ui.confirmProceed("Proceed with install?");
+  if (!proceed) {
+    return 1;
   }
 
   const status = await runInstallBackend(

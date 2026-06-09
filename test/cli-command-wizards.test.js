@@ -40,10 +40,10 @@ function mockProviderBinaries(installedIds) {
           providerId,
           {
             providerId,
-            commands: providerId === "cursor" ? ["cursor", "cursor-agent"] : [providerId],
+            commands: providerId === "cursor" ? ["agent", "cursor-agent", "cursor"] : [providerId],
             commandUsed: installed.has(providerId)
               ? providerId === "cursor"
-                ? "cursor"
+                ? "agent"
                 : providerId
               : null,
             installed: installed.has(providerId),
@@ -208,6 +208,7 @@ test("runInstallWizard interactive flow installs selected provider from binary-g
     const originalSelectInstallScope = mod.selectInstallScope;
     const originalShowInstallPlan = mod.showInstallPlan;
     const originalShowWarning = mod.showWarning;
+    const originalConfirmProceed = mod.confirmProceed;
     const originalRunWithSpinner = mod.runWithSpinner;
     const originalShowSuccess = mod.showSuccess;
     mod.useInteractiveUi = () => true;
@@ -219,6 +220,7 @@ test("runInstallWizard interactive flow installs selected provider from binary-g
     };
     mod.showInstallPlan = () => {};
     mod.showWarning = (message) => warnings.push(message);
+    mod.confirmProceed = async () => true;
     mod.runWithSpinner = async (_label, fn) => fn();
     mod.showSuccess = (message) => successes.push(message);
     return () => {
@@ -228,6 +230,7 @@ test("runInstallWizard interactive flow installs selected provider from binary-g
       mod.selectInstallScope = originalSelectInstallScope;
       mod.showInstallPlan = originalShowInstallPlan;
       mod.showWarning = originalShowWarning;
+      mod.confirmProceed = originalConfirmProceed;
       mod.runWithSpinner = originalRunWithSpinner;
       mod.showSuccess = originalShowSuccess;
     };
@@ -255,6 +258,75 @@ test("runInstallWizard interactive flow installs selected provider from binary-g
   assert.deepEqual(calls[0].domains, []);
   assert.equal(warnings.length, 0);
   assert.deepEqual(successes, ["Installed"]);
+});
+
+test("runInstallWizard interactive flow still prompts provider selection when only one provider CLI is available", async () => {
+  const target = makeTempDir();
+  initGitRepo(target);
+  mockProviderBinaries(["cursor"]);
+  let pickerCalls = 0;
+  const calls = [];
+
+  patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
+    const originalRunInstall = mod.runInstall;
+    mod.runInstall = (ctx) => {
+      calls.push(ctx);
+      return { ok: true, messages: [] };
+    };
+    return () => {
+      mod.runInstall = originalRunInstall;
+    };
+  });
+
+  patchModule("dist/lib/cli-ui.js", (mod) => {
+    const originalUseInteractiveUi = mod.useInteractiveUi;
+    const originalIntroBanner = mod.introBanner;
+    const originalSelectProviders = mod.selectProviders;
+    const originalSelectInstallScope = mod.selectInstallScope;
+    const originalShowInstallPlan = mod.showInstallPlan;
+    const originalConfirmProceed = mod.confirmProceed;
+    const originalRunWithSpinner = mod.runWithSpinner;
+    const originalShowSuccess = mod.showSuccess;
+    mod.useInteractiveUi = () => true;
+    mod.introBanner = () => {};
+    mod.selectProviders = async () => {
+      pickerCalls += 1;
+      return ["cursor"];
+    };
+    mod.selectInstallScope = async () => "project";
+    mod.showInstallPlan = () => {};
+    mod.confirmProceed = async () => true;
+    mod.runWithSpinner = async (_label, fn) => fn();
+    mod.showSuccess = () => {};
+    return () => {
+      mod.useInteractiveUi = originalUseInteractiveUi;
+      mod.introBanner = originalIntroBanner;
+      mod.selectProviders = originalSelectProviders;
+      mod.selectInstallScope = originalSelectInstallScope;
+      mod.showInstallPlan = originalShowInstallPlan;
+      mod.confirmProceed = originalConfirmProceed;
+      mod.runWithSpinner = originalRunWithSpinner;
+      mod.showSuccess = originalShowSuccess;
+    };
+  });
+
+  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  const status = await withInteractiveTty(() =>
+    runInstallWizard(repoRoot, {
+      providers: [],
+      target,
+      scope: "",
+      visibility: "",
+      dryRun: false,
+      yes: false,
+      verbose: false,
+    })
+  );
+
+  assert.equal(status, 0);
+  assert.equal(pickerCalls, 1);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].provider, "cursor");
 });
 
 test("runInitWizard with no domain flags scaffolds empty domain config and no generated skills", async () => {
@@ -334,9 +406,21 @@ test("runInstallWizard interactive cancel exits before backend calls", async () 
   assert.equal(backendCalled, false);
 });
 
-test("runInstallWizard refuses non-git targets before backend writes", async () => {
+test("runInstallWizard supports non-git targets and prepares git exclude setup for future git init", async () => {
   const target = makeTempDir();
   mockProviderBinaries(["cursor", "claude"]);
+  const calls = [];
+
+  patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
+    const originalRunInstall = mod.runInstall;
+    mod.runInstall = (ctx) => {
+      calls.push(ctx);
+      return originalRunInstall(ctx);
+    };
+    return () => {
+      mod.runInstall = originalRunInstall;
+    };
+  });
 
   patchModule("dist/lib/cli-ui.js", (mod) => {
     const originalUseInteractiveUi = mod.useInteractiveUi;
@@ -344,17 +428,29 @@ test("runInstallWizard refuses non-git targets before backend writes", async () 
     const originalSelectProviders = mod.selectProviders;
     const originalSelectInstallScope = mod.selectInstallScope;
     const originalShowInstallPlan = mod.showInstallPlan;
+    const originalShowWarning = mod.showWarning;
+    const originalConfirmProceed = mod.confirmProceed;
+    const originalRunWithSpinner = mod.runWithSpinner;
+    const originalShowSuccess = mod.showSuccess;
     mod.useInteractiveUi = () => true;
     mod.introBanner = () => {};
     mod.selectProviders = async () => ["cursor"];
     mod.selectInstallScope = async () => "project";
     mod.showInstallPlan = () => {};
+    mod.showWarning = () => {};
+    mod.confirmProceed = async () => true;
+    mod.runWithSpinner = async (_label, fn) => fn();
+    mod.showSuccess = () => {};
     return () => {
       mod.useInteractiveUi = originalUseInteractiveUi;
       mod.introBanner = originalIntroBanner;
       mod.selectProviders = originalSelectProviders;
       mod.selectInstallScope = originalSelectInstallScope;
       mod.showInstallPlan = originalShowInstallPlan;
+      mod.showWarning = originalShowWarning;
+      mod.confirmProceed = originalConfirmProceed;
+      mod.runWithSpinner = originalRunWithSpinner;
+      mod.showSuccess = originalShowSuccess;
     };
   });
 
@@ -370,11 +466,80 @@ test("runInstallWizard refuses non-git targets before backend writes", async () 
       verbose: false,
     })
   );
+  assert.equal(status, 0);
+  assert.equal(calls.length, 1);
+  assert.equal(fs.existsSync(path.join(target, ".ai-harness")), true);
+  assert.equal(fs.existsSync(path.join(target, ".harness")), true);
+  assert.equal(fs.existsSync(path.join(target, ".cursor")), true);
+  assert.equal(fs.existsSync(path.join(target, ".git", "info", "exclude")), true);
+  assert.equal(
+    require("node:child_process").spawnSync("git", ["status", "--short"], { cwd: target }).status,
+    128
+  );
+  assert.equal(
+    require("node:child_process").spawnSync("git", ["init", "-q"], { cwd: target }).status,
+    0
+  );
+  assert.equal(
+    require("node:child_process").spawnSync("git", ["status", "--short"], { cwd: target }).status,
+    0
+  );
+});
+
+test("runInstallWizard with explicit provider still stays interactive and asks before install", async () => {
+  const target = makeTempDir();
+  initGitRepo(target);
+  mockProviderBinaries(["cursor"]);
+  let backendCalled = false;
+  let confirmCalls = 0;
+
+  patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
+    const originalRunInstall = mod.runInstall;
+    mod.runInstall = () => {
+      backendCalled = true;
+      return { ok: true, messages: [] };
+    };
+    return () => {
+      mod.runInstall = originalRunInstall;
+    };
+  });
+
+  patchModule("dist/lib/cli-ui.js", (mod) => {
+    const originalUseInteractiveUi = mod.useInteractiveUi;
+    const originalIntroBanner = mod.introBanner;
+    const originalShowInstallPlan = mod.showInstallPlan;
+    const originalConfirmProceed = mod.confirmProceed;
+    mod.useInteractiveUi = () => true;
+    mod.introBanner = () => {};
+    mod.showInstallPlan = () => {};
+    mod.confirmProceed = async () => {
+      confirmCalls += 1;
+      return false;
+    };
+    return () => {
+      mod.useInteractiveUi = originalUseInteractiveUi;
+      mod.introBanner = originalIntroBanner;
+      mod.showInstallPlan = originalShowInstallPlan;
+      mod.confirmProceed = originalConfirmProceed;
+    };
+  });
+
+  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  const status = await withInteractiveTty(() =>
+    runInstallWizard(repoRoot, {
+      providers: ["cursor"],
+      target,
+      scope: "project",
+      visibility: "private",
+      dryRun: false,
+      yes: false,
+      verbose: false,
+    })
+  );
+
   assert.equal(status, 1);
-  assert.equal(fs.existsSync(path.join(target, ".ai-harness")), false);
-  assert.equal(fs.existsSync(path.join(target, ".harness")), false);
-  assert.equal(fs.existsSync(path.join(target, ".claude")), false);
-  assert.equal(fs.existsSync(path.join(target, ".cursor")), false);
+  assert.equal(confirmCalls, 1);
+  assert.equal(backendCalled, false);
 });
 
 test("runInstallWizard stops when no provider CLI is installed", async () => {

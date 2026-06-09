@@ -7,6 +7,7 @@ const {
   applyPrivateIgnore,
   removeIgnoreBlock,
   collectIgnorePaths,
+  reconcileDeferredPrivateIgnore,
 } = require("../../dist/lib/backend/git-hygiene.js");
 
 function tmpGitRepo() {
@@ -190,6 +191,61 @@ test("applyPrivateIgnore resolves git worktree metadata files", () => {
   const content = fs.readFileSync(path.join(actualGitDir, "info", "exclude"), "utf8");
   assert.match(content, /# ai-engineering-harness start/);
   assert.match(content, /\.claude\/CLAUDE\.md/);
+});
+
+test("applyPrivateIgnore prepares .git/info/exclude before git init", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gh-non-git-"));
+  const result = applyPrivateIgnore({
+    targetAbs: dir,
+    provider: "claude",
+    initHarness: true,
+    installCache: true,
+    scope: "project",
+    visibility: "private",
+    dryRun: false,
+  });
+
+  assert.equal(result.action, "update");
+  const excludeFile = path.join(dir, ".git", "info", "exclude");
+  assert.equal(fs.existsSync(excludeFile), true);
+  const beforeInit = fs.readFileSync(excludeFile, "utf8");
+  assert.match(beforeInit, /# ai-engineering-harness start/);
+  assert.match(beforeInit, /\.harness\//);
+  assert.match(beforeInit, /\.ai-harness\//);
+
+  require("node:child_process").spawnSync("git", ["init", "-q"], { cwd: dir });
+  const afterInit = fs.readFileSync(excludeFile, "utf8");
+  assert.match(afterInit, /# ai-engineering-harness start/);
+  assert.match(afterInit, /\.harness\//);
+  assert.match(afterInit, /\.ai-harness\//);
+});
+
+test("reconcileDeferredPrivateIgnore applies deferred exclude block after git init", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gh-deferred-"));
+  const pendingDir = path.join(dir, ".ai-harness");
+  fs.mkdirSync(pendingDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(pendingDir, "pending-git-exclude.json"),
+    JSON.stringify(
+      {
+        paths: [".harness/", ".claude/CLAUDE.md", ".ai-harness/"],
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+  fs.mkdirSync(path.join(dir, ".git", "info"), { recursive: true });
+
+  const result = reconcileDeferredPrivateIgnore({ targetAbs: dir, dryRun: false });
+
+  assert.equal(result.action, "update");
+  const excludeFile = path.join(dir, ".git", "info", "exclude");
+  const content = fs.readFileSync(excludeFile, "utf8");
+  assert.match(content, /# ai-engineering-harness start/);
+  assert.match(content, /\.harness\//);
+  assert.match(content, /\.claude\/CLAUDE\.md/);
+  assert.equal(fs.existsSync(path.join(pendingDir, "pending-git-exclude.json")), false);
 });
 
 test("removeIgnoreBlock resolves git worktree metadata files", () => {

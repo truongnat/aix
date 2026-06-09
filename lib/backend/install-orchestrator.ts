@@ -1,6 +1,6 @@
 /** In-process install orchestrator. */
 
-import { applyPrivateIgnore } from "./git-hygiene";
+import { applyPrivateIgnore, reconcileDeferredPrivateIgnore } from "./git-hygiene";
 import { initHarnessProfile } from "./harness-skeleton";
 import { writeDomainSkillSurface } from "../domain-skill-generation";
 import { installCapabilityCache } from "../install-cache";
@@ -59,11 +59,10 @@ export function runInstall(ctx: InstallContext, options: InstallRunOptions = {})
     const ignoreStrategy = resolveIgnoreStrategy(ctx.scope, ctx.visibility);
 
     const gitRepo = isGitRepo(ctx.target);
-    if (ctx.scope === "project" && !gitRepo) {
-      const message =
-        "Target directory is not a Git repo. Run git init first so generated files stay out of tracked content.";
-      throw new Error(message);
-    }
+    reconcileDeferredPrivateIgnore({
+      targetAbs: ctx.target,
+      dryRun: ctx.dryRun,
+    });
     if (ignoreStrategy === "info-exclude" && gitRepo) {
       process.stdout.write("\n--- Git exclude (private) ---\n");
     }
@@ -80,11 +79,6 @@ export function runInstall(ctx: InstallContext, options: InstallRunOptions = {})
       dryRun: ctx.dryRun,
       ignoreStrategy,
     });
-    if (ignoreResult.action === "manual") {
-      throw new Error(
-        "Target directory is not a Git repo. Run git init first so generated files stay out of tracked content."
-      );
-    }
     if (ignoreStrategy === "info-exclude" && gitRepo) {
       process.stdout.write("--- Git exclude complete ---\n\n");
     }

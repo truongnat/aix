@@ -56,9 +56,7 @@ function isCancel(_value: unknown): boolean {
 }
 
 function useInteractiveUi(options: ParseOptions): boolean {
-  return (
-    process.stdin.isTTY && process.stdout.isTTY && !options.yes && options.providers.length === 0
-  );
+  return process.stdin.isTTY && process.stdout.isTTY && !options.yes;
 }
 
 function introBanner(meta: IntroMeta): void {

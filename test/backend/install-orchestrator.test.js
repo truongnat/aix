@@ -183,24 +183,31 @@ test("runInstall provisions codex native hooks, rules, and agents", () => {
   assert.ok(lines.some((line) => /restart the app/i.test(line)));
 });
 
-test("runInstall hard-stops on non-git project installs before writing", () => {
+test("runInstall on a non-git project prepares private git exclude setup for future git init", () => {
   const dir = tmpDir();
   const r = runInstall({
     packRoot: PACK_ROOT,
     target: dir,
     provider: "claude",
     scope: "project",
-    visibility: "shared",
+    visibility: "private",
     dryRun: false,
     initHarness: true,
     installCache: true,
     force: false,
   });
-  assert.equal(r.ok, false);
-  assert.match(r.messages.join(" "), /Git repo/);
-  assert.equal(fs.existsSync(path.join(dir, ".claude")), false);
-  assert.equal(fs.existsSync(path.join(dir, ".harness")), false);
-  assert.equal(fs.existsSync(path.join(dir, ".ai-harness")), false);
+  assert.equal(r.ok, true);
+  assert.equal(fs.existsSync(path.join(dir, ".claude", "CLAUDE.md")), true);
+  assert.equal(fs.existsSync(path.join(dir, ".harness", "HARNESS.md")), true);
+  assert.equal(fs.existsSync(path.join(dir, ".ai-harness")), true);
+  assert.equal(fs.existsSync(path.join(dir, ".git", "info", "exclude")), true);
+  assert.match(
+    fs.readFileSync(path.join(dir, ".git", "info", "exclude"), "utf8"),
+    /# ai-engineering-harness start/
+  );
+  assert.equal(cp.spawnSync("git", ["status", "--short"], { cwd: dir }).status, 128);
+  assert.equal(cp.spawnSync("git", ["init", "-q"], { cwd: dir }).status, 0);
+  assert.equal(cp.spawnSync("git", ["status", "--short"], { cwd: dir }).status, 0);
 });
 
 test("runInstall dryRun writes no provider files", () => {

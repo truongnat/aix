@@ -105,7 +105,20 @@ function isGitRepo(targetRoot: string): boolean {
       return false;
     }
     const stat = fs.statSync(gitPath);
-    return stat.isDirectory() || stat.isFile();
+    if (stat.isDirectory()) {
+      return fs.existsSync(path.join(gitPath, "HEAD"));
+    }
+    if (!stat.isFile()) {
+      return false;
+    }
+
+    const content = fs.readFileSync(gitPath, "utf8");
+    const match = content.match(/^gitdir:\s*(.+)$/m);
+    if (!match) {
+      return false;
+    }
+    const resolved = path.resolve(targetRoot, match[1].trim());
+    return fs.existsSync(path.join(resolved, "HEAD"));
   } catch {
     return false;
   }

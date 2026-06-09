@@ -24,7 +24,11 @@ export interface IgnoreContext {
 }
 
 export interface IgnoreResult {
-  action: "update" | "skip" | "manual";
+  action: "update" | "skip" | "manual" | "defer";
+  paths: string[];
+}
+
+interface PendingIgnoreState {
   paths: string[];
 }
 
@@ -136,6 +140,82 @@ function printManualIgnoreInstructions(paths: string[]): void {
   process.stderr.write("  " + EXCLUDE_BLOCK_END + "\n");
 }
 
+function pendingIgnoreStatePath(targetAbs: string): string {
+  return path.join(targetAbs, ".ai-harness", "pending-git-exclude.json");
+}
+
+function writePendingIgnoreState(targetAbs: string, paths: string[]): void {
+  const filePath = pendingIgnoreStatePath(targetAbs);
+  const existing = fs.existsSync(filePath)
+    ? (JSON.parse(fs.readFileSync(filePath, "utf8")) as PendingIgnoreState)
+    : { paths: [] };
+  const merged = [...new Set([...(existing.paths || []), ...paths])];
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, JSON.stringify({ paths: merged }, null, 2) + "\n", "utf8");
+}
+
+function readPendingIgnoreState(targetAbs: string): PendingIgnoreState | null {
+  const filePath = pendingIgnoreStatePath(targetAbs);
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+  return JSON.parse(fs.readFileSync(filePath, "utf8")) as PendingIgnoreState;
+}
+
+function writeExcludeBlockFromPaths(
+  gitDir: string,
+  paths: string[],
+  dryRun: boolean
+): "update" | "skip" {
+  const excludeFile = path.join(gitDir, "info", "exclude");
+  const blockContent = buildExcludeBlockContent(paths);
+  const existing = fs.existsSync(excludeFile) ? fs.readFileSync(excludeFile, "utf8") : "";
+  const updated = fs.existsSync(excludeFile)
+    ? hasHarnessBlockInFile(excludeFile)
+      ? replaceBlock(existing, blockContent)
+      : `${existing.trimEnd()}\n\n${blockContent}`.replace(/^\n+/, "")
+    : blockContent;
+
+  if (existing === updated) {
+    process.stdout.write("SKIP .git/info/exclude\n");
+    return "skip";
+  }
+
+  if (dryRun) {
+    process.stdout.write("WOULD UPDATE .git/info/exclude\n");
+    for (const p of paths) {
+      if (p.length > 0) {
+        process.stdout.write("  ignore: " + p + "\n");
+      }
+    }
+    return "update";
+  }
+
+  fs.mkdirSync(path.join(gitDir, "info"), { recursive: true });
+  fs.writeFileSync(excludeFile, updated, "utf8");
+  process.stdout.write("UPDATE .git/info/exclude\n");
+  return "update";
+}
+
+function prepareFutureExcludeBlock(
+  targetAbs: string,
+  paths: string[],
+  dryRun: boolean
+): "update" | "skip" {
+  const futureGitDir = path.join(targetAbs, ".git");
+  if (dryRun) {
+    process.stdout.write("WOULD PREPARE .git/info/exclude for future git init\n");
+    for (const p of paths) {
+      if (p.length > 0) {
+        process.stdout.write("  ignore: " + p + "\n");
+      }
+    }
+    return "update";
+  }
+
+  return writeExcludeBlockFromPaths(futureGitDir, paths, false);
+}
+
 function resolveGitDir(targetAbs: string): string | null {
   const gitPath = path.join(targetAbs, ".git");
   if (!fs.existsSync(gitPath)) {
@@ -175,46 +255,11 @@ export function applyPrivateIgnore(ctx: IgnoreContext): IgnoreResult {
 
   const gitDir = resolveGitDir(ctx.targetAbs);
   if (!gitDir) {
-    printManualIgnoreInstructions(paths);
-    return { action: "manual", paths };
+    const action = prepareFutureExcludeBlock(ctx.targetAbs, paths, ctx.dryRun);
+    return { action, paths };
   }
 
-  const excludeFile = path.join(gitDir, "info", "exclude");
-  const blockContent = buildExcludeBlockContent(paths);
-  const existing = fs.existsSync(excludeFile) ? fs.readFileSync(excludeFile, "utf8") : "";
-  const updated = fs.existsSync(excludeFile)
-    ? hasHarnessBlockInFile(excludeFile)
-      ? replaceBlock(existing, blockContent)
-      : `${existing.trimEnd()}\n\n${blockContent}`.replace(/^\n+/, "")
-    : blockContent;
-
-  if (existing === updated) {
-    process.stdout.write("SKIP .git/info/exclude\n");
-    return { action: "skip", paths };
-  }
-
-  if (ctx.dryRun) {
-    process.stdout.write("WOULD UPDATE .git/info/exclude\n");
-    for (const p of paths) {
-      if (p.length > 0) {
-        process.stdout.write("  ignore: " + p + "\n");
-      }
-    }
-    return { action: "update", paths };
-  }
-
-  fs.mkdirSync(path.join(gitDir, "info"), { recursive: true });
-
-  if (!fs.existsSync(excludeFile)) {
-    fs.writeFileSync(excludeFile, blockContent, "utf8");
-  } else if (!hasHarnessBlockInFile(excludeFile)) {
-    fs.writeFileSync(excludeFile, updated, "utf8");
-  } else {
-    fs.writeFileSync(excludeFile, updated, "utf8");
-  }
-
-  process.stdout.write("UPDATE .git/info/exclude\n");
-  return { action: "update", paths };
+  return { action: writeExcludeBlockFromPaths(gitDir, paths, ctx.dryRun), paths };
 }
 
 /**
@@ -248,4 +293,25 @@ export function removeIgnoreBlock(opts: { targetAbs: string; dryRun: boolean }):
   fs.writeFileSync(excludeFile, updated, "utf8");
   process.stdout.write("UPDATE .git/info/exclude\n");
   return { action: "update" };
+}
+
+export function reconcileDeferredPrivateIgnore(opts: { targetAbs: string; dryRun: boolean }): {
+  action: "update" | "skip";
+  paths: string[];
+} {
+  const pending = readPendingIgnoreState(opts.targetAbs);
+  if (!pending?.paths?.length) {
+    return { action: "skip", paths: [] };
+  }
+
+  const gitDir = resolveGitDir(opts.targetAbs);
+  if (!gitDir) {
+    return { action: "skip", paths: pending.paths };
+  }
+
+  const action = writeExcludeBlockFromPaths(gitDir, pending.paths, opts.dryRun);
+  if (!opts.dryRun) {
+    fs.rmSync(pendingIgnoreStatePath(opts.targetAbs), { force: true });
+  }
+  return { action, paths: pending.paths };
 }

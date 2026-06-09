@@ -462,6 +462,29 @@ describe("CLI Provider Detection", () => {
     }
   });
 
+  test("probeCursorBinary prefers agent before other Cursor shims", () => {
+    const originalSpawnSync = childProcess.spawnSync;
+    const calls = [];
+
+    childProcess.spawnSync = (command) => {
+      calls.push(command);
+      if (command === "agent") {
+        return { stdout: "agent 1.2.3\n", stderr: "", status: 0, error: undefined };
+      }
+      return { stdout: "", stderr: "", status: null, error: { code: "ENOENT" } };
+    };
+
+    try {
+      const providerBinaryDetect = fresh("dist/lib/provider-binary-detect.js");
+      const probe = providerBinaryDetect.probeCursorBinary();
+      assert.equal(probe.installed, true);
+      assert.equal(probe.commandUsed, "agent");
+      assert.deepEqual(calls, ["agent"]);
+    } finally {
+      childProcess.spawnSync = originalSpawnSync;
+    }
+  });
+
   test("detectLegacyProviderResidue returns empty for clean project", () => {
     const tmpDir = makeTempDir();
     const legacy = cliDetect.detectLegacyProviderResidue(tmpDir);
@@ -471,6 +494,7 @@ describe("CLI Provider Detection", () => {
   test("isGitRepo detects .git directory", () => {
     const tmpDir = makeTempDir();
     fs.mkdirSync(path.join(tmpDir, ".git"));
+    fs.writeFileSync(path.join(tmpDir, ".git", "HEAD"), "ref: refs/heads/main\n");
     const result = cliDetect.isGitRepo(tmpDir);
     assert.equal(result, true);
   });
@@ -483,9 +507,20 @@ describe("CLI Provider Detection", () => {
 
   test("isGitRepo detects .git file used by worktrees", () => {
     const tmpDir = makeTempDir();
-    fs.writeFileSync(path.join(tmpDir, ".git"), "gitdir: /tmp/fake-worktree\n");
+    const actualGitDir = path.join(tmpDir, "worktree-meta");
+    fs.mkdirSync(actualGitDir, { recursive: true });
+    fs.writeFileSync(path.join(actualGitDir, "HEAD"), "ref: refs/heads/main\n");
+    fs.writeFileSync(path.join(tmpDir, ".git"), `gitdir: ${path.relative(tmpDir, actualGitDir)}\n`);
     const result = cliDetect.isGitRepo(tmpDir);
     assert.equal(result, true);
+  });
+
+  test("isGitRepo returns false for a precreated .git directory without HEAD", () => {
+    const tmpDir = makeTempDir();
+    fs.mkdirSync(path.join(tmpDir, ".git", "info"), { recursive: true });
+    fs.writeFileSync(path.join(tmpDir, ".git", "info", "exclude"), "precreated\n");
+    const result = cliDetect.isGitRepo(tmpDir);
+    assert.equal(result, false);
   });
 
   test("fileContainsHarnessMarker detects marker string", () => {
@@ -531,6 +566,28 @@ describe("CLI Non-Interactive Detection", () => {
     const result = cliArgs.isNonInteractive(opts);
     // In test environment, should be non-interactive
     assert.equal(typeof result, "boolean");
+  });
+});
+
+describe("CLI Interactive UI", () => {
+  test("useInteractiveUi stays interactive when provider is explicitly specified", () => {
+    const stdinDescriptor = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
+    const stdoutDescriptor = Object.getOwnPropertyDescriptor(process.stdout, "isTTY");
+    Object.defineProperty(process.stdin, "isTTY", { value: true, configurable: true });
+    Object.defineProperty(process.stdout, "isTTY", { value: true, configurable: true });
+
+    try {
+      const { useInteractiveUi } = fresh("dist/lib/cli-ui.js");
+      assert.equal(useInteractiveUi({ yes: false, providers: ["cursor"] }), true);
+      assert.equal(useInteractiveUi({ yes: true, providers: ["cursor"] }), false);
+    } finally {
+      if (stdinDescriptor) {
+        Object.defineProperty(process.stdin, "isTTY", stdinDescriptor);
+      }
+      if (stdoutDescriptor) {
+        Object.defineProperty(process.stdout, "isTTY", stdoutDescriptor);
+      }
+    }
   });
 });
 

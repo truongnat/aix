@@ -92,7 +92,7 @@ function probeCommand(command: string, args: string[] = ["--version"]): Provider
 }
 
 function probeCursorBinary(): ProviderBinaryProbe {
-  const candidates = ["cursor", "cursor-agent"];
+  const candidates = ["agent", "cursor-agent", "cursor"];
   const attempts: ProviderBinaryProbe[] = [];
 
   for (const command of candidates) {
