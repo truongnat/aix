@@ -1,0 +1,74 @@
+---
+description: ai-engineering-harness phase and blocking guardrails
+globs:
+alwaysApply: true
+---
+
+# Harness Guardrails
+
+## Stop Conditions
+
+Stop and ask if:
+
+- plan is missing
+- plan is not approved
+- acceptance criteria are unclear
+- verification command is unknown
+- manual review is required
+- test failure needs product judgment
+- verify evidence is missing
+- current command is not allowed in this phase
+
+After asking in gated phases, stop. Do not continue implementation, verification, shipping, or memory updates.
+
+`harness-discuss` is multi-turn: ask, receive input, continue discuss — see `rules/core/discussion.md`.
+
+## Blocked Behavior
+
+Applies to **gated execution phases** (`harness-plan`, `harness-run`, `harness-verify`, `harness-ship`, `harness-remember`) — not to normal `harness-discuss` exploration.
+
+For discuss-phase questions (feature choice, scope, tradeoffs), use interactive discussion per `rules/core/discussion.md` instead of `### Blocked`.
+
+If required input, approval, evidence, or phase preconditions are missing:
+
+1. Stop.
+2. Ask the minimum required question.
+3. Do not continue after asking.
+4. Return a blocked output.
+
+After asking a blocking question, do not continue implementation, verification, shipping, or memory updates in the same turn.
+
+## Phase Discipline
+
+Do not skip phases.
+
+- Plan before run.
+- Approved plan before implementation.
+- Verification before ship.
+- Evidence before success claim.
+- Remember only after shipped result, failed attempt, or durable lesson.
+
+Read `.harness/STATE.md` and the active session under `.harness/sessions/` before changing phase.
+
+## Interactive Discussion (Discuss Phase)
+
+`harness-discuss` is a **collaborative, multi-turn** phase. It is not a hard gate stop.
+
+When goal, scope, or approach is still forming:
+
+1. Synthesize what you already know from artifacts first.
+2. For deliberative decisions (feature, approach, solution), use **three-option scoring** per `rules/core/option-scoring.md` before asking the user to choose.
+3. Ask the **minimum** targeted question(s) needed to continue.
+4. Read `.ai-harness/provider-interaction.md` and **invoke** the listed structured choice tool for this install's provider (`AskQuestion` on Cursor, `AskUserQuestion` on Claude Code).
+5. Wait for the tool result, then continue discuss — update `DISCUSSION.md` and ask the next question or recommend `harness-plan`.
+6. Use markdown-only A/B/C prompts only when no structured tool is listed or the tool is absent from the active tool list.
+
+Do **not** use `### Blocked` for normal discuss clarifications (feature choice, scope tradeoffs, approach preference).
+
+Use `### Blocked` in discuss only when:
+
+- no goal or artifact exists and Session Start has not run
+- the user must choose between materially different directions and explicit approval is required before planning
+- required product judgment cannot proceed even after one round of questions
+
+After the user answers a discuss question, **continue the discuss workflow** in the next turn. Do not treat the question as a terminal stop.

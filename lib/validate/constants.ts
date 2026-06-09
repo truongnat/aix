@@ -202,6 +202,8 @@ const promptTemplateFiles = [
   "prompt-templates/harness-ship.md",
   "prompt-templates/domain-analysis.md",
   "prompt-templates/blocker-question.md",
+  "prompt-templates/discussion-question.md",
+  "prompt-templates/option-scoring.md",
   "prompt-templates/code-reviewer.md",
 ];
 

@@ -81,6 +81,8 @@
     "hooks.json",
     "gemini-extension.json",
     "scripts/discover-tools.js",
+    "scripts/discover-provider-tools.js",
+    "scripts/discover-report-templates.js",
     "scripts/generate-report-context.js",
     "scripts/generate-compatibility-matrix.js",
     "scripts/sync-site-version.js",

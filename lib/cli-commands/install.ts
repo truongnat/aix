@@ -83,7 +83,7 @@ async function runInstallBackend(
         plannedInstallCache: ctx.plannedInstallCache,
         domains: ctx.initHarness && i === 0 ? ctx.domains : [],
         plannedProviders: ctx.plannedProviders,
-        force: false,
+        force: options.force ?? false,
       });
       if (!lastResult.ok) {
         break;

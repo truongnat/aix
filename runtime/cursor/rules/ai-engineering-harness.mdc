@@ -23,16 +23,31 @@ Read `.harness/STATE.md` and the active session under `.harness/sessions/` befor
 
 ## Blocked Behavior
 
-If required input, approval, evidence, or phase preconditions are missing:
+If required input, approval, evidence, or phase preconditions are missing in gated phases (`plan`, `run`, `verify`, `ship`):
 
 1. Stop.
 2. Ask the minimum required question.
 3. Do not continue after asking.
 4. Return a blocked output.
 
-After asking a blocking question, do not continue implementation, verification, shipping, or memory updates in the same turn.
+`harness-discuss` is multi-turn: ask via structured question tools when available, then continue after the user answers. See `rules/core/discussion.md`.
+
+After asking a blocking question in gated phases, do not continue implementation, verification, shipping, or memory updates in the same turn.
 
 Loop: harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember
+
+Default chaining: when ship status is `shipped`, continue with `harness-remember` in the same turn unless the user requests ship-only.
+
+## Session Start And Domain Bootstrap
+
+On a new chat or when session state is unknown, run `harness-start` before other harness commands.
+
+If `.harness/config.json` has `domains: []` and `.harness/skills/` has no generated domain directories:
+
+1. Announce codebase analysis visibly to the user.
+2. Run domain analysis per `prompt-templates/domain-analysis.md`.
+3. Generate skills with `npx ai-engineering-harness domains --analysis-file <path>`.
+4. Report generated domains and files before continuing.
 
 Routing:
 - Use `.cursor/commands/` for native project commands.

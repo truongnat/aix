@@ -29,6 +29,8 @@ const PROMPT_TEMPLATE_FILES = [
   "prompt-templates/harness-verify.md",
   "prompt-templates/harness-ship.md",
   "prompt-templates/blocker-question.md",
+  "prompt-templates/discussion-question.md",
+  "prompt-templates/option-scoring.md",
   "prompt-templates/code-reviewer.md",
 ];
 

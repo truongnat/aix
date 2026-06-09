@@ -153,9 +153,10 @@ This repository uses a **project-local** harness install. Canonical command IDs 
 
 1. Read \`.ai-harness/manifest.json\` (see \`commandSurface\` for provider-specific support).
 2. Read this file (\`.ai-harness/activation.md\`).
-3. Use only \`.ai-harness/commands/\`, \`.ai-harness/skills/\`, \`.ai-harness/workflows/\`, and \`.ai-harness/patterns/\` under **this** repository.
-4. Use only \`.harness/\` for project-specific state (goals, memory, gates).
-5. **Do not** use global skills, sibling-repo harness files, or source-pack paths unless the user explicitly asks.
+3. Read \`.ai-harness/provider-interaction.md\` before deliberative discuss or scored user choices — **invoke the listed provider tool**, not markdown-only menus.
+4. Use only \`.ai-harness/commands/\`, \`.ai-harness/skills/\`, \`.ai-harness/workflows/\`, and \`.ai-harness/patterns/\` under **this** repository.
+5. Use only \`.harness/\` for project-specific state (goals, memory, gates).
+6. **Do not** use global skills, sibling-repo harness files, or source-pack paths unless the user explicitly asks.
 
 ## If install is incomplete
 

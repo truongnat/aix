@@ -19,6 +19,8 @@ Stop and ask if:
 - verify evidence is missing
 - current command is not allowed in this phase
 
-After asking, stop. Do not continue implementation, verification, shipping, or memory updates.
+After asking in gated phases, stop. Do not continue implementation, verification, shipping, or memory updates.
 
-<!-- @core:blocking,phase-guards -->
+`harness-discuss` is multi-turn: ask, receive input, continue discuss — see `rules/core/discussion.md`.
+
+<!-- @core:blocking,phase-guards,discussion -->

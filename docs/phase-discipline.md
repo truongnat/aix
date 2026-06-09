@@ -38,3 +38,23 @@ harness-verify requires implementation evidence (completed tasks or tool runs)
 5. **Verify Phase**: Collect evidence and run verification checks
 6. **Ship Phase**: Ship only when verification passes
 7. **Remember Phase**: Capture lessons and update memory
+
+## Default Phase Chaining
+
+Some adjacent phases chain by default so the agent does not stop between closely related steps.
+
+### Ship → Remember (default on)
+
+When `harness-ship` completes with status `shipped` (verification passed, gaps documented or none):
+
+1. Continue in the same turn with the `harness-remember` workflow.
+2. Promote only durable, safe lessons to typed memory artifacts.
+3. If nothing is worth remembering, write a short session `REMEMBER.md` note and stop.
+
+Skip auto-remember when:
+
+- Ship status is `shipped-with-gaps`, `failed`, or blocked pending human acceptance.
+- The user explicitly requests ship-only handoff.
+- No durable lesson exists and the outcome is purely transient.
+
+Hard gates (plan approval, verification before ship) stay separate. Chaining applies only after the ship decision is allowed and complete.

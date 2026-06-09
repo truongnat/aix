@@ -24,7 +24,10 @@ Claude and Cursor get project-native `/harness-*` command files. Codex uses plug
 |------|----------------|
 | `rules/core/command-naming.md` | Hyphen-form canonical command IDs |
 | `rules/core/phase-guards.md` | Plan → run → verify → ship discipline |
-| `rules/core/blocking.md` | Stop, ask, do not continue |
+| `rules/core/blocking.md` | Stop, ask, do not continue (gated phases only) |
+| `rules/core/discussion.md` | Multi-turn discuss; structured questions; continue after answers |
+| `rules/core/option-scoring.md` | Three options + 4-dimension scoring before user choice |
+| `rules/core/provider-interaction.md` | Provider-native tools for user choice (not markdown-only) |
 | `rules/core/session-memory.md` | STATE + sessions read order |
 | `rules/core/tool-routing.md` | Tool discovery and capability routing |
 

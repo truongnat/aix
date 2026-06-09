@@ -22,6 +22,7 @@ import {
   type Manifest,
 } from "./command-rendering";
 import { HARNESS_MARKER } from "../backend/constants";
+import { renderProviderInteractionMarkdown } from "../provider-interaction-tools";
 
 type SupportedRuntime = "claude" | "cursor" | "codex" | "generic" | "gemini";
 type InstallScope = "project" | "global";
@@ -425,10 +426,21 @@ function fileReferencesActivation(filePath: string): boolean {
   }
 }
 
+function installProviderInteraction(
+  targetRoot: string,
+  providers: string[],
+  options: InstallOptions = {}
+): WriteResult {
+  const opts = { dryRun: false, force: true, ...options };
+  const content = renderProviderInteractionMarkdown(providers);
+  return writeFile(targetRoot, `${CACHE_DIR}/provider-interaction.md`, `${content.trim()}\n`, opts);
+}
+
 export {
   writeFile,
   installPromptTemplates,
   installRuntimeCommandCatalog,
+  installProviderInteraction,
   mergeManifestProviders,
   installClaudeNativeCommands,
   installCursorNativeCommands,

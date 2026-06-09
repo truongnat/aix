@@ -43,9 +43,10 @@ If active session is unknown or `.harness/STATE.md` has not been established for
 
 ## When To Use
 
-- after verified work ships
+- after verified work ships (often chained automatically from `harness-ship` when status is `shipped`)
 - after a failed attempt reveals a durable hazard or root cause
 - when future sessions would benefit from a durable note
+- as a standalone command when ship was ship-only or remember was deferred
 
 ## Skills To Use
 

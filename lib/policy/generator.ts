@@ -145,6 +145,34 @@ export function generatePhaseDisciplineDoc(policies: PolicySet): string {
   lines.push(`6. **Ship Phase**: Ship only when verification passes`);
   lines.push(`7. **Remember Phase**: Capture lessons and update memory`);
   lines.push(``);
+  lines.push(`## Default Phase Chaining`);
+  lines.push(``);
+  lines.push(
+    `Some adjacent phases chain by default so the agent does not stop between closely related steps.`
+  );
+  lines.push(``);
+  lines.push(`### Ship → Remember (default on)`);
+  lines.push(``);
+  lines.push(
+    `When \`harness-ship\` completes with status \`shipped\` (verification passed, gaps documented or none):`
+  );
+  lines.push(``);
+  lines.push(`1. Continue in the same turn with the \`harness-remember\` workflow.`);
+  lines.push(`2. Promote only durable, safe lessons to typed memory artifacts.`);
+  lines.push(
+    `3. If nothing is worth remembering, write a short session \`REMEMBER.md\` note and stop.`
+  );
+  lines.push(``);
+  lines.push(`Skip auto-remember when:`);
+  lines.push(``);
+  lines.push(`- Ship status is \`shipped-with-gaps\`, \`failed\`, or blocked pending human acceptance.`);
+  lines.push(`- The user explicitly requests ship-only handoff.`);
+  lines.push(`- No durable lesson exists and the outcome is purely transient.`);
+  lines.push(``);
+  lines.push(
+    `Hard gates (plan approval, verification before ship) stay separate. Chaining applies only after the ship decision is allowed and complete.`
+  );
+  lines.push(``);
 
   return lines.join("\n");
 }

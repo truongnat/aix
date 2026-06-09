@@ -267,3 +267,26 @@ Prefer typed project-memory artifacts when the lesson applies across goals:
 - `.harness/REMEMBER.md` for goal-level lessons that may later be promoted
 
 **Do not store secrets, credentials, customer data, or private business information.** See [SECURITY.md](SECURITY.md#artifact-content-restrictions) for the complete policy and rationale.
+
+<!-- ai-engineering-harness generated-domain-skills start -->
+## Generated Domain Skills
+
+The following domain assets were generated from project analysis:
+
+- `backend`: Route API, service, and persistence work toward contract-safe checks.
+  - `.harness/skills/backend/SKILL.md`
+  - `.agents/skills/backend/SKILL.md`
+  - `.codex/agents/domain-backend.toml`
+- `devops`: Route CI, deployment, and infra changes toward environment-aware checks.
+  - `.harness/skills/devops/SKILL.md`
+  - `.agents/skills/devops/SKILL.md`
+  - `.codex/agents/domain-devops.toml`
+- `debugging`: Route bugs, flaky behavior, and regressions toward root-cause checks.
+  - `.harness/skills/debugging/SKILL.md`
+  - `.agents/skills/debugging/SKILL.md`
+  - `.codex/agents/domain-debugging.toml`
+
+## Codex Notes
+
+- Trust the project's `.codex/` layer in Codex and restart the app after generating.
+<!-- ai-engineering-harness generated-domain-skills end -->

@@ -24,6 +24,8 @@
     "lib/cli-ui.ts",
     "lib/stack-detect.ts",
     "lib/domain-skill-generation.ts",
+    "lib/report-template-discovery.ts",
+    "lib/provider-interaction-tools.ts",
     "lib/evals/*.ts",
     "lib/insights/*.ts",
     "lib/validate/*.ts",

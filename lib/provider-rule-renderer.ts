@@ -5,6 +5,9 @@ type CoreFragmentName =
   | "command-naming"
   | "phase-guards"
   | "blocking"
+  | "discussion"
+  | "option-scoring"
+  | "provider-interaction"
   | "session-memory"
   | "tool-routing";
 
@@ -39,6 +42,9 @@ const CORE_FRAGMENTS: readonly CoreFragmentName[] = Object.freeze([
   "command-naming",
   "phase-guards",
   "blocking",
+  "discussion",
+  "option-scoring",
+  "provider-interaction",
   "session-memory",
   "tool-routing",
 ]);

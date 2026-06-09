@@ -6,6 +6,7 @@ allowed_tools:
   - Bash
   - Glob
   - Grep
+  - AskQuestion
 ---
 # harness-discuss
 
@@ -31,6 +32,7 @@ Read:
 - `.harness/CONTEXT.md` if present
 - `.harness/DECISIONS.md` if present
 - `.harness/HAZARDS.md` if present
+- `.ai-harness/provider-interaction.md` before any scored user choice
 
 ## Preconditions
 
@@ -51,14 +53,30 @@ Read:
 - `brainstorming` when the goal needs option-shaping before planning
 - `remembering` when prior decisions constrain the solution
 
+## Interactive Discussion Mode
+
+`harness-discuss` is **multi-turn**. Questions are part of the workflow, not a terminal stop.
+
+When user input is needed (feature choice, scope, approach, tradeoffs, solution pick):
+
+1. Synthesize artifacts first — do not ask what the user already documented.
+2. For **deliberative** decisions, present **exactly 3 options** with scoring (Value, Effort fit, Risk, Fit — each 1–5, total /20) per `rules/core/option-scoring.md`.
+3. State a **Recommendation** (highest total, with tie-break rationale).
+4. **Invoke** the structured choice tool from `.ai-harness/provider-interaction.md` (Cursor: `AskQuestion`; Claude: `AskUserQuestion`) with three choices labeled `A: … (score/20)`. Do not stop at markdown-only menus when the tool is available.
+5. After the user answers, **continue discuss**: record selection and scores in `DISCUSSION.md` (`templates/DISCUSSION.md`), then resolve the next ambiguity or recommend `harness-plan`.
+6. Use `### Discussion` from `agent-system/RESPONSE_CONTRACT.md` — not `### Blocked` for normal clarifications.
+
+See `prompt-templates/discussion-question.md`, `prompt-templates/option-scoring.md`, and `rules/core/discussion.md`.
+
 ## Step-By-Step Workflow
 
 1. Read the minimum read set in order of artifact priority, including typed memory artifacts when they shape scope or constraints.
 2. If `.harness/REVIEW.md` exists, synthesize it into a decision-oriented discussion instead of repeating the whole review.
 3. Otherwise restate the request, separate confirmed requirements from assumptions, and make the following explicit before handing off to planning: goal, success criteria, scope boundaries, constraints, and unresolved risks.
 4. Compare realistic approaches, recommend one, and note tradeoffs the planner must preserve.
-4. Write or update the active session `DISCUSSION.md`.
-5. End with the next recommended command, not a vague prompt.
+5. Write or update the active session `DISCUSSION.md` on every meaningful round.
+6. If ambiguity remains, ask via interactive discussion and continue after the answer.
+7. When ready, end with `harness-plan` as the next command — not a vague prompt.
 
 ## Required Outputs
 
@@ -79,6 +97,8 @@ Read:
 - Do not duplicate full review text instead of synthesizing it.
 - Do not plan or implement inside `harness-discuss`.
 - Do not claim branch freshness without evidence.
+- Do not return `### Blocked` and stop the session for normal discuss questions (feature choice, scope, tradeoffs).
+- Do not print a question list and end the turn without a path to continue after the user answers.
 
 ## Forbidden when REVIEW.md exists
 

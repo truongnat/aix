@@ -29,6 +29,8 @@ const cacheExportPaths = [
   "templates",
   "tool-capabilities",
   "scripts/discover-tools.js",
+  "scripts/discover-provider-tools.js",
+  "scripts/discover-report-templates.js",
   "hooks/",
   "agent-system/",
   "PACK.md",

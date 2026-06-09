@@ -52,11 +52,12 @@ Do not use this skill when:
 
 1. Read the active session state.
 2. Read PLAN, TASKS, and VERIFY.
-3. Run `node scripts/generate-report-context.js --json` or inspect git status and diff directly.
-4. Group changes by purpose.
-5. Produce `REPORT.md`.
-6. Produce `PR_MESSAGE.md`.
-7. Produce `CHANGE_SUMMARY.md`.
+3. Run `node scripts/generate-report-context.js --json --templates` (or `discover-report-templates.js --write`) to load git context and project PR templates.
+4. Prefer project templates from `.github/`, `.gitlab/`, or provider dirs; fall back to `.ai-harness/templates/` or harness `templates/`.
+5. Group changes by purpose.
+6. Produce `REPORT.md` using the discovered report template structure when available.
+7. Produce `PR_MESSAGE.md` following the discovered PR/MR template sections.
+8. Produce `CHANGE_SUMMARY.md`.
 8. Do not overclaim verification.
 
 ## Reasoning Procedure

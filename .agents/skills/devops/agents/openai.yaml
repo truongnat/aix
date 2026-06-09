@@ -1,0 +1,4 @@
+interface:
+  display_name: "DevOps Domain Skill"
+  short_description: "Route CI, deployment, and infra changes toward environment-aware checks."
+  default_prompt: "Use devops domain guidance to keep the repo aligned with devops."

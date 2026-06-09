@@ -1,5 +1,9 @@
 ## Blocked Behavior
 
+Applies to **gated execution phases** (`harness-plan`, `harness-run`, `harness-verify`, `harness-ship`, `harness-remember`) — not to normal `harness-discuss` exploration.
+
+For discuss-phase questions (feature choice, scope, tradeoffs), use interactive discussion per `rules/core/discussion.md` instead of `### Blocked`.
+
 If required input, approval, evidence, or phase preconditions are missing:
 
 1. Stop.

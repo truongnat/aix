@@ -98,10 +98,14 @@ Before doing project work, you **MUST** establish session state through Session 
 - If a plan is required but not approved, **stop**
 - If verification evidence is missing, **stop**
 - If the current phase is wrong, redirect to the correct command
-- If user input is required, ask the minimum necessary question and **stop**
+- If user input is required in gated phases (`plan`, `run`, `verify`, `ship`), ask the minimum necessary question and **stop**
+- In `harness-discuss`, ask interactively and **continue after the user answers** — use structured question tools when available; do not treat discuss questions as `### Blocked`
 - Do not implement, verify, or ship before session state is established
 - Domain bootstrap is automatic on first session when domains are empty, and it must
   announce analysis to the user before running silently.
+- Default phase chaining: when `harness-ship` completes with status `shipped`, continue
+  with `harness-remember` in the same turn unless the user requests ship-only or skip
+  conditions in `docs/phase-discipline.md` apply.
 
 See `AGENTS.md` for minimum read sets and command discipline details.
 
@@ -115,7 +119,8 @@ You **MUST NOT**:
 - Create PR or report notes without inspecting actual changes
 - Hide failing tests or skip checks silently
 - Summarize risky gaps as success
-- Continue after asking a blocking question
+- Continue after asking a blocking question in gated phases (`plan`, `run`, `verify`, `ship`)
+- Use `### Blocked` during `harness-discuss` for normal feature or scope questions
 - Use legacy colon-separated command IDs (use `harness-plan`, not `harness:plan`)
 - Claim Cursor, Codex, or Gemini native slash commands unless explicitly verified for this install
 - Store secrets, tokens, or private business data in memory artifacts

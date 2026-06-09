@@ -72,14 +72,15 @@ Use this command doc as the reference contract for phase behavior and artifact d
 ## Tool Routing
 
 - use `git diff` and `git log` for release scope context
-- run `node scripts/generate-report-context.js --json` to gather changed files and diff stats
+- run `node scripts/generate-report-context.js --json --templates` to gather git context **and** discovered PR/report templates
+- or `node scripts/discover-report-templates.js --write` to refresh `.harness/REPORT_TEMPLATES.md`
 - use `rg` before `grep` when locating ship evidence
 - treat missing optional tools as degraded routing, not failure
 - if shipping depends on unavailable required evidence tooling, stop and return `Blocked`
 
 ## Current Working State
 
-!`node scripts/generate-report-context.js --json`
+!`node scripts/generate-report-context.js --json --templates`
 
 ## Daily Report / PR Notes
 
@@ -103,13 +104,31 @@ If git diff cannot be inspected, stop with Blocked instead of guessing file list
 ## Step-By-Step Workflow
 
 1. Confirm that the active session `VERIFY.md` supports the current status.
-2. Run `node scripts/generate-report-context.js --json` or inspect git status and diff.
-3. Summarize what changed, why it changed, and what was actually verified.
-4. If the change included `templates/CHANGE_SPEC.md`, note whether the approved delta is ready to be folded into `.harness/specs/` when the spec layer is enabled.
-5. Write `REPORT.md`, `PR_MESSAGE.md`, and `CHANGE_SUMMARY.md`.
-6. Record follow-ups, deferred work, and residual risk honestly.
-7. Write the handoff summary into the active session `SHIP.md`.
-8. Transition to `harness-remember` for durable lessons.
+2. Run `node scripts/generate-report-context.js --json --templates` or inspect git status, diff, and `.harness/REPORT_TEMPLATES.md`.
+3. **Template precedence:** use project PR/MR template from discovery (`.github/`, `.gitlab/`, etc.) when present; otherwise use harness `templates/PR_MESSAGE.md` (or `.ai-harness/templates/`).
+4. Summarize what changed, why it changed, and what was actually verified.
+5. If the change included `templates/CHANGE_SPEC.md`, note whether the approved delta is ready to be folded into `.harness/specs/` when the spec layer is enabled.
+6. Write `REPORT.md`, `PR_MESSAGE.md`, and `CHANGE_SUMMARY.md` following the discovered template **structure** (headings/sections), filled with evidence from VERIFY and git.
+7. Record follow-ups, deferred work, and residual risk honestly.
+8. Write the handoff summary into the active session `SHIP.md`.
+9. When ship status is `shipped`, continue in the same turn with the `harness-remember` workflow (see Default Phase Chaining below).
+
+## Default Phase Chaining
+
+By default, a successful ship chains into remember in the same turn.
+
+When ship status is `shipped`:
+
+1. Do not stop after writing `SHIP.md` and report artifacts.
+2. Execute the `harness-remember` workflow from `commands/harness-remember.md`.
+3. Promote durable lessons to `DECISIONS.md`, `HAZARDS.md`, `INDEX.md`, or session `REMEMBER.md`.
+4. If nothing is worth remembering, write session `REMEMBER.md` with a one-line "no durable lesson" note.
+
+Skip auto-remember when:
+
+- Ship status is `shipped-with-gaps`, `failed`, or blocked pending human acceptance.
+- The user explicitly requests ship-only handoff.
+- Residual risk still needs a human decision before memory is written.
 
 ## Required Outputs
 
@@ -141,7 +160,7 @@ If git diff cannot be inspected, stop with Blocked instead of guessing file list
 
 ## Completion Gate
 
-The command is complete when the handoff summary matches the evidence in the active session `VERIFY.md`, follow-ups are explicit, and no hidden assumptions remain about status, risk, or next steps.
+The command is complete when the handoff summary matches the evidence in the active session `VERIFY.md`, follow-ups are explicit, and no hidden assumptions remain about status, risk, or next steps. When status is `shipped` and auto-remember applies, completion also requires the remember step to finish or a documented skip reason.
 
 ## Artifact Paths
 

@@ -1,0 +1,7 @@
+# DevOps Domain Skill
+
+Use the generated domain skill at `.harness/skills/devops/SKILL.md`.
+
+- Domain: devops
+- Commands: harness-map, harness-plan, harness-run, harness-verify, harness-remember
+- Checks: pipeline validation, build verification, health check

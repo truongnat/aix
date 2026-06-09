@@ -49,7 +49,7 @@ Protocol steps:
 7. If `.harness/config.json` has an empty `domains` array and `.harness/skills/` has no generated domain skill files, surface a visible status line, run domain analysis, and bootstrap matching domain skills with `npx ai-engineering-harness domains`.
 8. Detect tool context.
 9. Recommend next command.
-10. Ask the user only if routing is ambiguous.
+10. Ask the user only if routing is ambiguous. When routing requires a deliberative choice (continue session vs new session vs archive), use **three-option scoring** per `rules/core/option-scoring.md` and `AskQuestion` when available — do not hard-stop with an open-ended menu.
 
 See `docs/session-start.md` for the full contract.
 

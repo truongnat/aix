@@ -1,0 +1,106 @@
+# Backend Domain Skill
+
+# ai-engineering-harness Codex domain rule
+# Generated from project analysis. Shell-level policy only.
+
+prefix_rule(
+  pattern = ["rg"],
+  decision = "allow",
+  justification = "Read-only inspection commands do not modify repository state.",
+)
+
+prefix_rule(
+  pattern = ["git","status"],
+  decision = "allow",
+  justification = "Read-only inspection commands do not modify repository state.",
+)
+
+prefix_rule(
+  pattern = ["git","diff"],
+  decision = "allow",
+  justification = "Read-only inspection commands do not modify repository state.",
+)
+
+prefix_rule(
+  pattern = ["git","log"],
+  decision = "allow",
+  justification = "Read-only inspection commands do not modify repository state.",
+)
+
+prefix_rule(
+  pattern = ["ls"],
+  decision = "allow",
+  justification = "Read-only inspection commands do not modify repository state.",
+)
+
+prefix_rule(
+  pattern = ["cat"],
+  decision = "allow",
+  justification = "Read-only inspection commands do not modify repository state.",
+)
+
+prefix_rule(
+  pattern = ["npm","install"],
+  decision = "prompt",
+  justification = "Confirm before changing dependencies, merging, or deploying.",
+)
+
+prefix_rule(
+  pattern = ["pnpm","install"],
+  decision = "prompt",
+  justification = "Confirm before changing dependencies, merging, or deploying.",
+)
+
+prefix_rule(
+  pattern = ["yarn","add"],
+  decision = "prompt",
+  justification = "Confirm before changing dependencies, merging, or deploying.",
+)
+
+prefix_rule(
+  pattern = ["gh","pr","merge"],
+  decision = "prompt",
+  justification = "Confirm before changing dependencies, merging, or deploying.",
+)
+
+prefix_rule(
+  pattern = ["vercel"],
+  decision = "prompt",
+  justification = "Confirm before changing dependencies, merging, or deploying.",
+)
+
+prefix_rule(
+  pattern = ["npm","publish"],
+  decision = "prompt",
+  justification = "Confirm before changing dependencies, merging, or deploying.",
+)
+
+prefix_rule(
+  pattern = ["git","push","--force"],
+  decision = "forbidden",
+  justification = "Use a safer alternative: revert, branch, or targeted cleanup.",
+)
+
+prefix_rule(
+  pattern = ["git","push","--force-with-lease"],
+  decision = "forbidden",
+  justification = "Use a safer alternative: revert, branch, or targeted cleanup.",
+)
+
+prefix_rule(
+  pattern = ["git","reset","--hard"],
+  decision = "forbidden",
+  justification = "Use a safer alternative: revert, branch, or targeted cleanup.",
+)
+
+prefix_rule(
+  pattern = ["git","clean","-fdx"],
+  decision = "forbidden",
+  justification = "Use a safer alternative: revert, branch, or targeted cleanup.",
+)
+
+prefix_rule(
+  pattern = ["rm","-rf"],
+  decision = "forbidden",
+  justification = "Use a safer alternative: revert, branch, or targeted cleanup.",
+)

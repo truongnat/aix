@@ -4,6 +4,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { appendHarnessEvent, findHarnessRoot, readText } = require("./_util.js");
+const { buildSessionStartIntent } = require("./domain-bootstrap.js");
 
 function readHookPayload() {
   try {
@@ -62,10 +63,7 @@ function buildSessionContext(repoRoot) {
   const goal = safeRead(path.join(repoRoot, ".harness", "GOAL.md"));
   const plan = safeRead(path.join(repoRoot, ".harness", "PLAN.md"));
   const state = safeRead(path.join(repoRoot, ".harness", "STATE.md"));
-  const chunks = [
-    "Harness session start.",
-    "Read .harness/STATE.md, .harness/GOAL.md, and .harness/PLAN.md before editing.",
-  ];
+  const chunks = [buildSessionStartIntent(repoRoot)];
   if (state.trim()) {
     chunks.push("Current harness state is present.");
   }

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Backend Domain Skill"
+  short_description: "Route API, service, and persistence work toward contract-safe checks."
+  default_prompt: "Use backend domain guidance to keep the repo aligned with backend."

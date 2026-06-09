@@ -225,8 +225,12 @@ Describe the workflow stages, command loop, and how the repository uses them.
 | 3 | \`harness-plan\` | implementation work | break work into ordered tasks and stop before coding | never |
 | 4 | \`harness-run\` | after plan approval | implement the approved scope in small steps | never |
 | 5 | \`harness-verify\` | after implementation | run gates and record evidence | never |
-| 6 | \`harness-ship\` | after verification | summarize outcome and remaining gaps | when no ship artifact is needed |
-| 7 | \`harness-remember\` | after verified work | capture durable lessons worth reusing | when the work produced nothing reusable |
+| 6 | \`harness-ship\` | after verification | summarize outcome; chain to remember when \`shipped\` | when no ship artifact is needed |
+| 7 | \`harness-remember\` | default: chained after successful ship | capture durable lessons worth reusing | ship-only handoff, gaps/failure, or nothing reusable |
+
+## Default Phase Chaining
+
+- **Ship → Remember**: when ship status is \`shipped\`, run remember in the same turn unless the user requests ship-only or skip conditions in \`docs/phase-discipline.md\` apply.
 
 ## Execution Rules
 

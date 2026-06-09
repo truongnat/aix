@@ -1,0 +1,7 @@
+# Backend Domain Skill
+
+Use the generated domain skill at `.harness/skills/backend/SKILL.md`.
+
+- Domain: backend
+- Commands: harness-map, harness-discuss, harness-plan, harness-verify
+- Checks: contract tests, migration validation, auth boundary checks

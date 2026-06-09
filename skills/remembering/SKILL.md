@@ -6,7 +6,8 @@ Capture durable lessons, constraints, and decisions that will improve later sess
 
 ## When To Use
 
-- after shipping meaningful work
+- chained automatically after `harness-ship` when status is `shipped`
+- after shipping meaningful work (standalone when ship was ship-only)
 - after resolving a root cause or tricky tradeoff
 - when new constraints should shape future decisions
 

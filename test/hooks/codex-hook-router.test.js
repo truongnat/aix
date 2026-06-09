@@ -57,3 +57,30 @@ test("codex hook router emits session context and records events", () => {
   assert.equal(fs.existsSync(eventsPath), true);
   assert.match(fs.readFileSync(eventsPath, "utf8"), /codex-hook/);
 });
+
+test("codex hook router signals domain bootstrap when domains are empty", () => {
+  const dir = tmpRepo();
+  fs.writeFileSync(
+    path.join(dir, ".harness", "config.json"),
+    `${JSON.stringify({ domains: [] }, null, 2)}\n`
+  );
+  const result = handleCodexHook({
+    hook_event_name: "SessionStart",
+    cwd: dir,
+  });
+  assert.match(result.hookSpecificOutput.additionalContext, /Domain bootstrap required/i);
+  assert.match(result.hookSpecificOutput.additionalContext, /harness-start/i);
+});
+
+test("codex hook router skips domain bootstrap when domains are configured", () => {
+  const dir = tmpRepo();
+  fs.writeFileSync(
+    path.join(dir, ".harness", "config.json"),
+    `${JSON.stringify({ domains: ["backend"] }, null, 2)}\n`
+  );
+  const result = handleCodexHook({
+    hook_event_name: "SessionStart",
+    cwd: dir,
+  });
+  assert.doesNotMatch(result.hookSpecificOutput.additionalContext, /Domain bootstrap required/i);
+});

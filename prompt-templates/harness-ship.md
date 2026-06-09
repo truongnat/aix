@@ -52,7 +52,8 @@ Your job is to prepare a ship summary only if verification evidence supports it.
 
 ### Tool Routing
 
-- Prefer `node scripts/generate-report-context.js --json` for changed files and diff stats.
+- Prefer `node scripts/generate-report-context.js --json --templates` for changed files, diff stats, and project PR template discovery.
+- Fill `PR_MESSAGE.md` using the discovered project template structure when present; otherwise harness defaults.
 - Prefer `git diff` and `git log` for release scope context.
 - Prefer `rg` before `grep` when locating evidence.
 - Treat optional tools as best-effort.
@@ -128,7 +129,11 @@ No ship summary, PR message, or report artifacts were created.
 - `CHANGE_SUMMARY.md`
 
 **Next allowed command:**
-`harness-remember`
+`harness-remember` (auto-run in the same turn when status is `shipped`)
+
+## Default Phase Chaining
+
+When status is `shipped`, continue immediately with the `harness-remember` workflow after ship artifacts are written. Do not end the turn at ship-only unless the user asked for ship-only or skip conditions in `docs/phase-discipline.md` apply.
 
 ## Reasoning Procedure
 
@@ -143,6 +148,7 @@ No ship summary, PR message, or report artifacts were created.
 - Action: inspect the verification, review, and blocker artifacts.
 - Observation: record the real allow/block/defer result.
 - Repeat until the decision is clear.
+- If status is `shipped`: chain to `harness-remember` in the same turn (read `commands/harness-remember.md`).
 
 ## Examples
 
@@ -194,4 +200,4 @@ Output: Block ship with the missing evidence named explicitly.
 - ship when verification is blocked
 - convert missing tests into success
 - hide known gaps
-- continue to remember automatically unless requested
+- stop after ship when status is `shipped` without chaining to remember (unless user asked for ship-only or skip conditions apply)

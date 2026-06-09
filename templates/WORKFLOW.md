@@ -30,8 +30,12 @@ Default workflow for all work types.
 | 3 | `harness-plan` | Any implementation | Break work into ordered tasks; stop before coding | Never |
 | 4 | `harness-run` | After plan approved | Execute approved tasks, small surgical steps | Never |
 | 5 | `harness-verify` | After implementation | Run gates fresh, record evidence in VERIFY.md | Never |
-| 6 | `harness-ship` | After verification | Summarize, write PR notes, close session | When no shipping artifact needed |
-| 7 | `harness-remember` | After shipping | Capture durable lessons in DECISIONS/HAZARDS/INDEX | When session produced nothing reusable |
+| 6 | `harness-ship` | After verification | Summarize, write PR notes; chain to remember when `shipped` | When no shipping artifact needed |
+| 7 | `harness-remember` | Default: chained after successful ship | Capture durable lessons in DECISIONS/HAZARDS/INDEX | Ship-only handoff, gaps/failure, or nothing reusable |
+
+## Default Phase Chaining
+
+- **Ship → Remember**: when ship status is `shipped`, run remember in the same turn unless the user requests ship-only or skip conditions in `docs/phase-discipline.md` apply.
 
 ## Execution Rules
 

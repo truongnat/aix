@@ -1,0 +1,4 @@
+interface:
+  display_name: "Debugging Domain Skill"
+  short_description: "Route bugs, flaky behavior, and regressions toward root-cause checks."
+  default_prompt: "Use debugging domain guidance to keep the repo aligned with debugging."

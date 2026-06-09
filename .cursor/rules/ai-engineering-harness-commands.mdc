@@ -1,0 +1,77 @@
+---
+description: ai-engineering-harness command routing
+globs:
+alwaysApply: true
+---
+
+# Harness Command Routing
+
+Always follow `.ai-harness/agent-system/SYSTEM_PROMPT.md` and response formats in `.ai-harness/agent-system/RESPONSE_CONTRACT.md`.
+
+Canonical commands:
+
+- harness-map
+- harness-start
+- harness-discuss
+- harness-plan
+- harness-run
+- harness-verify
+- harness-ship
+- harness-remember
+
+When a canonical command is requested:
+
+1. Read `.cursor/commands/<command>.md`
+2. Read `.ai-harness/runtime-commands/<command>.md`
+3. Read `.ai-harness/commands/<command>.md`
+4. Read matching `.ai-harness/prompt-templates/<command>.md` if present
+5. Follow phase guards
+6. Stop and ask if blocked
+
+Cursor project install provides native `/harness-*` commands from `.cursor/commands/`.
+
+## Command Naming
+
+Canonical command IDs use hyphen form.
+
+Correct:
+
+- harness-plan
+- harness-run
+- harness-verify
+- harness-ship
+
+Native slash invocation is provider-specific. Do not assume every provider exposes `/harness-*`.
+
+Incorrect:
+
+- harness:plan
+- /harness:plan
+- harness_plan
+
+## Phase Discipline
+
+Do not skip phases.
+
+- Plan before run.
+- Approved plan before implementation.
+- Verification before ship.
+- Evidence before success claim.
+- Remember only after shipped result, failed attempt, or durable lesson.
+
+Read `.harness/STATE.md` and the active session under `.harness/sessions/` before changing phase.
+
+## Blocked Behavior
+
+Applies to **gated execution phases** (`harness-plan`, `harness-run`, `harness-verify`, `harness-ship`, `harness-remember`) — not to normal `harness-discuss` exploration.
+
+For discuss-phase questions (feature choice, scope, tradeoffs), use interactive discussion per `rules/core/discussion.md` instead of `### Blocked`.
+
+If required input, approval, evidence, or phase preconditions are missing:
+
+1. Stop.
+2. Ask the minimum required question.
+3. Do not continue after asking.
+4. Return a blocked output.
+
+After asking a blocking question, do not continue implementation, verification, shipping, or memory updates in the same turn.

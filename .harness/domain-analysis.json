@@ -1,0 +1,36 @@
+{
+  "domains": [
+    {
+      "id": "backend",
+      "confidence": 0.95,
+      "evidence": [
+        "lib/ TypeScript modules",
+        "bin/aih.js CLI entry",
+        "package.json commonjs build via tsc",
+        "domain-skill-generation and install orchestrator"
+      ]
+    },
+    {
+      "id": "devops",
+      "confidence": 0.88,
+      "evidence": [
+        "hooks/ lifecycle adapters",
+        "lib/install-runtime.ts provider installs",
+        "lib/backend/git-hygiene.ts",
+        "npm test and validate scripts"
+      ]
+    },
+    {
+      "id": "debugging",
+      "confidence": 0.82,
+      "evidence": [
+        "test/ harness regression suite",
+        "lib/validate/ contract guards",
+        "lib/backend/status-doctor.ts"
+      ]
+    }
+  ],
+  "languages": ["typescript", "javascript"],
+  "frameworks": ["node"],
+  "notes": "Source pack dogfooding: markdown-first AI agent discipline framework with CLI installer and multi-provider runtime surfaces."
+}

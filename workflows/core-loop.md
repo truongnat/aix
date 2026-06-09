@@ -8,6 +8,8 @@ Use this as the default workflow when no more specific task workflow is a better
 
 `harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember`
 
+By default, `harness-ship` chains into `harness-remember` in the same turn when ship status is `shipped`. See `docs/phase-discipline.md` for skip conditions.
+
 ## Decision Tree
 
 - Is the current phase clear from `STATE.md`?

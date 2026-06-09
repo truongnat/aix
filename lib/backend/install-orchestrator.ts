@@ -4,6 +4,7 @@ import { applyPrivateIgnore, reconcileDeferredPrivateIgnore } from "./git-hygien
 import { initHarnessProfile } from "./harness-skeleton";
 import { writeDomainSkillSurface } from "../domain-skill-generation";
 import { installCapabilityCache } from "../install-cache";
+import { installProviderInteraction } from "../catalog/command-installation";
 import { installRuntime } from "../install-runtime";
 import { isRuntimeNative } from "../cli-providers";
 import { isGitRepo } from "../provider-detection";
@@ -129,6 +130,12 @@ export function runInstall(ctx: InstallContext, options: InstallRunOptions = {})
       });
       process.stdout.write(`\nRuntime '${ctx.provider}' install finished.\n`);
       messages.push(`runtime-native(${ctx.provider}): ok`);
+    }
+
+    if (ctx.scope === "project" && ctx.installCache) {
+      const runtime = ctx.provider === "manual" ? "generic" : ctx.provider;
+      installProviderInteraction(ctx.target, [runtime], { dryRun: ctx.dryRun, force: true });
+      messages.push(`provider-interaction(${runtime}): ok`);
     }
 
     return { ok: true, messages };
