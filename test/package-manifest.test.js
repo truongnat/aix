@@ -1,6 +1,8 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
+const cp = require("node:child_process");
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
@@ -49,6 +51,41 @@ test("Codex plugin manifest exposes skills, commands, agents, and hooks", () => 
   assert.equal(manifest.agents, "./agents/");
   assert.equal(manifest.hooks, "./hooks.json");
   assert.match(manifest.interface.longDescription, /Codex \/plugins/);
+});
+
+test("build:codex-plugin stages a publishable Codex bundle", () => {
+  const bundleRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-codex-plugin-"));
+
+  try {
+    const result = cp.spawnSync(
+      process.execPath,
+      ["scripts/build-codex-plugin.js", "--out-dir", bundleRoot],
+      {
+        cwd: repoRoot,
+        encoding: "utf8",
+      }
+    );
+
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stderr.trim(), "");
+    assert.match(result.stdout, /aih-codex-plugin/);
+    assert.ok(fs.existsSync(path.join(bundleRoot, ".codex-plugin", "plugin.json")));
+    assert.ok(fs.existsSync(path.join(bundleRoot, "skills")));
+    assert.ok(fs.existsSync(path.join(bundleRoot, "commands")));
+    assert.ok(fs.existsSync(path.join(bundleRoot, "agents")));
+    assert.ok(fs.existsSync(path.join(bundleRoot, "hooks")));
+    assert.ok(fs.existsSync(path.join(bundleRoot, "hooks.json")));
+
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(bundleRoot, ".codex-plugin", "plugin.json"), "utf8")
+    );
+    assert.equal(
+      manifest.version,
+      JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8")).version
+    );
+  } finally {
+    fs.rmSync(bundleRoot, { recursive: true, force: true });
+  }
 });
 
 test("package exposes an incremental TypeScript typecheck for lib", () => {

@@ -68,6 +68,25 @@ Does **not** emit `.codex-plugin/plugin.json` into the target repo; that manifes
 - Dogfood `/plugins` install in Codex CLI/App
 - Verify skill discovery and default prompts from `interface.defaultPrompt`
 
+## Build and publish
+
+Use the repo's publish bundle when you want a Codex-ready artifact without changing the project install path:
+
+```bash
+npm run build:codex-plugin
+```
+
+This writes a release bundle to `dist/codex-plugin/` with:
+
+- `.codex-plugin/plugin.json`
+- `skills/`
+- `commands/`
+- `agents/`
+- `hooks/`
+- `hooks.json`
+
+`npm run publish:codex-plugin` currently maps to the same build step. Marketplace submission remains a manual Codex `/plugins` action until OpenAI publishes a direct upload flow.
+
 ## Related
 
 - [provider-native-command-research.md](provider-native-command-research.md)
