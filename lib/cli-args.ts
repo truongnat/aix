@@ -7,7 +7,6 @@ const COMMANDS = new Set([
   "help",
   "eval",
   "insights",
-  "init",
   "domains",
 ]);
 const EVAL_COMMANDS = new Set(["list", "run", "report"]);
@@ -36,7 +35,6 @@ interface ParseOptions {
   recommendEvals: boolean;
   runRecommendedEvals: boolean;
   useLlmJudge: boolean;
-  skipDemoEval: boolean;
   liveProviderCommand: string;
   domains: string[];
   analysisFile: string;
@@ -78,7 +76,6 @@ function parseArgv(argv: string[]): ParseOptions {
     recommendEvals: false,
     runRecommendedEvals: false,
     useLlmJudge: true,
-    skipDemoEval: false,
     liveProviderCommand: "",
     domains: [],
     analysisFile: "",
@@ -190,10 +187,6 @@ function parseArgv(argv: string[]): ParseOptions {
     }
     if (arg === "--no-llm-judge") {
       options.useLlmJudge = false;
-      continue;
-    }
-    if (arg === "--skip-demo-eval") {
-      options.skipDemoEval = true;
       continue;
     }
     if (arg === "--domains") {

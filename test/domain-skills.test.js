@@ -161,7 +161,6 @@ test("runDomainsCommand generates the skill surface from an analysis file", asyn
       recommendEvals: false,
       runRecommendedEvals: false,
       useLlmJudge: true,
-      skipDemoEval: false,
       liveProviderCommand: "",
       domains: [],
       analysisFile,

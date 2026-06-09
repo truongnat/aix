@@ -8,7 +8,6 @@ import { runStatusOrDoctor } from "./cli-commands/diagnostics";
 import { runEvalCommand } from "./cli-commands/eval";
 import { runInsightsCommand } from "./cli-commands/insights";
 import { runDomainsCommand } from "./cli-commands/domains";
-import { runInitWizard } from "./cli-commands/init";
 import ui from "./cli-ui";
 
 const SOURCE_URL = "https://github.com/truongnat/ai-engineering-harness";
@@ -52,8 +51,6 @@ async function main(argv: string[], moduleFilename: string): Promise<number> {
         return await runInsightsCommand(packRoot, options);
       case "domains":
         return await runDomainsCommand(packRoot, options);
-      case "init":
-        return await runInitWizard(packRoot, options);
       default:
         printHelp();
         return 0;

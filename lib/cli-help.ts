@@ -2,7 +2,6 @@ function renderHelp(): string {
   return `ai-engineering-harness (experimental)
 
 Primary:
-  npx ai-engineering-harness init
   npx ai-engineering-harness install
   npx ai-engineering-harness status
   npx ai-engineering-harness doctor
@@ -26,12 +25,6 @@ Insights:
   npx ai-engineering-harness insights --recommend-evals
   npx ai-engineering-harness insights --recommend-evals --run-recommended-evals
   npx ai-engineering-harness insights --upload
-
-Init (quickstart):
-  npx ai-engineering-harness init
-  npx ai-engineering-harness init --provider cursor --yes
-  npx ai-engineering-harness init --skip-demo-eval
-  npx ai-engineering-harness init --analysis-file ./domain-analysis.json
 
 Non-interactive:
   npx ai-engineering-harness install --provider cursor --yes
