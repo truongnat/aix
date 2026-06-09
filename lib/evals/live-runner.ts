@@ -2,7 +2,7 @@ import childProcess from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
-const FORBIDDEN_SHELL_PATTERN = /[|&;<>()`$]/;
+const FORBIDDEN_SHELL_PATTERN = /[|&;<>()`$%]/;
 const DEFAULT_TIMEOUT_MS = 10 * 60 * 1000;
 
 interface Task {

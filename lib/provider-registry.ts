@@ -83,10 +83,13 @@ function validateProviderManifest(manifestPath: string, manifest: unknown): Prov
 }
 
 function readProviderManifest(manifestPath: string): ProviderManifest {
-  return validateProviderManifest(
-    manifestPath,
-    JSON.parse(fs.readFileSync(manifestPath, "utf8")) as unknown
-  );
+  let raw: unknown;
+  try {
+    raw = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  } catch {
+    throw new Error(`Failed to parse provider manifest: ${manifestPath}`);
+  }
+  return validateProviderManifest(manifestPath, raw);
 }
 
 function loadProviderManifests(packRoot: string): ProviderManifest[] {

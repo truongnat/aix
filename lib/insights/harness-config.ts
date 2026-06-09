@@ -25,7 +25,11 @@ function readHarnessConfig(targetRoot: string): HarnessConfig {
   if (!fs.existsSync(configPath)) {
     return {};
   }
-  return JSON.parse(fs.readFileSync(configPath, "utf8"));
+  try {
+    return JSON.parse(fs.readFileSync(configPath, "utf8"));
+  } catch {
+    return {};
+  }
 }
 
 function resolveRemoteUploadConfig(targetRoot: string): RemoteUploadConfig {

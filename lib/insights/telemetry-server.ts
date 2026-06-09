@@ -176,7 +176,6 @@ async function handleTelemetryRequest(
       accepted: true,
       schema: payload.schema,
       fingerprint: payload.fingerprint || null,
-      storagePath: record.storagePath,
       bytesWritten: record.bytesWritten,
     });
     return {
@@ -187,7 +186,6 @@ async function handleTelemetryRequest(
         accepted: true,
         schema: payload.schema,
         fingerprint: payload.fingerprint || null,
-        storagePath: record.storagePath,
         bytesWritten: record.bytesWritten,
       },
     };

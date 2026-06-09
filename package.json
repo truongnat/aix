@@ -20,7 +20,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/truongnat/ai-engineering-harness"
+    "url": "git+https://github.com/truongnat/ai-engineering-harness.git"
   },
   "homepage": "https://ai-engineering-harness.dev",
   "bugs": {
@@ -42,8 +42,8 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "ai-engineering-harness": "./bin/aih.js",
-    "aih": "./bin/aih.js"
+    "ai-engineering-harness": "bin/aih.js",
+    "aih": "bin/aih.js"
   },
   "files": [
     "bin/",

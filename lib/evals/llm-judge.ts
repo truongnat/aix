@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import { runSingleCheck } from "./checks";
+import { runSingleCheck, Check, CheckResult } from "./checks";
 
 interface Rubric {
   id?: string;
-  behaviorChecks?: any[];
+  behaviorChecks?: Check[];
 }
 
 interface Task {
@@ -12,10 +12,16 @@ interface Task {
   rubric?: string;
 }
 
+interface LlmJudgeResponse {
+  passed?: boolean;
+  score?: number | null;
+  reason?: string;
+}
+
 interface JudgeResult {
   mode: string;
   rubricId?: string;
-  checks: any[];
+  checks: CheckResult[];
   passed: boolean;
   llm?: {
     attempted: boolean;
@@ -35,7 +41,11 @@ function loadRubric(packRoot: string, rubricPath: string | undefined): Rubric | 
   if (!fs.existsSync(resolved)) {
     throw new Error(`Rubric not found: ${rubricPath}`);
   }
-  return JSON.parse(fs.readFileSync(resolved, "utf8"));
+  try {
+    return JSON.parse(fs.readFileSync(resolved, "utf8"));
+  } catch {
+    throw new Error(`Failed to parse rubric as JSON: ${rubricPath}`);
+  }
 }
 
 function readJudgeContent(cwd: string): string {
@@ -65,7 +75,7 @@ async function callLlmJudge(
   endpoint: string,
   payload: Record<string, unknown>,
   timeoutMs: number = DEFAULT_LLM_JUDGE_TIMEOUT_MS
-): Promise<any> {
+): Promise<LlmJudgeResponse> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -91,7 +101,7 @@ async function callLlmJudge(
     throw new Error(`LLM judge request failed (${response.status}): ${body}`);
   }
 
-  return response.json();
+  return response.json() as Promise<LlmJudgeResponse>;
 }
 
 interface JudgeOptions {

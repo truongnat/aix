@@ -216,6 +216,9 @@ function parseArgv(argv: string[]): ParseOptions {
       }
       continue;
     }
+    if (arg === "--skip-demo-eval") {
+      continue;
+    }
     throw new Error(`Unknown argument: ${arg}`);
   }
 

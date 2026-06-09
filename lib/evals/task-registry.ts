@@ -29,27 +29,40 @@ interface Registry {
   tasks: Task[];
 }
 
-function validateTaskManifest(task: any): Task {
+function validateTaskManifest(task: Record<string, unknown>): Task {
   for (const field of REQUIRED_FIELDS) {
     if (!task || !task[field]) {
       throw new Error(`Missing required task field: ${field}`);
     }
   }
 
-  if (!task.fixture.path) {
+  const fixture = task.fixture as Record<string, unknown> | undefined;
+  if (!fixture || !fixture.path) {
     throw new Error("Missing required task field: fixture.path");
   }
 
   return {
-    ...task,
+    id: task.id as string,
+    suite: task.suite as string,
+    title: task.title as string,
+    goal: task.goal as string,
+    mode: task.mode as string,
+    rubric: task.rubric as string | undefined,
+    fixture: { path: fixture.path as string },
+    prompt: task.prompt as string,
     successChecks: Array.isArray(task.successChecks) ? task.successChecks : [],
     behaviorChecks: Array.isArray(task.behaviorChecks) ? task.behaviorChecks : [],
+    metrics: task.metrics as Task["metrics"],
     tags: Array.isArray(task.tags) ? task.tags : [],
   };
 }
 
-function loadManifest(filePath: string): any {
-  return JSON.parse(fs.readFileSync(filePath, "utf8"));
+function loadManifest(filePath: string): Record<string, unknown> {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch {
+    throw new Error(`Failed to parse eval task manifest: ${filePath}`);
+  }
 }
 
 function loadRegistry(packRoot: string): Registry {

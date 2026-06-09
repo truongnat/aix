@@ -848,7 +848,7 @@ function assertWorkerRegistryContract(baseDir: string, failures: string[]): void
     return;
   }
 
-  let registryModule: any;
+  let registryModule: { workers?: Array<{ id: string }> };
   try {
     delete require.cache[require.resolve(registryPath)];
     registryModule = require(registryPath);
@@ -863,7 +863,7 @@ function assertWorkerRegistryContract(baseDir: string, failures: string[]): void
   }
 
   for (const expectedId of WORKER_IDS) {
-    const entry = registryModule.workers.find((worker: any) => worker.id === expectedId);
+    const entry = registryModule.workers.find((worker: { id: string }) => worker.id === expectedId);
     if (!entry) {
       failures.push(`${relativePath} is missing canonical worker: ${expectedId}`);
     }
@@ -904,7 +904,7 @@ function assertWorkerDefinitionContract(baseDir: string, failures: string[]): vo
       failures.push(`${relativePath} frontmatter must include providerSupport map`);
     } else {
       for (const value of Object.values(providerSupport)) {
-        if (!VALID_PROVIDER_SUPPORT.includes(value as any)) {
+        if (!VALID_PROVIDER_SUPPORT.includes(value as (typeof VALID_PROVIDER_SUPPORT)[number])) {
           failures.push(`${relativePath} has invalid providerSupport value: ${value}`);
         }
       }
@@ -924,14 +924,14 @@ function assertWorkerDefinitionContract(baseDir: string, failures: string[]): vo
     }
   }
 
-  const readOnlyWorkers = workers.filter((worker: any) => worker.writeAccess === "none");
+  const readOnlyWorkers = workers.filter((worker) => worker.writeAccess === "none");
   for (const worker of readOnlyWorkers) {
     if (worker.writeAccess !== "none") {
       failures.push(`Worker ${worker.id} must remain read-only in v1`);
     }
   }
 
-  const fixer = workers.find((worker: any) => worker.id === "fixer");
+  const fixer = workers.find((worker) => worker.id === "fixer");
   if (fixer && fixer.writeAccess !== "write") {
     failures.push("fixer must be explicitly write-enabled");
   }

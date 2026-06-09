@@ -35,6 +35,14 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && matrix.node-version == 20
         run: npx prettier --check lib/ bin/ test/ *.js *.md --no-error-on-unmatched-pattern
 
+      - name: Typecheck (strict)
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 20
+        run: npm run typecheck
+
+      - name: Security audit
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 20
+        run: npm audit --audit-level=high
+
       - name: Validate pack contracts
         run: npm run build && node bin/validate.js
 

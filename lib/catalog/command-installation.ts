@@ -162,7 +162,7 @@ function mergeManifestProviders(
   let manifest = buildManifest() as Manifest;
   if (fs.existsSync(manifestPath)) {
     try {
-      const parsed = JSON.parse(fs.readFileSync(manifestPath, "utf8")) as any;
+      const parsed = JSON.parse(fs.readFileSync(manifestPath, "utf8")) as Record<string, unknown>;
       if (parsed && typeof parsed === "object") {
         manifest = { ...buildManifest(), ...parsed };
       }

@@ -292,7 +292,12 @@ export function regenerateDocsFromPolicy(repoRoot: string, policyPath?: string):
   }
 
   const content = fs.readFileSync(policyFile, "utf8");
-  const policies = JSON.parse(content) as PolicySet;
+  let policies: PolicySet;
+  try {
+    policies = JSON.parse(content) as PolicySet;
+  } catch {
+    throw new Error(`Failed to parse policy file: ${policyFile}`);
+  }
 
   updateWorkflowDocs(policies, repoRoot);
 }

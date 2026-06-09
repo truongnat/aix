@@ -354,8 +354,7 @@ function installCodexHooks(
 
   const destRoot = path.join(codexRoot, "hooks", "core");
   ensureDirectory(destRoot, options.dryRun);
-  installTextTree(sourceRoot, destRoot, options, "", (relativePath, sourcePath, content) => {
-    void sourcePath;
+  installTextTree(sourceRoot, destRoot, options, "", (_relativePath, _sourcePath, content) => {
     return content;
   });
   writeFileAction(codexRoot, "hooks.json", renderCodexHooksConfig(), options);
@@ -572,11 +571,10 @@ function installCodexSkills(
     }
     const destSkillRoot = path.join(destRoot, entry.name);
     ensureDirectory(destSkillRoot, options.dryRun);
-    installTextTree(skillRoot, destSkillRoot, options, "", (relativePath, sourcePath, content) => {
+    installTextTree(skillRoot, destSkillRoot, options, "", (relativePath, _sourcePath, content) => {
       if (relativePath === "SKILL.md") {
         return renderCodexSkillMarkdown(content, entry.name);
       }
-      void sourcePath;
       return content;
     });
     writeFileAction(
@@ -594,10 +592,19 @@ function installCursor(
   packRoot: string,
   options: InstallRuntimeOptions
 ): void {
-  if (scope !== "global") {
+  if (scope === "global") {
+    const destRoot = path.join(os.homedir(), ".cursor");
+    const rules: [string, string][] = [
+      ["rules/ai-engineering-harness.mdc", renderCursorActivationMdc()],
+      ["rules/ai-engineering-harness-commands.mdc", renderCursorCommandsMdc()],
+      ["rules/ai-engineering-harness-guardrails.mdc", renderCursorGuardrailsMdc()],
+    ];
+    for (const [relativePath, content] of rules) {
+      writeFileAction(destRoot, relativePath, content, options);
+    }
     return;
   }
-  const destRoot = path.join(os.homedir(), ".cursor");
+  const destRoot = path.join(targetRoot, ".cursor");
   const rules: [string, string][] = [
     ["rules/ai-engineering-harness.mdc", renderCursorActivationMdc()],
     ["rules/ai-engineering-harness-commands.mdc", renderCursorCommandsMdc()],
@@ -606,9 +613,6 @@ function installCursor(
   for (const [relativePath, content] of rules) {
     writeFileAction(destRoot, relativePath, content, options);
   }
-  void targetRoot;
-  void packRoot;
-  void options;
 }
 
 function installCodex(
@@ -751,7 +755,6 @@ function installProviderCommands(
   packRoot: string,
   options: InstallRuntimeOptions
 ): void {
-  void packRoot;
   if (scope !== "project") {
     return;
   }
@@ -801,6 +804,38 @@ function installOne(
   installProviderCommands(runtime, scope, targetRoot, packRoot, options);
 }
 
+class InstallManifest {
+  private createdFiles: string[] = [];
+  private backups: Map<string, string> = new Map();
+
+  trackCreated(filePath: string): void {
+    if (!fs.existsSync(filePath)) {
+      this.createdFiles.push(filePath);
+    } else if (!this.backups.has(filePath)) {
+      this.backups.set(filePath, fs.readFileSync(filePath, "utf8"));
+    }
+  }
+
+  rollback(): void {
+    for (const filePath of this.createdFiles.reverse()) {
+      try {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      } catch {
+        // best-effort cleanup
+      }
+    }
+    for (const [filePath, content] of this.backups) {
+      try {
+        fs.writeFileSync(filePath, content, "utf8");
+      } catch {
+        // best-effort restore
+      }
+    }
+  }
+}
+
 function installRuntime(options: InstallRuntimeOptions): void {
   if (!options.packRoot || !fs.existsSync(path.join(options.packRoot, "runtime", "README.md"))) {
     throw new Error("Invalid --pack-root (missing runtime/ payloads)");
@@ -816,8 +851,21 @@ function installRuntime(options: InstallRuntimeOptions): void {
       ? (ALL_RUNTIMES as Exclude<RuntimeId, "all">[])
       : [options.runtime as Exclude<RuntimeId, "all">];
 
+  const manifest = new InstallManifest();
+
   for (const runtime of runtimes) {
-    installOne(runtime, options.scope, targetRoot, options.packRoot, options);
+    try {
+      installOne(runtime, options.scope, targetRoot, options.packRoot, options);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(`\nInstall failed for ${runtime}: ${message}`);
+      if (!options.dryRun) {
+        console.error("Rolling back partial install...");
+        manifest.rollback();
+        console.error("Rollback complete.");
+      }
+      throw error;
+    }
   }
 
   console.log("\n--- Runtime install complete ---");

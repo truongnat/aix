@@ -75,7 +75,7 @@ function summarizeEvents(events: Event[]): Summary {
 function formatInsightsText(summary: Summary, eventsPath: string): string {
   const lines = [`Harness Insights (${eventsPath})`, `Events: ${summary.totalEvents}`, ""];
 
-  const appendSection = (title: string, rows: any[], formatter: (row: any) => string) => {
+  const appendSection = <T>(title: string, rows: T[], formatter: (row: T) => string) => {
     lines.push(title);
     if (rows.length === 0) {
       lines.push("  (none)");

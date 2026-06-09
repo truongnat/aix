@@ -40,3 +40,8 @@ process.on("SIGINT", () => {
 process.on("SIGTERM", () => {
   server.close(() => process.exit(0));
 });
+
+process.on("unhandledRejection", (reason) => {
+  process.stderr.write(`Unhandled rejection: ${reason}\n`);
+  server.close(() => process.exit(1));
+});

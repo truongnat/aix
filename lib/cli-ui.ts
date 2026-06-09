@@ -100,7 +100,7 @@ async function selectProviders(
         label,
         disabled: !p.implemented || !p.installed,
         hint: p.hint,
-      } as any;
+      } as { value: string; label: string; disabled?: boolean; hint?: string };
     }),
     required: true,
     initialValues: initial.length ? initial : undefined,

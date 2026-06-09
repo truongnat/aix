@@ -77,7 +77,10 @@ async function selectMany(items: SelectableItem[], options: SelectManyOptions): 
   process.stdout.write(`${lines.join("\n")}\n`);
 
   return new Promise((resolve, reject) => {
-    const onKeypress = (_str: string, key: any) => {
+    const onKeypress = (
+      _str: string,
+      key: { name: string; ctrl?: boolean; meta?: boolean; shift?: boolean }
+    ) => {
       if (key.name === "up") {
         do {
           index = (index - 1 + items.length) % items.length;
@@ -192,7 +195,10 @@ async function selectOne(choices: SelectOneChoice[], options: SelectOneOptions):
   process.stdout.write(`${lines.join("\n")}\n`);
 
   return new Promise((resolve, reject) => {
-    const onKeypress = (_str: string, key: any) => {
+    const onKeypress = (
+      _str: string,
+      key: { name: string; ctrl?: boolean; meta?: boolean; shift?: boolean }
+    ) => {
       if (key.name === "up") {
         index = (index - 1 + choices.length) % choices.length;
       } else if (key.name === "down") {

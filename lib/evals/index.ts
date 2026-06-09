@@ -64,12 +64,17 @@ async function runTask(
 function readReport(
   packRoot: string,
   runId: string
-): { output: string; summary: any; summaryPath: string } {
+): { output: string; summary: Record<string, unknown>; summaryPath: string } {
   const summaryPath = path.join(resolveArtifactsBase(packRoot), "runs", runId, "summary.json");
   if (!fs.existsSync(summaryPath)) {
     throw new Error(`Eval run not found: ${runId}`);
   }
-  const summary = JSON.parse(fs.readFileSync(summaryPath, "utf8"));
+  let summary: Record<string, unknown>;
+  try {
+    summary = JSON.parse(fs.readFileSync(summaryPath, "utf8"));
+  } catch {
+    throw new Error(`Failed to parse eval summary: ${summaryPath}`);
+  }
   return {
     output: JSON.stringify(summary, null, 2),
     summary,

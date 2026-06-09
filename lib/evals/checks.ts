@@ -16,7 +16,7 @@ interface CheckResult {
   detail: string;
 }
 
-const FORBIDDEN_SHELL_PATTERN = /[|&;<>()`$]/;
+const FORBIDDEN_SHELL_PATTERN = /[|&;<>()`$%]/;
 
 function isolatedCommandEnv(): Record<string, string | undefined> {
   const env = { ...process.env };

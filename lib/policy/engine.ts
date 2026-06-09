@@ -14,6 +14,9 @@ import {
   PolicyOperator,
 } from "./schema";
 
+const MAX_REGEX_CACHE_SIZE = 1000;
+const MAX_REGEX_PATTERN_LENGTH = 1000;
+
 export class PolicyEngine {
   private static readonly regexCache = new Map<string, RegExp>();
   private policySet: PolicySet | null = null;
@@ -45,6 +48,12 @@ export class PolicyEngine {
   }
 
   private static compileRegex(pattern: string, context: string): RegExp {
+    if (pattern.length > MAX_REGEX_PATTERN_LENGTH) {
+      throw new Error(
+        `Regex pattern too long for ${context}: ${pattern.length} chars (max ${MAX_REGEX_PATTERN_LENGTH})`
+      );
+    }
+
     const cached = PolicyEngine.regexCache.get(pattern);
     if (cached) {
       return cached;
@@ -52,6 +61,10 @@ export class PolicyEngine {
 
     try {
       const compiled = new RegExp(pattern);
+      if (PolicyEngine.regexCache.size >= MAX_REGEX_CACHE_SIZE) {
+        const firstKey = PolicyEngine.regexCache.keys().next().value as string;
+        PolicyEngine.regexCache.delete(firstKey);
+      }
       PolicyEngine.regexCache.set(pattern, compiled);
       return compiled;
     } catch (error) {
@@ -131,7 +144,12 @@ export class PolicyEngine {
     }
 
     const content = fs.readFileSync(pathToLoad, "utf8");
-    const policySet = JSON.parse(content) as PolicySet;
+    let policySet: PolicySet;
+    try {
+      policySet = JSON.parse(content) as PolicySet;
+    } catch {
+      throw new Error(`Failed to parse policy file as JSON: ${pathToLoad}`);
+    }
     this.validatePolicySet(policySet);
     this.policySet = policySet;
     return this.policySet;

@@ -37,7 +37,12 @@ function loadMutationRegistry(packRoot: string): MutationRegistry {
     registryCache.set(packRoot, empty);
     return empty;
   }
-  const registry = JSON.parse(fs.readFileSync(registryPath, "utf8")) as MutationRegistry;
+  let registry: MutationRegistry;
+  try {
+    registry = JSON.parse(fs.readFileSync(registryPath, "utf8")) as MutationRegistry;
+  } catch {
+    throw new Error(`Failed to parse mutation registry: ${registryPath}`);
+  }
   registryCache.set(packRoot, registry);
   return registry;
 }
