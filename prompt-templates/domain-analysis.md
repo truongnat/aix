@@ -53,10 +53,11 @@ Return a JSON object with this shape:
 
 ## Action Loop
 
-1. Read the repo signals.
-2. Map them to known domain ids.
-3. Clamp confidence to the 0 to 1 range.
-4. Return the JSON object and nothing else.
+1. Run `npx ai-engineering-harness scan --target .` and capture the JSON output.
+2. Use the scan output as base context. It provides automated evidence from manifests.
+3. Validate and refine the domain selection — override domains where your analysis disagrees.
+4. Save the final JSON to a file (e.g., `.harness/domain-analysis.json`).
+5. Run `npx ai-engineering-harness domains --analysis-file .harness/domain-analysis.json`.
 
 ## Examples
 
