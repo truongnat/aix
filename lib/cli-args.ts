@@ -8,6 +8,7 @@ const COMMANDS = new Set([
   "eval",
   "insights",
   "domains",
+  "scan",
 ]);
 const EVAL_COMMANDS = new Set(["list", "run", "report"]);
 
