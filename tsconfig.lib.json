@@ -23,6 +23,7 @@
     "lib/cli-prompts.ts",
     "lib/cli-ui.ts",
     "lib/stack-detect.ts",
+    "lib/stack-scanner.ts",
     "lib/domain-skill-generation.ts",
     "lib/report-template-discovery.ts",
     "lib/provider-interaction-tools.ts",
