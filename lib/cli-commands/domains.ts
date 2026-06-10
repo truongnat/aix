@@ -87,13 +87,14 @@ async function runDomainsCommand(packRoot: string, options: ParseOptions): Promi
       },
       scan
     );
-    const mergedParsed = parseProjectAnalysis(JSON.stringify(merged));
+    const mergedParsed = parseProjectAnalysis(merged);
     domains = mergedParsed.domains;
     stackMeta = {
       ...scan,
       frameworks: mergedParsed.meta.frameworks,
       languages: mergedParsed.meta.languages,
       notes: mergedParsed.meta.notes,
+      domains: mergedParsed.meta.domains,
     };
   } else {
     // No AI analysis: use scanner domains directly

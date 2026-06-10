@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { DomainId } from "./stack-detect";
+import type { DomainId, StackScanResult } from "./stack-detect";
 import { DOMAIN_LABELS, normalizeDomainSelection } from "./stack-detect";
 import { renderCodexRuleSet } from "./codex-rule-generation";
 
@@ -1023,12 +1023,7 @@ function updateConfigWithDomains(
   targetAbs: string,
   selectedDomains: DomainId[],
   options: WriteOptions,
-  stackMeta?: {
-    languages: string[];
-    frameworks: string[];
-    evidence: Record<string, string[]>;
-    notes: string | null;
-  } | null
+  stackMeta?: StackScanResult | null
 ): "created" | "overwritten" | "skipped" {
   const templatePath = path.join(packRoot, "templates", "harness-config.json");
   const template = readJsonFile(templatePath);
@@ -1216,12 +1211,7 @@ function writeDomainSkillSurface(
   targetAbs: string,
   selectedDomains: string[],
   options: WriteOptions,
-  stackMeta?: {
-    languages: string[];
-    frameworks: string[];
-    evidence: Record<string, string[]>;
-    notes: string | null;
-  } | null
+  stackMeta?: StackScanResult | null
 ): WriteResult {
   const normalized = normalizeDomains(selectedDomains);
   const created: string[] = [];
