@@ -14,6 +14,10 @@ Eval:
   npx ai-engineering-harness eval report <run-id>
   npx ai-engineering-harness eval run <task-or-suite> --live-provider-command "<cmd>"
 
+Scan:
+  npx ai-engineering-harness scan
+  npx ai-engineering-harness scan --target <path>
+
 Domains:
   npx ai-engineering-harness domains --analysis-file ./domain-analysis.json
   npx ai-engineering-harness domains --target ./repo < analysis.json
