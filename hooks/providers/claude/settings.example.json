@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .ai-harness/hooks/core/guard-phase.js --command harness-run --session .harness/sessions/<active-session> --json"
+            "command": "node .ai-harness/hooks/core/run-with-active-session.js guard-phase --command harness-run --json"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .ai-harness/hooks/core/record-tool-output.js --session .harness/sessions/<active-session> --command \"$COMMAND\" --exit-code \"$EXIT_CODE\" --summary \"Recorded by Claude hook adapter\" --used-by harness-verify"
+            "command": "node .ai-harness/hooks/core/run-with-active-session.js record-tool-output --command \"$COMMAND\" --exit-code \"$EXIT_CODE\" --summary \"Recorded by Claude hook adapter\" --used-by harness-verify"
           }
         ]
       }
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .ai-harness/hooks/core/record-subagent-result.js --session .harness/sessions/<active-session> --agent \"$AGENT\" --status completed --summary \"Subagent completed\""
+            "command": "node .ai-harness/hooks/core/run-with-active-session.js record-subagent-result --agent \"$AGENT\" --status completed --summary \"Subagent completed\""
           }
         ]
       }
@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .ai-harness/hooks/core/compact-session-memory.js --session .harness/sessions/<active-session>"
+            "command": "node .ai-harness/hooks/core/run-with-active-session.js compact-session-memory"
           }
         ]
       }
