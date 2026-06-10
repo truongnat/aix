@@ -9,7 +9,8 @@ const os = require("node:os") as typeof import("node:os");
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require("node:path") as typeof import("node:path");
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { stackScanner } = require("../lib/stack-scanner.ts") as typeof import("../lib/stack-scanner.js");
+const { stackScanner } =
+  require("../lib/stack-scanner.ts") as typeof import("../lib/stack-scanner.js");
 
 function tmpDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), "stack-scanner-"));
@@ -42,7 +43,10 @@ test("detects fastapi from pyproject.toml", () => {
 
 test("detects flutter from pubspec.yaml", () => {
   const dir = tmpDir();
-  fs.writeFileSync(path.join(dir, "pubspec.yaml"), "name: my_app\nflutter:\n  uses-material-design: true\n");
+  fs.writeFileSync(
+    path.join(dir, "pubspec.yaml"),
+    "name: my_app\nflutter:\n  uses-material-design: true\n"
+  );
   const result = stackScanner(dir);
   assert.ok(result.frameworks.includes("flutter"));
   assert.ok(result.languages.includes("dart"));
@@ -76,7 +80,10 @@ test("skips node_modules and .git directories", () => {
   const dir = tmpDir();
   const nm = path.join(dir, "node_modules", "some-pkg");
   fs.mkdirSync(nm, { recursive: true });
-  fs.writeFileSync(path.join(nm, "package.json"), JSON.stringify({ dependencies: { next: "14.0.0" } }));
+  fs.writeFileSync(
+    path.join(nm, "package.json"),
+    JSON.stringify({ dependencies: { next: "14.0.0" } })
+  );
   const result = stackScanner(dir);
   assert.ok(!result.frameworks.includes("nextjs"), "should not detect nextjs inside node_modules");
 });
