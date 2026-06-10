@@ -169,32 +169,26 @@ function parseProjectAnalysis(input: string | ProjectAnalysisInput): ParsedProje
   };
 }
 
+// AI fields win when present and non-empty; scanner fills gaps. Result feeds parseProjectAnalysis.
 function mergeStackSignals(ai: ProjectAnalysisInput, scan: StackScanResult): ProjectAnalysisInput {
-  // AI domains win when present; scanner fills gaps
-  const aiDomains =
+  const domains =
     Array.isArray(ai.domains) && (ai.domains as unknown[]).length > 0
       ? ai.domains
-      : scan.domains.map((d) => ({ id: d.id, confidence: d.confidence, evidence: d.evidence }));
+      : [...scan.domains];
 
-  const aiFrameworks =
+  const frameworks =
     Array.isArray(ai.frameworks) && (ai.frameworks as unknown[]).length > 0
       ? ai.frameworks
       : scan.frameworks;
 
-  const aiLanguages =
+  const languages =
     Array.isArray(ai.languages) && (ai.languages as unknown[]).length > 0
       ? ai.languages
       : scan.languages;
 
-  const aiNotes =
-    typeof ai.notes === "string" && (ai.notes as string).trim() ? ai.notes : scan.notes;
+  const notes = typeof ai.notes === "string" && ai.notes.trim() ? ai.notes : scan.notes;
 
-  return {
-    domains: aiDomains,
-    frameworks: aiFrameworks,
-    languages: aiLanguages,
-    notes: aiNotes,
-  };
+  return { domains, frameworks, languages, notes };
 }
 
 export {
