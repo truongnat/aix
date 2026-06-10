@@ -33,6 +33,14 @@ interface ProjectAnalysisInput {
   notes?: unknown;
 }
 
+interface StackScanResult {
+  languages: string[];
+  frameworks: string[];
+  evidence: Record<string, string[]>;
+  notes: string | null;
+  domains: ProjectAnalysisDomain[];
+}
+
 const DOMAIN_LABELS: Record<DomainId, string> = {
   frontend: "Frontend",
   backend: "Backend",
@@ -161,11 +169,46 @@ function parseProjectAnalysis(input: string | ProjectAnalysisInput): ParsedProje
   };
 }
 
-export { DOMAIN_LABELS, isKnownDomainId, normalizeDomainSelection, parseProjectAnalysis };
+function mergeStackSignals(ai: ProjectAnalysisInput, scan: StackScanResult): ProjectAnalysisInput {
+  // AI domains win when present; scanner fills gaps
+  const aiDomains =
+    Array.isArray(ai.domains) && (ai.domains as unknown[]).length > 0
+      ? ai.domains
+      : scan.domains.map((d) => ({ id: d.id, confidence: d.confidence, evidence: d.evidence }));
+
+  const aiFrameworks =
+    Array.isArray(ai.frameworks) && (ai.frameworks as unknown[]).length > 0
+      ? ai.frameworks
+      : scan.frameworks;
+
+  const aiLanguages =
+    Array.isArray(ai.languages) && (ai.languages as unknown[]).length > 0
+      ? ai.languages
+      : scan.languages;
+
+  const aiNotes =
+    typeof ai.notes === "string" && (ai.notes as string).trim() ? ai.notes : scan.notes;
+
+  return {
+    domains: aiDomains,
+    frameworks: aiFrameworks,
+    languages: aiLanguages,
+    notes: aiNotes,
+  };
+}
+
+export {
+  DOMAIN_LABELS,
+  isKnownDomainId,
+  mergeStackSignals,
+  normalizeDomainSelection,
+  parseProjectAnalysis,
+};
 export type {
   DomainId,
   ParsedProjectAnalysis,
   ProjectAnalysisDomain,
   ProjectAnalysisInput,
   ProjectAnalysisMeta,
+  StackScanResult,
 };
