@@ -6,7 +6,7 @@
 
 A markdown-first, open-source kit that helps agents restore context, plan before coding, verify with evidence, ship reviewer-ready summaries, and preserve durable project knowledge.
 
-![Version](https://img.shields.io/badge/version-v1.2.1-2563eb)
+![Version](https://img.shields.io/badge/version-v1.2.2-2563eb)
 ![CI](https://github.com/truongnat/ai-engineering-harness/actions/workflows/ci.yml/badge.svg)
 ![Coverage](https://img.shields.io/badge/coverage-lib%2075%25%2B-0f766e)
 ![License](https://img.shields.io/badge/license-MIT-16a34a)
@@ -327,7 +327,7 @@ Transcript: [TRANSCRIPT.md](examples/dogfood-tiny-node-api/TRANSCRIPT.md)
 | Session memory | [docs/session-memory.md](docs/session-memory.md) |
 | Command guardrails | [docs/command-guardrails.md](docs/command-guardrails.md) |
 
-Release notes: [docs/v1.2.1-release-notes.md](docs/v1.2.1-release-notes.md)
+Release notes: [docs/v1.2.2-release-notes.md](docs/v1.2.2-release-notes.md)
 
 ---
 
@@ -355,6 +355,6 @@ Publish: [docs/npm-publish.md](docs/npm-publish.md)
 
 ## Status
 
-**v1.2.1**: patch release — Codex CLI `/harness-*` slash commands now work via UserPromptSubmit hook routing. Fixed `.harness/` not being git-ignored on re-install.
+**v1.2.2**: patch release — Codex CLI `/harness-*` slash commands now work via UserPromptSubmit hook routing. Fixed `.harness/` not being git-ignored on re-install.
 
 MIT · [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md)

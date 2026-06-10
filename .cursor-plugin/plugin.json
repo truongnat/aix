@@ -2,7 +2,7 @@
   "name": "ai-engineering-harness",
   "displayName": "AI Engineering Harness",
   "description": "Project-scoped engineering workflows for AI coding agents",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "author": {
     "name": "truongnat"
   },

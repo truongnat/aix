@@ -61,7 +61,7 @@ Welcome! User-facing documentation for **ai-engineering-harness**, organized wit
 ### 📚 Release Notes & History
 | Version | Notes |
 |---|---|
-| **v1.2.1** | [Release Notes](v1.2.1-release-notes.md) |
+| **v1.2.2** | [Release Notes](v1.2.2-release-notes.md) |
 | v1.2.0 | [Release Notes](v1.2.0-release-notes.md) |
 | v1.1.0 | [Release Notes](v1.1.0-release-notes.md) |
 | v1.0.0 | [Release Notes](v1.0.0-release-notes.md) |
