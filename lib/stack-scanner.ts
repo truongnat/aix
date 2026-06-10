@@ -88,24 +88,20 @@ function relPath(targetAbs: string, filePath: string): string {
   return path.relative(targetAbs, filePath).replace(/\\/g, "/");
 }
 
-function detectLanguagesFromExtensions(dirPath: string, state: ScanState): void {
-  try {
-    for (const entry of fs.readdirSync(dirPath, { withFileTypes: true }) as unknown as Array<{
-      isFile(): boolean;
-      name: string;
-    }>) {
-      if (!entry.isFile()) continue;
-      const ext = path.extname(entry.name).toLowerCase();
-      if (ext === ".ts" || ext === ".tsx") state.languages.add("typescript");
-      else if (ext === ".js" || ext === ".jsx") state.languages.add("javascript");
-      else if (ext === ".py") state.languages.add("python");
-      else if (ext === ".go") state.languages.add("go");
-      else if (ext === ".rs") state.languages.add("rust");
-      else if (ext === ".dart") state.languages.add("dart");
-      else if (ext === ".java") state.languages.add("java");
-    }
-  } catch {
-    // best-effort
+function detectLanguagesFromExtensions(
+  entries: Array<{ isFile(): boolean; name: string }>,
+  state: ScanState
+): void {
+  for (const entry of entries) {
+    if (!entry.isFile()) continue;
+    const ext = path.extname(entry.name).toLowerCase();
+    if (ext === ".ts" || ext === ".tsx") state.languages.add("typescript");
+    else if (ext === ".js" || ext === ".jsx") state.languages.add("javascript");
+    else if (ext === ".py") state.languages.add("python");
+    else if (ext === ".go") state.languages.add("go");
+    else if (ext === ".rs") state.languages.add("rust");
+    else if (ext === ".dart") state.languages.add("dart");
+    else if (ext === ".java") state.languages.add("java");
   }
 }
 
@@ -136,7 +132,7 @@ function scanDirectory(dirPath: string, targetAbs: string, state: ScanState, dep
     return;
   }
 
-  detectLanguagesFromExtensions(dirPath, state);
+  detectLanguagesFromExtensions(entries, state);
 
   for (const entry of entries) {
     const entryName = entry.name;
@@ -243,11 +239,11 @@ function buildDomainList(
   const domainMap = new Map<DomainId, { confidence: number; evidence: string[] }>();
   for (const [fw, info] of frameworks) {
     const existing = domainMap.get(info.domain);
-    if (!existing || info.confidence > existing.confidence) {
-      domainMap.set(info.domain, {
-        confidence: Math.max(existing?.confidence ?? 0, info.confidence),
-        evidence: [...(existing?.evidence ?? []), `${fw} detected`],
-      });
+    if (!existing) {
+      domainMap.set(info.domain, { confidence: info.confidence, evidence: [`${fw} detected`] });
+    } else {
+      existing.evidence.push(`${fw} detected`);
+      if (info.confidence > existing.confidence) existing.confidence = info.confidence;
     }
   }
   return Array.from(domainMap.entries())
