@@ -130,6 +130,27 @@ function handleSessionStart(repoRoot, eventName) {
   });
 }
 
+function resolveSlashCommand(repoRoot, prompt) {
+  const match = prompt.match(/^\/(harness-[a-z]+)/);
+  if (!match) {
+    return null;
+  }
+  const commandId = match[1];
+  const args = prompt.slice(match[0].length).trim();
+  const searchPaths = [
+    path.join(repoRoot, ".codex", "commands", `${commandId}.md`),
+    path.join(repoRoot, ".ai-harness", "runtime-commands", `${commandId}.md`),
+    path.join(repoRoot, "commands", `${commandId}.md`),
+  ];
+  for (const candidate of searchPaths) {
+    const content = safeRead(candidate);
+    if (content) {
+      return { commandId, args, filePath: candidate, content };
+    }
+  }
+  return null;
+}
+
 function handlePromptSubmit(repoRoot, eventName, payload) {
   const prompt = getPrompt(payload).trim();
   recordEvent(repoRoot, {
@@ -137,6 +158,27 @@ function handlePromptSubmit(repoRoot, eventName, payload) {
     hook_event: eventName,
     prompt,
   });
+
+  const slashCmd = resolveSlashCommand(repoRoot, prompt);
+  if (slashCmd) {
+    recordEvent(repoRoot, {
+      type: "codex-slash-command",
+      command: slashCmd.commandId,
+      args: slashCmd.args,
+      resolved: slashCmd.filePath,
+    });
+    const parts = [
+      `Execute the harness command /${slashCmd.commandId}.`,
+      `Command definition:\n\n${slashCmd.content}`,
+    ];
+    if (slashCmd.args) {
+      parts.push(`User arguments: ${slashCmd.args}`);
+    }
+    return hookOutput(eventName, {
+      additionalContext: parts.join("\n\n"),
+    });
+  }
+
   const parts = [buildPromptContext()];
   if (prompt) {
     parts.push(`User prompt: ${prompt}`);

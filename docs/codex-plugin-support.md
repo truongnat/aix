@@ -1,8 +1,10 @@
 # Codex plugin support
 
-## What failed
+## Slash command routing (current)
 
-Treating Codex like a **project-local slash command** provider (`/harness-plan` via `AGENTS.md` aliases) does not register commands in Codex. Codex uses the **OpenAI plugin model**, not `.codex/commands/` or repo slash files.
+`/harness-*` slash commands now work in Codex CLI via **UserPromptSubmit hook routing**. When a user types `/harness-plan` in Codex, the hook in `.codex/hooks/core/codex-hook-router.js` intercepts the prompt, reads the command file from `.codex/commands/harness-plan.md`, and injects it as `additionalContext`. This gives functional parity with Claude Code and Cursor without requiring Codex to support project-local slash commands natively.
+
+## Plugin model (marketplace)
 
 ## Correct Codex model
 
@@ -53,14 +55,8 @@ Creates:
 
 After install, trust the project `.codex/` layer in Codex and restart the app so rules and hooks load.
 
-Does **not** create native `/harness-*` slash commands in Codex.
+Creates `/harness-*` slash command routing via UserPromptSubmit hook + `.codex/commands/` files.
 Does **not** emit `.codex-plugin/plugin.json` into the target repo; that manifest lives in the package root and is shipped when the plugin is published.
-
-## Not supported
-
-- Claimed **`/harness-plan`** in Codex UI from project install
-- Fake **`.codex/commands/`** paths
-- Equating Codex with Claude `.claude/commands/*.md` behavior
 
 ## Future work
 

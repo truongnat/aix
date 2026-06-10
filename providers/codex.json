@@ -1,10 +1,10 @@
 {
   "id": "codex",
   "label": "Codex",
-  "nativeSlashCommands": false,
+  "nativeSlashCommands": true,
   "supportsSubagents": false,
-  "status": "plugin-packaging",
+  "status": "native-command-files",
   "pluginPath": ".codex-plugin/plugin.json",
   "ruleEntrypoints": ["AGENTS.md", ".codex/", ".agents/skills/"],
-  "installPaths": ["AGENTS.md", ".codex/", ".agents/skills/"]
+  "installPaths": ["AGENTS.md", ".codex/commands/", ".codex/hooks/", ".codex/agents/", ".codex/rules/", ".agents/skills/"]
 }

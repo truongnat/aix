@@ -84,3 +84,64 @@ test("codex hook router skips domain bootstrap when domains are configured", () 
   });
   assert.doesNotMatch(result.hookSpecificOutput.additionalContext, /Domain bootstrap required/i);
 });
+
+test("codex hook router intercepts /harness-plan slash command", () => {
+  const dir = tmpRepo();
+  fs.mkdirSync(path.join(dir, ".codex", "commands"), { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, ".codex", "commands", "harness-plan.md"),
+    "# harness-plan\n\nTranslate the agreed goal into a plan.\n"
+  );
+  const result = handleCodexHook({
+    hook_event_name: "UserPromptSubmit",
+    cwd: dir,
+    prompt: "/harness-plan",
+  });
+  assert.match(result.hookSpecificOutput.additionalContext, /Execute the harness command/);
+  assert.match(result.hookSpecificOutput.additionalContext, /harness-plan/);
+  assert.match(result.hookSpecificOutput.additionalContext, /Translate the agreed goal/);
+});
+
+test("codex hook router passes args for slash commands", () => {
+  const dir = tmpRepo();
+  fs.mkdirSync(path.join(dir, ".codex", "commands"), { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, ".codex", "commands", "harness-start.md"),
+    "# harness-start\n\nRun session start.\n"
+  );
+  const result = handleCodexHook({
+    hook_event_name: "UserPromptSubmit",
+    cwd: dir,
+    prompt: "/harness-start goal-123",
+  });
+  assert.match(result.hookSpecificOutput.additionalContext, /Execute the harness command/);
+  assert.match(result.hookSpecificOutput.additionalContext, /User arguments: goal-123/);
+});
+
+test("codex hook router falls back for non-harness slash prompts", () => {
+  const dir = tmpRepo();
+  const result = handleCodexHook({
+    hook_event_name: "UserPromptSubmit",
+    cwd: dir,
+    prompt: "/something-else",
+  });
+  assert.match(result.hookSpecificOutput.additionalContext, /harness loop/);
+  assert.doesNotMatch(result.hookSpecificOutput.additionalContext, /Execute the harness command/);
+});
+
+test("codex hook router falls back to runtime-commands when .codex/commands/ missing", () => {
+  const dir = tmpRepo();
+  fs.mkdirSync(path.join(dir, ".ai-harness", "runtime-commands"), { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, ".ai-harness", "runtime-commands", "harness-verify.md"),
+    "# harness-verify\n\nVerify implementation.\n"
+  );
+  const result = handleCodexHook({
+    hook_event_name: "UserPromptSubmit",
+    cwd: dir,
+    prompt: "/harness-verify",
+  });
+  assert.match(result.hookSpecificOutput.additionalContext, /Execute the harness command/);
+  assert.match(result.hookSpecificOutput.additionalContext, /harness-verify/);
+  assert.match(result.hookSpecificOutput.additionalContext, /Verify implementation/);
+});

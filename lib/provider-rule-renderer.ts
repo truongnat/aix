@@ -363,8 +363,12 @@ function assertProviderRuleContent(
   }
 
   if (relativePath === "AGENTS.md" && content.includes("Codex")) {
-    if (!/Do \*\*not\*\* assume native|Do not assume native/i.test(content)) {
-      failures.push(`${relativePath} must deny native /harness-* slash claim for Codex`);
+    const hasSlashDocs =
+      /\/harness-\w+.*slash commands? are available/i.test(content) ||
+      /routed via.*hook/i.test(content) ||
+      /\.codex\/commands\//i.test(content);
+    if (!hasSlashDocs && !/Do \*\*not\*\* assume native|Do not assume native/i.test(content)) {
+      failures.push(`${relativePath} must document /harness-* slash command support for Codex`);
     }
   }
 

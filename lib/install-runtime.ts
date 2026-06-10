@@ -542,6 +542,31 @@ function installCodexAgents(
   }
 }
 
+function installCodexCommands(
+  scope: InstallScope,
+  targetRoot: string,
+  packRoot: string,
+  options: InstallRuntimeOptions
+): void {
+  const sourceRoot = path.join(packRoot, "commands");
+  if (!fs.existsSync(sourceRoot)) {
+    return;
+  }
+
+  const codexRoot =
+    scope === "global" ? path.join(os.homedir(), ".codex") : path.join(targetRoot, ".codex");
+  const destRoot = path.join(codexRoot, "commands");
+  ensureDirectory(destRoot, options.dryRun);
+
+  for (const entry of fs.readdirSync(sourceRoot, { withFileTypes: true })) {
+    if (!entry.isFile() || !entry.name.startsWith("harness-") || !entry.name.endsWith(".md")) {
+      continue;
+    }
+    const content = fs.readFileSync(path.join(sourceRoot, entry.name), "utf8");
+    writeFileAction(codexRoot, path.join("commands", entry.name), content, options);
+  }
+}
+
 function installCodexSkills(
   scope: InstallScope,
   targetRoot: string,
@@ -632,23 +657,27 @@ function installCodex(
     installCodexRules(scope, targetRoot, options);
     installCodexHooks(scope, targetRoot, packRoot, options);
     installCodexAgents(scope, targetRoot, packRoot, options);
+    installCodexCommands(scope, targetRoot, packRoot, options);
     installCodexSkills(scope, targetRoot, packRoot, options);
     console.log(
-      "NEXT: Codex native support — install plugin via /plugins (marketplace pending). Package: .codex-plugin/plugin.json + skills/ + hooks/ + agents/"
+      "NEXT: Codex — /harness-* slash commands are routed via hooks. Trust ~/.codex/ in Codex and restart the app."
     );
-    console.log("REMEMBER: Trust ~/.codex/ in Codex and restart the app so rules and hooks load.");
+    console.log(
+      "REMEMBER: Use /harness-start, /harness-plan, etc. in Codex CLI. The UserPromptSubmit hook routes them."
+    );
     return;
   }
   writeFileAction(targetRoot, "AGENTS.md", renderCodexAgentsMd(), options);
   installCodexRules(scope, targetRoot, options);
   installCodexHooks(scope, targetRoot, packRoot, options);
   installCodexAgents(scope, targetRoot, packRoot, options);
+  installCodexCommands(scope, targetRoot, packRoot, options);
   installCodexSkills(scope, targetRoot, packRoot, options);
   console.log(
-    "NEXT: Codex — project install is AGENTS.md + .codex/ + .agents/skills/ fallback. Native: /plugins → ai-engineering-harness plugin (not /harness-* slash)."
+    "NEXT: Codex — /harness-* slash commands are routed via hooks. Trust .codex/ in Codex and restart the app."
   );
   console.log(
-    "REMEMBER: Trust the project's .codex/ layer in Codex and restart the app so rules and hooks load."
+    "REMEMBER: Use /harness-start, /harness-plan, etc. in Codex CLI. The UserPromptSubmit hook routes them."
   );
 }
 

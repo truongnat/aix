@@ -1,6 +1,6 @@
 {
   "name": "ai-engineering-harness",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": false,
   "description": "Engineering discipline and workflow guardrails for AI coding agents (Claude, Cursor, Codex, Gemini).",
   "keywords": [

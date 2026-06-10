@@ -179,8 +179,10 @@ test("runInstall provisions codex native hooks, rules, and agents", () => {
     fs.readFileSync(path.join(dir, ".codex", "rules", "default.rules"), "utf8"),
     /prefixes\s*=|action\s*=|message\s*=/
   );
-  assert.ok(lines.some((line) => /Trust the project's \.codex\/ layer/i.test(line)));
-  assert.ok(lines.some((line) => /restart the app/i.test(line)));
+  assert.ok(
+    lines.some((line) => /Trust \.codex\/ in Codex|\/harness-\* slash commands/i.test(line))
+  );
+  assert.ok(lines.some((line) => /restart the app|UserPromptSubmit hook/i.test(line)));
 });
 
 test("runInstall on a non-git project prepares private git exclude setup for future git init", () => {

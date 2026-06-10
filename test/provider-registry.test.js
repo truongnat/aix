@@ -35,12 +35,13 @@ test("getProviderManifest returns claude native slash support", () => {
   assert.ok(claude.installPaths.includes(".claude/skills/"));
 });
 
-test("getProviderManifest returns codex plugin-packaged skills support", () => {
+test("getProviderManifest returns codex slash command support via hook routing", () => {
   const codex = getProviderManifest(repoRoot, "codex");
-  assert.equal(codex.nativeSlashCommands, false);
+  assert.equal(codex.nativeSlashCommands, true);
   assert.ok(codex.ruleEntrypoints.includes(".codex/"));
   assert.ok(codex.ruleEntrypoints.includes(".agents/skills/"));
-  assert.ok(codex.installPaths.includes(".codex/"));
+  assert.ok(codex.installPaths.some((p) => p.includes(".codex/commands/")));
+  assert.ok(codex.installPaths.some((p) => p.includes(".codex/hooks/")));
   assert.ok(codex.installPaths.includes(".agents/skills/"));
 });
 

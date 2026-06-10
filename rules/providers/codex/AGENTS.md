@@ -15,11 +15,20 @@ When the user asks for a harness command such as harness-plan:
 
 ## Codex Command Support
 
-Do **not** assume native `/harness-*` slash commands.
+The following `/harness-*` slash commands are available (routed via UserPromptSubmit hook):
 
-Use the local command catalog and AGENTS.md instructions.
+- `/harness-start` — Session Start: restore context, route session, map repository
+- `/harness-discuss` — Discuss scope, constraints, and approach before planning
+- `/harness-plan` — Translate goal into an explicit, reviewable implementation plan
+- `/harness-run` — Execute the approved plan
+- `/harness-verify` — Verify implementation against acceptance criteria
+- `/harness-ship` — Ship the verified change
+- `/harness-remember` — Record session learnings
+- `/harness-map` — Manual context refresh
+- `/harness-status` — Show current harness state
+- `/harness-doctor` — Diagnose harness installation issues
 
-Fallback instruction: **Use harness-plan for this repository.**
+Command files are installed at `.codex/commands/harness-*.md`.
 
 Follow `.ai-harness/agent-system/SYSTEM_PROMPT.md` as the repository-level operating prompt.
 

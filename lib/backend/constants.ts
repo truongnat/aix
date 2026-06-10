@@ -18,8 +18,8 @@ export function providerCommandPaths(provider: string): string[] {
 
 /** Paths to ignore for a provider install. */
 export function ignorePathsForProvider(provider: string, initHarness: boolean): string[] {
-  const out: string[] = [];
-  if (initHarness) out.push(".harness/");
+  const out: string[] = [".harness/"];
+  void initHarness;
   switch (provider) {
     case "cursor":
       out.push(...providerCommandPaths("cursor"));
@@ -68,7 +68,7 @@ export function ignorePathsForProvider(provider: string, initHarness: boolean): 
   return out;
 }
 
-/** Paths removed on uninstall for a provider. */
+/** Paths removed on uninstall for a provider (.harness/ excluded — handled by removeState flag). */
 export function uninstallPathsForProvider(provider: string): string[] {
-  return ignorePathsForProvider(provider, false);
+  return ignorePathsForProvider(provider, false).filter((p) => p !== ".harness/");
 }

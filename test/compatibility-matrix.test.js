@@ -13,7 +13,7 @@ test("buildMatrix includes providers and eval tasks", () => {
   assert.match(markdown, /example-health-report/);
   assert.match(
     markdown,
-    /Codex \| rules\/fallback \| adapter \| plugin-packaging \| deterministic local \(31 tasks\) \| (no live evals yet|\d+\/\d+ passed \(\d+% across \d+ task[s]?\))/
+    /Codex \| yes \| adapter \| native-command-files \| deterministic local \(31 tasks\) \| (no live evals yet|\d+\/\d+ passed \(\d+% across \d+ task[s]?\))/
   );
   assert.match(
     markdown,
