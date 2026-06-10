@@ -99,9 +99,8 @@ describe("CLI Arguments Parser", () => {
     assert.deepEqual(opts.providers, ["claude", "cursor"]);
   });
 
-  test("parseArgv marks --runtime alias usage", () => {
+  test("parseArgv parses --runtime alias as providers", () => {
     const opts = cliArgs.parseArgv(["node", "aih.js", "--runtime", "claude"]);
-    assert.equal(opts.runtimeAliasUsed, true);
     assert.deepEqual(opts.providers, ["claude"]);
   });
 

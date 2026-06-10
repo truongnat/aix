@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { appendHarnessEvent, findHarnessRoot, readText } = require("./_util.js");
 const { buildSessionStartIntent } = require("./domain-bootstrap.js");
+const { evaluateFileEditHook, getToolInput, isEditTool } = require("./file-edit-guards.js");
 
 function readHookPayload() {
   try {
@@ -30,7 +31,7 @@ function getCwd(payload) {
 }
 
 function getCommand(payload) {
-  const toolInput = payload.tool_input || payload.toolInput || payload.input || {};
+  const toolInput = getToolInput(payload);
   if (typeof toolInput === "string") {
     return toolInput;
   }
@@ -196,6 +197,18 @@ function handleToolEvent(repoRoot, eventName, payload) {
     command,
   });
 
+  if (isEditTool(payload)) {
+    const fileGuardBlock = evaluateFileEditHook({ ...payload, cwd: payload.cwd || repoRoot });
+    if (fileGuardBlock) {
+      return hookOutput(eventName, {
+        permissionDecision: "deny",
+        decision: "deny",
+        permissionDecisionReason: fileGuardBlock.reason,
+        systemMessage: fileGuardBlock.reason,
+      });
+    }
+  }
+
   if (!command) {
     // Non-shell tools (file read/write) have no command — allow by default.
     return hookOutput(eventName, {
@@ -309,4 +322,6 @@ module.exports = {
   handleCodexHook,
   isDangerous,
   isPromptWorthy,
+  evaluateFileEditHook,
+  isEditTool,
 };

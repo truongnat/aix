@@ -20,7 +20,7 @@ const SPEC = {
   session: { required: true },
 };
 
-function extractReferencedFiles(sessionDir) {
+function extractReferencedFiles(sessionDir, repoRoot) {
   const referencedFiles = new Set();
 
   // Extract from GOAL.md
@@ -34,9 +34,12 @@ function extractReferencedFiles(sessionDir) {
     }
   }
 
-  // Extract from PLAN.md
-  const planName =
-    extractField(readText(path.join(sessionDir, "STATE.md")), "current_plan") || "PLAN-001.md";
+  // Extract from PLAN.md (current_plan lives in repo-root STATE.md)
+  const statePath = path.join(repoRoot, ".harness", "STATE.md");
+  let planName = "PLAN-001.md";
+  if (fs.existsSync(statePath)) {
+    planName = extractField(readText(statePath), "current_plan") || planName;
+  }
   const planPath = path.join(sessionDir, planName);
   if (fs.existsSync(planPath)) {
     const planContent = readText(planPath);
@@ -91,11 +94,12 @@ function guardScope(options) {
     .map((f) => f.trim())
     .filter(Boolean);
 
-  const referencedFiles = extractReferencedFiles(sessionDir);
+  const referencedFiles = extractReferencedFiles(sessionDir, repoRoot);
   const outOfScopeFiles = [];
 
   for (const file of files) {
-    const relativePath = path.relative(repoRoot, file);
+    const absoluteFile = path.isAbsolute(file) ? file : path.resolve(repoRoot, file);
+    const relativePath = path.relative(repoRoot, absoluteFile);
     if (!isFileInScope(relativePath, referencedFiles)) {
       outOfScopeFiles.push(relativePath);
     }
@@ -159,4 +163,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { guardScope };
+module.exports = { guardScope, extractReferencedFiles, isFileInScope };

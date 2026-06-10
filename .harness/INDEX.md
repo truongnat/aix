@@ -13,6 +13,10 @@
 | Name | Command | When To Use | Notes |
 | --- | --- | --- | --- |
 | Full test suite | `npm test` | before shipping behavior changes | records build + test coverage of the public surface |
+| Guard scope smoke | `node hooks/core/guard-scope.js --files <path> --session .harness/sessions/<id> --json` | after guard-scope or STATE routing changes | expect `"ok":true` not ENOENT/`failed` |
+| Session wrapper | `node --test test/hooks/run-with-active-session.test.js` | after `run-with-active-session.js` changes | 4 tests; wrapper must invoke hook not silent skip |
+| Router read/write gate | `node --test test/hooks/codex-hook-router.test.js` | after `codex-hook-router.js` or `file-edit-guards.js` changes | Read out-of-scope → allow; Write → deny |
+| CLI flag edge | `node -e "require('./dist/lib/cli-args.js').parseArgv(['node','aih','install','--scope','--yes'])"` | after cli-args parser changes | must throw Missing value for --scope |
 | Package validation | `node bin/validate.js` | when docs/templates/contracts move | catches repo-surface drift |
 
 ## Verification Recipes

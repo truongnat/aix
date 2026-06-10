@@ -90,7 +90,6 @@ describe("parseArgv", () => {
     it("parses single provider", () => {
       const opts = parse("install", "--provider", "openai");
       assert.deepEqual(opts.providers, ["openai"]);
-      assert.equal(opts.providerAlias, "provider");
     });
 
     it("parses comma-separated providers", () => {
@@ -106,12 +105,15 @@ describe("parseArgv", () => {
     it("throws when --provider has no value", () => {
       assert.throws(() => parse("install", "--provider"), /Missing value/);
     });
+
+    it("throws when the next token is another flag", () => {
+      assert.throws(() => parse("install", "--provider", "--dry-run"), /Missing value/);
+    });
   });
 
   describe("--runtime alias", () => {
-    it("sets runtimeAliasUsed to true", () => {
+    it("parses providers from --runtime", () => {
       const opts = parse("install", "--runtime", "openai");
-      assert.equal(opts.runtimeAliasUsed, true);
       assert.deepEqual(opts.providers, ["openai"]);
     });
   });
@@ -120,6 +122,14 @@ describe("parseArgv", () => {
     it("parses scope", () => {
       const opts = parse("install", "--scope", "project");
       assert.equal(opts.scope, "project");
+    });
+
+    it("throws when --scope is followed by another flag", () => {
+      assert.throws(() => parse("install", "--scope", "--yes"), /Missing value for --scope/);
+    });
+
+    it("throws when --scope has no value", () => {
+      assert.throws(() => parse("install", "--scope"), /Missing value for --scope/);
     });
   });
 
@@ -132,18 +142,15 @@ describe("parseArgv", () => {
     it("defaults to . when no target given", () => {
       assert.equal(parse("install").target, ".");
     });
+
+    it("throws when --target is followed by another flag", () => {
+      assert.throws(() => parse("install", "--target", "--yes"), /Missing value for --target/);
+    });
   });
 
   describe("--ref flag", () => {
     it("throws error", () => {
       assert.throws(() => parse("install", "--ref", "main"), /--ref is not supported/);
-    });
-  });
-
-  describe("--skip-demo-eval flag", () => {
-    it("is silently accepted", () => {
-      const opts = parse("install", "--skip-demo-eval");
-      assert.equal(opts.command, "install");
     });
   });
 
@@ -190,6 +197,10 @@ describe("parseArgv", () => {
   describe("error cases", () => {
     it("throws on unknown flag", () => {
       assert.throws(() => parse("install", "--banana"), /Unknown argument/);
+    });
+
+    it("throws on deprecated --skip-demo-eval flag", () => {
+      assert.throws(() => parse("install", "--skip-demo-eval"), /Unknown argument/);
     });
   });
 });

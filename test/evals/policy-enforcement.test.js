@@ -273,8 +273,8 @@ test("policy documentation is generated from policies", () => {
   const scopeContent = fs.readFileSync(scopeDoc, "utf8");
   assert.ok(scopeContent.includes("Scope Guard"), "Scope doc must have title");
   assert.ok(
-    scopeContent.includes("No default scope-guard rule is enabled."),
-    "Scope doc must explain that no default scope rule is active"
+    scopeContent.includes("codex-hook-router.js"),
+    "Scope doc must explain runtime enforcement via the Codex hook router"
   );
 });
 
@@ -289,12 +289,16 @@ test("policy hooks exist and are executable", () => {
   assert.ok(fs.existsSync(guardScope), "guard-scope.js must exist");
   assert.ok(fs.existsSync(guardTestFirst), "guard-test-first.js must exist");
 
-  // Verify hooks are executable (have shebang)
-  const guardPhaseContent = fs.readFileSync(guardPhasePolicy, "utf8");
+  const guardPhase = require(path.join(hooksDir, "guard-phase.js"));
+  const guardPhasePolicyModule = require(path.join(hooksDir, "guard-phase-policy.js"));
+  assert.equal(guardPhasePolicyModule.guardPhase, guardPhase.guardPhase);
+
+  const guardPhasePolicyContent = fs.readFileSync(guardPhasePolicy, "utf8");
   assert.ok(
-    guardPhaseContent.startsWith("#!/usr/bin/env node"),
+    guardPhasePolicyContent.startsWith("#!/usr/bin/env node"),
     "guard-phase-policy must have shebang"
   );
+  assert.match(guardPhasePolicyContent, /require\("\.\/guard-phase\.js"\)/);
 
   const guardScopeContent = fs.readFileSync(guardScope, "utf8");
   assert.ok(guardScopeContent.startsWith("#!/usr/bin/env node"), "guard-scope must have shebang");

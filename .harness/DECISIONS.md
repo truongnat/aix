@@ -35,6 +35,30 @@
 - Opt-out: user requests ship-only, or ship status is `shipped-with-gaps` / `failed` / blocked.
 - Reference: `docs/phase-discipline.md` — Default Phase Chaining
 
+### DECISION-002
+
+- Date: 2026-06-10
+- Status: accepted
+- Area: runtime
+- Decision: Wire `guard-scope` and `guard-test-first` at tool time via `codex-hook-router.js` and `guard-file-edits.js` (gap review C3 Option A).
+- Rationale: Guards were implemented but never invoked; wiring matches enforcement narrative and closes the largest functionality gap.
+- Alternatives considered: remove orphaned guards (B); keep manual-only (C).
+- Consequences: PreToolUse may block out-of-scope edits and source changes without failing tests; requires accurate GOAL/PLAN file references.
+- Verification impact: router integration test + backend guard tests required on hook changes.
+- Follow-up: live IDE hook smoke on Claude Write/Edit matcher.
+
+### DECISION-003
+
+- Date: 2026-06-10
+- Status: accepted
+- Area: runtime
+- Decision: Keep hard deny on test-first violations (gap review N3 Option A); document limitation rather than downgrade severity.
+- Rationale: Softening would weaken enforcement contract; blocking until failing assertion exists is intentional TDD gate behavior.
+- Alternatives considered: warn-only (B); skip guard when no failing assertion (C).
+- Consequences: Agents editing tested source may be blocked until test file contains a failing assertion pattern; docs must state this explicitly.
+- Verification impact: `guard-test-first.test.js` deny contract; hooks README limitation section.
+- Follow-up: revisit if user feedback shows excessive false blocks in practice.
+
 ## Example
 
 ### DECISION-001

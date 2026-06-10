@@ -63,3 +63,42 @@
 - Verification focus: `harness-discuss` contract and `prompt-templates/discussion-question.md`
 - Related decisions: none
 - Notes: hard `### Blocked` remains correct for plan/run/verify/ship gates only
+
+### HAZARD-004
+
+- Date: 2026-06-10
+- Severity: high
+- Area: runtime
+- Trigger: `guard-scope.js` (or similar) reads `STATE.md` inside session dir instead of repo-root `.harness/STATE.md`
+- Failure mode: ENOENT → guard returns `status: failed` (exit 1) instead of scope check; enforcement silently broken
+- Early warning signs: manual `guard-scope --json` returns `failed` not `blocked`; no scope violations ever recorded
+- Mitigation: read `path.join(repoRoot, ".harness", "STATE.md")` with `existsSync`; mirror `guard-phase.js` pattern
+- Verification focus: `test/backend/guard-scope.test.js`; smoke `node hooks/core/guard-scope.js --files … --session … --json`
+- Related decisions: none
+- Notes: from CLI_CORE_GAP_REVIEW C2
+
+### HAZARD-005
+
+- Date: 2026-06-10
+- Severity: high
+- Area: runtime
+- Trigger: `evaluateFileEditHook` invoked for all PreToolUse tools including Read/Grep/Glob
+- Failure mode: out-of-scope read paths denied; agents cannot inspect files outside plan scope even when read-only
+- Early warning signs: router tests fail when `tool_name: Read` returns `deny`; users report "can't read file X" during harness-run
+- Mitigation: gate file guards with `isEditTool()` — only Write/Edit/MultiEdit/apply_patch/NotebookEdit
+- Verification focus: `test/hooks/codex-hook-router.test.js` Read allow + Write deny cases
+- Related decisions: `DECISION-002`
+- Notes: from CLI_CORE_GAP_REVIEW N2; introduced when C3 wired guards without tool filter
+
+### HAZARD-006
+
+- Date: 2026-06-10
+- Severity: high
+- Area: runtime
+- Trigger: `run-with-active-session.js` parses session via backtick regex instead of `extractField(state, "session")`
+- Failure mode: Claude Write/Edit hooks never invoke target guard; enforcement silently skipped (exit 0)
+- Early warning signs: manual wrapper run with valid STATE returns 0 without invoking guard script
+- Mitigation: use `extractField` from `_util.js`; normalize `sessions/<id>` to `.harness/sessions/<id>`
+- Verification focus: `test/hooks/run-with-active-session.test.js`
+- Related decisions: none
+- Notes: from CLI_CORE_GAP_REVIEW N1; pre-existing bug exposed after C3 added guard-file-edits wiring

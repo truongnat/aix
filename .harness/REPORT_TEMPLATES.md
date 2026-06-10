@@ -6,9 +6,9 @@ status: fallback
 
 ## Primary templates
 
-- **prMessage:** `.ai-harness/templates/PR_MESSAGE.md` (harness-pack, harness) — Harness default template
-- **report:** `.ai-harness/templates/REPORT.md` (harness-pack, harness) — Harness default template
-- **changeSummary:** `.ai-harness/templates/CHANGE_SUMMARY.md` (harness-pack, harness) — Harness default template
+- **prMessage:** `templates/PR_MESSAGE.md` (harness-pack, harness) — Harness default template
+- **report:** `templates/REPORT.md` (harness-pack, harness) — Harness default template
+- **changeSummary:** `templates/CHANGE_SUMMARY.md` (harness-pack, harness) — Harness default template
 
 ## PR template candidates
 
@@ -16,9 +16,9 @@ status: fallback
 
 ## Harness fallback paths
 
-- PR: `.ai-harness/templates/PR_MESSAGE.md`
-- Report: `.ai-harness/templates/REPORT.md`
-- Change summary: `.ai-harness/templates/CHANGE_SUMMARY.md`
+- PR: `templates/PR_MESSAGE.md`
+- Report: `templates/REPORT.md`
+- Change summary: `templates/CHANGE_SUMMARY.md`
 
 ## Ship rule
 

@@ -43,12 +43,11 @@ function findCorrespondingTestFile(sourceFile, repoRoot) {
 }
 
 function hasFailingAssertion(testContent) {
-  // Look for common failing assertion patterns
   const failingPatterns = [
     /assert\.(fail|false|notOk|notStrictEqual|notDeepStrictEqual)/,
-    /expect\.\w+\.toBe\(false\)/,
-    /expect\.\w+\.not\./,
-    /toThrow\(\)/,
+    /expect\([^)]+\)\.toBe\(\s*false\s*\)/,
+    /expect\([^)]+\)\.not\./,
+    /expect\([^)]+\)\.toThrow\(/,
     /\.should\.\w+\.not\./,
   ];
 
@@ -166,4 +165,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { guardTestFirst };
+module.exports = { guardTestFirst, hasFailingAssertion, findCorrespondingTestFile };
