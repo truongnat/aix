@@ -3,10 +3,15 @@ import path from "node:path";
 
 import type { ParseOptions } from "../cli-args";
 import { resolveTargetAbs } from "../cli-command-helpers";
-import { parseProjectAnalysis } from "../stack-detect";
+import { mergeStackSignals, parseProjectAnalysis } from "../stack-detect";
+import type { StackScanResult } from "../stack-detect";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { stackScanner } = require("../stack-scanner.js") as {
+  stackScanner: (target: string) => StackScanResult;
+};
 import { writeDomainSkillSurface } from "../domain-skill-generation";
 
-function readAnalysisInput(options: ParseOptions): string {
+function readAnalysisInput(options: ParseOptions): string | null {
   if (options.analysisFile) {
     const resolved = path.isAbsolute(options.analysisFile)
       ? options.analysisFile
@@ -17,15 +22,12 @@ function readAnalysisInput(options: ParseOptions): string {
     return fs.readFileSync(resolved, "utf8");
   }
 
-  if (process.stdin.isTTY) {
-    throw new Error("Provide --analysis-file or pipe project analysis JSON on stdin.");
+  if (!process.stdin.isTTY) {
+    const input = fs.readFileSync(0, "utf8");
+    if (input.trim()) return input;
   }
 
-  const input = fs.readFileSync(0, "utf8");
-  if (!input.trim()) {
-    throw new Error("Project analysis JSON is required on stdin.");
-  }
-  return input;
+  return null;
 }
 
 function printWriteResult(
@@ -65,16 +67,53 @@ async function runDomainsCommand(packRoot: string, options: ParseOptions): Promi
     throw new Error(`Target directory does not exist: ${targetAbs}`);
   }
 
+  // Always run scanner for evidence/metadata
+  const scan = stackScanner(targetAbs);
+
   const analysisText = readAnalysisInput(options);
-  const analysis = parseProjectAnalysis(analysisText);
-  const result = writeDomainSkillSurface(packRoot, targetAbs, analysis.domains, {
+
+  let domains: string[];
+  let stackMeta = scan;
+
+  if (analysisText) {
+    // AI-provided analysis: merge with scanner (AI wins on domains/frameworks/languages)
+    const aiAnalysis = parseProjectAnalysis(analysisText);
+    const merged = mergeStackSignals(
+      {
+        domains: aiAnalysis.meta.domains,
+        frameworks: aiAnalysis.meta.frameworks,
+        languages: aiAnalysis.meta.languages,
+        notes: aiAnalysis.meta.notes,
+      },
+      scan
+    );
+    const mergedParsed = parseProjectAnalysis(JSON.stringify(merged));
+    domains = mergedParsed.domains;
+    stackMeta = {
+      ...scan,
+      frameworks: mergedParsed.meta.frameworks,
+      languages: mergedParsed.meta.languages,
+      notes: mergedParsed.meta.notes,
+    };
+  } else {
+    // No AI analysis: use scanner domains directly
+    domains = scan.domains.map((d) => d.id);
+  }
+
+  const result = writeDomainSkillSurface(
     packRoot,
     targetAbs,
-    dryRun: options.dryRun,
-    force: options.force,
-  });
+    domains,
+    {
+      packRoot,
+      targetAbs,
+      dryRun: options.dryRun,
+      force: options.force,
+    },
+    stackMeta
+  );
 
-  printWriteResult(analysis.domains, result);
+  printWriteResult(domains, result);
   return 0;
 }
 

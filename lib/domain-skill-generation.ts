@@ -1022,7 +1022,13 @@ function updateConfigWithDomains(
   packRoot: string,
   targetAbs: string,
   selectedDomains: DomainId[],
-  options: WriteOptions
+  options: WriteOptions,
+  stackMeta?: {
+    languages: string[];
+    frameworks: string[];
+    evidence: Record<string, string[]>;
+    notes: string | null;
+  } | null
 ): "created" | "overwritten" | "skipped" {
   const templatePath = path.join(packRoot, "templates", "harness-config.json");
   const template = readJsonFile(templatePath);
@@ -1030,6 +1036,14 @@ function updateConfigWithDomains(
   const existing = readJsonFile(targetPath);
   const merged = deepMerge(template, existing);
   merged.domains = [...selectedDomains];
+  if (stackMeta) {
+    merged.stack = {
+      languages: stackMeta.languages,
+      frameworks: stackMeta.frameworks,
+      evidence: stackMeta.evidence,
+      notes: stackMeta.notes,
+    };
+  }
   const serialized = `${JSON.stringify(merged, null, 2)}\n`;
 
   const exists = fs.existsSync(targetPath);
@@ -1201,14 +1215,20 @@ function writeDomainSkillSurface(
   packRoot: string,
   targetAbs: string,
   selectedDomains: string[],
-  options: WriteOptions
+  options: WriteOptions,
+  stackMeta?: {
+    languages: string[];
+    frameworks: string[];
+    evidence: Record<string, string[]>;
+    notes: string | null;
+  } | null
 ): WriteResult {
   const normalized = normalizeDomains(selectedDomains);
   const created: string[] = [];
   const overwritten: string[] = [];
   const skipped: string[] = [];
 
-  const configAction = updateConfigWithDomains(packRoot, targetAbs, normalized, options);
+  const configAction = updateConfigWithDomains(packRoot, targetAbs, normalized, options, stackMeta);
   if (configAction === "created") created.push(".harness/config.json");
   else if (configAction === "overwritten") overwritten.push(".harness/config.json");
   else skipped.push(".harness/config.json");
