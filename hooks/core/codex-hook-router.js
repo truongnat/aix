@@ -197,7 +197,11 @@ function handleToolEvent(repoRoot, eventName, payload) {
   });
 
   if (!command) {
-    return null;
+    // Non-shell tools (file read/write) have no command — allow by default.
+    return hookOutput(eventName, {
+      permissionDecision: "allow",
+      decision: "allow",
+    });
   }
 
   if (isDangerous(command)) {

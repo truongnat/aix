@@ -129,6 +129,18 @@ test("codex hook router falls back for non-harness slash prompts", () => {
   assert.doesNotMatch(result.hookSpecificOutput.additionalContext, /Execute the harness command/);
 });
 
+test("codex hook router allows non-shell tools with no command field", () => {
+  const dir = tmpRepo();
+  const result = handleCodexHook({
+    hook_event_name: "PreToolUse",
+    cwd: dir,
+    tool_input: { path: ".harness/STATE.md" },
+  });
+  assert.ok(result, "should return a result, not null");
+  assert.equal(result.hookSpecificOutput.permissionDecision, "allow");
+  assert.equal(result.hookSpecificOutput.decision, "allow");
+});
+
 test("codex hook router falls back to runtime-commands when .codex/commands/ missing", () => {
   const dir = tmpRepo();
   fs.mkdirSync(path.join(dir, ".ai-harness", "runtime-commands"), { recursive: true });
