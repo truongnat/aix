@@ -1,0 +1,9 @@
+// Purpose: Backward-compat shim — implementation in src/features/validate/.
+// Layer: presentation (shim)
+// Depends on: dist/features/validate (built by build:src)
+
+/* eslint-disable @typescript-eslint/no-require-imports */
+const api =
+  require("../../features/validate/application/agent-system.js") as typeof import("../../features/validate/application/agent-system");
+
+export const assertAgentSystemLayer = api.assertAgentSystemLayer;

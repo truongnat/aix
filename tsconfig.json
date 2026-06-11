@@ -12,6 +12,6 @@
     "resolveJsonModule": true,
     "ignoreDeprecations": "6.0"
   },
-  "include": ["src/**/*.ts", "lib/**/*.ts", "workers/**/*.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "site"]
 }

@@ -659,12 +659,12 @@ describe("Hooks & Skills Layer", () => {
   test("hooks and skills layer surface exists", () => {
     for (const relativePath of [
       "hooks/README.md",
-      "hooks/core/guard-phase.js",
-      "hooks/core/record-tool-output.js",
-      "hooks/core/record-subagent-result.js",
-      "hooks/core/compact-session-memory.js",
-      "hooks/core/record-skill-run.js",
-      "hooks/core/archive-session-skill.js",
+      "dist/hooks/core/guard-phase.js",
+      "dist/hooks/core/record-tool-output.js",
+      "dist/hooks/core/record-subagent-result.js",
+      "dist/hooks/core/compact-session-memory.js",
+      "dist/hooks/core/record-skill-run.js",
+      "dist/hooks/core/archive-session-skill.js",
       "docs/hooks-and-skills-layer.md",
       "docs/skill-lifecycle.md",
       "workflows/create-skill.md",
@@ -678,12 +678,12 @@ describe("Hooks & Skills Layer", () => {
 
   test("hook scripts support --help", () => {
     for (const script of [
-      "hooks/core/guard-phase.js",
-      "hooks/core/record-tool-output.js",
-      "hooks/core/record-subagent-result.js",
-      "hooks/core/record-skill-run.js",
-      "hooks/core/archive-session-skill.js",
-      "hooks/core/compact-session-memory.js",
+      "dist/hooks/core/guard-phase.js",
+      "dist/hooks/core/record-tool-output.js",
+      "dist/hooks/core/record-subagent-result.js",
+      "dist/hooks/core/record-skill-run.js",
+      "dist/hooks/core/archive-session-skill.js",
+      "dist/hooks/core/compact-session-memory.js",
     ]) {
       const result = runNode([path.join(repoRoot, script), "--help"]);
       assert.equal(result.status, 0, result.stderr || result.stdout);
@@ -695,7 +695,7 @@ describe("Hooks & Skills Layer", () => {
     const session = ".harness/sessions/2026-06-04-google-login";
     const result = runNode(
       [
-        path.join(repoRoot, "hooks", "core", "guard-phase.js"),
+        path.join(repoRoot, "dist", "hooks", "core", "guard-phase.js"),
         "--command",
         "harness-verify",
         "--session",

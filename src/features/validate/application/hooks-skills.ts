@@ -3,12 +3,12 @@ import path from "node:path";
 import childProcess from "node:child_process";
 
 const HOOK_SCRIPTS = [
-  "hooks/core/guard-phase.js",
-  "hooks/core/record-tool-output.js",
-  "hooks/core/record-subagent-result.js",
-  "hooks/core/compact-session-memory.js",
-  "hooks/core/record-skill-run.js",
-  "hooks/core/archive-session-skill.js",
+  "dist/hooks/core/guard-phase.js",
+  "dist/hooks/core/record-tool-output.js",
+  "dist/hooks/core/record-subagent-result.js",
+  "dist/hooks/core/compact-session-memory.js",
+  "dist/hooks/core/record-skill-run.js",
+  "dist/hooks/core/archive-session-skill.js",
 ];
 
 const SKILL_TEMPLATES = [

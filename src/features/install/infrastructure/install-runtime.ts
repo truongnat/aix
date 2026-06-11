@@ -358,7 +358,7 @@ function installCodexHooks(
 ): void {
   const codexRoot =
     scope === "global" ? path.join(os.homedir(), ".codex") : path.join(targetRoot, ".codex");
-  const sourceRoot = path.join(packRoot, "hooks", "core");
+  const sourceRoot = path.join(packRoot, "dist", "hooks", "core");
   if (!fs.existsSync(sourceRoot)) {
     return;
   }

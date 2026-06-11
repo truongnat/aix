@@ -91,7 +91,6 @@ test("build:codex-plugin stages a publishable Codex bundle", () => {
 test("package exposes an incremental TypeScript typecheck for lib and src", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
   const tsconfigPath = path.join(repoRoot, "tsconfig.json");
-  const tsconfigLibPath = path.join(repoRoot, "tsconfig.lib.json");
 
   assert.equal(typeof pkg.scripts.typecheck, "string");
   assert.equal(pkg.scripts.typecheck, "node ./node_modules/typescript/bin/tsc -p tsconfig.json");
@@ -99,110 +98,28 @@ test("package exposes an incremental TypeScript typecheck for lib and src", () =
   assert.ok(pkg.devDependencies.typescript, "typescript devDependency must be present");
   assert.ok(pkg.devDependencies["@types/node"], "@types/node devDependency must be present");
   assert.ok(fs.existsSync(tsconfigPath), "tsconfig.json must exist");
-  assert.ok(fs.existsSync(tsconfigLibPath), "tsconfig.lib.json must exist");
   assert.ok(
     fs.existsSync(path.join(repoRoot, "node_modules", "typescript", "bin", "tsc")),
     "local TypeScript CLI must exist"
   );
 
   const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, "utf8"));
-  const tsconfigLib = JSON.parse(fs.readFileSync(tsconfigLibPath, "utf8"));
   assert.equal(tsconfig.compilerOptions.noEmit, true);
   assert.ok(
     tsconfig.compilerOptions.types?.includes("node"),
     "tsconfig.json must include node types"
   );
   assert.ok(tsconfig.include.includes("src/**/*.ts"), "tsconfig.json must include src/**/*.ts");
-  assert.ok(tsconfig.include.includes("lib/**/*.ts"), "tsconfig.json must include lib/**/*.ts");
-  assert.equal(tsconfigLib.compilerOptions.allowJs, true);
-  assert.equal(tsconfigLib.compilerOptions.checkJs, true);
-  assert.equal(tsconfigLib.compilerOptions.noEmit, true);
-  assert.ok(
-    tsconfigLib.include.includes("lib/provider-registry.ts"),
-    "tsconfig.lib.json must include lib/provider-registry.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/cli-providers.ts"),
-    "tsconfig.lib.json must include lib/cli-providers.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/provider-rule-renderer.ts"),
-    "tsconfig.lib.json must include lib/provider-rule-renderer.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/catalog/provider-command-metadata.ts"),
-    "tsconfig.lib.json must include lib/catalog/provider-command-metadata.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/catalog/command-rendering.ts"),
-    "tsconfig.lib.json must include lib/catalog/command-rendering.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/catalog/command-installation.ts"),
-    "tsconfig.lib.json must include lib/catalog/command-installation.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/runtime-command-catalog.ts"),
-    "tsconfig.lib.json must include lib/runtime-command-catalog.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/worker-claude-adapter.ts"),
-    "tsconfig.lib.json must include lib/worker-claude-adapter.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("workers/registry.ts"),
-    "tsconfig.lib.json must include workers/registry.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/install-runtime.ts"),
-    "tsconfig.lib.json must include lib/install-runtime.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/file-operations.ts"),
-    "tsconfig.lib.json must include lib/file-operations.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/command-surface-report.ts"),
-    "tsconfig.lib.json must include lib/command-surface-report.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/plugin-packaging.ts"),
-    "tsconfig.lib.json must include lib/plugin-packaging.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/install-cache.ts"),
-    "tsconfig.lib.json must include lib/install-cache.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/cli-help.ts"),
-    "tsconfig.lib.json must include lib/cli-help.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/cli-detect.ts"),
-    "tsconfig.lib.json must include lib/cli-detect.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/provider-detection.ts"),
-    "tsconfig.lib.json must include lib/provider-detection.ts"
-  );
-  assert.ok(
-    tsconfigLib.include.includes("lib/cli-plan.ts"),
-    "tsconfig.lib.json must include lib/cli-plan.ts"
-  );
 });
 
 test("package exposes a TypeScript watch build script", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
   const verifyDistScript = path.join(repoRoot, "scripts", "verify-dist.js");
 
-  assert.equal(pkg.scripts.build, "npm run build:src && npm run build:legacy");
+  assert.equal(pkg.scripts.build, "npm run build:src");
   assert.equal(
     pkg.scripts["build:src"],
     "node ./node_modules/typescript/bin/tsc -p tsconfig.src.json"
-  );
-  assert.equal(
-    pkg.scripts["build:legacy"],
-    "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json"
   );
   assert.equal(
     pkg.scripts["build:watch"],
@@ -333,8 +250,8 @@ test("cli-backend only retains pack-root resolution after the in-process port", 
   assert.doesNotMatch(backend, /buildInstallArgs|buildUpdateArgs|buildUninstallArgs/);
 });
 
-test("lib/ and workers/ source tree stays free of @ts-ignore suppressions", () => {
-  const roots = [path.join(repoRoot, "lib"), path.join(repoRoot, "workers")];
+test("src/ source tree stays free of @ts-ignore suppressions", () => {
+  const roots = [path.join(repoRoot, "src")];
   const matches = [];
   const pending = [...roots];
 

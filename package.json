@@ -98,9 +98,8 @@
   ],
   "scripts": {
     "install:harness": "node dist/cli/main.js install",
-    "build": "npm run build:src && npm run build:legacy",
+    "build": "npm run build:src",
     "build:src": "node ./node_modules/typescript/bin/tsc -p tsconfig.src.json",
-    "build:legacy": "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json",
     "build:watch": "node ./node_modules/typescript/bin/tsc -p tsconfig.src.json --watch",
     "build:codex-plugin": "node scripts/build-codex-plugin.js",
     "publish:codex-plugin": "npm run build:codex-plugin",
