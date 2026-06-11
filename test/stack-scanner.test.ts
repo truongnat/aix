@@ -9,13 +9,9 @@ const os = require("node:os") as typeof import("node:os");
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require("node:path") as typeof import("node:path");
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { stackScanner } = require(path.join(
-  __dirname,
-  "..",
-  "dist",
-  "lib",
-  "stack-scanner.js"
-)) as typeof import("../lib/stack-scanner.js");
+const { stackScanner } = require(
+  path.join(__dirname, "..", "dist", "lib", "stack-scanner.js")
+) as typeof import("../lib/stack-scanner.js");
 
 function tmpDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), "stack-scanner-"));
