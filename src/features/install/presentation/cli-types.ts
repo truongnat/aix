@@ -1,7 +1,10 @@
-// Purpose: CLI types shared by install presentation until Phase 7 migration.
+// Purpose: CLI types shared by install presentation.
 // Layer: presentation
-// Depends on: nothing
+// Depends on: src/cli/args for ParseOptions
 
+import type { ParseOptions } from "../../../cli/args";
+
+export type { ParseOptions };
 export type PlanProviderId = "claude" | "cursor" | "codex" | "gemini" | "generic" | "manual";
 
 export interface ProviderDescriptor {
@@ -57,35 +60,4 @@ export interface UiFacade {
   confirmInstallCache: (defaultYes: boolean) => Promise<boolean | null>;
   confirmRemoveState: (defaultYes?: boolean) => Promise<boolean | null>;
   confirmFullCleanup: (defaultYes?: boolean) => Promise<boolean | null>;
-  selectUninstallScope: () => Promise<string | null | undefined>;
-  selectUninstallTargets: (options: Record<string, unknown>) => Promise<Record<string, boolean> | null>;
-}
-
-export interface ParseOptions {
-  command: string;
-  evalCommand: string;
-  evalTarget: string;
-  providers: string[];
-  providerAlias: string;
-  runtimeAliasUsed: boolean;
-  scope: string;
-  visibility: string;
-  target: string;
-  dryRun: boolean;
-  yes: boolean;
-  help: boolean;
-  all: boolean;
-  verbose: boolean;
-  json: boolean;
-  export: boolean;
-  anonymize: boolean;
-  upload: boolean;
-  forceUpload: boolean;
-  force: boolean;
-  recommendEvals: boolean;
-  runRecommendedEvals: boolean;
-  useLlmJudge: boolean;
-  liveProviderCommand: string;
-  domains: string[];
-  analysisFile: string;
 }

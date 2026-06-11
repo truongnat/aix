@@ -596,7 +596,7 @@ describe("CLI Main", () => {
     const calls = [];
 
     Module._load = function patchedLoader(request, parent, isMain) {
-      if (request === "./cli-commands/eval") {
+      if (request.includes("features/eval/presentation/eval-command")) {
         return {
           runEvalCommand: async (_packRoot, options) => {
             calls.push(options);
@@ -627,7 +627,7 @@ describe("CLI Main", () => {
     const calls = [];
 
     Module._load = function patchedLoader(request, parent, isMain) {
-      if (request === "./cli-commands/domains") {
+      if (request.includes("features/domains/presentation/domains-command")) {
         return {
           runDomainsCommand: async (_packRoot, options) => {
             calls.push(options);

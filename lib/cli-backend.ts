@@ -1,7 +1,8 @@
-import path from "node:path";
+// Purpose: Backward-compat shim — implementation in src/cli/.
+// Layer: presentation (shim)
+// Depends on: dist/cli (built by build:src)
 
-function packRootFromModule(moduleFilename: string): string {
-  return path.resolve(path.dirname(moduleFilename), "..");
-}
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+const api = require("../cli/backend.js") as any;
 
-export { packRootFromModule };
+export const packRootFromModule = api.packRootFromModule;

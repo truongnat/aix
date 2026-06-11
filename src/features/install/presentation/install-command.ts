@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { modeToScopeVisibility, type ParseOptions } from "./cli-legacy";
+import { modeToScopeVisibility, type ParseOptions, type ProviderBinaryMap } from "./cli-legacy";
 import { ACTIVE_PROVIDERS, providerPriorityLabel, isRuntimeNative } from "./cli-legacy";
 import { detectProviderBinaries, detectLegacyProviderResidue, isGitRepo } from "./cli-legacy";
 import { normalizeDomainSelection } from "./cli-legacy";
@@ -145,7 +145,7 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     throw new Error(`Unknown domain skill(s): ${invalidDomainIds.join(", ")}`);
   }
   let domains = [...explicitDomains];
-  const binaryStatus = detectProviderBinaries();
+  const binaryStatus: ProviderBinaryMap = detectProviderBinaries();
   const availableProviders = ACTIVE_PROVIDERS.filter(
     (provider) => binaryStatus[provider.id]?.installed
   );

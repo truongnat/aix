@@ -1,77 +1,51 @@
-// Purpose: Bridge to legacy CLI modules until Phase 7 CLI router migration.
+// Purpose: Bridge to src/cli modules for install/update/uninstall wizards.
 // Layer: presentation
-// Depends on: dist/lib CLI modules at runtime
-
-/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+// Depends on: src/cli at compile time
 
 import type {
   BackendSpawnResult,
   InstallPlan,
-  ParseOptions,
   PlanProviderId,
   ProviderBinaryMap,
   ProviderDescriptor,
   UiFacade,
 } from "./cli-types";
+import type { ParseOptions } from "../../../cli/args";
 
-export type { ParseOptions, PlanProviderId, InstallPlan, ProviderDescriptor };
-
-function req(modulePath: string): any {
-  return require(modulePath);
-}
-
-export const ui = req("../../../lib/cli-ui.js") as UiFacade;
-
-export const { modeToScopeVisibility, isNonInteractive } = req("../../../lib/cli-args.js") as {
-  modeToScopeVisibility: (mode: string) => { scope: string; visibility: string };
-  isNonInteractive: (options: ParseOptions) => boolean;
+export type {
+  ParseOptions,
+  PlanProviderId,
+  InstallPlan,
+  ProviderDescriptor,
+  ProviderBinaryMap,
 };
 
-export const { ACTIVE_PROVIDERS, providerPriorityLabel, isRuntimeNative, FALLBACK_TARGETS } =
-  req("../../../lib/cli-providers.js") as {
-    ACTIVE_PROVIDERS: readonly ProviderDescriptor[];
-    providerPriorityLabel: (provider: ProviderDescriptor) => string;
-    isRuntimeNative: (runtime: string) => boolean;
-    FALLBACK_TARGETS: readonly ProviderDescriptor[];
-  };
+/* eslint-disable @typescript-eslint/no-require-imports */
+export const ui = require("../../../cli/ui/index.js").default as UiFacade;
 
-export const {
+export { modeToScopeVisibility, isNonInteractive } from "../../../cli/args";
+export {
+  ACTIVE_PROVIDERS,
+  providerPriorityLabel,
+  isRuntimeNative,
+  FALLBACK_TARGETS,
+} from "../../../cli/providers";
+export {
   detectProviderBinaries,
   detectLegacyProviderResidue,
   detectInstalledProviders,
   isGitRepo,
-} = req("../../../lib/cli-detect.js") as {
-  detectProviderBinaries: () => ProviderBinaryMap;
-  detectLegacyProviderResidue: (targetAbs: string) => string[];
-  detectInstalledProviders: (targetAbs: string, options?: { includeLegacy?: boolean }) => string[];
-  isGitRepo: (targetAbs: string) => boolean;
-};
-
+} from "../../../cli/detect";
 export { normalizeDomainSelection } from "../../../shared/stack-detect";
-
-export const { NON_GIT_PRIVATE_WARNING, NON_GIT_PRIVATE_WARNING_FOLLOWUP, buildInstallPlan } =
-  req("../../../lib/cli-plan.js") as {
-    NON_GIT_PRIVATE_WARNING: string;
-    NON_GIT_PRIVATE_WARNING_FOLLOWUP: string;
-    buildInstallPlan: (options: {
-      providers: PlanProviderId[];
-      initHarness: boolean;
-      installCache: boolean;
-      mode: string;
-      isGit: boolean;
-    }) => InstallPlan;
-  };
-
-export const {
+export {
+  NON_GIT_PRIVATE_WARNING,
+  NON_GIT_PRIVATE_WARNING_FOLLOWUP,
+  buildInstallPlan,
+} from "../../../cli/plan";
+export {
   readPackageVersion,
   resolveTargetAbs,
   validateProviderSelection,
   validateManualMix,
   failWithBackendError,
-} = req("../../../lib/cli-command-helpers.js") as {
-  readPackageVersion: (packRoot: string) => string;
-  resolveTargetAbs: (target: string) => string;
-  validateProviderSelection: (providers: string[]) => void;
-  validateManualMix: (providers: string[]) => void;
-  failWithBackendError: (kind: string, result: BackendSpawnResult, options: ParseOptions) => number;
-};
+} from "../../../cli/command-helpers";

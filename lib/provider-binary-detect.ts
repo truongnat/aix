@@ -154,7 +154,8 @@ function detectProviderBinaries(): ProviderBinaryMap {
 }
 
 function listDetectedProviderIds(binaries: ProviderBinaryMap): string[] {
-  return ACTIVE_PROVIDER_IDS.filter((providerId) => binaries[providerId]?.installed);
+  const providerIds = ACTIVE_PROVIDER_IDS as readonly string[];
+  return providerIds.filter((providerId) => binaries[providerId]?.installed);
 }
 
 export {

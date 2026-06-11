@@ -15,7 +15,7 @@ test("main routes eval list through the eval command module", async () => {
   const originalLoad = require("node:module").Module._load;
 
   require("node:module").Module._load = function patchedLoader(request, parent, isMain) {
-    if (request === "./cli-commands/eval") {
+    if (request.includes("features/eval/presentation/eval-command")) {
       return {
         runEvalCommand: async (_packRoot, options) => {
           calls.push(options);

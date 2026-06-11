@@ -12,7 +12,7 @@ export const legacyCommandInstallation = require("../../../lib/catalog/command-i
   installProviderInteraction: (...args: unknown[]) => void;
 };
 
-export const legacyCliProviders = require("../../../lib/cli-providers.js") as {
+export const legacyCliProviders = require("../../../cli/providers.js") as {
   isRuntimeNative: (runtime: string) => boolean;
   RUNTIME_NATIVE_PROVIDER_IDS: readonly string[];
 };

@@ -33,10 +33,14 @@ function detectRuntimesFromTarget(targetAbs: string): string[] {
 }
 
 function formatBinaryAvailability(): string {
-  const binaries = detectProviderBinaries();
+  const binaries = detectProviderBinaries() as Record<
+    string,
+    { installed: boolean; version: string | null }
+  >;
   return Object.entries(binaries)
     .map(([providerId, probe]) => {
-      const state = probe.installed ? (probe.version ? `yes (${probe.version})` : "yes") : "no";
+      const row = probe as { installed: boolean; version: string | null };
+      const state = row.installed ? (row.version ? `yes (${row.version})` : "yes") : "no";
       return `${providerId}=${state}`;
     })
     .join(", ");
