@@ -9,6 +9,7 @@ const requiredPaths = [
   "dist/server/telemetry.js",
   "dist/features/telemetry/index.js",
   "dist/features/insights/index.js",
+  "dist/features/validate/index.js",
   "dist/lib/cli-main.js",
   "dist/lib/cli-ui.js",
   "dist/lib/evals/index.js",
