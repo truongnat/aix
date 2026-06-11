@@ -1,21 +1,8 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const fs: typeof import("node:fs") = require("node:fs");
-import type { ParseOptions } from "../cli-args";
-import { resolveTargetAbs } from "../cli-command-helpers";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { stackScanner } = require("../stack-scanner.js") as {
-  stackScanner: (target: string) => unknown;
-};
+// Purpose: Backward-compat shim — implementation in src/.
+// Layer: presentation (shim)
+// Depends on: dist (built by build:src)
 
-async function runScanCommand(_packRoot: string, options: ParseOptions): Promise<number> {
-  const targetAbs = resolveTargetAbs(options.target);
-  if (!fs.existsSync(targetAbs)) {
-    throw new Error(`Target directory does not exist: ${targetAbs}`);
-  }
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+const api = require("../../features/scan/presentation/scan-command.js") as any;
 
-  const result = stackScanner(targetAbs);
-  process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-  return 0;
-}
-
-export { runScanCommand };
+export const runScanCommand = api.runScanCommand;

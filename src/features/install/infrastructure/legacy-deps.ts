@@ -4,8 +4,8 @@
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 
-export const legacyDomainSkillGeneration = require("../../../lib/domain-skill-generation.js") as {
-  writeDomainSkillSurface: (...args: unknown[]) => void;
+export const legacyDomainSkillGeneration = require("../../../features/domains/index.js") as {
+  writeDomainSkillSurface: (...args: unknown[]) => unknown;
 };
 
 export const legacyCommandInstallation = require("../../../lib/catalog/command-installation.js") as {

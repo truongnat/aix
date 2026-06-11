@@ -1,7 +1,7 @@
 # Clean Architecture TypeScript Migration — Design Spec
 
 **Date:** 2026-06-11  
-**Status:** Approved — Phase 1 shipped (2026-06-11); Phase 2 insights CLI shipped (2026-06-11); Phase 3 validate shipped (2026-06-11); Phase 4 install/update/uninstall shipped (2026-06-11); Phase 5 eval shipped (2026-06-11)  
+**Status:** Approved — Phase 1 shipped (2026-06-11); Phase 2 insights CLI shipped (2026-06-11); Phase 3 validate shipped (2026-06-11); Phase 4 install/update/uninstall shipped (2026-06-11); Phase 5 eval shipped (2026-06-11); Phase 6 scan + domains shipped (2026-06-11)  
 **Scope:** Migrate all Node-side code (CLI, server, hooks) to TypeScript under clean architecture. Release artifact is `dist/`.
 
 ---

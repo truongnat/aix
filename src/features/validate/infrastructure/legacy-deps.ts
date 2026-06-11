@@ -36,7 +36,7 @@ export const legacyWorkerClaudeAdapter = require("../../../lib/worker-claude-ada
   assertClaudeWorkerSurface: (baseDir: string, failures: string[]) => void;
 };
 
-export const legacyDomainSkillGeneration = require("../../../lib/domain-skill-generation.js") as {
+export const legacyDomainSkillGeneration = require("../../../features/domains/index.js") as {
   listDomainDefinitions: () => DomainDefinition[];
 };
 

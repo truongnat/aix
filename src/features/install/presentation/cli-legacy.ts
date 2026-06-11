@@ -47,9 +47,7 @@ export const {
   isGitRepo: (targetAbs: string) => boolean;
 };
 
-export const { normalizeDomainSelection } = req("../../../lib/stack-detect.js") as {
-  normalizeDomainSelection: (domains: string[]) => string[];
-};
+export { normalizeDomainSelection } from "../../../shared/stack-detect";
 
 export const { NON_GIT_PRIVATE_WARNING, NON_GIT_PRIVATE_WARNING_FOLLOWUP, buildInstallPlan } =
   req("../../../lib/cli-plan.js") as {
