@@ -1,65 +1,11 @@
-/** In-process update orchestrator. */
+// Purpose: Backward-compat shim — implementation in src/ clean architecture.
+// Layer: presentation (shim)
+// Depends on: dist/features or dist/shared (built by build:src)
 
-import os from "node:os";
-import { runInstall } from "./install-orchestrator";
-import { readInstalledCommandSurface } from "../runtime-command-catalog";
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+const api = require("../../features/update/application/run-update.js") as any;
 
-export interface UpdateContext {
-  packRoot: string;
-  target: string;
-  provider: string;
-  scope: string;
-  visibility: string;
-  dryRun: boolean;
-  /** Ignored — update always uses force=true. Present for forward-compat parity. */
-  force?: boolean;
-}
+export const runUpdate = api.runUpdate;
 
-export interface UpdateResult {
-  ok: boolean;
-  messages: string[];
-}
-
-export function runUpdate(ctx: UpdateContext): UpdateResult {
-  const messages: string[] = [];
-  const targetAbs = ctx.scope === "global" ? os.homedir() : ctx.target;
-  const installedProviders = readInstalledCommandSurface(targetAbs)?.installedProviders || [];
-
-  if (ctx.provider === "manual") {
-    messages.push("error: Manual fallback update is not supported. Re-run install instead.");
-    return { ok: false, messages };
-  }
-
-  if (ctx.scope !== "global") {
-    if (installedProviders.length === 0) {
-      messages.push(
-        "error: No installed providers recorded in .ai-harness/manifest.json. Reinstall first."
-      );
-      return { ok: false, messages };
-    }
-    if (!installedProviders.includes(ctx.provider)) {
-      messages.push(
-        `error: Provider ${ctx.provider} is not recorded in .ai-harness/manifest.json. Reinstall first.`
-      );
-      return { ok: false, messages };
-    }
-  }
-
-  return runInstall(
-    {
-      packRoot: ctx.packRoot,
-      target: targetAbs,
-      provider: ctx.provider,
-      scope: ctx.scope,
-      visibility: ctx.visibility,
-      dryRun: ctx.dryRun,
-      initHarness: false,
-      installCache: true,
-      domains: [],
-      force: true,
-    },
-    {
-      runtimeBannerVerb: "update",
-    }
-  );
-}
+export type UpdateContext = any;
+export type UpdateResult = any;

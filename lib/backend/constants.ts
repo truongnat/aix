@@ -1,74 +1,13 @@
-export const EXCLUDE_BLOCK_START = "# ai-engineering-harness start";
-export const EXCLUDE_BLOCK_END = "# ai-engineering-harness end";
-export const HARNESS_MARKER = "ai-engineering-harness";
+// Purpose: Backward-compat shim — implementation in src/ clean architecture.
+// Layer: presentation (shim)
+// Depends on: dist/features or dist/shared (built by build:src)
 
-/** Provider command surface paths written into a target repo. */
-export function providerCommandPaths(provider: string): string[] {
-  switch (provider) {
-    case "cursor":
-      return [".cursor/commands/", ".cursor/rules/"];
-    case "claude":
-      return [".claude/commands/"];
-    case "gemini":
-      return [".gemini/extensions/ai-engineering-harness/commands/"];
-    default:
-      return [];
-  }
-}
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+const api = require("../../shared/install-kernel/constants.js") as any;
 
-/** Paths to ignore for a provider install. */
-export function ignorePathsForProvider(provider: string, initHarness: boolean): string[] {
-  const out: string[] = [".harness/"];
-  void initHarness;
-  switch (provider) {
-    case "cursor":
-      out.push(...providerCommandPaths("cursor"));
-      break;
-    case "claude":
-      out.push(
-        ".claude/CLAUDE.md",
-        ".claude/settings.json",
-        ".claude/agents/",
-        ".claude/skills/",
-        ...providerCommandPaths("claude")
-      );
-      break;
-    case "gemini":
-      out.push(".gemini/extensions/ai-engineering-harness/", ...providerCommandPaths("gemini"));
-      break;
-    case "opencode":
-      out.push(".opencode/plugins/ai-engineering-harness.js");
-      break;
-    case "codex":
-    case "generic":
-    case "manual":
-      out.push("AGENTS.md");
-      if (provider === "codex") {
-        out.push(".codex/");
-        out.push(".agents/skills/");
-      }
-      break;
-    case "all":
-      out.push(
-        ".cursor/commands/",
-        ".cursor/rules/",
-        ".claude/CLAUDE.md",
-        ".claude/settings.json",
-        ".claude/agents/",
-        ".claude/skills/",
-        ".claude/commands/",
-        ".codex/",
-        ".gemini/extensions/ai-engineering-harness/",
-        ".opencode/plugins/ai-engineering-harness.js",
-        "AGENTS.md",
-        ".agents/skills/"
-      );
-      break;
-  }
-  return out;
-}
-
-/** Paths removed on uninstall for a provider (.harness/ excluded — handled by removeState flag). */
-export function uninstallPathsForProvider(provider: string): string[] {
-  return ignorePathsForProvider(provider, false).filter((p) => p !== ".harness/");
-}
+export const EXCLUDE_BLOCK_START = api.EXCLUDE_BLOCK_START;
+export const EXCLUDE_BLOCK_END = api.EXCLUDE_BLOCK_END;
+export const HARNESS_MARKER = api.HARNESS_MARKER;
+export const providerCommandPaths = api.providerCommandPaths;
+export const ignorePathsForProvider = api.ignorePathsForProvider;
+export const uninstallPathsForProvider = api.uninstallPathsForProvider;

@@ -5,6 +5,17 @@ const os = require("node:os");
 const path = require("node:path");
 const { initHarnessProfile } = require("../../dist/lib/backend/harness-skeleton.js");
 
+const harnessSkeletonSource = path.join(
+  __dirname,
+  "..",
+  "..",
+  "src",
+  "features",
+  "install",
+  "infrastructure",
+  "harness-skeleton.ts"
+);
+
 const EXPECTED = [
   "HARNESS.md",
   "TEAM.md",
@@ -83,17 +94,14 @@ test("initHarnessProfile overwrites an existing file when force=true", () => {
 });
 
 test("writeTargetFile docstring explains newline normalization and first overwrite candidates", () => {
-  const source = fs.readFileSync(
-    path.join(__dirname, "..", "..", "lib", "backend", "harness-skeleton.ts"),
-    "utf8"
-  );
+  const source = fs.readFileSync(harnessSkeletonSource, "utf8");
 
   assert.match(source, /All generated markdown ends with a trailing newline/);
   assert.match(source, /older installers may therefore show a first overwrite/);
 });
 
 test("generated harness skeleton sources do not contain placeholder TODO or FIXME markers", () => {
-  const sources = [path.join(__dirname, "..", "..", "lib", "backend", "harness-skeleton.ts")];
+  const sources = [harnessSkeletonSource];
 
   for (const file of sources) {
     const source = fs.readFileSync(file, "utf8");
@@ -103,10 +111,7 @@ test("generated harness skeleton sources do not contain placeholder TODO or FIXM
 });
 
 test("policy skeleton stays aligned without a default scope guard rule", () => {
-  const tsSource = fs.readFileSync(
-    path.join(__dirname, "..", "..", "lib", "backend", "harness-skeleton.ts"),
-    "utf8"
-  );
+  const tsSource = fs.readFileSync(harnessSkeletonSource, "utf8");
   const policyGenerator = fs.readFileSync(
     path.join(__dirname, "..", "..", "lib", "policy", "generator.ts"),
     "utf8"
