@@ -1,64 +1,8 @@
-import type { ParseOptions } from "../cli-args";
-import { listTasks, readReport, runTask } from "../evals";
+// Purpose: Backward-compat shim — implementation in src/features/eval/.
+// Layer: presentation (shim)
+// Depends on: dist/features/eval (built by build:src)
 
-interface RunTaskOptions {
-  provider: string;
-  verbose: boolean;
-  useLlmJudge: boolean;
-  targetRoot: string;
-  liveProviderCommand: string;
-}
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+const api = require("../../features/eval/presentation/eval-command.js") as any;
 
-interface RunTaskResult {
-  summaryPath: string;
-  exitCode: number;
-  comparison?: {
-    selfCorrectionDemonstrated: boolean;
-  };
-}
-
-interface ListTasksResult {
-  output: string;
-}
-
-interface ReadReportResult {
-  output: string;
-}
-
-async function runEvalCommand(packRoot: string, options: ParseOptions): Promise<number> {
-  const evalCommand = options.evalCommand || "list";
-
-  switch (evalCommand) {
-    case "list": {
-      const result = listTasks(packRoot, { targetRoot: options.target }) as ListTasksResult;
-      process.stdout.write(`${result.output}\n`);
-      return 0;
-    }
-    case "run": {
-      if (!options.evalTarget) {
-        throw new Error("Missing eval target for `aih eval run`.");
-      }
-      const result = (await runTask(packRoot, options.evalTarget, {
-        provider: options.providers[0] || "codex",
-        verbose: options.verbose,
-        useLlmJudge: options.useLlmJudge,
-        targetRoot: options.target,
-        liveProviderCommand: options.liveProviderCommand || process.env.EVAL_PROVIDER_COMMAND || "",
-      })) as RunTaskResult;
-      process.stdout.write(`${result.summaryPath}\n`);
-      return result.exitCode;
-    }
-    case "report": {
-      if (!options.evalTarget) {
-        throw new Error("Missing eval target for `aih eval report`.");
-      }
-      const result = readReport(packRoot, options.evalTarget) as ReadReportResult;
-      process.stdout.write(`${result.output}\n`);
-      return 0;
-    }
-    default:
-      throw new Error(`Unknown eval subcommand: ${evalCommand}`);
-  }
-}
-
-export { runEvalCommand };
+export const runEvalCommand = api.runEvalCommand;

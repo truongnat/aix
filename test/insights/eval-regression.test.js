@@ -27,7 +27,12 @@ test("runRecommendedEvalRegression executes recommended tasks and writes a repor
   const calls = [];
 
   Module._load = function patchedLoader(request, parent, isMain) {
-    if (request === "../evals" || request.endsWith("lib/evals/index.js")) {
+    const normalized = String(request).replace(/\\/g, "/");
+    if (
+      request === "../evals" ||
+      normalized.endsWith("lib/evals/index.js") ||
+      normalized.endsWith("features/eval/index.js")
+    ) {
       return {
         runTask: async (_packRoot, taskId) => {
           calls.push(taskId);
@@ -42,6 +47,11 @@ test("runRecommendedEvalRegression executes recommended tasks and writes a repor
   };
 
   try {
+    for (const key of Object.keys(require.cache)) {
+      if (key.includes(`${path.sep}dist${path.sep}features${path.sep}insights${path.sep}`)) {
+        delete require.cache[key];
+      }
+    }
     const { runRecommendedEvalRegression } = fresh("dist/lib/insights/eval-regression.js");
     const result = await runRecommendedEvalRegression(repoRoot, tempRoot, {
       provider: "codex",

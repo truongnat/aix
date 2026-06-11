@@ -1,33 +1,11 @@
-import fs from "node:fs";
-import path from "node:path";
+// Purpose: Backward-compat shim — implementation in src/features/eval/.
+// Layer: presentation (shim)
+// Depends on: dist/features/eval (built by build:src)
 
-interface RunContext {
-  runId: string;
-  runRoot: string;
-  modeDir: (mode: string) => string;
-}
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+const api = require("../../features/eval/infrastructure/run-context.js") as any;
 
-function resolveArtifactsBase(packRoot: string): string {
-  return process.env.AIH_EVAL_ARTIFACTS_DIR
-    ? path.resolve(process.env.AIH_EVAL_ARTIFACTS_DIR)
-    : path.join(packRoot, "artifacts");
-}
+export const createRunContext = api.createRunContext;
+export const resolveArtifactsBase = api.resolveArtifactsBase;
 
-function createRunContext(packRoot: string, taskId: string): RunContext {
-  const safeTaskId = taskId.replace(/[/\\:*?"<>|]/g, "-");
-  const runId = `${new Date().toISOString().replace(/[:.]/g, "-")}-${safeTaskId}`;
-  const runRoot = path.join(resolveArtifactsBase(packRoot), "runs", runId);
-  fs.mkdirSync(runRoot, { recursive: true });
-  return {
-    runId,
-    runRoot,
-    modeDir(mode: string) {
-      const dir = path.join(runRoot, mode);
-      fs.mkdirSync(dir, { recursive: true });
-      return dir;
-    },
-  };
-}
-
-export { createRunContext, resolveArtifactsBase };
-export type { RunContext };
+export type RunContext = any;

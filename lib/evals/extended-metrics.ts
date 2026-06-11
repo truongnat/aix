@@ -1,61 +1,12 @@
-import { mutationMetrics } from "./mode-mutations";
-import type { Task } from "./task-registry";
-import type { ExtendedMetrics, ComparisonMetrics, Score } from "./scoring";
+// Purpose: Backward-compat shim — implementation in src/features/eval/.
+// Layer: presentation (shim)
+// Depends on: dist/features/eval (built by build:src)
 
-function scoreExtendedMetrics(
-  task: Task,
-  mode: string,
-  baseScore: Score,
-  packRoot: string
-): ExtendedMetrics {
-  const metrics = mutationMetrics(task, packRoot);
-  const steps = mode === "with-harness" ? metrics.withHarnessSteps : metrics.withoutHarnessSteps;
-  const phaseDiscipline = {
-    phases: metrics.phases || [],
-    behaviorPassRate: baseScore.behavior.percent,
-    passed: baseScore.behavior.failed === 0,
-  };
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+const api = require("../../features/eval/infrastructure/extended-metrics.js") as any;
 
-  return {
-    steps,
-    efficiency: {
-      steps,
-      baselineSteps: metrics.withoutHarnessSteps,
-      harnessSteps: metrics.withHarnessSteps,
-      improvement:
-        metrics.withoutHarnessSteps > 0
-          ? (metrics.withoutHarnessSteps - metrics.withHarnessSteps) / metrics.withoutHarnessSteps
-          : 0,
-    },
-    phaseDiscipline,
-    selfCorrectionReady: mode === "with-harness" && baseScore.behavior.percent >= 0.8,
-  };
-}
+export const compareAbMetrics = api.compareAbMetrics;
+export const scoreExtendedMetrics = api.scoreExtendedMetrics;
 
-function compareAbMetrics(
-  task: Task,
-  withHarnessScore: Score,
-  withoutHarnessScore: Score,
-  packRoot: string
-): ComparisonMetrics {
-  const withMetrics = scoreExtendedMetrics(task, "with-harness", withHarnessScore, packRoot);
-  const withoutMetrics = scoreExtendedMetrics(
-    task,
-    "without-harness",
-    withoutHarnessScore,
-    packRoot
-  );
-
-  return {
-    estimatedEfficiencyGain: withMetrics.efficiency.improvement,
-    withHarnessSteps: withMetrics.efficiency.harnessSteps,
-    withoutHarnessSteps: withoutMetrics.efficiency.steps,
-    phaseDisciplineDelta: withHarnessScore.behavior.percent - withoutHarnessScore.behavior.percent,
-    selfCorrectionDemonstrated:
-      withoutHarnessScore.behavior.failed > 0 && withHarnessScore.behavior.failed === 0,
-    phases: withMetrics.phaseDiscipline.phases,
-  };
-}
-
-export { compareAbMetrics, scoreExtendedMetrics };
-export type { ExtendedMetrics, ComparisonMetrics };
+export type ExtendedMetrics = any;
+export type ComparisonMetrics = any;

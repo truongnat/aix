@@ -22,7 +22,7 @@ export async function runEvalTask(
   options: RunEvalTaskOptions = {}
 ): Promise<RunEvalTaskResult> {
   /* eslint-disable @typescript-eslint/no-require-imports */
-  const { runTask } = require("../../../lib/evals/index.js") as {
+  const { runTask } = require("../../../features/eval/index.js") as {
     runTask: (
       packRoot: string,
       taskId: string,
