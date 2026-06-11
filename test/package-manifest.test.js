@@ -25,7 +25,7 @@ test("package.json does not expose removed root shims", () => {
     assert.ok(!pkg.files.includes(entry), `${entry} should not be packaged`);
     assert.ok(!fs.existsSync(path.join(repoRoot, entry)), `${entry} should be removed`);
   }
-  assert.equal(pkg.scripts["install:harness"], "node bin/aih.js install");
+  assert.equal(pkg.scripts["install:harness"], "node dist/cli/main.js install");
   assert.equal(pkg.scripts.validate, "node bin/validate.js");
 });
 
@@ -288,7 +288,7 @@ test("README advertises the current coverage target", () => {
 });
 
 test("cli-ui uses typed imports without ts-ignore suppressions", () => {
-  const cliUi = fs.readFileSync(path.join(repoRoot, "lib", "cli-ui.ts"), "utf8");
+  const cliUi = fs.readFileSync(path.join(repoRoot, "src", "cli", "ui", "index.ts"), "utf8");
 
   assert.match(cliUi, /import type \* as ClackPrompts from "@clack\/prompts"/);
   assert.match(cliUi, /type DynamicImport = <T>\(specifier: string\) => Promise<T>/);
@@ -297,7 +297,7 @@ test("cli-ui uses typed imports without ts-ignore suppressions", () => {
   assert.match(cliUi, /async function loadClackPrompts/);
   assert.match(
     cliUi,
-    /import \{ formatCommandSupportForPlan \} from "\.\/runtime-command-catalog"/
+    /import \{ formatCommandSupportForPlan \} from "\.\.\/infrastructure\/legacy-deps"/
   );
   assert.doesNotMatch(cliUi, /@ts-ignore/);
 });
@@ -325,7 +325,7 @@ test("CLI UX docs describe the primary lifecycle path as in-process, not shell-b
 });
 
 test("cli-backend only retains pack-root resolution after the in-process port", () => {
-  const backend = fs.readFileSync(path.join(repoRoot, "lib", "cli-backend.ts"), "utf8");
+  const backend = fs.readFileSync(path.join(repoRoot, "src", "cli", "backend.ts"), "utf8");
 
   assert.match(backend, /function packRootFromModule/);
   assert.match(backend, /export \{ packRootFromModule \}/);
@@ -367,7 +367,7 @@ test("CI smoke install uses a runner-agnostic Node invocation instead of bash", 
   assert.match(workflow, /run: node scripts\/smoke-install\.js/);
   assert.match(smokeInstall, /process\.env\.RUNNER_TEMP \|\| os\.tmpdir\(\)/);
   assert.match(smokeInstall, /spawnSync\(\s*process\.execPath,/);
-  assert.match(smokeInstall, /"bin\/aih\.js", "install"/);
+  assert.match(smokeInstall, /"dist\/cli\/main\.js", "install"/);
   assert.match(smokeInstall, /"--provider", "cursor"/);
   assert.match(smokeInstall, /"--dry-run"/);
 });
@@ -408,7 +408,7 @@ test("adoption-facing install docs keep the Node CLI as primary", () => {
 
   assert.match(
     adoptionGuide,
-    /prefer the Node\.js CLI \(`npx ai-engineering-harness install` or `node bin\/aih\.js install`\) as the primary install surface/i
+    /prefer the Node\.js CLI \(`npx ai-engineering-harness install` or `node dist\/cli\/main\.js install`\) as the primary install surface/i
   );
   assert.match(adoptionGuide, /npx ai-engineering-harness install --target/);
 
@@ -614,7 +614,7 @@ test("install and diagnostics warnings point legacy residue cleanup to uninstall
     "utf8"
   );
   const diagnosticsCommand = fs.readFileSync(
-    path.join(repoRoot, "lib", "cli-commands", "diagnostics.ts"),
+    path.join(repoRoot, "src", "cli", "commands", "diagnostics.ts"),
     "utf8"
   );
 

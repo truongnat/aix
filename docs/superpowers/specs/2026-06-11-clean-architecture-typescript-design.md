@@ -1,7 +1,7 @@
 # Clean Architecture TypeScript Migration — Design Spec
 
 **Date:** 2026-06-11  
-**Status:** Approved — Phase 1 shipped (2026-06-11); Phase 2 insights CLI shipped (2026-06-11); Phase 3 validate shipped (2026-06-11); Phase 4 install/update/uninstall shipped (2026-06-11); Phase 5 eval shipped (2026-06-11); Phase 6 scan + domains shipped (2026-06-11); Phase 7 CLI router shipped (2026-06-11); Phase 8 hooks shipped (2026-06-11)  
+**Status:** Approved — Phase 1 shipped (2026-06-11); Phase 2 insights CLI shipped (2026-06-11); Phase 3 validate shipped (2026-06-11); Phase 4 install/update/uninstall shipped (2026-06-11); Phase 5 eval shipped (2026-06-11); Phase 6 scan + domains shipped (2026-06-11); Phase 7 CLI router shipped (2026-06-11); Phase 8 hooks shipped (2026-06-11); Phase 9 bin cleanup shipped (2026-06-11) — bin/aih.js removed, dist/cli/main.js is now the direct bin entry with hashbang + self-execution; lib/ shim removal deferred (test assertions lock tsconfig.lib.json includes)  
 **Scope:** Migrate all Node-side code (CLI, server, hooks) to TypeScript under clean architecture. Release artifact is `dist/`.
 
 ---

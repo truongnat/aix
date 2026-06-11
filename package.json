@@ -42,8 +42,8 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "ai-engineering-harness": "bin/aih.js",
-    "aih": "bin/aih.js"
+    "ai-engineering-harness": "dist/cli/main.js",
+    "aih": "dist/cli/main.js"
   },
   "files": [
     "bin/",
@@ -97,7 +97,7 @@
     "SECURITY.md"
   ],
   "scripts": {
-    "install:harness": "node bin/aih.js install",
+    "install:harness": "node dist/cli/main.js install",
     "build": "npm run build:src && npm run build:legacy",
     "build:src": "node ./node_modules/typescript/bin/tsc -p tsconfig.src.json",
     "build:legacy": "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json",
