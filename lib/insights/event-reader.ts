@@ -1,35 +1,13 @@
-import fs from "node:fs";
-import path from "node:path";
+// Purpose: Backward-compat shim — implementation in src/features/insights/.
+// Layer: infrastructure (shim)
+// Depends on: dist/features/insights
 
-interface Event {
-  type: string;
-  [key: string]: unknown;
-}
+/* eslint-disable @typescript-eslint/no-require-imports */
+const api = require("../../features/insights/infrastructure/event-reader.js") as {
+  readEvents: typeof import("../../src/features/insights/infrastructure/event-reader").readEvents;
+  resolveEventsPath: typeof import("../../src/features/insights/infrastructure/event-reader").resolveEventsPath;
+};
 
-function resolveEventsPath(targetRoot: string): string {
-  return path.join(targetRoot, ".harness", "history", "events.jsonl");
-}
-
-function readEvents(eventsPath: string): Event[] {
-  if (!fs.existsSync(eventsPath)) {
-    return [];
-  }
-
-  const events: Event[] = [];
-  const lines = fs.readFileSync(eventsPath, "utf8").split(/\r?\n/);
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) {
-      continue;
-    }
-    try {
-      events.push(JSON.parse(trimmed));
-    } catch {
-      // Skip malformed lines so local history stays resilient.
-    }
-  }
-  return events;
-}
-
-export { readEvents, resolveEventsPath };
-export type { Event };
+export const readEvents = api.readEvents;
+export const resolveEventsPath = api.resolveEventsPath;
+export type Event = import("../../src/features/insights/domain/event").Event;

@@ -1,70 +1,35 @@
-import path from "node:path";
-import { readEvents, resolveEventsPath, type Event } from "./event-reader";
-import { buildAnonymizedExport, type ExportOptions, type ExportPayload } from "./export";
-import {
-  createTelemetryServer,
-  handleTelemetryRequest,
-  validateTelemetryPayload,
-  writeTelemetryExport,
-  type TelemetryServerOptions,
-  type TelemetryExportPayload,
-  type TelemetryIngestResult,
-  type TelemetryWriteResult,
-} from "./telemetry-server";
-import { formatInsightsText, summarizeEvents, type Summary } from "./summarize";
+// Purpose: Backward-compat shim — implementation in src/features/insights/.
+// Layer: presentation (shim)
+// Depends on: dist/features/insights
 
-interface Insights {
-  target: string;
-  eventsPath: string;
-  events: Event[];
-  summary: Summary;
-  output: string;
-}
+/* eslint-disable @typescript-eslint/no-require-imports */
+const api =
+  require("../../features/insights/index.js") as typeof import("../../src/features/insights/index");
 
-function buildInsights(targetRoot: string): Insights {
-  const resolvedTarget = path.resolve(targetRoot || ".");
-  const eventsPath = resolveEventsPath(resolvedTarget);
-  const events = readEvents(eventsPath);
-  const summary = summarizeEvents(events);
+export const buildInsights = api.buildInsights;
+export const buildInsightsExport = api.buildInsightsExport;
+export const buildAnonymizedExport = api.buildAnonymizedExport;
+export const createTelemetryServer = api.createTelemetryServer;
+export const formatInsightsText = api.formatInsightsText;
+export const readEvents = api.readEvents;
+export const handleTelemetryRequest = api.handleTelemetryRequest;
+export const resolveEventsPath = api.resolveEventsPath;
+export const summarizeEvents = api.summarizeEvents;
+export const validateTelemetryPayload = api.validateTelemetryPayload;
+export const writeTelemetryExport = api.writeTelemetryExport;
 
-  return {
-    target: resolvedTarget,
-    eventsPath,
-    events,
-    summary,
-    output: formatInsightsText(summary, eventsPath),
-  };
-}
-
-function buildInsightsExport(targetRoot: string, options: ExportOptions = {}): ExportPayload {
-  const insights = buildInsights(targetRoot);
-  return buildAnonymizedExport(insights.summary, {
-    includeFingerprint: true,
-    ...options,
-  });
-}
-
-export {
-  buildInsights,
-  buildInsightsExport,
-  buildAnonymizedExport,
-  createTelemetryServer,
-  formatInsightsText,
-  readEvents,
-  handleTelemetryRequest,
-  resolveEventsPath,
-  summarizeEvents,
-  validateTelemetryPayload,
-  writeTelemetryExport,
-};
-export type {
-  Insights,
-  Event,
-  Summary,
-  ExportOptions,
-  ExportPayload,
-  TelemetryServerOptions,
-  TelemetryExportPayload,
-  TelemetryIngestResult,
-  TelemetryWriteResult,
-};
+export type Insights = import("../../src/features/insights/application/build-insights").Insights;
+export type Event = import("../../src/features/insights/domain/event").Event;
+export type Summary = import("../../src/features/insights/domain/summary").Summary;
+export type ExportOptions =
+  import("../../src/features/insights/domain/export-payload").ExportOptions;
+export type ExportPayload =
+  import("../../src/features/insights/domain/export-payload").ExportPayload;
+export type TelemetryServerOptions =
+  import("../../src/features/telemetry/presentation/routes").TelemetryServerOptions;
+export type TelemetryExportPayload =
+  import("../../src/features/telemetry/domain/telemetry-payload").TelemetryExportPayload;
+export type TelemetryIngestResult =
+  import("../../src/features/telemetry/presentation/routes").TelemetryIngestResult;
+export type TelemetryWriteResult =
+  import("../../src/features/telemetry/infrastructure/file-storage").TelemetryWriteResult;

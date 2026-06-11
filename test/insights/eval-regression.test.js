@@ -27,7 +27,7 @@ test("runRecommendedEvalRegression executes recommended tasks and writes a repor
   const calls = [];
 
   Module._load = function patchedLoader(request, parent, isMain) {
-    if (request === "../evals") {
+    if (request === "../evals" || request.endsWith("lib/evals/index.js")) {
       return {
         runTask: async (_packRoot, taskId) => {
           calls.push(taskId);

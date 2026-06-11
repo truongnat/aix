@@ -188,11 +188,20 @@ test("package exposes a TypeScript watch build script", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
   const verifyDistScript = path.join(repoRoot, "scripts", "verify-dist.js");
 
-  assert.equal(pkg.scripts.build, "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json");
+  assert.equal(pkg.scripts.build, "npm run build:src && npm run build:legacy");
+  assert.equal(
+    pkg.scripts["build:src"],
+    "node ./node_modules/typescript/bin/tsc -p tsconfig.src.json"
+  );
+  assert.equal(
+    pkg.scripts["build:legacy"],
+    "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json"
+  );
   assert.equal(
     pkg.scripts["build:watch"],
-    "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json --watch"
+    "node ./node_modules/typescript/bin/tsc -p tsconfig.src.json --watch"
   );
+  assert.equal(pkg.scripts["telemetry:server"], "node dist/server/telemetry.js");
   assert.match(pkg.scripts["test:coverage"], /--lines 75/);
   assert.match(pkg.scripts["test:coverage"], /--functions 70/);
   assert.match(pkg.scripts["test:coverage"], /--branches 65/);
@@ -211,6 +220,8 @@ test("verify-dist script checks compiled test entrypoints with a clear error mes
     verifyDist,
     /Run `npm run build` and fix the TypeScript\/build error before running tests\./
   );
+  assert.match(verifyDist, /dist\/server\/telemetry\.js/);
+  assert.match(verifyDist, /dist\/features\/telemetry\/index\.js/);
   assert.match(verifyDist, /dist\/lib\/cli-main\.js/);
   assert.match(verifyDist, /dist\/lib\/evals\/index\.js/);
   assert.match(verifyDist, /dist\/lib\/validate\/index\.js/);

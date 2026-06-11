@@ -6,6 +6,9 @@ const path = require("node:path");
 const repoRoot = path.resolve(__dirname, "..");
 
 const requiredPaths = [
+  "dist/server/telemetry.js",
+  "dist/features/telemetry/index.js",
+  "dist/features/insights/index.js",
   "dist/lib/cli-main.js",
   "dist/lib/cli-ui.js",
   "dist/lib/evals/index.js",
