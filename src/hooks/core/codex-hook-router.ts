@@ -7,6 +7,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { appendHarnessEvent, findHarnessRoot, readText } from "../shared/util";
 import { buildSessionStartIntent } from "./domain-bootstrap";
+import { evaluateFileEditHook, getToolInput, isEditTool } from "./file-edit-guards";
 
 interface HookPayload {
   hook_event_name?: string;
@@ -66,7 +67,7 @@ function getCwd(payload: HookPayload): string {
 }
 
 function getCommand(payload: HookPayload): string {
-  const toolInput = payload.tool_input || payload.toolInput || payload.input || {};
+  const toolInput = getToolInput(payload);
   if (typeof toolInput === "string") {
     return toolInput;
   }
@@ -227,6 +228,18 @@ function handleToolEvent(repoRoot: string, eventName: string, payload: HookPaylo
     hook_event: eventName,
     command,
   });
+
+  if (isEditTool(payload)) {
+    const fileGuardBlock = evaluateFileEditHook({ ...payload, cwd: payload.cwd || repoRoot });
+    if (fileGuardBlock) {
+      return hookOutput(eventName, {
+        permissionDecision: "deny",
+        decision: "deny",
+        permissionDecisionReason: fileGuardBlock.reason,
+        systemMessage: fileGuardBlock.reason,
+      });
+    }
+  }
 
   if (!command) {
     // Non-shell tools (file read/write) have no command — allow by default.

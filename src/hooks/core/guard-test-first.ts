@@ -20,7 +20,7 @@ const SPEC = {
   session: { required: true },
 };
 
-function findCorrespondingTestFile(sourceFile: string, repoRoot: string): string | null {
+export function findCorrespondingTestFile(sourceFile: string, repoRoot: string): string | null {
   const relativePath = path.relative(repoRoot, sourceFile);
   const parsed = path.parse(relativePath);
 
@@ -43,12 +43,12 @@ function findCorrespondingTestFile(sourceFile: string, repoRoot: string): string
   return null;
 }
 
-function hasFailingAssertion(testContent: string): boolean {
+export function hasFailingAssertion(testContent: string): boolean {
   const failingPatterns = [
     /assert\.(fail|false|notOk|notStrictEqual|notDeepStrictEqual)/,
-    /expect\.\w+\.toBe\(false\)/,
-    /expect\.\w+\.not\./,
-    /toThrow\(\)/,
+    /expect\([^)]+\)\.toBe\(\s*false\s*\)/,
+    /expect\([^)]+\)\.not\./,
+    /expect\([^)]+\)\.toThrow\(/,
     /\.should\.\w+\.not\./,
   ];
 

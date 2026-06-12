@@ -141,6 +141,58 @@ test("codex hook router allows non-shell tools with no command field", () => {
   assert.equal(result.hookSpecificOutput.decision, "allow");
 });
 
+test("codex hook router denies out-of-scope file edits", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "codex-scope-"));
+  const sessionId = "2026-06-10-scope";
+  const sessionDir = path.join(dir, ".harness", "sessions", sessionId);
+  fs.mkdirSync(path.join(dir, "lib"), { recursive: true });
+  fs.mkdirSync(sessionDir, { recursive: true });
+  fs.writeFileSync(path.join(dir, "lib", "allowed.ts"), "// allowed\n");
+  fs.writeFileSync(path.join(dir, "lib", "blocked.ts"), "// blocked\n");
+  fs.writeFileSync(path.join(sessionDir, "GOAL.md"), "Change lib/allowed.ts only.\n");
+  fs.writeFileSync(path.join(sessionDir, "PLAN-001.md"), "Update lib/allowed.ts\n");
+  fs.writeFileSync(
+    path.join(dir, ".harness", "STATE.md"),
+    `session: sessions/${sessionId}\ncurrent_plan: PLAN-001.md\n`
+  );
+
+  const result = handleCodexHook({
+    hook_event_name: "PreToolUse",
+    cwd: dir,
+    tool_name: "Write",
+    tool_input: { path: "lib/blocked.ts" },
+  });
+
+  assert.equal(result.hookSpecificOutput.permissionDecision, "deny");
+  assert.match(result.hookSpecificOutput.permissionDecisionReason, /outside approved scope/i);
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test("codex hook router allows Read on out-of-scope paths", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "codex-read-"));
+  const sessionId = "2026-06-10-read";
+  const sessionDir = path.join(dir, ".harness", "sessions", sessionId);
+  fs.mkdirSync(path.join(dir, "lib"), { recursive: true });
+  fs.mkdirSync(sessionDir, { recursive: true });
+  fs.writeFileSync(path.join(dir, "lib", "allowed.ts"), "// allowed\n");
+  fs.writeFileSync(path.join(dir, "lib", "blocked.ts"), "// blocked\n");
+  fs.writeFileSync(path.join(sessionDir, "GOAL.md"), "Change lib/allowed.ts only.\n");
+  fs.writeFileSync(
+    path.join(dir, ".harness", "STATE.md"),
+    `session: sessions/${sessionId}\ncurrent_plan: PLAN-001.md\n`
+  );
+
+  const result = handleCodexHook({
+    hook_event_name: "PreToolUse",
+    cwd: dir,
+    tool_name: "Read",
+    tool_input: { path: "lib/blocked.ts" },
+  });
+
+  assert.equal(result.hookSpecificOutput.permissionDecision, "allow");
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
 test("codex hook router falls back to runtime-commands when .codex/commands/ missing", () => {
   const dir = tmpRepo();
   fs.mkdirSync(path.join(dir, ".ai-harness", "runtime-commands"), { recursive: true });

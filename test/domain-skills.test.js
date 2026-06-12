@@ -144,8 +144,6 @@ test("runDomainsCommand generates the skill surface from an analysis file", asyn
       evalCommand: "",
       evalTarget: "",
       providers: [],
-      providerAlias: "",
-      runtimeAliasUsed: false,
       scope: "",
       visibility: "",
       target,

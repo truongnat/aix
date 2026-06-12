@@ -9,6 +9,15 @@
             "command": "node .ai-harness/hooks/core/run-with-active-session.js guard-phase --command harness-run --json"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .ai-harness/hooks/core/guard-file-edits.js --json"
+          }
+        ]
       }
     ],
     "PostToolUse": [

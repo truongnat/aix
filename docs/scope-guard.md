@@ -4,8 +4,8 @@ Scope guard ensures that edits stay within the approved scope defined in the goa
 
 ## Policy
 
-No default scope-guard rule is enabled.
-Add a custom scope policy in `.harness/policies.json` when a repository needs it.
+Scope enforcement runs at tool time through `hooks/core/codex-hook-router.js` when an active session is present in `.harness/STATE.md`.
+Repositories can add custom scope policies in `.harness/policies.json` when needed.
 
 ## Scope Definition
 

@@ -59,7 +59,6 @@ Options:
   --recommend-evals   Suggest eval tasks from local telemetry guard/tool signals
   --run-recommended-evals  Execute recommended eval tasks immediately
   --no-anonymize      Include raw paths in export payload (not recommended)
-  --skip-demo-eval    Init without running the sample-bugfix demo eval
   --live-provider-command <cmd>  Run a live provider CLI/command for evals
   --no-llm-judge      Eval run without EVAL_JUDGE_ENDPOINT lookup
   --all               Uninstall: full cleanup (runtime + cache + state + exclude)

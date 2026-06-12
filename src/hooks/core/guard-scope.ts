@@ -22,7 +22,7 @@ const SPEC = {
   session: { required: true },
 };
 
-function extractReferencedFiles(sessionDir: string): string[] {
+function extractReferencedFiles(sessionDir: string, repoRoot: string): string[] {
   const referencedFiles = new Set<string>();
 
   const goalPath = path.join(sessionDir, "GOAL.md");
@@ -34,9 +34,11 @@ function extractReferencedFiles(sessionDir: string): string[] {
     }
   }
 
-  const statePath = path.join(sessionDir, "STATE.md");
-  const stateContent = fs.existsSync(statePath) ? readText(statePath) : "";
-  const planName = extractField(stateContent, "current_plan") || "PLAN-001.md";
+  const statePath = path.join(repoRoot, ".harness", "STATE.md");
+  let planName = "PLAN-001.md";
+  if (fs.existsSync(statePath)) {
+    planName = extractField(readText(statePath), "current_plan") || planName;
+  }
   const planPath = path.join(sessionDir, planName);
   if (fs.existsSync(planPath)) {
     const planContent = readText(planPath);
@@ -91,11 +93,12 @@ export function guardScope(options: { files: string; session: string }): {
     .map((f) => f.trim())
     .filter(Boolean);
 
-  const referencedFiles = extractReferencedFiles(sessionDir);
+  const referencedFiles = extractReferencedFiles(sessionDir, repoRoot);
   const outOfScopeFiles: string[] = [];
 
   for (const file of files) {
-    const relativePath = path.relative(repoRoot, file);
+    const absoluteFile = path.isAbsolute(file) ? file : path.resolve(repoRoot, file);
+    const relativePath = path.relative(repoRoot, absoluteFile);
     if (!isFileInScope(relativePath, referencedFiles)) {
       outOfScopeFiles.push(relativePath);
     }

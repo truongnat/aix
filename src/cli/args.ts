@@ -21,8 +21,6 @@ interface ParseOptions {
   evalCommand: string;
   evalTarget: string;
   providers: string[];
-  providerAlias: string;
-  runtimeAliasUsed: boolean;
   scope: string;
   visibility: string;
   target: string;
@@ -45,6 +43,14 @@ interface ParseOptions {
   analysisFile: string;
 }
 
+function takeFlagValue(args: string[], index: number, flagName: string): string {
+  const value = args[index + 1];
+  if (value === undefined || value.startsWith("--")) {
+    throw new Error(`Missing value for ${flagName}`);
+  }
+  return value;
+}
+
 function parseArgv(argv: string[]): ParseOptions {
   const args = argv.slice(2);
   let command = "install";
@@ -62,8 +68,6 @@ function parseArgv(argv: string[]): ParseOptions {
     evalCommand: "",
     evalTarget: "",
     providers: [],
-    providerAlias: "",
-    runtimeAliasUsed: false,
     scope: "",
     visibility: "",
     target: ".",
@@ -115,32 +119,28 @@ function parseArgv(argv: string[]): ParseOptions {
       continue;
     }
     if (arg === "--provider" || arg === "--runtime") {
-      const value = args[++i];
-      if (!value) {
-        throw new Error(`Missing value for ${arg}`);
-      }
+      const value = takeFlagValue(args, i, arg);
+      i += 1;
       const ids = value
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
-      if (arg === "--runtime") {
-        options.runtimeAliasUsed = true;
-      } else {
-        options.providerAlias = "provider";
-      }
       options.providers.push(...ids);
       continue;
     }
     if (arg === "--scope") {
-      options.scope = args[++i] || "";
+      options.scope = takeFlagValue(args, i, arg);
+      i += 1;
       continue;
     }
     if (arg === "--visibility") {
-      options.visibility = args[++i] || "";
+      options.visibility = takeFlagValue(args, i, arg);
+      i += 1;
       continue;
     }
     if (arg === "--target") {
-      options.target = args[++i] || ".";
+      options.target = takeFlagValue(args, i, arg);
+      i += 1;
       continue;
     }
     if (arg === "--ref") {
@@ -195,10 +195,8 @@ function parseArgv(argv: string[]): ParseOptions {
       continue;
     }
     if (arg === "--domains") {
-      const value = args[++i];
-      if (!value) {
-        throw new Error(`Missing value for ${arg}`);
-      }
+      const value = takeFlagValue(args, i, arg);
+      i += 1;
       options.domains.push(
         ...value
           .split(",")
@@ -208,20 +206,13 @@ function parseArgv(argv: string[]): ParseOptions {
       continue;
     }
     if (arg === "--analysis-file") {
-      options.analysisFile = args[++i] || "";
-      if (!options.analysisFile) {
-        throw new Error(`Missing value for ${arg}`);
-      }
+      options.analysisFile = takeFlagValue(args, i, arg);
+      i += 1;
       continue;
     }
     if (arg === "--live-provider-command") {
-      options.liveProviderCommand = args[++i] || "";
-      if (!options.liveProviderCommand) {
-        throw new Error(`Missing value for ${arg}`);
-      }
-      continue;
-    }
-    if (arg === "--skip-demo-eval") {
+      options.liveProviderCommand = takeFlagValue(args, i, arg);
+      i += 1;
       continue;
     }
     throw new Error(`Unknown argument: ${arg}`);
