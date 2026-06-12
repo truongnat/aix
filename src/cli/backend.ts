@@ -5,7 +5,11 @@
 import path from "node:path";
 
 function packRootFromModule(moduleFilename: string): string {
-  return path.resolve(path.dirname(moduleFilename), "..");
+  const moduleDir = path.dirname(moduleFilename);
+  if (path.basename(moduleDir) === "cli" && path.basename(path.dirname(moduleDir)) === "dist") {
+    return path.resolve(moduleDir, "..", "..");
+  }
+  return path.resolve(moduleDir, "..");
 }
 
 export { packRootFromModule };

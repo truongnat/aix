@@ -8,10 +8,31 @@ const repoRoot = path.resolve(__dirname, "..");
 const { ACTIVE_PROVIDER_IDS } = require(path.join(repoRoot, "dist", "cli", "providers.js"));
 
 const originals = [];
+const wizardModules = [
+  "dist/features/install/presentation/install-command.js",
+  "dist/features/update/presentation/update-command.js",
+  "dist/features/uninstall/presentation/uninstall-command.js",
+  "dist/features/install/presentation/cli-legacy.js",
+  "dist/cli/ui/index.js",
+  "dist/cli/detect.js",
+  "dist/cli/infrastructure/legacy-deps.js",
+];
 
 function patchModule(modulePath, patcher) {
   const mod = require(path.join(repoRoot, modulePath));
-  const restore = patcher(mod);
+  const patchTarget =
+    modulePath === "dist/cli/ui/index.js" && mod.default
+      ? new Proxy(mod, {
+          set(target, property, value) {
+            target[property] = value;
+            if (property in target.default) {
+              target.default[property] = value;
+            }
+            return true;
+          },
+        })
+      : mod;
+  const restore = patcher(patchTarget);
   originals.push(restore);
   return mod;
 }
@@ -107,6 +128,15 @@ function withInteractiveTty(fn) {
 afterEach(() => {
   while (originals.length) {
     originals.pop()();
+  }
+  process.stdin.removeAllListeners("keypress");
+  if (process.stdin.isTTY && typeof process.stdin.setRawMode === "function") {
+    process.stdin.setRawMode(false);
+  }
+  process.stdin.pause();
+  for (const modulePath of wizardModules) {
+    const resolved = require.resolve(path.join(repoRoot, modulePath));
+    delete require.cache[resolved];
   }
 });
 

@@ -198,7 +198,7 @@ test("domains CLI reads project analysis JSON from stdin", () => {
 
   const run = cp.spawnSync(
     process.execPath,
-    [path.join(repoRoot, "bin", "aih.js"), "domains", "--target", target],
+    [path.join(repoRoot, "dist", "cli", "main.js"), "domains", "--target", target],
     {
       cwd: repoRoot,
       input: `${JSON.stringify(analysis)}\n`,

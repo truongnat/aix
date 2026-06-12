@@ -236,6 +236,14 @@ describe("CLI Help", () => {
   });
 });
 
+describe("CLI Backend", () => {
+  test("packRootFromModule resolves package root for dist cli entrypoint", () => {
+    const { packRootFromModule } = fresh("dist/cli/backend.js");
+    const moduleFile = path.join(repoRoot, "dist", "cli", "main.js");
+    assert.equal(packRootFromModule(moduleFile), repoRoot);
+  });
+});
+
 describe("CLI Mode to Scope/Visibility", () => {
   test("modeToScopeVisibility handles project-private", () => {
     const result = cliArgs.modeToScopeVisibility("project-private");
