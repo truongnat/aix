@@ -6,9 +6,9 @@ const childProcess = require("node:child_process");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const { formatTaskList, loadRegistry, validateTaskManifest } = require(
-  path.join(repoRoot, "dist", "lib", "evals", "task-registry.js")
+  path.join(repoRoot, "dist", "features", "eval", "domain", "task-registry.js")
 );
-const { listTasks } = require(path.join(repoRoot, "dist", "lib", "evals", "index.js"));
+const { listTasks } = require(path.join(repoRoot, "dist", "features", "eval", "index.js"));
 
 test("loadRegistry returns task manifests with ids, fixtures, and checks", () => {
   const registry = loadRegistry(repoRoot);

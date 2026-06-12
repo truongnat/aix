@@ -6,7 +6,7 @@ const {
   getRuntimeBootstrapPaths,
   isValidTargetRuntime,
   normalizeTargetRuntime,
-} = require("../dist/lib/validate/target");
+} = require("../dist/features/validate/infrastructure/target");
 
 describe("validate/target", () => {
   describe("normalizeTargetRuntime", () => {

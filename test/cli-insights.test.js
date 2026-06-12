@@ -22,7 +22,7 @@ test("runInsightsCommand prints summary for target events file", async () => {
     "utf8"
   );
 
-  const { runInsightsCommand } = fresh("dist/lib/cli-commands/insights.js");
+  const { runInsightsCommand } = fresh("dist/cli/commands/insights.js");
   let output = "";
   const originalWrite = process.stdout.write;
   process.stdout.write = (chunk) => {
@@ -40,7 +40,7 @@ test("runInsightsCommand prints summary for target events file", async () => {
 });
 
 test("parseArgv recognizes insights command and --json flag", () => {
-  const cliArgs = fresh("dist/lib/cli-args.js");
+  const cliArgs = fresh("dist/cli/args.js");
   const opts = cliArgs.parseArgv(["node", "aih.js", "insights", "--target", ".", "--json"]);
   assert.equal(opts.command, "insights");
   assert.equal(opts.target, ".");
@@ -48,7 +48,7 @@ test("parseArgv recognizes insights command and --json flag", () => {
 });
 
 test("parseArgv recognizes insights --recommend-evals and --upload", () => {
-  const cliArgs = fresh("dist/lib/cli-args.js");
+  const cliArgs = fresh("dist/cli/args.js");
   const opts = cliArgs.parseArgv([
     "node",
     "aih.js",
@@ -63,7 +63,7 @@ test("parseArgv recognizes insights --recommend-evals and --upload", () => {
 });
 
 test("parseArgv recognizes insights --run-recommended-evals", () => {
-  const cliArgs = fresh("dist/lib/cli-args.js");
+  const cliArgs = fresh("dist/cli/args.js");
   const opts = cliArgs.parseArgv([
     "node",
     "aih.js",
@@ -87,7 +87,7 @@ test("runInsightsCommand --export emits anonymized aggregate JSON", async () => 
     "utf8"
   );
 
-  const { runInsightsCommand } = fresh("dist/lib/cli-commands/insights.js");
+  const { runInsightsCommand } = fresh("dist/cli/commands/insights.js");
   let output = "";
   const originalWrite = process.stdout.write;
   process.stdout.write = (chunk) => {
@@ -116,7 +116,7 @@ test("runInsightsCommand --recommend-evals --run-recommended-evals emits regress
     "utf8"
   );
 
-  const { runInsightsCommand } = fresh("dist/lib/cli-commands/insights.js");
+  const { runInsightsCommand } = fresh("dist/cli/commands/insights.js");
   let output = "";
   const originalWrite = process.stdout.write;
   process.stdout.write = (chunk) => {
@@ -152,7 +152,7 @@ test("runInsightsCommand --upload --json returns failure payload when upload is 
   };
 
   try {
-    const { runInsightsCommand } = fresh("dist/lib/cli-commands/insights.js");
+    const { runInsightsCommand } = fresh("dist/cli/commands/insights.js");
     const status = await runInsightsCommand(repoRoot, {
       target: tempRoot,
       upload: true,

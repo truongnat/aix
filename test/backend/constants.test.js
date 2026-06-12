@@ -4,7 +4,7 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const { ignorePathsForProvider } = require(
-  path.join(repoRoot, "dist", "lib", "backend", "constants.js")
+  path.join(repoRoot, "dist", "shared", "install-kernel", "constants.js")
 );
 
 test('ignorePathsForProvider("all") includes the opencode plugin path', () => {

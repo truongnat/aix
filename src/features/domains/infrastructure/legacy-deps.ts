@@ -1,9 +1,8 @@
-// Purpose: Bridge to legacy lib modules until later migration phases.
-// Layer: infrastructure
-// Depends on: dist/lib codex-rule-generation at runtime
+// Purpose: Bridge to install infrastructure modules.
+// Layer: infrastructure — codex rule generation
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 
-export const legacyCodexRuleGeneration = require("../../../lib/codex-rule-generation.js") as {
+export const legacyCodexRuleGeneration = require("../../install/infrastructure/codex-rule-generation.js") as {
   renderCodexRuleSet: (...args: unknown[]) => string;
 };

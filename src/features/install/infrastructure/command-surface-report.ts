@@ -73,7 +73,7 @@ function formatDoctorCommandLines(targetRoot: string, detectedRuntimes: string[]
       lines.push(
         `WARN ${spec.provider}: plugin-packaging — no project-local /harness-* slash; use /plugins plugin skills or project .codex/ + .agents/skills/ fallback`
       );
-      const packManifest = path.join(__dirname, "..", ".codex-plugin/plugin.json");
+      const packManifest = path.join(__dirname, "../../../..", ".codex-plugin/plugin.json");
       if (fs.existsSync(packManifest)) {
         lines.push("PASS npm package includes .codex-plugin/plugin.json (Codex plugin surface)");
       }

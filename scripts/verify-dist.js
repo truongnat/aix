@@ -19,11 +19,9 @@ const requiredPaths = [
   "dist/cli/main.js",
   "dist/cli/args.js",
   "dist/cli/ui/index.js",
-  "dist/lib/cli-main.js",
-  "dist/lib/cli-ui.js",
-  "dist/lib/evals/index.js",
-  "dist/lib/validate/index.js",
-  "dist/lib/backend/install-orchestrator.js",
+  "dist/features/install/application/run-install.js",
+  "dist/features/install/infrastructure/status-doctor.js",
+  "dist/features/install/infrastructure/file-operations.js",
   "dist/workers/registry.js",
 ];
 

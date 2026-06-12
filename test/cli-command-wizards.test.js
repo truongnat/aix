@@ -5,7 +5,7 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
-const { ACTIVE_PROVIDER_IDS } = require(path.join(repoRoot, "dist", "lib", "cli-providers.js"));
+const { ACTIVE_PROVIDER_IDS } = require(path.join(repoRoot, "dist", "cli", "providers.js"));
 
 const originals = [];
 
@@ -31,7 +31,7 @@ function initGitRepo(dir) {
 }
 
 function mockProviderBinaries(installedIds) {
-  return patchModule("dist/lib/provider-binary-detect.js", (mod) => {
+  return patchModule("dist/features/install/infrastructure/provider-binary-detect.js", (mod) => {
     const originalDetectProviderBinaries = mod.detectProviderBinaries;
     mod.detectProviderBinaries = () => {
       const installed = new Set(installedIds);
@@ -116,7 +116,7 @@ test("runInstallWizard non-interactive install calls backend with selected provi
   initGitRepo(target);
   mockProviderBinaries(["cursor", "claude"]);
 
-  patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
+  patchModule("dist/features/install/application/run-install.js", (mod) => {
     const originalRunInstall = mod.runInstall;
     mod.runInstall = (ctx) => {
       calls.push(ctx);
@@ -127,7 +127,7 @@ test("runInstallWizard non-interactive install calls backend with selected provi
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalShowInstallPlan = mod.showInstallPlan;
     mod.showInstallPlan = () => {};
     return () => {
@@ -135,7 +135,7 @@ test("runInstallWizard non-interactive install calls backend with selected provi
     };
   });
 
-  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  const { runInstallWizard } = fresh("dist/features/install/presentation/install-command.js");
   const status = await runInstallWizard(repoRoot, {
     providers: ["cursor", "claude"],
     target,
@@ -186,7 +186,7 @@ test("runInstallWizard non-interactive without --yes throws instead of silently 
   initGitRepo(target);
   mockProviderBinaries(["claude"]);
 
-  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  const { runInstallWizard } = fresh("dist/features/install/presentation/install-command.js");
   await assert.rejects(
     () =>
       runInstallWizard(repoRoot, {
@@ -211,7 +211,7 @@ test("runInstallWizard interactive flow installs selected provider from binary-g
   initGitRepo(target);
   mockProviderBinaries(["cursor", "claude"]);
 
-  patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
+  patchModule("dist/features/install/application/run-install.js", (mod) => {
     const originalRunInstall = mod.runInstall;
     mod.runInstall = (ctx) => {
       calls.push(ctx);
@@ -222,7 +222,7 @@ test("runInstallWizard interactive flow installs selected provider from binary-g
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalUseInteractiveUi = mod.useInteractiveUi;
     const originalIntroBanner = mod.introBanner;
     const originalSelectProviders = mod.selectProviders;
@@ -257,7 +257,7 @@ test("runInstallWizard interactive flow installs selected provider from binary-g
     };
   });
 
-  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  const { runInstallWizard } = fresh("dist/features/install/presentation/install-command.js");
   const status = await withInteractiveTty(() =>
     runInstallWizard(repoRoot, {
       providers: [],
@@ -288,7 +288,7 @@ test("runInstallWizard interactive flow still prompts provider selection when on
   let pickerCalls = 0;
   const calls = [];
 
-  patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
+  patchModule("dist/features/install/application/run-install.js", (mod) => {
     const originalRunInstall = mod.runInstall;
     mod.runInstall = (ctx) => {
       calls.push(ctx);
@@ -299,7 +299,7 @@ test("runInstallWizard interactive flow still prompts provider selection when on
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalUseInteractiveUi = mod.useInteractiveUi;
     const originalIntroBanner = mod.introBanner;
     const originalSelectProviders = mod.selectProviders;
@@ -331,7 +331,7 @@ test("runInstallWizard interactive flow still prompts provider selection when on
     };
   });
 
-  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  const { runInstallWizard } = fresh("dist/features/install/presentation/install-command.js");
   const status = await withInteractiveTty(() =>
     runInstallWizard(repoRoot, {
       providers: [],
@@ -356,7 +356,7 @@ test("runInstallWizard interactive cancel exits before backend calls", async () 
   mockProviderBinaries(["cursor", "claude"]);
   let backendCalled = false;
 
-  patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
+  patchModule("dist/features/install/application/run-install.js", (mod) => {
     const originalRunInstall = mod.runInstall;
     mod.runInstall = () => {
       backendCalled = true;
@@ -367,7 +367,7 @@ test("runInstallWizard interactive cancel exits before backend calls", async () 
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalUseInteractiveUi = mod.useInteractiveUi;
     const originalIntroBanner = mod.introBanner;
     const originalSelectProviders = mod.selectProviders;
@@ -383,7 +383,7 @@ test("runInstallWizard interactive cancel exits before backend calls", async () 
     };
   });
 
-  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  const { runInstallWizard } = fresh("dist/features/install/presentation/install-command.js");
   const status = await withInteractiveTty(() =>
     runInstallWizard(repoRoot, {
       providers: [],
@@ -405,7 +405,7 @@ test("runInstallWizard supports non-git targets and prepares git exclude setup f
   mockProviderBinaries(["cursor", "claude"]);
   const calls = [];
 
-  patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
+  patchModule("dist/features/install/application/run-install.js", (mod) => {
     const originalRunInstall = mod.runInstall;
     mod.runInstall = (ctx) => {
       calls.push(ctx);
@@ -416,7 +416,7 @@ test("runInstallWizard supports non-git targets and prepares git exclude setup f
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalUseInteractiveUi = mod.useInteractiveUi;
     const originalIntroBanner = mod.introBanner;
     const originalSelectProviders = mod.selectProviders;
@@ -448,7 +448,7 @@ test("runInstallWizard supports non-git targets and prepares git exclude setup f
     };
   });
 
-  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  const { runInstallWizard } = fresh("dist/features/install/presentation/install-command.js");
   const status = await withInteractiveTty(() =>
     runInstallWizard(repoRoot, {
       providers: [],
@@ -488,7 +488,7 @@ test("runInstallWizard with explicit provider still shows provider picker before
   let pickerCalls = 0;
   let selectedInitialProviders = null;
 
-  patchModule("dist/lib/backend/install-orchestrator.js", (mod) => {
+  patchModule("dist/features/install/application/run-install.js", (mod) => {
     const originalRunInstall = mod.runInstall;
     mod.runInstall = () => {
       backendCalled = true;
@@ -499,7 +499,7 @@ test("runInstallWizard with explicit provider still shows provider picker before
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalUseInteractiveUi = mod.useInteractiveUi;
     const originalIntroBanner = mod.introBanner;
     const originalSelectProviders = mod.selectProviders;
@@ -523,7 +523,7 @@ test("runInstallWizard with explicit provider still shows provider picker before
     };
   });
 
-  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  const { runInstallWizard } = fresh("dist/features/install/presentation/install-command.js");
   const status = await withInteractiveTty(() =>
     runInstallWizard(repoRoot, {
       providers: ["cursor"],
@@ -547,7 +547,7 @@ test("runInstallWizard stops when no provider CLI is installed", async () => {
   initGitRepo(target);
   mockProviderBinaries([]);
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalUseInteractiveUi = mod.useInteractiveUi;
     const originalIntroBanner = mod.introBanner;
     const originalSelectInstallScope = mod.selectInstallScope;
@@ -560,7 +560,7 @@ test("runInstallWizard stops when no provider CLI is installed", async () => {
     };
   });
 
-  const { runInstallWizard } = fresh("dist/lib/cli-commands/install.js");
+  const { runInstallWizard } = fresh("dist/features/install/presentation/install-command.js");
   await assert.rejects(
     withInteractiveTty(() =>
       runInstallWizard(repoRoot, {
@@ -582,7 +582,7 @@ test("runUpdateWizard non-interactive update calls backend for each provider", a
   const target = makeTempDir();
   writeManifest(target, ["cursor", "claude"]);
 
-  patchModule("dist/lib/backend/update.js", (mod) => {
+  patchModule("dist/features/update/application/run-update.js", (mod) => {
     const originalRunUpdate = mod.runUpdate;
     mod.runUpdate = (ctx) => {
       calls.push(ctx);
@@ -593,7 +593,7 @@ test("runUpdateWizard non-interactive update calls backend for each provider", a
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalShowUpdatePlan = mod.showUpdatePlan;
     mod.showUpdatePlan = () => {};
     return () => {
@@ -601,7 +601,7 @@ test("runUpdateWizard non-interactive update calls backend for each provider", a
     };
   });
 
-  const { runUpdateWizard } = fresh("dist/lib/cli-commands/update.js");
+  const { runUpdateWizard } = fresh("dist/features/update/presentation/update-command.js");
   const status = await runUpdateWizard(repoRoot, {
     providers: ["cursor", "claude"],
     target,
@@ -637,7 +637,7 @@ test("runUpdateWizard surfaces backend failure status", async () => {
   const target = makeTempDir();
   writeManifest(target, ["cursor"]);
 
-  patchModule("dist/lib/backend/update.js", (mod) => {
+  patchModule("dist/features/update/application/run-update.js", (mod) => {
     const originalRunUpdate = mod.runUpdate;
     mod.runUpdate = () => ({
       ok: false,
@@ -648,7 +648,7 @@ test("runUpdateWizard surfaces backend failure status", async () => {
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalShowUpdatePlan = mod.showUpdatePlan;
     mod.showUpdatePlan = () => {};
     return () => {
@@ -656,7 +656,7 @@ test("runUpdateWizard surfaces backend failure status", async () => {
     };
   });
 
-  const { runUpdateWizard } = fresh("dist/lib/cli-commands/update.js");
+  const { runUpdateWizard } = fresh("dist/features/update/presentation/update-command.js");
   const status = await runUpdateWizard(repoRoot, {
     providers: ["cursor"],
     target,
@@ -676,7 +676,7 @@ test("runUpdateWizard interactive cancel after plan does not call backend", asyn
   writeManifest(target, ["cursor"]);
   let backendCalled = false;
 
-  patchModule("dist/lib/backend/update.js", (mod) => {
+  patchModule("dist/features/update/application/run-update.js", (mod) => {
     const originalRunUpdate = mod.runUpdate;
     mod.runUpdate = () => {
       backendCalled = true;
@@ -687,7 +687,7 @@ test("runUpdateWizard interactive cancel after plan does not call backend", asyn
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalUseInteractiveUi = mod.useInteractiveUi;
     const originalIntroBanner = mod.introBanner;
     const originalSelectProviders = mod.selectProviders;
@@ -707,7 +707,7 @@ test("runUpdateWizard interactive cancel after plan does not call backend", asyn
     };
   });
 
-  const { runUpdateWizard } = fresh("dist/lib/cli-commands/update.js");
+  const { runUpdateWizard } = fresh("dist/features/update/presentation/update-command.js");
   const status = await withInteractiveTty(() =>
     runUpdateWizard(repoRoot, {
       providers: [],
@@ -729,7 +729,7 @@ test("runUpdateWizard global interactive flow can select active providers withou
   const target = makeTempDir();
   initGitRepo(target);
 
-  patchModule("dist/lib/backend/update.js", (mod) => {
+  patchModule("dist/features/update/application/run-update.js", (mod) => {
     const originalRunUpdate = mod.runUpdate;
     mod.runUpdate = (ctx) => {
       calls.push(ctx);
@@ -740,7 +740,7 @@ test("runUpdateWizard global interactive flow can select active providers withou
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalUseInteractiveUi = mod.useInteractiveUi;
     const originalIntroBanner = mod.introBanner;
     const originalSelectProviders = mod.selectProviders;
@@ -766,7 +766,7 @@ test("runUpdateWizard global interactive flow can select active providers withou
     };
   });
 
-  const { runUpdateWizard } = fresh("dist/lib/cli-commands/update.js");
+  const { runUpdateWizard } = fresh("dist/features/update/presentation/update-command.js");
   const status = await withInteractiveTty(() =>
     runUpdateWizard(repoRoot, {
       providers: [],
@@ -796,7 +796,7 @@ test("runUninstallWizard non-interactive uninstall calls backend with full clean
   const calls = [];
   const target = makeTempDir();
 
-  patchModule("dist/lib/backend/uninstall.js", (mod) => {
+  patchModule("dist/features/uninstall/application/run-uninstall.js", (mod) => {
     const originalRunUninstall = mod.runUninstall;
     mod.runUninstall = (ctx) => {
       calls.push(ctx);
@@ -807,7 +807,7 @@ test("runUninstallWizard non-interactive uninstall calls backend with full clean
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalShowUninstallPlan = mod.showUninstallPlan;
     mod.showUninstallPlan = () => {};
     return () => {
@@ -815,7 +815,7 @@ test("runUninstallWizard non-interactive uninstall calls backend with full clean
     };
   });
 
-  const { runUninstallWizard } = fresh("dist/lib/cli-commands/uninstall.js");
+  const { runUninstallWizard } = fresh("dist/features/uninstall/presentation/uninstall-command.js");
   const status = await runUninstallWizard(repoRoot, {
     providers: ["cursor"],
     target,
@@ -845,7 +845,7 @@ test("runUninstallWizard interactive choices flow through to backend", async () 
   const target = makeTempDir();
   fs.mkdirSync(path.join(target, ".cursor", "commands"), { recursive: true });
 
-  patchModule("dist/lib/backend/uninstall.js", (mod) => {
+  patchModule("dist/features/uninstall/application/run-uninstall.js", (mod) => {
     const originalRunUninstall = mod.runUninstall;
     mod.runUninstall = (ctx) => {
       calls.push(ctx);
@@ -856,7 +856,7 @@ test("runUninstallWizard interactive choices flow through to backend", async () 
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalUseInteractiveUi = mod.useInteractiveUi;
     const originalIntroBanner = mod.introBanner;
     const originalSelectProviders = mod.selectProviders;
@@ -891,7 +891,7 @@ test("runUninstallWizard interactive choices flow through to backend", async () 
     };
   });
 
-  const { runUninstallWizard } = fresh("dist/lib/cli-commands/uninstall.js");
+  const { runUninstallWizard } = fresh("dist/features/uninstall/presentation/uninstall-command.js");
   const status = await withInteractiveTty(() =>
     runUninstallWizard(repoRoot, {
       providers: [],
@@ -921,7 +921,7 @@ test("runUninstallWizard interactive choices flow through to backend", async () 
 test("runUninstallWizard surfaces backend failure status", async () => {
   const target = makeTempDir();
 
-  patchModule("dist/lib/backend/uninstall.js", (mod) => {
+  patchModule("dist/features/uninstall/application/run-uninstall.js", (mod) => {
     const originalRunUninstall = mod.runUninstall;
     mod.runUninstall = () => ({
       ok: false,
@@ -932,7 +932,7 @@ test("runUninstallWizard surfaces backend failure status", async () => {
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalShowUninstallPlan = mod.showUninstallPlan;
     mod.showUninstallPlan = () => {};
     return () => {
@@ -940,7 +940,7 @@ test("runUninstallWizard surfaces backend failure status", async () => {
     };
   });
 
-  const { runUninstallWizard } = fresh("dist/lib/cli-commands/uninstall.js");
+  const { runUninstallWizard } = fresh("dist/features/uninstall/presentation/uninstall-command.js");
   const status = await runUninstallWizard(repoRoot, {
     providers: ["cursor"],
     target,
@@ -958,7 +958,7 @@ test("runStatusOrDoctor forwards status to the in-process backend", () => {
   const calls = [];
   const target = makeTempDir();
 
-  patchModule("dist/lib/backend/status-doctor.js", (mod) => {
+  patchModule("dist/cli/infrastructure/legacy-deps.js", (mod) => {
     const originalRunStatus = mod.runStatus;
     mod.runStatus = ({ targetAbs }) => {
       calls.push(targetAbs);
@@ -969,7 +969,7 @@ test("runStatusOrDoctor forwards status to the in-process backend", () => {
     };
   });
 
-  patchModule("dist/lib/cli-ui.js", (mod) => {
+  patchModule("dist/cli/ui/index.js", (mod) => {
     const originalFormatStatus = mod.formatStatus;
     mod.formatStatus = () => {};
     return () => {
@@ -977,7 +977,7 @@ test("runStatusOrDoctor forwards status to the in-process backend", () => {
     };
   });
 
-  const { runStatusOrDoctor } = fresh("dist/lib/cli-commands/diagnostics.js");
+  const { runStatusOrDoctor } = fresh("dist/cli/commands/diagnostics.js");
   const status = runStatusOrDoctor(repoRoot, "status", {
     providers: [],
     target,
@@ -994,7 +994,7 @@ test("runStatusOrDoctor returns doctor failure status in verbose mode", () => {
   const target = makeTempDir();
   let output = "";
 
-  patchModule("dist/lib/backend/status-doctor.js", (mod) => {
+  patchModule("dist/cli/infrastructure/legacy-deps.js", (mod) => {
     const originalRunDoctor = mod.runDoctor;
     mod.runDoctor = ({ targetAbs }) => ({
       text: `doctor report for ${targetAbs}`,
@@ -1012,7 +1012,7 @@ test("runStatusOrDoctor returns doctor failure status in verbose mode", () => {
   };
 
   try {
-    const { runStatusOrDoctor } = fresh("dist/lib/cli-commands/diagnostics.js");
+    const { runStatusOrDoctor } = fresh("dist/cli/commands/diagnostics.js");
     const status = runStatusOrDoctor(repoRoot, "doctor", {
       providers: [],
       target,
@@ -1030,7 +1030,7 @@ test("runStatusOrDoctor returns doctor failure status in verbose mode", () => {
 });
 
 test("runEvalCommand lists registry tasks", async () => {
-  const { runEvalCommand } = fresh("dist/lib/cli-commands/eval.js");
+  const { runEvalCommand } = fresh("dist/features/eval/presentation/eval-command.js");
   let output = "";
   const originalWrite = process.stdout.write;
   process.stdout.write = (chunk) => {

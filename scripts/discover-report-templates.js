@@ -57,7 +57,7 @@ function main() {
       return;
     }
 
-    const mod = require(path.join(__dirname, "..", "dist", "lib", "report-template-discovery.js"));
+    const mod = require(path.join(__dirname, "..", "dist", "features", "install", "infrastructure", "report-template-discovery.js"));
     const discovery = mod.discoverReportTemplates(options.target);
 
     if (options.write) {

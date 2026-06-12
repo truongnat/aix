@@ -6,7 +6,7 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const { runLiveProviderCommand } = require(
-  path.join(repoRoot, "dist", "lib", "evals", "live-runner.js")
+  path.join(repoRoot, "dist", "features", "eval", "infrastructure", "live-runner.js")
 );
 
 test("runLiveProviderCommand honors timeoutMs overrides", () => {

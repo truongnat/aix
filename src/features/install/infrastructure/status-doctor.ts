@@ -2,10 +2,11 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { hasHarnessExcludeBlock, reconcileDeferredPrivateIgnore } from "./git-hygiene";
-import { detectInstalledProviders, isGitRepo, detectProviderBinaries } from "../cli-detect";
-import { readInstalledCommandSurface } from "../runtime-command-catalog";
-import { formatStatusCommandLines, formatDoctorCommandLines } from "../command-surface-report";
+import { hasHarnessExcludeBlock, reconcileDeferredPrivateIgnore } from "../../../shared/install-kernel/git-hygiene";
+import { detectInstalledProviders, isGitRepo } from "./provider-detection";
+import { detectProviderBinaries } from "./provider-binary-detect";
+import { readInstalledCommandSurface } from "./runtime-command-catalog";
+import { formatStatusCommandLines, formatDoctorCommandLines } from "./command-surface-report";
 
 export interface ReportContext {
   targetAbs: string;

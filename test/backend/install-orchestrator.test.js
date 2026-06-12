@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const cp = require("node:child_process");
-const { runInstall } = require("../../dist/lib/backend/install-orchestrator.js");
+const { runInstall } = require("../../dist/features/install/application/run-install.js");
 const PACK_ROOT = path.resolve(__dirname, "..", "..");
 
 function tmpRepo() {

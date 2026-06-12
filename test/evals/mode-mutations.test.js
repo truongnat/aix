@@ -6,7 +6,7 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const { applyModeMutation } = require(
-  path.join(repoRoot, "dist", "lib", "evals", "mode-mutations.js")
+  path.join(repoRoot, "dist", "features", "eval", "domain", "mode-mutations.js")
 );
 
 test("applyModeMutation writes with-harness fix for sample-divide", () => {

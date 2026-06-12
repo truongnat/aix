@@ -33,8 +33,8 @@ interface RuleRenderOptions {
   coreFragments?: "all" | CoreFragmentName[];
 }
 
-// Adjust for dist/ build layout: compiled files are at dist/lib/, so go up 2 levels to reach repo root
-const REPO_ROOT = path.resolve(__dirname, "../..");
+// Adjust for dist/ build layout: compiled files are at dist/features/install/infrastructure/, so go up 4 levels to reach repo root
+const REPO_ROOT = path.resolve(__dirname, "../../../..");
 const RULES_CORE_DIR = path.join(REPO_ROOT, "rules", "core");
 const RULES_PROVIDERS_DIR = path.join(REPO_ROOT, "rules", "providers");
 

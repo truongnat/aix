@@ -52,7 +52,7 @@ test("runRecommendedEvalRegression executes recommended tasks and writes a repor
         delete require.cache[key];
       }
     }
-    const { runRecommendedEvalRegression } = fresh("dist/lib/insights/eval-regression.js");
+    const { runRecommendedEvalRegression } = fresh("dist/features/insights/application/run-eval-regression.js");
     const result = await runRecommendedEvalRegression(repoRoot, tempRoot, {
       provider: "codex",
     });

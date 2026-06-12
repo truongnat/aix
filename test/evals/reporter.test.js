@@ -6,7 +6,7 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const { writeModeArtifacts, writeRunSummary } = require(
-  path.join(repoRoot, "dist", "lib", "evals", "reporter.js")
+  path.join(repoRoot, "dist", "features", "eval", "infrastructure", "reporter.js")
 );
 
 test("reporter writes schemaVersion into mode and run summary JSON", () => {

@@ -1,6 +1,5 @@
-// Purpose: Bridge to legacy eval runner until Phase 5 migrates evals to src.
+// Purpose: Bridge to eval runner.
 // Layer: infrastructure
-// Depends on: dist/lib/evals at runtime
 
 export interface RunEvalTaskOptions {
   provider?: string;

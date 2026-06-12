@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const cp = require("node:child_process");
-const { runUpdate } = require("../../dist/lib/backend/update.js");
+const { runUpdate } = require("../../dist/features/update/application/run-update.js");
 const PACK_ROOT = path.resolve(__dirname, "..", "..");
 function tmpRepo() {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), "up-"));
@@ -56,7 +56,7 @@ function withTempHome(fn) {
 test("update refreshes provider files with force (overwrites modified file)", () => {
   const dir = tmpRepo();
   // first install to create the surface
-  const { runInstall } = require("../../dist/lib/backend/install-orchestrator.js");
+  const { runInstall } = require("../../dist/features/install/application/run-install.js");
   runInstall({
     packRoot: PACK_ROOT,
     target: dir,

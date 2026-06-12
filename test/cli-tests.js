@@ -7,8 +7,8 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
-const cliArgs = require(path.join(repoRoot, "dist", "lib", "cli-args.js"));
-const cliDetect = require(path.join(repoRoot, "dist", "lib", "cli-detect.js"));
+const cliArgs = require(path.join(repoRoot, "dist", "cli", "args.js"));
+const cliDetect = require(path.join(repoRoot, "dist", "cli", "detect.js"));
 
 function fresh(modulePath) {
   const resolved = require.resolve(path.join(repoRoot, modulePath));
@@ -207,7 +207,7 @@ describe("CLI Arguments Parser", () => {
 
 describe("CLI Help", () => {
   test("renderHelp includes eval commands", () => {
-    const { renderHelp } = fresh("dist/lib/cli-help.js");
+    const { renderHelp } = fresh("dist/cli/help.js");
     const help = renderHelp();
     assert.match(help, /ai-engineering-harness eval list/);
     assert.match(help, /ai-engineering-harness eval run <task-or-suite>/);
@@ -219,7 +219,7 @@ describe("CLI Help", () => {
   });
 
   test("renderHelp includes insights command", () => {
-    const { renderHelp } = fresh("dist/lib/cli-help.js");
+    const { renderHelp } = fresh("dist/cli/help.js");
     const help = renderHelp();
     assert.match(help, /ai-engineering-harness insights/);
     assert.match(help, /--json/);
@@ -227,7 +227,7 @@ describe("CLI Help", () => {
   });
 
   test("renderHelp reflects in-process primary lifecycle commands", () => {
-    const { renderHelp } = fresh("dist/lib/cli-help.js");
+    const { renderHelp } = fresh("dist/cli/help.js");
     const help = renderHelp();
     assert.match(help, /--verbose\s+Show raw backend output/);
     assert.match(help, /Primary lifecycle commands run in-process on Node\.js/);
@@ -410,7 +410,7 @@ describe("CLI Provider Detection", () => {
     };
 
     try {
-      const providerBinaryDetect = fresh("dist/lib/provider-binary-detect.js");
+      const providerBinaryDetect = fresh("dist/features/install/infrastructure/provider-binary-detect.js");
       const binaries = providerBinaryDetect.detectProviderBinaries();
       assert.equal(binaries.claude.installed, true);
       assert.equal(binaries.cursor.installed, true);
@@ -443,7 +443,7 @@ describe("CLI Provider Detection", () => {
     };
 
     try {
-      const providerBinaryDetect = fresh("dist/lib/provider-binary-detect.js");
+      const providerBinaryDetect = fresh("dist/features/install/infrastructure/provider-binary-detect.js");
       const probe = providerBinaryDetect.probeCommand("cursor");
       assert.equal(probe.installed, true);
       assert.equal(probe.commandUsed, "cursor");
@@ -474,7 +474,7 @@ describe("CLI Provider Detection", () => {
     };
 
     try {
-      const providerBinaryDetect = fresh("dist/lib/provider-binary-detect.js");
+      const providerBinaryDetect = fresh("dist/features/install/infrastructure/provider-binary-detect.js");
       const probe = providerBinaryDetect.probeCursorBinary();
       assert.equal(probe.installed, true);
       assert.equal(probe.commandUsed, "agent");
@@ -576,7 +576,7 @@ describe("CLI Interactive UI", () => {
     Object.defineProperty(process.stdout, "isTTY", { value: true, configurable: true });
 
     try {
-      const { useInteractiveUi } = fresh("dist/lib/cli-ui.js");
+      const { useInteractiveUi } = fresh("dist/cli/ui/index.js");
       assert.equal(useInteractiveUi({ yes: false, providers: ["cursor"] }), true);
       assert.equal(useInteractiveUi({ yes: true, providers: ["cursor"] }), false);
     } finally {
@@ -608,7 +608,7 @@ describe("CLI Main", () => {
     };
 
     try {
-      const { main } = fresh("dist/lib/cli-main.js");
+      const { main } = fresh("dist/cli/main.js");
       const status = await main(
         ["node", "aih.js", "eval", "list"],
         path.join(repoRoot, "bin", "aih.js")
@@ -639,7 +639,7 @@ describe("CLI Main", () => {
     };
 
     try {
-      const { main } = fresh("dist/lib/cli-main.js");
+      const { main } = fresh("dist/cli/main.js");
       const status = await main(
         ["node", "aih.js", "domains", "--analysis-file", "analysis.json"],
         path.join(repoRoot, "bin", "aih.js")
@@ -678,7 +678,7 @@ describe("CLI Main", () => {
     };
 
     try {
-      const { runEvalCommand } = fresh("dist/lib/cli-commands/eval.js");
+      const { runEvalCommand } = fresh("dist/features/eval/presentation/eval-command.js");
       await assert.rejects(
         () => runEvalCommand(repoRoot, { evalCommand: "run", evalTarget: "" }),
         /Missing eval target for `aih eval run`\./
@@ -714,7 +714,7 @@ describe("CLI Main", () => {
     };
 
     try {
-      const { runEvalCommand } = fresh("dist/lib/cli-commands/eval.js");
+      const { runEvalCommand } = fresh("dist/features/eval/presentation/eval-command.js");
       await assert.rejects(
         () => runEvalCommand(repoRoot, { evalCommand: "report", evalTarget: "" }),
         /Missing eval target for `aih eval report`\./

@@ -1,6 +1,5 @@
-// Purpose: Bridge to legacy lib modules until later migration phases.
+// Purpose: Bridge to install infrastructure modules.
 // Layer: infrastructure
-// Depends on: dist/lib and dist/workers at runtime
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 
@@ -8,7 +7,7 @@ export const legacyDomainSkillGeneration = require("../../../features/domains/in
   writeDomainSkillSurface: (...args: unknown[]) => unknown;
 };
 
-export const legacyCommandInstallation = require("../../../lib/catalog/command-installation.js") as {
+export const legacyCommandInstallation = require("./catalog/command-installation.js") as {
   installProviderInteraction: (...args: unknown[]) => void;
 };
 
@@ -17,11 +16,11 @@ export const legacyCliProviders = require("../../../cli/providers.js") as {
   RUNTIME_NATIVE_PROVIDER_IDS: readonly string[];
 };
 
-export const legacyProviderDetection = require("../../../lib/provider-detection.js") as {
+export const legacyProviderDetection = require("./provider-detection.js") as {
   isGitRepo: (target: string) => boolean;
 };
 
-export const legacyFileOperations = require("../../../lib/file-operations.js") as {
+export const legacyFileOperations = require("./file-operations.js") as {
   ensureDirectory: (...args: unknown[]) => void;
   logAction: (...args: unknown[]) => void;
 };
@@ -31,21 +30,21 @@ interface CatalogInstallEntry {
   relativePath: string;
 }
 
-export const legacyRuntimeCommandCatalog = require("../../../lib/runtime-command-catalog.js") as {
+export const legacyRuntimeCommandCatalog = require("./runtime-command-catalog.js") as {
   installProviderCommandSurface: (...args: unknown[]) => CatalogInstallEntry[];
   installRuntimeCommandCatalog: (...args: unknown[]) => CatalogInstallEntry[];
   readInstalledCommandSurface: (targetAbs: string) => { installedProviders?: string[] } | null;
 };
 
-export const legacyWorkerClaudeAdapter = require("../../../lib/worker-claude-adapter.js") as {
+export const legacyWorkerClaudeAdapter = require("../../../workers/claude-adapter.js") as {
   installClaudeWorkers: (...args: unknown[]) => CatalogInstallEntry[];
 };
 
-export const legacyCodexRuleGeneration = require("../../../lib/codex-rule-generation.js") as {
+export const legacyCodexRuleGeneration = require("./codex-rule-generation.js") as {
   renderCodexRuleSet: (...args: unknown[]) => string;
 };
 
-export const legacyProviderRuleRenderer = require("../../../lib/provider-rule-renderer.js") as {
+export const legacyProviderRuleRenderer = require("./provider-rule-renderer.js") as {
   renderClaudeProjectMd: (...args: unknown[]) => string;
   renderCodexAgentsMd: (...args: unknown[]) => string;
   renderCursorActivationMdc: (...args: unknown[]) => string;

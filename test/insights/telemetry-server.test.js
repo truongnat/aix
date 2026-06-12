@@ -11,7 +11,7 @@ const {
   handleTelemetryRequest,
   validateTelemetryPayload,
   defaultStoragePath,
-} = require(path.join(repoRoot, "dist", "lib", "insights", "telemetry-server.js"));
+} = require(path.join(repoRoot, "dist", "features", "telemetry", "index.js"));
 
 function makeResponse() {
   let body = "";

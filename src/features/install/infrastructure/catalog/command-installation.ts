@@ -21,7 +21,7 @@ import {
   buildCommandSurface,
   type Manifest,
 } from "./command-rendering";
-import { HARNESS_MARKER } from "../backend/constants";
+import { HARNESS_MARKER } from "../../../../shared/install-kernel/constants";
 import { renderProviderInteractionMarkdown } from "../provider-interaction-tools";
 
 type SupportedRuntime = "claude" | "cursor" | "codex" | "generic" | "gemini";
@@ -71,7 +71,7 @@ function writeFile(
 
 function installPromptTemplates(targetRoot: string, options: InstallOptions = {}): WriteResult[] {
   const opts = { dryRun: false, force: false, ...options };
-  const repoRoot = path.resolve(__dirname, "../..");
+  const repoRoot = path.resolve(__dirname, "../../../../..");
   const sourceDir = path.join(repoRoot, "prompt-templates");
   const results: WriteResult[] = [];
 

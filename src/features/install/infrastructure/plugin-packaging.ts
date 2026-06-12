@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-function readPackageVersion(repoRoot = path.join(__dirname, "..")): string {
+function readPackageVersion(repoRoot = path.join(__dirname, "../../..")): string {
   const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
   return pkg.version;
 }

@@ -54,7 +54,7 @@ function main() {
 
   let rendered = null;
   try {
-    const mod = require(path.join(__dirname, "..", "dist", "lib", "provider-interaction-tools.js"));
+    const mod = require(path.join(__dirname, "..", "dist", "features", "install", "infrastructure", "provider-interaction-tools.js"));
     const manifest = readManifest(targetRoot);
     if (manifest) {
       rendered = mod.renderProviderInteractionFromManifest(manifest);

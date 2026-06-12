@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const { appendHarnessEvent, resolveEventsPath } = require("../hooks/core/_util.js");
+const { appendHarnessEvent, resolveEventsPath } = require("../dist/hooks/shared/util.js");
 
 test("appendHarnessEvent writes JSONL records under .harness/history", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-hook-events-"));

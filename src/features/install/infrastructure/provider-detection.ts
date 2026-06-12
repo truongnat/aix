@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { HARNESS_MARKER } from "./backend/constants";
+import { HARNESS_MARKER } from "../../../shared/install-kernel/constants";
 
 interface DetectInstalledProviderOptions {
   includeLegacy?: boolean;

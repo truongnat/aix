@@ -214,7 +214,7 @@ export function guardPhase(options: { command: string; session: string }): Guard
   const policyPath = path.join(repoRoot, ".harness", "policies.json");
   if (fs.existsSync(policyPath)) {
     try {
-      const { PolicyEngine } = require("../../../dist/lib/policy/engine.js") as PolicyEngineModule;
+      const { PolicyEngine } = require("../../features/validate/infrastructure/policy/engine.js") as PolicyEngineModule;
       const engine = new PolicyEngine(policyPath);
       const context = buildExecutionContext(sessionDir, repoRoot, command);
       const { blocked, reason, actions } = engine.shouldBlock(context);

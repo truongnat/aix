@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { workers, type WorkerId } from "../workers/registry";
+import { workers, type WorkerId } from "./registry";
 
 interface InstallOptions {
   dryRun?: boolean;

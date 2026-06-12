@@ -146,9 +146,9 @@ test("verify-dist script checks compiled test entrypoints with a clear error mes
   );
   assert.match(verifyDist, /dist\/server\/telemetry\.js/);
   assert.match(verifyDist, /dist\/features\/telemetry\/index\.js/);
-  assert.match(verifyDist, /dist\/lib\/cli-main\.js/);
-  assert.match(verifyDist, /dist\/lib\/evals\/index\.js/);
-  assert.match(verifyDist, /dist\/lib\/validate\/index\.js/);
+  assert.match(verifyDist, /dist\/features\/install\/application\/run-install\.js/);
+  assert.match(verifyDist, /dist\/features\/install\/infrastructure\/status-doctor\.js/);
+  assert.match(verifyDist, /dist\/features\/install\/infrastructure\/file-operations\.js/);
   assert.match(verifyDist, /dist\/workers\/registry\.js/);
 });
 
@@ -158,9 +158,9 @@ test("package declares an explicit public exports surface", () => {
   const types = fs.readFileSync(path.join(repoRoot, "index.d.ts"), "utf8");
 
   assert.deepEqual(pkg.exports["."], { types: "./index.d.ts" });
-  assert.equal(pkg.exports["./cli-main"], "./dist/lib/cli-main.js");
-  assert.equal(pkg.exports["./file-operations"], "./dist/lib/file-operations.js");
-  assert.equal(pkg.exports["./validate"], "./dist/lib/validate/index.js");
+  assert.equal(pkg.exports["./cli-main"], "./dist/cli/main.js");
+  assert.equal(pkg.exports["./file-operations"], "./dist/features/install/infrastructure/file-operations.js");
+  assert.equal(pkg.exports["./validate"], "./dist/features/validate/index.js");
   assert.equal(pkg.exports["./package.json"], "./package.json");
   assert.match(types, /declare module "ai-engineering-harness"/);
   assert.match(types, /declare module "ai-engineering-harness\/cli-main"/);

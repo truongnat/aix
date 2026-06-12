@@ -31,7 +31,7 @@ test("policy engine loads and validates schema", () => {
 });
 
 test("policy engine evaluates phase gate conditions correctly", () => {
-  const { PolicyEngine } = require(path.join(repoRoot, "dist", "lib", "policy", "engine.js"));
+  const { PolicyEngine } = require(path.join(repoRoot, "dist", "features", "validate", "infrastructure", "policy", "engine.js"));
   const policyPath = path.join(repoRoot, ".harness", "policies.json");
 
   const engine = new PolicyEngine(policyPath);
@@ -51,7 +51,7 @@ test("policy engine evaluates phase gate conditions correctly", () => {
 });
 
 test("policy engine allows when conditions not met", () => {
-  const { PolicyEngine } = require(path.join(repoRoot, "dist", "lib", "policy", "engine.js"));
+  const { PolicyEngine } = require(path.join(repoRoot, "dist", "features", "validate", "infrastructure", "policy", "engine.js"));
   const policyPath = path.join(repoRoot, ".harness", "policies.json");
 
   const engine = new PolicyEngine(policyPath);
@@ -69,7 +69,7 @@ test("policy engine allows when conditions not met", () => {
 });
 
 test("policy engine lazily loads policy set when shouldBlock is called without explicit load", () => {
-  const { PolicyEngine } = require(path.join(repoRoot, "dist", "lib", "policy", "engine.js"));
+  const { PolicyEngine } = require(path.join(repoRoot, "dist", "features", "validate", "infrastructure", "policy", "engine.js"));
   const policyPath = path.join(repoRoot, ".harness", "policies.json");
 
   // Intentionally do NOT call loadPolicySet() — engine must auto-load.
@@ -90,7 +90,7 @@ test("policy engine lazily loads policy set when shouldBlock is called without e
 });
 
 test("policy engine rejects invalid regex patterns when loading policy set", () => {
-  const { PolicyEngine } = require(path.join(repoRoot, "dist", "lib", "policy", "engine.js"));
+  const { PolicyEngine } = require(path.join(repoRoot, "dist", "features", "validate", "infrastructure", "policy", "engine.js"));
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "policy-invalid-"));
   const policyPath = path.join(tmpRoot, "policies.json");
 
@@ -126,7 +126,7 @@ test("policy engine rejects invalid regex patterns when loading policy set", () 
 });
 
 test("globToRegExp converts glob patterns to correct anchored regexes", () => {
-  const { PolicyEngine } = require(path.join(repoRoot, "dist", "lib", "policy", "engine.js"));
+  const { PolicyEngine } = require(path.join(repoRoot, "dist", "features", "validate", "infrastructure", "policy", "engine.js"));
 
   const srcGlob = PolicyEngine.globToRegExp("src/**");
   assert.ok(srcGlob.test("src/foo/bar.ts"), "src/** should match nested source file");
@@ -140,7 +140,7 @@ test("globToRegExp converts glob patterns to correct anchored regexes", () => {
 });
 
 test("policy file_pattern condition matches files in execution context", () => {
-  const { PolicyEngine } = require(path.join(repoRoot, "dist", "lib", "policy", "engine.js"));
+  const { PolicyEngine } = require(path.join(repoRoot, "dist", "features", "validate", "infrastructure", "policy", "engine.js"));
   const policyPath = path.join(repoRoot, ".harness", "policies.json");
 
   const engine = new PolicyEngine(policyPath);
@@ -164,7 +164,7 @@ test("policy file_pattern condition matches files in execution context", () => {
 });
 
 test("policy generator functions produce expected markdown sections", () => {
-  const generator = require(path.join(repoRoot, "dist", "lib", "policy", "generator.js"));
+  const generator = require(path.join(repoRoot, "dist", "features", "validate", "infrastructure", "policy", "generator.js"));
   const policyPath = path.join(repoRoot, ".harness", "policies.json");
   const policies = JSON.parse(fs.readFileSync(policyPath, "utf8"));
 
@@ -190,7 +190,7 @@ test("policy generator functions produce expected markdown sections", () => {
 });
 
 test("regenerateDocsFromPolicy writes discipline docs into a target repo", () => {
-  const generator = require(path.join(repoRoot, "dist", "lib", "policy", "generator.js"));
+  const generator = require(path.join(repoRoot, "dist", "features", "validate", "infrastructure", "policy", "generator.js"));
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "policy-docs-"));
   fs.mkdirSync(path.join(tmpRoot, ".harness"), { recursive: true });
   fs.copyFileSync(
@@ -211,7 +211,7 @@ test("regenerateDocsFromPolicy writes discipline docs into a target repo", () =>
 });
 
 test("policy engine evaluates phase and file_pattern operators", () => {
-  const { PolicyEngine } = require(path.join(repoRoot, "dist", "lib", "policy", "engine.js"));
+  const { PolicyEngine } = require(path.join(repoRoot, "dist", "features", "validate", "infrastructure", "policy", "engine.js"));
 
   // phase condition: equals on a present phase
   const phaseRule = {
@@ -279,7 +279,7 @@ test("policy documentation is generated from policies", () => {
 });
 
 test("policy hooks exist and are executable", () => {
-  const hooksDir = path.join(repoRoot, "hooks", "core");
+  const hooksDir = path.join(repoRoot, "dist", "hooks", "core");
 
   const guardPhasePolicy = path.join(hooksDir, "guard-phase-policy.js");
   const guardScope = path.join(hooksDir, "guard-scope.js");
@@ -321,7 +321,7 @@ test("policy enforcement reduces violations (A/B comparison)", () => {
   // This test establishes the framework for A/B comparison
   // Actual A/B evals would require running agent tasks with/without policy enforcement
 
-  const { PolicyEngine } = require(path.join(repoRoot, "dist", "lib", "policy", "engine.js"));
+  const { PolicyEngine } = require(path.join(repoRoot, "dist", "features", "validate", "infrastructure", "policy", "engine.js"));
   const policyPath = path.join(repoRoot, ".harness", "policies.json");
 
   const engine = new PolicyEngine(policyPath);

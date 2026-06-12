@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { ACTIVE_PROVIDER_IDS } from "./cli-providers";
+import { ACTIVE_PROVIDER_IDS } from "../../../cli/providers";
 
 interface ProviderManifest {
   id: string;

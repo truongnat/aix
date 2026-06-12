@@ -58,9 +58,9 @@ const ACTIVE_COMMAND_NAMING_PATHS = [
   "docs/simple-cli-ux.md",
   "docs/private-capability-cache.md",
   "docs/terminal-wizard-ux.md",
-  "runtime-command-catalog.js",
-  "dist/lib/command-surface-report.js",
-  "dist/lib/cli-ui.js",
+  "dist/features/install/infrastructure/runtime-command-catalog.js",
+  "dist/features/install/infrastructure/command-surface-report.js",
+  "dist/cli/ui/index.js",
 ];
 
 const FORBIDDEN_COLON_COMMAND_PATTERNS = [

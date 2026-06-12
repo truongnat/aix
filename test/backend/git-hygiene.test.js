@@ -8,7 +8,7 @@ const {
   removeIgnoreBlock,
   collectIgnorePaths,
   reconcileDeferredPrivateIgnore,
-} = require("../../dist/lib/backend/git-hygiene.js");
+} = require("../../dist/shared/install-kernel/git-hygiene.js");
 
 function tmpGitRepo() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "gh-"));

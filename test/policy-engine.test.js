@@ -5,7 +5,7 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
-const { PolicyEngine } = require(path.join(repoRoot, "dist", "lib", "policy", "engine.js"));
+const { PolicyEngine } = require(path.join(repoRoot, "dist", "features", "validate", "infrastructure", "policy", "engine.js"));
 
 function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");

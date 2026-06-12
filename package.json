@@ -36,9 +36,9 @@
     ".": {
       "types": "./index.d.ts"
     },
-    "./cli-main": "./dist/lib/cli-main.js",
-    "./file-operations": "./dist/lib/file-operations.js",
-    "./validate": "./dist/lib/validate/index.js",
+    "./cli-main": "./dist/cli/main.js",
+    "./file-operations": "./dist/features/install/infrastructure/file-operations.js",
+    "./validate": "./dist/features/validate/index.js",
     "./package.json": "./package.json"
   },
   "bin": {
@@ -106,7 +106,7 @@
     "prepack": "npm run build",
     "test": "npm run build && node scripts/verify-dist.js && node --test",
     "test:evals": "npm run build && node scripts/verify-dist.js && node --test test/evals/",
-    "test:coverage": "npm run build && node scripts/verify-dist.js && c8 --include=dist/lib/** --check-coverage --lines 75 --functions 70 --branches 65 --statements 75 node --test",
+    "test:coverage": "npm run build && node scripts/verify-dist.js && c8 --include=dist/features/** --include=dist/cli/** --include=dist/shared/** --check-coverage --lines 75 --functions 70 --branches 65 --statements 75 node --test",
     "telemetry:server": "node dist/server/telemetry.js",
     "version-packages": "changeset version",
     "release": "npm publish --provenance",

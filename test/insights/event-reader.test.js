@@ -4,8 +4,8 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const { readEvents, resolveEventsPath } = require("../../dist/lib/insights/event-reader.js");
-const { buildInsights } = require("../../dist/lib/insights/index.js");
+const { readEvents, resolveEventsPath } = require("../../dist/features/insights/infrastructure/event-reader.js");
+const { buildInsights } = require("../../dist/features/insights/index.js");
 
 test("readEvents skips malformed lines and parses valid events", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-insights-"));

@@ -1,6 +1,5 @@
-// Purpose: Bridge to legacy lib modules until later migration phases.
+// Purpose: Bridge to install infrastructure modules.
 // Layer: infrastructure
-// Depends on: dist/lib and dist/workers at runtime
 
 /* eslint-disable @typescript-eslint/no-require-imports */
 
@@ -22,7 +21,7 @@ interface WorkerDefinition {
   definitionPath: string;
 }
 
-export const legacyRuntimeCommandCatalog = require("../../../lib/runtime-command-catalog.js") as {
+export const legacyRuntimeCommandCatalog = require("../../install/infrastructure/runtime-command-catalog.js") as {
   fileReferencesActivation: (content: string) => boolean;
 };
 
@@ -32,7 +31,7 @@ export const legacyWorkerRegistry = require("../../../workers/registry.js") as {
   WORKER_IDS: readonly string[];
 };
 
-export const legacyWorkerClaudeAdapter = require("../../../lib/worker-claude-adapter.js") as {
+export const legacyWorkerClaudeAdapter = require("../../../workers/claude-adapter.js") as {
   assertClaudeWorkerSurface: (baseDir: string, failures: string[]) => void;
 };
 
@@ -40,6 +39,6 @@ export const legacyDomainSkillGeneration = require("../../../features/domains/in
   listDomainDefinitions: () => DomainDefinition[];
 };
 
-export const legacyProviderRuleRenderer = require("../../../lib/provider-rule-renderer.js") as {
+export const legacyProviderRuleRenderer = require("../../install/infrastructure/provider-rule-renderer.js") as {
   assertRepositoryProviderRules: (baseDir: string, failures: string[]) => void;
 };

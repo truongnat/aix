@@ -1,6 +1,6 @@
 import childProcess from "node:child_process";
 
-import { ACTIVE_PROVIDER_IDS } from "./cli-providers";
+import { ACTIVE_PROVIDER_IDS } from "../../../cli/providers";
 
 interface ProviderBinaryProbe {
   providerId: string;

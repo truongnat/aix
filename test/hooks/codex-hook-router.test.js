@@ -8,7 +8,7 @@ const {
   handleCodexHook,
   isDangerous,
   isPromptWorthy,
-} = require("../../hooks/core/codex-hook-router.js");
+} = require("../../dist/hooks/core/codex-hook-router.js");
 
 function tmpRepo() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "codex-hook-"));
