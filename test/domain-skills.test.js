@@ -8,7 +8,9 @@ const path = require("node:path");
 const repoRoot = path.resolve(__dirname, "..");
 const stackDetect = require(path.join(repoRoot, "dist", "shared", "stack-detect", "index.js"));
 const domainSkills = require(path.join(repoRoot, "dist", "features", "domains", "index.js"));
-const { skillHeadings } = require(path.join(repoRoot, "dist", "features", "validate", "domain", "constants.js"));
+const { skillHeadings } = require(
+  path.join(repoRoot, "dist", "features", "validate", "domain", "constants.js")
+);
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-domain-test-"));

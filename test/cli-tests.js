@@ -410,7 +410,9 @@ describe("CLI Provider Detection", () => {
     };
 
     try {
-      const providerBinaryDetect = fresh("dist/features/install/infrastructure/provider-binary-detect.js");
+      const providerBinaryDetect = fresh(
+        "dist/features/install/infrastructure/provider-binary-detect.js"
+      );
       const binaries = providerBinaryDetect.detectProviderBinaries();
       assert.equal(binaries.claude.installed, true);
       assert.equal(binaries.cursor.installed, true);
@@ -443,7 +445,9 @@ describe("CLI Provider Detection", () => {
     };
 
     try {
-      const providerBinaryDetect = fresh("dist/features/install/infrastructure/provider-binary-detect.js");
+      const providerBinaryDetect = fresh(
+        "dist/features/install/infrastructure/provider-binary-detect.js"
+      );
       const probe = providerBinaryDetect.probeCommand("cursor");
       assert.equal(probe.installed, true);
       assert.equal(probe.commandUsed, "cursor");
@@ -474,7 +478,9 @@ describe("CLI Provider Detection", () => {
     };
 
     try {
-      const providerBinaryDetect = fresh("dist/features/install/infrastructure/provider-binary-detect.js");
+      const providerBinaryDetect = fresh(
+        "dist/features/install/infrastructure/provider-binary-detect.js"
+      );
       const probe = providerBinaryDetect.probeCursorBinary();
       assert.equal(probe.installed, true);
       assert.equal(probe.commandUsed, "agent");

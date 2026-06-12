@@ -159,7 +159,10 @@ test("package declares an explicit public exports surface", () => {
 
   assert.deepEqual(pkg.exports["."], { types: "./index.d.ts" });
   assert.equal(pkg.exports["./cli-main"], "./dist/cli/main.js");
-  assert.equal(pkg.exports["./file-operations"], "./dist/features/install/infrastructure/file-operations.js");
+  assert.equal(
+    pkg.exports["./file-operations"],
+    "./dist/features/install/infrastructure/file-operations.js"
+  );
   assert.equal(pkg.exports["./validate"], "./dist/features/validate/index.js");
   assert.equal(pkg.exports["./package.json"], "./package.json");
   assert.match(types, /declare module "ai-engineering-harness"/);

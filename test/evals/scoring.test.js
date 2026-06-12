@@ -8,7 +8,9 @@ const repoRoot = path.resolve(__dirname, "..", "..");
 const { runChecks, runSingleCheck } = require(
   path.join(repoRoot, "dist", "features", "eval", "domain", "checks.js")
 );
-const { scoreRun } = require(path.join(repoRoot, "dist", "features", "eval", "domain", "scoring.js"));
+const { scoreRun } = require(
+  path.join(repoRoot, "dist", "features", "eval", "domain", "scoring.js")
+);
 
 test("scoreRun separates outcome and behavior results", async () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-eval-score-"));

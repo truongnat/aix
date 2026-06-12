@@ -8,7 +8,9 @@ const repoRoot = path.resolve(__dirname, "..");
 const { loadProviderManifests } = require(
   path.join(repoRoot, "dist", "features", "install", "infrastructure", "provider-registry.js")
 );
-const { loadRegistry } = require(path.join(repoRoot, "dist", "features", "eval", "domain", "task-registry.js"));
+const { loadRegistry } = require(
+  path.join(repoRoot, "dist", "features", "eval", "domain", "task-registry.js")
+);
 
 function loadLiveEvalStats(repoRoot) {
   const runsRoot = path.join(repoRoot, "artifacts", "runs");

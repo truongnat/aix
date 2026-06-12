@@ -5,7 +5,9 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const { buildInsightsExport } = require(path.join(repoRoot, "dist", "features", "insights", "index.js"));
+const { buildInsightsExport } = require(
+  path.join(repoRoot, "dist", "features", "insights", "index.js")
+);
 
 test("buildInsightsExport returns anonymized aggregate payload", () => {
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), "aih-export-"));

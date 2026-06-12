@@ -4,7 +4,10 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const { readEvents, resolveEventsPath } = require("../../dist/features/insights/infrastructure/event-reader.js");
+const {
+  readEvents,
+  resolveEventsPath,
+} = require("../../dist/features/insights/infrastructure/event-reader.js");
 const { buildInsights } = require("../../dist/features/insights/index.js");
 
 test("readEvents skips malformed lines and parses valid events", () => {

@@ -3,7 +3,9 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const { initHarnessProfile } = require("../../dist/features/install/infrastructure/harness-skeleton.js");
+const {
+  initHarnessProfile,
+} = require("../../dist/features/install/infrastructure/harness-skeleton.js");
 
 const harnessSkeletonSource = path.join(
   __dirname,
@@ -113,7 +115,17 @@ test("generated harness skeleton sources do not contain placeholder TODO or FIXM
 test("policy skeleton stays aligned without a default scope guard rule", () => {
   const tsSource = fs.readFileSync(harnessSkeletonSource, "utf8");
   const policyGenerator = fs.readFileSync(
-    path.join(__dirname, "..", "..", "src", "features", "validate", "infrastructure", "policy", "generator.ts"),
+    path.join(
+      __dirname,
+      "..",
+      "..",
+      "src",
+      "features",
+      "validate",
+      "infrastructure",
+      "policy",
+      "generator.ts"
+    ),
     "utf8"
   );
 

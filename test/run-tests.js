@@ -7,8 +7,12 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
 const validateApi = require(path.join(repoRoot, "dist", "features", "validate", "index.js"));
-const validateConstants = require(path.join(repoRoot, "dist", "features", "validate", "domain", "constants.js"));
-const installCacheApi = require(path.join(repoRoot, "dist", "features", "install", "infrastructure", "install-cache.js"));
+const validateConstants = require(
+  path.join(repoRoot, "dist", "features", "validate", "domain", "constants.js")
+);
+const installCacheApi = require(
+  path.join(repoRoot, "dist", "features", "install", "infrastructure", "install-cache.js")
+);
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-test-"));
@@ -358,7 +362,14 @@ describe("Workflow Command Documentation", () => {
 
   test("command metadata keeps start and map with updated descriptions and no brief", () => {
     const { WORKFLOW_COMMANDS } = require(
-      path.join(repoRoot, "dist", "features", "install", "infrastructure", "runtime-command-catalog")
+      path.join(
+        repoRoot,
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "runtime-command-catalog"
+      )
     );
     const byId = new Map(WORKFLOW_COMMANDS.map((spec) => [spec.id, spec]));
     assert.equal(byId.get("start").canonical, "harness-start");
@@ -586,7 +597,16 @@ describe("Provider Rules & Adapters", () => {
   });
 
   test("provider rule renderer composes core fragments for each provider", () => {
-    const renderer = require(path.join(repoRoot, "dist", "features", "install", "infrastructure", "provider-rule-renderer.js"));
+    const renderer = require(
+      path.join(
+        repoRoot,
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "provider-rule-renderer.js"
+      )
+    );
     const samples = [
       [".claude/CLAUDE.md", renderer.renderClaudeProjectMd()],
       [".cursor/rules/ai-engineering-harness.mdc", renderer.renderCursorActivationMdc()],
@@ -607,7 +627,16 @@ describe("Provider Rules & Adapters", () => {
   });
 
   test("provider rule renderer renders Claude command files from a provider template", () => {
-    const renderer = require(path.join(repoRoot, "dist", "features", "install", "infrastructure", "provider-rule-renderer.js"));
+    const renderer = require(
+      path.join(
+        repoRoot,
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "provider-rule-renderer.js"
+      )
+    );
     const templatePath = path.join(repoRoot, "rules", "providers", "claude", "command.md");
     assert.ok(fs.existsSync(templatePath), "rules/providers/claude/command.md must exist");
 
@@ -628,7 +657,14 @@ describe("Provider Rules & Adapters", () => {
 
   test("provider rule adapters declare honest native slash support", () => {
     const { PROVIDER_RULE_ADAPTERS } = require(
-      path.join(repoRoot, "dist", "features", "install", "infrastructure", "provider-rule-renderer.js")
+      path.join(
+        repoRoot,
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "provider-rule-renderer.js"
+      )
     );
     assert.equal(PROVIDER_RULE_ADAPTERS.claude.nativeSlashCommands, true);
     assert.equal(PROVIDER_RULE_ADAPTERS.claude.supportsSubagents, true);
@@ -641,7 +677,14 @@ describe("Provider Rules & Adapters", () => {
 describe("Provider Command Support", () => {
   test("provider command support merges rule adapter metadata", () => {
     const { providerCommandSupport } = require(
-      path.join(repoRoot, "dist", "features", "install", "infrastructure", "runtime-command-catalog")
+      path.join(
+        repoRoot,
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "runtime-command-catalog"
+      )
     );
     const claude = providerCommandSupport("claude");
     const cursor = providerCommandSupport("cursor");

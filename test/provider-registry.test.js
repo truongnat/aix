@@ -11,7 +11,9 @@ const { ACTIVE_PROVIDER_IDS, RUNTIME_NATIVE_PROVIDER_IDS } = require(
 const { PROVIDER_IDS, loadProviderManifests, getProviderManifest } = require(
   path.join(repoRoot, "dist", "features", "install", "infrastructure", "provider-registry.js")
 );
-const { ALL_RUNTIMES } = require(path.join(repoRoot, "dist", "features", "install", "infrastructure", "install-runtime.js"));
+const { ALL_RUNTIMES } = require(
+  path.join(repoRoot, "dist", "features", "install", "infrastructure", "install-runtime.js")
+);
 
 function makeTempPack() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-provider-registry-"));

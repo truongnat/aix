@@ -83,13 +83,17 @@ describe("resolveRemoteUploadConfig", () => {
   });
 
   it("returns disabled when no config file", () => {
-    const { resolveRemoteUploadConfig } = fresh("dist/features/insights/infrastructure/harness-config.js");
+    const { resolveRemoteUploadConfig } = fresh(
+      "dist/features/insights/infrastructure/harness-config.js"
+    );
     const result = resolveRemoteUploadConfig(tmpDir);
     assert.equal(result.enabled, false);
   });
 
   it("returns disabled when remoteUpload.enabled is false", () => {
-    const { resolveRemoteUploadConfig } = fresh("dist/features/insights/infrastructure/harness-config.js");
+    const { resolveRemoteUploadConfig } = fresh(
+      "dist/features/insights/infrastructure/harness-config.js"
+    );
     const configDir = path.join(tmpDir, ".harness");
     fs.mkdirSync(configDir, { recursive: true });
     fs.writeFileSync(
@@ -107,7 +111,9 @@ describe("resolveRemoteUploadConfig", () => {
   });
 
   it("returns endpoint from env var", () => {
-    const { resolveRemoteUploadConfig } = fresh("dist/features/insights/infrastructure/harness-config.js");
+    const { resolveRemoteUploadConfig } = fresh(
+      "dist/features/insights/infrastructure/harness-config.js"
+    );
     const configDir = path.join(tmpDir, ".harness");
     fs.mkdirSync(configDir, { recursive: true });
     fs.writeFileSync(
@@ -130,7 +136,9 @@ describe("resolveRemoteUploadConfig", () => {
   });
 
   it("uses default env var name when endpointEnv not specified", () => {
-    const { resolveRemoteUploadConfig } = fresh("dist/features/insights/infrastructure/harness-config.js");
+    const { resolveRemoteUploadConfig } = fresh(
+      "dist/features/insights/infrastructure/harness-config.js"
+    );
     const configDir = path.join(tmpDir, ".harness");
     fs.mkdirSync(configDir, { recursive: true });
     fs.writeFileSync(
@@ -151,7 +159,9 @@ describe("resolveRemoteUploadConfig", () => {
   });
 
   it("returns empty endpoint when env var not set", () => {
-    const { resolveRemoteUploadConfig } = fresh("dist/features/insights/infrastructure/harness-config.js");
+    const { resolveRemoteUploadConfig } = fresh(
+      "dist/features/insights/infrastructure/harness-config.js"
+    );
     const configDir = path.join(tmpDir, ".harness");
     fs.mkdirSync(configDir, { recursive: true });
     fs.writeFileSync(
