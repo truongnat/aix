@@ -5,7 +5,15 @@ const os = require("node:os");
 const path = require("node:path");
 
 const { discoverReportTemplates } = require(
-  path.join(__dirname, "..", "dist", "lib", "report-template-discovery.js")
+  path.join(
+    __dirname,
+    "..",
+    "dist",
+    "features",
+    "install",
+    "infrastructure",
+    "report-template-discovery.js"
+  )
 );
 
 function tmpRepo() {

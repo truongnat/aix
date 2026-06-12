@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const cp = require("node:child_process");
-const { runUninstall } = require("../../dist/lib/backend/uninstall.js");
+const { runUninstall } = require("../../dist/features/uninstall/application/run-uninstall.js");
 
 function tmpRepo() {
   const d = fs.mkdtempSync(path.join(os.tmpdir(), "un-"));

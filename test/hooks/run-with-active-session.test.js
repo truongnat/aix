@@ -6,11 +6,12 @@ const path = require("node:path");
 const cp = require("node:child_process");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const wrapperScript = path.join(repoRoot, "hooks", "core", "run-with-active-session.js");
+const hooksCoreDir = path.join(repoRoot, "dist", "hooks", "core");
+const wrapperScript = path.join(hooksCoreDir, "run-with-active-session.js");
 const {
   readActiveSession,
   resolveSessionPath,
-} = require("../../hooks/core/run-with-active-session.js");
+} = require("../../dist/hooks/core/run-with-active-session.js");
 
 test("readActiveSession parses session: field from STATE.md", () => {
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "run-with-session-"));
@@ -44,12 +45,9 @@ test("run-with-active-session invokes hook when session field is present", () =>
   fs.mkdirSync(sessionDir, { recursive: true });
   fs.mkdirSync(path.join(tmpRoot, "hooks", "core"), { recursive: true });
 
-  for (const file of fs.readdirSync(path.join(repoRoot, "hooks", "core"))) {
+  for (const file of fs.readdirSync(hooksCoreDir)) {
     if (file.endsWith(".js")) {
-      fs.copyFileSync(
-        path.join(repoRoot, "hooks", "core", file),
-        path.join(tmpRoot, "hooks", "core", file)
-      );
+      fs.copyFileSync(path.join(hooksCoreDir, file), path.join(tmpRoot, "hooks", "core", file));
     }
   }
 

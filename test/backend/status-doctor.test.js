@@ -4,7 +4,10 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const cp = require("node:child_process");
-const { runStatus, runDoctor } = require("../../dist/lib/backend/status-doctor.js");
+const {
+  runStatus,
+  runDoctor,
+} = require("../../dist/features/install/infrastructure/status-doctor.js");
 const PACK_ROOT = path.resolve(__dirname, "..", "..");
 
 function tmpRepo() {
@@ -14,7 +17,7 @@ function tmpRepo() {
 }
 
 function installClaude(dir) {
-  require("../../dist/lib/backend/install-orchestrator.js").runInstall({
+  require("../../dist/features/install/application/run-install.js").runInstall({
     packRoot: PACK_ROOT,
     target: dir,
     provider: "claude",
@@ -28,7 +31,7 @@ function installClaude(dir) {
 }
 
 function installCodex(dir) {
-  require("../../dist/lib/backend/install-orchestrator.js").runInstall({
+  require("../../dist/features/install/application/run-install.js").runInstall({
     packRoot: PACK_ROOT,
     target: dir,
     provider: "codex",

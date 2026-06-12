@@ -6,12 +6,14 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
 const { ACTIVE_PROVIDER_IDS, RUNTIME_NATIVE_PROVIDER_IDS } = require(
-  path.join(repoRoot, "dist", "lib", "cli-providers.js")
+  path.join(repoRoot, "dist", "cli", "providers.js")
 );
 const { PROVIDER_IDS, loadProviderManifests, getProviderManifest } = require(
-  path.join(repoRoot, "dist", "lib", "provider-registry.js")
+  path.join(repoRoot, "dist", "features", "install", "infrastructure", "provider-registry.js")
 );
-const { ALL_RUNTIMES } = require(path.join(repoRoot, "dist", "lib", "install-runtime.js"));
+const { ALL_RUNTIMES } = require(
+  path.join(repoRoot, "dist", "features", "install", "infrastructure", "install-runtime.js")
+);
 
 function makeTempPack() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-provider-registry-"));

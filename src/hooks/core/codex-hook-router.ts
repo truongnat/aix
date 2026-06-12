@@ -1,0 +1,347 @@
+#!/usr/bin/env node
+// Purpose: Route Codex hook events to appropriate harness handlers.
+// Layer: infrastructure
+// Depends on: ../shared/util, ./domain-bootstrap
+
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { appendHarnessEvent, findHarnessRoot, readText } from "../shared/util";
+import { buildSessionStartIntent } from "./domain-bootstrap";
+import { evaluateFileEditHook, getToolInput, isEditTool } from "./file-edit-guards";
+
+interface HookPayload {
+  hook_event_name?: string;
+  hookEventName?: string;
+  event?: string;
+  name?: string;
+  cwd?: string;
+  working_directory?: string;
+  workingDirectory?: string;
+  tool_input?: unknown;
+  toolInput?: unknown;
+  input?: unknown;
+  command?: string;
+  shell_command?: string;
+  prompt?: string;
+  user_prompt?: string;
+  message?: string;
+  status?: string;
+  exit_code?: string | number;
+  exitCode?: string | number;
+}
+
+interface HookSpecificOutput {
+  hookEventName: string;
+  additionalContext?: string;
+  permissionDecision?: string;
+  decision?: string;
+  permissionDecisionReason?: string;
+  systemMessage?: string;
+}
+
+interface HookOutput {
+  hookSpecificOutput: HookSpecificOutput;
+}
+
+function readHookPayload(): HookPayload {
+  try {
+    if (process.stdin.isTTY) {
+      return {};
+    }
+    const raw = fs.readFileSync(0, "utf8").trim();
+    if (!raw) {
+      return {};
+    }
+    return JSON.parse(raw) as HookPayload;
+  } catch {
+    return {};
+  }
+}
+
+function getHookEventName(payload: HookPayload): string {
+  return payload.hook_event_name || payload.hookEventName || payload.event || payload.name || "";
+}
+
+function getCwd(payload: HookPayload): string {
+  return payload.cwd || payload.working_directory || payload.workingDirectory || process.cwd();
+}
+
+function getCommand(payload: HookPayload): string {
+  const toolInput = getToolInput(payload);
+  if (typeof toolInput === "string") {
+    return toolInput;
+  }
+  if (toolInput && typeof toolInput === "object") {
+    const t = toolInput as Record<string, unknown>;
+    return String(
+      t["command"] || t["shell_command"] || t["text"] || t["prompt"] || t["input"] || ""
+    );
+  }
+  return payload.command || payload.shell_command || "";
+}
+
+function getPrompt(payload: HookPayload): string {
+  return payload.prompt || payload.user_prompt || payload.message || "";
+}
+
+function safeRead(filePath: string): string {
+  try {
+    return fs.existsSync(filePath) ? readText(filePath) : "";
+  } catch {
+    return "";
+  }
+}
+
+function buildSessionContext(repoRoot: string): string {
+  const goal = safeRead(path.join(repoRoot, ".harness", "GOAL.md"));
+  const plan = safeRead(path.join(repoRoot, ".harness", "PLAN.md"));
+  const state = safeRead(path.join(repoRoot, ".harness", "STATE.md"));
+  const chunks = [buildSessionStartIntent(repoRoot)];
+  if (state.trim()) {
+    chunks.push("Current harness state is present.");
+  }
+  if (goal.trim()) {
+    chunks.push("A goal file exists; keep the current goal in scope.");
+  }
+  if (plan.trim()) {
+    chunks.push("A plan file exists; follow the approved step order.");
+  }
+  return chunks.join(" ");
+}
+
+function buildPromptContext(): string {
+  return "Use the harness loop: discuss, plan, run, verify, ship, then remember.";
+}
+
+function sanitizeCommand(command: string): string {
+  return command.replace(/\s+/g, " ").trim();
+}
+
+export function isDangerous(command: string): boolean {
+  return (
+    /(^|\s)git push\s+--force(\-with-lease)?(\s|$)/.test(command) ||
+    /(^|\s)git reset\s+--hard(\s|$)/.test(command) ||
+    /(^|\s)git clean\s+-fdx(\s|$)/.test(command) ||
+    /(^|\s)rm\s+-rf(\s|$)/.test(command)
+  );
+}
+
+export function isPromptWorthy(command: string): boolean {
+  return (
+    /(^|\s)(npm|pnpm|yarn)\s+(install|add)\b/.test(command) ||
+    /(^|\s)gh\s+pr\s+merge\b/.test(command) ||
+    /(^|\s)npm\s+publish\b/.test(command) ||
+    /(^|\s)vercel\b/.test(command)
+  );
+}
+
+function recordEvent(repoRoot: string, event: Record<string, unknown>): void {
+  try {
+    appendHarnessEvent(repoRoot, { type: "codex-hook", ...event });
+  } catch {
+    // Best-effort only.
+  }
+}
+
+function hookOutput(eventName: string, payload: Omit<HookSpecificOutput, "hookEventName">): HookOutput {
+  return {
+    hookSpecificOutput: {
+      hookEventName: eventName,
+      ...payload,
+    },
+  };
+}
+
+function handleSessionStart(repoRoot: string, eventName: string): HookOutput {
+  recordEvent(repoRoot, {
+    hook_event: eventName,
+    cwd: repoRoot,
+  });
+  return hookOutput(eventName, {
+    additionalContext: buildSessionContext(repoRoot),
+  });
+}
+
+function resolveSlashCommand(
+  repoRoot: string,
+  prompt: string
+): { commandId: string; args: string; filePath: string; content: string } | null {
+  const match = prompt.match(/^\/(harness-[a-z]+)/);
+  if (!match) {
+    return null;
+  }
+  const commandId = match[1];
+  const args = prompt.slice(match[0].length).trim();
+  const searchPaths = [
+    path.join(repoRoot, ".codex", "commands", `${commandId}.md`),
+    path.join(repoRoot, ".ai-harness", "runtime-commands", `${commandId}.md`),
+    path.join(repoRoot, "commands", `${commandId}.md`),
+  ];
+  for (const candidate of searchPaths) {
+    const content = safeRead(candidate);
+    if (content) {
+      return { commandId, args, filePath: candidate, content };
+    }
+  }
+  return null;
+}
+
+function handlePromptSubmit(repoRoot: string, eventName: string, payload: HookPayload): HookOutput {
+  const prompt = getPrompt(payload).trim();
+  recordEvent(repoRoot, {
+    hook_event: eventName,
+    prompt,
+  });
+
+  const slashCmd = resolveSlashCommand(repoRoot, prompt);
+  if (slashCmd) {
+    recordEvent(repoRoot, {
+      type: "codex-slash-command",
+      command: slashCmd.commandId,
+      args: slashCmd.args,
+      resolved: slashCmd.filePath,
+    });
+    const parts = [
+      `Execute the harness command /${slashCmd.commandId}.`,
+      `Command definition:\n\n${slashCmd.content}`,
+    ];
+    if (slashCmd.args) {
+      parts.push(`User arguments: ${slashCmd.args}`);
+    }
+    return hookOutput(eventName, {
+      additionalContext: parts.join("\n\n"),
+    });
+  }
+
+  const parts = [buildPromptContext()];
+  if (prompt) {
+    parts.push(`User prompt: ${prompt}`);
+  }
+  return hookOutput(eventName, {
+    additionalContext: parts.join(" "),
+  });
+}
+
+function handleToolEvent(repoRoot: string, eventName: string, payload: HookPayload): HookOutput {
+  const command = sanitizeCommand(getCommand(payload));
+  recordEvent(repoRoot, {
+    hook_event: eventName,
+    command,
+  });
+
+  if (isEditTool(payload)) {
+    const fileGuardBlock = evaluateFileEditHook({ ...payload, cwd: payload.cwd || repoRoot });
+    if (fileGuardBlock) {
+      return hookOutput(eventName, {
+        permissionDecision: "deny",
+        decision: "deny",
+        permissionDecisionReason: fileGuardBlock.reason,
+        systemMessage: fileGuardBlock.reason,
+      });
+    }
+  }
+
+  if (!command) {
+    // Non-shell tools (file read/write) have no command — allow by default.
+    return hookOutput(eventName, {
+      permissionDecision: "allow",
+      decision: "allow",
+    });
+  }
+
+  if (isDangerous(command)) {
+    return hookOutput(eventName, {
+      permissionDecision: "deny",
+      decision: "deny",
+      permissionDecisionReason:
+        "Blocked by harness Codex policy: use a safer alternative such as revert, branch, or targeted cleanup.",
+      systemMessage:
+        "Blocked by harness Codex policy: use a safer alternative such as revert, branch, or targeted cleanup.",
+    });
+  }
+
+  if (isPromptWorthy(command)) {
+    return hookOutput(eventName, {
+      additionalContext:
+        "Harness Codex policy: confirm dependency, merge, or deploy operations before continuing.",
+    });
+  }
+
+  return hookOutput(eventName, {
+    permissionDecision: "allow",
+    decision: "allow",
+  });
+}
+
+function handlePostToolUse(repoRoot: string, eventName: string, payload: HookPayload): HookOutput {
+  const command = sanitizeCommand(getCommand(payload));
+  recordEvent(repoRoot, {
+    hook_event: eventName,
+    command,
+    status: payload.status || payload.exit_code || payload.exitCode || "recorded",
+  });
+  return hookOutput(eventName, {
+    additionalContext: "Command output was recorded in the harness event log.",
+  });
+}
+
+function handleStop(repoRoot: string, eventName: string): HookOutput {
+  recordEvent(repoRoot, {
+    hook_event: eventName,
+    status: "stop",
+  });
+  return hookOutput(eventName, {
+    additionalContext: "Stop event received. Compact session memory if needed before exit.",
+  });
+}
+
+export function handleCodexHook(payload: HookPayload): HookOutput | null {
+  const eventName = getHookEventName(payload) || "Unknown";
+  const cwd = getCwd(payload);
+  let repoRoot = cwd;
+
+  try {
+    repoRoot = findHarnessRoot(cwd);
+  } catch {
+    // Fall back to cwd.
+  }
+
+  switch (eventName) {
+    case "SessionStart":
+      return handleSessionStart(repoRoot, eventName);
+    case "UserPromptSubmit":
+      return handlePromptSubmit(repoRoot, eventName, payload);
+    case "PreToolUse":
+    case "PermissionRequest":
+      return handleToolEvent(repoRoot, eventName, payload);
+    case "PostToolUse":
+      return handlePostToolUse(repoRoot, eventName, payload);
+    case "Stop":
+      return handleStop(repoRoot, eventName);
+    case "SubagentStart":
+    case "SubagentStop":
+      recordEvent(repoRoot, {
+        hook_event: eventName,
+      });
+      return hookOutput(eventName, {
+        additionalContext: `Harness recorded ${eventName.toLowerCase()} for traceability.`,
+      });
+    default:
+      recordEvent(repoRoot, {
+        hook_event: eventName,
+      });
+      return null;
+  }
+}
+
+function main(): void {
+  const payload = readHookPayload();
+  const result = handleCodexHook(payload);
+  if (result) {
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+  }
+}
+
+if (require.main === module) {
+  main();
+}

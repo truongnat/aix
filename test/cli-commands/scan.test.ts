@@ -21,7 +21,7 @@ test("scan command outputs valid JSON with frameworks and domains", () => {
     path.join(dir, "package.json"),
     JSON.stringify({ dependencies: { next: "14.0.0" } })
   );
-  const output = execSync(`node bin/aih.js scan --target "${dir}"`, { encoding: "utf8" });
+  const output = execSync(`node dist/cli/main.js scan --target "${dir}"`, { encoding: "utf8" });
   const result = JSON.parse(output.trim()) as Record<string, unknown>;
   assert.ok(Array.isArray(result.frameworks), "frameworks should be array");
   assert.ok(Array.isArray(result.domains), "domains should be array");
@@ -32,7 +32,8 @@ test("scan command outputs valid JSON with frameworks and domains", () => {
 
 test("scan command exits 1 for missing target", () => {
   assert.throws(
-    () => execSync("node bin/aih.js scan --target /nonexistent/path/xyz", { encoding: "utf8" }),
+    () =>
+      execSync("node dist/cli/main.js scan --target /nonexistent/path/xyz", { encoding: "utf8" }),
     /Target directory does not exist/
   );
 });

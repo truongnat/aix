@@ -6,9 +6,11 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
-const stackDetect = require(path.join(repoRoot, "dist", "lib", "stack-detect.js"));
-const domainSkills = require(path.join(repoRoot, "dist", "lib", "domain-skill-generation.js"));
-const { skillHeadings } = require(path.join(repoRoot, "dist", "lib", "validate", "constants.js"));
+const stackDetect = require(path.join(repoRoot, "dist", "shared", "stack-detect", "index.js"));
+const domainSkills = require(path.join(repoRoot, "dist", "features", "domains", "index.js"));
+const { skillHeadings } = require(
+  path.join(repoRoot, "dist", "features", "validate", "domain", "constants.js")
+);
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-domain-test-"));
@@ -135,7 +137,7 @@ test("runDomainsCommand generates the skill surface from an analysis file", asyn
 
   try {
     const { runDomainsCommand } = require(
-      path.join(repoRoot, "dist", "lib", "cli-commands", "domains.js")
+      path.join(repoRoot, "dist", "features", "domains", "presentation", "domains-command.js")
     );
     const status = await runDomainsCommand(repoRoot, {
       command: "domains",
@@ -194,7 +196,7 @@ test("domains CLI reads project analysis JSON from stdin", () => {
 
   const run = cp.spawnSync(
     process.execPath,
-    [path.join(repoRoot, "bin", "aih.js"), "domains", "--target", target],
+    [path.join(repoRoot, "dist", "cli", "main.js"), "domains", "--target", target],
     {
       cwd: repoRoot,
       input: `${JSON.stringify(analysis)}\n`,

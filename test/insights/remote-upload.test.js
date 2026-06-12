@@ -6,7 +6,7 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const { uploadInsightsExport } = require(
-  path.join(repoRoot, "dist", "lib", "insights", "remote-upload.js")
+  path.join(repoRoot, "dist", "features", "insights", "application", "upload-insights.js")
 );
 
 test("uploadInsightsExport skips when remote upload disabled", async () => {

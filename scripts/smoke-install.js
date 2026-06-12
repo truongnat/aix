@@ -21,7 +21,7 @@ if (isWindows) {
 
 const result = childProcess.spawnSync(
   process.execPath,
-  ["bin/aih.js", "install", "--provider", "cursor", "--yes", "--target", target, "--dry-run"],
+  ["dist/cli/main.js", "install", "--provider", "cursor", "--yes", "--target", target, "--dry-run"],
   {
     stdio: "inherit",
     env: {

@@ -244,7 +244,17 @@ function attachTemplates(result, cwd, options) {
   try {
     const fs = require("node:fs");
     const path = require("node:path");
-    const mod = require(path.join(__dirname, "..", "dist", "lib", "report-template-discovery.js"));
+    const mod = require(
+      path.join(
+        __dirname,
+        "..",
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "report-template-discovery.js"
+      )
+    );
     const discovery = mod.discoverReportTemplates(cwd);
     const harnessDir = path.join(cwd, ".harness");
     if (fs.existsSync(harnessDir)) {

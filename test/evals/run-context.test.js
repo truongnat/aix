@@ -6,7 +6,7 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const { createRunContext, resolveArtifactsBase } = require(
-  path.join(repoRoot, "dist", "lib", "evals", "run-context.js")
+  path.join(repoRoot, "dist", "features", "eval", "infrastructure", "run-context.js")
 );
 
 test("createRunContext sanitizes task ids before creating run directories", () => {

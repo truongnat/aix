@@ -15,7 +15,7 @@ test("main routes eval list through the eval command module", async () => {
   const originalLoad = require("node:module").Module._load;
 
   require("node:module").Module._load = function patchedLoader(request, parent, isMain) {
-    if (request === "./cli-commands/eval") {
+    if (request.includes("features/eval/presentation/eval-command")) {
       return {
         runEvalCommand: async (_packRoot, options) => {
           calls.push(options);
@@ -27,7 +27,7 @@ test("main routes eval list through the eval command module", async () => {
   };
 
   try {
-    const { main } = fresh("dist/lib/cli-main.js");
+    const { main } = fresh("dist/cli/main.js");
     const code = await main(
       ["node", "aih.js", "eval", "list"],
       path.join(repoRoot, "bin", "aih.js")
@@ -40,7 +40,7 @@ test("main routes eval list through the eval command module", async () => {
 });
 
 test("runEvalCommand lists registry tasks and returns exit code 0", async () => {
-  const { runEvalCommand } = fresh("dist/lib/cli-commands/eval.js");
+  const { runEvalCommand } = fresh("dist/features/eval/presentation/eval-command.js");
   let output = "";
   const originalWrite = process.stdout.write;
   process.stdout.write = (chunk) => {
@@ -65,7 +65,7 @@ test("runEvalCommand lists registry tasks and returns exit code 0", async () => 
 });
 
 test("runEvalCommand runs sample-bugfix and prints summary path", async () => {
-  const { runEvalCommand } = fresh("dist/lib/cli-commands/eval.js");
+  const { runEvalCommand } = fresh("dist/features/eval/presentation/eval-command.js");
   let output = "";
   const originalWrite = process.stdout.write;
   process.stdout.write = (chunk) => {

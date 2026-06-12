@@ -2,7 +2,7 @@
 
 const { describe, it } = require("node:test");
 const assert = require("node:assert/strict");
-const { useInteractiveUi, isCancel } = require("../dist/lib/cli-ui");
+const { useInteractiveUi, isCancel } = require("../dist/cli/ui/index");
 
 describe("cli-ui", () => {
   describe("useInteractiveUi", () => {

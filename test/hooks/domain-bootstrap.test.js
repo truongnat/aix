@@ -8,7 +8,7 @@ const {
   needsDomainBootstrap,
   hasGeneratedDomainSkills,
   buildDomainBootstrapIntent,
-} = require("../../hooks/core/domain-bootstrap.js");
+} = require("../../dist/hooks/core/domain-bootstrap.js");
 
 function tmpRepo() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "domain-bootstrap-"));

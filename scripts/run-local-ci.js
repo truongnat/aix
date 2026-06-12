@@ -53,7 +53,7 @@ const steps = [
   {
     name: "Run eval regression",
     command: nodeCmd,
-    args: ["bin/aih.js", "eval", "run", "sample-bugfix", "--yes", "--no-llm-judge"],
+    args: ["dist/cli/main.js", "eval", "run", "sample-bugfix", "--yes", "--no-llm-judge"],
   },
   {
     name: "Check lib coverage gate",

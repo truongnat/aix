@@ -11,7 +11,7 @@ function fresh(modulePath) {
 }
 
 function parse(...argv) {
-  const { parseArgv } = fresh("dist/lib/cli-args.js");
+  const { parseArgv } = fresh("dist/cli/args.js");
   return parseArgv(["node", "script", ...argv]);
 }
 
@@ -207,7 +207,7 @@ describe("parseArgv", () => {
 
 describe("modeToScopeVisibility", () => {
   it("maps project-private", () => {
-    const { modeToScopeVisibility } = fresh("dist/lib/cli-args.js");
+    const { modeToScopeVisibility } = fresh("dist/cli/args.js");
     assert.deepEqual(modeToScopeVisibility("project-private"), {
       scope: "project",
       visibility: "private",
@@ -215,7 +215,7 @@ describe("modeToScopeVisibility", () => {
   });
 
   it("maps project-shared", () => {
-    const { modeToScopeVisibility } = fresh("dist/lib/cli-args.js");
+    const { modeToScopeVisibility } = fresh("dist/cli/args.js");
     assert.deepEqual(modeToScopeVisibility("project-shared"), {
       scope: "project",
       visibility: "shared",
@@ -223,12 +223,12 @@ describe("modeToScopeVisibility", () => {
   });
 
   it("maps global", () => {
-    const { modeToScopeVisibility } = fresh("dist/lib/cli-args.js");
+    const { modeToScopeVisibility } = fresh("dist/cli/args.js");
     assert.deepEqual(modeToScopeVisibility("global"), { scope: "global", visibility: "" });
   });
 
   it("defaults unknown to project-private", () => {
-    const { modeToScopeVisibility } = fresh("dist/lib/cli-args.js");
+    const { modeToScopeVisibility } = fresh("dist/cli/args.js");
     assert.deepEqual(modeToScopeVisibility("unknown"), { scope: "project", visibility: "private" });
   });
 });

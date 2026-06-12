@@ -25,7 +25,7 @@ test("package.json does not expose removed root shims", () => {
     assert.ok(!pkg.files.includes(entry), `${entry} should not be packaged`);
     assert.ok(!fs.existsSync(path.join(repoRoot, entry)), `${entry} should be removed`);
   }
-  assert.equal(pkg.scripts["install:harness"], "node bin/aih.js install");
+  assert.equal(pkg.scripts["install:harness"], "node dist/cli/main.js install");
   assert.equal(pkg.scripts.validate, "node bin/validate.js");
 });
 
@@ -88,111 +88,44 @@ test("build:codex-plugin stages a publishable Codex bundle", () => {
   }
 });
 
-test("package exposes an incremental TypeScript typecheck for lib", () => {
+test("package exposes an incremental TypeScript typecheck for lib and src", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-  const tsconfigPath = path.join(repoRoot, "tsconfig.lib.json");
+  const tsconfigPath = path.join(repoRoot, "tsconfig.json");
 
   assert.equal(typeof pkg.scripts.typecheck, "string");
-  assert.equal(
-    pkg.scripts.typecheck,
-    "node ./node_modules/typescript/bin/tsc -p tsconfig.lib.json"
-  );
-  assert.match(pkg.scripts.typecheck, /tsconfig\.lib\.json/);
+  assert.equal(pkg.scripts.typecheck, "node ./node_modules/typescript/bin/tsc -p tsconfig.json");
+  assert.match(pkg.scripts.typecheck, /tsconfig\.json/);
   assert.ok(pkg.devDependencies.typescript, "typescript devDependency must be present");
   assert.ok(pkg.devDependencies["@types/node"], "@types/node devDependency must be present");
-  assert.ok(fs.existsSync(tsconfigPath), "tsconfig.lib.json must exist");
+  assert.ok(fs.existsSync(tsconfigPath), "tsconfig.json must exist");
   assert.ok(
     fs.existsSync(path.join(repoRoot, "node_modules", "typescript", "bin", "tsc")),
     "local TypeScript CLI must exist"
   );
 
   const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, "utf8"));
-  assert.equal(tsconfig.compilerOptions.allowJs, true);
-  assert.equal(tsconfig.compilerOptions.checkJs, true);
   assert.equal(tsconfig.compilerOptions.noEmit, true);
   assert.ok(
-    tsconfig.include.includes("lib/provider-registry.ts"),
-    "tsconfig.lib.json must include lib/provider-registry.ts"
+    tsconfig.compilerOptions.types?.includes("node"),
+    "tsconfig.json must include node types"
   );
-  assert.ok(
-    tsconfig.include.includes("lib/cli-providers.ts"),
-    "tsconfig.lib.json must include lib/cli-providers.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/provider-rule-renderer.ts"),
-    "tsconfig.lib.json must include lib/provider-rule-renderer.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/catalog/provider-command-metadata.ts"),
-    "tsconfig.lib.json must include lib/catalog/provider-command-metadata.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/catalog/command-rendering.ts"),
-    "tsconfig.lib.json must include lib/catalog/command-rendering.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/catalog/command-installation.ts"),
-    "tsconfig.lib.json must include lib/catalog/command-installation.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/runtime-command-catalog.ts"),
-    "tsconfig.lib.json must include lib/runtime-command-catalog.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/worker-claude-adapter.ts"),
-    "tsconfig.lib.json must include lib/worker-claude-adapter.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("workers/registry.ts"),
-    "tsconfig.lib.json must include workers/registry.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/install-runtime.ts"),
-    "tsconfig.lib.json must include lib/install-runtime.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/file-operations.ts"),
-    "tsconfig.lib.json must include lib/file-operations.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/command-surface-report.ts"),
-    "tsconfig.lib.json must include lib/command-surface-report.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/plugin-packaging.ts"),
-    "tsconfig.lib.json must include lib/plugin-packaging.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/install-cache.ts"),
-    "tsconfig.lib.json must include lib/install-cache.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/cli-help.ts"),
-    "tsconfig.lib.json must include lib/cli-help.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/cli-detect.ts"),
-    "tsconfig.lib.json must include lib/cli-detect.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/provider-detection.ts"),
-    "tsconfig.lib.json must include lib/provider-detection.ts"
-  );
-  assert.ok(
-    tsconfig.include.includes("lib/cli-plan.ts"),
-    "tsconfig.lib.json must include lib/cli-plan.ts"
-  );
+  assert.ok(tsconfig.include.includes("src/**/*.ts"), "tsconfig.json must include src/**/*.ts");
 });
 
 test("package exposes a TypeScript watch build script", () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
   const verifyDistScript = path.join(repoRoot, "scripts", "verify-dist.js");
 
-  assert.equal(pkg.scripts.build, "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json");
+  assert.equal(pkg.scripts.build, "npm run build:src");
+  assert.equal(
+    pkg.scripts["build:src"],
+    "node ./node_modules/typescript/bin/tsc -p tsconfig.src.json"
+  );
   assert.equal(
     pkg.scripts["build:watch"],
-    "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json --watch"
+    "node ./node_modules/typescript/bin/tsc -p tsconfig.src.json --watch"
   );
+  assert.equal(pkg.scripts["telemetry:server"], "node dist/server/telemetry.js");
   assert.match(pkg.scripts["test:coverage"], /--lines 75/);
   assert.match(pkg.scripts["test:coverage"], /--functions 70/);
   assert.match(pkg.scripts["test:coverage"], /--branches 65/);
@@ -211,9 +144,11 @@ test("verify-dist script checks compiled test entrypoints with a clear error mes
     verifyDist,
     /Run `npm run build` and fix the TypeScript\/build error before running tests\./
   );
-  assert.match(verifyDist, /dist\/lib\/cli-main\.js/);
-  assert.match(verifyDist, /dist\/lib\/evals\/index\.js/);
-  assert.match(verifyDist, /dist\/lib\/validate\/index\.js/);
+  assert.match(verifyDist, /dist\/server\/telemetry\.js/);
+  assert.match(verifyDist, /dist\/features\/telemetry\/index\.js/);
+  assert.match(verifyDist, /dist\/features\/install\/application\/run-install\.js/);
+  assert.match(verifyDist, /dist\/features\/install\/infrastructure\/status-doctor\.js/);
+  assert.match(verifyDist, /dist\/features\/install\/infrastructure\/file-operations\.js/);
   assert.match(verifyDist, /dist\/workers\/registry\.js/);
 });
 
@@ -223,9 +158,12 @@ test("package declares an explicit public exports surface", () => {
   const types = fs.readFileSync(path.join(repoRoot, "index.d.ts"), "utf8");
 
   assert.deepEqual(pkg.exports["."], { types: "./index.d.ts" });
-  assert.equal(pkg.exports["./cli-main"], "./dist/lib/cli-main.js");
-  assert.equal(pkg.exports["./file-operations"], "./dist/lib/file-operations.js");
-  assert.equal(pkg.exports["./validate"], "./dist/lib/validate/index.js");
+  assert.equal(pkg.exports["./cli-main"], "./dist/cli/main.js");
+  assert.equal(
+    pkg.exports["./file-operations"],
+    "./dist/features/install/infrastructure/file-operations.js"
+  );
+  assert.equal(pkg.exports["./validate"], "./dist/features/validate/index.js");
   assert.equal(pkg.exports["./package.json"], "./package.json");
   assert.match(types, /declare module "ai-engineering-harness"/);
   assert.match(types, /declare module "ai-engineering-harness\/cli-main"/);
@@ -270,7 +208,7 @@ test("README advertises the current coverage target", () => {
 });
 
 test("cli-ui uses typed imports without ts-ignore suppressions", () => {
-  const cliUi = fs.readFileSync(path.join(repoRoot, "lib", "cli-ui.ts"), "utf8");
+  const cliUi = fs.readFileSync(path.join(repoRoot, "src", "cli", "ui", "index.ts"), "utf8");
 
   assert.match(cliUi, /import type \* as ClackPrompts from "@clack\/prompts"/);
   assert.match(cliUi, /type DynamicImport = <T>\(specifier: string\) => Promise<T>/);
@@ -279,7 +217,7 @@ test("cli-ui uses typed imports without ts-ignore suppressions", () => {
   assert.match(cliUi, /async function loadClackPrompts/);
   assert.match(
     cliUi,
-    /import \{ formatCommandSupportForPlan \} from "\.\/runtime-command-catalog"/
+    /import \{ formatCommandSupportForPlan \} from "\.\.\/infrastructure\/legacy-deps"/
   );
   assert.doesNotMatch(cliUi, /@ts-ignore/);
 });
@@ -307,7 +245,7 @@ test("CLI UX docs describe the primary lifecycle path as in-process, not shell-b
 });
 
 test("cli-backend only retains pack-root resolution after the in-process port", () => {
-  const backend = fs.readFileSync(path.join(repoRoot, "lib", "cli-backend.ts"), "utf8");
+  const backend = fs.readFileSync(path.join(repoRoot, "src", "cli", "backend.ts"), "utf8");
 
   assert.match(backend, /function packRootFromModule/);
   assert.match(backend, /export \{ packRootFromModule \}/);
@@ -315,8 +253,8 @@ test("cli-backend only retains pack-root resolution after the in-process port", 
   assert.doesNotMatch(backend, /buildInstallArgs|buildUpdateArgs|buildUninstallArgs/);
 });
 
-test("lib/ and workers/ source tree stays free of @ts-ignore suppressions", () => {
-  const roots = [path.join(repoRoot, "lib"), path.join(repoRoot, "workers")];
+test("src/ source tree stays free of @ts-ignore suppressions", () => {
+  const roots = [path.join(repoRoot, "src")];
   const matches = [];
   const pending = [...roots];
 
@@ -349,7 +287,7 @@ test("CI smoke install uses a runner-agnostic Node invocation instead of bash", 
   assert.match(workflow, /run: node scripts\/smoke-install\.js/);
   assert.match(smokeInstall, /process\.env\.RUNNER_TEMP \|\| os\.tmpdir\(\)/);
   assert.match(smokeInstall, /spawnSync\(\s*process\.execPath,/);
-  assert.match(smokeInstall, /"bin\/aih\.js", "install"/);
+  assert.match(smokeInstall, /"dist\/cli\/main\.js", "install"/);
   assert.match(smokeInstall, /"--provider", "cursor"/);
   assert.match(smokeInstall, /"--dry-run"/);
 });
@@ -390,7 +328,7 @@ test("adoption-facing install docs keep the Node CLI as primary", () => {
 
   assert.match(
     adoptionGuide,
-    /prefer the Node\.js CLI \(`npx ai-engineering-harness install` or `node bin\/aih\.js install`\) as the primary install surface/i
+    /prefer the Node\.js CLI \(`npx ai-engineering-harness install` or `node dist\/cli\/main\.js install`\) as the primary install surface/i
   );
   assert.match(adoptionGuide, /npx ai-engineering-harness install --target/);
 
@@ -592,11 +530,11 @@ test("runtime-native install docs keep legacy OpenCode cleanup routed through un
 
 test("install and diagnostics warnings point legacy residue cleanup to uninstall docs", () => {
   const installCommand = fs.readFileSync(
-    path.join(repoRoot, "lib", "cli-commands", "install.ts"),
+    path.join(repoRoot, "src", "features", "install", "presentation", "install-command.ts"),
     "utf8"
   );
   const diagnosticsCommand = fs.readFileSync(
-    path.join(repoRoot, "lib", "cli-commands", "diagnostics.ts"),
+    path.join(repoRoot, "src", "cli", "commands", "diagnostics.ts"),
     "utf8"
   );
 

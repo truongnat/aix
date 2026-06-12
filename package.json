@@ -36,14 +36,14 @@
     ".": {
       "types": "./index.d.ts"
     },
-    "./cli-main": "./dist/lib/cli-main.js",
-    "./file-operations": "./dist/lib/file-operations.js",
-    "./validate": "./dist/lib/validate/index.js",
+    "./cli-main": "./dist/cli/main.js",
+    "./file-operations": "./dist/features/install/infrastructure/file-operations.js",
+    "./validate": "./dist/features/validate/index.js",
     "./package.json": "./package.json"
   },
   "bin": {
-    "ai-engineering-harness": "bin/aih.js",
-    "aih": "bin/aih.js"
+    "ai-engineering-harness": "dist/cli/main.js",
+    "aih": "dist/cli/main.js"
   },
   "files": [
     "bin/",
@@ -97,21 +97,22 @@
     "SECURITY.md"
   ],
   "scripts": {
-    "install:harness": "node bin/aih.js install",
-    "build": "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json",
-    "build:watch": "node ./node_modules/typescript/bin/tsc -p tsconfig.build.json --watch",
+    "install:harness": "node dist/cli/main.js install",
+    "build": "npm run build:src",
+    "build:src": "node ./node_modules/typescript/bin/tsc -p tsconfig.src.json",
+    "build:watch": "node ./node_modules/typescript/bin/tsc -p tsconfig.src.json --watch",
     "build:codex-plugin": "node scripts/build-codex-plugin.js",
     "publish:codex-plugin": "npm run build:codex-plugin",
     "prepack": "npm run build",
     "test": "npm run build && node scripts/verify-dist.js && node --test",
     "test:evals": "npm run build && node scripts/verify-dist.js && node --test test/evals/",
-    "test:coverage": "npm run build && node scripts/verify-dist.js && c8 --include=dist/lib/** --check-coverage --lines 75 --functions 70 --branches 65 --statements 75 node --test",
-    "telemetry:server": "node bin/telemetry-server.js",
+    "test:coverage": "npm run build && node scripts/verify-dist.js && c8 --include=dist/features/** --include=dist/cli/** --include=dist/shared/** --check-coverage --lines 75 --functions 70 --branches 65 --statements 75 node --test",
+    "telemetry:server": "node dist/server/telemetry.js",
     "version-packages": "changeset version",
     "release": "npm publish --provenance",
     "prepare": "husky",
     "validate": "node bin/validate.js",
-    "typecheck": "node ./node_modules/typescript/bin/tsc -p tsconfig.lib.json",
+    "typecheck": "node ./node_modules/typescript/bin/tsc -p tsconfig.json",
     "lint": "eslint bin/ test/ *.js --max-warnings 0 --no-error-on-unmatched-pattern",
     "lint:fix": "eslint bin/ test/ *.js --fix",
     "format": "prettier --write lib/ bin/ test/ *.js *.md",

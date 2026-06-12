@@ -6,7 +6,7 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const { buildEvalRecommendations } = require(
-  path.join(repoRoot, "dist", "lib", "insights", "eval-recommendations.js")
+  path.join(repoRoot, "dist", "features", "insights", "index.js")
 );
 
 test("buildEvalRecommendations maps guard blocks to eval tasks", () => {

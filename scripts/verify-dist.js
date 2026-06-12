@@ -6,11 +6,22 @@ const path = require("node:path");
 const repoRoot = path.resolve(__dirname, "..");
 
 const requiredPaths = [
-  "dist/lib/cli-main.js",
-  "dist/lib/cli-ui.js",
-  "dist/lib/evals/index.js",
-  "dist/lib/validate/index.js",
-  "dist/lib/backend/install-orchestrator.js",
+  "dist/server/telemetry.js",
+  "dist/features/telemetry/index.js",
+  "dist/features/insights/index.js",
+  "dist/features/validate/index.js",
+  "dist/features/eval/index.js",
+  "dist/features/install/index.js",
+  "dist/features/scan/index.js",
+  "dist/features/domains/index.js",
+  "dist/shared/install-kernel/index.js",
+  "dist/shared/stack-detect/index.js",
+  "dist/cli/main.js",
+  "dist/cli/args.js",
+  "dist/cli/ui/index.js",
+  "dist/features/install/application/run-install.js",
+  "dist/features/install/infrastructure/status-doctor.js",
+  "dist/features/install/infrastructure/file-operations.js",
   "dist/workers/registry.js",
 ];
 

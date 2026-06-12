@@ -8,7 +8,7 @@ function run(command, args) {
   return childProcess.spawnSync(command, args, {
     encoding: "utf8",
     timeout: 15000,
-    shell: false
+    shell: false,
   });
 }
 
@@ -23,7 +23,7 @@ function detectCommand(command) {
   return {
     available: true,
     command,
-    location
+    location,
   };
 }
 
@@ -44,14 +44,14 @@ function detectGitWorktree(gitInfo) {
   return {
     available: result.status === 0,
     command: "git worktree",
-    version: detectVersion("git")
+    version: detectVersion("git"),
   };
 }
 
 function detectGitGrep(gitInfo) {
   return {
     available: gitInfo.available,
-    command: "git grep"
+    command: "git grep",
   };
 }
 
@@ -62,7 +62,7 @@ function detectOptional(command, versionArgs) {
   }
   return {
     ...info,
-    version: detectVersion(command, versionArgs)
+    version: detectVersion(command, versionArgs),
   };
 }
 
@@ -74,7 +74,7 @@ function detectCodegraph() {
   return {
     ...info,
     command: "codegraph",
-    reference: "https://github.com/colbymchenry/codegraph"
+    reference: "https://github.com/colbymchenry/codegraph",
   };
 }
 
@@ -82,7 +82,10 @@ function discover() {
   const git = { ...detectCommand("git"), version: detectVersion("git") };
   const rg = { ...detectCommand("rg"), version: detectVersion("rg") };
   const grep = { ...detectCommand("grep"), version: detectVersion("grep") };
-  const find = { ...detectCommand(isWindows ? "where" : "find"), version: isWindows ? null : detectVersion("find") };
+  const find = {
+    ...detectCommand(isWindows ? "where" : "find"),
+    version: isWindows ? null : detectVersion("find"),
+  };
   const markitdown = detectOptional("markitdown", ["--help"]);
   const codegraph = detectCodegraph();
 
@@ -103,19 +106,25 @@ function discover() {
     find,
     markitdown,
     codegraph,
-    gitNexus
+    gitNexus,
   };
 }
 
 function capabilityRouting(tools) {
   return {
-    codeSearch: tools.rg.available ? "rg" : tools.gitGrep.available ? "git grep" : tools.grep.available ? "grep" : "blocked",
+    codeSearch: tools.rg.available
+      ? "rg"
+      : tools.gitGrep.available
+        ? "git grep"
+        : tools.grep.available
+          ? "grep"
+          : "blocked",
     diffReview: tools.git.available ? "git diff" : "user-provided diff",
     historyReview: tools.git.available ? "git log / git blame" : "user-provided commit context",
     parallelWork: tools.gitWorktree.available ? "git worktree" : "normal branch or stash workflow",
     documentToMarkdown: tools.markitdown.available ? "markitdown" : "ask user for extracted text",
     repoStructure: tools.codegraph.available ? "codegraph" : "file tree plus import scan",
-    dependencyScan: "package manager or grep imports"
+    dependencyScan: "package manager or grep imports",
   };
 }
 
@@ -127,7 +136,7 @@ function toMarkdown(tools) {
     "## Detected Tools",
     "",
     "| Tool | Available | Notes |",
-    "|---|---:|---|"
+    "|---|---:|---|",
   ];
 
   for (const [label, info, notes] of [
@@ -139,7 +148,7 @@ function toMarkdown(tools) {
     ["find", tools.find, "filesystem inspection"],
     ["markitdown", tools.markitdown, "rich document conversion"],
     ["codegraph", tools.codegraph, "https://github.com/colbymchenry/codegraph"],
-    ["git-nexus", tools.gitNexus, "optional history tool"]
+    ["git-nexus", tools.gitNexus, "optional history tool"],
   ]) {
     lines.push(`| ${label} | ${info.available ? "yes" : "no"} | ${notes} |`);
   }

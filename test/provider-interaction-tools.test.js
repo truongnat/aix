@@ -3,7 +3,15 @@ const assert = require("node:assert/strict");
 const path = require("node:path");
 
 const { renderProviderInteractionMarkdown, normalizeProvider } = require(
-  path.join(__dirname, "..", "dist", "lib", "provider-interaction-tools.js")
+  path.join(
+    __dirname,
+    "..",
+    "dist",
+    "features",
+    "install",
+    "infrastructure",
+    "provider-interaction-tools.js"
+  )
 );
 
 test("renderProviderInteractionMarkdown includes AskQuestion for cursor", () => {

@@ -4,7 +4,7 @@ const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const { compareAbMetrics, scoreExtendedMetrics } = require(
-  path.join(repoRoot, "dist", "lib", "evals", "extended-metrics.js")
+  path.join(repoRoot, "dist", "features", "eval", "infrastructure", "extended-metrics.js")
 );
 
 test("compareAbMetrics reports self-correction when only with-harness passes", () => {

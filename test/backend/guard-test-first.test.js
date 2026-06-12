@@ -5,7 +5,7 @@ const {
   hasFailingAssertion,
   findCorrespondingTestFile,
   guardTestFirst,
-} = require("../../hooks/core/guard-test-first.js");
+} = require("../../dist/hooks/core/guard-test-first.js");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");

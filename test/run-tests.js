@@ -6,9 +6,13 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..");
-const validateApi = require(path.join(repoRoot, "dist", "lib", "validate", "index.js"));
-const validateConstants = require(path.join(repoRoot, "dist", "lib", "validate", "constants.js"));
-const installCacheApi = require(path.join(repoRoot, "dist", "lib", "install-cache.js"));
+const validateApi = require(path.join(repoRoot, "dist", "features", "validate", "index.js"));
+const validateConstants = require(
+  path.join(repoRoot, "dist", "features", "validate", "domain", "constants.js")
+);
+const installCacheApi = require(
+  path.join(repoRoot, "dist", "features", "install", "infrastructure", "install-cache.js")
+);
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "aih-test-"));
@@ -358,7 +362,14 @@ describe("Workflow Command Documentation", () => {
 
   test("command metadata keeps start and map with updated descriptions and no brief", () => {
     const { WORKFLOW_COMMANDS } = require(
-      path.join(repoRoot, "dist", "lib", "runtime-command-catalog")
+      path.join(
+        repoRoot,
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "runtime-command-catalog"
+      )
     );
     const byId = new Map(WORKFLOW_COMMANDS.map((spec) => [spec.id, spec]));
     assert.equal(byId.get("start").canonical, "harness-start");
@@ -519,7 +530,7 @@ describe("Delegated Workers", () => {
 
   test("worker definitions include frontmatter and agent result envelope", () => {
     const { parseFrontmatter } = require(
-      path.join(repoRoot, "dist", "lib", "validate", "utils.js")
+      path.join(repoRoot, "dist", "features", "validate", "domain", "utils.js")
     );
     for (const workerId of ["explorer", "reviewer", "verifier", "gatekeeper", "fixer"]) {
       const text = fs.readFileSync(path.join(repoRoot, "workers", `${workerId}.md`), "utf8");
@@ -564,7 +575,7 @@ describe("Delegated Workers", () => {
 describe("Provider Rules & Adapters", () => {
   test("claude worker adapter renders native agent files", () => {
     const { renderClaudeAgentFile } = require(
-      path.join(repoRoot, "dist", "lib", "worker-claude-adapter.js")
+      path.join(repoRoot, "dist", "workers", "claude-adapter.js")
     );
     const body = fs
       .readFileSync(path.join(repoRoot, "workers", "reviewer.md"), "utf8")
@@ -586,7 +597,16 @@ describe("Provider Rules & Adapters", () => {
   });
 
   test("provider rule renderer composes core fragments for each provider", () => {
-    const renderer = require(path.join(repoRoot, "dist", "lib", "provider-rule-renderer.js"));
+    const renderer = require(
+      path.join(
+        repoRoot,
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "provider-rule-renderer.js"
+      )
+    );
     const samples = [
       [".claude/CLAUDE.md", renderer.renderClaudeProjectMd()],
       [".cursor/rules/ai-engineering-harness.mdc", renderer.renderCursorActivationMdc()],
@@ -607,7 +627,16 @@ describe("Provider Rules & Adapters", () => {
   });
 
   test("provider rule renderer renders Claude command files from a provider template", () => {
-    const renderer = require(path.join(repoRoot, "dist", "lib", "provider-rule-renderer.js"));
+    const renderer = require(
+      path.join(
+        repoRoot,
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "provider-rule-renderer.js"
+      )
+    );
     const templatePath = path.join(repoRoot, "rules", "providers", "claude", "command.md");
     assert.ok(fs.existsSync(templatePath), "rules/providers/claude/command.md must exist");
 
@@ -628,7 +657,14 @@ describe("Provider Rules & Adapters", () => {
 
   test("provider rule adapters declare honest native slash support", () => {
     const { PROVIDER_RULE_ADAPTERS } = require(
-      path.join(repoRoot, "dist", "lib", "provider-rule-renderer.js")
+      path.join(
+        repoRoot,
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "provider-rule-renderer.js"
+      )
     );
     assert.equal(PROVIDER_RULE_ADAPTERS.claude.nativeSlashCommands, true);
     assert.equal(PROVIDER_RULE_ADAPTERS.claude.supportsSubagents, true);
@@ -641,7 +677,14 @@ describe("Provider Rules & Adapters", () => {
 describe("Provider Command Support", () => {
   test("provider command support merges rule adapter metadata", () => {
     const { providerCommandSupport } = require(
-      path.join(repoRoot, "dist", "lib", "runtime-command-catalog")
+      path.join(
+        repoRoot,
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "runtime-command-catalog"
+      )
     );
     const claude = providerCommandSupport("claude");
     const cursor = providerCommandSupport("cursor");
@@ -659,12 +702,12 @@ describe("Hooks & Skills Layer", () => {
   test("hooks and skills layer surface exists", () => {
     for (const relativePath of [
       "hooks/README.md",
-      "hooks/core/guard-phase.js",
-      "hooks/core/record-tool-output.js",
-      "hooks/core/record-subagent-result.js",
-      "hooks/core/compact-session-memory.js",
-      "hooks/core/record-skill-run.js",
-      "hooks/core/archive-session-skill.js",
+      "dist/hooks/core/guard-phase.js",
+      "dist/hooks/core/record-tool-output.js",
+      "dist/hooks/core/record-subagent-result.js",
+      "dist/hooks/core/compact-session-memory.js",
+      "dist/hooks/core/record-skill-run.js",
+      "dist/hooks/core/archive-session-skill.js",
       "docs/hooks-and-skills-layer.md",
       "docs/skill-lifecycle.md",
       "workflows/create-skill.md",
@@ -678,12 +721,12 @@ describe("Hooks & Skills Layer", () => {
 
   test("hook scripts support --help", () => {
     for (const script of [
-      "hooks/core/guard-phase.js",
-      "hooks/core/record-tool-output.js",
-      "hooks/core/record-subagent-result.js",
-      "hooks/core/record-skill-run.js",
-      "hooks/core/archive-session-skill.js",
-      "hooks/core/compact-session-memory.js",
+      "dist/hooks/core/guard-phase.js",
+      "dist/hooks/core/record-tool-output.js",
+      "dist/hooks/core/record-subagent-result.js",
+      "dist/hooks/core/record-skill-run.js",
+      "dist/hooks/core/archive-session-skill.js",
+      "dist/hooks/core/compact-session-memory.js",
     ]) {
       const result = runNode([path.join(repoRoot, script), "--help"]);
       assert.equal(result.status, 0, result.stderr || result.stdout);
@@ -695,7 +738,7 @@ describe("Hooks & Skills Layer", () => {
     const session = ".harness/sessions/2026-06-04-google-login";
     const result = runNode(
       [
-        path.join(repoRoot, "hooks", "core", "guard-phase.js"),
+        path.join(repoRoot, "dist", "hooks", "core", "guard-phase.js"),
         "--command",
         "harness-verify",
         "--session",

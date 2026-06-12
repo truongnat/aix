@@ -5,7 +5,7 @@ const os = require("node:os");
 const path = require("node:path");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const { runTask } = require(path.join(repoRoot, "dist", "lib", "evals", "index.js"));
+const { runTask } = require(path.join(repoRoot, "dist", "features", "eval", "index.js"));
 
 test("runTask emits with-harness and without-harness reports", async () => {
   const result = await runTask(repoRoot, "sample-bugfix", {

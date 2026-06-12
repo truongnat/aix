@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const { recordSubagentResult } = require("../../hooks/core/record-subagent-result.js");
+const { recordSubagentResult } = require("../../dist/hooks/core/record-subagent-result.js");
 
 function makeTempRepo() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "aih-worker-memory-"));

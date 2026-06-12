@@ -6,7 +6,7 @@ const path = require("node:path");
 const cp = require("node:child_process");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const guardPhaseScript = path.join(repoRoot, "hooks", "core", "guard-phase.js");
+const guardPhaseScript = path.join(repoRoot, "dist", "hooks", "core", "guard-phase.js");
 
 function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);

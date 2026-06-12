@@ -6,7 +6,7 @@ const path = require("node:path");
 const cp = require("node:child_process");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
-const guardScopeScript = path.join(repoRoot, "hooks", "core", "guard-scope.js");
+const guardScopeScript = path.join(repoRoot, "dist", "hooks", "core", "guard-scope.js");
 
 function makeScopeFixture() {
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "guard-scope-"));

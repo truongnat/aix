@@ -1,7 +1,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 
-const { summarizeEvents, formatInsightsText } = require("../../dist/lib/insights/summarize.js");
+const { summarizeEvents, formatInsightsText } = require("../../dist/features/insights/index.js");
 
 test("summarizeEvents aggregates skills, guards, tools, and subagents", () => {
   const summary = summarizeEvents([
