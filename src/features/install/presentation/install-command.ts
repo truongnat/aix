@@ -6,9 +6,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { modeToScopeVisibility, type ParseOptions, type ProviderBinaryMap } from "./cli-legacy";
-import { ACTIVE_PROVIDERS, providerPriorityLabel, isRuntimeNative } from "./cli-legacy";
-import { detectProviderBinaries, detectLegacyProviderResidue, isGitRepo } from "./cli-legacy";
-import { normalizeDomainSelection } from "./cli-legacy";
+import { ACTIVE_PROVIDERS, providerPriorityLabel } from "./cli-legacy";
+import { detectProviderBinaries, isGitRepo } from "./cli-legacy";
 import {
   NON_GIT_PRIVATE_WARNING,
   NON_GIT_PRIVATE_WARNING_FOLLOWUP,
@@ -16,20 +15,9 @@ import {
   type PlanProviderId,
 } from "./cli-legacy";
 import { ui } from "./cli-legacy";
-import {
-  readPackageVersion,
-  resolveTargetAbs,
-  validateProviderSelection,
-  validateManualMix,
-  failWithBackendError,
-} from "./cli-legacy";
+import { readPackageVersion, resolveTargetAbs, failWithBackendError } from "./cli-legacy";
 import { runInstall } from "../application/run-install";
 
-interface InstallWizardOptions extends ParseOptions {
-  command: string;
-  scope: string;
-  visibility: string;
-}
 
 interface InstallContextExtended {
   target: string;
@@ -50,19 +38,8 @@ function toPlanProviders(providers: string[]): PlanProviderId[] {
   return providers as PlanProviderId[];
 }
 
-function resolveInstallMode(
-  options: ParseOptions
-): "project-private" | "project-shared" | "global" {
-  if (options.scope === "global") {
-    return "global";
-  }
-  if (options.scope === "project" && options.visibility === "shared") {
-    return "project-shared";
-  }
-  if (!options.scope && options.visibility === "shared") {
-    return "project-shared";
-  }
-  return "project-private";
+function resolveInstallMode(options: ParseOptions): "project" | "global" {
+  return options.scope === "global" ? "global" : "project";
 }
 
 async function runInstallBackend(
@@ -128,105 +105,24 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     throw new Error(`Target directory does not exist: ${targetAbs}`);
   }
 
-  const legacyProviders = detectLegacyProviderResidue(targetAbs);
-  if (legacyProviders.length > 0 && !ui.useInteractiveUi(options)) {
-    console.error(
-      `warning: legacy provider residue detected: ${legacyProviders.join(", ")}. See docs/uninstall-usage.md for legacy cleanup guidance if this is stale.`
-    );
-  }
-
-  const interactive = process.stdin.isTTY && process.stdout.isTTY && !options.yes;
   let providers = [...options.providers];
-  const explicitDomains = normalizeDomainSelection(options.domains || []);
-  const invalidDomainIds = (options.domains || []).filter(
-    (domainId) => !normalizeDomainSelection([domainId]).length
-  );
-  if (invalidDomainIds.length > 0) {
-    throw new Error(`Unknown domain skill(s): ${invalidDomainIds.join(", ")}`);
-  }
-  let domains = [...explicitDomains];
+
   const binaryStatus: ProviderBinaryMap = detectProviderBinaries();
   const availableProviders = ACTIVE_PROVIDERS.filter(
     (provider) => binaryStatus[provider.id]?.installed
   );
-
-  if (!interactive) {
-    if (providers.length === 0) {
-      throw new Error("No provider selected. Pass --provider cursor or run interactively.");
-    }
-    if (!options.yes) {
-      throw new Error(
-        "Non-interactive install requires --yes. Re-run with --yes to confirm, or run without --provider to use the interactive wizard."
-      );
-    }
-    validateProviderSelection(providers);
-    validateManualMix(providers);
-    const missingProviders = providers.filter((id) => !binaryStatus[id]?.installed);
-    if (missingProviders.length > 0) {
-      const installHints = missingProviders
-        .map((providerId) => {
-          const probe = binaryStatus[providerId];
-          const hint = probe?.commands?.length ? probe.commands.join(" or ") : providerId;
-          return `${providerId} (${hint} --version not found)`;
-        })
-        .join(", ");
-      throw new Error(`Provider binary not installed: ${installHints}`);
-    }
-
-    const mode = resolveInstallMode(options);
-    const scopeVis = modeToScopeVisibility(mode);
-
-    const initHarness =
-      scopeVis.scope === "project" && !fs.existsSync(path.join(targetAbs, ".harness"));
-    const installCache =
-      scopeVis.scope === "project" && providers.some((id) => isRuntimeNative(id));
-    const plan = buildInstallPlan({
-      providers: toPlanProviders(providers),
-      initHarness,
-      installCache,
-      mode:
-        scopeVis.scope === "global"
-          ? "global"
-          : scopeVis.visibility === "shared"
-            ? "project-shared"
-            : "project-private",
-      isGit: isGitRepo(targetAbs),
-    });
-    ui.showInstallPlan(plan, { compact: true });
-    if (plan.mode === "project-private" && !plan.isGit) {
-      console.log(`\n${NON_GIT_PRIVATE_WARNING}`);
-      console.log(NON_GIT_PRIVATE_WARNING_FOLLOWUP);
-    }
-
-    const status = await runInstallBackend(
-      packRoot,
-      {
-        providers,
-        target: targetAbs,
-        scope: scopeVis.scope,
-        visibility: scopeVis.visibility,
-        dryRun: options.dryRun,
-        yes: true,
-        initHarness,
-        plannedInitHarness: initHarness,
-        installCache,
-        plannedInstallCache: installCache,
-        domains,
-        plannedProviders: providers,
-      },
-      options
-    );
-    if (status === 0) {
-      console.log(options.dryRun ? "\nDry-run complete." : "\nInstalled.");
-    }
-    return status;
-  }
 
   ui.introBanner({
     version: readPackageVersion(packRoot),
     target: targetAbs,
     gitRepo: isGitRepo(targetAbs),
   });
+
+  if (availableProviders.length === 0) {
+    throw new Error(
+      "No supported provider CLI detected. Install claude, codex, cursor, or gemini first."
+    );
+  }
 
   const providerItems = ACTIVE_PROVIDERS.map((p) => ({
     id: p.id,
@@ -242,12 +138,6 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     priorityLabel: providerPriorityLabel(p),
   }));
 
-  if (availableProviders.length === 0) {
-    throw new Error(
-      "No supported provider CLI detected. Install claude, codex, cursor, or gemini first."
-    );
-  }
-
   const selectedProviders = await ui.selectProviders(
     providerItems,
     providers.length > 0 ? providers : undefined
@@ -256,30 +146,20 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     return 1;
   }
   providers = selectedProviders;
-  validateProviderSelection(providers);
-  validateManualMix(providers);
 
   let mode = resolveInstallMode(options);
-  if (!options.scope && interactive) {
+  if (!options.scope) {
     const selectedScope = await ui.selectInstallScope();
     if (!selectedScope) {
       return 1;
     }
-    mode =
-      selectedScope === "global"
-        ? "global"
-        : options.visibility === "shared"
-          ? "project-shared"
-          : "project-private";
+    mode = selectedScope === "global" ? "global" : "project";
   }
 
-  const { scope } = modeToScopeVisibility(mode);
-  const defaultCache = scope === "project" && providers.some((id) => isRuntimeNative(id));
-  const installCache = defaultCache;
-  const harnessExists = fs.existsSync(path.join(targetAbs, ".harness"));
-  const initHarness = scope === "project" && !harnessExists;
-
   const { scope: resolvedScope, visibility } = modeToScopeVisibility(mode);
+  const installCache = resolvedScope === "project";
+  const harnessExists = fs.existsSync(path.join(targetAbs, ".harness"));
+  const initHarness = resolvedScope === "project" && !harnessExists;
   const plan = buildInstallPlan({
     providers: toPlanProviders(providers),
     initHarness,
@@ -287,8 +167,10 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
     mode,
     isGit: isGitRepo(targetAbs),
   });
+
   ui.showInstallPlan(plan);
-  if (plan.mode === "project-private" && !plan.isGit) {
+
+  if (plan.mode === "project" && !plan.isGit) {
     ui.showWarning(
       `${NON_GIT_PRIVATE_WARNING}\nHarness will defer the .git/info/exclude update until this directory is initialized with git.\n${NON_GIT_PRIVATE_WARNING_FOLLOWUP}`
     );
@@ -313,12 +195,12 @@ async function runInstallWizard(packRoot: string, options: ParseOptions): Promis
       plannedInitHarness: initHarness,
       installCache,
       plannedInstallCache: installCache,
-      domains,
+      domains: [],
     },
     options
   );
 
-  if (status === 0 && interactive) {
+  if (status === 0) {
     ui.showSuccess(options.dryRun ? "Dry-run complete" : "Installed");
   }
   return status;

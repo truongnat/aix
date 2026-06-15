@@ -94,8 +94,6 @@ const requiredFiles = [
   "rules/core/session-memory.md",
   "rules/core/tool-routing.md",
   "dist/features/install/infrastructure/provider-rule-renderer.js",
-  "rules/providers/claude/CLAUDE.md",
-  "rules/providers/cursor/ai-engineering-harness.mdc",
   "hooks/README.md",
   "dist/hooks/core/guard-phase.js",
   "dist/hooks/core/record-tool-output.js",

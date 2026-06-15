@@ -11,12 +11,16 @@ const { writeDomainSkillSurface } = legacyDomainSkillGeneration;
 import { installCapabilityCache } from "../infrastructure/install-cache";
 import { legacyCommandInstallation } from "../infrastructure/legacy-deps";
 const { installProviderInteraction } = legacyCommandInstallation;
-import { installRuntime } from "../infrastructure/install-runtime";
-import { legacyCliProviders } from "../infrastructure/legacy-deps";
-const { isRuntimeNative } = legacyCliProviders;
+import { getProviderAdapter } from "../infrastructure/adapters/registry";
+import {
+  createCoreSource,
+  detectProjectContext,
+  resolveCoreRoot,
+} from "../domain/core-source";
+import type { ProviderScope } from "../domain/provider-adapter";
 import { legacyProviderDetection } from "../infrastructure/legacy-deps";
 const { isGitRepo } = legacyProviderDetection;
-import type { RuntimeId } from "../infrastructure/install-runtime";
+import os from "node:os";
 
 export interface InstallContext {
   packRoot: string;
@@ -73,9 +77,9 @@ export function runInstall(ctx: InstallContext, options: InstallRunOptions = {})
       dryRun: ctx.dryRun,
     });
     if (ignoreStrategy === "info-exclude" && gitRepo) {
-      process.stdout.write("\n--- Git exclude (private) ---\n");
+      process.stdout.write("\n--- Git exclude ---\n");
     }
-    const ignoreResult = applyPrivateIgnore({
+    applyPrivateIgnore({
       targetAbs: ctx.target,
       provider: ctx.provider,
       plannedProviders,
@@ -126,18 +130,28 @@ export function runInstall(ctx: InstallContext, options: InstallRunOptions = {})
 
     const verb = options.runtimeBannerVerb ?? "install";
     const runtime = ctx.provider === "manual" ? "generic" : ctx.provider;
-    if (isRuntimeNative(runtime)) {
-      process.stdout.write(`\n--- Runtime-native ${verb} ---\n`);
-      installRuntime({
+    const adapter = getProviderAdapter(runtime);
+    if (adapter) {
+      const scope = ctx.scope as ProviderScope;
+      process.stdout.write(`\n--- Provider ${verb}: ${runtime} (${scope}) ---\n`);
+      const core = createCoreSource(
+        resolveCoreRoot({ scope, targetRoot: ctx.target, packRoot: ctx.packRoot })
+      );
+      const result = adapter.install({
+        core,
         packRoot: ctx.packRoot,
-        runtime: runtime as RuntimeId,
-        scope: ctx.scope as "project" | "global",
-        target: ctx.target,
+        scope,
+        targetRoot: ctx.target,
+        homeRoot: os.homedir(),
+        project: detectProjectContext(ctx.target, gitRepo),
         dryRun: ctx.dryRun,
         force,
       });
-      process.stdout.write(`\nRuntime '${ctx.provider}' install finished.\n`);
-      messages.push(`runtime-native(${ctx.provider}): ok`);
+      messages.push(...result.messages);
+      if (!result.ok) {
+        throw new Error(`Provider '${runtime}' ${verb} failed`);
+      }
+      process.stdout.write(`\nProvider '${ctx.provider}' ${verb} finished.\n`);
     }
 
     if (ctx.scope === "project" && ctx.installCache) {

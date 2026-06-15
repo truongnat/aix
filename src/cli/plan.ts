@@ -14,7 +14,7 @@ const NON_GIT_PRIVATE_WARNING_FOLLOWUP =
   "Run `git init` first or choose project shared / install inside a cloned repo.";
 
 type PlanProviderId = "claude" | "cursor" | "codex" | "gemini" | "generic" | "manual";
-type InstallMode = "project-private" | "project-shared" | "global";
+type InstallMode = "project" | "global";
 
 interface InstallPlan {
   willInstall: string[];
@@ -84,10 +84,10 @@ function buildInstallPlan(options: {
     }
   }
 
-  if (options.mode === "project-private" || options.mode === "project-shared") {
-    if (options.mode === "project-private" && options.isGit) {
+  if (options.mode === "project" || options.mode === "global") {
+    if (options.mode === "project" && options.isGit) {
       willInstall.push(".git/info/exclude block");
-    } else if (options.mode === "project-private" && !options.isGit) {
+    } else if (options.mode === "project" && !options.isGit) {
       willInstall.push("(no .git/info/exclude — target is not a Git repo)");
     }
   }
@@ -111,7 +111,7 @@ function buildInstallPlan(options: {
 }
 
 function warnNonGitPrivate(plan: InstallPlan): void {
-  if (plan.mode === "project-private" && !plan.isGit) {
+  if (plan.mode === "project" && !plan.isGit) {
     console.log("");
     console.log(NON_GIT_PRIVATE_WARNING);
     console.log(NON_GIT_PRIVATE_WARNING_FOLLOWUP);

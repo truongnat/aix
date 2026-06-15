@@ -118,18 +118,24 @@ function assertAgentSystemLayer(baseDir: string, failures: string[]): void {
     }
   }
 
-  for (const provider of ["claude", "cursor", "codex", "gemini"]) {
-    const template = path.join(
-      baseDir,
-      `rules/providers/${provider === "cursor" ? "cursor/ai-engineering-harness.mdc" : provider === "claude" ? "claude/CLAUDE.md" : provider === "codex" ? "codex/AGENTS.md" : "gemini/GEMINI.md"}`
-    );
-    if (fs.existsSync(template)) {
-      const content = fs.readFileSync(template, "utf8");
-      if (!/agent-system\/SYSTEM_PROMPT\.md/.test(content)) {
-        failures.push(
-          `rules/providers ${provider} template must reference agent-system/SYSTEM_PROMPT.md`
-        );
-      }
+  // Provider rule docs are built in code from the common core (no static
+  // rules/providers/ rule templates). Validate the rendered output instead.
+  /* eslint-disable-next-line @typescript-eslint/no-require-imports */
+  const renderer = require("../../install/infrastructure/provider-rule-renderer.js") as {
+    renderClaudeProjectMd: () => string;
+    renderCursorActivationMdc: () => string;
+    renderCodexAgentsMd: () => string;
+    renderGeminiMd: () => string;
+  };
+  const providerDocs: Record<string, () => string> = {
+    claude: renderer.renderClaudeProjectMd,
+    cursor: renderer.renderCursorActivationMdc,
+    codex: renderer.renderCodexAgentsMd,
+    gemini: renderer.renderGeminiMd,
+  };
+  for (const [provider, render] of Object.entries(providerDocs)) {
+    if (!/agent-system\/SYSTEM_PROMPT\.md/.test(render())) {
+      failures.push(`${provider} rule doc must reference agent-system/SYSTEM_PROMPT.md`);
     }
   }
 }

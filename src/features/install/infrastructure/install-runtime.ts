@@ -16,6 +16,7 @@ import { legacyWorkerClaudeAdapter } from "./legacy-deps";
 const { installClaudeWorkers } = legacyWorkerClaudeAdapter;
 import { legacyCodexRuleGeneration } from "./legacy-deps";
 const { renderCodexRuleSet } = legacyCodexRuleGeneration;
+import { loadCommandPolicy } from "./command-policy";
 import { legacyProviderRuleRenderer } from "./legacy-deps";
 const {
   renderClaudeProjectMd,
@@ -285,7 +286,7 @@ function renderOpenAiSkillYaml(sourceContent: string, fallbackName: string): str
   const displayName = titleCaseSlug(name);
   const shortDescription = clampText(description, 64);
   const defaultPrompt = clampText(
-    `Use $${name} to help with ${description.replace(/\.$/, "")}.`,
+    `Use the ${name} skill to ${description.replace(/^\w/, (c) => c.toLowerCase()).replace(/\.$/, "")}.`,
     120
   );
 
@@ -294,6 +295,8 @@ function renderOpenAiSkillYaml(sourceContent: string, fallbackName: string): str
     `  display_name: ${JSON.stringify(displayName)}`,
     `  short_description: ${JSON.stringify(shortDescription)}`,
     `  default_prompt: ${JSON.stringify(defaultPrompt)}`,
+    "policy:",
+    "  allow_implicit_invocation: true",
     "",
   ].join("\n");
 }
@@ -301,6 +304,19 @@ function renderOpenAiSkillYaml(sourceContent: string, fallbackName: string): str
 function escapeTomlMultiline(value: string): string {
   return value.replace(/"""/g, '\\"""');
 }
+
+const WORKER_DESCRIPTIONS: Record<string, string> = {
+  explorer:
+    "Use to map and explore a codebase area without modifying files. Provide: goal, scope, entrypoints, context_budget.",
+  reviewer:
+    "Use to review code changes for quality, correctness, and risk. Provide: goal, plan, changed_files, verification_status.",
+  verifier:
+    "Use to run verification commands and confirm changes meet requirements. Provide: goal, plan, verification_commands, changed_files.",
+  gatekeeper:
+    "Use to evaluate whether the phase gate is passed and it is safe to ship. Provide: goal, verify_artifact, review_artifact, ship_blockers.",
+  fixer:
+    "Use to apply targeted code fixes from review or verification findings. Can modify files. Provide: goal, plan, issue_description, changed_files.",
+};
 
 function renderCodexAgentToml(workerId: string, sourceContent: string): string {
   const worker = workers.find((entry) => entry.id === workerId);
@@ -310,12 +326,16 @@ function renderCodexAgentToml(workerId: string, sourceContent: string): string {
 
   const body = stripFrontmatter(sourceContent).trim();
   const sandboxMode = worker.writeAccess === "write" ? "workspace-write" : "read-only";
+  const description = WORKER_DESCRIPTIONS[worker.id] ??
+    `Harness ${worker.role} worker (${worker.mode}, writeAccess=${worker.writeAccess}).`;
+  const nicknames = [`harness-${worker.role}`, worker.id];
+
   return [
     `name = "harness-${worker.id}"`,
-    `description = "Harness delegated ${worker.role} worker (${worker.mode}, writeAccess=${worker.writeAccess})"`,
-    `developer_instructions = """${escapeTomlMultiline(body)}"""`,
-    `model = "inherit"`,
+    `description = ${JSON.stringify(description)}`,
+    `nickname_candidates = ${JSON.stringify(nicknames)}`,
     `sandbox_mode = "${sandboxMode}"`,
+    `developer_instructions = """${escapeTomlMultiline(body)}"""`,
     "",
   ].join("\n");
 }
@@ -459,42 +479,15 @@ function installCodexRules(
       ? path.join(os.homedir(), ".codex", "rules")
       : path.join(targetRoot, ".codex", "rules");
   ensureDirectory(destRoot, options.dryRun);
+  // Command rules come from the shared core (rules/core/command-policy.json),
+  // extended by the codex overlay (rules/providers/codex/command-policy.json).
   const content = [
     "# ai-engineering-harness Codex rules",
     "",
     "# This file keeps only shell-level command policy.",
     "# Project coding conventions stay in AGENTS.md or skills.",
     "",
-    renderCodexRuleSet([
-      {
-        prefixes: ["rg", "git status", "git diff", "git log", "ls", "cat"],
-        decision: "allow",
-        justification: "Read-only inspection commands do not modify repository state.",
-      },
-      {
-        prefixes: [
-          "npm install",
-          "pnpm install",
-          "yarn add",
-          "gh pr merge",
-          "vercel",
-          "npm publish",
-        ],
-        decision: "prompt",
-        justification: "Confirm before changing dependencies, merging, or deploying.",
-      },
-      {
-        prefixes: [
-          "git push --force",
-          "git push --force-with-lease",
-          "git reset --hard",
-          "git clean -fdx",
-          "rm -rf",
-        ],
-        decision: "forbidden",
-        justification: "Use a safer alternative: revert, branch, or targeted cleanup.",
-      },
-    ]),
+    renderCodexRuleSet(loadCommandPolicy(options.packRoot)),
   ].join("\n");
   writeFileAction(destRoot, "default.rules", content, options);
 }
@@ -657,35 +650,18 @@ function installCodex(
   packRoot: string,
   options: InstallRuntimeOptions
 ): void {
-  if (scope === "global") {
-    const destRoot = path.join(os.homedir(), ".codex");
-    writeFileAction(
-      destRoot,
-      "AGENTS.md",
-      readPackBootstrap(packRoot, "AGENTS.global.codex.md"),
-      options
-    );
-    installCodexRules(scope, targetRoot, options);
-    installCodexHooks(scope, targetRoot, packRoot, options);
-    installCodexAgents(scope, targetRoot, packRoot, options);
-    installCodexCommands(scope, targetRoot, packRoot, options);
-    installCodexSkills(scope, targetRoot, packRoot, options);
-    console.log(
-      "NEXT: Codex — /harness-* slash commands are routed via hooks. Trust ~/.codex/ in Codex and restart the app."
-    );
-    console.log(
-      "REMEMBER: Use /harness-start, /harness-plan, etc. in Codex CLI. The UserPromptSubmit hook routes them."
-    );
-    return;
-  }
-  writeFileAction(targetRoot, "AGENTS.md", renderCodexAgentsMd(), options);
+  const codexRoot =
+    scope === "global" ? path.join(os.homedir(), ".codex") : path.join(targetRoot, ".codex");
+  ensureDirectory(codexRoot, options.dryRun);
+  writeFileAction(codexRoot, "AGENTS.md", renderCodexAgentsMd(), options);
   installCodexRules(scope, targetRoot, options);
   installCodexHooks(scope, targetRoot, packRoot, options);
   installCodexAgents(scope, targetRoot, packRoot, options);
   installCodexCommands(scope, targetRoot, packRoot, options);
   installCodexSkills(scope, targetRoot, packRoot, options);
+  const trustPath = scope === "global" ? "~/.codex/" : ".codex/";
   console.log(
-    "NEXT: Codex — /harness-* slash commands are routed via hooks. Trust .codex/ in Codex and restart the app."
+    `NEXT: Codex — /harness-* slash commands are routed via hooks. Trust ${trustPath} in Codex and restart the app.`
   );
   console.log(
     "REMEMBER: Use /harness-start, /harness-plan, etc. in Codex CLI. The UserPromptSubmit hook routes them."

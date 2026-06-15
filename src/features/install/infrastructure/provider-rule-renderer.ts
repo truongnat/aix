@@ -19,7 +19,6 @@ interface ProviderRuleAdapter {
   nativeInvocationExample: string | null;
   supportsSubagents: boolean;
   fallbackInstruction: string;
-  notes: string;
 }
 
 interface ClaudeCommandSpec {
@@ -27,10 +26,6 @@ interface ClaudeCommandSpec {
   canonical: string;
   title: string;
   sourceCommand?: string;
-}
-
-interface RuleRenderOptions {
-  coreFragments?: "all" | CoreFragmentName[];
 }
 
 // Adjust for dist/ build layout: compiled files are at dist/features/install/infrastructure/, so go up 4 levels to reach repo root
@@ -75,7 +70,6 @@ const PROVIDER_RULE_ADAPTERS: Readonly<Record<string, ProviderRuleAdapter>> = Ob
     supportsSubagents: true,
     fallbackInstruction:
       "Read .claude/CLAUDE.md and use /harness-plan when project commands are installed.",
-    notes: "Only provider with verified project-native /harness-* command files in v1.",
   },
   cursor: {
     provider: "Cursor",
@@ -90,8 +84,6 @@ const PROVIDER_RULE_ADAPTERS: Readonly<Record<string, ProviderRuleAdapter>> = Ob
     nativeInvocationExample: "/harness-plan",
     supportsSubagents: false,
     fallbackInstruction: "Use /harness-plan for this repository.",
-    notes:
-      "Cursor project install uses .cursor/commands/ for native commands and .cursor/rules/ for guardrails.",
   },
   codex: {
     provider: "Codex",
@@ -101,8 +93,6 @@ const PROVIDER_RULE_ADAPTERS: Readonly<Record<string, ProviderRuleAdapter>> = Ob
     nativeInvocationExample: null,
     supportsSubagents: false,
     fallbackInstruction: "Use harness-plan for this repository.",
-    notes:
-      "AGENTS.md plus .codex/ and .agents/skills/ project fallback. No /harness-* slash claim.",
   },
   gemini: {
     provider: "Gemini",
@@ -115,7 +105,6 @@ const PROVIDER_RULE_ADAPTERS: Readonly<Record<string, ProviderRuleAdapter>> = Ob
     nativeInvocationExample: null,
     supportsSubagents: false,
     fallbackInstruction: "Use harness-plan for this repository.",
-    notes: "Extension context plus local catalog. No /harness-* slash claim.",
   },
   generic: {
     provider: "Generic AGENTS.md",
@@ -125,7 +114,6 @@ const PROVIDER_RULE_ADAPTERS: Readonly<Record<string, ProviderRuleAdapter>> = Ob
     nativeInvocationExample: null,
     supportsSubagents: false,
     fallbackInstruction: "Use harness-plan for this repository.",
-    notes: "Plain AGENTS.md fallback when provider is unknown.",
   },
 });
 
@@ -189,45 +177,109 @@ function applyTemplateVariables(template: string, replacements: Record<string, s
   return output;
 }
 
-function renderProviderRuleFile(
-  providerId: string,
-  fileName: string,
-  options: RuleRenderOptions = {}
-): string {
-  const template = readProviderTemplate(providerId, fileName);
-  return `${expandCoreMarkers(template, options.coreFragments)}\n`;
+// --- Provider rule docs: copy core fragments to provider locations ----------
+// The common rule set lives in rules/core/*.md (the harness system).
+// Each provider doc = a short header + core fragments copied in.
+// No complex generation — just concatenate and write to the right path.
+
+const SYSTEM_PROMPT_REF =
+  "Read `agent-system/SYSTEM_PROMPT.md` before using the harness.";
+
+const CURSOR_FRONTMATTER = [
+  "---",
+  "description: ai-engineering-harness core operating discipline",
+  "alwaysApply: true",
+  "---",
+].join("\n");
+
+function renderAllCoreFragments(names?: readonly CoreFragmentName[]): string {
+  return (names ?? CORE_FRAGMENTS).map((name) => readCoreFragment(name)).join("\n\n");
 }
 
 function renderClaudeProjectMd(): string {
-  return renderProviderRuleFile("claude", "CLAUDE.md");
+  return [
+    "# ai-engineering-harness (Claude Code)",
+    "",
+    SYSTEM_PROMPT_REF,
+    "Routing: use `.claude/commands/` for native project commands.",
+    "",
+    renderAllCoreFragments(),
+    "",
+  ].join("\n");
 }
 
 function renderCursorActivationMdc(): string {
-  return renderProviderRuleFile("cursor", "ai-engineering-harness.mdc");
+  return [
+    CURSOR_FRONTMATTER,
+    "# ai-engineering-harness",
+    "",
+    SYSTEM_PROMPT_REF,
+    "Routing: use `.cursor/commands/` for native project commands. Use `.ai-harness/runtime-commands/` as the local catalog mirror.",
+    "",
+    renderAllCoreFragments(),
+    "",
+  ].join("\n");
 }
 
 function renderCursorCommandsMdc(): string {
-  return renderProviderRuleFile("cursor", "ai-engineering-harness-commands.mdc", {
-    coreFragments: ["command-naming", "phase-guards", "blocking"],
-  });
+  return [
+    CURSOR_FRONTMATTER,
+    "# ai-engineering-harness commands",
+    "",
+    SYSTEM_PROMPT_REF,
+    "Use `.cursor/commands/` for native project commands.",
+    "",
+    renderAllCoreFragments(["command-naming", "phase-guards", "blocking"]),
+    "",
+  ].join("\n");
 }
 
 function renderCursorGuardrailsMdc(): string {
-  return renderProviderRuleFile("cursor", "ai-engineering-harness-guardrails.mdc", {
-    coreFragments: ["blocking", "phase-guards"],
-  });
+  return [
+    CURSOR_FRONTMATTER,
+    "# ai-engineering-harness guardrails",
+    "",
+    SYSTEM_PROMPT_REF,
+    "",
+    renderAllCoreFragments(["blocking", "phase-guards"]),
+    "",
+  ].join("\n");
 }
 
 function renderCodexAgentsMd(): string {
-  return renderProviderRuleFile("codex", "AGENTS.md");
+  return [
+    "# ai-engineering-harness (Codex) — AGENTS.md",
+    "",
+    SYSTEM_PROMPT_REF,
+    "`/harness-*` commands are routed via `.codex/commands/` hooks.",
+    "",
+    renderAllCoreFragments(),
+    "",
+  ].join("\n");
 }
 
 function renderGeminiMd(): string {
-  return renderProviderRuleFile("gemini", "GEMINI.md");
+  return [
+    "# ai-engineering-harness (Gemini)",
+    "",
+    SYSTEM_PROMPT_REF,
+    "Do **not** claim native `/harness-*` slash commands. Route via the local catalog.",
+    "",
+    renderAllCoreFragments(),
+    "",
+  ].join("\n");
 }
 
 function renderGenericAgentsMd(): string {
-  return renderProviderRuleFile("generic", "AGENTS.md");
+  return [
+    "# ai-engineering-harness generic agent instructions",
+    "",
+    SYSTEM_PROMPT_REF,
+    "Route commands through `.ai-harness/runtime-commands/`.",
+    "",
+    renderAllCoreFragments(),
+    "",
+  ].join("\n");
 }
 
 function renderClaudeCommandFile(spec: ClaudeCommandSpec): string {
@@ -241,65 +293,6 @@ function renderClaudeCommandFile(spec: ClaudeCommandSpec): string {
     }),
     ["blocking"]
   )}\n`;
-}
-
-function providerRuleAdapter(providerId: string): ProviderRuleAdapter {
-  return PROVIDER_RULE_ADAPTERS[providerId] || PROVIDER_RULE_ADAPTERS.generic;
-}
-
-function listProviderRuleOutputs(
-  providerId: string
-): { relativePath: string; render: (spec?: ClaudeCommandSpec) => string }[] {
-  switch (providerId) {
-    case "claude":
-      return [
-        { relativePath: ".claude/CLAUDE.md", render: renderClaudeProjectMd },
-        ...WORKFLOW_COMMAND_IDS.map((id) => ({
-          relativePath: `.claude/commands/harness-${id}.md`,
-          render: (spec?: ClaudeCommandSpec) =>
-            renderClaudeCommandFile(
-              spec || {
-                id,
-                canonical: `harness-${id}`,
-                title: `Harness ${id}`,
-                sourceCommand: `commands/harness-${id}.md`,
-              }
-            ),
-        })),
-      ];
-    case "cursor":
-      return [
-        {
-          relativePath: ".cursor/rules/ai-engineering-harness.mdc",
-          render: renderCursorActivationMdc,
-        },
-        {
-          relativePath: ".cursor/rules/ai-engineering-harness-commands.mdc",
-          render: renderCursorCommandsMdc,
-        },
-        {
-          relativePath: ".cursor/rules/ai-engineering-harness-guardrails.mdc",
-          render: renderCursorGuardrailsMdc,
-        },
-      ];
-    case "codex":
-    case "generic":
-      return [
-        {
-          relativePath: "AGENTS.md",
-          render: providerId === "codex" ? renderCodexAgentsMd : renderGenericAgentsMd,
-        },
-      ];
-    case "gemini":
-      return [
-        {
-          relativePath: ".gemini/extensions/ai-engineering-harness/GEMINI.md",
-          render: renderGeminiMd,
-        },
-      ];
-    default:
-      return [];
-  }
 }
 
 function hasForbiddenColonCommandIds(content: string): boolean {
@@ -387,41 +380,11 @@ function assertRepositoryProviderRules(baseDir: string, failures: string[]): voi
     }
   }
 
-  for (const [providerId, adapter] of Object.entries(PROVIDER_RULE_ADAPTERS)) {
-    if (providerId === "generic") {
-      continue;
-    }
-    for (const entrypoint of adapter.ruleEntrypoints) {
-      if (entrypoint.includes("*")) {
-        if (providerId === "claude" && entrypoint === ".claude/commands/harness-*.md") {
-          const commandTemplatePath = "rules/providers/claude/command.md";
-          if (!fs.existsSync(path.join(baseDir, commandTemplatePath))) {
-            failures.push(
-              `Missing provider rule template for ${providerId}: ${commandTemplatePath}`
-            );
-          }
-        }
-        continue;
-      }
-      const templatePath = entrypoint
-        .replace(/^\.claude\/CLAUDE\.md$/, "rules/providers/claude/CLAUDE.md")
-        .replace(/^\.cursor\/rules\//, "rules/providers/cursor/")
-        .replace(
-          /^AGENTS\.md$/,
-          `rules/providers/${providerId === "codex" ? "codex" : "generic"}/AGENTS.md`
-        )
-        .replace(
-          /^\.gemini\/extensions\/ai-engineering-harness\/GEMINI\.md$/,
-          "rules/providers/gemini/GEMINI.md"
-        );
-
-      if (
-        templatePath.startsWith("rules/providers/") &&
-        !fs.existsSync(path.join(baseDir, templatePath))
-      ) {
-        failures.push(`Missing provider rule template for ${providerId}: ${templatePath}`);
-      }
-    }
+  // Provider rule docs are now built in code from the common core (no static
+  // rules/providers/ rule templates). Only the Claude command template remains.
+  const commandTemplatePath = "rules/providers/claude/command.md";
+  if (!fs.existsSync(path.join(baseDir, commandTemplatePath))) {
+    failures.push(`Missing claude command template: ${commandTemplatePath}`);
   }
 
   try {
@@ -447,9 +410,6 @@ export {
   WORKFLOW_COMMAND_IDS,
   assertProviderRuleContent,
   assertRepositoryProviderRules,
-  expandCoreMarkers,
-  listProviderRuleOutputs,
-  providerRuleAdapter,
   readCoreFragment,
   renderClaudeCommandFile,
   renderClaudeProjectMd,
@@ -459,6 +419,5 @@ export {
   renderCursorGuardrailsMdc,
   renderGeminiMd,
   renderGenericAgentsMd,
-  renderProviderRuleFile,
 };
-export type { CoreFragmentName, ProviderRuleAdapter, ClaudeCommandSpec, RuleRenderOptions };
+export type { CoreFragmentName, ProviderRuleAdapter, ClaudeCommandSpec };
