@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "core": [
+    "skills",
+    "rules",
+    "hooks",
+    "templates",
+    "memory",
+    "tools",
+    "agents"
+  ],
+  "output": [
+    ".ai-harness",
+    ".codex",
+    ".claude"
+  ]
+}

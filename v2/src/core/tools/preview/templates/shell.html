@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{TITLE}}</title>
+  <link rel="stylesheet" href="/tailwind.css" />
+</head>
+<body class="min-h-screen bg-stone-50 text-stone-900 antialiased">
+  <div class="animate-rise-in">
+    {{BODY}}
+  </div>
+  <div id="done" hidden class="mx-auto max-w-5xl px-6">
+    <div class="animate-rise-in mt-8 rounded-2xl bg-emerald-50 px-5 py-4 text-emerald-800 shadow-md ring-1 ring-emerald-600/20">
+      ✓ Response recorded. You can close this tab and return to the terminal.
+    </div>
+  </div>
+  <script src="/mermaid.js"></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'neutral',
+        themeVariables: {
+          fontFamily: 'system-ui, sans-serif',
+          primaryColor: '#f5f5f4',
+          primaryTextColor: '#1c1917',
+          primaryBorderColor: '#e7e5e4',
+          lineColor: '#a8a29e',
+          tertiaryColor: '#fafaf9',
+          pie1: '#059669',
+          pie2: '#dc2626',
+          pie3: '#d97706',
+          pie4: '#0284c7',
+          pie5: '#78716c',
+          pie6: '#44403c',
+          pie7: '#a8a29e',
+          pieOpacity: '1',
+          pieStrokeColor: '#ffffff',
+          pieStrokeWidth: '2px',
+          pieOuterStrokeWidth: '0px',
+          pieTitleTextSize: '15px',
+          pieTitleTextColor: '#1c1917',
+          pieSectionTextSize: '13px',
+          pieSectionTextColor: '#ffffff',
+          pieLegendTextSize: '13px',
+          pieLegendTextColor: '#57534e',
+        },
+      });
+    }
+  </script>
+  <script src="/lucide.js"></script>
+  <script>
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  </script>
+  <script src="/app.js"></script>
+</body>
+</html>

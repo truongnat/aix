@@ -1,0 +1,27 @@
+{
+  "extraKnownMarketplaces": {
+    "ai-engineering-harness": {
+      "source": {
+        "source": "github",
+        "repo": "truongnat/ai-engineering-harness"
+      }
+    }
+  },
+  "permissions": {
+    "allow": [
+      "Bash(rg *)",
+      "Bash(git diff *)"
+    ],
+    "ask": [
+      "Bash(gh pr view *)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./.env.local)",
+      "Read(./.envrc)",
+      "Read(./secrets/**)",
+      "Read(./**/secrets/**)"
+    ]
+  }
+}

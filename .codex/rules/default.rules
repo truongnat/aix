@@ -1,0 +1,101 @@
+prefix_rule(
+    pattern = ["gh", "pr", "view"],
+    decision = "prompt",
+    justification = "Viewing pull requests requires approval",
+    match = [
+        "gh pr view 7888",
+        "gh pr view --repo openai/codex",
+    ],
+    not_match = [
+        "gh pr --repo openai/codex view 7888",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rg"],
+    decision = "allow",
+    justification = "Fast code search is preferred over grep",
+    match = [
+        "rg install v2",
+    ],
+    not_match = [
+        "grep install -R .",
+    ],
+)
+
+prefix_rule(
+    pattern = ["printenv"],
+    decision = "forbidden",
+    justification = "Do not dump environment variables because they can expose secrets",
+    match = [
+        "printenv",
+        "printenv DATABASE_URL",
+    ],
+    not_match = [
+        "printf "DATABASE_URL is configured\n"",
+    ],
+)
+
+prefix_rule(
+    pattern = ["env"],
+    decision = "forbidden",
+    justification = "Do not dump environment variables because they can expose secrets",
+    match = [
+        "env",
+        "env | sort",
+    ],
+    not_match = [
+        "npx envinfo --system",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", ".env"],
+    decision = "forbidden",
+    justification = "Do not delete sensitive environment or secrets files without explicit approval",
+    match = [
+        "rm .env",
+        "rm .env.production",
+    ],
+    not_match = [
+        "rm docs/tmp-note.md",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", ".env.local"],
+    decision = "forbidden",
+    justification = "Do not delete sensitive environment or secrets files without explicit approval",
+    match = [
+        "rm .env.local",
+        "rm .env.local.backup",
+    ],
+    not_match = [
+        "rm local.env.example",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", ".envrc"],
+    decision = "forbidden",
+    justification = "Do not delete sensitive environment or secrets files without explicit approval",
+    match = [
+        "rm .envrc",
+    ],
+    not_match = [
+        "rm docs/envrc-migration.md",
+    ],
+)
+
+prefix_rule(
+    pattern = ["rm", "-rf", "secrets"],
+    decision = "forbidden",
+    justification = "Do not delete sensitive environment or secrets files without explicit approval",
+    match = [
+        "rm -rf secrets",
+        "rm -rf secrets/cache",
+    ],
+    not_match = [
+        "rm -rf test-fixtures",
+    ],
+)

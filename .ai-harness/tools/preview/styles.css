@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/*
+ * Feed every class the design system may use into the build. Agent-generated
+ * HTML composes these dynamically at runtime, so the classes must be known at
+ * build time — they come from the curated vocabulary, the shell, and the
+ * examples in the design guide.
+ */
+@source "./safelist.html";
+@source "./safelist-colors.html";
+@source "./templates/shell.html";
+@source "./references/design-guide.md";
+
+@layer components {
+  /* Applied by app.js to the clicked choice; works on any layout.
+     Matches the soft-elevated direction: stronger shadow + lift, not just a ring. */
+  .is-selected {
+    @apply -translate-y-0.5 shadow-xl ring-2 ring-stone-900/10;
+  }
+
+  /* Page-load entrance, applied automatically by the shell — agents never add this. */
+  .animate-rise-in {
+    animation: rise-in 0.4s ease-out both;
+  }
+
+  /* Liquid-glass surface: frosted translucency + a specular highlight line at the
+     top edge, like light catching the rim of real glass. Combine with rounded-*
+     and ambient color blobs behind it (see design-guide.md) — a glass panel over
+     a flat page reads as plain blur, not glass. */
+  .glass-panel {
+    @apply bg-white/60 shadow-xl backdrop-blur-xl ring-1 ring-white/60;
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.7),
+      0 8px 30px -6px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Stronger variant for the primary/hero surface on a glass page. */
+  .glass-panel-strong {
+    @apply bg-white/70 shadow-2xl backdrop-blur-2xl ring-1 ring-white/70;
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.8),
+      0 12px 40px -8px rgba(0, 0, 0, 0.18);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

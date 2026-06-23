@@ -44,6 +44,7 @@
     "lib/worker-claude-adapter.ts",
     "lib/policy/*.ts",
     "lib/backend/*.ts",
-    "workers/registry.ts"
+    "workers/registry.ts",
+    "v2/src/**/*.ts"
   ]
 }
