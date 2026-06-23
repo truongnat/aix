@@ -8,6 +8,13 @@ Use this when restoring expected behavior, fixing regressions, or addressing bro
 
 `harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember`
 
+## Decision Tree
+
+- Have you reproduced the bug?
+- If yes: do you have a failing test or explicit repro steps?
+- If yes: fix the root cause, rerun the targeted check, then verify related behavior.
+- If no: improve the repro first or document the manual verification gap before fixing.
+
 ## Required Artifacts
 
 - `.harness/STATE.md`
@@ -39,6 +46,13 @@ Use this when restoring expected behavior, fixing regressions, or addressing bro
 - if reproduction is unclear, stop and improve the problem statement
 - if root cause is uncertain, do not ship a speculative fix as complete
 - if the fix requires major redesign, return to discussion and planning
+
+## Artifact Checklist
+
+- `GOAL.md` describes the symptom or repro clearly enough to verify.
+- `PLAN-*.md` states the minimal fix approach and regression strategy.
+- `VERIFY.md` records before/after evidence or an explicit manual gap.
+- `REMEMBER.md` captures the root cause if this failure mode can recur.
 
 ## Completion Criteria
 

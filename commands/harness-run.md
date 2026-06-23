@@ -1,3 +1,12 @@
+---
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+---
 # harness-run
 
 ## Purpose
@@ -16,6 +25,7 @@ Read:
 
 - `.harness/STATE.md`
 - active session current `PLAN-*.md`
+- active session `CHANGE_SPEC.md` if present
 - active session `TASKS.md` if present
 - active session `GOAL.md`
 - relevant implementation files

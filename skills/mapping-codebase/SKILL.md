@@ -4,6 +4,8 @@
 
 Understand the repository structure, active artifacts, boundaries, and likely impact area before discussion or planning.
 
+Treat this as the Explore phase of the harness workflow. When a delegated explorer worker is available, use it for broad reads and keep the returned map bounded and decision-oriented.
+
 ## When To Use
 
 - in unfamiliar codebases
@@ -29,6 +31,7 @@ Understand the repository structure, active artifacts, boundaries, and likely im
 3. Separate facts from inferences.
 4. Record impact zones, dependencies, and unknowns.
 5. Summarize only what later planning or execution needs.
+6. Prefer condensed maps and explicit file paths over pasted file dumps.
 
 ## Operating Principles
 
@@ -37,6 +40,38 @@ Understand the repository structure, active artifacts, boundaries, and likely im
 - Separate facts, inferences, and unknowns.
 - Focus on what the next command needs.
 
+## Reasoning Procedure
+
+1. Restate the area or question that needs mapping.
+2. Find the smallest set of files or artifacts that can answer it.
+3. Trace dependencies or ownership from the evidence.
+4. Stop and report blocked if the needed path or artifact is missing.
+
+## Action Loop
+
+- Thought: identify the next file, folder, or relationship to inspect.
+- Action: search, open, or trace the relevant artifact.
+- Observation: record the concrete repository fact that was found.
+- Repeat until the map answers the question.
+
+## Examples
+
+### Example 1
+
+Input: Which files enforce the new prompt format?
+
+Output:
+- Affected-area map: skills/PROMPT_FORMAT_STANDARD.md, lib/validate/constants.ts, lib/validate/hooks-skills.ts.
+- Dependencies: validator headings flow into both core skill files and capability prompt.md files.
+- Unknowns: whether an eval exists that checks example quality.
+
+### Example 2
+
+Input: The repository surface needed to answer the question does not exist.
+
+Output:
+- Blocked: missing artifact or path.
+- Next step: ask for the target file set or restore the missing surface.
 ## Output Contract
 
 This skill must produce:

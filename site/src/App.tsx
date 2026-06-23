@@ -8,6 +8,7 @@ import { SessionStartSection } from './components/SessionStartSection'
 import { EvidenceBlockedSection } from './components/EvidenceBlockedSection'
 import { DailyReportSection } from './components/DailyReportSection'
 import { ProviderCards } from './components/ProviderCards'
+import { CapabilitiesSection } from './components/CapabilitiesSection'
 import { PowerLayersSection } from './components/PowerLayersSection'
 import { InstallSection } from './components/InstallSection'
 import { CTA } from './components/CTA'
@@ -30,6 +31,7 @@ export default function App() {
         <EvidenceBlockedSection />
         <DemoTerminal />
         <ProviderCards />
+        <CapabilitiesSection />
         <PowerLayersSection />
         <AgentSystemSection />
         <DailyReportSection />

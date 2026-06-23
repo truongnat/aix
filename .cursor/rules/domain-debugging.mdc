@@ -1,0 +1,7 @@
+# Debugging Domain Skill
+
+Use the generated domain skill at `.harness/skills/debugging/SKILL.md`.
+
+- Domain: debugging
+- Commands: harness-map, harness-discuss, harness-plan, harness-verify, harness-remember
+- Checks: failing-before evidence, passing-after evidence, regression check

@@ -7,12 +7,13 @@ function printHelp() {
   console.log(`generate-report-context.js
 
 Usage:
-  node scripts/generate-report-context.js [--base <ref>] [--head <ref>] [--json]
+  node scripts/generate-report-context.js [--base <ref>] [--head <ref>] [--json] [--templates]
 
 Options:
   --base <ref>   Optional base ref for range diff (e.g. origin/main)
   --head <ref>   Head ref, default HEAD
   --json         Output JSON to stdout
+  --templates    Include discovered PR/report template metadata (and --write .harness/REPORT_TEMPLATES.md)
   --help         Show this help
 
 Gathers git branch, status, diff stat, and changed files.
@@ -25,12 +26,12 @@ function runGit(args, cwd = process.cwd()) {
     cwd,
     encoding: "utf8",
     timeout: 15000,
-    shell: false
+    shell: false,
   });
 }
 
 function parseCli(argv) {
-  const options = { json: false, help: false, head: "HEAD" };
+  const options = { json: false, help: false, templates: false, head: "HEAD" };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === "--help" || arg === "-h") {
@@ -39,6 +40,10 @@ function parseCli(argv) {
     }
     if (arg === "--json") {
       options.json = true;
+      continue;
+    }
+    if (arg === "--templates") {
+      options.templates = true;
       continue;
     }
     if (arg === "--base") {
@@ -103,7 +108,7 @@ function parseDiffStat(output) {
     filesChanged: 0,
     insertions: 0,
     deletions: 0,
-    raw: (output || "").trim()
+    raw: (output || "").trim(),
   };
   const summaryLine = (output || "")
     .split(/\r?\n/)
@@ -127,7 +132,7 @@ function diffRange(base, head, cwd) {
   if (statResult.status !== 0 || nameResult.status !== 0) {
     return {
       ok: false,
-      reason: statResult.stderr || nameResult.stderr || "git diff range failed"
+      reason: statResult.stderr || nameResult.stderr || "git diff range failed",
     };
   }
   return {
@@ -135,7 +140,7 @@ function diffRange(base, head, cwd) {
     stat: parseDiffStat(statResult.stdout),
     files: parseNameStatus(nameResult.stdout),
     statRaw: (statResult.stdout || "").trim(),
-    nameStatusRaw: (nameResult.stdout || "").trim()
+    nameStatusRaw: (nameResult.stdout || "").trim(),
   };
 }
 
@@ -147,7 +152,7 @@ function diffWorkingTree(cwd) {
   if (statResult.status !== 0 || nameResult.status !== 0) {
     return {
       ok: false,
-      reason: statResult.stderr || nameResult.stderr || "git diff failed"
+      reason: statResult.stderr || nameResult.stderr || "git diff failed",
     };
   }
   const files = parseNameStatus(nameResult.stdout);
@@ -166,7 +171,7 @@ function diffWorkingTree(cwd) {
     stat,
     files,
     statRaw: [statResult.stdout, stagedStat.stdout].filter(Boolean).join("\n").trim(),
-    nameStatusRaw: [nameResult.stdout, stagedNames.stdout].filter(Boolean).join("\n").trim()
+    nameStatusRaw: [nameResult.stdout, stagedNames.stdout].filter(Boolean).join("\n").trim(),
   };
 }
 
@@ -175,7 +180,7 @@ function generateReportContext(options, cwd = process.cwd()) {
     return {
       ok: false,
       status: "blocked",
-      reason: "Not a git repository or git context cannot be inspected."
+      reason: "Not a git repository or git context cannot be inspected.",
     };
   }
 
@@ -185,7 +190,7 @@ function generateReportContext(options, cwd = process.cwd()) {
     return {
       ok: false,
       status: "blocked",
-      reason: status.reason
+      reason: status.reason,
     };
   }
 
@@ -196,7 +201,7 @@ function generateReportContext(options, cwd = process.cwd()) {
     return {
       ok: false,
       status: "blocked",
-      reason: diff.reason
+      reason: diff.reason,
     };
   }
 
@@ -227,9 +232,90 @@ function generateReportContext(options, cwd = process.cwd()) {
     stat: diff.stat,
     diff: {
       stat: diff.statRaw,
-      nameStatus: diff.nameStatusRaw
-    }
+      nameStatus: diff.nameStatusRaw,
+    },
   };
+}
+
+function attachTemplates(result, cwd, options) {
+  if (!options.templates || !result.ok) {
+    return result;
+  }
+  try {
+    const fs = require("node:fs");
+    const path = require("node:path");
+    const mod = require(
+      path.join(
+        __dirname,
+        "..",
+        "dist",
+        "features",
+        "install",
+        "infrastructure",
+        "report-template-discovery.js"
+      )
+    );
+    const discovery = mod.discoverReportTemplates(cwd);
+    const harnessDir = path.join(cwd, ".harness");
+    if (fs.existsSync(harnessDir)) {
+      fs.writeFileSync(
+        path.join(harnessDir, "REPORT_TEMPLATES.md"),
+        `${mod.renderReportTemplatesMarkdown(discovery).trim()}\n`,
+        "utf8"
+      );
+    }
+    return {
+      ...result,
+      templates: {
+        status: discovery.status,
+        primary: {
+          prMessage: discovery.primary.prMessage
+            ? {
+                path: discovery.primary.prMessage.path,
+                source: discovery.primary.prMessage.source,
+                provider: discovery.primary.prMessage.provider,
+                label: discovery.primary.prMessage.label,
+                content: discovery.primary.prMessage.content,
+              }
+            : null,
+          report: discovery.primary.report
+            ? {
+                path: discovery.primary.report.path,
+                source: discovery.primary.report.source,
+                provider: discovery.primary.report.provider,
+                label: discovery.primary.report.label,
+                content: discovery.primary.report.content,
+              }
+            : null,
+          changeSummary: discovery.primary.changeSummary
+            ? {
+                path: discovery.primary.changeSummary.path,
+                source: discovery.primary.changeSummary.source,
+                provider: discovery.primary.changeSummary.provider,
+                label: discovery.primary.changeSummary.label,
+                content: discovery.primary.changeSummary.content,
+              }
+            : null,
+        },
+        fallback: discovery.fallback,
+        candidates: {
+          prMessage: discovery.candidates.prMessage.map((entry) => ({
+            path: entry.path,
+            provider: entry.provider,
+            label: entry.label,
+          })),
+        },
+      },
+    };
+  } catch (error) {
+    return {
+      ...result,
+      templates: {
+        status: "fallback",
+        error: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
 }
 
 function main() {
@@ -239,7 +325,8 @@ function main() {
       printHelp();
       return;
     }
-    const result = generateReportContext(options);
+    let result = generateReportContext(options);
+    result = attachTemplates(result, process.cwd(), options);
     if (options.json) {
       process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     } else if (result.ok) {

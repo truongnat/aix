@@ -72,7 +72,7 @@ Summary:
 4. verify the repository with the validation commands listed in `PACK.md`
 5. assemble a release archive using the release archive checklist
 6. include `PACK.md` in the archive root
-7. tag the source repository manually
+7. complete the repository release flow documented in [release-checklist.md](release-checklist.md)
 
 Archive generation scripts are not required for `v0.7.0`.
 

@@ -6,7 +6,8 @@ Capture durable lessons, constraints, and decisions that will improve later sess
 
 ## When To Use
 
-- after shipping meaningful work
+- chained automatically after `harness-ship` when status is `shipped`
+- after shipping meaningful work (standalone when ship was ship-only)
 - after resolving a root cause or tricky tradeoff
 - when new constraints should shape future decisions
 
@@ -28,7 +29,8 @@ Capture durable lessons, constraints, and decisions that will improve later sess
 2. Identify the durable fact, decision, root cause, or hazard worth keeping.
 3. Exclude temporary details, secrets, and private business data.
 4. Write concise memory tied to affected areas.
-5. Confirm the note would help a future session start faster.
+5. If the work produced an approved delta spec, record that the durable spec layer should absorb it when enabled.
+6. Confirm the note would help a future session start faster.
 
 ## Operating Principles
 
@@ -37,6 +39,38 @@ Capture durable lessons, constraints, and decisions that will improve later sess
 - Short, precise memory loads faster.
 - Record constraints that are easy to forget but costly to miss.
 
+## Reasoning Procedure
+
+1. Restate the durable lesson and why it matters later.
+2. Check that the lesson is stable, reusable, and safe to store.
+3. Convert it into a short memory entry with references.
+4. Stop and report blocked if the lesson would capture sensitive data.
+
+## Action Loop
+
+- Thought: identify the durable decision or hazard worth keeping.
+- Action: inspect the evidence and draft the memory entry.
+- Observation: verify the entry is factual, scoped, and sanitized.
+- Repeat until the lesson is ready to record.
+
+## Examples
+
+### Example 1
+
+Input: Repeated validation failures showed a missing heading requirement.
+
+Output:
+- Remember note: add the heading to the validator before relying on the doc surface.
+- Durable decision: required docs must be enforced by bin/validate.js.
+- Affected-area references: lib/validate/constants.ts, lib/validate/hooks-skills.ts.
+
+### Example 2
+
+Input: Recording the lesson would require secrets or private data.
+
+Output:
+- Blocked: unsafe to store in memory.
+- Needed next step: summarize the pattern without sensitive details.
 ## Output Contract
 
 This skill must produce:

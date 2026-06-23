@@ -4,6 +4,8 @@ Read `.harness/TOOL_CONTEXT.md` first when it exists.
 
 Otherwise run `node scripts/discover-tools.js --markdown` when available.
 
+For deliberative user choices, read `.ai-harness/provider-interaction.md` or run `node scripts/discover-provider-tools.js` and invoke the listed provider tool.
+
 Prefer capability routing over tool-name memory:
 
 - code search: `rg` before `grep`

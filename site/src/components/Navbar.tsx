@@ -6,6 +6,7 @@ const NAV = [
   { href: '#agent-system', label: 'Agent' },
   { href: '#workflow', label: 'Workflow' },
   { href: '#session-start', label: 'Session' },
+  { href: '#capabilities', label: 'Capabilities' },
 ] as const
 
 const GITHUB = 'https://github.com/truongnat/ai-engineering-harness'

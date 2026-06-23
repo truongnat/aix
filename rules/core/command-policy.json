@@ -1,0 +1,20 @@
+{
+  "$comment": "Common command rules (core). Type-1 rules: shell command policy. Shared by all providers; extend per provider via rules/providers/<id>/command-policy.json.",
+  "rules": [
+    {
+      "decision": "allow",
+      "prefixes": ["rg", "git status", "git diff", "git log", "ls", "cat"],
+      "justification": "Read-only inspection commands do not modify repository state."
+    },
+    {
+      "decision": "prompt",
+      "prefixes": ["npm install", "pnpm install", "yarn add", "gh pr merge", "vercel", "npm publish"],
+      "justification": "Confirm before changing dependencies, merging, or deploying."
+    },
+    {
+      "decision": "forbidden",
+      "prefixes": ["git push --force", "git push --force-with-lease", "git reset --hard", "git clean -fdx", "rm -rf"],
+      "justification": "Use a safer alternative: revert, branch, or targeted cleanup."
+    }
+  ]
+}

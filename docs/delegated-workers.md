@@ -17,6 +17,7 @@ Workers are one-shot delegated task runners owned by the harness contract in `wo
 
 | Worker | Role | Write access | Typical command |
 |--------|------|--------------|-----------------|
+| `explorer` | explore | none | `harness-map` |
 | `reviewer` | review | none | `harness-verify` |
 | `verifier` | verify | none | `harness-verify` |
 | `gatekeeper` | gate | none | `harness-ship` |
@@ -24,7 +25,7 @@ Workers are one-shot delegated task runners owned by the harness contract in `wo
 
 Source of truth:
 
-- `workers/registry.js`
+- `workers/registry.ts`
 - `workers/<id>.md`
 - `templates/WORKER_RUN.md`
 
@@ -75,6 +76,7 @@ Claude is the first **native** adapter target.
 Project runtime install renders canonical workers to:
 
 ```txt
+.claude/agents/harness-explorer.md
 .claude/agents/harness-reviewer.md
 .claude/agents/harness-verifier.md
 .claude/agents/harness-gatekeeper.md
@@ -106,6 +108,7 @@ Other runtimes may use **fallback** execution when the main agent follows the wo
 
 ## Command Integration
 
+- `harness-map` may dispatch `explorer` to produce a condensed repository map
 - `harness-verify` may dispatch `reviewer` and `verifier`
 - `harness-ship` may dispatch `gatekeeper`
 - `harness-run` may dispatch `fixer` only for bounded remediation explicitly authorized by the main agent

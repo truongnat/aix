@@ -2,7 +2,8 @@
 
 ## Purpose
 
-Use this checklist to prepare a manual release without adding release automation or runtime complexity.
+Use this checklist to prepare and verify a release while the repository uses
+automated npm publication through the changesets release workflow.
 
 ## npm package (v0.10.x+)
 
@@ -10,8 +11,7 @@ Use this checklist to prepare a manual release without adding release automation
 - run `npm publish --dry-run` to catch registry or packaging issues before the real publish
 - run `node bin/aih.js --help`
 - run `npm test` and `node bin/validate.js`
-- bump `package.json` version; align `PACK.md` pack version
-- publish manually: see [npm-publish.md](npm-publish.md)
+- confirm the release workflow is the intended publish path: see [npm-publish.md](npm-publish.md)
 - smoke: `npx --yes ai-engineering-harness@latest install --provider cursor --yes --dry-run`
 
 ## Pre-Release Checks
@@ -42,7 +42,7 @@ Use this checklist to prepare a manual release without adding release automation
 - confirm no generated runtime state was added to the repository
 - confirm no automation or packaging work slipped into the release
 
-## Manual Release Steps
+## Release Workflow Steps
 
 1. Run `node bin/validate.js`
 2. Inspect `git status`
@@ -50,8 +50,19 @@ Use this checklist to prepare a manual release without adding release automation
 4. Review `AGENTS.md`
 5. Review `docs/adoption-guide.md`
 6. Update the `CHANGELOG.md` release date when releasing
-7. Create the git tag manually
-8. Push the tag manually
+7. Merge the changesets release PR once validation is complete
+8. Confirm the release workflow published npm with provenance
+9. Confirm the tag workflow created the GitHub Release
+
+## Current v1.x Validation Commands
+
+- `node bin/validate.js`
+- `npm test`
+- `npx ai-engineering-harness --help`
+- `npm run build --prefix site`
+- `npm pack --dry-run`
+- `npm publish --dry-run`
+- `git status`
 
 ## Post-Release Checks
 
@@ -61,11 +72,14 @@ Use this checklist to prepare a manual release without adding release automation
 
 ## What Not To Add For Releases
 
-- no release automation
-- no package publishing automation
 - no runtime adapters
 - no heavy runtime systems
 - no server, database, Docker, LangGraph, or orchestration framework
+
+## Historical Release Snapshots
+
+The version-by-version command blocks below are retained as historical release
+records for earlier tags. They are not the primary v1.x release instructions.
 
 ## v0.1.0 Final Manual Commands
 
@@ -180,19 +194,16 @@ Use this checklist to prepare a manual release without adding release automation
 - `node bin/validate.js --target test/fixtures/valid-target-profile --profile-only`
 - `node bin/validate.js --target test/fixtures/valid-target-goal --goal google-login`
 - `node bin/validate.js --target test/fixtures/valid-target-profile-cursor --runtime cursor --profile-only`
-- `sh aih.sh --help`
-- `sh aih.sh status --target <dogfood target>`
 - `git status`
 - `git tag v0.9.2`
 - `git push origin v0.9.2`
 
-## v1.0.1 Final Manual Commands
+## v1.0.1 Final Validation Commands
 
 - `node bin/validate.js`
 - `npm test`
+- `npx ai-engineering-harness --help`
 - `npm run build --prefix site`
 - `npm pack --dry-run`
 - `npm publish --dry-run`
 - `git status`
-- `git tag v1.0.1`
-- `git push origin v1.0.1`

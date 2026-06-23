@@ -2,33 +2,35 @@
 
 ## Purpose
 
-Document what `install.sh` + `lib/install-runtime.ts` install per runtime **without** copying the full pack to the product repo root.
+Document what the primary Node.js CLI installs per provider **without** copying the full pack to the product repo root.
 
 Canonical scope: per-runtime payload paths and follow-up actions after runtime-native install.
 
-Use [install-command-model.md](install-command-model.md) for command defaults and flag semantics. Use [install-sh-usage.md](install-sh-usage.md) for remote wrapper behavior, review-before-run flows, and manual fallback entrypoints.
+Use [install-command-model.md](install-command-model.md) for primary CLI command defaults and flag semantics. Historical shell-installer notes live under `docs/internal/archive/install/`.
 
 **Status:** Experimental until dogfooded. See [runtime-native-install-audit.md](runtime-native-install-audit.md) and [runtime-native-install-dogfood-plan.md](runtime-native-install-dogfood-plan.md). Do not claim stable support in production adoption guides yet.
 
 ## Runtime-Native Entry Shape
 
 ```bash
-sh install.sh --runtime <name> --scope <global|project> --target <path> [--init-harness] [--dry-run] [--force] [--yes]
+npx ai-engineering-harness install --provider <id> [--scope <global|project>] [--target <path>] [--dry-run] [--yes]
 ```
 
-Flag semantics and defaults live in [install-command-model.md](install-command-model.md).
+`--runtime <id>` remains accepted as a deprecated alias for `--provider <id>`.
 
 | Runtime | Alias | Project scope | Global scope |
 |---|---|---|---|
-| `opencode` | — | `.opencode/plugins/ai-engineering-harness.js` | `~/.config/opencode/plugins/` |
 | `cursor` | — | `.cursor/commands/`, `.cursor/rules/` | `~/.cursor/commands/`, `~/.cursor/rules/` |
-| `windsurf` | same as cursor | same | same |
 | `claude` | — | `.claude/CLAUDE.md`, merge `.claude/settings.json` | `~/.claude/CLAUDE.md`, settings |
 | `codex` | — | `AGENTS.md` bootstrap | `~/.codex/AGENTS.md` |
 | `gemini` | — | `.gemini/extensions/ai-engineering-harness/` | `~/.gemini/extensions/...` |
 | `generic` | — | `AGENTS.md` bootstrap | (skip; use codex global) |
-| `all` | — | runs all rows above in order | use `--scope global` |
-| `manual` | `--legacy-root` | full root copy via `node bin/aih.js install` (fallback) | N/A |
+| `manual` | legacy flat-root install path | full root copy via `node bin/aih.js install` | N/A |
+
+Removed from the active install surface:
+
+- `opencode` — legacy cleanup only; see [uninstall-usage.md](uninstall-usage.md)
+- `windsurf` — no separately documented runtime path; use `cursor` only if you intentionally want the Cursor rule path
 
 ## Claude Code Follow-Up
 
@@ -51,17 +53,9 @@ gemini extensions install https://github.com/truongnat/ai-engineering-harness
 ## Combined With `.harness` Init
 
 ```bash
-sh install.sh --runtime opencode --scope project --init-harness --yes --target .
+npx ai-engineering-harness install --provider claude --scope project --target . --yes
 ```
 
 ## Payload Source
 
 Files live under `runtime/` in the pack. See [runtime/README.md](../runtime/README.md).
-
-## Manual Fallback
-
-```bash
-sh install.sh --runtime manual --target .
-```
-
-Copies default installed surface (`commands/`, `skills/`, …) — not recommended as the long-term default. See [install-sh-usage.md](install-sh-usage.md) for remote wrapper behavior and manual fallback examples.

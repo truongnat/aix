@@ -4,12 +4,8 @@ Scope guard ensures that edits stay within the approved scope defined in the goa
 
 ## Policy
 
-### Scope Guard
-
-Edits must stay within scope defined in goal artifact or plan
-
-**When enforced:** file_pattern matches **
-**Action:** warn - Edit may be outside approved scope
+Scope enforcement runs at tool time through `hooks/core/codex-hook-router.js` when an active session is present in `.harness/STATE.md`.
+Repositories can add custom scope policies in `.harness/policies.json` when needed.
 
 ## Scope Definition
 

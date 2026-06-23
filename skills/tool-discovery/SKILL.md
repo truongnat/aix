@@ -46,6 +46,38 @@ Detect available local tools and route work by capability instead of tool-name m
 3. Update or create `.harness/TOOL_CONTEXT.md`.
 4. Route by capability, not by guessed tool names.
 
+## Reasoning Procedure
+
+1. Restate the tool capability that is needed.
+2. Check the current tool context or discover it fresh.
+3. Derive the safest route by capability, not by memory.
+4. Stop and report blocked if a required capability has no safe fallback.
+
+## Action Loop
+
+- Thought: identify the next tool or routing question.
+- Action: inspect the context or run the discovery command.
+- Observation: record the real tool availability and routing result.
+- Repeat until the tool context is ready.
+
+## Examples
+
+### Example 1
+
+Input: The repository needs a fresh .harness/TOOL_CONTEXT.md.
+
+Output:
+- Refreshed tool context: detected git, rg, and repository-local scripts.
+- Routing guidance: use code search first, then git diff/history as needed.
+- Notes: prefer safe fallbacks when a preferred tool is absent.
+
+### Example 2
+
+Input: A required capability has no safe fallback.
+
+Output:
+- Blocked: missing capability for the next step.
+- Needed next step: choose a safe fallback or install the missing tool.
 ## Output Contract
 
 Produce or refresh `.harness/TOOL_CONTEXT.md` with detected tools and routing guidance.

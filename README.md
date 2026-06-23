@@ -6,9 +6,9 @@
 
 A markdown-first, open-source kit that helps agents restore context, plan before coding, verify with evidence, ship reviewer-ready summaries, and preserve durable project knowledge.
 
-![Version](https://img.shields.io/badge/version-v1.0.1-2563eb)
+![Version](https://img.shields.io/badge/version-v1.2.3-2563eb)
 ![CI](https://github.com/truongnat/ai-engineering-harness/actions/workflows/ci.yml/badge.svg)
-![Coverage](https://img.shields.io/badge/coverage-lib%2065%25%2B-0f766e)
+![Coverage](https://img.shields.io/badge/coverage-lib%2075%25%2B-0f766e)
 ![License](https://img.shields.io/badge/license-MIT-16a34a)
 ![Open Source](https://img.shields.io/badge/open-source-0f172a)
 ![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-818cf8)
@@ -64,8 +64,7 @@ See [compatibility matrix](docs/compatibility-matrix.md) and [evals](docs/evals.
 Inside your target project:
 
 ```bash
-npx ai-engineering-harness init
-# or: npx ai-engineering-harness install
+npx ai-engineering-harness install
 npx ai-engineering-harness status
 npx ai-engineering-harness doctor
 ```
@@ -77,6 +76,8 @@ npx ai-engineering-harness install --provider claude --yes
 ```
 
 **Note:** `--provider` is preferred; `--runtime` is a deprecated alias.
+
+The Node.js CLI (`npx ai-engineering-harness ...`) is the only supported install and lifecycle surface.
 
 Wizard details: [docs/npx-cli-ux.md](docs/npx-cli-ux.md), [docs/terminal-wizard-ux.md](docs/terminal-wizard-ux.md)
 
@@ -326,7 +327,7 @@ Transcript: [TRANSCRIPT.md](examples/dogfood-tiny-node-api/TRANSCRIPT.md)
 | Session memory | [docs/session-memory.md](docs/session-memory.md) |
 | Command guardrails | [docs/command-guardrails.md](docs/command-guardrails.md) |
 
-Release notes: [docs/v1.0.1-release-notes.md](docs/v1.0.1-release-notes.md)
+Release notes: [docs/v1.2.3-release-notes.md](docs/v1.2.3-release-notes.md)
 
 ---
 
@@ -354,6 +355,6 @@ Publish: [docs/npm-publish.md](docs/npm-publish.md)
 
 ## Status
 
-**v1.0.1**: patch release for README clarity, landing-page polish, and release metadata alignment. Core workflow contracts and provider support posture are unchanged.
+**v1.2.3**: patch release — Stack scanner with framework detection and domain inference. New `harness scan` CLI command. `harness domains` now auto-scans. Fixed Codex hook router crash on non-shell tools.
 
 MIT · [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md)

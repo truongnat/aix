@@ -12,7 +12,7 @@ See also: [provider-command-matrix.md](provider-command-matrix.md), [provider-na
    gemini-extension.json
    commands/  skills/  hooks/
 
-2. Project-local activation (npx install)
+2. Project-local activation (npx ai-engineering-harness install)
    .ai-harness/runtime-commands/   ← local command catalog (always)
    .harness/
    provider entrypoints + native paths where supported
@@ -46,9 +46,9 @@ How a command runs after routing is defined in `.ai-harness/commands/` — same 
 
 | Provider | Mode | Native slash | Project install adds |
 |----------|------|--------------|----------------------|
-| Claude Code | native-plugin | `/harness-plan` via project command files where installed | `.claude/commands/harness-*.md`, `.claude/agents/harness-*.md` (delegated workers) |
+| Claude Code | native-plugin | `/harness-plan` via project command files where installed | `.claude/commands/harness-*.md`, `.claude/agents/harness-*.md`, `.claude/skills/` |
 | Cursor | native-command-files | `/harness-plan` via project command files | `.cursor/commands/`, `.cursor/rules/` |
-| Codex | plugin-packaging | plugin skills via `/plugins` | `AGENTS.md` fallback |
+| Codex | plugin-packaging | plugin skills via `/plugins` | `AGENTS.md`, `.codex/`, `.agents/skills/` |
 | Gemini | native-command-files | none | `.gemini/extensions/ai-engineering-harness/` (`GEMINI.md` + manifest) |
 | Generic | fallback-only | none | `AGENTS.md` aliases |
 
@@ -56,8 +56,9 @@ How a command runs after routing is defined in `.ai-harness/commands/` — same 
 
 | Provider | Preferred | Fallback |
 |----------|-----------|----------|
-| Cursor | npx + project commands/rules | `/add-plugin ai-engineering-harness` when published |
-| Claude | `/plugin install …` | npx + `.claude/commands/` |
+| Cursor | `npx ai-engineering-harness install` + project commands/rules | `/add-plugin ai-engineering-harness` when published |
+| Claude | `/plugin install …` | `npx ai-engineering-harness install` + `.claude/commands/`, `.claude/agents/`, `.claude/skills/` |
+| Codex | `/plugins` (when marketplace published) | `npx ai-engineering-harness install` + `.codex/`, `.agents/skills/`, `AGENTS.md` |
 | Gemini | `gemini extensions install <url>` | ask harness-plan via `GEMINI.md` context |
 
 ## Troubleshooting

@@ -1,3 +1,12 @@
+---
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+---
 # harness-plan
 
 ## Purpose
@@ -17,6 +26,7 @@ Read:
 - `.harness/STATE.md`
 - active session `GOAL.md`
 - active session `DISCUSSION.md` if present
+- active session `CHANGE_SPEC.md` if present
 - `.harness/DECISIONS.md` if present
 - `.harness/HAZARDS.md` if present
 - `.harness/INDEX.md` if present
@@ -70,9 +80,10 @@ Use this command doc as the reference contract for phase behavior and artifact d
 2. Identify the files, systems, and `.harness/` artifacts that will change.
 3. Break the work into small ordered tasks that are easy to verify independently.
 4. Define verification strategy for each task cluster, approval checkpoints, and not-run risks.
-5. Record assumptions, dependencies, rollback considerations, and scope boundaries.
-6. Write the plan to `.harness/sessions/<active-session>/PLAN-001.md` or the next numbered plan and update session `TASKS.md` if task tracking is needed.
-7. Stop before implementation.
+5. If the work changes behavior, capture the delta in `templates/CHANGE_SPEC.md` using ADDED, MODIFIED, and REMOVED requirements.
+6. Record assumptions, dependencies, rollback considerations, and scope boundaries.
+7. Write the plan to `.harness/sessions/<active-session>/PLAN-001.md` or the next numbered plan and update session `TASKS.md` if task tracking is needed.
+8. Stop before implementation.
 
 ## Required Outputs
 

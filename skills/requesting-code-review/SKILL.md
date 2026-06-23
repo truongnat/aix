@@ -37,6 +37,38 @@ Request an independent review pass that checks scope fidelity, risk, and missing
 - Findings should be actionable and severity-oriented.
 - No-findings is still a documented outcome.
 
+## Reasoning Procedure
+
+1. Restate the change and the review objective.
+2. Check what a reviewer needs to inspect the diff efficiently.
+3. Decide whether the handoff is review-ready or still blocked.
+4. Stop and report blocked if the scope is not inspectable yet.
+
+## Action Loop
+
+- Thought: identify the changed surface and reviewer needs.
+- Action: gather the diff, plan, and verification context.
+- Observation: record the exact review request frame.
+- Repeat until the request is ready to hand off.
+
+## Examples
+
+### Example 1
+
+Input: The prompt standard upgrade is implemented and verified.
+
+Output:
+- Review request frame: review the prompt standard, content pass, and eval addition.
+- Findings or decision: no known blocking issue, but confirm the examples are concrete.
+- Follow-up: verify the conformance eval checks the new skill output shape.
+
+### Example 2
+
+Input: There is no inspectable diff yet.
+
+Output:
+- Blocked: review context is missing.
+- Needed next step: wait for an inspectable diff and verification evidence.
 ## Output Contract
 
 This skill must produce:

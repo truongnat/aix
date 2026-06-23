@@ -5,6 +5,6 @@
   "supportsSubagents": true,
   "status": "native-plugin",
   "pluginPath": ".claude-plugin/plugin.json",
-  "ruleEntrypoints": [".claude/CLAUDE.md", ".claude/commands/"],
-  "installPaths": [".claude/commands/", ".claude-plugin/"]
+  "ruleEntrypoints": [".claude/CLAUDE.md", ".claude/commands/", ".claude/skills/"],
+  "installPaths": [".claude/commands/", ".claude/agents/", ".claude/skills/", ".claude-plugin/"]
 }

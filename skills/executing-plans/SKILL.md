@@ -37,6 +37,38 @@ Execute an approved plan step by step without drifting scope or skipping state u
 - Unplanned discoveries should be documented, not hidden.
 - Verification preparation should happen continuously without replacing the verify phase.
 
+## Reasoning Procedure
+
+1. Restate the approved step and the artifact it should change.
+2. Check the current session state and any blockers before acting.
+3. Derive the smallest execution action that matches the plan.
+4. Stop and report blocked if the step is not approved or cannot be verified.
+
+## Action Loop
+
+- Thought: identify the next approved step and required evidence.
+- Action: edit the planned artifact or run the planned command.
+- Observation: record the actual result and whether it matched the step.
+- Repeat until the step is complete or blocked.
+
+## Examples
+
+### Example 1
+
+Input: Plan step: Add the prompt standard docs and validate the repo.
+
+Output:
+- Completed step: added skills/PROMPT_FORMAT_STANDARD.md and updated authoring docs.
+- Updated notes: validator now requires the new headings on skills and prompts.
+- Deviations: none.
+
+### Example 2
+
+Input: The step is not approved yet.
+
+Output:
+- Blocked: plan approval is missing.
+- Needed next step: approve the plan before implementation continues.
 ## Output Contract
 
 This skill must produce:

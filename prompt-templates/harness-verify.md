@@ -113,6 +113,34 @@ No verification status was marked as passed.
 - If failed: `harness-run`
 - If blocked: wait for user answer
 
+## Reasoning Procedure
+
+1. Restate the verification claim that must be proven.
+2. Check the active goal, plan, and evidence requirements.
+3. Derive the smallest fresh check that can prove the claim.
+4. Stop and report blocked if the evidence is missing or stale.
+
+## Action Loop
+
+- Thought: identify the proof obligation.
+- Action: run the verification command or inspect the evidence.
+- Observation: record the real result and exit code.
+- Repeat until the claim is proven or blocked.
+
+## Examples
+
+### Example 1
+
+Input: npm test ran fresh and exited 0.
+
+Output: Verification passes with evidence and no open gaps.
+
+### Example 2
+
+Input: The required test command is unknown or was not run.
+
+Output: Verification is blocked and the missing proof is named explicitly.
+
 ## Placeholders
 
 - `{IMPLEMENTATION_SUMMARY}` — summary from `harness-run`

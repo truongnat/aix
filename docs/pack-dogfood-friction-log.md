@@ -19,7 +19,7 @@ Do not paste secrets, tokens, customer data, or private business details. Summar
 | 2026-06-02 | B | No blocking friction for install or validation | none | Profile and goal validation passed | No action required | no action |
 | 2026-06-02 | C | One-line install works without manual clone | none | Scenario C dry-run and write install | No action required | no action |
 | 2026-06-02 | C | install.js next steps still say node bin/aih.js install not curl one-liner | low | Scenario C install output | Mention one-line install and validate-from-pack options | v0.9.x patch |
-| 2026-06-02 | C | install-sh-usage.md not in default installed surface | low | Scenario C surface check | Optional exportPaths or link from adoption-guide | later optional |
+| 2026-06-02 | C | legacy shell install doc not in default installed surface | low | Scenario C surface check | Optional exportPaths or link from adoption-guide | later optional |
 | 2026-06-02 | C | Install summary absolute target path (repeat) | low | Scenario C install | Same as A/B | v0.9.x patch |
 | 2026-06-02 | C | No blocking friction for one-line install or validation | none | Profile and goal validation passed | No action required | no action |
 | 2026-06-02 | D1 | `AGENTS.md` CREATE in harness init then SKIP in generic runtime step (first write) | low | Scenario D1 write output | **addressed** — init no longer creates AGENTS.md; runtime owns bootstrap | v0.9.x fix |

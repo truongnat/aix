@@ -6,8 +6,6 @@
 
 **Active providers:** Claude Code, Cursor, Codex, Gemini. OpenCode is not offered in the wizard (v0.11.0).
 
-**Fallbacks:** `aih.sh`, `install.sh`, `aih.ps1` — see [simple-cli-ux.md](simple-cli-ux.md).
-
 ## Primary command
 
 ```bash
@@ -36,7 +34,7 @@ Uses `@clack/prompts` when stdin/stdout is a TTY:
 6. Install `.ai-harness/` cache?
 7. Plan + non-Git warning for private mode
 8. Confirm
-9. Spinner + bundled `aih.sh` per provider
+9. Spinner + in-process backend run per provider
 10. Outro with `harness-plan` (ask agent) and `doctor` next steps
 
 ```txt
@@ -63,7 +61,7 @@ npx ai-engineering-harness update
 npx ai-engineering-harness uninstall
 ```
 
-Interactive: select **installed** providers. Uninstall defaults keep `.ai-harness/` and `.harness/`; optional full cleanup maps to `aih.sh --all`.
+Interactive: select **installed** providers. Uninstall defaults keep `.ai-harness/` and `.harness/`; optional full cleanup removes runtime entrypoints plus cache/state through the in-process backend.
 
 ## Non-interactive
 
@@ -79,16 +77,9 @@ npx ai-engineering-harness uninstall --all --yes
 | `--provider` | Primary; comma-separated (`--runtime` alias) |
 | `--scope` | `project` \| `global` |
 | `--visibility` | `private` \| `shared` |
-| `--target`, `--ref`, `--dry-run`, `--yes`, `--all`, `--verbose` | See `npx ai-engineering-harness --help` |
+| `--target`, `--dry-run`, `--yes`, `--all`, `--verbose` | See `npx ai-engineering-harness --help` |
 
 Without `--provider` in non-interactive mode: `No provider selected. Pass --provider cursor or run interactively.`
-
-## Windows
-
-- Primary: `npx ai-engineering-harness install`
-- Backend needs `sh` — Git Bash or WSL
-- Missing `sh`: `Git Bash or WSL is required for the shell backend in v0.10.x. Native JS backend is planned.`
-- `aih.ps1` is experimental fallback only
 
 ## npm package
 

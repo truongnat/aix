@@ -98,26 +98,6 @@
           "Create or update the corresponding test file first"
         ]
       }
-    },
-    {
-      "id": "scope-guard",
-      "name": "Scope Guard",
-      "description": "Edits must stay within scope defined in goal artifact or plan",
-      "severity": "warning",
-      "conditions": [
-        {
-          "type": "file_pattern",
-          "operator": "matches",
-          "value": "**"
-        }
-      ],
-      "action": {
-        "type": "warn",
-        "message": "Edit may be outside approved scope",
-        "questions": [
-          "Is this edit within the approved goal scope?"
-        ]
-      }
     }
   ]
 }

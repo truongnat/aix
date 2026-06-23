@@ -14,64 +14,28 @@ See [npx-cli-ux.md](npx-cli-ux.md) and [terminal-wizard-ux.md](terminal-wizard-u
 
 After install, use the local command catalog (`harness-plan`, `harness-verify`, …). Cursor and Claude expose native project commands; Codex uses plugin packaging plus `AGENTS.md` fallback; Gemini uses extension packaging plus `GEMINI.md` context — [runtime-command-surface.md](runtime-command-surface.md).
 
-## Shell fallback
-
-The installer also supports `aih.sh` / `install.sh` for CI and environments without Node. Historical problem: too many flags on one line:
-
-## Problem (shell advanced)
-
-The installer worked, but the user-facing command was exposing too many internal switches:
+## Primary commands
 
 ```bash
-sh install.sh install --runtime cursor --scope project --visibility private --ignore-strategy info-exclude --init-harness --yes
-```
-
-That is useful for debugging, not as the main adoption UX.
-
-## Simple Commands
-
-```bash
-sh aih.sh install
-sh aih.sh update
-sh aih.sh uninstall
-sh aih.sh uninstall --all
-sh aih.sh status
-sh aih.sh doctor
-```
-
-Remote one-line usage should also be simple:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- update
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- uninstall
+npx ai-engineering-harness install
+npx ai-engineering-harness update
+npx ai-engineering-harness uninstall
+npx ai-engineering-harness uninstall --all
+npx ai-engineering-harness status
+npx ai-engineering-harness doctor
 ```
 
 Windows notes:
 
-- In Windows PowerShell, `curl` is usually an alias for `Invoke-WebRequest`, so `curl -fsSL ...` fails there.
-- Use `curl.exe` if you want the shell pipeline form from PowerShell, or use `aih.ps1` for a copy-paste-friendly bootstrap.
-- Use Git Bash or WSL when you want a native `sh` environment.
-- `aih.ps1` is the experimental PowerShell bootstrap wrapper for `install`, `status`, `doctor`, `update`, `uninstall`, and `help`.
-- Pass `-Yes` (maps to `--yes`) to skip the `Proceed? [y/N]` confirmation in non-interactive copy-paste flows.
+- Primary lifecycle commands run natively on Node.js; PowerShell can use `npx ai-engineering-harness ...` directly.
+- In Windows PowerShell, `curl` is usually an alias for `Invoke-WebRequest`, so shell pipeline examples need `curl.exe`.
 - Private git hygiene (`.git/info/exclude`) requires the target to be a Git repo; run `git init` or install inside a cloned repository.
 - PowerShell profile warnings (for example PSReadLine prediction) are unrelated to ai-engineering-harness.
 
 Windows PowerShell examples:
 
 ```powershell
-curl.exe -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install --runtime cursor --yes
-irm https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.ps1 | iex
-```
-
-Recommended explicit PowerShell execution:
-
-```powershell
-$script = "$env:TEMP\aih.ps1"
-Invoke-WebRequest https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.ps1 -OutFile $script
-powershell -ExecutionPolicy Bypass -File $script install -Runtime cursor -Yes
-powershell -ExecutionPolicy Bypass -File $script status
-powershell -ExecutionPolicy Bypass -File $script doctor
+npx ai-engineering-harness install --provider cursor --yes
 ```
 
 Dogfood evidence: [scenario-f1-simple-cli-lifecycle.md](pack-dogfood-reports/scenario-f1-simple-cli-lifecycle.md).
@@ -81,7 +45,7 @@ Dogfood evidence: [scenario-f1-simple-cli-lifecycle.md](pack-dogfood-reports/sce
 ### Install
 
 - target: current directory
-- runtime: auto-detect
+- provider: auto-detect
 - scope: project
 - visibility: private
 - ignore strategy: info-exclude
@@ -91,7 +55,7 @@ Dogfood evidence: [scenario-f1-simple-cli-lifecycle.md](pack-dogfood-reports/sce
 ### Update
 
 - target: current directory
-- runtime: auto-detect from installed runtime files
+- provider: auto-detect from installed runtime files
 - scope: project
 - refresh `.ai-harness/`
 - refresh runtime entrypoint
@@ -100,7 +64,7 @@ Dogfood evidence: [scenario-f1-simple-cli-lifecycle.md](pack-dogfood-reports/sce
 ### Uninstall
 
 - target: current directory
-- runtime: auto-detect from installed runtime files
+- provider: auto-detect from installed runtime files
 - scope: project
 - remove runtime entrypoint
 - remove `.git/info/exclude` harness block when present
@@ -124,17 +88,15 @@ Install-time provider detection uses project hints such as `.cursor/`, `.claude/
 
 If no provider can be detected:
 
-- interactive shell: prompt for provider
-- non-interactive shell: fail and require `--runtime`
+- interactive CLI: prompt for provider
+- non-interactive CLI: fail and require `--provider`
 
 Manual fallback is still supported explicitly with `--runtime manual` or `--legacy-root`, but it is no longer the default non-interactive path.
 
 ## Entrypoints
 
 - `npx ai-engineering-harness` / `bin/aih.js` — **primary** interactive CLI (v0.11.x)
-- `aih.sh` — lifecycle backend and shell fallback
-- `install.sh` — compatibility wrapper around `aih.sh`
-- `aih.ps1` — experimental Windows bootstrap (downloads `aih.sh`, requires `sh`)
+- legacy shell bootstrap docs live in the archive
 - npm bin aliases: `ai-engineering-harness`, `aih`
 
 ## Install
@@ -187,40 +149,25 @@ Without `--visibility`, update does not change `.git/info/exclude`. With `--visi
 
 ## Advanced Flags
 
-Advanced flags remain supported:
+Primary CLI flags:
 
-- `--runtime`
+- `--provider`
+- `--runtime` (deprecated alias)
 - `--scope`
 - `--visibility`
-- `--ignore-strategy`
-- `--init-harness`
-- `--install-cache`
-- `--no-install-cache`
-- `--remove-cache`
-- `--remove-state`
 - `--target`
-- `--ref`
 - `--dry-run`
 - `--yes`
-- `--force`
-
-## Backward Compatibility
-
-Existing explicit commands still work:
-
-```bash
-sh aih.sh install --runtime cursor --scope project --visibility private --ignore-strategy info-exclude --init-harness --yes
-```
-
-The simplified CLI is an additive UX improvement, not a breaking change.
+- `--verbose`
+- `--all`
 
 ## Examples
 
 ```bash
-sh aih.sh install
-sh aih.sh update
-sh aih.sh uninstall
-sh aih.sh uninstall --all
-sh aih.sh status
-sh aih.sh doctor
+npx ai-engineering-harness install
+npx ai-engineering-harness update
+npx ai-engineering-harness uninstall
+npx ai-engineering-harness uninstall --all
+npx ai-engineering-harness status
+npx ai-engineering-harness doctor
 ```

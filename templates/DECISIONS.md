@@ -12,12 +12,30 @@
 
 ### DECISION-000
 
-- Date:
+- Date: YYYY-MM-DD
 - Status: proposed | accepted | superseded
-- Area:
-- Decision:
-- Why this decision exists:
-- What changes if revisited:
-- Related hazards:
-- Verification impact:
-- Follow-up:
+- Area: runtime | docs | release | tooling
+- Decision: one-sentence statement
+- Rationale: what pain, constraint, or tradeoff this decision resolves
+- Alternatives considered: rejected options and why they were not chosen
+- Consequences: follow-on costs, migration impact, or rollback expectations
+- What changes if revisited: migration cost, breaking surface, or rollback path
+- Related hazards: `HAZARD-###`, if any
+- Verification impact: what checks become required
+- Follow-up: owner + next review date
+
+## Example
+
+### DECISION-001
+
+- Date: 2026-06-07
+- Status: accepted
+- Area: install
+- Decision: Keep provider-specific entrypoints project-local instead of copying root-level command packs.
+- Rationale: avoids stale duplicated surfaces and keeps uninstall predictable.
+- Alternatives considered: keeping the flat-root fallback or provider-specific shims for backward compatibility.
+- Consequences: install, update, and uninstall stay smaller, but manual fallback must stay AGENTS-based.
+- What changes if revisited: install, update, and uninstall contracts and docs must change together.
+- Related hazards: `HAZARD-002`
+- Verification impact: install smoke tests and package surface checks must pass.
+- Follow-up: review after the next release cut.

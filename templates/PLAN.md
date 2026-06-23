@@ -39,6 +39,12 @@
 
 -
 
+## Delta Spec
+
+- Use `templates/CHANGE_SPEC.md` when the work changes behavior, contracts, or user-visible workflow.
+- Capture only the requirements that are added, modified, or removed.
+- Keep the delta spec linked to the plan so ship and remember can fold it into durable memory when approved.
+
 ## Tasks
 
 - Task:

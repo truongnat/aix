@@ -9,6 +9,9 @@ Skill packs are compact routing aids that help an agent choose the most relevant
 - [Mobile](mobile.md)
 - [DevOps](devops.md)
 - [Debugging](debugging.md)
+- [Data & AI](data-ai.md)
+- [Security](security.md)
+- [Cloud](cloud.md)
 
 ## Pack Rules
 

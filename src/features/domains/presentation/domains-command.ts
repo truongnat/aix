@@ -1,0 +1,122 @@
+// Purpose: CLI handler for `aih domains`
+// Layer: presentation
+// Depends on: application, install CLI bridges
+
+import fs from "node:fs";
+import path from "node:path";
+
+import type { ParseOptions } from "../../install/presentation/cli-types";
+import { resolveTargetAbs } from "../../install/presentation/cli-legacy";
+import { mergeStackSignals, parseProjectAnalysis } from "../../../shared/stack-detect";
+import type { StackScanResult } from "../../../shared/stack-detect";
+import { stackScanner } from "../../scan/infrastructure/stack-scanner";
+import { writeDomainSkillSurface } from "../application/domain-skill-generation";
+
+function readAnalysisInput(options: ParseOptions): string | null {
+  if (options.analysisFile) {
+    const resolved = path.isAbsolute(options.analysisFile)
+      ? options.analysisFile
+      : path.resolve(process.cwd(), options.analysisFile);
+    if (!fs.existsSync(resolved)) {
+      throw new Error(`Domain analysis file does not exist: ${resolved}`);
+    }
+    return fs.readFileSync(resolved, "utf8");
+  }
+
+  if (!process.stdin.isTTY) {
+    const input = fs.readFileSync(0, "utf8");
+    if (input.trim()) return input;
+  }
+
+  return null;
+}
+
+function printWriteResult(
+  selectedDomains: string[],
+  result: { created: string[]; overwritten: string[]; skipped: string[] }
+): void {
+  const lines: string[] = [];
+  lines.push(
+    `Domain skills generated for: ${selectedDomains.length ? selectedDomains.join(", ") : "(none)"}`
+  );
+  lines.push("");
+
+  const sections = [
+    ["Created", result.created],
+    ["Overwritten", result.overwritten],
+    ["Skipped", result.skipped],
+  ] as const;
+
+  for (const [label, paths] of sections) {
+    lines.push(`${label} (${paths.length})`);
+    if (paths.length === 0) {
+      lines.push("  (none)");
+    } else {
+      for (const p of paths) {
+        lines.push(`  - ${p}`);
+      }
+    }
+    lines.push("");
+  }
+
+  process.stdout.write(`${lines.join("\n").trimEnd()}\n`);
+}
+
+async function runDomainsCommand(packRoot: string, options: ParseOptions): Promise<number> {
+  const targetAbs = resolveTargetAbs(options.target);
+  if (!fs.existsSync(targetAbs)) {
+    throw new Error(`Target directory does not exist: ${targetAbs}`);
+  }
+
+  // Always run scanner for evidence/metadata
+  const scan = stackScanner(targetAbs);
+
+  const analysisText = readAnalysisInput(options);
+
+  let domains: string[];
+  let stackMeta = scan;
+
+  if (analysisText) {
+    // AI-provided analysis: merge with scanner (AI wins on domains/frameworks/languages)
+    const aiAnalysis = parseProjectAnalysis(analysisText);
+    const merged = mergeStackSignals(
+      {
+        domains: aiAnalysis.meta.domains,
+        frameworks: aiAnalysis.meta.frameworks,
+        languages: aiAnalysis.meta.languages,
+        notes: aiAnalysis.meta.notes,
+      },
+      scan
+    );
+    const mergedParsed = parseProjectAnalysis(merged);
+    domains = mergedParsed.domains;
+    stackMeta = {
+      ...scan,
+      frameworks: mergedParsed.meta.frameworks,
+      languages: mergedParsed.meta.languages,
+      notes: mergedParsed.meta.notes,
+      domains: mergedParsed.meta.domains,
+    };
+  } else {
+    // No AI analysis: use scanner domains directly
+    domains = scan.domains.map((d) => d.id);
+  }
+
+  const result = writeDomainSkillSurface(
+    packRoot,
+    targetAbs,
+    domains,
+    {
+      packRoot,
+      targetAbs,
+      dryRun: options.dryRun,
+      force: options.force,
+    },
+    stackMeta
+  );
+
+  printWriteResult(domains, result);
+  return 0;
+}
+
+export { runDomainsCommand };

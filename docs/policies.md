@@ -1,7 +1,7 @@
 # Policy Documentation
 
 **Version:** 1.0.0
-**Total Rules:** 5
+**Total Rules:** 4
 
 This documentation is automatically generated from `.harness/policies.json`. Do not edit manually.
 
@@ -96,25 +96,3 @@ Source file edits require corresponding test file with failing assertion
 **Message:** Test-first discipline violated: editing source without corresponding test
 **Questions:**
 - Create or update the corresponding test file first
-
-## Scope Guard Policies
-
-### Scope Guard
-
-**ID:** `scope-guard`
-**Severity:** warning
-
-Edits must stay within scope defined in goal artifact or plan
-
-#### Conditions
-
-| Type | Operator | Value |
-|------|----------|-------|
-| file_pattern | matches | `**` |
-
-#### Action
-
-**Type:** warn
-**Message:** Edit may be outside approved scope
-**Questions:**
-- Is this edit within the approved goal scope?

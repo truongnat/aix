@@ -32,6 +32,27 @@
 - Decisions:
 - Hazards:
 
+## Reusable Commands
+
+| Name | Command | When To Use | Notes |
+|---|---|---|---|
+| Full test suite | `npm test` | before shipping behavior changes | records build + test coverage of the public surface |
+| Package validation | `node bin/validate.js` | when docs/templates/contracts move | catches repo-surface drift |
+
+## Verification Recipes
+
+| Area | Check | Evidence To Capture | Notes |
+|---|---|---|---|
+| Install flow | dry-run + real install in temp repo | created files and warnings | cover private and shared modes |
+| Runtime docs | read rendered markdown in target | key headings and commands | verify wording, not just file existence |
+
+## Useful References
+
+| Topic | Artifact Or Doc | Why It Matters |
+|---|---|---|
+| Workflow rules | `docs/phase-discipline.md` | defines hard phase stops |
+| Session start | `docs/session-start.md` | explains state restoration contract |
+
 ## Rules
 
 - Do not write new working artifacts directly into root `.harness/` unless updating router files.

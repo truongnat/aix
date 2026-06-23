@@ -1,8 +1,10 @@
 # Codex plugin support
 
-## What failed
+## Slash command routing (current)
 
-Treating Codex like a **project-local slash command** provider (`/harness-plan` via `AGENTS.md` aliases) does not register commands in Codex. Codex uses the **OpenAI plugin model**, not `.codex/commands/` or repo slash files.
+`/harness-*` slash commands now work in Codex CLI via **UserPromptSubmit hook routing**. When a user types `/harness-plan` in Codex, the hook in `.codex/hooks/core/codex-hook-router.js` intercepts the prompt, reads the command file from `.codex/commands/harness-plan.md`, and injects it as `additionalContext`. This gives functional parity with Claude Code and Cursor without requiring Codex to support project-local slash commands natively.
+
+## Plugin model (marketplace)
 
 ## Correct Codex model
 
@@ -25,8 +27,13 @@ Official example [build-web-apps](https://github.com/openai/plugins/tree/main/pl
 | Artifact | Purpose |
 |----------|---------|
 | `.codex-plugin/plugin.json` | Codex marketplace/plugin manifest |
-| `skills/` | Plugin skill surface (repo root) |
-| `commands/` | Used by Cursor/Claude pack; **not** Codex native slash registration |
+| `skills/` | Plugin skill surface in the published package |
+| `commands/` | Optional plugin command surface |
+| `agents/` | Optional plugin subagent surface |
+| `hooks.json` | Optional plugin hook surface |
+| `agents/openai.yaml` | Optional per-skill metadata for Codex skill discovery |
+| `.codex/` | Project install Codex surface for rules, hooks, and agents |
+| `.agents/skills/` | Project install skill surface for Codex-native repository usage |
 
 ## Install flows
 
@@ -42,21 +49,39 @@ Creates:
 
 - `.ai-harness/` local command catalog
 - `.harness/` project state (if selected)
+- `.codex/` project rules, hooks, and agents
+- `.agents/skills/` Codex skill surface
 - `AGENTS.md` bootstrap pointing at harness workflows
 
-Does **not** create native `/harness-*` slash commands in Codex.
+After install, trust the project `.codex/` layer in Codex and restart the app so rules and hooks load.
 
-## Not supported
-
-- Claimed **`/harness-plan`** in Codex UI from project install
-- Fake **`.codex/commands/`** paths
-- Equating Codex with Claude `.claude/commands/*.md` behavior
+Creates `/harness-*` slash command routing via UserPromptSubmit hook + `.codex/commands/` files.
+Does **not** emit `.codex-plugin/plugin.json` into the target repo; that manifest lives in the package root and is shipped when the plugin is published.
 
 ## Future work
 
 - Submit plugin to Codex marketplace
 - Dogfood `/plugins` install in Codex CLI/App
 - Verify skill discovery and default prompts from `interface.defaultPrompt`
+
+## Build and publish
+
+Use the repo's publish bundle when you want a Codex-ready artifact without changing the project install path:
+
+```bash
+npm run build:codex-plugin
+```
+
+This writes a release bundle to `dist/codex-plugin/` with:
+
+- `.codex-plugin/plugin.json`
+- `skills/`
+- `commands/`
+- `agents/`
+- `hooks/`
+- `hooks.json`
+
+`npm run publish:codex-plugin` currently maps to the same build step. Marketplace submission remains a manual Codex `/plugins` action until OpenAI publishes a direct upload flow.
 
 ## Related
 

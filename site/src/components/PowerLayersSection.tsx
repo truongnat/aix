@@ -6,7 +6,8 @@ const LAYERS = [
   { title: 'Tool Discovery', body: 'Route to git, rg, worktree, markitdown, and code-graph fallbacks.' },
   { title: 'Hooks', body: 'Guard phase transitions and record tool or subagent evidence.' },
   { title: 'Dynamic Skills', body: 'Package reusable capability; archive session skills when done.' },
-  { title: 'Delegated Workers', body: 'Read-only reviewer, verifier, gatekeeper; bounded fixer on Claude.' },
+  { title: 'Delegated Workers', body: 'Explorer, reviewer, verifier, gatekeeper; bounded fixer with optional per-worker memory.' },
+  { title: 'Spec Layer', body: 'Opt-in delta specs (ADDED / MODIFIED / REMOVED) and a durable .harness/specs/ behavior spec.' },
   { title: 'Daily Reports', body: 'REPORT.md and PR_MESSAGE.md from real git diff and VERIFY evidence.' },
 ]
 

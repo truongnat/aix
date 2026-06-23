@@ -4,6 +4,14 @@
 
 Produce daily developer handoff notes and PR-ready message from completed work.
 
+## Decision Tree
+
+- Is verification complete enough to describe the work truthfully?
+- If no: stop and return to verify.
+- If yes: is the diff and file list inspectable?
+- If no: document the inspection gap before writing a report.
+- If yes: generate report artifacts and gate any ship-facing claims.
+
 ## Skills Used
 
 1. tool-discovery
@@ -75,6 +83,13 @@ Stop if:
 - verification is blocked
 - diff cannot be inspected
 - user approval is required for known gaps
+
+## Artifact Checklist
+
+- `REPORT.md` summarizes what changed and why.
+- `PR_MESSAGE.md` reflects the current evidence, not intended future work.
+- `CHANGE_SUMMARY.md` lists the concrete changed areas.
+- `SHIP.md` is updated only when shipping status is actually supported.
 
 ## Dispose Rules
 

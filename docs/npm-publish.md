@@ -10,8 +10,7 @@
 
 Controlled by `files` in `package.json`:
 
-- `bin/`, `lib/`, `runtime/`, capability dirs, `docs/`
-- `aih.sh`, `install.sh`, `aih.ps1`, install scripts
+- `bin/`, `dist/`, `runtime/`, capability dirs, `docs/`
 - `README.md`, `PACK.md`, `LICENSE`, etc.
 
 **Not** included: `test/`, `examples/`, local dogfood directories.
@@ -30,12 +29,20 @@ If npm reports `You cannot publish over the previously published versions`, the 
 ```bash
 node bin/validate.js
 npm test
-npm version patch   # or minor, as appropriate
 npm pack --dry-run
 npm publish --dry-run
-npm publish --access public --auth-type=web
 npm view ai-engineering-harness version
 ```
+
+Version bumps and real npm publication are owned by the main-branch
+`changesets` release workflow:
+
+- `.github/workflows/release.yml` runs `changesets/action`
+- `npm run release` publishes with `npm publish --provenance`
+- `.github/workflows/publish.yml` is limited to the GitHub Release on `v*` tags
+
+Use the manual commands above as preflight checks, dry-runs, and emergency
+maintainer fallback. They are no longer the primary publish path.
 
 Smoke test:
 
@@ -55,6 +62,8 @@ GitHub specifier (pre-publish or pinned dev):
 npx --yes github:truongnat/ai-engineering-harness install
 ```
 
-## Do not publish automatically from CI
+## Release ownership
 
-Publishing is a manual maintainer step after validation and version bump.
+- npm publication is automated from the main-branch release workflow
+- GitHub Releases are created from the tag workflow
+- Maintainers still run validation and dry-run checks locally before merging a release PR

@@ -37,6 +37,39 @@ Inspect changes for bugs, regressions, risk, and missing verification before wor
 - Review the change against requirements, not just style.
 - Missing verification is a finding.
 
+## Reasoning Procedure
+
+1. Restate the review target and the approved scope.
+2. Check the diff, plan, and evidence against the requirements.
+3. Derive concrete findings or confirm that none are present.
+4. Stop and report blocked if the review cannot be scoped safely.
+
+## Action Loop
+
+- Thought: identify the next artifact or risk surface to inspect.
+- Action: read the diff, review context, or supporting evidence.
+- Observation: record the real finding or lack of finding.
+- Repeat until the review is complete.
+
+## Examples
+
+### Example 1
+
+Input: The prompt upgrade passes validation but still has boilerplate examples.
+
+Output:
+- Findings: important - skills/*/SKILL.md examples are not skill-specific enough.
+- Open questions: should the conformance eval be run against the actual example text or the rendered output?
+- Residual risk: medium until the content pass is made concrete.
+
+### Example 2
+
+Input: The change is blocked because the scope is still unclear.
+
+Output:
+- Findings: none yet.
+- Open questions: missing review context.
+- Residual risk: unable to assess until the diff is inspectable.
 ## Output Contract
 
 This skill must produce:

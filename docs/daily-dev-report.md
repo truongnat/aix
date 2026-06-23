@@ -58,8 +58,16 @@ Before writing report artifacts, read:
 Preferred helper:
 
 ```bash
-node scripts/generate-report-context.js --json
+node scripts/generate-report-context.js --json --templates
 ```
+
+Template discovery (project before harness):
+
+```bash
+node scripts/discover-report-templates.js --write
+```
+
+Scans, in order: `.github/pull_request_template.md`, `.github/PULL_REQUEST_TEMPLATE/`, `.gitlab/merge_request_templates/`, and other provider paths — then falls back to `templates/PR_MESSAGE.md`.
 
 With a known base branch:
 

@@ -1,6 +1,6 @@
 # TypeScript & JSDoc Support
 
-The `ai-engineering-harness` package includes full TypeScript type definitions for the public API.
+The `ai-engineering-harness` package includes TypeScript type definitions for the public API surface.
 
 ## Installation
 
@@ -27,13 +27,15 @@ async function run() {
 }
 ```
 
+The package root exports shared types only. Runtime entrypoints are available through explicit subpaths such as `ai-engineering-harness/cli-main`, `ai-engineering-harness/file-operations`, and `ai-engineering-harness/validate`.
+
 ## JSDoc Support
 
-All public API functions include JSDoc comments for inline documentation:
+Runtime entrypoints include JSDoc comments for inline documentation:
 
 ```javascript
 // JavaScript with JSDoc
-const { main } = require('ai-engineering-harness/lib/cli-main');
+const { main } = require('ai-engineering-harness/cli-main');
 
 /**
  * Run the CLI with type hints from JSDoc
@@ -55,7 +57,7 @@ Most IDEs (VS Code, WebStorm, Sublime, etc.) provide autocomplete based on:
 ### CLI Entry Point
 
 ```javascript
-const { main } = require('ai-engineering-harness/lib/cli-main');
+const { main } = require('ai-engineering-harness/cli-main');
 
 // Run the CLI programmatically
 const exitCode = await main(process.argv, __filename);
@@ -70,7 +72,7 @@ const exitCode = await main(process.argv, __filename);
 ### File Operations
 
 ```javascript
-const { ensureDirectory, writeFileWithDryRun } = require('ai-engineering-harness/lib/file-operations');
+const { ensureDirectory, writeFileWithDryRun } = require('ai-engineering-harness/file-operations');
 
 // Create directory safely
 ensureDirectory('./output', false); // Create
@@ -86,15 +88,21 @@ writeFileWithDryRun('./output.md', 'content', {
 ### Validation
 
 ```javascript
-const { main: validate } = require('ai-engineering-harness/lib/validate');
+const {
+  validateHarnessRepository,
+  validateTargetProfile,
+} = require('ai-engineering-harness/validate');
 
-// Validate harness or target repository
-validate();
+// Validate the harness repository
+const harnessFailures = validateHarnessRepository(process.cwd());
+
+// Validate a target profile
+const targetFailures = validateTargetProfile('/path/to/project');
 ```
 
 ## Type Definitions
 
-Core types are exported from `index.d.ts`:
+Shared types are exported from the package root in `index.d.ts`:
 
 ### `InstallOptions`
 
@@ -160,7 +168,8 @@ interface ProviderCommandSupport {
 
 1. Ensure `index.d.ts` is in the package root
 2. Verify `package.json` has `"types": "./index.d.ts"`
-3. Restart your IDE's TypeScript server (Cmd+Shift+P → "TypeScript: Reload Projects")
+3. Use the exported runtime subpaths (`/cli-main`, `/file-operations`, `/validate`) instead of deep imports
+4. Restart your IDE's TypeScript server (Cmd+Shift+P → "TypeScript: Reload Projects")
 
 ### JSDoc comments not showing on hover
 
@@ -182,7 +191,8 @@ Type definitions are maintained in `index.d.ts` and JSDoc comments in the source
 When adding new public APIs:
 
 1. Add JSDoc comments with `@param`, `@returns`, `@example`
-2. Update `index.d.ts` with the new types
-3. Run tests to ensure backward compatibility
+2. Update `index.d.ts` with the new root types or subpath module declarations
+3. Update `package.json` `"exports"` when adding a new runtime entrypoint
+4. Run tests to ensure backward compatibility
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for details.

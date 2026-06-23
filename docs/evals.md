@@ -40,5 +40,6 @@ Each run writes artifacts under `artifacts/runs/<run-id>/`:
 | --- | --- | --- |
 | `sample-bugfix` | bugfix | Fix a broken helper; with-harness passes tests |
 | `example-health-report` | workflow-discipline | Generate a health report artifact |
+| `sample-verify-conformance` | workflow-discipline | Generate VERIFY.md with concrete evidence and no boilerplate |
 
 See [evals/README.md](../evals/README.md) for contributor reference.

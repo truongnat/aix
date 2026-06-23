@@ -2,35 +2,29 @@
 
 ## Purpose
 
-Document **project-local** `.harness/` scaffolding via [install.sh](../install.sh). This is shared across all runtimes before runtime-native install modes land.
+Document **project-local** `.harness/` scaffolding for the primary Node.js CLI.
 
 ## Project Scope Only
 
 - `.harness/` is created **inside the target repository** only.
-- **Global** scope with `--init-harness` is **rejected**.
+- **Global** scope init is **rejected**.
 - There is **no** `~/.harness/` or shared global harness state.
 
 ## Commands
 
-Dry-run (no writes, no network for non-manual runtimes):
+Dry-run (no writes):
 
 ```bash
-sh install.sh --runtime claude --scope project --target . --init-harness --dry-run --yes
+npx ai-engineering-harness install --provider claude --scope project --target . --dry-run --yes
 ```
 
 Write scaffold:
 
 ```bash
-sh install.sh --runtime claude --scope project --target . --init-harness --yes
+npx ai-engineering-harness install --provider claude --scope project --target . --yes
 ```
 
-Manual fallback + harness init (downloads pack, then scaffolds `.harness/`):
-
-```bash
-sh install.sh --runtime manual --target . --init-harness --dry-run
-```
-
-Non-interactive **requires** explicit `--init-harness` (no silent scaffold). Interactive **project** scope may prompt to init after scope selection.
+Primary Node CLI project installs initialize `.harness/` automatically when it is missing. There is no separate current CLI flag for `.harness/` scaffolding.
 
 ## Generated Files
 
@@ -46,17 +40,17 @@ Minimal structural skeletons (required `##` headings only):
 | `.harness/MEMORY.md` | Memory policy |
 | `.harness/goals/.gitkeep` | Goals directory placeholder |
 
-Init does **not** create runtime bootstrap files such as `AGENTS.md`. Those belong to runtime modes (e.g. `generic`, `codex`) or `manual` fallback via `bin/aih.js install`.
+Init does **not** create runtime bootstrap files such as `AGENTS.md`. Those belong to runtime modes (e.g. `generic`, `codex`) or the legacy `manual` root-copy path.
 
 To get both `.harness/` and `AGENTS.md` from `runtime/bootstrap/AGENTS.project.md`:
 
 ```bash
-sh install.sh --runtime generic --scope project --target . --init-harness --yes
+npx ai-engineering-harness install --provider generic --scope project --target . --yes
 # or
-sh install.sh --runtime codex --scope project --target . --init-harness --yes
+npx ai-engineering-harness install --provider codex --scope project --target . --yes
 ```
 
-Runtimes that do not write `AGENTS.md` (e.g. `cursor`, `claude`) require `AGENTS.md` from another runtime or `manual` install before `--profile-only` validation passes.
+Runtimes that do not write `AGENTS.md` (e.g. `cursor`, `claude`) require `AGENTS.md` from another runtime or the legacy `manual` install before `--profile-only` validation passes.
 
 Fill content after init. Do not store secrets in `.harness/`.
 
@@ -74,12 +68,12 @@ Prints `WOULD CREATE`, `WOULD SKIP`, or `WOULD OVERWRITE` per file. No filesyste
 
 ## Force
 
-`--force` applies to `.harness/` profile files only. Runtime installers and the legacy manual fallback respect `--force` for their own files (including `AGENTS.md` when the runtime writes it).
+`--force` applies to `.harness/` profile files only. Runtime installers and the legacy manual root-copy path respect `--force` for their own files (including `AGENTS.md` when the runtime writes it).
 
 ## Global Scope Rejection
 
 ```bash
-sh install.sh --runtime claude --scope global --init-harness --yes
+npx ai-engineering-harness install --provider claude --scope global --yes
 ```
 
 Exits with:
@@ -106,10 +100,9 @@ Checks `.harness/` paths and required headings per [frozen-target-profile-contra
 
 ## Commit Policy
 
-**v0.9.1:** Installer does **not** modify ignore files. **v0.9.2:** project **private** mode prefers `.git/info/exclude` (not tracked); `.gitignore` only with `--ignore-strategy gitignore` — [git-hygiene-policy.md](git-hygiene-policy.md). See [project-state-policy.md](project-state-policy.md).
+Project **private** mode prefers `.git/info/exclude` (not tracked). The primary Node CLI handles ignore strategy internally. See [git-hygiene-policy.md](git-hygiene-policy.md) and [project-state-policy.md](project-state-policy.md).
 
 ## Related
 
 - [interactive-installer-design.md](interactive-installer-design.md)
-- [install-sh-usage.md](install-sh-usage.md)
 - [project-state-policy.md](project-state-policy.md)

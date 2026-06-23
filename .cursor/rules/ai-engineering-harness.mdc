@@ -1,0 +1,147 @@
+---
+description: ai-engineering-harness core operating discipline
+alwaysApply: true
+---
+
+# ai-engineering-harness
+
+Read `.ai-harness/activation.md` before acting.
+Read `.harness/STATE.md`, the active goal, and the current plan before implementing.
+Read `.ai-harness/agent-system/SYSTEM_PROMPT.md` and `.ai-harness/agent-system/RESPONSE_CONTRACT.md` before using the harness.
+
+Shared fragments:
+## Phase Discipline
+
+Do not skip phases.
+
+- Plan before run.
+- Approved plan before implementation.
+- Verification before ship.
+- Evidence before success claim.
+- Remember only after shipped result, failed attempt, or durable lesson.
+
+Read `.harness/STATE.md` and the active session under `.harness/sessions/` before changing phase.
+
+## Blocked Behavior
+
+Applies to **gated execution phases** (`harness-plan`, `harness-run`, `harness-verify`, `harness-ship`, `harness-remember`) — not to normal `harness-discuss` exploration.
+
+For discuss-phase questions (feature choice, scope, tradeoffs), use interactive discussion per `rules/core/discussion.md` instead of `### Blocked`.
+
+If required input, approval, evidence, or phase preconditions are missing:
+
+1. Stop.
+2. Ask the minimum required question.
+3. Do not continue after asking.
+4. Return a blocked output.
+
+After asking a blocking question, do not continue implementation, verification, shipping, or memory updates in the same turn.
+
+## Interactive Discussion (Discuss Phase)
+
+`harness-discuss` is a **collaborative, multi-turn** phase. It is not a hard gate stop.
+
+When goal, scope, or approach is still forming:
+
+1. Synthesize what you already know from artifacts first.
+2. For deliberative decisions (feature, approach, solution), use **three-option scoring** per `rules/core/option-scoring.md` before asking the user to choose.
+3. Ask the **minimum** targeted question(s) needed to continue.
+4. Read `.ai-harness/provider-interaction.md` and **invoke** the listed structured choice tool for this install's provider (`AskQuestion` on Cursor, `AskUserQuestion` on Claude Code).
+5. Wait for the tool result, then continue discuss — update `DISCUSSION.md` and ask the next question or recommend `harness-plan`.
+6. Use markdown-only A/B/C prompts only when no structured tool is listed or the tool is absent from the active tool list.
+
+Do **not** use `### Blocked` for normal discuss clarifications (feature choice, scope tradeoffs, approach preference).
+
+Use `### Blocked` in discuss only when:
+
+- no goal or artifact exists and Session Start has not run
+- the user must choose between materially different directions and explicit approval is required before planning
+- required product judgment cannot proceed even after one round of questions
+
+After the user answers a discuss question, **continue the discuss workflow** in the next turn. Do not treat the question as a terminal stop.
+
+## Three-Option Scoring (Deliberative Decisions)
+
+When `harness-discuss` (or Session Start routing) needs a **deliberative** choice — feature direction, approach, tradeoff, or solution pick — use exactly **3 options** with a scored comparison before asking the user to choose.
+
+### When to apply
+
+- feature or scope choice
+- architecture or implementation approach
+- review merge / direction decisions with real alternatives
+- any question that is not a simple yes/no gate
+
+### Scoring dimensions (each 1–5)
+
+| Dimension | 5 means | 1 means |
+|-----------|---------|---------|
+| **Value** | High impact toward the stated goal | Low or unclear impact |
+| **Effort fit** | Low effort / fast to ship | High effort / large unknowns |
+| **Risk** | Low regression or operational risk | High blast radius or fragility |
+| **Fit** | Matches repo constraints and conventions | Poor fit with stack, harness, or policy |
+
+**Total** = sum of the four scores (max 20).
+
+### Required output shape
+
+1. Restate the decision in one sentence.
+2. Present **exactly 3** distinct options (add a hybrid or defer option if only two are obvious).
+3. Show a scoring table with all four dimensions per option.
+4. State **Recommendation** = highest total; explain ties or close calls.
+5. Read `.ai-harness/provider-interaction.md` and **call** the provider's structured choice tool with 3 labels (option name + total score). Markdown-only menus are fallback.
+6. After the tool returns the user's pick, record the choice and scores in `DISCUSSION.md`.
+
+### Example table
+
+| Option | Summary | Value | Effort fit | Risk | Fit | **Total** |
+|--------|---------|------:|-----------:|-----:|----:|----------:|
+| A | … | 4 | 3 | 4 | 5 | **16** |
+| B | … | 5 | 2 | 3 | 4 | **14** |
+| C | … | 3 | 5 | 5 | 3 | **16** |
+
+Do not ask the user to choose without scores unless they explicitly request an unscored brainstorm.
+
+## Provider Interaction Tools
+
+Markdown-only option lists are **fallback**, not the primary path.
+
+Before deliberative discuss or three-option scoring:
+
+1. Read `.ai-harness/provider-interaction.md` (install-generated for this repo's provider).
+2. If a **Structured user choice tool** is listed, **invoke that tool** after the scoring table.
+3. Continue `harness-discuss` after the tool returns the user's answer.
+4. Use chat fallback only when the tool is absent from the active tool list.
+
+| Provider | Structured choice tool |
+|----------|------------------------|
+| Cursor | `AskQuestion` |
+| Claude Code | `AskUserQuestion` |
+| Codex | chat fallback (no verified tool in v1) |
+| Gemini | chat fallback (no verified tool in v1) |
+
+Do not end the turn with an unscored markdown menu when the provider tool is available.
+
+Loop: harness-start -> harness-discuss -> harness-plan -> harness-run -> harness-verify -> harness-ship -> harness-remember
+
+Default chaining: when ship status is `shipped`, continue with `harness-remember` in the same turn unless the user requests ship-only.
+
+## Session Start And Domain Bootstrap
+
+On a new chat or when session state is unknown, run `harness-start` before other harness commands.
+
+If `.harness/config.json` has `domains: []` and `.harness/skills/` has no generated domain directories:
+
+1. Announce codebase analysis visibly to the user.
+2. Run domain analysis per `prompt-templates/domain-analysis.md`.
+3. Generate skills with `npx ai-engineering-harness domains --analysis-file <path>`.
+4. Report generated domains and files before continuing.
+
+Routing:
+- Use `.cursor/commands/` for native project commands.
+- Use `.ai-harness/runtime-commands/` as the local catalog mirror.
+
+Never implement without an approved plan.
+Never ship without evidence in `VERIFY.md`.
+Never write secrets into `.harness/`.
+
+See `ai-engineering-harness-detail.mdc` for the on-demand routing guide.

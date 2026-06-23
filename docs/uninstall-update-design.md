@@ -41,6 +41,11 @@ Update does **not**:
 - Change `.gitignore`
 - Support manual runtime update
 
+For repositories created by the older shell skeleton writer, a later TypeScript-backed install or
+re-init may show `.harness/*.md` files as overwrite candidates. The current generator preserves the
+trailing newline on markdown files; the shell path used command substitution and dropped that byte.
+Treat this as a migration diff, not a semantic content change.
+
 ## Manifest / Ownership Tracking
 
 ### v0.9.2 design (minimal)

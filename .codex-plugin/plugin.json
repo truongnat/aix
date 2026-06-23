@@ -1,6 +1,6 @@
 {
   "name": "ai-engineering-harness",
-  "version": "1.0.0",
+  "version": "1.2.3",
   "description": "Project-scoped engineering workflows for AI coding agents: planning, verification, shipping, and memory.",
   "author": {
     "name": "truongnat",
@@ -19,6 +19,9 @@
     "harness"
   ],
   "skills": "./skills/",
+  "commands": "./commands/",
+  "agents": "./agents/",
+  "hooks": "./hooks.json",
   "interface": {
     "displayName": "AI Engineering Harness",
     "shortDescription": "Planning, verification, and shipping workflows for coding agents",

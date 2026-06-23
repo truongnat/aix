@@ -20,6 +20,22 @@ Read `.harness/` profile artifacts in this repository before planning or coding:
 
 ## Loop
 
-map → start → discuss → plan → run → verify → ship → remember
+start → discuss → plan → run → verify → ship → remember
+
+Use `harness-map` only for manual context refresh outside the normal loop.
+
+## Verification standard
+
+Verification is complete only when `VERIFY.md` or the active verification artifact contains fresh command output, test results, exit codes, or an explicit manual check result.
+
+Confidence is not evidence.
+
+## Forbidden
+
+- Implementing before the plan is approved
+- Shipping when verification is missing, blocked, or unproven
+- Writing secrets, tokens, customer data, or private business data into `.harness/`
+- Continuing after a blocking question without an answer
+- Claiming commands were run when they were only proposed
 
 Do not skip verification. Do not invent facts missing from artifacts.

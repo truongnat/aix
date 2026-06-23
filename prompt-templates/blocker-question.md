@@ -60,6 +60,34 @@ If required input, approval, or evidence is missing, return only `### Blocked`.
 **Stopped:**
 The workflow is paused. No further phase was executed.
 
+## Reasoning Procedure
+
+1. Restate the blocking question and the missing prerequisite.
+2. Check the current command, plan, and evidence.
+3. Derive the minimum question needed to unblock the phase.
+4. Stop once the question has been asked; do not continue the phase.
+
+## Action Loop
+
+- Thought: identify the one missing prerequisite that blocks progress.
+- Action: ask the minimum necessary question.
+- Observation: capture the user answer or confirm that the phase is still blocked.
+- Repeat only if the answer reveals a new missing prerequisite.
+
+## Examples
+
+### Example 1
+
+Input: Verification cannot continue because the required evidence is missing.
+
+Output: A single blocking question and a blocked response.
+
+### Example 2
+
+Input: The command is clear and no question is needed.
+
+Output: A non-blocking answer that stays within the current command contract.
+
 ## Placeholders
 
 - `{COMMAND}` — current command

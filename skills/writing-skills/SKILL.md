@@ -46,6 +46,38 @@ Create or revise skills so they remain clear, bounded, validated, and consistent
 - Workflows should be actionable, not philosophical.
 - Skills should plug cleanly into commands, workflows, templates, and gates.
 
+## Reasoning Procedure
+
+1. Restate the writing problem and the target audience.
+2. Check the current style, constraints, and output shape.
+3. Derive the smallest wording change that satisfies the request.
+4. Stop and report blocked if the style or target is unclear.
+
+## Action Loop
+
+- Thought: identify the next writing decision.
+- Action: inspect the existing text and the requested change.
+- Observation: record the actual wording that best fits the constraints.
+- Repeat until the output is ready.
+
+## Examples
+
+### Example 1
+
+Input: The user wants a short review note explaining the gap.
+
+Output:
+- Updated existing skill: verification/prompt.md regained the missing operational hook guidance.
+- Preserved required headings: yes.
+- Validation rules updated: yes, if the conformance eval needs a new required check.
+
+### Example 2
+
+Input: The requested skill duplicates an existing capability.
+
+Output:
+- Blocked: prefer updating the existing skill instead of creating a duplicate.
+- Needed next step: justify the new skill boundary or merge the change into the existing one.
 ## Output Contract
 
 This skill must produce:

@@ -1,0 +1,35 @@
+---
+description: ai-engineering-harness cursor routing and capability guide
+alwaysApply: false
+---
+
+# ai-engineering-harness detail
+
+## Capability Source
+
+Read `.ai-harness/activation.md` first.
+Read `.ai-harness/agent-system/SYSTEM_PROMPT.md` and `.ai-harness/agent-system/RESPONSE_CONTRACT.md` before using the harness.
+Use `.ai-harness/runtime-commands/` as the local catalog mirror when available.
+Use `.ai-harness/commands/` and `.ai-harness/prompt-templates/` for command behavior.
+
+## Provider Capabilities
+
+| Capability | Status |
+|---|---|
+| Slash commands | fallback only |
+| Subagents | rules-based |
+| Lifecycle hooks | manual setup |
+| Path-scoped rules | native |
+
+## Path-Scoped Rules
+
+Use `.claude/rules/` for files that should only load when matching paths are in context.
+Use this detail file for onboarding, setup, and provider questions that do not belong in the always-loaded core rule.
+
+## Forbidden
+
+- Implementing without a clear goal and approved plan
+- Shipping without evidence in `VERIFY.md`
+- Writing secrets or private business data into `.harness/`
+- Continuing after a blocking question
+- Inventing command capabilities that are not present in this repo

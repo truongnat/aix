@@ -45,4 +45,5 @@ Use this checklist when adopting `ai-engineering-harness` in another repository.
 
 - [ ] Run `node bin/validate.js`
 - [ ] Review `AGENTS.md` for repository-specific adjustments if needed
-- [ ] Confirm the first real task can move through `Map -> Start -> Discuss -> Plan -> Run -> Verify -> Ship -> Remember`
+- [ ] Confirm the first real task can move through `Session Start -> Discuss -> Plan -> Run -> Verify -> Ship -> Remember`
+- [ ] Treat `Map` as a compatibility/manual context-refresh command, not part of the default loop

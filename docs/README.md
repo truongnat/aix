@@ -6,7 +6,7 @@ Welcome! User-facing documentation for **ai-engineering-harness**, organized wit
 | --- | --- | --- |
 | **Tutorial** | Learn by doing | [first-5-minutes.md](first-5-minutes.md) |
 | **How-to** | Solve a task | [adoption-guide.md](adoption-guide.md), [harness-init-usage.md](harness-init-usage.md) |
-| **Reference** | Facts & contracts | [harness-command-behavior.md](harness-command-behavior.md), [compatibility-matrix.md](compatibility-matrix.md) |
+| **Reference** | Facts & contracts | [feature-catalog.md](feature-catalog.md), [harness-command-behavior.md](harness-command-behavior.md), [compatibility-matrix.md](compatibility-matrix.md) |
 | **Explanation** | Concepts & design | [concepts.md](concepts.md), [architecture.md](architecture.md), [architecture/](architecture/) |
 
 ## Quick Navigation
@@ -15,6 +15,7 @@ Welcome! User-facing documentation for **ai-engineering-harness**, organized wit
 - **[Adoption Guide](adoption-guide.md)** — How to install and set up the harness in your project
 - **[Concepts](concepts.md)** — Core terminology: commands, skills, workflows, patterns, gates
 - **[Architecture](architecture.md)** — System design and component relationships
+- **[Feature Catalog](feature-catalog.md)** — Diagrams and detailed reports for every major feature
 
 ### 📖 Using the Harness
 - **[Phase Discipline Rules](phase-discipline.md)** ⭐ **START HERE** — The canonical source for phase discipline, preconditions, hard stops, and evidence standards
@@ -42,6 +43,8 @@ Welcome! User-facing documentation for **ai-engineering-harness**, organized wit
 - **[Tool Discovery & Routing](tool-discovery-and-routing.md)** — How the harness discovers and routes to available tools
 - **[Provider Rule Configuration](provider-rule-configuration.md)** — Customizing rules per provider
 - **[Hooks & Skills Layer](hooks-and-skills-layer.md)** — Extensibility and automation
+- **[Context Engineering](context-engineering.md)** — Compaction, just-in-time retrieval, and delta-spec discipline
+- **[Token Budget](token-budget.md)** — Why the harness stays lightweight by design
 - **[Quality Gates Matrix](quality-gates-matrix.md)** — Entry/exit criteria per phase
 - **[Delegated Workers](delegated-workers.md)** — Claude-native subagent framework
 
@@ -53,13 +56,16 @@ Welcome! User-facing documentation for **ai-engineering-harness**, organized wit
 
 ### 📦 Installation & Deployment
 - **[Install Command Model](install-command-model.md)** — How `npx ai-engineering-harness install` works
-- **[Runtime-Native Installation](runtime-native-install.md)** — The `install.sh` backend
+- **[Runtime-Native Installation](runtime-native-install.md)** — Provider-specific install payloads and follow-up actions
 - **[Consumption Modes](consumption-modes.md)** — Different ways to use the harness
 
 ### 📚 Release Notes & History
 | Version | Notes |
 |---|---|
-| **v1.0.1** | [Release Notes](v1.0.1-release-notes.md) |
+| **v1.2.3** | [Release Notes](v1.2.3-release-notes.md) |
+| v1.2.2 | [Release Notes](v1.2.2-release-notes.md) |
+| v1.2.0 | [Release Notes](v1.2.0-release-notes.md) |
+| v1.1.0 | [Release Notes](v1.1.0-release-notes.md) |
 | v1.0.0 | [Release Notes](v1.0.0-release-notes.md) |
 | v0.x archive | [internal/archive/v0/](internal/archive/v0/) |
 | [Older versions...](versioning.md) | See version history |

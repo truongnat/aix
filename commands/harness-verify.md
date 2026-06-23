@@ -1,3 +1,9 @@
+---
+allowed_tools:
+  - Read
+  - Bash(git diff, git log, npm test, tsc --noEmit, node bin/validate.js)
+  - Grep
+---
 # harness-verify
 
 ## Purpose
@@ -16,6 +22,7 @@ Read:
 
 - `.harness/STATE.md`
 - active session current `PLAN-*.md`
+- active session `CHANGE_SPEC.md` if present
 - active session `GOAL.md`
 - active session `TASKS.md` if present
 - `.harness/HAZARDS.md` if present
@@ -81,6 +88,12 @@ Use this command doc as the reference contract for phase behavior and artifact d
 - use `rg` before `grep` when locating evidence or changed behavior
 - use [CodeGraph](https://github.com/colbymchenry/codegraph) (`codegraph`) when installed and indexed; otherwise fall back to file tree plus search
 - if verification requires a missing capability with no safe fallback, stop and return `Blocked`
+
+## Current Working State
+
+!`git diff --stat HEAD`
+
+!`git status --short`
 
 ## Step-By-Step Workflow
 

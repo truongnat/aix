@@ -1,5 +1,61 @@
 # Changelog
 
+## 1.1.4
+
+### Patch Changes
+
+- Remove the redundant `init` command and make `install` the single bootstrap path.
+- Fix non-git install fallback, provider prompt gating, and `flow` / install command routing.
+- Expand the Codex-native install surface with agents, hooks, domain generation, and plugin build workflow.
+- Fix CI regressions across lint, Node 18 wizard flows, and Windows smoke install.
+
+## 1.1.3
+
+### Patch Changes
+
+- Improve provider binary detection, make project installs fail fast without git, and align update, uninstall, status, and doctor with the recorded install manifest.
+
+## 1.1.2
+
+### Patch Changes
+
+- Refine domain bootstrap UX by removing interactive domain prompts from `init` and `install`, adding the headless `domains` command, tightening the session-start bootstrap guidance, and fixing duplicate Cursor rule output during project installs.
+
+## 1.1.1
+
+### Patch Changes
+
+- Add a headless `domains` command, remove interactive domain prompts from `init` and `install`,
+  and update session-start guidance for automatic domain bootstrap.
+
+## [1.1.0] - 2026-06-08
+
+### Added
+
+- agent-driven domain skill generation: `init` analysis gate (`prompt-templates/domain-analysis.md`, `lib/stack-detect.ts`) plus deterministic generation into `.harness/skills/`, `.harness/SKILLS.md`, `.harness/WORKFLOW.md`, and path-scoped domain rules for Claude, Cursor, Codex, and Gemini
+- spec-driven layer (opt-in): `templates/CHANGE_SPEC.md` delta specs and optional `.harness/specs/`
+- delegated-worker memory (opt-in): `.harness/memory/workers/` with bounded notes
+- explorer worker and `docs/context-engineering.md` doctrine; `docs/token-budget.md`
+- prompt-quality standard (`skills/PROMPT_FORMAT_STANDARD.md`) with modular Few-shot/CoT/ReAct format enforced across skills and dispatch prompts, plus a conformance eval
+- eval harness maturity (A/B runner, LLM judge, telemetry insights) and policy engine G0–G3
+- `v1.1.0` release notes — [v1.1.0-release-notes.md](docs/v1.1.0-release-notes.md)
+
+### Changed
+
+- backend lifecycle (install, uninstall, update, doctor, skeleton, git-hygiene) ported to in-process TypeScript
+- generated domain skills conform to the full core skill heading contract
+
+### Fixed
+
+- core review findings across git hygiene, evals, and policy enforcement
+- keep CI green when the repo no longer has root-level JavaScript files
+- build before contract validation in the tag-triggered publish workflow
+
+### Notes
+
+- `v1.1.0` is a minor release: new capabilities are backward-compatible and opt-in.
+- The core workflow loop and provider support posture are unchanged.
+
 ## [1.0.1] - 2026-06-05
 
 ### Added
@@ -224,6 +280,7 @@
 ## [Unreleased]
 
 ### Changed
+
 - Windows bootstrap docs and `aih.ps1` help: recommended PowerShell install includes `-Yes` for copy-paste flows
 - `aih.ps1` warns when private project install/update targets a non-Git directory (`.git/info/exclude` unavailable)
 - `doctor` and docs: clearer non-Git target messaging (`git init` or cloned repo)

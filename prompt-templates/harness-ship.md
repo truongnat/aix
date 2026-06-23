@@ -52,7 +52,8 @@ Your job is to prepare a ship summary only if verification evidence supports it.
 
 ### Tool Routing
 
-- Prefer `node scripts/generate-report-context.js --json` for changed files and diff stats.
+- Prefer `node scripts/generate-report-context.js --json --templates` for changed files, diff stats, and project PR template discovery.
+- Fill `PR_MESSAGE.md` using the discovered project template structure when present; otherwise harness defaults.
 - Prefer `git diff` and `git log` for release scope context.
 - Prefer `rg` before `grep` when locating evidence.
 - Treat optional tools as best-effort.
@@ -128,7 +129,40 @@ No ship summary, PR message, or report artifacts were created.
 - `CHANGE_SUMMARY.md`
 
 **Next allowed command:**
-`harness-remember`
+`harness-remember` (auto-run in the same turn when status is `shipped`)
+
+## Default Phase Chaining
+
+When status is `shipped`, continue immediately with the `harness-remember` workflow after ship artifacts are written. Do not end the turn at ship-only unless the user asked for ship-only or skip conditions in `docs/phase-discipline.md` apply.
+
+## Reasoning Procedure
+
+1. Restate the ship decision and the evidence required.
+2. Check VERIFY.md, REVIEW.md, and blocker artifacts.
+3. Derive allow, block, or defer from the evidence.
+4. Stop and report blocked if ship cannot be decided safely.
+
+## Action Loop
+
+- Thought: identify the evidence needed to decide ship.
+- Action: inspect the verification, review, and blocker artifacts.
+- Observation: record the real allow/block/defer result.
+- Repeat until the decision is clear.
+- If status is `shipped`: chain to `harness-remember` in the same turn (read `commands/harness-remember.md`).
+
+## Examples
+
+### Example 1
+
+Input: VERIFY.md is fresh and review findings are resolved.
+
+Output: Allow ship with a clear reason and next command.
+
+### Example 2
+
+Input: Verification is pending or stale.
+
+Output: Block ship with the missing evidence named explicitly.
 
 ## Placeholders
 
@@ -166,4 +200,4 @@ No ship summary, PR message, or report artifacts were created.
 - ship when verification is blocked
 - convert missing tests into success
 - hide known gaps
-- continue to remember automatically unless requested
+- stop after ship when status is `shipped` without chaining to remember (unless user asked for ship-only or skip conditions apply)

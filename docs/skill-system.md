@@ -38,7 +38,10 @@ Initial harness setup should select the smallest sufficient set of core skills a
 It should:
 
 - start from core skills
+- ask the agent to produce domain analysis JSON when a repo has domain signals
+- validate that JSON against the domain-analysis gate before generating anything
 - add one or more skill packs when domain routing is needed
+- materialize selected domain skills into `.harness/skills/` when they are justified
 - avoid inventing a new skill unless the gap is recurring and distinct
 - record the reason for each selected skill or pack in `.harness/SKILLS.md`
 
@@ -55,6 +58,30 @@ Skills should strengthen these layers, not compete with them.
 ## Why Skills Must Stay Compact
 
 Compact skills are easier to select, read, maintain, and reuse. Long skills tend to blur boundaries, duplicate docs, and create catalog bloat.
+
+## Prompt Format Standard
+
+Skill prompts and prompt-dispatch templates should follow the canonical
+modules in [`../skills/PROMPT_FORMAT_STANDARD.md`](../skills/PROMPT_FORMAT_STANDARD.md):
+
+- Role & Persona
+- Context
+- Task
+- Reasoning Procedure
+- Action Loop
+- Constraints & Rules
+- Examples
+- Output Format
+
+Keep the format additive and compatible with the existing harness layers.
+
+## Context Engineering Doctrine
+
+Use [`context-engineering.md`](context-engineering.md) as the shared doctrine for compaction, just-in-time retrieval, structured notes, subagent isolation, and token discipline.
+
+- `.harness/INDEX.md` is the on-demand lookup layer
+- `.harness/specs/` is the optional durable behavior-spec layer when enabled
+- `templates/CHANGE_SPEC.md` captures delta specs for behavior-changing work
 
 ## Add A New Skill Or Update An Existing One
 

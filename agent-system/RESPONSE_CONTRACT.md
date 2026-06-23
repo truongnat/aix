@@ -157,7 +157,44 @@ Implementation only. Verification still required.
 
 ---
 
-## F. Review response
+## F. Discussion response
+
+Use during `harness-discuss` when user input is needed to continue shaping the goal. This is **not** a hard block.
+
+```md
+### Discussion
+
+**Status:** discussing | ready-for-plan
+
+**Context:**
+- What is already known from artifacts
+
+**Decision:**
+[One sentence]
+
+**Scored options:**
+
+| Option | Summary | Value | Effort fit | Risk | Fit | Total |
+|--------|---------|------:|-----------:|-----:|----:|------:|
+| A | … | | | | | |
+| B | … | | | | | |
+| C | … | | | | | |
+
+**Recommendation:**
+Option [X] (total [N]) — why
+
+**User choice:**
+[Use AskQuestion with 3 options: `A: … (N/20)`, `B: …`, `C: …`]
+
+**Next step after answer:**
+Continue discuss (update DISCUSSION.md) or run `harness-plan` when ready.
+```
+
+**REQUIRED:** After the user answers, continue the discuss workflow. Do not treat this like `### Blocked`.
+
+---
+
+## G. Review response
 
 ```md
 ### Strengths

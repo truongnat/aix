@@ -2,11 +2,10 @@
 
 ## Purpose
 
-Refresh project runtime-native harness files from a selected pack ref without touching project state in `.harness/`.
+Refresh project runtime-native harness files without touching project state in `.harness/`.
 
 ## What Update Does
 
-- downloads the selected `--ref`
 - refreshes `.ai-harness/` with overwrite semantics
 - refreshes the selected runtime entrypoint with overwrite semantics
 - optionally refreshes `.git/info/exclude` when `--visibility private` is passed
@@ -18,25 +17,13 @@ Refresh project runtime-native harness files from a selected pack ref without to
 - does not edit `.gitignore`
 - does not support global update in this step
 - does not support manual runtime update
+- primary Node CLI does not support `--ref`
 
 ## Commands
 
 ```bash
-sh aih.sh update
-sh aih.sh update --runtime cursor --scope project --ref v0.9.2 --yes
-sh aih.sh update --runtime all --scope project --ref main --yes
-```
-
-## Ref Pinning
-
-Use `--ref` to choose the GitHub branch or tag to fetch.
-
-Examples:
-
-```bash
-sh aih.sh update
-sh aih.sh update --runtime cursor --scope project --ref v0.9.2 --yes
-sh aih.sh update --runtime cursor --scope project --ref main --yes
+npx ai-engineering-harness update
+npx ai-engineering-harness update --provider cursor --yes
 ```
 
 ## Cache Update
@@ -56,7 +43,6 @@ Examples:
 - `generic` / `codex` → `AGENTS.md`
 - `claude` → `.claude/CLAUDE.md`, `.claude/settings.json`
 - `gemini` → `.gemini/extensions/ai-engineering-harness/`
-- `opencode` → `.opencode/plugins/ai-engineering-harness.js`
 
 ## `.harness` Safety
 
@@ -66,12 +52,19 @@ Update preserves `.harness/` completely.
 - no `.harness` removal
 - no `--init-harness` support during update
 
+### Skeleton note
+
+If your repo was initialized by an older install path, the first TypeScript-backed install or
+re-init can treat existing `.harness/*.md` skeleton files as overwrite candidates. The current
+generator keeps the trailing newline required by normal POSIX text files, while older generators
+could differ by one byte. Review the diff and keep or overwrite intentionally.
+
 ## Git Hygiene
 
 Update only changes ignore settings when `--visibility private` is passed.
 
 ```bash
-sh aih.sh update --runtime cursor --scope project --ref main --visibility private --yes
+npx ai-engineering-harness update --provider cursor --visibility private --yes
 ```
 
 Without `--visibility`, update leaves `.git/info/exclude` unchanged.
@@ -79,7 +72,7 @@ Without `--visibility`, update leaves `.git/info/exclude` unchanged.
 ## Dry Run
 
 ```bash
-sh aih.sh update --runtime cursor --scope project --ref v0.9.2 --dry-run
+npx ai-engineering-harness update --provider cursor --dry-run --yes
 ```
 
 Dry-run prints the update plan plus the cache/runtime writes it would perform.
@@ -89,17 +82,13 @@ Dry-run prints the update plan plus the cache/runtime writes it would perform.
 Refresh Cursor from the latest tag:
 
 ```bash
-sh aih.sh update
+npx ai-engineering-harness update
 ```
 
-Refresh Cursor from the latest tag with explicit ref pinning:
+Refresh Cursor non-interactively:
 
 ```bash
-sh aih.sh update --runtime cursor --scope project --ref v0.9.2 --yes
+npx ai-engineering-harness update --provider cursor --yes
 ```
 
-Refresh all supported project runtimes from `main`:
-
-```bash
-sh aih.sh update --runtime all --scope project --ref main --yes
-```
+No shell installer path remains in the current surface.

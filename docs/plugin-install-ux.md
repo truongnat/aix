@@ -43,7 +43,7 @@ The **recommended** consumer UX is **not** “copy the capability pack into the 
 
 Target flow (**shipped in `v0.9.1`**, experimental):
 
-1. Choose **runtime** (Claude, Cursor, Codex, Gemini, generic, or manual fallback — avoid `all` until dogfooded)
+1. Choose **runtime** (Claude, Cursor, Codex, Gemini, generic)
 2. Choose **scope** (global vs project)
 3. Install into **runtime-correct locations** only
 4. Create **project-local** `.harness/` only for project scope or explicit init
@@ -71,19 +71,13 @@ See:
 
 **Runtime-native installer exists (`v0.9.1` tag).** All primary runtimes are **experimental** (file/install dogfooded; **stable support: No**). See [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
 
-Recommended consumer path (v0.10.x — private project, capability cache, no git noise):
+Recommended consumer path (current primary surface — private project, capability cache, no git noise):
 
 ```bash
 npx ai-engineering-harness install
 ```
 
 Use provider-native paths where implemented — [provider-command-matrix.md](provider-command-matrix.md). Claude (primary): `/harness-plan`; Cursor: `/add-plugin` when published; Codex/Gemini: experimental; local catalog at `.ai-harness/runtime-commands/`.
-
-Shell fallback:
-
-```bash
-sh aih.sh install --runtime cursor --scope project --visibility private --yes
-```
 
 Maintainers validate from source pack:
 
@@ -98,34 +92,32 @@ All **project** runtime-native installs **default** to `.ai-harness/` capability
 Team-shared (files visible in `git status`):
 
 ```bash
-sh aih.sh install --runtime <name> --scope project --visibility shared --init-harness --yes
+npx ai-engineering-harness install --provider <name> --scope project --visibility shared --yes
 ```
 
 - `<name>`: `generic`, `codex`, `cursor`, `gemini`, `claude`
-- **Manual fallback** (`manual` / `--legacy-root`): root copy only — [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md)
+- **Manual fallback** (`manual` / `--legacy-root`): legacy root-copy path only — [scenario-c-one-line-installer.md](pack-dogfood-reports/scenario-c-one-line-installer.md)
 
-[install.sh](../install.sh) + [lib/install-runtime.ts](../lib/install-runtime.ts) install **per runtime** without copying `commands/`, `skills/`, etc. to the product root. Capabilities live under **`.ai-harness/`** when cache is installed (private project default). See [runtime-native-install.md](runtime-native-install.md) and [private-capability-cache.md](private-capability-cache.md).
+The primary Node CLI calls [lib/install-runtime.ts](../lib/install-runtime.ts) in-process to install **per runtime** without copying `commands/`, `skills/`, etc. to the product root. Capabilities live under **`.ai-harness/`** when cache is installed (private project default). See [runtime-native-install.md](runtime-native-install.md) and [private-capability-cache.md](private-capability-cache.md).
 
 Uninstall examples:
 
 ```bash
-sh aih.sh uninstall
-sh aih.sh uninstall --runtime cursor --scope project --yes
-sh aih.sh uninstall --runtime cursor --scope project --remove-cache --remove-state --yes
-sh aih.sh uninstall --all
+npx ai-engineering-harness uninstall
+npx ai-engineering-harness uninstall --provider cursor --yes
+npx ai-engineering-harness uninstall --all --yes
 ```
 
 Update examples:
 
 ```bash
-sh aih.sh update
-sh aih.sh update --runtime cursor --scope project --ref v0.9.2 --yes
-sh aih.sh update --runtime all --scope project --ref main --yes
+npx ai-engineering-harness update
+npx ai-engineering-harness update --provider cursor --yes
 ```
 
 | Capability | Status |
 |---|---|
-| `manual` / `--legacy-root` | **Implemented** — legacy root-copy fallback via `bin/aih.js install`; dogfooded (Scenario C); **fallback only** |
+| `manual` / `--legacy-root` | **Implemented** — legacy root-copy path via `bin/aih.js install`; dogfooded (Scenario C) |
 | `.harness/` init (`--init-harness`) | **Implemented** — project scope; automated tests |
 | Runtime-native modes | **Experimental PASS** (D1–D6 file/install) — [runtime-dogfood-summary.md](runtime-dogfood-summary.md); stable **No** until manual runtime checks |
 | `generic` + `project` + `--init-harness` | **experimental PASS** (Scenario D1) — [scenario-d1-generic-project.md](pack-dogfood-reports/scenario-d1-generic-project.md) |
@@ -137,59 +129,11 @@ sh aih.sh update --runtime all --scope project --ref main --yes
 
 Do **not** treat runtime-native modes as **stable** until manual session evidence exists per [runtime-dogfood-summary.md](runtime-dogfood-summary.md).
 
-## Secure Remote Installation
-
-**Recommended for security:** Use `install-secure.sh` with checksum verification:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/install-secure.sh | sh
-```
-
-This verifies the SHA256 checksum before execution, protecting against repository compromise or man-in-the-middle attacks.
-
----
-
 ## Supported User Flows
 
-**Recommended:** runtime-native install + `--init-harness` for project state — see [install-sh-usage.md](install-sh-usage.md), [harness-init-usage.md](harness-init-usage.md), [runtime-aware-validation.md](runtime-aware-validation.md).
+**Recommended:** runtime-native install on the Node CLI, then validate the target profile — see [install-command-model.md](install-command-model.md), [harness-init-usage.md](harness-init-usage.md), [runtime-aware-validation.md](runtime-aware-validation.md).
 
-Piping `curl | sh` without flags on `aih.sh` now maps to `install`, using runtime detection or interactive provider selection. Manual fallback remains explicit only.
-
-### Project install (default target = cwd)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install
-```
-
-Installs with runtime detection, project scope, private visibility, `.ai-harness/` capability cache, `.harness/` init when missing, and `.git/info/exclude` hygiene when applicable.
-
-### Explicit target install
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install --target ../my-project
-```
-
-### Dry run
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install --dry-run
-```
-
-### Force overwrite
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install --target . --force
-```
-
-### Global CLI install (planned)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/truongnat/ai-engineering-harness/main/aih.sh | sh -s -- install --scope global
-ai-harness install --target .
-ai-harness validate --target . --profile-only
-```
-
-`install.sh` remains available as a compatibility wrapper for existing commands. Long explicit commands are still supported for advanced/debug flows, but `aih.sh` is the primary UX.
+For primary day-to-day usage, prefer `npx ai-engineering-harness install`.
 
 See [one-line-installer-design.md](one-line-installer-design.md).
 

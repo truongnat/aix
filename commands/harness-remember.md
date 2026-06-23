@@ -1,3 +1,12 @@
+---
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+---
 # harness-remember
 
 ## Purpose
@@ -17,6 +26,7 @@ Read:
 - active session `VERIFY.md`
 - active session `SHIP.md` if present
 - active session current `PLAN-*.md` if present
+- active session `CHANGE_SPEC.md` if present
 - `.harness/DECISIONS.md` if present
 - `.harness/HAZARDS.md` if present
 - `.harness/INDEX.md` if present
@@ -33,9 +43,10 @@ If active session is unknown or `.harness/STATE.md` has not been established for
 
 ## When To Use
 
-- after verified work ships
+- after verified work ships (often chained automatically from `harness-ship` when status is `shipped`)
 - after a failed attempt reveals a durable hazard or root cause
 - when future sessions would benefit from a durable note
+- as a standalone command when ship was ship-only or remember was deferred
 
 ## Skills To Use
 
@@ -49,7 +60,8 @@ If active session is unknown or `.harness/STATE.md` has not been established for
 2. Extract the durable lesson, decision, root cause, or hazard.
 3. Remove transient details and anything sensitive.
 4. Write the lesson into the right memory artifact: `DECISIONS.md`, `HAZARDS.md`, `INDEX.md`, or goal-level `REMEMBER.md`.
-5. Confirm the note is safe, durable, and reusable.
+5. If the change produced an approved delta spec, note whether it should be folded into `.harness/specs/` when the spec layer is enabled.
+6. Confirm the note is safe, durable, and reusable.
 
 ## Required Outputs
 

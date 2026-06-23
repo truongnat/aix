@@ -102,6 +102,34 @@ No implementation plan was produced.
 **Next allowed command:**
 `harness-run` only after `PLAN.md` is approved.
 
+## Reasoning Procedure
+
+1. Restate the goal and the planning question.
+2. Check the active artifacts, scope, and constraints.
+3. Derive the smallest approved plan that can satisfy the goal.
+4. Stop and report blocked if the goal or approval is unclear.
+
+## Action Loop
+
+- Thought: identify the next planning decision.
+- Action: inspect the goal, context, and approval state.
+- Observation: record the exact plan element that follows.
+- Repeat until the plan is explicit and executable.
+
+## Examples
+
+### Example 1
+
+Input: The goal is clear and the work needs a concrete plan.
+
+Output: A concise approved plan that follows the command contract.
+
+### Example 2
+
+Input: The goal or approval is too unclear to plan safely.
+
+Output: A blocked response naming the missing decision.
+
 ## Placeholders
 
 - `{GOAL_PATH}` — usually `.harness/sessions/<active-session>/GOAL.md`

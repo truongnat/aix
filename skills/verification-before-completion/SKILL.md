@@ -37,6 +37,39 @@ Prevent optimistic completion claims by forcing the final status to match the ac
 - Missing evidence is a first-class result.
 - Short honest verification is better than long optimistic verification.
 
+## Reasoning Procedure
+
+1. Restate the completion claim and what must prove it.
+2. Check the current verification artifacts and evidence.
+3. Decide whether the claim is proven, incomplete, or blocked.
+4. Stop and report blocked if fresh proof is missing.
+
+## Action Loop
+
+- Thought: identify the proof required before completion can be claimed.
+- Action: inspect or run the relevant verification check.
+- Observation: record the real result and whether it covers the claim.
+- Repeat until the completion claim is either proven or blocked.
+
+## Examples
+
+### Example 1
+
+Input: Fresh evidence proves the requested work is complete.
+
+Output:
+- Final claim-to-evidence check: supported by validator and test output.
+- Honest status: complete.
+- Explicit blockers or gaps: none.
+
+### Example 2
+
+Input: The evidence is stale or incomplete for the completion claim.
+
+Output:
+- Final claim-to-evidence check: insufficient.
+- Honest status: blocked until fresh proof is gathered.
+- Explicit blockers or gaps: missing current verification.
 ## Output Contract
 
 This skill must produce:

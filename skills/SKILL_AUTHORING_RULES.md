@@ -36,6 +36,14 @@ Every skill should define:
 
 The contract is the minimum promise the skill makes. If the boundary is unclear, the skill is not ready.
 
+Every skill should also carry the prompt-standard modules from
+[`PROMPT_FORMAT_STANDARD.md`](PROMPT_FORMAT_STANDARD.md):
+
+- reasoning procedure
+- action loop when the skill inspects artifacts, calls tools, or delegates
+- examples
+- output format
+
 ## Decision
 
 Every skill should include:
@@ -68,6 +76,10 @@ Every skill should define:
 - handoff rules
 
 Execution guidance should be repeatable, practical, and artifact-aware.
+
+When the skill is dispatched as a prompt, structure it into explicit modules
+instead of a free-form essay. Follow the canonical order in
+[`PROMPT_FORMAT_STANDARD.md`](PROMPT_FORMAT_STANDARD.md).
 
 ## Quality
 

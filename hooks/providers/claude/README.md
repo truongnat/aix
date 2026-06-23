@@ -17,7 +17,7 @@ See `settings.example.json` for a starting point. Replace `<active-session>` wit
 
 - Hook events are provider-specific.
 - If a hook returns blocked, the agent must stop.
-- Keep hook commands pointed at portable scripts in `hooks/core/`.
+- Keep hook commands pointed at portable scripts in `.ai-harness/hooks/core/`.
 
 ## Related
 

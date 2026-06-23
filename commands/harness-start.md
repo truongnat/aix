@@ -1,3 +1,13 @@
+---
+argument-hint: "[goal-id]"
+allowed_tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+---
 # harness-start
 
 ## Purpose
@@ -5,6 +15,8 @@
 Run the **Session Start** protocol: the mandatory boot sequence that restores context, routes the active session, checks blocked state, loads memory, maps repository/current context, and determines the next allowed harness command before any implementation work begins.
 
 `harness-start` is session-scoped. It restores or establishes active session state, checks current phase, blocked state, active goal, and the next recommended command. It also performs context mapping for the current repository by identifying important paths, conventions, commands, quality gates, provider entrypoints, harness artifacts, constraints, and likely affected areas when an active goal exists. It should not implement code.
+
+If a goal id or session id is supplied as an argument, prefer that routing hint when it matches the active artifacts.
 
 ## System Prompt Requirement
 
@@ -34,9 +46,10 @@ Protocol steps:
 4. Load durable memory.
 5. Check blocked and unfinished work.
 6. Map repository/current context.
-7. Detect tool context.
-8. Recommend next command.
-9. Ask the user only if routing is ambiguous.
+7. If `.harness/config.json` has an empty `domains` array and `.harness/skills/` has no generated domain skill files, surface a visible status line, run domain analysis, and bootstrap matching domain skills with `npx ai-engineering-harness domains`.
+8. Detect tool context.
+9. Recommend next command.
+10. Ask the user only if routing is ambiguous. When routing requires a deliberative choice (continue session vs new session vs archive), use **three-option scoring** per `rules/core/option-scoring.md` and `AskQuestion` when available — do not hard-stop with an open-ended menu.
 
 See `docs/session-start.md` for the full contract.
 
@@ -89,6 +102,19 @@ See `docs/session-start.md` for the full contract.
 7. Write or update active session `SESSION_START.md` using `templates/SESSION_START.md`.
 8. Return a Session Start summary with explicit next command. Do not implement code and do not produce a detailed implementation plan.
 
+### Domain Skill Bootstrap
+
+If `.harness/config.json` has an empty `domains` array and `.harness/skills/` does not
+already contain generated domain skill files, bootstrap them at the start of the
+session:
+
+1. Tell the user explicitly that you are analyzing the codebase.
+2. Surface the message visibly before analysis, for example:
+   `🔍 Analyzing the codebase to detect domains and generate matching skills…`
+3. Run the domain analysis workflow from `prompt-templates/domain-analysis.md`.
+4. Generate domain skills non-interactively with `npx ai-engineering-harness domains`.
+5. Report the generated domains and files so the user can inspect the diff.
+
 ## Required Outputs
 
 - active session `SESSION_START.md` or equivalent Session Start summary using `templates/SESSION_START.md`
@@ -129,3 +155,4 @@ Ask for approval if the previously recorded plan is invalid and a materially dif
 ## Notes
 
 Use `harness-start` to run Session Start at session boundaries. Root `.harness/` is the router; sessions own working artifacts. Other commands must not proceed with unknown session state — redirect here first.
+Domain bootstrap is automatic on the first session when no domains are configured, and it must always announce analysis to the user before running silently.

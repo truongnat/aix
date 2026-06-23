@@ -30,8 +30,8 @@ const replacements = [
           `Release notes: [docs/v${version}-release-notes.md](docs/v${version}-release-notes.md)`
         )
         .replace(
-          /\*\*v\d+\.\d+\.\d+\*\*: patch release for README clarity, landing-page polish, and release metadata alignment\./,
-          `**v${version}**: patch release for README clarity, landing-page polish, and release metadata alignment.`
+          /\*\*v\d+\.\d+\.\d+\*\*: ((?:minor|patch|major) release[^\n]*)/,
+          `**v${version}**: $1`
         );
     },
   },

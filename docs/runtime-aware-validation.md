@@ -53,7 +53,7 @@ Rules:
 - `--profile-only` and `--goal` remain mutually exclusive.
 - `--goal` with `--runtime` validates runtime bootstrap + profile + goal artifacts.
 
-Supported values: `generic`, `codex`, `cursor`, `gemini`, `claude`, `manual`. (`opencode` removed v0.11.0 — use legacy uninstall only via `aih.sh`.)
+Supported values: `generic`, `codex`, `cursor`, `gemini`, `claude`, `manual`. OpenCode is historical/legacy only and is not a current validation mode.
 
 ## Runtime Bootstrap Requirements
 
@@ -86,10 +86,10 @@ Structural **path existence** only:
 
 ## Relationship To Runtime Native Install Audit
 
-Use the same runtime names as [install.sh](../install.sh) / [lib/install-runtime.ts](../lib/install-runtime.ts). After install, validate with matching `--runtime`:
+Use the same runtime names as the primary Node CLI install surface (`npx ai-engineering-harness install`) and [lib/install-runtime.ts](../lib/install-runtime.ts). After install, validate with matching `--runtime`:
 
 ```bash
-sh install.sh --runtime cursor --scope project --target . --init-harness --yes
+npx ai-engineering-harness install --provider cursor --scope project --target . --yes
 node bin/validate.js --target . --runtime cursor --profile-only
 ```
 

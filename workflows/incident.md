@@ -10,6 +10,13 @@ Use this for urgent failures, outages, security-sensitive breakages, or broken c
 
 The same loop applies, but planning and discussion may be shorter because urgency is high.
 
+## Decision Tree
+
+- Is the current issue actively impacting users or critical systems?
+- If yes: confirm blast radius first, then choose the smallest safe mitigation.
+- If the cause is unknown: avoid speculative high-risk fixes and favor containment.
+- If mitigation restores service but not the root cause: ship with explicit gaps and follow-up work.
+
 ## Required Artifacts
 
 - `.harness/GOAL.md`
@@ -40,6 +47,13 @@ The same loop applies, but planning and discussion may be shorter because urgenc
 - if the cause is unknown, avoid risky speculative fixes
 - if restoration is partial, state that clearly in verification and ship notes
 - if incident pressure tempts secret leakage into memory, stop and sanitize the artifact
+
+## Artifact Checklist
+
+- `GOAL.md` states impact, blast radius, and current urgency.
+- `PLAN.md` distinguishes containment from long-term fix when both matter.
+- `VERIFY.md` records mitigation or restoration evidence with exact current status.
+- `REMEMBER.md` captures durable incident lessons without sensitive detail.
 
 ## Completion Criteria
 

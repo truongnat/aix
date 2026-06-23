@@ -2,7 +2,9 @@
 "use strict";
 
 const path = require("node:path");
-const { regenerateDocsFromPolicy } = require("../dist/lib/policy/generator.js");
+const {
+  regenerateDocsFromPolicy,
+} = require("../dist/features/validate/infrastructure/policy/generator.js");
 
 const repoRoot = process.cwd();
 const policyPath = process.argv[2] || path.join(repoRoot, ".harness", "policies.json");

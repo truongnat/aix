@@ -65,7 +65,7 @@ Gemini CLI can follow the harness as long as the repository keeps the markdown a
 
 ## OpenCode (historical)
 
-OpenCode is **not** in the active provider scope as of v0.11.0. See [runtimes/opencode.md](runtimes/opencode.md) for legacy notes; use `aih.sh uninstall --runtime opencode` to remove old installs.
+OpenCode is **not** in the active provider scope as of v0.11.0. See [runtimes/opencode.md](runtimes/opencode.md) for legacy notes and cleanup history.
 
 ## Compatibility Boundaries
 

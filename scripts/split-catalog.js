@@ -17,11 +17,7 @@ const { PROVIDER_RULE_ADAPTERS } = require("../provider-rule-renderer.js");
 
 `;
 
-const metadataBody = [
-  ...lines.slice(34, 268),
-  "",
-  ...lines.slice(784, 806),
-].join("\n");
+const metadataBody = [...lines.slice(34, 268), "", ...lines.slice(784, 806)].join("\n");
 
 const metadataFooter = `
 module.exports = {
