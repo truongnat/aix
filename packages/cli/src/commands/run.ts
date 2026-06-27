@@ -19,7 +19,13 @@ export function registerRunCommand(program: Command): void {
     .description('Run a task in guardrail mode (with human review)')
     .option('--auto', 'Run in autonomous mode (bypasses human review)')
     .option('--resume <checkpoint-id>', 'Resume from a checkpoint')
-    .action(async (task: string, opts: { auto?: boolean; resume?: string }) => {
+    .option('--dry-run', 'Preview phases and token estimates without executing')
+    .action(async (task: string, opts: { auto?: boolean; resume?: string; dryRun?: boolean }) => {
+      if (opts.dryRun) {
+        await handleDryRun(task);
+        return;
+      }
+
       if (opts.resume) {
         await handleResume(opts.resume);
         return;
@@ -32,6 +38,26 @@ export function registerRunCommand(program: Command): void {
 
       await handleGuardrail(task);
     });
+}
+
+async function handleDryRun(task: string): Promise<void> {
+  const registry = await SkillRegistry.load(process.cwd());
+  const markdownStore = new MarkdownStore();
+  const assembler = new PromptAssembler(registry, markdownStore, DEFAULT_SYSTEM_PARTS);
+
+  console.log(`\n  Dry-run: "${task}"\n`);
+  console.log(`  Phases that would execute:\n`);
+
+  let totalTokens = 0;
+  for (const phase of PHASES) {
+    const ctx: AssembleContext = { role: 'planner', phase, task, tags: [phase] };
+    const prompt = await assembler.assemble(ctx);
+    totalTokens += prompt.tokenEstimate;
+    console.log(`  ${phase.padEnd(10)} ~${prompt.tokenEstimate} tokens  (${prompt.skillMetadata.length} skills)`);
+  }
+
+  console.log(`\n  Total estimated: ~${totalTokens} tokens across ${PHASES.length} phases`);
+  console.log('  (no files written, no LLM calls made)\n');
 }
 
 async function handleResume(checkpointId: string): Promise<void> {

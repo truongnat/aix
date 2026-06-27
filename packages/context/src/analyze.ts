@@ -37,6 +37,7 @@ const IGNORE_DIRS = new Set([
   '.aix',
   '.claude',
   '.cursor',
+  'imports',
 ]);
 
 function analyzeFile(filePath: string, content: string): AnalyzedFile {

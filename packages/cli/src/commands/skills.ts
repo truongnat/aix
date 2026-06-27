@@ -33,14 +33,23 @@ export function registerSkillsCommand(program: Command): void {
     .action(async () => {
       const registry = await SkillRegistry.load(findContentRoot());
       const errors = registry.validateAll();
-      if (errors.length === 0) {
-        console.log('All skills valid');
-        return;
+      const warnings = errors.filter(e => e.code === 'WARN');
+      const fatal = errors.filter(e => e.code !== 'WARN');
+      const total = registry.all().length;
+
+      for (const w of warnings) {
+        console.warn(`  WARN: ${w.message}`);
       }
-      for (const err of errors) {
-        console.error(`  ${err.code}: ${err.message}`);
+      for (const e of fatal) {
+        console.error(`  ERROR: ${e.message}`);
       }
-      process.exit(1);
+
+      if (fatal.length > 0) {
+        console.error(`\n  ${fatal.length} error(s), ${warnings.length} warning(s) — ${total} skills checked`);
+        process.exit(1);
+      }
+
+      console.log(`  ${total} skills valid${warnings.length > 0 ? `, ${warnings.length} warning(s)` : ''}`);
     });
 
   skills

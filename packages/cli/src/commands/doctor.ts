@@ -47,8 +47,7 @@ export function registerDoctorCommand(program: Command): void {
         const found = hasRoot ? 'aix.json' : '.aix/config.json';
         console.log(`  Config: ${found}`);
       } else {
-        console.error('  Config: not found (looked for aix.json or .aix/config.json)');
-        ok = false;
+        console.log('  Config: not found (optional — create aix.json to customize)');
       }
 
       const contentDir = join(cwd, 'content');
