@@ -147,6 +147,9 @@ const compiledGraph = new StateGraph(GraphAnnotation)
 // --- Public API (interface unchanged) ---
 
 export class EngineGraph {
+  // _checkpoints accepted for API compatibility; LangGraph MemorySaver handles in-process checkpointing
+  constructor(_checkpoints?: unknown) {}
+
   async run(initial: EngineState): Promise<EngineState> {
     const result = await compiledGraph.invoke(
       { ...initial, _interrupted: false },
