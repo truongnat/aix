@@ -3,6 +3,12 @@
 > Kế hoạch đóng khoảng cách giữa **tuyên bố** và **thực tế** đã nêu trong [ASSESSMENT.md](./ASSESSMENT.md).
 > Trạng thái: `[ ]` chưa làm · `[~]` đang làm · `[x]` xong.
 
+> **✅ HOÀN THÀNH T1–T7** (2026-06-28):
+> - T1–T6 trong commit `59c2cad` — engine ghi file, wire budget, mock fail-loud, docs, private, tests.
+> - T7 — `git filter-repo` đã strip `imports/` khỏi toàn bộ history; force-push lên `origin/main`
+>   (HEAD `8626fe6`). Backup bundle: `scratchpad/aix-backup-20260628-003954.bundle`. `.git` 42M→38M;
+>   `imports/` còn trên đĩa (gitignored, làm reference) nhưng 0 refs trong history.
+
 ---
 
 ## T1 — Coder node ghi file thật 🔴
