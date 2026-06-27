@@ -15,7 +15,9 @@
     "neo4j-driver": "^5.26.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.0",
-    "bcryptjs": "^2.4.0"
+    "bcryptjs": "^2.4.0",
+    "ioredis": "^5.4.0",
+    "meilisearch": "^0.45.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.0",
