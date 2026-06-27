@@ -22,6 +22,8 @@ function findContentRoot(): string {
   const candidates = [
     join(process.cwd(), 'content'),
     join(process.cwd(), '..', 'content'),
+    // dir = packages/cli/dist → repo root is 3 levels up (dist→cli→packages→root)
+    join(dir, '..', '..', '..', 'content'),
     join(dir, '..', '..', '..', '..', 'content'),
   ];
   for (const c of candidates) {
