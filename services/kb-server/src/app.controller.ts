@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+import { Public } from './auth/master.guard.js';
 import { Neo4jService } from './neo4j/neo4j.service.js';
 import { CacheService } from './cache/cache.service.js';
 import { SearchService } from './search/search.service.js';
@@ -22,6 +23,7 @@ export class AppController {
     this.#search = search;
   }
 
+  @Public()
   @Get('health')
   async health(): Promise<HealthReport> {
     const [neo4j, redis, meili] = await Promise.all([
