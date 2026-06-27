@@ -4,7 +4,7 @@ description: >-
   Entry-point skill for the aix platform. Injected at session start. Explains
   that the agent has access to a large skill library (domain + process) and an
   opinionated engineering methodology, and how to reach the rest of them via the
-  Skill tool, router-pro, and tool-discovery. Read this first; it is the map.
+  Skill tool, router-pro, and tool-discovery-skill. Read this first; it is the map.
 disable-model-invocation: false
 user-invocable: true
 x-kind: process
@@ -20,7 +20,7 @@ You have aix. aix gives you two things:
 
 1. **A skill library** — 160+ skills. Two kinds:
    - **Process skills** (the methodology spine): how to work — `brainstorming`,
-     `router-pro`, `tool-discovery`, planning, TDD, review, ship.
+     `router-pro`, `tool-discovery-skill`, planning, TDD, review, ship.
    - **Domain skills** (the library): deep references — `react-pro`, `aws-pro`,
      `api-design-pro`, and many more.
 2. **A methodology** — a default flow you follow unless told otherwise.
@@ -32,7 +32,7 @@ tool** with the skill's name. To decide *which* skill:
 
 - For a broad or ambiguous request, invoke **`router-pro`** — it analyses the
   request, sharpens the prompt, and routes to the right skill(s)/workflow.
-- To find a skill or tool by capability, invoke **`tool-discovery`**.
+- To find a skill or tool by capability, invoke **`tool-discovery-skill`**.
 - If you already know the skill name, call `Skill` with it directly.
 
 **Check for a relevant skill before starting any non-trivial task.** Skills are

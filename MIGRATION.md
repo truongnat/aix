@@ -51,11 +51,24 @@ Phát hiện: aix **đã có sẵn** toàn bộ methodology skills từ repo mer
 
 ---
 
-## Phase C — Commit per-provider artifacts (như superpowers)
+## Phase C — Skills native cho host (Claude Code) ✅ (xong)
 
-- [ ] Commit `.claude-plugin/` (skills đã compile) thay vì chỉ sinh runtime.
-- [ ] (Tùy chọn) `.cursor/`, `.codex/`, `.gemini/` compiled output cho đa nền tảng.
-- [ ] Giữ `aix install` làm đường phụ (dev/local), không phải đường chính.
+Phát hiện khi đối chiếu plugin thật (ecc 271 skills): `plugin.json` hỗ trợ trường
+`"skills": ["./path/"]` trỏ thẳng tới thư mục chứa skill dirs. Host (Claude Code) đọc
+`name` ở frontmatter làm tên skill cho Skill tool — **không cần** dir trùng name, và
+**không cần** nhân đôi skills sang `skills/` ở root. Đây là cách DRY, tránh drift.
+
+- [x] `plugin.json` khai báo `"skills": ["./content/skills/"]` → cài plugin là 164 skills
+  có ngay, không cần chạy `aix install`. `content/` vẫn là nguồn canonical duy nhất.
+- [x] Sửa wiring bug: `using-aix` + `session-start.sh` tham chiếu `tool-discovery`
+  (tên dir) trong khi tên skill thật (frontmatter) là `tool-discovery-skill` → Skill tool
+  sẽ resolve trượt. Đã đổi sang `tool-discovery-skill` (4 chỗ).
+- [x] Giữ `aix install` làm **đường phụ** để compile cho cursor/codex/gemini
+  (`.cursor/`, `.codex/`, `.gemini/`); đường chính của Claude Code là manifest ở trên.
+
+**Acceptance:** ✅ `plugin.json`/`marketplace.json` hợp lệ; hook emit JSON 3398 chars chứa
+`tool-discovery-skill`, không còn `tool-discovery` trần; 164 skills frontmatter hợp lệ,
+name format đúng, không trùng tên, đều có description.
 
 ---
 

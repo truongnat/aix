@@ -6,6 +6,10 @@ coverage/
 
 # aix runtime output (context index, engine-generated code, checkpoints)
 .aix/
+# agent memory output (runtime, machine-local)
+.ai/
+# generated skill index — contains machine-absolute paths; regenerate via `aix skills`
+catalog.json
 
 # env
 .env

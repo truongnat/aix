@@ -16,5 +16,8 @@
     "agents",
     "workflows",
     "best-practices"
+  ],
+  "skills": [
+    "./content/skills/"
   ]
 }

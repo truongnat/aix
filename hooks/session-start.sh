@@ -16,7 +16,7 @@ try { body = fs.readFileSync(path, "utf8"); } catch { process.exit(0); }
 const intro =
   "You have aix. The text below is your entry-point skill (using-aix): it explains " +
   "the default engineering methodology and how to reach every other aix skill via the " +
-  "Skill tool (start with router-pro for broad requests, tool-discovery to find by " +
+  "Skill tool (start with router-pro for broad requests, tool-discovery-skill to find by " +
   "capability). Check for a relevant skill before any non-trivial task.\n\n";
 process.stdout.write(JSON.stringify({
   hookSpecificOutput: {
