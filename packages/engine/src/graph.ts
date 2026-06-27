@@ -96,9 +96,11 @@ async function lgReviewerNode(state: GraphState): Promise<Partial<GraphState>> {
 }
 
 // --- Conditional edge routers (must be synchronous) ---
+// Node names use "Step" suffix where the name would collide with a state channel key.
+// LangGraph forbids a node and a channel sharing the same name ('plan', 'rules', 'tasks').
 
-function routeAfterPlan(state: GraphState): 'rules' | typeof END {
-  return state._interrupted ? END : 'rules';
+function routeAfterPlanStep(state: GraphState): 'rulesStep' | typeof END {
+  return state._interrupted ? END : 'rulesStep';
 }
 
 function routeLoopStart(state: GraphState): 'pick' | typeof END {
@@ -125,18 +127,18 @@ function routeAfterReview(state: GraphState): 'loopStart' | typeof END {
 const checkpointer = new MemorySaver();
 
 const compiledGraph = new StateGraph(GraphAnnotation)
-  .addNode('plan', lgPlanNode)
-  .addNode('rules', lgRulesNode)
-  .addNode('tasks', lgTasksNode)
+  .addNode('planStep', lgPlanNode)
+  .addNode('rulesStep', lgRulesNode)
+  .addNode('tasksStep', lgTasksNode)
   .addNode('loopStart', lgLoopStartNode)
   .addNode('pick', lgPickNode)
   .addNode('ticketPlan', lgTicketPlanNode)
   .addNode('coder', lgCoderNode)
   .addNode('reviewer', lgReviewerNode)
-  .addEdge(START, 'plan')
-  .addConditionalEdges('plan', routeAfterPlan)
-  .addEdge('rules', 'tasks')
-  .addEdge('tasks', 'loopStart')
+  .addEdge(START, 'planStep')
+  .addConditionalEdges('planStep', routeAfterPlanStep)
+  .addEdge('rulesStep', 'tasksStep')
+  .addEdge('tasksStep', 'loopStart')
   .addConditionalEdges('loopStart', routeLoopStart)
   .addConditionalEdges('pick', routeAfterPick)
   .addConditionalEdges('ticketPlan', routeAfterTicketPlan)
