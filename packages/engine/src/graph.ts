@@ -31,6 +31,10 @@ const GraphAnnotation = Annotation.Root({
   }),
   ticketPlans: Annotation<readonly TicketPlan[] | undefined>(),
   coderOutput: Annotation<string | undefined>(),
+  writtenFiles: Annotation<readonly string[]>({
+    reducer: (a: readonly string[], b: readonly string[]) => [...new Set([...a, ...b])],
+    default: (): readonly string[] => [],
+  }),
   // Internal routing flag — not part of the public EngineState interface
   _interrupted: Annotation<boolean>({
     reducer: (_: boolean, v: boolean) => v,

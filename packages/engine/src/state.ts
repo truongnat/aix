@@ -30,6 +30,7 @@ export interface EngineState {
   readonly attempts: number;
   readonly ticketPlans?: readonly TicketPlan[];
   readonly coderOutput?: string;
+  readonly writtenFiles?: readonly string[];
 }
 
 export function createInitialEngineState(session: SessionState): EngineState {

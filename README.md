@@ -17,7 +17,7 @@ Six separate repos (`ai-engineering-harness`, `agentic-sdlc`, `skills`, `docs-wi
 | `@x/policy` | Boundary redaction (20+ secret/PII patterns), shell denylist |
 | `@x/providers` | Pure adapters (Claude/Cursor/Codex/Gemini) + runtime LLM provider |
 | `@x/compiler` | Idempotent, dry-run-capable file emitter (hash + generated-marker) |
-| `@x/context` | Tree-sitter analysis, RAG index/query, wiki generation |
+| `@x/context` | Regex-based code analysis (tree-sitter planned), RAG index/query, wiki generation |
 | `@x/memory` | Markdown-first store + KB adapter, redaction-wrapped |
 | `@x/prompt` | Eval-driven prompt assembly + linter |
 | `@x/preview` | Tiered preview (Mermaid / image / HTML server) |
@@ -43,7 +43,9 @@ aix skills validate | list [--kind] [--role] | show <name> | migrate [--write]
 aix install --provider <claude|cursor|codex|gemini> [--dry-run] [--force] [--all]
 aix context build [path] | query "<q>"
 aix run "<task>"            # guardrail mode (human-reviewed phase loop)
-aix run "<task>" --auto     # autonomous mode (LangGraph engine, resumable)
+aix run "<task>" --auto     # autonomous mode (LangGraph engine; writes generated
+                            #   code to .aix/generated/<session>/ for review, not into src/)
+aix run "<task>" --dry-run  # preview phases + token estimate, no execution
 aix verify | ship
 aix memory push|search|list|get
 aix eval <suite>

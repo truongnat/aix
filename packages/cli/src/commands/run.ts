@@ -106,6 +106,8 @@ async function handleResume(checkpointId: string): Promise<void> {
 }
 
 async function handleAuto(task: string): Promise<void> {
+  const usingMock = !process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY;
+
   const loop = new GuardrailLoop();
   const session = { ...(await loop.createSession(task)), mode: 'autonomous' as const };
   const initial = createInitialEngineState(session);
@@ -113,11 +115,31 @@ async function handleAuto(task: string): Promise<void> {
   const graph = new EngineGraph(mgr);
 
   p.intro(`Auto-running: "${task}"`);
+  if (usingMock) {
+    console.warn('\n  ⚠  MOCK MODE — no ANTHROPIC_API_KEY or OPENAI_API_KEY set.');
+    console.warn('     Generated code is PLACEHOLDER, not produced by a real model.');
+    console.warn('     Set an API key for real output.\n');
+  }
+
   const final = await graph.run(initial);
   const id = await mgr.save(final);
 
-  console.log(`Score: ${final.reviewScore ?? 0}/10`);
+  console.log(`Score:    ${final.reviewScore ?? 0}/10`);
+  console.log(`Budget:   $${final.session.budget.usdSpent.toFixed(4)} of $${final.session.budget.usdLimit.toFixed(2)}`);
+
+  const written = final.writtenFiles ?? [];
+  if (written.length > 0) {
+    console.log(`Files (${written.length}):`);
+    for (const f of written) console.log(`  ${f}`);
+  } else {
+    console.log('Files:    none written');
+  }
+
   console.log(`Checkpoint: ${id}`);
+
+  if (usingMock) {
+    console.warn('\n  ⚠  Reminder: output above is MOCK placeholder, not real code.\n');
+  }
   p.outro('Auto-run complete');
 }
 

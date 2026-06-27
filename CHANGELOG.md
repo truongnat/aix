@@ -5,6 +5,32 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- **Engine now writes generated code to disk.** `coderNode` persists model output to
+  a sandbox `.aix/generated/<sessionId>/` (path-traversal-guarded) instead of discarding
+  it. The autonomous loop produces real, reviewable artefacts — it never clobbers `src/`.
+- **Budget hard-stop is now wired.** `coderNode` feeds real provider `usd`/`tokens` back
+  into the session via `BudgetTracker.addUsage()`. `checkHardStop` now sees actual spend;
+  the loop stops when `usdSpent >= usdLimit` (previously `usdSpent` was frozen at 0).
+- **Mock mode is now fail-loud.** `aix run --auto` without an API key prints a prominent
+  ⚠ MOCK MODE banner before and after the run, and reports budget + written files, so
+  placeholder output can never be mistaken for real code.
+- **LangGraph node-name collision** — renamed `plan`/`rules`/`tasks` nodes to
+  `planStep`/`rulesStep`/`tasksStep` (they collided with state-channel keys, throwing at runtime).
+- **CLI UX**: `aix doctor` treats missing optional config as a note (exit 0);
+  `aix skills validate` separates WARN vs ERROR and prints a total count;
+  `aix context build .` ignores `imports/`; `aix run --dry-run` added.
+
+### Changed
+- All 13 `@x/*` packages set to `private: true` until publish metadata
+  (`files`, `license`, `repository`, scope) is in place.
+- README: corrected `@x/context` description (regex-based, not tree-sitter) and
+  documented the engine's sandbox output behaviour.
+
+---
+
 ## [0.1.0] — 2026-06-27
 
 ### Added

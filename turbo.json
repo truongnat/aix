@@ -10,6 +10,10 @@
     "lint": {
       "cache": true
     },
+    "test": {
+      "dependsOn": ["build"],
+      "cache": true
+    },
     "check": {
       "cache": true
     },

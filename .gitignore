@@ -4,6 +4,9 @@ dist/
 *.tsbuildinfo
 coverage/
 
+# aix runtime output (context index, engine-generated code, checkpoints)
+.aix/
+
 # env
 .env
 .env.local
