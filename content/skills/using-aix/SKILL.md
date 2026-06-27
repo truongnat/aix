@@ -38,18 +38,28 @@ tool** with the skill's name. To decide *which* skill:
 **Check for a relevant skill before starting any non-trivial task.** Skills are
 the proven path, not optional decoration.
 
-## The default methodology
+## The default methodology (the spine)
 
-Unless the user asks for something quick, follow this spine:
+Unless the user asks for something quick, follow this spine. Each step is a real
+aix process skill — invoke it via the `Skill` tool by the name in backticks:
 
-1. **Brainstorm** (`brainstorming`) — don't jump to code. Tease out the real goal,
-   explore alternatives, surface the spec in digestible chunks, get agreement.
-2. **Plan** — break work into small, verifiable tasks with concrete file paths.
-3. **TDD** — write the test first, watch it fail, implement, watch it pass.
-4. **Subagent-driven execution** — dispatch focused subagents (the host's Task
-   tool) per task; review each for spec compliance, then code quality.
-5. **Review** — security + quality pass before declaring done.
-6. **Ship / Remember** — verify evidence, then record what was learned.
+1. **`discussing-goals`** — align on what success actually means before anything.
+2. **`brainstorming`** — for fuzzy problems: explore alternatives, surface the
+   spec in digestible chunks, get agreement before any code.
+3. **`writing-plans`** — break the work into small, verifiable tasks with concrete
+   file paths and verification steps.
+4. **`using-git-worktrees`** — isolate the work on a branch with a clean baseline.
+5. **`test-driven-development`** — write the test first, watch it fail, implement,
+   watch it pass.
+6. **`executing-plans`** — dispatch focused subagents (the host's Task tool) per
+   task; review each for spec compliance, then code quality.
+7. **`requesting-code-review`** / **`code-review`** — security + quality pass.
+8. **`verification-before-completion`** — prove it works before declaring done.
+9. **`remembering`** — record what was learned.
+
+Supporting skills: `mapping-codebase` (orient in unfamiliar code),
+`debugging-investigation` (systematic root-cause), `writing-skills` (author new
+skills). See **`using-harness`** for the full operating contract.
 
 You are the runtime. aix is the playbook and the library — not a separate engine
-to invoke. Execute the methodology yourself, using the host's native subagents.
+to invoke. Execute the spine yourself, using the host's native subagents.
