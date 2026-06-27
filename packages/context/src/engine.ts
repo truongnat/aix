@@ -1,3 +1,4 @@
+// T4.1: replaces spec's api-contract.ts — folded into engine.ts
 import { readFile } from 'node:fs/promises';
 import type { CodeAnalysis, FlowGraph, RagHit } from './types.js';
 import type { Embedder } from './embed.js';

@@ -24,6 +24,7 @@
     "@x/memory": "workspace:*",
     "@x/policy": "workspace:*",
     "@x/prompt": "workspace:*",
+    "@x/providers": "workspace:*",
     "@x/registry": "workspace:*"
   },
   "devDependencies": {

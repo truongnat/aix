@@ -3,7 +3,8 @@ import { statSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SkillRegistry } from '@x/registry';
+import { SkillRegistry, migrateSkills } from '@x/registry';
+import { PolicyEngine } from '@x/policy';
 
 function findContentRoot(): string {
   const dir = fileURLToPath(new URL('.', import.meta.url));
@@ -88,5 +89,47 @@ export function registerSkillsCommand(program: Command): void {
       console.log(`  Roles:       ${skill.frontmatter['x-roles'].join(', ')}`);
       console.log(`  Compatible:  ${skill.frontmatter['x-compatible'].join(', ')}`);
       console.log(`  Body:        ~${skill.bodyTokenEstimate} tokens`);
+    });
+
+  skills
+    .command('migrate')
+    .description('Migrate skills from imports/ into content/skills/')
+    .option('--write', 'Write files (default: dry-run only)')
+    .action(async (opts: { write?: boolean }) => {
+      const report = await migrateSkills({
+        sources: ['imports/skills/skills', 'imports/system-design-skills', 'imports/ai-engineering-harness/skills', 'imports/dev-memory/skills'],
+        outDir: 'content/skills',
+        ...(opts.write ? { write: true, policyEngine: new PolicyEngine() } : {}),
+      });
+
+      console.log(`Converted: ${report.converted.length} skills`);
+      for (const c of report.converted) {
+        console.log(`  ${c.from} → ${c.to}`);
+      }
+      if (report.duplicates.length > 0) {
+        console.log(`Duplicates: ${report.duplicates.length}`);
+        for (const d of report.duplicates) {
+          console.log(`  ${d.name}: ${d.sources.join(', ')}`);
+        }
+      }
+      if (report.dropped.length > 0) {
+        console.log(`Dropped: ${report.dropped.length}`);
+        for (const d of report.dropped) {
+          console.log(`  ${d.name} — ${d.reason}`);
+        }
+      }
+      if (report.errors.length > 0) {
+        console.log(`Errors: ${report.errors.length}`);
+        for (const e of report.errors) {
+          console.log(`  ${e.code}: ${e.message}`);
+        }
+      }
+
+      if (opts.write) {
+        const registry = await SkillRegistry.load('content');
+        const catalog = registry.toCatalog();
+        await writeFile('catalog.json', JSON.stringify(catalog, null, 2), 'utf-8');
+        console.log(`catalog.json written (${catalog.length} skills)`);
+      }
     });
 }

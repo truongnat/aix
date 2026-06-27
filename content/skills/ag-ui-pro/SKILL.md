@@ -1,0 +1,205 @@
+---
+name: ag-ui-pro
+description: >
+  Build interactive user interfaces for AI agents using the AG-UI protocol:
+  streaming chat, human-in-the-loop, generative UI, shared state, and frontend
+  tool calling.
+
+
+  Use this skill when designing agent-interactive frontends, implementing
+  streaming chat UIs, adding human approval gates, building generative UI
+  components, or connecting a React/Vue/Svelte frontend to an agentic backend.
+
+
+  Do not use for backend agent logic (use ai-integration-pro) or for general
+  frontend design (use frontend-design-pro).
+
+
+  Triggers: "agent UI", "copilot interface", "AG-UI", "agent frontend", "human
+  in the loop", "streaming chat", "generative UI", "CopilotKit", "agent
+  component", "shared state agent", "frontend tool calling", "agent user
+  interaction".
+x-kind: domain
+x-version: 0.1.0
+x-roles: []
+x-tags: []
+x-compatible:
+  - claude
+  - cursor
+  - codex
+  - gemini
+---
+
+# Agent-User Interface (AG-UI) (professional)
+
+Skill text is **English**; match the user's response language from Cursor User Rules / project rules when applicable.
+
+Use the official [AG-UI specification](https://docs.ag-ui.com) and [CopilotKit docs](https://docs.copilotkit.ai) as authority. This skill encodes **streaming chat patterns**, **human-in-the-loop flows**, **generative UI components**, **shared state management**, and **frontend tool calling**. Confirm **frontend framework**, **agent backend**, **real-time requirements**, and **auth model** before proposing a UI architecture.
+
+## Boundary
+
+**`ag-ui-pro`** owns **agent-interactive frontend design**, **streaming UI patterns**, **human-in-the-loop (HITL) flows**, **generative UI**, **shared state**, and **frontend tool calling**. It does **not** own backend agent logic, general frontend design, or deployment infrastructure — combine with **`ai-integration-pro`**, **`frontend-design-pro`**, and **`deployment-pro`** as needed.
+
+| Skill | When to combine with **`ag-ui-pro`** |
+|-------|--------------------------------------|
+| **`ai-integration-pro`** | When designing the agent backend that powers the UI |
+| **`frontend-design-pro`** | When designing the visual aesthetic and component style |
+| **`react-pro`** / **`nextjs-pro`** | When implementing in React / Next.js |
+| **`a2a-protocol-pro`** | When the frontend interacts with a multi-agent system |
+| **`auth-pro`** | When the UI needs user authentication and authorization |
+
+## When to use
+
+- Designing a chat interface where users interact with an AI agent.
+- Adding human-in-the-loop approval gates (e.g., "Approve this action?").
+- Building generative UI components that render dynamically based on agent output.
+- Managing shared state between the frontend and agent backend.
+- Implementing frontend tool calling (the UI invokes tools on behalf of the agent).
+- Connecting a React, Vue, or Svelte frontend to an agentic backend via AG-UI or CopilotKit.
+- Trigger keywords: `agent UI`, `copilot interface`, `AG-UI`, `agent frontend`, `human in the loop`, `streaming chat`, `generative UI`
+
+## When not to use
+
+- **Backend agent logic** (prompts, tools, RAG, memory) — use **`ai-integration-pro`**.
+- **General frontend design** (aesthetics, layout, accessibility) — use **`frontend-design-pro`**.
+- **Static content rendering** without agent interactivity — use **`react-pro`** / **`nextjs-pro`**.
+
+## Required inputs
+
+- **Frontend framework** — React, Vue, Svelte, or vanilla.
+- **Agent backend** — LangChain, custom API, or A2A multi-agent system.
+- **Real-time requirements** — streaming text, tool results, or generative UI updates.
+- **Auth model** — anonymous, user auth, or OAuth.
+
+## Expected output
+
+Follow **Suggested response format (STRICT)**.
+
+## Workflow
+
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** frontend framework, backend, real-time needs, and auth → verify: [stack documented].
+2. **State assumptions** about user expectations, latency tolerance, and error recovery (**Think Before Coding**).
+3. **Apply** minimum UI first (streaming chat); add HITL or generative UI only when justified (**Simplicity First**).
+4. **Make surgical changes** — only add UI patterns the request needs (**Surgical Changes**).
+5. **Define success criteria**; loop until verified with interactive test (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; note main risks.
+
+### Operating principles
+
+1. **Think Before Coding** — Understand the user's mental model. A chat UI is not always the right pattern; sometimes a form, dashboard, or inline assistant is better.
+2. **Simplicity First** — Start with a streaming chat component. Add HITL, generative UI, or shared state only when the use case demands it.
+3. **Surgical Changes** — Modify only the UI components directly related to the request. Don't redesign the entire app for a chat widget addition.
+4. **Goal-Driven Execution** — Done = the user can interact with the agent, see real-time updates, and complete tasks end-to-end.
+5. **Streaming is the default** — Users expect real-time feedback. Batch responses feel slow and broken.
+6. **Human-in-the-loop is a feature, not a bug** — Explicit approval gates increase trust and reduce catastrophic errors.
+7. **State is shared, not duplicated** — The frontend and backend should share a single source of truth for conversation state. Avoid sync bugs.
+
+## Default recommendations by scenario
+
+| Scenario | Default |
+|----------|---------|
+| Simple chatbot | CopilotKit `CopilotChat` or custom SSE streaming |
+| Action approval required | HITL component with `approve` / `reject` / `edit` buttons |
+| Dynamic forms from agent | Generative UI with JSON Schema → React component mapping |
+| Collaborative workspace | Shared state via WebSocket or AG-UI events |
+| Tool invocation from UI | Frontend tool calling with result fed back to agent |
+
+## Decision trees
+
+Summary: interaction type → component → state → backend connection.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: polling instead of streaming, no error states, duplicating state, blocking UI on agent thinking, no HITL for destructive actions, ignoring accessibility.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Streaming and real-time patterns (summary)
+
+- SSE (Server-Sent Events): simple, HTTP-based, one-directional.
+- WebSocket: bidirectional, lower latency, more complex.
+- AG-UI events: standardized event protocol for agent backends.
+
+Details: [references/streaming-and-realtime.md](references/streaming-and-realtime.md)
+
+### Human-in-the-loop (summary)
+
+- Approval gates: explicit user confirmation before destructive actions.
+- Correction loops: user edits agent output before it is applied.
+- Override: user can bypass the agent and take manual control.
+
+Details: [references/human-in-the-loop.md](references/human-in-the-loop.md)
+
+### Generative UI (summary)
+
+- JSON Schema → component mapping: agent outputs schema, frontend renders component.
+- A2UI (Google): generative UI specification for widgets.
+- CopilotKit: built-in generative UI components for React.
+
+Details: [references/generative-ui.md](references/generative-ui.md)
+
+## Cross-skill handoffs
+
+- **`ai-integration-pro`** — when designing the agent backend that powers the UI.
+- **`frontend-design-pro`** — when designing the visual aesthetic and component style.
+- **`react-pro`** / **`nextjs-pro`** — when implementing in React / Next.js.
+- **`a2a-protocol-pro`** — when the frontend interacts with a multi-agent system.
+- **`auth-pro`** — when the UI needs user authentication and authorization.
+
+Details: [references/integration-map.md](references/integration-map.md)
+
+## Suggested response format (implement / review)
+
+1. **Issue or goal** — What the agent-interactive UI needs to achieve.
+2. **Recommendation** — Component choice, state management, backend connection, and auth.
+3. **Code** — Component implementation, event handling, and state sync.
+4. **Residual risks** — Latency, error handling, accessibility, backend coupling.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Streaming and real-time patterns | [references/streaming-and-realtime.md](references/streaming-and-realtime.md) |
+| Human-in-the-loop | [references/human-in-the-loop.md](references/human-in-the-loop.md) |
+| Generative UI | [references/generative-ui.md](references/generative-ui.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+
+## Quick example
+
+**Input:** "Add a chat assistant to our Next.js dashboard that can trigger API actions."
+- Use CopilotKit or custom SSE streaming component.
+- HITL: confirm destructive API actions with a modal.
+- Frontend tool calling: agent requests `api_call` tool; UI executes it and returns result.
+- **Verify:** Chat streams in real-time; API actions require approval; results feed back to agent.
+
+**Input (tricky):** "Our chat UI freezes while the agent is 'thinking'."
+- Show a typing indicator or reasoning steps (CoT) during agent processing.
+- Use streaming so partial results appear immediately.
+- Run agent logic in a non-blocking thread / async context.
+- **Verify:** UI remains responsive; user can cancel or navigate away.
+
+**Input (cross-skill):** "Build a full copilot for our CRM with multi-agent backend and React frontend."
+- **`ag-ui-pro`**: Design chat UI, HITL for record edits, generative UI for reports.
+- **`ai-integration-pro`**: Design CRM agent with tool access to database.
+- **`a2a-protocol-pro`**: If multi-agent (triage → lookup → update → notify).
+- **`frontend-design-pro`**: Visual style, accessibility, responsive layout.
+- **Verify:** Each skill owns a clear slice; UI does not duplicate backend logic.
+
+## Checklist before calling the skill done
+
+- [ ] Assumptions stated explicitly; asked when uncertain (Think Before Coding)
+- [ ] Started with minimum UI (streaming chat); added complexity only when justified (Simplicity First)
+- [ ] Only modified UI components directly related to the request (Surgical Changes)
+- [ ] Success criteria defined and verified with interactive test (Goal-Driven Execution)
+- [ ] Streaming is implemented; no polling for real-time updates
+- [ ] Error states are handled (agent failure, network error, timeout)
+- [ ] State is shared between frontend and backend; no sync bugs
+- [ ] HITL is present for destructive or high-stakes actions
+- [ ] Accessibility is considered (ARIA labels, keyboard navigation, screen readers)
+- [ ] Residual risks called out: latency, backend coupling, vendor lock-in

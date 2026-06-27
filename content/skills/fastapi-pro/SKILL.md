@@ -1,0 +1,110 @@
+---
+name: fastapi-pro
+description: >-
+  Expert FastAPI development covering async API design, Pydantic validation,
+  Dependency Injection, and high-performance patterns.
+x-kind: domain
+x-version: 0.1.0
+x-roles: []
+x-tags: []
+x-compatible:
+  - claude
+  - cursor
+  - codex
+  - gemini
+---
+
+# FastAPI Pro
+
+Expert-level orchestration of high-performance Python APIs using FastAPI. Focuses on speed, type safety, and automatic documentation.
+
+## Boundary
+
+**`fastapi-pro`** covers FastAPI core (Routes, Dependencies, Middleware), Pydantic (Models, Validation), Async support (`async def`), and integration with SQL/NoSQL databases. It does NOT cover general Python language features (use `python-pro` for that).
+
+## When to use
+
+- Building high-performance, async APIs in Python.
+- Implementing robust data validation and serialization using Pydantic.
+- Designing modular APIs through FastAPI's Dependency Injection system.
+- Generating interactive API documentation (Swagger/ReDoc) automatically.
+
+## Workflow
+
+1. **Schema Design**: Define request/response models using Pydantic.
+2. **Endpoint Implementation**: Write async route handlers.
+3. **Dependency Injection**: Implement reusable logic (Auth, DB session) via dependencies.
+4. **Integration**: Connect to databases or external services.
+5. **Testing**: Write unit tests using `TestClient` and `pytest`.
+6. **Deployment**: Configure Uvicorn/Gunicorn for production.
+
+### Operating principles
+
+- **Type Safety is King**: Leverage Python type hints for validation and editor support.
+- **Async First**: Use `async def` for I/O bound operations to maximize throughput.
+- **Minimalistic Logic in Routes**: Keep route handlers thin; move logic to services/dependencies.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior FastAPI Developer.
+</Role>
+
+<Feature>
+[API Endpoint/Feature Description]
+</Feature>
+
+<Implementation>
+[Clean, type-hinted FastAPI code Artifact]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan with Swagger or Pytest examples]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| FastAPI Roadmap | [roadmap.sh/fastapi](https://roadmap.sh/fastapi) |
+| FastAPI Docs | [fastapi.tiangolo.com](https://fastapi.tiangolo.com) |
+| Pydantic Docs | [docs.pydantic.dev](https://docs.pydantic.dev) |
+| Tiangolo's Full Stack Template | [github.com/tiangolo/full-stack-fastapi-template](https://github.com/tiangolo/full-stack-fastapi-template) |
+
+## Quick example
+
+**Feature:** Async endpoint with Pydantic validation and Dependency Injection.
+
+```python
+from fastapi import FastAPI, Depends
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Item(BaseModel):
+    name: str
+    price: float
+
+async def get_db():
+    # ... db logic
+    yield "db_session"
+
+@app.post("/items/")
+async def create_item(item: Item, db=Depends(get_db)):
+    return {"item": item, "db": db}
+```
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Pydantic models and dependency flow planned.
+- [ ] **Simplicity First**: Leveraged FastAPI's built-in validation and documentation.
+- [ ] **Surgical Changes**: Only updated necessary routers or models.
+- [ ] **Goal-Driven Execution**: Verified with Swagger UI (`/docs`) and `pytest`.
+- [ ] Request and Response models correctly defined and typed.
+- [ ] Dependency Injection used for shared logic (Auth, DB).
+- [ ] Error handling (HTTPException) implemented for all edge cases.

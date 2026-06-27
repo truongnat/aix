@@ -1,6 +1,17 @@
 import { Command } from 'commander';
-import { GuardrailLoop } from '@x/core';
+import * as p from '@clack/prompts';
+import { GuardrailLoop, createBudgetTracker } from '@x/core';
+import type { Phase } from '@x/core';
 import { EngineGraph, CheckpointManager, createInitialEngineState } from '@x/engine';
+import { PromptAssembler } from '@x/prompt';
+import type { AssembleContext } from '@x/prompt';
+import { SkillRegistry } from '@x/registry';
+import { RedactedMemoryStore, MarkdownStore } from '@x/memory';
+import { PolicyEngine } from '@x/policy';
+import { ClackHitlChannel } from '@x/hitl';
+import { DEFAULT_SYSTEM_PARTS } from '@x/prompt';
+
+const PHASES: readonly Phase[] = ['discuss', 'plan', 'run', 'verify', 'ship', 'remember'];
 
 export function registerRunCommand(program: Command): void {
   program
@@ -10,73 +21,200 @@ export function registerRunCommand(program: Command): void {
     .option('--resume <checkpoint-id>', 'Resume from a checkpoint')
     .action(async (task: string, opts: { auto?: boolean; resume?: string }) => {
       if (opts.resume) {
-        const mgr = new CheckpointManager();
-        const saved = await mgr.load(opts.resume);
-        if (!saved) {
-          console.error(`  Checkpoint "${opts.resume}" not found`);
-          process.exit(1);
-        }
-        console.log(`\n  Resuming checkpoint: "${opts.resume}"`);
-        const graph = new EngineGraph(mgr);
-        const final = await graph.resume(saved);
-        console.log(`  Score: ${final.reviewScore ?? 'N/A'} / 10`);
-        console.log(`\n  Resume complete`);
+        await handleResume(opts.resume);
         return;
       }
 
       if (opts.auto) {
-        const loop = new GuardrailLoop();
-        const session = await loop.createSession(task);
-        const initial = createInitialEngineState(session);
-
-        const mgr = new CheckpointManager();
-        const graph = new EngineGraph(mgr);
-        console.log(`\n  Auto-running: "${task}"\n`);
-
-        const final = await graph.run(initial);
-        const id = await mgr.save(final);
-        console.log(`  Score: ${final.reviewScore ?? 'N/A'} / 10`);
-        console.log(`  Checkpoint: ${id}`);
-        console.log(`\n  Auto-run complete`);
+        await handleAuto(task);
         return;
       }
 
-      const loop = new GuardrailLoop();
-      let state = await loop.createSession(task);
-
-      console.log(`\n  Starting: "${task}"\n`);
-
-      const phases = ['discuss', 'plan', 'run', 'verify', 'ship', 'remember'] as const;
-      for (const phase of phases) {
-        const answers: Record<string, string> = {
-          discuss: 'y',
-          plan: 'y',
-          run: 'y',
-          verify: 'y',
-          ship: 'y',
-          remember: 'y',
-        };
-        const answer = answers[phase];
-        if (answer === 'y') {
-          state = loop.addEvidence(state, {
-            phase,
-            kind: 'decision',
-            summary: `Approved by user: ${phase}`,
-          });
-        } else {
-          state = loop.rewindTo(state, 'plan', `User rejected ${phase}`);
-          continue;
-        }
-
-        try {
-          state = await loop.advancePhase(state);
-          console.log(`  Phase "${phase}" complete`);
-        } catch (err) {
-          console.error(`  Phase "${phase}" failed: ${err}`);
-          process.exit(1);
-        }
-      }
-
-      console.log(`\n  Task complete`);
+      await handleGuardrail(task);
     });
+}
+
+async function handleResume(checkpointId: string): Promise<void> {
+  const mgr = new CheckpointManager();
+  const saved = await mgr.load(checkpointId);
+  if (!saved) {
+    console.error(`Checkpoint "${checkpointId}" not found`);
+    process.exit(1);
+  }
+
+  p.intro(`Resuming checkpoint: "${checkpointId}"`);
+
+  const budgetTracker = createBudgetTracker();
+  const budgetCheck = budgetTracker.checkHardStop(saved.session);
+  if (!budgetCheck.ok) {
+    console.error(budgetCheck.error.message);
+    process.exit(1);
+  }
+
+  const channel = new ClackHitlChannel();
+  const decision = await channel.ask({
+    question: 'Approve resume?',
+    options: [
+      { id: 'resume', label: 'Resume', summary: 'Continue execution from checkpoint' },
+      { id: 'cancel', label: 'Cancel', summary: 'Abort and exit' },
+    ],
+    tier: 0,
+  });
+
+  if (decision.chosen === 'cancel') {
+    p.outro('Resume cancelled');
+    return;
+  }
+
+  const graph = new EngineGraph(mgr);
+  const final = await graph.resume(saved);
+  const checkpointId2 = await mgr.save(final);
+
+  const score = final.reviewScore ?? 0;
+  const passed = score >= 9;
+  p.outro(
+    passed
+      ? `Resume complete — Score: ${score}/10 (Checkpoint: ${checkpointId2})`
+      : `Resume complete — Score: ${score}/10 (below threshold) — Checkpoint: ${checkpointId2}`,
+  );
+}
+
+async function handleAuto(task: string): Promise<void> {
+  const loop = new GuardrailLoop();
+  const session = { ...(await loop.createSession(task)), mode: 'autonomous' as const };
+  const initial = createInitialEngineState(session);
+  const mgr = new CheckpointManager();
+  const graph = new EngineGraph(mgr);
+
+  p.intro(`Auto-running: "${task}"`);
+  const final = await graph.run(initial);
+  const id = await mgr.save(final);
+
+  console.log(`Score: ${final.reviewScore ?? 0}/10`);
+  console.log(`Checkpoint: ${id}`);
+  p.outro('Auto-run complete');
+}
+
+async function handleGuardrail(task: string): Promise<void> {
+  const loop = new GuardrailLoop();
+  const budgetTracker = createBudgetTracker();
+  const channel = new ClackHitlChannel();
+  const policy = new PolicyEngine();
+  const markdownStore = new MarkdownStore();
+  const redactedMemory = new RedactedMemoryStore(markdownStore, policy);
+  const registry = await SkillRegistry.load(process.cwd());
+  const assembler = new PromptAssembler(
+    registry,
+    markdownStore,
+    DEFAULT_SYSTEM_PARTS,
+  );
+  const mgr = new CheckpointManager();
+
+  let state = await loop.createSession(task);
+
+  p.intro(`Guardrail: "${task}"`);
+  console.log(`Session: ${state.id}\n`);
+
+  for (const phase of PHASES) {
+    const budgetCheck = budgetTracker.checkHardStop(state);
+    if (!budgetCheck.ok) {
+      console.error(`\n  Budget exceeded: ${budgetCheck.error.message}`);
+      process.exit(1);
+    }
+
+    const ctx: AssembleContext = {
+      role: 'planner',
+      phase,
+      task: state.task,
+      tags: [phase],
+    };
+
+    const prompt = await assembler.assemble(ctx);
+
+    const decision = await channel.ask({
+      question: `Approve "${phase}" phase? (${prompt.tokenEstimate} tokens, ${prompt.skillMetadata.length} skills)`,
+      options: [
+        { id: 'approve', label: 'Approve', summary: `Proceed with ${phase}` },
+        { id: 'revise', label: 'Revise', summary: 'Return to plan for revision' },
+        { id: 'cancel', label: 'Cancel', summary: 'Abort the run' },
+      ],
+      tier: 0,
+    });
+
+    if (decision.chosen === 'cancel') {
+      state = loop.addEvidence(state, {
+        phase,
+        kind: 'decision',
+        summary: `User cancelled at ${phase}`,
+      });
+      p.outro('Run cancelled');
+      return;
+    }
+
+    if (decision.chosen === 'revise') {
+      state = loop.rewindTo(state, 'plan', `User requested revision during ${phase}`);
+      console.log(`  ↺ Revised back to "plan"\n`);
+      continue;
+    }
+
+    state = loop.addEvidence(state, {
+      phase,
+      kind: 'decision',
+      summary: `User approved ${phase}`,
+    });
+
+    await redactedMemory.push({
+      id: `${state.id}-${phase}-${Date.now()}`,
+      kind: 'evidence',
+      title: `${phase} approval`,
+      body: JSON.stringify({
+        sessionId: state.id,
+        phase,
+        task: state.task,
+        decision: 'approve',
+        promptTokenEstimate: prompt.tokenEstimate,
+        skillCount: prompt.skillMetadata.length,
+        fewShotCount: prompt.fewShot.length,
+      }),
+      tags: [phase, 'hitl', 'approval'],
+      version: '0.1.0',
+      createdAt: new Date().toISOString(),
+    });
+
+    if (phase === 'run' || phase === 'verify') {
+      const initial = createInitialEngineState(state);
+      const graph = new EngineGraph(mgr);
+      const finalState = await graph.run(initial);
+      state = finalState.session;
+
+      await mgr.save(finalState);
+      await redactedMemory.push({
+        id: `${state.id}-${phase}-result-${Date.now()}`,
+        kind: 'evidence',
+        title: `${phase} result`,
+        body: JSON.stringify({
+          sessionId: state.id,
+          phase,
+          score: finalState.reviewScore,
+          attempts: finalState.attempts,
+          tasksDone: finalState.tasks.filter(t => t.status === 'done').length,
+          tasksTotal: finalState.tasks.length,
+          reviewFailed: (finalState.reviewScore ?? 0) < 9 && finalState.attempts >= 3,
+        }),
+        tags: [phase, 'result'],
+        version: '0.1.0',
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    try {
+      state = await loop.advancePhase(state);
+      console.log(`\n  ✓ Phase "${phase}" complete (now in "${state.phase}")\n`);
+    } catch (err) {
+      console.error(`\n  ✗ Phase "${phase}" failed: ${err}`);
+      process.exit(1);
+    }
+  }
+
+  p.outro(`Task complete — Session ${state.id}`);
 }

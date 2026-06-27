@@ -1,0 +1,201 @@
+---
+name: 3d-motion-pro
+description: >
+  3D design and motion graphics for the web: Three.js scenes, WebGL shaders,
+  GLTF model loading, particle systems, physics simulations, AR/VR with WebXR,
+  and GSAP animation pipelines.
+
+
+  Use this skill when building interactive 3D web experiences, loading and
+  optimizing 3D models for browsers, implementing motion graphics and
+  animations, creating WebXR (VR/AR) experiences, or building animated data
+  visualizations in 3D.
+
+
+  Do not use for 2D UI animations (use motion-design-pro), static UI design (use
+  ui-design-brain-pro), or non-web 3D production pipelines.
+
+
+  Triggers: "Three.js", "WebGL", "3D web", "GLTF", "GLB", "3D model", "particle
+  system", "shader", "WebXR", "VR", "AR", "Babylon.js", "React Three Fiber", "3D
+  animation", "motion graphics web", "Spline", "3D visualization".
+x-kind: domain
+x-version: 0.1.0
+x-roles: []
+x-tags: []
+x-compatible:
+  - claude
+  - cursor
+  - codex
+  - gemini
+---
+
+# 3D Motion Design (professional)
+
+Skill text is **English**; match the user's response language when applicable.
+
+Use [Three.js docs](https://threejs.org/docs/), [React Three Fiber](https://docs.pmnd.rs/react-three-fiber), [WebXR API](https://www.w3.org/TR/webxr/), [GSAP docs](https://gsap.com/docs/), and [glTF spec](https://registry.khronos.org/glTF/) as authority. This skill encodes **Three.js scene architecture**, **GLTF model loading and optimization**, **custom shaders (GLSL)**, **particle systems**, **WebXR VR/AR**, and **performance optimization for 60fps**. Confirm **target platform**, **performance budget**, **asset pipeline**, and **interactivity requirements** before architecting.
+
+## Boundary
+
+**`3d-motion-pro`** owns **Three.js/WebGL scenes**, **3D model loading and optimization**, **GLSL shaders**, **particle systems**, **WebXR VR/AR experiences**, and **3D animation pipelines**. It does **not** own 2D CSS/JS animations, static UI design, or DCC tool production workflows (Blender/Maya) beyond web export.
+
+| Skill | When to combine with **`3d-motion-pro`** |
+|-------|------------------------------------------|
+| **`motion-design-pro`** | When 3D scene includes 2D overlay animations |
+| **`react-pro`** | When using React Three Fiber (R3F) for React integration |
+| **`performance-tuning-pro`** | When scene has sustained FPS drops or memory issues |
+| **`ai-design-pro`** | When AI-generated textures or reference images feed into 3D assets |
+| **`frontend-design-pro`** | When 3D canvas lives inside a larger UI layout |
+
+## When to use
+
+- Building interactive 3D product showcases, hero sections, or landing pages.
+- Loading and rendering GLTF/GLB models in the browser.
+- Creating particle systems, shader-based effects, or post-processing pipelines.
+- Implementing WebXR VR/AR experiences.
+- Building 3D data visualizations or scientific simulations.
+- Animating 3D objects with GSAP, Framer Motion, or Three.js AnimationMixer.
+- Trigger keywords: `Three.js`, `WebGL`, `3D web`, `GLTF`, `WebXR`, `VR`, `AR`, `shader`, `particle`, `React Three Fiber`
+
+## When not to use
+
+- **2D CSS/JS animations** — use **`motion-design-pro`**.
+- **Static UI design** — use **`ui-design-brain-pro`**.
+- **Blender/Maya production workflows** without web export target — outside scope.
+
+## Required inputs
+
+- **Target platform** — desktop web, mobile web, VR headset (Quest), AR (WebXR).
+- **Performance budget** — target FPS (60 web, 72/90 VR), max draw calls, max texture memory.
+- **Asset pipeline** — are GLTF models provided, or must they be sourced/created?
+- **Interactivity** — mouse hover, click raycasting, physics, user locomotion?
+- **Framework** — vanilla Three.js, React Three Fiber, Babylon.js, or A-Frame?
+
+## Expected output
+
+Follow **Suggested response format (STRICT)**.
+
+## Workflow
+
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** platform, performance budget, asset pipeline, and interactivity → verify: [inputs documented].
+2. **State assumptions** about device capabilities and fallbacks for no-WebGL (**Think Before Coding**).
+3. **Start with a static scene** (geometry, lights, camera); add animation and shaders only when needed (**Simplicity First**).
+4. **Profile before optimizing** — use `renderer.info`; touch only the bottleneck (**Surgical Changes**).
+5. **Define done** as: scene runs at target FPS on lowest-spec target device (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; note performance and compatibility risks.
+
+### Operating principles
+
+1. **Think Before Coding** — A scene that runs at 60fps on desktop may drop to 10fps on mid-range mobile. Confirm device target first.
+2. **Simplicity First** — Start with `MeshStandardMaterial`. Add custom shaders only when standard materials can't achieve the look.
+3. **Surgical Changes** — Profile with `renderer.info` before optimizing. Don't guess the bottleneck.
+4. **Goal-Driven Execution** — Done = target FPS on target device, not "works on my machine."
+5. **GLTF/GLB is the web format** — Always export to GLB for production. Run `gltf-transform optimize` before shipping.
+6. **Instancing over duplication** — •••• identical objects → one `InstancedMesh`, not •••• `Mesh` objects.
+7. **Dispose everything** — Three.js leaks memory if geometry, materials, and textures aren't disposed on unmount.
+
+## Default recommendations by scenario
+
+| Scenario | Default | Notes |
+|----------|---------|-------|
+| Product 3D viewer | Three.js + GLTFLoader + OrbitControls | Lightweight, no framework needed |
+| React app with 3D | React Three Fiber (R3F) + Drei | Declarative, hooks-based |
+| VR experience | Three.js + WebXR + VRButton | Works in Quest browser |
+| AR on mobile | WebXR hit-testing or AR.js | AR.js needs no permissions |
+| Particle effects | Three.js `Points` + `ShaderMaterial` | Custom GLSL for best performance |
+| Data visualization | R3F + drei `<Text>` + instancing | Easier axis/label handling |
+
+## Decision trees
+
+Summary: use case → library → asset format → performance strategy.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: no disposal of geometry/materials, too many draw calls, uncompressed GLTF, updating geometry every frame, missing LOD, blocking main thread with physics.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Performance optimization (summary)
+
+- Draw calls: merge geometries or use `InstancedMesh`.
+- Textures: compress with KTX2/Basis; use power-of-two dimensions.
+- GLTF: run `gltf-transform optimize` + Draco compression before shipping.
+- FPS: `renderer.info.render.calls` must be < 100 for mobile.
+
+Details: [references/performance.md](references/performance.md)
+
+### Shaders and effects (summary)
+
+- `ShaderMaterial` for custom GLSL; `uniforms` for animatable values.
+- Post-processing via `EffectComposer` (UnrealBloom, FXAA, SSR).
+- Avoid `discard` in fragment shaders on mobile — expensive.
+
+Details: [references/shaders-effects.md](references/shaders-effects.md)
+
+## Cross-skill handoffs
+
+- **`motion-design-pro`** — when the 3D scene needs 2D UI overlay animations.
+- **`react-pro`** — when using React Three Fiber; R3F is idiomatic React.
+- **`performance-tuning-pro`** — when scene has sustained FPS drops below budget.
+- **`frontend-design-pro`** — when 3D canvas is embedded in a full-page UI.
+
+Details: [references/integration-map.md](references/integration-map.md)
+
+## Suggested response format (implement / review)
+
+1. **Scene architecture** — Scene graph, camera, renderer settings, lighting setup.
+2. **Assets** — Model sources, format, compression, loading strategy.
+3. **Code** — Scene setup, animation loop, interactivity, disposal.
+4. **Performance** — Draw call count, FPS target, profiling approach.
+5. **Residual risks** — Mobile support, WebXR browser compatibility, asset load time.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Performance optimization | [references/performance.md](references/performance.md) |
+| Shaders and effects | [references/shaders-effects.md](references/shaders-effects.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Advanced techniques | [REFERENCE.md](REFERENCE.md) |
+| Scripts | [Scripts/](Scripts/) |
+
+## Quick example
+
+**Input:** "Add a rotating 3D product viewer for our e-commerce product page."
+- Three.js GLTFLoader + OrbitControls; render to a `<canvas>` element.
+- Compress GLB with `gltf-transform`: Draco geometry + WebP textures.
+- Add loading progress indicator; dispose scene on component unmount.
+- **Verify:** GLB < 2MB; renders at 60fps on iPhone 12; OrbitControls work on touch.
+
+**Input (tricky):** "The 3D scene is running at 15fps on mobile."
+- Profile: check `renderer.info.render.calls` — likely too many draw calls.
+- Merge static geometries with `BufferGeometryUtils.mergeGeometries`.
+- Downscale textures to 512px; compress with KTX2.
+- **Verify:** Draw calls < 50; FPS ≥ 30 on mid-range Android (Pixel 4a benchmark).
+
+**Input (cross-skill):** "Build a WebXR VR product configurator in a React app."
+- **`3d-motion-pro`**: Three.js scene, WebXR session, controller raycasting.
+- **`react-pro`**: React Three Fiber; `useFrame`, `useThree` hooks.
+- **`performance-tuning-pro`**: 72fps budget for Quest 2; 100 draw call limit.
+- **Verify:** Runs at 72fps in Quest 2 browser; controller selects variants correctly.
+
+## Checklist before calling the skill done
+
+- [ ] Assumptions stated: target device, FPS budget, asset pipeline (**Think Before Coding**)
+- [ ] Started with static scene; added complexity only as needed (**Simplicity First**)
+- [ ] Profiled before optimizing; only bottleneck was touched (**Surgical Changes**)
+- [ ] Target FPS achieved on lowest-spec target device (**Goal-Driven Execution**)
+- [ ] GLTF/GLB compressed (Draco/Meshopt + WebP textures)
+- [ ] Geometry, materials, textures disposed on unmount
+- [ ] Draw calls counted and within budget
+- [ ] Loading states handled; fallback for no-WebGL browsers
+- [ ] Mobile/touch interactivity tested
+- [ ] Residual risks called out: mobile perf, WebXR browser support, asset load time
+

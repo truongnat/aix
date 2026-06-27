@@ -1,8 +1,10 @@
-import { readdir, mkdir, copyFile, readFile } from 'node:fs/promises';
+import { readdir, mkdir, copyFile, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { statSync } from 'node:fs';
 import matter from 'gray-matter';
+import { SKILL_DESC_MAX } from '@x/core';
 import type { AppError, SkillKind } from '@x/core';
+import type { PolicyEngine } from '@x/policy';
 import type { MigrationReport } from './types.js';
 
 const DEFAULT_SOURCE_KINDS: Record<string, SkillKind> = {
@@ -78,6 +80,7 @@ export async function migrateSkills(opts: {
   outDir: string;
   write?: boolean;
   kindMap?: Record<string, SkillKind>;
+  policyEngine?: PolicyEngine;
 }): Promise<MigrationReport> {
   const dryRun = opts.write !== true;
   const errors: AppError[] = [];
@@ -188,13 +191,70 @@ export async function migrateSkills(opts: {
   if (!dryRun) {
     for (const skill of keepSet) {
       const targetDir = join(opts.outDir, skill.name);
+      await mkdir(targetDir, { recursive: true });
 
       for (const file of skill.files) {
         const src = join(skill.sourceDir, file);
         const dest = join(targetDir, file);
         try {
-          await mkdir(targetDir, { recursive: true });
-          await copyFile(src, dest);
+          if (file === 'SKILL.md') {
+            const raw = await readFile(src, 'utf-8');
+            const parsed = matter(raw);
+
+            // Normalize frontmatter to match registry schema
+            const knownKeys = new Set(['name', 'description', 'disable-model-invocation', 'user-invocable']);
+            const cleaned: Record<string, unknown> = {};
+            for (const [key, val] of Object.entries(parsed.data)) {
+              if (knownKeys.has(key) || key.startsWith('x-')) {
+                cleaned[key] = val;
+              }
+            }
+            // Ensure required fields
+            if (!cleaned['name'] || String(cleaned['name']).trim() === '') {
+              cleaned['name'] = skill.name;
+            }
+            // Sanitize name: lowercase, replace spaces/special chars with hyphens
+            let skillName = String(cleaned['name']).toLowerCase().trim();
+            skillName = skillName.replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
+            if (!skillName) skillName = skill.name;
+            // Reject names containing claude/anthropic
+            if (/claude|anthropic/.test(skillName)) {
+              skillName = skillName.replace(/claude|anthropic/g, '').replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
+              if (!skillName || skillName.length < 2) skillName = 'specialized-pro';
+            }
+            cleaned['name'] = skillName;
+            if (!cleaned['description'] || String(cleaned['description']).trim() === '') {
+              cleaned['description'] = `Skill: ${skillName}`;
+            }
+            if (typeof cleaned['description'] === 'string' && cleaned['description'].length > SKILL_DESC_MAX) {
+              cleaned['description'] = (cleaned['description'] as string).slice(0, SKILL_DESC_MAX);
+            }
+            cleaned['x-kind'] ??= skill.kind;
+            cleaned['x-version'] ??= '0.1.0';
+            cleaned['x-roles'] ??= [];
+            cleaned['x-tags'] ??= [];
+            cleaned['x-compatible'] ??= ['claude', 'cursor', 'codex', 'gemini'];
+
+            const engine = opts.policyEngine;
+            if (engine) {
+              for (const key of Object.keys(cleaned)) {
+                const val = cleaned[key];
+                if (typeof val === 'string') {
+                  cleaned[key] = engine.redact(val).clean;
+                } else if (Array.isArray(val)) {
+                  cleaned[key] = val.map(v => typeof v === 'string' ? engine.redact(v).clean : v);
+                }
+              }
+              const cleanBody = engine.redact(parsed.content).clean;
+              const output = matter.stringify(cleanBody, cleaned);
+              await writeFile(dest, output, 'utf-8');
+            } else {
+              const output = matter.stringify(parsed.content, cleaned);
+              await writeFile(dest, output, 'utf-8');
+            }
+          } else {
+            await copyFile(src, dest);
+          }
         } catch (e) {
           errors.push({ code: 'IO', message: `Failed to copy ${src}`, cause: e, path: src } as AppError);
         }

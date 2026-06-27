@@ -9,7 +9,7 @@
     "lint": "turbo run lint",
     "check": "turbo run check",
     "clean": "turbo run clean",
-    "doctor": "node --eval \"import('./packages/cli/dist/index.js').then(m => m.run?.(['doctor']))\""
+    "doctor": "node packages/cli/dist/index.js doctor"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

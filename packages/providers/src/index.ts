@@ -10,3 +10,6 @@ export { GeminiAdapter } from './adapters/gemini.js';
 
 export type { BrowserMcpConfig } from './mcp/browser.js';
 export { createBrowserMcpDef } from './mcp/browser.js';
+
+export type { ModelCallOptions, ModelCallResponse, RuntimeProvider } from './runtime.js';
+export { MockRuntimeProvider, ApiRuntimeProvider, createProvider } from './runtime.js';

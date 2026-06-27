@@ -1,0 +1,230 @@
+---
+name: deploy-workflow
+description: >
+  VPS deployment, monitoring, and recovery for Personal KB + Skill Hub at
+  dev.truongsoftware.com: Docker Compose, Caddy SSL, health checks, backups,
+  troubleshooting.
+
+
+  Use this skill when deploying to the VPS, checking production health,
+  restarting services, SSL issues, or backup/restore on ••••.
+
+
+  Combine with **`docker-compose-pro`** for compose file design,
+  **`vps-devops-pro`** for server provisioning and Caddy.
+
+
+  Triggers: "deploy to VPS", "deploy personal-ai", "check VPS health", "restart
+  services", "troubleshoot deployment", "backup restore", "SSL certificate",
+  "docker compose operations on VPS", "dev.truongsoftware.com"
+x-kind: domain
+x-version: 0.1.0
+x-roles: []
+x-tags: []
+x-compatible:
+  - claude
+  - cursor
+  - codex
+  - gemini
+---
+
+# Deploy Workflow
+
+Professional deployment and operations skill for the Personal KB + Skill Hub VPS.
+
+## Boundary
+
+**`deploy-workflow`** owns **deploy/monitor/recover** for VPS `••••` (dev.truongsoftware.com): Compose lifecycle, Caddy SSL, health checks, backups, incident response. Defers to **`docker-compose-pro`** for compose authoring and **`vps-devops-pro`** for initial server setup.
+
+## When to use
+
+- Deploying new code or configuration changes to the VPS
+- Running health checks against the production environment
+- Restarting or rebuilding individual services
+- Investigating why a service is down or misbehaving
+- Managing SSL certificates or Caddy configuration
+- Performing or verifying backups
+- Recovering from service failures or data loss
+
+## When not to use
+
+- General Docker or Docker Compose tutorials unrelated to this stack
+- Creating entirely new services or adding new VPS instances
+- Local development environment setup
+- CI/CD pipeline configuration (this skill is for manual/semi-automated deploys)
+- Domain registrar or DNS management (beyond verifying DNS points correctly)
+
+## Required inputs
+
+| Input | Required | Description |
+|-------|----------|-------------|
+| What changed | Yes | Code changes, config changes, or incident description |
+| Deploy target | No | Defaults to full stack; can target specific service |
+| Branch/commit | No | Defaults to main branch HEAD |
+
+## Expected output
+
+- Deployment confirmation with timestamp
+- Health check results (HTTP status, response time)
+- Service status summary (all containers running)
+- Any warnings or follow-up actions needed
+
+## Workflow
+
+### Step 1: Pre-check
+
+1. SSH into VPS: `ssh root@••••`
+2. Check current state: `cd /opt/personal-ai && docker compose ps`
+3. Verify disk space: `df -h /` (alert if >85% used)
+4. Check current git status: `git log --oneline -3`
+5. Confirm no active users if destructive change (check access logs)
+
+### Step 2: Deploy
+
+1. Pull latest code: `git pull origin main`
+2. If API code changed, rebuild: `docker compose build api`
+3. Apply changes: `docker compose up -d`
+4. Watch startup logs: `docker compose logs -f --tail=50 api` (wait ~15s)
+5. If docker-compose.yml changed, run: `docker compose up -d --remove-orphans`
+
+### Step 3: Verify
+
+1. Health check API: `curl -s -o /dev/null -w "%{http_code}" http://localhost:••••/auth/keys`
+2. Check all containers: `docker compose ps` (all should show "Up")
+3. External check: `curl -s https://dev.truongsoftware.com/auth/keys -H "x-master-••••`
+4. Verify response time: should be <500ms for health endpoint
+5. Check error logs: `docker compose logs --tail=20 api | grep -i error`
+
+### Operating principles
+
+1. **Start simple, add complexity only when needed** — Try `docker compose restart api` before rebuilding. Try rebuilding before wiping volumes.
+
+2. **Always verify after every change** — Never assume a deploy succeeded. Run the health check. Read the logs. Confirm externally.
+
+3. **Keep a paper trail** — Note what was deployed, when, and what the health check showed. If something breaks later, you need to know what changed.
+
+4. **Fail fast, recover faster** — If a deploy breaks things, roll back immediately with `git checkout <prev-commit> && docker compose up -d --build api`. Investigate after recovery.
+
+5. **Respect the dependency chain** — Neo4j and Redis must be healthy before the API starts. Meilisearch can lag behind but search will be degraded.
+
+6. **One change at a time** — Deploy code OR config OR infrastructure. Never all three simultaneously. Makes rollback trivial.
+
+## Default recommendations by scenario
+
+| Scenario | Action |
+|----------|--------|
+| Code-only change (no deps) | `git pull && docker compose build api && docker compose up -d api` |
+| Dependency update | `git pull && docker compose build api --no-cache && docker compose up -d api` |
+| Config change (env vars) | Edit `.env`, then `docker compose up -d api` (recreates with new env) |
+| Docker Compose file change | `docker compose up -d --remove-orphans` |
+| Full restart needed | `docker compose down && docker compose up -d` |
+| Neo4j schema migration | Deploy code first, then hit migration endpoint or run script |
+| Emergency rollback | `git log --oneline -5` to find good commit, `git checkout <hash>`, rebuild, verify |
+| SSL issue | Check Caddy logs, reload config, verify DNS |
+
+## Anti-patterns
+
+| Anti-pattern | Why it's bad | Do this instead |
+|--------------|-------------|-----------------|
+| `docker compose down -v` without backup | Destroys all data volumes | Always backup first, see [backup-recovery](references/backup-recovery.md) |
+| Deploying without checking disk space | Build cache fills disk, everything crashes | Check `df -h` before building |
+| Skipping health check after deploy | Silent failures go unnoticed | Always curl the health endpoint |
+| Editing files directly on VPS | Changes lost on next git pull | Commit to repo, then deploy |
+| `docker system prune -a` during business hours | Removes images needed by running containers | Schedule cleanup during low traffic |
+| Restarting Neo4j without checking connections | Can corrupt in-flight transactions | Drain connections first or accept brief downtime |
+
+See [troubleshooting](references/troubleshooting.md) for detailed resolution guides.
+
+### VPS health checks (summary)
+
+- Endpoint verification, expected responses, alerting thresholds
+
+Details: [references/vps-health-checks.md](references/vps-health-checks.md)
+
+### Docker Compose operations (summary)
+
+- Service lifecycle, rebuild strategies, log analysis
+
+Details: [references/docker-compose-ops.md](references/docker-compose-ops.md)
+
+### Caddy and SSL (summary)
+
+- Reverse proxy config, certificate management, routing rules
+
+Details: [references/caddy-ssl.md](references/caddy-ssl.md)
+
+### Backup and recovery (summary)
+
+- Automated backups, retention policy, restore procedures
+
+Details: [references/backup-recovery.md](references/backup-recovery.md)
+
+### Troubleshooting (summary)
+
+- Common failures, diagnosis steps, resolution patterns
+
+Details: [references/troubleshooting.md](references/troubleshooting.md)
+
+## Suggested response format
+
+```
+## Deploy Report
+
+**Target:** dev.truongsoftware.com
+**Time:** [timestamp]
+**Changes:** [brief description]
+
+### Pre-check
+- [ ] SSH access confirmed
+- [ ] Disk space adequate (XX% used)
+- [ ] Current state healthy
+
+### Deployment
+- [ ] Code pulled (commit: XXXXXXX)
+- [ ] Image rebuilt (if needed)
+- [ ] Services restarted
+
+### Verification
+- [ ] Health endpoint: HTTP [status] ([time]ms)
+- [ ] All containers: [status]
+- [ ] External access: [status]
+- [ ] No errors in recent logs
+
+### Notes
+[Any warnings, follow-up items, or observations]
+```
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| VPS health checks | [references/vps-health-checks.md](references/vps-health-checks.md) |
+| Docker Compose ops | [references/docker-compose-ops.md](references/docker-compose-ops.md) |
+| Caddy and SSL | [references/caddy-ssl.md](references/caddy-ssl.md) |
+| Backup and recovery | [references/backup-recovery.md](references/backup-recovery.md) |
+| Troubleshooting | [references/troubleshooting.md](references/troubleshooting.md) |
+
+## Quick example
+
+**User:** "Deploy the latest changes to VPS"
+
+**Response flow:**
+1. SSH in, check current state
+2. `git pull origin main`
+3. `docker compose build api`
+4. `docker compose up -d api`
+5. Wait 10 seconds for startup
+6. `curl -s -w "\n%{http_code} %{time_total}s" https://dev.truongsoftware.com/auth/keys -H "x-master-••••`
+7. Report: "Deployed commit abc1234. Health check: 200 OK in 120ms. All 4 containers running."
+
+## Checklist before calling the skill done
+
+- [ ] Assumptions stated explicitly; asked when uncertain (Think Before Coding)
+- [ ] Started with minimum solution; no speculative complexity (Simplicity First)
+- [ ] Only touched code/content directly related to the request (Surgical Changes)
+- [ ] Success criteria defined and verified before marking done (Goal-Driven Execution)
+- [ ] Health check returned expected HTTP 200 with valid response
+- [ ] All containers show "Up" in `docker compose ps`
+- [ ] No new errors in `docker compose logs --tail=50 api`
+- [ ] External access via HTTPS confirmed working
+- [ ] Deployment noted (what, when, which commit)

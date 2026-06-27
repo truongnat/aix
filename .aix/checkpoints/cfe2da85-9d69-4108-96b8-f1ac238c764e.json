@@ -1,0 +1,31 @@
+{
+  "session": {
+    "id": "cfe2da85-9d69-4108-96b8-f1ac238c764e",
+    "task": "Create a simple API endpoint",
+    "mode": "guardrail",
+    "phase": "start",
+    "createdAt": "2026-06-27T00:24:51.701Z",
+    "evidence": [],
+    "budget": {
+      "usdSpent": 0,
+      "usdLimit": 10,
+      "tokensInPhase": 0,
+      "tokenWarnThreshold": 64000
+    }
+  },
+  "tasks": [
+    {
+      "id": "task-1",
+      "description": "Create a simple API endpoint",
+      "status": "pending"
+    }
+  ],
+  "attempts": 0,
+  "plan": {
+    "goal": "Create a simple API endpoint",
+    "steps": [
+      "Create a simple API endpoint"
+    ]
+  },
+  "rules": []
+}

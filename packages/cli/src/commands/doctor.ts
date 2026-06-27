@@ -33,14 +33,12 @@ export function registerDoctorCommand(program: Command): void {
       try {
         const res = await fetch('http://localhost:4000/health');
         if (res.ok) {
-          console.log('  Neo4j: connected');
+          console.log('  KB: connected (Neo4j)');
         } else {
-          console.error(`  Neo4j: unhealthy (status ${res.status})`);
-          ok = false;
+          console.log('  KB: optional (markdown fallback active) — server unhealthy');
         }
       } catch {
-        console.error('  Neo4j: not reachable at localhost:4000');
-        ok = false;
+        console.log('  KB: optional (markdown fallback active)');
       }
 
       const hasRoot = existsSync(join(cwd, 'aix.json'));

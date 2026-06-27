@@ -1,0 +1,113 @@
+---
+name: cpp-pro
+description: >-
+  Expert C++ development covering modern C++20/23 standards, RAII, Smart
+  Pointers, Template Metaprogramming, and performance optimization.
+x-kind: domain
+x-version: 0.1.0
+x-roles: []
+x-tags: []
+x-compatible:
+  - claude
+  - cursor
+  - codex
+  - gemini
+---
+
+# C++ Pro
+
+Expert-level orchestration of high-performance C++ applications. Focuses on systems programming, memory safety through RAII, and low-level performance.
+
+## Boundary
+
+**`cpp-pro`** covers modern C++ standards (C++17/20/23), memory management (RAII, Smart Pointers), STL, Template Metaprogramming, and performance profiling. It does NOT cover legacy C patterns (use modern C++ alternatives).
+
+## When to use
+
+- Building high-performance systems (Game engines, Financial trading, Compilers).
+- Optimizing existing codebases for memory and CPU efficiency.
+- Implementing low-level hardware or OS interfaces.
+- Developing performance-critical libraries or middleware.
+
+## Workflow
+
+1. **Project Setup**: Initialize with CMake or Meson.
+2. **Memory Strategy**: Define ownership using Smart Pointers (`unique_ptr`, `shared_ptr`).
+3. **Logic Implementation**: Build features using modern C++ abstractions (STL, Coroutines).
+4. **Templates**: Utilize Template Metaprogramming for compile-time efficiency.
+5. **Testing**: Write unit tests with GoogleTest or Catch2.
+6. **Profiling**: Analyze performance with `valgrind`, `gprof`, or `perf`.
+
+### Operating principles
+
+- **RAII is Key**: Resource Acquisition Is Initialization — always manage resources via object lifetimes.
+- **Modern Standards**: Prefer C++20/23 features (Concepts, Ranges, Coroutines) over legacy code.
+- **Performance First**: Design with memory locality and cache efficiency in mind.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior C++ Software Engineer.
+</Role>
+
+<Feature>
+[C++ Component/System Description]
+</Feature>
+
+<Implementation>
+[Modern, performant C++ code Artifact]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan with Testing framework examples]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| C++ Roadmap | [roadmap.sh/cpp](https://roadmap.sh/cpp) |
+| C++ Core Guidelines | [isocpp.github.io/CppCoreGuidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) |
+| CPPReference | [en.cppreference.com](https://en.cppreference.com) |
+| Modern C++ Features | [github.com/anthonycalandra/modern-cpp-features](https://github.com/anthonycalandra/modern-cpp-features) |
+
+## Quick example
+
+**Feature:** RAII-compliant file management with Smart Pointers.
+
+```cpp
+#include <iostream>
+#include <memory>
+#include <fstream>
+
+class FileWrapper {
+    std::ofstream file;
+public:
+    FileWrapper(const std::string& filename) : file(filename) {
+        if (!file.is_open()) throw std::runtime_error("Could not open file");
+    }
+    void write(const std::string& data) { file << data; }
+    // Destructor automatically closes file
+};
+
+int main() {
+    auto fw = std::make_unique<FileWrapper>("log.txt");
+    fw->write("Modern C++ RAII example.");
+    return 0;
+}
+```
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Memory ownership and resource management strategy planned.
+- [ ] **Simplicity First**: Modern STL features used over custom low-level logic where possible.
+- [ ] **Surgical Changes**: Modified only necessary headers or source files.
+- [ ] **Goal-Driven Execution**: Verified with GoogleTest and memory leak checks (`valgrind`).
+- [ ] RAII principles strictly followed (no manual `new`/`delete`).
+- [ ] Smart pointers (`unique_ptr`, `shared_ptr`) used for all dynamic allocations.
+- [ ] C++20/23 features (Concepts, Ranges) leveraged for cleaner code.

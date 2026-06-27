@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@x/core": "workspace:*",
+    "@x/policy": "workspace:*",
     "gray-matter": "^4.0.3",
     "zod": "^3.25.76"
   },

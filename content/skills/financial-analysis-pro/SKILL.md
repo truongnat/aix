@@ -1,0 +1,306 @@
+---
+name: financial-analysis-pro
+description: >-
+  Use this skill whenever the user wants to perform financial analysis,
+  financial modeling, valuation, investment analysis, or work with financial
+  data. This includes analyzing financial statements, calculating financial
+  ratios, building financial models, performing company valuations, analyzing
+  investment opportunities, creating financial reports, and working with
+  time-series financial data. If the user mentions financial statements,
+  financial metrics, investment analysis, company valuation, or financial
+  modeling, use this skill.
+x-kind: domain
+x-version: 0.1.0
+x-roles: []
+x-tags: []
+x-compatible:
+  - claude
+  - cursor
+  - codex
+  - gemini
+---
+
+## Boundary
+
+This skill handles financial analysis tasks including financial statement analysis, ratio calculation, financial modeling, company valuation, investment analysis, and financial reporting. It focuses on using Python libraries (pandas, numpy, yfinance, matplotlib, seaborn) and financial modeling techniques. It does NOT cover accounting bookkeeping, tax compliance, or fintech payment processing.
+
+## When to use
+
+Use this skill when:
+- Analyzing financial statements (balance sheet, income statement, cash flow)
+- Calculating financial ratios (liquidity, profitability, solvency, efficiency)
+- Building financial models (DCF, comparable companies, precedent transactions)
+- Performing company valuation
+- Analyzing investment opportunities
+- Creating financial reports and dashboards
+- Working with time-series financial data
+- Performing technical analysis on stock prices
+
+DO NOT use this skill for:
+- Bookkeeping or accounting entries (use accounting-specific tools)
+- Tax compliance and filing (use tax-specific skills)
+- Payment processing or fintech APIs (use fintech-specific skills)
+- Legal or regulatory compliance (use compliance-specific skills)
+
+## Workflow
+
+1. **Identify the financial analysis task** (statement analysis, ratio calculation, modeling, valuation)
+2. **Gather financial data** (financial statements, market data, economic indicators)
+3. **Select appropriate analysis method** (ratio analysis, DCF, multiples, technical analysis)
+4. **Perform calculations** using appropriate formulas and models
+5. **Validate results** (check for data errors, reasonableness checks)
+6. **Create visualizations** (charts, graphs, dashboards)
+7. **Generate reports** with insights and recommendations
+
+### Operating principles
+
+- **Use pandas** for data manipulation and analysis
+- **Use yfinance** for market data retrieval
+- **Use matplotlib/seaborn** for financial visualizations
+- **Follow standard financial modeling best practices**
+- **Validate data quality** before analysis
+- **Document assumptions** in models
+- **Use consistent time periods** for comparisons
+- **Handle missing data** appropriately
+
+## Suggested response format
+
+```
+Analysis Type: [statement analysis / ratio calculation / valuation / investment analysis]
+Data Source: [financial statements / market data / economic indicators]
+Key Metrics: [relevant financial metrics]
+Findings: [analysis results]
+Recommendations: [actionable insights]
+Risks: [identified risks and limitations]
+Next steps: [follow-up analysis or actions]
+```
+
+## Resources in this skill
+
+- **Python Libraries**: pandas, numpy, yfinance, matplotlib, seaborn, scipy
+- **Analysis Methods**: Ratio analysis, DCF valuation, multiples analysis, technical analysis
+- **Data Sources**: Financial statements, market data, economic indicators
+- **Reference Documentation**: REFERENCE.md for advanced modeling techniques
+
+## Quick example
+
+**Calculate key financial ratios:**
+
+```
+1. Load financial statement data into pandas DataFrame
+2. Calculate liquidity ratios (current ratio, quick ratio)
+3. Calculate profitability ratios (ROE, ROA, profit margin)
+4. Calculate solvency ratios (debt-to-equity, interest coverage)
+5. Compare ratios to industry benchmarks
+6. Identify trends over time
+7. Generate insights and recommendations
+```
+
+## Checklist before calling the skill done
+
+- [ ] Financial data is available and accessible
+- [ ] Required libraries are installed (pandas, numpy, yfinance, etc.)
+- [ ] Analysis objective is clearly defined
+- [ ] Time period for analysis is specified
+- [ ] Industry benchmarks are available (for comparison)
+- [ ] Data quality has been validated
+- [ ] Assumptions are documented
+- [ ] Output format is specified (report, dashboard, raw data)
+
+---
+
+# Financial Analysis Guide
+
+## Overview
+
+This guide covers essential financial analysis techniques using Python libraries. For advanced modeling techniques and real-world examples, see REFERENCE.md.
+
+## Quick Start
+
+```python
+import pandas as pd
+import yfinance as yf
+import matplotlib.pyplot as plt
+
+# Get stock data
+stock = yf.Ticker("AAPL")
+financials = stock.financials
+balance_sheet = stock.balance_sheet
+cash_flow = stock.cashflow
+
+# Calculate basic ratios
+current_ratio = balance_sheet.loc['Total Assets'] / balance_sheet.loc['Total Liab']
+```
+
+## Financial Statement Analysis
+
+### Balance Sheet Analysis
+```python
+# Analyze liquidity
+current_assets = balance_sheet.loc['Total Current Assets']
+current_liabilities = balance_sheet.loc['Total Current Liab']
+current_ratio = current_assets / current_liabilities
+
+# Analyze solvency
+total_debt = balance_sheet.loc['Total Debt']
+total_equity = balance_sheet.loc['Total Stockholder Equity']
+debt_to_equity = total_debt / total_equity
+```
+
+### Income Statement Analysis
+```python
+# Calculate profitability ratios
+net_income = income_statement.loc['Net Income']
+revenue = income_statement.loc['Total Revenue']
+profit_margin = net_income / revenue
+
+# Calculate operating margin
+operating_income = income_statement.loc['Operating Income']
+operating_margin = operating_income / revenue
+```
+
+### Cash Flow Analysis
+```python
+# Calculate free cash flow
+operating_cash_flow = cash_flow.loc['Operating Cash Flow']
+capital_expenditure = cash_flow.loc['Capital Expenditure']
+free_cash_flow = operating_cash_flow - capital_expenditure
+```
+
+## Ratio Analysis
+
+### Liquidity Ratios
+```python
+def calculate_liquidity_ratios(balance_sheet):
+    current_ratio = balance_sheet.loc['Total Current Assets'] / balance_sheet.loc['Total Current Liab']
+    quick_ratio = (balance_sheet.loc['Total Current Assets'] - balance_sheet.loc['Inventory']) / balance_sheet.loc['Total Current Liab']
+    cash_ratio = balance_sheet.loc['Cash And Cash Equivalents'] / balance_sheet.loc['Total Current Liab']
+    return {
+        'current_ratio': current_ratio,
+        'quick_ratio': quick_ratio,
+        'cash_ratio': cash_ratio
+    }
+```
+
+### Profitability Ratios
+```python
+def calculate_profitability_ratios(income_statement, balance_sheet):
+    roe = income_statement.loc['Net Income'] / balance_sheet.loc['Total Stockholder Equity']
+    roa = income_statement.loc['Net Income'] / balance_sheet.loc['Total Assets']
+    profit_margin = income_statement.loc['Net Income'] / income_statement.loc['Total Revenue']
+    return {
+        'roe': roe,
+        'roa': roa,
+        'profit_margin': profit_margin
+    }
+```
+
+### Solvency Ratios
+```python
+def calculate_solvency_ratios(balance_sheet, income_statement):
+    debt_to_equity = balance_sheet.loc['Total Debt'] / balance_sheet.loc['Total Stockholder Equity']
+    interest_coverage = income_statement.loc['EBIT'] / income_statement.loc['Interest Expense']
+    return {
+        'debt_to_equity': debt_to_equity,
+        'interest_coverage': interest_coverage
+    }
+```
+
+## Valuation Methods
+
+### Discounted Cash Flow (DCF)
+```python
+def calculate_dcf(free_cash_flows, discount_rate, terminal_growth_rate):
+    """
+    Calculate company value using DCF method
+    """
+    pv_fcf = []
+    for i, fcf in enumerate(free_cash_flows):
+        pv = fcf / ((1 + discount_rate) ** (i + 1))
+        pv_fcf.append(pv)
+    
+    terminal_value = free_cash_flows[-1] * (1 + terminal_growth_rate) / (discount_rate - terminal_growth_rate)
+    pv_terminal = terminal_value / ((1 + discount_rate) ** len(free_cash_flows))
+    
+    enterprise_value = sum(pv_fcf) + pv_terminal
+    return enterprise_value
+```
+
+### Comparable Company Analysis
+```python
+def calculate_multiples(financials, market_cap):
+    """
+    Calculate valuation multiples
+    """
+    revenue = financials.loc['Total Revenue']
+    ebitda = financials.loc['EBITDA']
+    net_income = financials.loc['Net Income']
+    
+    p_e_ratio = market_cap / net_income
+    ev_revenue = market_cap / revenue
+    ev_ebitda = market_cap / ebitda
+    
+    return {
+        'p_e_ratio': p_e_ratio,
+        'ev_revenue': ev_revenue,
+        'ev_ebitda': ev_ebitda
+    }
+```
+
+## Technical Analysis
+
+```python
+import yfinance as yf
+import pandas as pd
+
+def calculate_moving_averages(ticker, period=50):
+    """Calculate moving average for stock price"""
+    data = yf.download(ticker, period="1y")
+    ma = data['Close'].rolling(window=period).mean()
+    return ma
+
+def calculate_rsi(ticker, period=14):
+    """Calculate Relative Strength Index"""
+    data = yf.download(ticker, period="3m")
+    delta = data['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+    rs = gain / loss
+    rsi = 100 - (100 / (1 + rs))
+    return rsi
+```
+
+## Visualization
+
+```python
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def plot_financial_ratios(ratios_df):
+    """Plot financial ratios over time"""
+    plt.figure(figsize=(12, 6))
+    for column in ratios_df.columns:
+        plt.plot(ratios_df.index, ratios_df[column], label=column)
+    plt.legend()
+    plt.title('Financial Ratios Over Time')
+    plt.xlabel('Date')
+    plt.ylabel('Ratio Value')
+    plt.grid(True)
+    plt.show()
+```
+
+## Quick Reference
+
+| Task | Best Tool | Key Functions |
+|------|-----------|---------------|
+| Data manipulation | pandas | DataFrame, read_csv, groupby |
+| Market data | yfinance | Ticker, download, financials |
+| Visualization | matplotlib/seaborn | plot, figure, subplots |
+| Statistical analysis | scipy | stats, optimize |
+| Time series | pandas | rolling, diff, shift |
+
+## Next Steps
+
+- For advanced DCF modeling, see REFERENCE.md
+- For industry-specific analysis, consult industry reports
+- For real-time data integration, explore API options

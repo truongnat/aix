@@ -1,0 +1,200 @@
+---
+name: sustainable-design-pro
+description: >
+  Sustainable web design: carbon footprint measurement, green hosting selection,
+  asset optimization (images, fonts, video), energy-efficient design patterns
+  (dark mode, lazy loading, code splitting), and performance budgets that reduce
+  CO2 per page view.
+
+
+  Use this skill when measuring and reducing a website's environmental impact,
+  choosing green hosting, optimizing assets for minimal data transfer,
+  implementing energy-efficient UX patterns, or reporting on digital
+  sustainability metrics.
+
+
+  Do not use for general performance optimization without sustainability framing
+  (use performance-tuning-pro) or for accessibility (use a11y-design-pro).
+
+
+  Triggers: "sustainable design", "green web", "carbon footprint", "eco-friendly
+  website", "energy efficiency", "website carbon", "digital sustainability",
+  "green hosting", "zero-waste design", "low-carbon UI".
+x-kind: domain
+x-version: 0.1.0
+x-roles: []
+x-tags: []
+x-compatible:
+  - claude
+  - cursor
+  - codex
+  - gemini
+---
+
+# Sustainable Design (professional)
+
+Skill text is **English**; match the user's response language when applicable.
+
+Use [Website Carbon Calculator](https://www.websitecarbon.com/), [Sustainable Web Design](https://sustainablewebdesign.org/), [Green Web Foundation](https://www.thegreenwebfoundation.org/), and [Core Web Vitals](https://web.dev/vitals/) as authority. This skill encodes **carbon measurement**, **green infrastructure selection**, **asset optimization pipelines**, **energy-efficient UX patterns**, and **sustainability reporting**. Confirm **current carbon rating**, **hosting provider**, **performance baseline**, and **sustainability goals** before recommending changes.
+
+## Boundary
+
+**`sustainable-design-pro`** owns **digital carbon measurement**, **green hosting decisions**, **asset optimization for minimal data transfer**, **energy-efficient UX patterns**, and **sustainability reporting**. It does **not** own general performance tuning without sustainability framing, accessibility, or design aesthetics.
+
+| Skill | When to combine with **`sustainable-design-pro`** |
+|-------|---------------------------------------------------|
+| **`performance-tuning-pro`** | When performance work also targets carbon reduction |
+| **`a11y-design-pro`** | When low-carbon design must also meet accessibility standards |
+| **`design-system-pro`** | When sustainable color and typography choices become design tokens |
+| **`ai-design-pro`** | When AI-generated assets need optimization before deployment |
+| **`deployment-pro`** | When choosing green hosting or CDN infrastructure |
+
+## When to use
+
+- Measuring current carbon footprint (websitecarbon.com, Ecograder, Lighthouse).
+- Reducing page weight through image/font/video optimization.
+- Choosing green hosting providers (100% renewable energy certified).
+- Implementing lazy loading, code splitting, and caching to reduce energy per visit.
+- Adopting dark mode or minimal-color palettes to reduce screen energy on OLED.
+- Reporting sustainability metrics to stakeholders (CO2/page view, energy per visit).
+- Trigger keywords: `sustainable design`, `carbon footprint`, `green web`, `eco-friendly`, `website carbon`, `digital sustainability`, `green hosting`, `energy efficiency`
+
+## When not to use
+
+- **General performance optimization** (non-sustainability context) — use **`performance-tuning-pro`**.
+- **Accessibility** — use **`a11y-design-pro`**.
+- **Design aesthetics** — use **`design-system-pro`**.
+
+## Required inputs
+
+- **Current carbon rating** — websitecarbon.com result or Lighthouse performance score.
+- **Hosting provider** — current host; whether renewable energy certified.
+- **Performance baseline** — page size (KB), TTFB, LCP, total requests.
+- **Sustainability goals** — target CO2/view, rating target (A/B/C), timeline.
+- **Asset inventory** — image formats in use, video presence, font loading strategy.
+
+## Expected output
+
+Follow **Suggested response format (STRICT)**.
+
+## Workflow
+
+Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+
+1. **Confirm** current carbon rating, hosting, and performance baseline → verify: [baseline documented].
+2. **Measure before optimizing** — run websitecarbon.com and Lighthouse; identify highest-impact assets (**Think Before Coding**).
+3. **Highest impact first** — images > video > fonts > JS > hosting; fix the largest byte savings first (**Simplicity First**).
+4. **Surgical changes** — optimize only the assets/patterns causing the largest CO2 contribution (**Surgical Changes**).
+5. **Define done** as: measurable CO2/view reduction; carbon rating improved by at least one grade (**Goal-Driven Execution**).
+6. **Respond** using **Suggested response format**; note trade-offs between UX and sustainability.
+
+### Operating principles
+
+1. **Think Before Coding** — Measure first. The biggest wins are almost always image optimization and hosting, not code changes.
+2. **Simplicity First** — Every byte not transferred saves energy. The most sustainable page is the one that loads less.
+3. **Surgical Changes** — Don't refactor the whole codebase. Fix the 3 assets that account for 80% of page weight.
+4. **Goal-Driven Execution** — Done = CO2/view reduced to target; green hosting confirmed; Lighthouse performance ≥ 90.
+5. **Data transfer = energy** — 1GB of data ≈ 0.44g CO2. Every KB saved multiplies across all page views.
+6. **Green hosting is the single biggest lever** — Switching to a 100% renewable host can reduce carbon by 50–80% instantly.
+7. **Sustainable ≠ ugly** — Lean pages are faster, cheaper, and more accessible. Sustainability and UX quality align.
+
+## Default recommendations by scenario
+
+| Scenario | Default action | Expected impact |
+|----------|---------------|-----------------|
+| Large images | Convert to AVIF/WebP + lazy load | 60–80% size reduction |
+| No green hosting | Migrate to Cloudflare Pages / Vercel / Netlify (all renewable) | 50–80% CO2 reduction |
+| Heavy fonts | Use `font-display: swap` + subsetting | 50–90% font size reduction |
+| Video autoplay | Replace with poster image + user-triggered play | 90%+ data reduction |
+| Third-party scripts | Audit and remove unused trackers | 10–30% request reduction |
+| Dark mode | Implement prefers-color-scheme | 20–40% OLED energy saving |
+
+## Decision trees
+
+Summary: current rating → highest-impact fix → implementation → re-measure.
+
+Details: [references/decision-tree.md](references/decision-tree.md)
+
+## Anti-patterns
+
+Summary: uncompressed images, video autoplay, blocking fonts, no caching headers, grey hosting, unused JS bundles, tracking scripts without audit.
+
+Details: [references/anti-patterns.md](references/anti-patterns.md)
+
+### Asset optimization (summary)
+
+- Images: AVIF > WebP > JPEG; use `<picture>` for format negotiation; `loading="lazy"` on all below-fold images.
+- Fonts: subset to used characters; `font-display: swap`; self-host over Google Fonts.
+- Video: never autoplay; use `<video>` with poster; compress with FFmpeg (H.265/AV1).
+
+Details: [references/asset-optimization.md](references/asset-optimization.md)
+
+### Green hosting (summary)
+
+- Check hosting at [thegreenwebfoundation.org](https://www.thegreenwebfoundation.org/).
+- Top green options: Cloudflare Pages, Vercel, Netlify, Hetzner (renewable), Infomaniak.
+- CDN caching reduces origin server requests → direct energy savings.
+
+Details: [references/green-hosting.md](references/green-hosting.md)
+
+## Cross-skill handoffs
+
+- **`performance-tuning-pro`** — when carbon reduction and Core Web Vitals improvement overlap.
+- **`deployment-pro`** — when migrating to green hosting or configuring CDN caching headers.
+- **`design-system-pro`** — when sustainable color/typography choices need to become design tokens.
+- **`a11y-design-pro`** — when dark mode and low-contrast palettes need accessibility validation.
+
+Details: [references/integration-map.md](references/integration-map.md)
+
+## Suggested response format (implement / review)
+
+1. **Baseline** — Current carbon rating, page weight, hosting provider.
+2. **Highest-impact fixes** — Ordered by CO2 savings (assets → hosting → patterns).
+3. **Implementation** — Code/config changes for each fix.
+4. **Verification** — Re-run websitecarbon.com; Lighthouse score; bytes saved.
+5. **Residual risks** — UX trade-offs, browser support for AVIF/AV1, migration complexity.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Asset optimization guide | [references/asset-optimization.md](references/asset-optimization.md) |
+| Green hosting guide | [references/green-hosting.md](references/green-hosting.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+| Advanced techniques | [REFERENCE.md](REFERENCE.md) |
+| Scripts | [Scripts/](Scripts/) |
+
+## Quick example
+
+**Input:** "Our product landing page scores F on websitecarbon.com."
+- Run Lighthouse; identify top 3 assets by byte size.
+- Convert hero image to AVIF + add `loading="lazy"` to all below-fold images.
+- Check hosting at thegreenwebfoundation.org; migrate to Cloudflare Pages if grey.
+- **Verify:** Re-run websitecarbon.com; target C rating or better; Lighthouse performance ≥ 85.
+
+**Input (tricky):** "Our marketing team insists on a 4K video hero section."
+- Propose: replace autoplay video with a static poster image + "Watch" button.
+- If video is non-negotiable: compress with AV1 (FFmpeg), serve via CDN, lazy-load.
+- Quantify trade-off: autoplay 4K video ≈ 50MB/visit vs. poster image ≈ 80KB/visit.
+- **Verify:** Page weight < 500KB without video; video < 2MB compressed; user triggers play.
+
+**Input (cross-skill):** "Build a carbon-neutral e-commerce site from scratch."
+- **`sustainable-design-pro`**: Asset pipeline (AVIF, font subsetting), green hosting on Cloudflare.
+- **`performance-tuning-pro`**: LCP < 2.5s; TBT < 200ms; service worker caching.
+- **`a11y-design-pro`**: Dark mode palette passes WCAG AA contrast.
+- **Verify:** websitecarbon.com rating A or B; Lighthouse 90+ all categories.
+
+## Checklist before calling the skill done
+
+- [ ] Baseline measured: carbon rating, page weight, hosting provider (**Think Before Coding**)
+- [ ] Highest-impact assets identified before coding (**Think Before Coding**)
+- [ ] Largest byte savings targeted first; no speculative refactoring (**Simplicity First**)
+- [ ] Only the high-impact assets/patterns were touched (**Surgical Changes**)
+- [ ] CO2/view reduced to target; carbon rating improved (**Goal-Driven Execution**)
+- [ ] Images converted to AVIF/WebP with lazy loading
+- [ ] Fonts subsetted and using font-display: swap
+- [ ] Hosting verified as renewable energy certified
+- [ ] Caching headers set (Cache-Control, CDN)
+- [ ] Residual risks called out: UX trade-offs, browser support, migration complexity

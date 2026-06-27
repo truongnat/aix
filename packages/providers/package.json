@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@x/core": "workspace:*",
+    "@x/policy": "workspace:*",
     "@x/registry": "workspace:*"
   },
   "devDependencies": {

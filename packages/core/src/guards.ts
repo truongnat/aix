@@ -5,6 +5,7 @@ function createEvidenceGuard(): PhaseGuard {
   return {
     id: 'evidence-guard',
     async check(state: SessionState): Promise<Result<void>> {
+      if (state.phase === 'start') return ok(undefined);
       const phaseEvidence = state.evidence.filter(e => e.phase === state.phase);
       if (phaseEvidence.length < 1) {
         return fail(new AppError({

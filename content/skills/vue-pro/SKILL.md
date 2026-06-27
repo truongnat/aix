@@ -1,0 +1,108 @@
+---
+name: vue-pro
+description: >-
+  Expert Vue 3 development covering the Composition API, Pinia, Vue Router, and
+  modern Vite-based workflows.
+x-kind: domain
+x-version: 0.1.0
+x-roles: []
+x-tags: []
+x-compatible:
+  - claude
+  - cursor
+  - codex
+  - gemini
+---
+
+# Vue Pro
+
+Expert-level orchestration of modern Vue.js applications. Focuses on the Vue 3 ecosystem, performance, and reactive state management.
+
+## Boundary
+
+**`vue-pro`** covers Vue 3 (Composition API, Script Setup), Reactive State (Pinia), Routing (Vue Router), and modern build tooling (Vite). It does NOT cover legacy Vue 2 patterns (Option API) unless specifically requested for migration.
+
+## When to use
+
+- Building high-performance, reactive frontends using Vue 3.
+- Implementing complex state management with Pinia.
+- Designing modular, reusable components using the Composition API.
+- Setting up a modern Vite-based frontend project.
+
+## Workflow
+
+1. **Project Setup**: Initialize with `npm create vue@latest`.
+2. **Component Design**: Build components using the `<script setup>` pattern.
+3. **State Management**: Define stores using Pinia for shared state.
+4. **Routing**: Configure Vue Router for SPA navigation.
+5. **Logic Implementation**: Use `ref`, `reactive`, `computed`, and `watch` for reactivity.
+6. **Testing**: Write unit tests with Vitest and E2E tests with Playwright/Cypress.
+
+### Operating principles
+
+- **Composition over Options**: Always prefer the Composition API for better logic reuse.
+- **Reactivity Awareness**: Understand how Vue's reactivity works to avoid performance pitfalls.
+- **Modularity**: Keep components small, focused, and well-documented.
+- **Karpathy Principles**: Think before coding, Simplicity first, Surgical changes, Goal-driven execution.
+
+## Suggested response format (STRICT)
+
+Your response MUST follow this structure:
+
+```xml
+<Role>
+Senior Vue.js Engineer.
+</Role>
+
+<Feature>
+[Vue Component/Feature Description]
+</Feature>
+
+<Implementation>
+[Clean, Vue 3 Composition API code Artifact]
+</Implementation>
+
+<Verification>
+[Step-by-step verification plan with Vitest examples]
+</Verification>
+```
+
+## Resources in this skill
+
+| Topic | Reference |
+|-------|-----------|
+| Vue Roadmap | [roadmap.sh/vue](https://roadmap.sh/vue) |
+| Vue 3 Docs | [vuejs.org/guide/introduction](https://vuejs.org/guide/introduction.html) |
+| Pinia Docs | [pinia.vuejs.org](https://pinia.vuejs.org/) |
+| Vite Docs | [vitejs.dev/guide](https://vitejs.dev/guide/) |
+
+## Quick example
+
+**Feature:** A simple counter component using the Composition API.
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+const count = ref(0);
+const doubleCount = computed(() => count.value * 2);
+
+function increment() {
+  count.value++;
+}
+</script>
+
+<template>
+  <button @click="increment">Count: {{ count }} (Double: {{ doubleCount }})</button>
+</template>
+```
+
+## Checklist before calling the skill done
+
+- [ ] **Think Before Coding**: Component structure and state flow planned.
+- [ ] **Simplicity First**: Built-in directives (`v-if`, `v-for`) used effectively.
+- [ ] **Surgical Changes**: Only updated necessary components or stores.
+- [ ] **Goal-Driven Execution**: Verified with Vitest and browser interaction.
+- [ ] Composition API (`<script setup>`) used for all new components.
+- [ ] Pinia stores used for global state management.
+- [ ] Props and Emits correctly typed with TypeScript.

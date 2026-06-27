@@ -1,6 +1,21 @@
 import { Command } from 'commander';
-import { MarkdownStore } from '@x/memory';
-import { join } from 'node:path';
+import { MarkdownStore, RedactedMemoryStore } from '@x/memory';
+import { PolicyEngine } from '@x/policy';
+import type { MemoryRecord } from '@x/memory';
+const VALID_KINDS: readonly MemoryRecord['kind'][] = ['solution', 'decision', 'prompt-template', 'evidence'];
+
+function parseKind(raw: string | undefined): MemoryRecord['kind'] {
+  if (raw && (VALID_KINDS as readonly string[]).includes(raw)) {
+    return raw as MemoryRecord['kind'];
+  }
+  return 'decision';
+}
+
+function createRedactedStore(baseDir: string): RedactedMemoryStore {
+  const policy = new PolicyEngine();
+  const inner = new MarkdownStore(baseDir);
+  return new RedactedMemoryStore(inner, policy);
+}
 
 export function registerMemoryCommand(program: Command): void {
   const memory = program.command('memory');
@@ -12,10 +27,10 @@ export function registerMemoryCommand(program: Command): void {
     .option('--kind <kind>', 'Kind: solution|decision|prompt-template|evidence')
     .option('--tags <tags>', 'Comma-separated tags')
     .action(async (title: string, body: string, opts: { kind?: string; tags?: string }) => {
-      const store = new MarkdownStore(join(process.cwd(), '.ai'));
+      const store = createRedactedStore(process.cwd());
       await store.push({
         id: crypto.randomUUID(),
-        kind: (opts.kind as any) ?? 'decision',
+        kind: parseKind(opts.kind),
         title,
         body,
         tags: opts.tags?.split(',').map(t => t.trim()) ?? [],
@@ -29,8 +44,9 @@ export function registerMemoryCommand(program: Command): void {
     .command('list')
     .option('--kind <kind>', 'Filter by kind')
     .action(async (opts: { kind?: string }) => {
-      const store = new MarkdownStore(join(process.cwd(), '.ai'));
-      const records = await store.list(opts.kind ? { kind: opts.kind as any } : undefined);
+      const store = createRedactedStore(process.cwd());
+      const kind = opts.kind ? parseKind(opts.kind) : undefined;
+      const records = await store.list(kind ? { kind } : undefined);
       for (const r of records) {
         console.log(`  ${r.id.slice(0, 8)}  ${r.title}  (${r.kind})`);
       }
@@ -40,7 +56,7 @@ export function registerMemoryCommand(program: Command): void {
   memory
     .command('search <query>')
     .action(async (query: string) => {
-      const store = new MarkdownStore(join(process.cwd(), '.ai'));
+      const store = createRedactedStore(process.cwd());
       const results = await store.search(query);
       for (const r of results) {
         console.log(`  ${r.id.slice(0, 8)}  ${r.title}`);

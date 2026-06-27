@@ -1,0 +1,114 @@
+---
+name: code-review
+description: 'Skill: code-review'
+x-kind: process
+x-version: 0.1.0
+x-roles: []
+x-tags: []
+x-compatible:
+  - claude
+  - cursor
+  - codex
+  - gemini
+---
+# code-review
+
+## Purpose
+
+Inspect changes for bugs, regressions, risk, and missing verification before work is accepted or shipped.
+
+## When To Use
+
+- before shipping non-trivial work
+- when reviewing a plan or implementation
+- when independent risk checking is needed
+
+## When Not To Use
+
+- when no changes have been made
+- when the task is only early-stage goal clarification
+- when the work is still too incomplete for meaningful inspection
+
+## Inputs
+
+- goal and plan artifacts
+- changed files or diffs
+- existing verification evidence if present
+
+## Workflow
+
+1. Read the goal, plan, and changed artifacts.
+2. Compare the change against expected scope and behavior.
+3. Look for correctness, regression, maintainability, and safety risks.
+4. Identify missing tests, missing evidence, and hidden assumptions.
+5. Record findings in severity order.
+
+## Operating Principles
+
+- Findings matter more than summaries.
+- Risk should be concrete and evidence-based.
+- Review the change against requirements, not just style.
+- Missing verification is a finding.
+
+## Reasoning Procedure
+
+1. Restate the review target and the approved scope.
+2. Check the diff, plan, and evidence against the requirements.
+3. Derive concrete findings or confirm that none are present.
+4. Stop and report blocked if the review cannot be scoped safely.
+
+## Action Loop
+
+- Thought: identify the next artifact or risk surface to inspect.
+- Action: read the diff, review context, or supporting evidence.
+- Observation: record the real finding or lack of finding.
+- Repeat until the review is complete.
+
+## Examples
+
+### Example 1
+
+Input: The prompt upgrade passes validation but still has boilerplate examples.
+
+Output:
+- Findings: important - skills/*/SKILL.md examples are not skill-specific enough.
+- Open questions: should the conformance eval be run against the actual example text or the rendered output?
+- Residual risk: medium until the content pass is made concrete.
+
+### Example 2
+
+Input: The change is blocked because the scope is still unclear.
+
+Output:
+- Findings: none yet.
+- Open questions: missing review context.
+- Residual risk: unable to assess until the diff is inspectable.
+## Output Contract
+
+This skill must produce:
+
+- a findings list
+- open questions when needed
+- a residual risk statement
+
+## Blocking Conditions
+
+Block or escalate when:
+
+- critical or important findings remain unresolved
+- verification gaps would allow unsafe shipping
+- scope drift is material and unapproved
+
+## Common Failure Modes
+
+- turning review into a style-only pass
+- restating the diff without identifying risk
+- ignoring verification gaps because code “looks fine”
+
+## Checklist Before Done
+
+- [ ] Goal and scope were reviewed
+- [ ] Changed artifacts were inspected
+- [ ] Risks were identified or ruled out
+- [ ] Missing verification was called out if present
+- [ ] Findings are concrete enough to act on

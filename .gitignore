@@ -20,3 +20,8 @@ Thumbs.db
 
 # build artifacts
 *.log
+
+# imported repo build artifacts
+imports/skills/dist/
+imports/dev-memory/dist/
+imports/ai-engineering-harness/dist/

@@ -1,7 +1,16 @@
 import type { MemoryRecord, MemoryStore } from './types.js';
-import { AppErrorClass } from '@x/core';
+import { MarkdownStore } from './markdown-store.js';
 
 export const KB_API_VERSION = 'v1';
+
+let degradeLogged = false;
+
+function logDegrade(): void {
+  if (!degradeLogged) {
+    console.warn('[kb] server unreachable — falling back to markdown storage');
+    degradeLogged = true;
+  }
+}
 
 function baseUrl(serverUrl: string): string {
   return `${serverUrl.replace(/\/+$/, '')}/api/${KB_API_VERSION}`;
@@ -9,68 +18,94 @@ function baseUrl(serverUrl: string): string {
 
 export class KbStore implements MemoryStore {
   readonly #serverUrl: string;
+  readonly #fallback: MarkdownStore;
+  #degrade: boolean;
 
-  constructor(serverUrl: string) {
+  constructor(serverUrl: string, fallbackBaseDir?: string) {
     this.#serverUrl = serverUrl;
+    this.#fallback = new MarkdownStore(fallbackBaseDir ?? '.');
+    this.#degrade = false;
   }
 
   async push(rec: MemoryRecord): Promise<void> {
-    const res = await fetch(`${baseUrl(this.#serverUrl)}/memory`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(rec),
-    });
-    if (!res.ok) {
-      throw new AppErrorClass({
-        code: 'IO',
-        message: `KbStore push failed: ${res.status} ${res.statusText}`,
-        path: rec.id,
+    if (this.#degrade) {
+      logDegrade();
+      await this.#fallback.push(rec);
+      return;
+    }
+    try {
+      const res = await fetch(`${baseUrl(this.#serverUrl)}/memory`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rec),
       });
+      if (!res.ok) {
+        throw new Error(`${res.status} ${res.statusText}`);
+      }
+    } catch {
+      this.#degrade = true;
+      logDegrade();
+      await this.#fallback.push(rec);
     }
   }
 
   async search(query: string, opts?: { tags?: readonly string[]; k?: number }): Promise<readonly MemoryRecord[]> {
-    const params = new URLSearchParams({ q: query });
-    if (opts?.k) params.set('k', String(opts.k));
-    if (opts?.tags) params.set('tags', opts.tags.join(','));
-
-    const res = await fetch(`${baseUrl(this.#serverUrl)}/memory/search?${params}`);
-    if (!res.ok) {
-      throw new AppErrorClass({
-        code: 'IO',
-        message: `KbStore search failed: ${res.status} ${res.statusText}`,
-      });
+    if (this.#degrade) {
+      logDegrade();
+      return this.#fallback.search(query, opts);
     }
-    const data = await res.json() as MemoryRecord[];
-    return data;
+    try {
+      const params = new URLSearchParams({ q: query });
+      if (opts?.k) params.set('k', String(opts.k));
+      if (opts?.tags) params.set('tags', opts.tags.join(','));
+      const res = await fetch(`${baseUrl(this.#serverUrl)}/memory/search?${params}`);
+      if (!res.ok) {
+        throw new Error(`${res.status} ${res.statusText}`);
+      }
+      return await res.json() as MemoryRecord[];
+    } catch {
+      this.#degrade = true;
+      logDegrade();
+      return this.#fallback.search(query, opts);
+    }
   }
 
   async get(id: string): Promise<MemoryRecord | undefined> {
-    const res = await fetch(`${baseUrl(this.#serverUrl)}/memory/${encodeURIComponent(id)}`);
-    if (res.status === 404) return undefined;
-    if (!res.ok) {
-      throw new AppErrorClass({
-        code: 'IO',
-        message: `KbStore get failed: ${res.status} ${res.statusText}`,
-        path: id,
-      });
+    if (this.#degrade) {
+      logDegrade();
+      return this.#fallback.get(id);
     }
-    const data = await res.json() as MemoryRecord;
-    return data;
+    try {
+      const res = await fetch(`${baseUrl(this.#serverUrl)}/memory/${encodeURIComponent(id)}`);
+      if (res.status === 404) return undefined;
+      if (!res.ok) {
+        throw new Error(`${res.status} ${res.statusText}`);
+      }
+      return await res.json() as MemoryRecord;
+    } catch {
+      this.#degrade = true;
+      logDegrade();
+      return this.#fallback.get(id);
+    }
   }
 
   async list(opts?: { kind?: MemoryRecord['kind'] }): Promise<readonly MemoryRecord[]> {
-    const params = new URLSearchParams();
-    if (opts?.kind) params.set('kind', opts.kind);
-
-    const res = await fetch(`${baseUrl(this.#serverUrl)}/memory?${params}`);
-    if (!res.ok) {
-      throw new AppErrorClass({
-        code: 'IO',
-        message: `KbStore list failed: ${res.status} ${res.statusText}`,
-      });
+    if (this.#degrade) {
+      logDegrade();
+      return this.#fallback.list(opts);
     }
-    const data = await res.json() as MemoryRecord[];
-    return data;
+    try {
+      const params = new URLSearchParams();
+      if (opts?.kind) params.set('kind', opts.kind);
+      const res = await fetch(`${baseUrl(this.#serverUrl)}/memory?${params}`);
+      if (!res.ok) {
+        throw new Error(`${res.status} ${res.statusText}`);
+      }
+      return await res.json() as MemoryRecord[];
+    } catch {
+      this.#degrade = true;
+      logDegrade();
+      return this.#fallback.list(opts);
+    }
   }
 }

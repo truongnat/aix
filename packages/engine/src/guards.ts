@@ -1,5 +1,8 @@
 import { checkShell } from '@x/policy';
-import type { EngineState } from './state.js';
+import { ConsoleHitlChannel } from '@x/hitl';
+import type { EngineState, TicketPlan } from './state.js';
+
+const hitl = new ConsoleHitlChannel();
 
 export function checkReviewerIsNotCoder(state: EngineState): boolean {
   if (!state.current?.assignedRole) return true;
@@ -16,6 +19,30 @@ export function checkShellDenylist(command: string): boolean {
   return result.ok;
 }
 
-export function shouldInterrupt(_phase: string, _state: EngineState): boolean {
-  return false;
+export function checkPlanShellDenylist(plans: readonly TicketPlan[] | undefined): boolean {
+  if (!plans) return true;
+  for (const plan of plans) {
+    for (const cmd of plan.files) {
+      if (!checkShell(cmd).ok) return false;
+    }
+  }
+  return true;
+}
+
+export async function shouldInterrupt(phase: string, state: EngineState): Promise<boolean> {
+  if (state.session.mode === 'autonomous') return false;
+
+  const interruptPhases = ['ticket-plan', 'coder'];
+  if (!interruptPhases.includes(phase)) return false;
+
+  const response = await hitl.ask({
+    question: `Intervention required before "${phase}" phase. Proceed?`,
+    tier: 0,
+    options: [
+      { id: 'proceed', label: 'Proceed', summary: `Continue with ${phase}` },
+      { id: 'cancel', label: 'Cancel', summary: 'Stop execution' },
+    ],
+  });
+
+  return response.chosen === 'cancel';
 }

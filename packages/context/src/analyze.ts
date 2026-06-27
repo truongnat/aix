@@ -1,3 +1,4 @@
+// T4.1: replaces spec's flow.ts — folded into analyze.ts
 import { readdir, readFile } from 'node:fs/promises';
 import { join, extname } from 'node:path';
 import type {

@@ -13,6 +13,13 @@ export interface TaskItem {
   readonly output?: string;
 }
 
+export interface TicketPlan {
+  readonly ticketId: string;
+  readonly description: string;
+  readonly files: readonly string[];
+  readonly acceptanceCriteria: readonly string[];
+}
+
 export interface EngineState {
   readonly session: SessionState;
   readonly plan?: PlanDoc;
@@ -21,6 +28,8 @@ export interface EngineState {
   readonly current?: TaskItem;
   readonly reviewScore?: number;
   readonly attempts: number;
+  readonly ticketPlans?: readonly TicketPlan[];
+  readonly coderOutput?: string;
 }
 
 export function createInitialEngineState(session: SessionState): EngineState {
