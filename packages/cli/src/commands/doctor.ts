@@ -42,9 +42,9 @@ export function registerDoctorCommand(program: Command): void {
       }
 
       const hasRoot = existsSync(join(cwd, 'aix.json'));
-      const hasDot = existsSync(join(cwd, '.aix', 'config.json'));
+      const hasDot = existsSync(join(cwd, '.aix', 'static', 'config.json'));
       if (hasRoot || hasDot) {
-        const found = hasRoot ? 'aix.json' : '.aix/config.json';
+        const found = hasRoot ? 'aix.json' : '.aix/static/config.json';
         console.log(`  Config: ${found}`);
       } else {
         console.log('  Config: not found (optional — create aix.json to customize)');

@@ -4,10 +4,9 @@ dist/
 *.tsbuildinfo
 coverage/
 
-# aix runtime output (context index, engine-generated code, checkpoints)
+# aix local state — runtime output (.aix/runtime: memory, context index, generated
+# code, checkpoints) + static inputs (.aix/static: config, eval suites). All machine-local.
 .aix/
-# agent memory output (runtime, machine-local)
-.ai/
 # generated skill index — contains machine-absolute paths; regenerate via `aix skills`
 catalog.json
 

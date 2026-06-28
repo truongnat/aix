@@ -4,7 +4,7 @@ import { createBudgetTracker } from '@x/core';
 import type { EngineState, TaskItem } from '../state.js';
 import { createProvider, type RuntimeProvider } from '@x/providers';
 
-const GENERATED_ROOT = '.aix/generated';
+const GENERATED_ROOT = '.aix/runtime/generated';
 
 export async function coderNode(state: EngineState): Promise<EngineState> {
   if (!state.current) return state;
@@ -23,7 +23,7 @@ export async function coderNode(state: EngineState): Promise<EngineState> {
 
   // T1: write generated code to a sandbox dir. The autonomous loop has no
   // human review, so we never clobber the user's source — output lands under
-  // .aix/generated/<sessionId>/ for the user to inspect and apply.
+  // .aix/runtime/generated/<sessionId>/ for the user to inspect and apply.
   const target = resolveTarget(state.current, state);
   const written = await writeOutput(session.id, target, output);
 
@@ -55,7 +55,7 @@ async function writeOutput(
 ): Promise<string[]> {
   // Strip leading ../ and absolute prefixes plus any embedded ../ segments to
   // prevent path traversal out of the sandbox; the result is always confined
-  // to .aix/generated/<sessionId>/.
+  // to .aix/runtime/generated/<sessionId>/.
   const safe = relPath
     .replace(/^(\.\.[/\\])+/, '')
     .replace(/^[/\\]+/, '')

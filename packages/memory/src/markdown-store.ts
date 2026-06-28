@@ -2,7 +2,7 @@ import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { MemoryRecord, MemoryStore } from './types.js';
 
-const MEMORY_DIR = '.ai/memory';
+const MEMORY_DIR = '.aix/runtime/memory';
 
 function recordToMarkdown(rec: MemoryRecord): string {
   return [

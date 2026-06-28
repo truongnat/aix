@@ -5,7 +5,7 @@ import { existsSync } from 'node:fs';
 import { ContextEngine } from '@x/context';
 import { SimpleVectorStore } from '@x/context';
 
-const INDEX_FILE = '.aix/context-index.json';
+const INDEX_FILE = '.aix/runtime/context-index.json';
 
 function getIndexPath(cwd: string): string {
   return join(cwd, INDEX_FILE);

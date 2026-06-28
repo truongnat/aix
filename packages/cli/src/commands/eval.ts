@@ -4,7 +4,7 @@ import { Command } from 'commander';
 import { EvalHarness } from '@x/evals';
 import type { EvalCase, VariantRunner } from '@x/evals';
 
-const EVALS_DIR = '.aix/evals';
+const EVALS_DIR = '.aix/static/evals';
 
 function makeMockRunner(): VariantRunner {
   return async (_variant: string, input: unknown) => {
@@ -21,7 +21,7 @@ function loadSuite(suiteName: string): EvalCase[] {
   const path = resolve(EVALS_DIR, `${suiteName}.json`);
   if (!existsSync(path)) {
     console.error(`Suite not found: ${path}`);
-    console.error('Place .json files in .aix/evals/');
+    console.error('Place .json files in .aix/static/evals/');
     process.exit(1);
   }
   const raw = readFileSync(path, 'utf-8');
@@ -64,7 +64,7 @@ export function registerEvalCommand(program: Command): void {
     .action(() => {
       const suites = listSuites();
       if (suites.length === 0) {
-        console.log('No eval suites found. Place .json files in .aix/evals/');
+        console.log('No eval suites found. Place .json files in .aix/static/evals/');
         return;
       }
       console.log('Available suites:');

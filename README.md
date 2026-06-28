@@ -73,7 +73,7 @@ aix also ships a TypeScript monorepo for authoring, compiling, and (optionally) 
 
 Only when there is **no interactive host** to be the runtime — e.g. a CI job or batch pipeline that
 must drive the SDLC loop unattended. In that path the engine writes generated code to
-`.aix/generated/<session>/` for review (never directly into `src/`), tracks USD budget with a
+`.aix/runtime/generated/<session>/` for review (never directly into `src/`), tracks USD budget with a
 hard-stop, and fails loud in mock mode. **In Claude Code / Cursor / any interactive agent, you do not
 need the engine** — install the plugin and let the host drive the spine.
 
@@ -97,7 +97,7 @@ aix install --provider <claude|cursor|codex|gemini> [--dry-run] [--force] [--all
 aix context build [path] | query "<q>"
 aix run "<task>"            # guardrail mode (human-reviewed phase loop)
 aix run "<task>" --auto     # headless engine (writes generated code to
-                            #   .aix/generated/<session>/ for review, not into src/)
+                            #   .aix/runtime/generated/<session>/ for review, not into src/)
 aix run "<task>" --dry-run  # preview phases + token estimate, no execution
 aix verify | ship
 aix memory push|search|list|get
