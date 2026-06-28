@@ -1,5 +1,22 @@
 # aix — Đánh giá kỹ thuật (Technical Assessment)
 
+> ⚠️ **SNAPSHOT LỊCH SỬ — đa số đã được khắc phục.** Báo cáo này chụp tại commit `08e7f87`.
+> Từ đó: **T1–T7** (xem [TASKS.md](./TASKS.md)) đã đóng các khoảng cách §1–§3 (coder ghi file
+> thật vào `.aix/generated/`, budget được wire qua `addUsage`, mock mode fail-loud), `private: true`
+> cho cả 13 package, thêm smoke test cho `EngineGraph.run()` + CI chạy `pnpm test`, và
+> `git filter-repo` đã dọn `imports/` khỏi lịch sử.
+>
+> **Quan trọng hơn — reframing chiến lược:** báo cáo này coi `@x/engine` là "điểm bán hàng chính",
+> nhưng đó là **góc nhìn sai**. aix không phải runtime độc lập; nó là **plugin cài vào agent** (mô hình
+> [superpowers](https://github.com/obra/superpowers)) — **host agent là runtime**, engine chỉ là đường
+> phụ headless/CI. Xem [MIGRATION.md](./MIGRATION.md) (Phase A–E) và [README.md](./README.md). Vì vậy
+> nhiều phê phán "engine rỗng" bên dưới đã **mất trọng số**: engine không còn là lõi.
+>
+> Phần còn giữ giá trị: Cost (§pricing hardcode), Testing (coverage thật vẫn thấp), Publishing
+> (scope `@x` placeholder). Giữ nguyên văn bên dưới làm hồ sơ lịch sử — **không sửa số liệu cũ**.
+>
+> ---
+>
 > Đánh giá độc lập với tư cách technical peer, dựa trên kiểm tra trực tiếp source code
 > (không dựa vào README/CHANGELOG). Mục tiêu: chỉ ra khoảng cách giữa **tuyên bố** và
 > **thực tế** trên mọi khía cạnh — git, coding, plan, cost, preview, testing, publishing, security.

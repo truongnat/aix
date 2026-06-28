@@ -72,11 +72,18 @@ name format đúng, không trùng tên, đều có description.
 
 ---
 
-## Phase D — Demote `@x/engine`
+## Phase D — Demote `@x/engine` ✅ (xong)
 
-- [ ] Đổi định vị: engine = "headless/CI runner cho non-interactive", không phải core.
-- [ ] Cập nhật README/ASSESSMENT: host agent (Claude Code) là runtime; engine optional.
-- [ ] Cân nhắc gỡ hẳn nếu không có use-case CI rõ ràng.
+- [x] Viết lại **README.md**: dẫn dắt bằng mô hình plugin (host agent = runtime); engine
+  chuyển xuống mục "Supporting tooling" + thêm mục "When to use `@x/engine`" (chỉ khi
+  không có host tương tác — CI/batch).
+- [x] **ASSESSMENT.md**: thêm banner đầu file đánh dấu snapshot lịch sử `08e7f87`, ghi rõ
+  T1–T7 đã fix §1–§3 và reframing chiến lược (engine không còn là lõi). Giữ nguyên văn cũ
+  làm hồ sơ.
+- [x] **`@x/engine/package.json`**: thêm `description` định vị "Optional headless/CI runner …
+  host agent is the runtime".
+- [ ] (Để ngỏ) Gỡ hẳn engine — chưa làm: vẫn giữ làm đường CI/batch; chỉ gỡ nếu sau này
+  xác định không có use-case non-interactive.
 
 ---
 

@@ -2,6 +2,7 @@
   "name": "@x/engine",
   "version": "0.1.0",
   "private": true,
+  "description": "Optional headless/CI runner for non-interactive autonomous SDLC runs (LangGraph.js). Not used by the aix plugin path — there the host agent is the runtime.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
