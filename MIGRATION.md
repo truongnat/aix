@@ -87,10 +87,33 @@ name format đúng, không trùng tên, đều có description.
 
 ---
 
-## Phase E — Tách content (sau)
+## Phase E — Content thành layer cộng đồng ✅ (xong, mô hình in-repo)
 
-- [ ] Tách `content/` thành layer cộng đồng sửa được (như `superpowers-skills`).
-- [ ] Marketplace repo riêng.
+Quyết định: **in-repo layer** (không tách 2 repo). Lý do: dự án solo, tax 2-repo (subtree
+sync, phối version) lớn; marketplace in-repo đã chạy. Lấy ~90% giá trị (đóng góp được,
+ranh giới rõ) mà không phải bảo trì repo thứ hai.
+
+- [x] `content/skills/CONTRIBUTING.md` — hợp đồng đóng góp: layout skill, **schema frontmatter
+  SKILL.md** (bảng đầy đủ từ Zod: name/description/x-kind/x-version/x-tags/x-roles/x-compatible),
+  hướng dẫn `x-kind`, ví dụ, checklist PR. Trỏ tới skill `writing-skills` cho phần thiết kế sâu.
+- [x] `.github/CODEOWNERS` — định tuyến review; process skills + spine + plugin mechanics
+  được soi kỹ hơn.
+- [x] README mục **Contributing** trỏ tới CONTRIBUTING + CODEOWNERS.
+- [x] An toàn loader: CONTRIBUTING.md là file (không phải dir) → registry bỏ qua
+  (`!isDirectory() continue`), không gây SKIP.
+- [ ] (Không làm — theo quyết định) Tách repo riêng `aix-skills` + marketplace repo riêng.
+  Để ngỏ nếu sau này thật sự cần versioning/đóng gói skill library độc lập.
+
+---
+
+## Tổng kết: A ✅ · B ✅ · C ✅ · D ✅ · E ✅ (in-repo)
+
+aix giờ là một plugin Claude Code hoàn chỉnh theo mô hình superpowers: SessionStart hook
+inject `using-aix` → 164 skills native qua Skill tool → host agent chạy spine bằng subagent
+của chính nó. Engine là đường phụ headless/CI. Content là layer cộng đồng đóng góp được.
+
+**Còn lại (ngoài migration):** test thật trên Claude Code (`/plugin marketplace add truongnat/aix`
+→ session mới → xác nhận inject + Skill tool resolve).
 
 ---
 

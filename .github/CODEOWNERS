@@ -1,0 +1,20 @@
+# Code owners for aix. GitHub requests review from these owners automatically.
+# Last matching pattern wins.
+
+# Default: the maintainer owns everything.
+*                                   @truongnat
+
+# The community-editable skill library. New/changed skills land here.
+/content/skills/                    @truongnat
+
+# Process skills + the spine change how every agent works — extra scrutiny.
+/content/skills/using-aix/          @truongnat
+/content/workflows/                 @truongnat
+
+# Plugin mechanics: changing these affects every install.
+/.claude-plugin/                    @truongnat
+/hooks/                             @truongnat
+
+# Engine + core tooling.
+/packages/                          @truongnat
+/services/                          @truongnat

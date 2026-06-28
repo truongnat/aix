@@ -135,6 +135,13 @@ imports/         the 6 original repos (git subtree, history preserved; untracked
 apps/docs        consolidated documentation
 ```
 
+## Contributing
+
+`content/skills/` is the community-editable layer — add or improve a skill without touching the
+TypeScript packages. See [`content/skills/CONTRIBUTING.md`](./content/skills/CONTRIBUTING.md) for the
+layout, the `SKILL.md` frontmatter schema, and the checks your PR must pass. For *how to design* a
+good skill, invoke the `writing-skills` skill. Reviews are routed via [`.github/CODEOWNERS`](./.github/CODEOWNERS).
+
 ## License
 
 MIT
