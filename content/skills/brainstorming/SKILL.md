@@ -53,7 +53,7 @@ Shape a vague request into an implementation-ready direction before detailed pla
    - *Safety & Boundary Risks:* Rollback complexity, security exposure, and fail-safe defaults.
 8. Recommend one option and provide a transparent, detailed justification explaining why it best fits the current repo, what tradeoffs were prioritized, and why the alternatives were bypassed.
 9. Final Alignment Confirmation: Restate the recommended approach, decomposed stages, and scope. Request final confirmation from the user to verify mutual understanding before handing off to the planning phase.
-10. Hand off the confirmed direction and detailed rationale to discussion or planning artifacts.
+10. Hand off the confirmed direction and detailed rationale to discussion or planning artifacts (e.g. DISCUSSION.md or SHAPE.md). If previous versions of these files exist, archive them first (e.g., move to .aix/archive/<file>.YYYYMMDD_HHMMSS.md) to preserve the historical audit trail, and add a reference link to the archived files at the top of the new ones.
 
 ## Operating Principles
 
