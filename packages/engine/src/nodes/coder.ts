@@ -63,7 +63,7 @@ async function writeOutput(
   const dest = join(GENERATED_ROOT, sessionId, safe);
   await mkdir(dirname(dest), { recursive: true });
   await writeFile(dest, content, 'utf-8');
-  return [dest];
+  return [dest.replace(/\\/g, '/')];
 }
 
 function buildSystemPrompt(state: EngineState): string {
