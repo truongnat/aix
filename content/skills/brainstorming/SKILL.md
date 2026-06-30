@@ -51,9 +51,9 @@ Shape a vague request into an implementation-ready direction before detailed pla
    - *Performance & Resource Impact:* Performance cost and resource overhead.
    - *Time-to-Value vs. Effort:* Direct business value versus implementation complexity.
    - *Safety & Boundary Risks:* Rollback complexity, security exposure, and fail-safe defaults.
-8. Recommend one option and explain why it best fits the current repo.
+8. Recommend one option and provide a transparent, detailed justification explaining why it best fits the current repo, what tradeoffs were prioritized, and why the alternatives were bypassed.
 9. Final Alignment Confirmation: Restate the recommended approach, decomposed stages, and scope. Request final confirmation from the user to verify mutual understanding before handing off to the planning phase.
-10. Hand off the confirmed direction to discussion or planning artifacts.
+10. Hand off the confirmed direction and detailed rationale to discussion or planning artifacts.
 
 ## Operating Principles
 

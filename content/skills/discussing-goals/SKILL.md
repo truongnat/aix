@@ -42,9 +42,9 @@ Turn a vague request into a clear engineering objective with explicit scope, con
 3. Prior Art & KB Lookup: Search the codebase history and knowledge base (using query/grep tools) to check if the problem or a similar solved pattern/library helper already exists.
 4. Identify constraints, risks, utility (is it a critical pain point or vanity request?), security/data integrity considerations, legal/license/copyright compliance, and success criteria.
 5. Compare exactly three realistic options with scored dimensions (Value, Effort fit, Risk, Fit) and explicit trade-offs. Each option must evaluate its boundary limits (what it solves vs. what it leaves out) and ensure it doesn't lock the system's interface contract.
-6. Recommend the highest total; let the user pick via structured question tool when available.
+6. Recommend the highest total and provide a detailed, clear justification for why this option was chosen (referencing specific constraints, utility, security, and compliance). Explain why the other options were bypassed. Let the user pick via structured question tool when available.
 7. Final Alignment Confirmation: Restate the finalized understanding of the goal, selected option, scope, and trade-offs. Obtain explicit confirmation from the user that the understanding is clear and aligned before closing the phase.
-8. Capture the decision basis, scores, final selection, and user confirmation in a discussion artifact.
+8. Capture the decision basis, scores, final selection, user confirmation, and detailed rationale in a discussion artifact.
 
 ## Operating Principles
 
