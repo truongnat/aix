@@ -39,10 +39,11 @@ Produce a concrete implementation plan before changes begin.
 
 1. Restate the approved goal and scope.
 2. List the affected files, systems, and artifacts.
-3. Break work into ordered, small, verifiable tasks.
-4. Define verification, not-run cases, and rollback considerations.
-5. If the work changes behavior, add a delta spec artifact using `templates/CHANGE_SPEC.md`.
-6. Save the plan in a durable artifact and stop before implementation.
+3. Plan Decomposition (Divide & Conquer): If the plan addresses a large system, split it into modular, sequential phases/milestones with clear interface contracts. Avoid a single flat list of steps.
+4. Break work into ordered, small, verifiable tasks with isolated tests for each sub-problem.
+5. Define verification, not-run cases, and rollback considerations.
+6. If the work changes behavior, add a delta spec artifact using `templates/CHANGE_SPEC.md`.
+7. Save the plan in a durable artifact and stop before implementation.
 
 ## Operating Principles
 

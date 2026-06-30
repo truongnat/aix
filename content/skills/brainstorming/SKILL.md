@@ -39,9 +39,15 @@ Shape a vague request into an implementation-ready direction before detailed pla
 
 1. Restate the problem in concrete engineering terms.
 2. Separate confirmed requirements from assumptions.
-3. Compare a small number of realistic approaches.
-4. Recommend one option and explain why it best fits the current repo.
-5. Hand off the clarified direction to discussion or planning artifacts.
+3. Prior Art & KB Lookup: Search the codebase history and knowledge base (using query/grep tools) to verify if a similar solution pattern or helper library already exists.
+4. Problem Decomposition (Divide & Conquer): For large/complex tasks, decompose the problem into modular, independent sub-problems. Define the boundaries and interface/API specifications between them first.
+5. Trade-off Matrix Comparison: Evaluate approaches against structured dimensions:
+   - *Complexity & Maintenance:* Long-term maintenance and integration code cost.
+   - *Performance & Resource Impact:* Performance cost and resource overhead.
+   - *Time-to-Value vs. Effort:* Direct business value versus implementation complexity.
+   - *Safety & Boundary Risks:* Rollback complexity, security exposure, and fail-safe defaults.
+6. Recommend one option and explain why it best fits the current repo.
+7. Hand off the clarified direction to discussion or planning artifacts.
 
 ## Operating Principles
 
