@@ -1,9 +1,8 @@
 # aix — AI Engineering Platform
 
-> A **Claude Code plugin**: an opinionated engineering methodology (brainstorm → plan → TDD →
-> subagent-driven dev → review → ship) plus a 160+ skill library (domain + process), activated at
-> session start. **The host agent is the runtime** — aix is the playbook and the library, not a
-> separate engine you invoke.
+> An AI engineering platform / plugin: an opinionated SDLC methodology (discuss → plan → execute) plus a
+> 159‑skill library (domain + process), activated at session start. **The host agent is the runtime** —
+> aix is the playbook and the library, not a separate engine you invoke.
 
 **Status:** v1 (active development). ESM, Node 22, strict TypeScript.
 
@@ -13,7 +12,7 @@ aix follows the [superpowers](https://github.com/obra/superpowers) model. On `/p
 
 1. A `SessionStart` hook injects one entry-point skill — [`using-aix`](./content/skills/using-aix/SKILL.md) —
    into the agent's context. It explains the methodology spine and how to reach every other skill.
-2. All 164 skills under [`content/skills/`](./content/skills) become available to the host's **`Skill`
+2. All 159 skills under [`content/skills/`](./content/skills) become available to the host's **`Skill`
    tool** (declared via `"skills"` in [`.claude-plugin/plugin.json`](./.claude-plugin/plugin.json)).
 3. The agent works the [engineering spine](./content/workflows/engineering-spine.md), dispatching
    **its own native subagents** (the host's `Task` tool) per plan task. There is no aix runtime engine
@@ -23,7 +22,7 @@ aix follows the [superpowers](https://github.com/obra/superpowers) model. On `/p
 # In Claude Code:
 /plugin marketplace add truongnat/aix
 /plugin install aix
-# New session → using-aix is injected → 164 skills reachable via the Skill tool.
+# New session → using-aix is injected → 159 skills reachable via the Skill tool.
 ```
 
 ## Why
@@ -53,10 +52,10 @@ aix also ships a TypeScript monorepo for authoring, compiling, and (optionally) 
 
 | Package | Role |
 |---|---|
-| `@x/core` | Shared types, phase machine, guards, budget tracker |
+| `@x/core` | Shared types, phase machine, guards, budget tracker (USD + context window) |
 | `@x/registry` | `SKILL.md` schema (Zod), loader, catalog, migrator |
 | `@x/policy` | Boundary redaction (20+ secret/PII patterns), shell denylist |
-| `@x/providers` | Pure adapters (Claude/Cursor/Codex/Gemini) + runtime LLM provider |
+| `@x/providers` | Compile-time adapters (Claude/Cursor/Codex/Gemini) + runtime LLM provider (Anthropic, OpenAI, Groq) |
 | `@x/compiler` | Idempotent, dry-run-capable file emitter (hash + generated-marker) |
 | `@x/context` | Regex-based code analysis, RAG index/query, wiki generation |
 | `@x/memory` | Markdown-first store + KB adapter, redaction-wrapped |
@@ -64,7 +63,7 @@ aix also ships a TypeScript monorepo for authoring, compiling, and (optionally) 
 | `@x/preview` | Tiered preview (Mermaid / image / HTML server) |
 | `@x/hitl` | Human-in-the-loop decision channel (always ≥2 options) |
 | `@x/evals` | A/B harness + rubric scoring |
-| `@x/engine` | **Optional headless/CI runner** — autonomous SDLC graph (LangGraph.js) for *non-interactive* runs (CI, batch). Not used by the plugin path; the host agent is the runtime there. |
+| `@x/engine` | **Optional headless/CI runner** — autonomous SDLC graph (LangGraph.js) with file-based checkpointing, budget guardrails, and structured logging per step. For *non-interactive* runs (CI, batch). Not used by the plugin path; the host agent is the runtime there. |
 | `@x/cli` | The `aix` command surface (authoring + compile + headless run) |
 | `services/kb-server` | NestJS + Neo4j graph knowledge base (auth: master + bcrypt API keys) |
 
@@ -72,9 +71,10 @@ aix also ships a TypeScript monorepo for authoring, compiling, and (optionally) 
 
 Only when there is **no interactive host** to be the runtime — e.g. a CI job or batch pipeline that
 must drive the SDLC loop unattended. In that path the engine writes generated code to
-`.aix/sessions/<session>/generated/` for review (never directly into `src/`), tracks USD budget with a
-hard-stop, and fails loud in mock mode. **In Claude Code / Cursor / any interactive agent, you do not
-need the engine** — install the plugin and let the host drive the spine.
+`.aix/sessions/<session>/generated/` for review (never directly into `src/`), tracks USD budget plus
+context-window usage with pre-flight checks and hard-stop, persists checkpoints to disk via
+`FileCheckpointer` for crash recovery, and fails loud in mock mode. **In Claude Code / Cursor / any
+interactive agent, you do not need the engine** — install the plugin and let the host drive the spine.
 
 ## Quick start (monorepo / authoring)
 
@@ -119,7 +119,7 @@ API keys are generated server-side (`kb_live_<hex>`), stored as bcrypt hashes, a
 ## Security model
 
 - **Redaction at the boundary:** all memory writes pass through `@x/policy.redact` before hitting disk or the KB — secrets become `••••`. The KB never receives raw secrets.
-- **Shell denylist** and **budget hard-stop (USD)** guard the headless engine path.
+- **Shell denylist** and **budget hard-stop (USD + context window)** guard the headless engine path.
 - **Provider error bodies** are redacted before surfacing.
 
 ## Repository layout
@@ -127,7 +127,7 @@ API keys are generated server-side (`kb_live_<hex>`), stored as bcrypt hashes, a
 ```
 .claude-plugin/  plugin.json + marketplace.json (the plugin manifest)
 hooks/           SessionStart hook that injects using-aix
-content/         canonical source: skills (164), agents, rules, workflows
+content/         canonical source: skills (159), agents, rules, workflows
 packages/        13 @x/* packages (authoring, compile, headless engine)
 services/        kb-server (NestJS + Neo4j)
 imports/         the 6 original repos (git subtree, history preserved; untracked)
