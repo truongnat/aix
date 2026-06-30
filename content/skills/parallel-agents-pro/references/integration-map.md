@@ -8,13 +8,11 @@ This map defines how parallel-agents-pro integrates with other skills in this re
 
 ### Upstream Skills (Use Before parallel-agents-pro)
 
-**writing-plans-pro**
+**planning-pro**
 - **When to call:** Before parallel execution
 - **Purpose:** Create detailed plan with dependency mapping
 - **Handoff:** Task list with dependencies and parallelization strategy
-- **Integration:** parallel-agents-pro uses writing-plans-pro output for agent dispatch
-
-**planning-pro**
+- **Integration:** parallel-agents-pro uses planning-pro output for agent dispatch
 - **When to call:** Before parallel execution
 - **Purpose:** High-level coordination and milestone tracking
 - **Handoff:** Milestone structure and high-level dependencies
@@ -22,11 +20,11 @@ This map defines how parallel-agents-pro integrates with other skills in this re
 
 ### Downstream Skills (Use After or During parallel-agents-pro)
 
-**executing-plans-pro**
+**executing-pro**
 - **When to call:** For sequential coordination of dependent tasks
 - **Purpose:** Execute dependent tasks sequentially
 - **Handoff:** Dependent tasks for sequential execution
-- **Integration:** parallel-agents-pro dispatches independent tasks, executing-plans-pro handles dependent
+- **Integration:** parallel-agents-pro dispatches independent tasks, executing-pro handles dependent
 
 **Domain *-pro skills**
 - **When to call:** During execution for agent task execution
@@ -51,23 +49,23 @@ This map defines how parallel-agents-pro integrates with other skills in this re
 ### Scenario 1: Parallel Task Execution
 
 **Flow:**
-1. **writing-plans-pro** creates detailed plan with dependency mapping
-2. **parallel-agents-pro** dispatches independent tasks to agents
-3. Domain ***-pro skills** execute tasks within each agent
+1. **planning-pro** creates detailed plan with dependency mapping
+2. **parallel-agents-pro** dispatches independent tasks
+3. Domain ***-pro skills** execute each agent task
 4. **parallel-agents-pro** aggregates results
-5. **executing-plans-pro** executes dependent tasks sequentially
+5. **executing-pro** executes dependent tasks sequentially
 
 **Key Integration Points:**
-- Dependency mapping (writing-plans-pro → parallel-agents-pro)
+- Dependency mapping (planning-pro → parallel-agents-pro)
 - Agent dispatch (parallel-agents-pro)
 - Task execution (parallel-agents-pro → domain skills)
 - Result aggregation (parallel-agents-pro)
-- Sequential coordination (parallel-agents-pro → executing-plans-pro)
+- Sequential coordination (parallel-agents-pro → executing-pro)
 
 ### Scenario 2: Parallel with Dependencies
 
 **Flow:**
-1. **writing-plans-pro** maps dependencies
+1. **planning-pro** maps dependencies
 2. **parallel-agents-pro** executes wave 1 (independent tasks)
 3. Domain ***-pro skills** execute wave 1 tasks
 4. **parallel-agents-pro** aggregates wave 1 results
@@ -75,7 +73,7 @@ This map defines how parallel-agents-pro integrates with other skills in this re
 6. Continue until all waves complete
 
 **Key Integration Points:**
-- Dependency mapping (writing-plans-pro)
+- Dependency mapping (planning-pro)
 - Wave execution (parallel-agents-pro)
 - Task execution (parallel-agents-pro → domain skills)
 - Wave coordination (parallel-agents-pro)
@@ -97,7 +95,7 @@ This map defines how parallel-agents-pro integrates with other skills in this re
 
 ## Handoff Protocols
 
-### From writing-plans-pro
+### From planning-pro
 
 **When:** Plan ready for parallel execution
 **Input:** Task list with dependencies, parallelization strategy
@@ -109,7 +107,7 @@ This map defines how parallel-agents-pro integrates with other skills in this re
 - Dispatch agents
 - Aggregate results
 
-### To executing-plans-pro
+### To executing-pro
 
 **When:** Dependent tasks need sequential execution
 **Input:** Dependent tasks with dependencies
@@ -155,17 +153,17 @@ This map defines how parallel-agents-pro integrates with other skills in this re
 
 ## Conflict Resolution
 
-### Conflicts with writing-plans-pro
+### Conflicts with planning-pro
 
 **Scenario:** Dependency mapping issues during execution
 
 **Resolution:**
 - Pause execution
-- Communicate dependency issues to writing-plans-pro
+- Communicate dependency issues to planning-pro
 - Adjust dependency map
 - Resume execution
 
-### Conflicts with executing-plans-pro
+### Conflicts with executing-pro
 
 **Scenario:** Sequential coordination conflicts
 
@@ -189,7 +187,7 @@ This map defines how parallel-agents-pro integrates with other skills in this re
 
 ### Before parallel-agents-pro
 
-- [ ] Plan received from writing-plans-pro
+- [ ] Plan received from planning-pro
 - [ ] Dependencies understood
 - [ ] Parallelization strategy defined
 - [ ] Resources available
@@ -204,6 +202,6 @@ This map defines how parallel-agents-pro integrates with other skills in this re
 ### After parallel-agents-pro
 
 - [ ] Results aggregated
-- [ ] Dependent tasks handed to executing-plans-pro
+- [ ] Dependent tasks handed to executing-pro
 - [ ] Execution reviewed with feedback-pro
 - [ ] Lessons learned documented

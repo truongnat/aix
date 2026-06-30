@@ -32,7 +32,7 @@ export function checkPlanShellDenylist(plans: readonly TicketPlan[] | undefined)
 export async function shouldInterrupt(phase: string, state: EngineState): Promise<boolean> {
   if (state.session.mode === 'autonomous') return false;
 
-  const interruptPhases = ['ticket-plan', 'coder'];
+  const interruptPhases = ['discuss', 'plan', 'ticket-plan', 'coder'];
   if (!interruptPhases.includes(phase)) return false;
 
   const response = await hitl.ask({

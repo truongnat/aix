@@ -2,7 +2,8 @@ import { Command } from 'commander';
 import * as p from '@clack/prompts';
 import { GuardrailLoop, createBudgetTracker } from '@x/core';
 import type { Phase } from '@x/core';
-import { EngineGraph, CheckpointManager, createInitialEngineState } from '@x/engine';
+import { EngineGraph, SessionStore, createInitialEngineState, discussNode, planNode } from '@x/engine';
+import type { EngineState } from '@x/engine';
 import { PromptAssembler } from '@x/prompt';
 import type { AssembleContext } from '@x/prompt';
 import { SkillRegistry } from '@x/registry';
@@ -61,8 +62,8 @@ async function handleDryRun(task: string): Promise<void> {
 }
 
 async function handleResume(checkpointId: string): Promise<void> {
-  const mgr = new CheckpointManager();
-  const saved = await mgr.load(checkpointId);
+  const store = new SessionStore();
+  const saved = await store.load(checkpointId);
   if (!saved) {
     console.error(`Checkpoint "${checkpointId}" not found`);
     process.exit(1);
@@ -92,9 +93,9 @@ async function handleResume(checkpointId: string): Promise<void> {
     return;
   }
 
-  const graph = new EngineGraph(mgr);
+  const graph = new EngineGraph(store);
   const final = await graph.resume(saved);
-  const checkpointId2 = await mgr.save(final);
+  const checkpointId2 = await store.save(final);
 
   const score = final.reviewScore ?? 0;
   const passed = score >= 9;
@@ -111,8 +112,8 @@ async function handleAuto(task: string): Promise<void> {
   const loop = new GuardrailLoop();
   const session = { ...(await loop.createSession(task)), mode: 'autonomous' as const };
   const initial = createInitialEngineState(session);
-  const mgr = new CheckpointManager();
-  const graph = new EngineGraph(mgr);
+  const store = new SessionStore();
+  const graph = new EngineGraph(store);
 
   p.intro(`Auto-running: "${task}"`);
   if (usingMock) {
@@ -122,7 +123,7 @@ async function handleAuto(task: string): Promise<void> {
   }
 
   const final = await graph.run(initial);
-  const id = await mgr.save(final);
+  const id = await store.save(final);
 
   console.log(`Score:    ${final.reviewScore ?? 0}/10`);
   console.log(`Budget:   $${final.session.budget.usdSpent.toFixed(4)} of $${final.session.budget.usdLimit.toFixed(2)}`);
@@ -156,9 +157,10 @@ async function handleGuardrail(task: string): Promise<void> {
     markdownStore,
     DEFAULT_SYSTEM_PARTS,
   );
-  const mgr = new CheckpointManager();
+  const store = new SessionStore();
 
   let state = await loop.createSession(task);
+  let engineState: EngineState = createInitialEngineState(state);
 
   p.intro(`Guardrail: "${task}"`);
   console.log(`Session: ${state.id}\n`);
@@ -229,13 +231,20 @@ async function handleGuardrail(task: string): Promise<void> {
       createdAt: new Date().toISOString(),
     });
 
-    if (phase === 'run' || phase === 'verify') {
-      const initial = createInitialEngineState(state);
-      const graph = new EngineGraph(mgr);
-      const finalState = await graph.run(initial);
-      state = finalState.session;
+    if (phase === 'discuss') {
+      engineState = await discussNode(engineState);
+      state = engineState.session;
+      await store.save(engineState);
+    } else if (phase === 'plan') {
+      engineState = await planNode(engineState);
+      state = engineState.session;
+      await store.save(engineState);
+    } else if (phase === 'run') {
+      const graph = new EngineGraph(store);
+      engineState = await graph.run(engineState);
+      state = engineState.session;
 
-      await mgr.save(finalState);
+      await store.save(engineState);
       await redactedMemory.push({
         id: `${state.id}-${phase}-result-${Date.now()}`,
         kind: 'evidence',
@@ -243,11 +252,11 @@ async function handleGuardrail(task: string): Promise<void> {
         body: JSON.stringify({
           sessionId: state.id,
           phase,
-          score: finalState.reviewScore,
-          attempts: finalState.attempts,
-          tasksDone: finalState.tasks.filter(t => t.status === 'done').length,
-          tasksTotal: finalState.tasks.length,
-          reviewFailed: (finalState.reviewScore ?? 0) < 9 && finalState.attempts >= 3,
+          score: engineState.reviewScore,
+          attempts: engineState.attempts,
+          tasksDone: engineState.tasks.filter(t => t.status === 'done').length,
+          tasksTotal: engineState.tasks.length,
+          reviewFailed: (engineState.reviewScore ?? 0) < 9 && engineState.attempts >= 3,
         }),
         tags: [phase, 'result'],
         version: '0.1.0',

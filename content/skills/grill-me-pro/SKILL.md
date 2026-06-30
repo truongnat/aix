@@ -15,7 +15,7 @@ description: >
 
 
   Combine with **`to-prd-pro`** after the interview to capture decisions, and
-  **`brainstorming-pro`** to explore alternatives before narrowing.
+  **`discussing-pro`** to explore alternatives before narrowing.
 x-kind: domain
 x-version: 0.1.0
 x-roles: []
@@ -35,14 +35,14 @@ Interview the user relentlessly about a plan or design — **one question at a t
 
 ## Boundary
 
-**`grill-me-pro`** owns **design interviews and assumption surfacing**. **`to-prd-pro`** owns synthesising decisions into a PRD. **`brainstorming-pro`** owns generating alternatives.
+**`grill-me-pro`** owns **design interviews and assumption surfacing**. **`to-prd-pro`** owns synthesising decisions into a PRD. **`discussing-pro`** owns goal discussion and alternative exploration.
 
 ## Related skills
 
 | Skill | When to combine |
 |-------|----------------|
 | **`to-prd-pro`** | Capture resolved decisions as a PRD after the interview |
-| **`brainstorming-pro`** | Generate and explore alternatives before narrowing |
+| **`discussing-pro`** | Clarify goals and explore alternatives before narrowing |
 | **`business-analysis-pro`** | Validate user stories and domain model |
 | **`clean-code-architecture-pro`** | Stress-test architectural decisions |
 
@@ -84,7 +84,7 @@ Use this structure while running the interview:
 
 - Decision tree discipline in this `SKILL.md` under `## Process` and `## Question quality bar`.
 - Downstream synthesis pairing: **`to-prd-pro`** for turning resolved decisions into a PRD.
-- Alternative-generation pairing: **`brainstorming-pro`** for widening options before narrowing.
+- Alternative-generation pairing: **`discussing-pro`** for widening options before narrowing.
 
 ## Quick example
 

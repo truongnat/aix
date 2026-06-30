@@ -11,7 +11,7 @@ The execution cycle follows a repeatable pattern: plan → execute batch → che
 **Goal:** Confirm plan is ready for execution.
 
 **Steps:**
-1. Review detailed plan from **`writing-plans-pro`**
+1. Review detailed plan from **`planning-pro`**
 2. Confirm dependencies are accurate
 3. Verify acceptance criteria are clear
 4. Check resources and environment are ready

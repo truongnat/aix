@@ -36,7 +36,7 @@ test('T1: coder writes at least one artefact to disk', async () => {
   assert.ok(Array.isArray(final.writtenFiles), 'writtenFiles is an array');
   assert.ok(final.writtenFiles.length > 0, 'at least one file written');
   assert.ok(
-    final.writtenFiles.every(f => f.startsWith('.aix/runtime/generated/')),
+    final.writtenFiles.every(f => f.includes('/.aix/sessions/') && f.includes('/generated/')),
     'all writes confined to the sandbox',
   );
 });

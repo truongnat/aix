@@ -29,7 +29,7 @@ Do not use this skill when:
 - there are no code or doc changes
 - verification is missing
 - git diff cannot be inspected
-- the user only asks for brainstorming or planning
+- the user only asks for discussing or planning
 
 ## Inputs
 

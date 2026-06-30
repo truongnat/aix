@@ -1,3 +1,4 @@
+export { discussNode } from './discuss.js';
 export { planNode } from './plan.js';
 export { rulesNode } from './rules.js';
 export { tasksNode } from './tasks.js';

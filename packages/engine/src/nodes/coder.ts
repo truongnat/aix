@@ -3,8 +3,8 @@ import { join, dirname } from 'node:path';
 import { createBudgetTracker } from '@x/core';
 import type { EngineState, TaskItem } from '../state.js';
 import { createProvider, type RuntimeProvider } from '@x/providers';
-
-const GENERATED_ROOT = '.aix/runtime/generated';
+import { sessionGeneratedDir } from '../session-store.js';
+import { checkBudget, formatBudgetWarnings } from '../budget-guard.js';
 
 export async function coderNode(state: EngineState): Promise<EngineState> {
   if (!state.current) return state;
@@ -12,6 +12,16 @@ export async function coderNode(state: EngineState): Promise<EngineState> {
   const provider: RuntimeProvider = createProvider();
   const system = buildSystemPrompt(state);
   const user = buildUserPrompt(state.current, state);
+
+  const budgetCheck = checkBudget(state);
+  if (!budgetCheck.ok) {
+    const critical = budgetCheck.warnings.filter(w => !w.recoverable);
+    if (critical.length > 0) {
+      throw new Error(`Budget check failed:\n${formatBudgetWarnings(critical)}`);
+    }
+    console.warn(`[budget] Warnings before coder:\n${formatBudgetWarnings(budgetCheck.warnings)}`);
+  }
+
   const response = await provider.call({ system, user });
 
   const output = response.content;
@@ -23,7 +33,7 @@ export async function coderNode(state: EngineState): Promise<EngineState> {
 
   // T1: write generated code to a sandbox dir. The autonomous loop has no
   // human review, so we never clobber the user's source — output lands under
-  // .aix/runtime/generated/<sessionId>/ for the user to inspect and apply.
+  // .aix/sessions/<sessionId>/generated/ for the user to inspect and apply.
   const target = resolveTarget(state.current, state);
   const written = await writeOutput(session.id, target, output);
 
@@ -55,12 +65,12 @@ async function writeOutput(
 ): Promise<string[]> {
   // Strip leading ../ and absolute prefixes plus any embedded ../ segments to
   // prevent path traversal out of the sandbox; the result is always confined
-  // to .aix/runtime/generated/<sessionId>/.
+  // to .aix/sessions/<sessionId>/generated/.
   const safe = relPath
     .replace(/^(\.\.[/\\])+/, '')
     .replace(/^[/\\]+/, '')
     .replace(/\.\.[/\\]/g, '');
-  const dest = join(GENERATED_ROOT, sessionId, safe);
+  const dest = join(sessionGeneratedDir(sessionId), safe);
   await mkdir(dirname(dest), { recursive: true });
   await writeFile(dest, content, 'utf-8');
   return [dest.replace(/\\/g, '/')];

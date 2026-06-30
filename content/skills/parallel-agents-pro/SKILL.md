@@ -16,10 +16,9 @@ description: >-
   parallel workflows.
 
 
-  Use **with** **`executing-plans-pro`** for execution coordination,
-  **`writing-plans-pro`** for dependency-aware task breakdown, domain
-  **`*-pro`** skills for agent task execution, and **`planning-pro`** for
-  workflow orchestration.
+  Use **with** **`executing-pro`** for execution coordination,
+  **`planning-pro`** for dependency-aware task breakdown and workflow orchestration,
+  and domain **`*-pro`** skills for agent task execution.
 
 
   Triggers: "parallel", "concurrent", "multiple agents", "pa
@@ -42,14 +41,14 @@ Use references such as [Parallel Computing Patterns](https://www.amazon.com/Patt
 
 ## Boundary
 
-**`parallel-agents-pro`** owns **agent dispatch**, **dependency coordination across agents**, **result aggregation**, and **failure handling**. **`executing-plans-pro`** owns **sequential execution coordination**. **`writing-plans-pro`** owns **dependency mapping for parallelization**. Domain **`*-pro`** skills own **agent task execution**.
+**`parallel-agents-pro`** owns **agent dispatch**, **dependency coordination across agents**, **result aggregation**, and **failure handling**. **`executing-pro`** owns **sequential execution coordination**. **`planning-pro`** owns **dependency mapping for parallelization**. Domain **`*-pro`** skills own **agent task execution**.
 
 ## Related skills (this repo)
 
 | Skill | When to combine with `parallel-agents-pro` |
 |-------|------------------------------------------|
-| **`executing-plans-pro`** | Sequential execution coordination for dependent tasks |
-| **`writing-plans-pro`** | Dependency mapping to identify parallelizable tasks |
+| **`executing-pro`** | Sequential execution coordination for dependent tasks |
+| **`planning-pro`** | Dependency mapping to identify parallelizable tasks |
 | **Domain `*-pro` skills** | Agent task execution within each agent |
 | **`planning-pro`** | Workflow orchestration and milestone coordination |
 | **`testing-pro`** | Parallel test execution strategies |
@@ -66,10 +65,10 @@ Use references such as [Parallel Computing Patterns](https://www.amazon.com/Patt
 
 ## When not to use
 
-- **Sequential task execution** without parallelization — **`executing-plans-pro`**.
+- **Sequential task execution** without parallelization — **`executing-pro`**.
 - **Single agent workflow** — domain skill directly.
 - **High-level orchestration** without agent detail — **`planning-pro`**.
-- **Pure task breakdown** without execution — **`writing-plans-pro`**.
+- **Pure task breakdown** without execution — **`planning-pro`**.
 
 ## Required inputs
 
@@ -185,7 +184,7 @@ Details: [references/monitoring-and-adaptation.md](references/monitoring-and-ada
 - **Verify:** No overlapping write set remains before agents are launched.
 
 **Input (cross-skill):** "Run implementation and validation in parallel."
-- Pair **`executing-plans-pro`** for checkpoint discipline and let **`parallel-agents-pro`** define safe concurrency boundaries.
+- Pair **`executing-pro`** for checkpoint discipline and let **`parallel-agents-pro`** define safe concurrency boundaries.
 - Keep one track from invalidating the other’s assumptions mid-run.
 - **Verify:** Verification results can still be trusted against the implementation state they were meant to test.
 

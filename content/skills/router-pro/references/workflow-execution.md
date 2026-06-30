@@ -39,7 +39,7 @@ Command stubs in `commands/<slug>.md` map slash commands to workflow files. YAML
 ## Skill + workflow combination
 
 Many workflows activate domain skills mid-execution:
-- `/ticket` → activates `writing-plans-pro` (planning step) and the relevant domain skill (implementation step).
+- `/ticket` → activates `planning-pro` (planning step) and the relevant domain skill (implementation step).
 - `/debug` → activates `systematic-debugging-pro`.
 - `/code-review` → activates domain skill(s) + `security-pro` + `testing-pro`.
 

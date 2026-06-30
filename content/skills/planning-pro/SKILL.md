@@ -2,29 +2,15 @@
 name: planning-pro
 description: >-
   Production-grade planning: turning goals into executable plans with scope
-  framing, decomposition, dependency mapping, sequencing, estimation ranges,
-  risk controls, delivery checkpoints — plus system model (goals → work graph →
-  execution feedback → re-plan), failure modes (planning fallacy, hidden
-  dependencies, scope creep, milestone theater, stale plans), decision
-  trade-offs (outcome-first vs activity-first, MVP vs foundation-first,
-  predictive vs adaptive, spikes), and quality guardrails (verifiable
-  milestones, honest estimates, no fabricated constraints).
-
-
-  Use this skill when the user asks to create an implementation plan, break a
-  complex project into phases, define milestones, estimate effort, review
-  whether a plan is realistic, or design execution controls and dependency
-  order.
-
-
-  Combine with **`business-analysis-pro`** before fixing scope,
-  **`deployment-pro`** and **`ci-cd-pro`** for release integration,
-  **`testing-pro`** for quality gates, **`feedback-pro`** when reviews drive
-  reprioritization, **`strateg
+  framing, decomposition, dependency mapping, task breakdown, acceptance
+  criteria, risk identification, verification checkpoints, and rollback
+  strategy
 x-kind: domain
-x-version: 0.1.0
-x-roles: []
-x-tags: []
+x-version: 0.2.0
+x-roles:
+  - planner
+x-tags:
+  - planning
 x-compatible:
   - claude
   - cursor
@@ -32,182 +18,174 @@ x-compatible:
   - gemini
 ---
 
-# Planning and execution (professional)
+# Planning (professional)
 
-Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
+## Purpose
 
-Use references such as [PMI PMBOK](https://www.pmi.org/pmbok-guide-standards/foundational/pmbok) and [Atlassian agile planning](https://www.atlassian.com/agile/project-management/project-planning) for terminology; this skill encodes **goal-backward planning**, **dependency-aware sequencing**, **risk-first controls**, and **explicit feedback loops** — not organizational PM methodology replacement.
+Turn a clarified goal into a concrete, executable implementation plan with explicit task breakdown, dependencies, acceptance criteria, verification strategy, and rollback plan.
 
-## Boundary
+This is the **single planning skill** for the core flow. It replaces `writing-plans` and `writing-plans-pro`.
 
-**`planning-pro`** owns **executable sequencing**, **milestone structure**, **dependency and risk framing**, and **delivery checkpoints**. **`business-analysis-pro`** owns **requirements discovery and acceptance criteria**. **`deployment-pro`** owns **release mechanics and rollout policy**. Domain **`*-pro`** skills own **implementation choices** inside phases.
+## When To Use
 
-## Related skills (this repo)
+- after goal discussion is complete (DISCUSSION.md exists)
+- before any code, document, or configuration changes
+- when an existing plan is missing, stale, or invalidated
+- when resuming work that needs a fresh execution plan
 
-| Skill | When to combine |
-|-------|----------------|
-| **`business-analysis-pro`** | Scope, acceptance criteria, traceability before dates harden |
-| **`strategic-consulting-pro`** | Portfolio prioritization and initiative sequencing |
-| **`deployment-pro`** | Cutover windows, rollback, rollout checkpoints |
-| **`ci-cd-pro`** | Integration cadence and pipeline-sensitive ordering |
-| **`testing-pro`** | QA gates and environments tied to milestones |
-| **`feedback-pro`** | Review-driven reprioritization |
-| **`security-pro`** | Compliance gates affecting order of work |
-| Domain **`*-pro`** | Technical tasks and spikes per phase |
+## When Not To Use
 
-## When to use
+- when the goal is still unclear — use `discussing-pro` first
+- when the session is only reading or reviewing
+- when executing an already approved and still-valid plan
 
-- Breaking large goals into phases, milestones, and deliverables.
-- Building realistic execution plans with dependencies and constraints.
-- Prioritizing MVP vs later phases under deadline pressure.
-- Estimating effort ranges and surfacing critical path risks.
-- Reviewing plans for sequencing errors, hidden dependencies, or governance gaps.
-- Designing **rolling-wave** updates when uncertainty is high.
+## Inputs
 
-## When not to use
-
-- **Pure requirements elicitation** without scheduling — **`business-analysis-pro`** first.
-- **Executive strategy** without execution breakdown — **`strategic-consulting-pro`** may lead.
-- **Technical deep dive** on one stack — route to domain **`*-pro`** skills.
-- **Incident response / firefighting runbooks** — operational runbooks, not portfolio planning.
-
-## Required inputs
-
-- **Goal or outcome** (what “done” means at a high level).
-- **Constraints** when known: deadline, budget, team capacity, risk tolerance.
-- **Stakeholders / dependencies** affecting external deliverables.
-
-## Expected output
-
-Follow **Suggested response format** strictly — system model through residual risks.
+- DISCUSSION.md (from discussing-pro phase)
+- current codebase context, constraints, and prior decisions
+- affected systems, files, and APIs
 
 ## Workflow
 
-Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution.
+### 1. Context Review
+Restate the approved goal, scope boundaries, constraints, and the recommended approach from DISCUSSION.md.
 
-1. **Confirm** objective, scope boundaries, constraints, success criteria, and planning horizon (detail vs rolling wave). → verify: [context documented].
-2. **State assumptions** about requirements, constraints (**Think Before Coding**).
-3. **Apply** minimum solution first; escalate only when justified (**Simplicity First**).
-4. **Make surgical changes** — only touch code directly related to the request (**Surgical Changes**).
-5. **Define success criteria**; loop until verified (**Goal-Driven Execution**).
-6. **Respond** using **Suggested response format**; note main risks.
+Output: confirmed goal statement and scope.
 
-### Operating principles
+### 2. Scope & Boundaries
+Define what is in scope, out of scope, non-goals, and concrete success criteria.
 
-1. **Think Before Coding** — Confirm outcome, scope boundary, constraints, and planning horizon before decomposing work. Ask when “done” or ownership is unclear.
-2. **Simplicity First** — Prefer the smallest executable plan that creates forward motion. Do not invent phases, committees, or governance layers that the request did not need.
-3. **Surgical Changes** — Change only the plan slices, dependencies, or milestones relevant to the request. Do not reframe the whole roadmap without cause.
-4. **Goal-Driven Execution** — Done = the plan has verifiable milestones, explicit assumptions, and a clear way to detect if execution is off track.
-5. **Outcome before activity** — Milestones should represent evidence of progress, not just meetings or generic tasks.
-6. **Dependency truth beats optimism** — Hidden blockers, external approvals, and environment constraints belong in the plan even when inconvenient.
-7. **Uncertainty should change detail level** — Use rolling-wave planning when facts are unstable instead of pretending precision exists.
-8. **Plans must adapt** — A plan is a control loop, not a frozen artifact; reprioritization triggers should be stated up front.
+Output: scope boundaries and success criteria.
 
-## Default recommendations by scenario
+### 3. Impact Analysis
+List the affected files, systems, APIs, configuration, and external dependencies.
 
-- **Ambiguous project** — Clarify scope and acceptance before estimating dates.
-- **Complex delivery** — Map dependencies and critical path before expanding task detail.
-- **High uncertainty** — Use phased checkpoints and spikes rather than detailed long-range commitments.
-- **Recovery plan** — Focus first on blockers and sequencing fixes before polish or parallel expansion.
+Output: affected files and systems list.
 
-## Decision trees
+### 4. Task Decomposition
+Break work into ordered, small, independently verifiable tasks. Each task must have:
 
-Summary: choose plan depth and sequencing based on certainty, dependency density, and external constraints rather than producing one generic roadmap shape.
+- **Description** — what to do
+- **Dependencies** — which tasks must be done first (use task index references like `task-1`)
+- **Acceptance Criteria** — concrete, testable conditions
+- **Files** — which files this task touches
 
-Details: [references/decision-tree.md](references/decision-tree.md)
+For large work, split into phases/milestones first, then decompose each phase into tasks.
 
-## Anti-patterns
+Output: ordered task list with dependencies and acceptance criteria.
 
-Summary: milestone theater, optimistic estimates without dependencies, oversized phase plans under uncertainty, and task lists that never tie back to outcomes.
+### 5. Verification & Rollback
+Define how the overall implementation is verified and how to rollback if something goes wrong.
 
-Details: [references/anti-patterns.md](references/anti-patterns.md)
+Output: verification strategy and rollback strategy.
 
-### Plan system model and feedback loops (summary)
+### 6. Risk Assessment
+Identify blockers, assumptions, open questions, and residual risks that could change the plan.
 
-How goals, work breakdown, checkpoints, and re-planning should connect so plans remain executable instead of decorative.
+Output: risks and open questions list.
 
-Details: [references/plan-system-model-and-feedback-loops.md](references/plan-system-model-and-feedback-loops.md)
+### 7. Save Artifact
+Write PLAN.md in the session artifacts directory with all of the above.
 
-### Scope and decomposition (summary)
+## Output Contract
 
-How to carve scope into increments that are small enough to execute and meaningful enough to evaluate.
+### Plugin mode (agent reads skill)
 
-Details: [references/scope-and-decomposition.md](references/scope-and-decomposition.md)
+The agent must produce PLAN.md containing:
 
-### Sequencing and dependencies (summary)
+```markdown
+# Plan
 
-How to order work around prerequisites, external owners, and critical path constraints.
+## Goal & Scope
+{goal statement, scope boundaries, non-goals}
 
-Details: [references/sequencing-and-dependencies.md](references/sequencing-and-dependencies.md)
+## Constraints & Assumptions
+- {constraint or assumption}
 
-### Estimation and risk controls (summary)
+## Affected Files
+- {file path}
 
-How to express uncertainty honestly, size work in ranges, and add validation checkpoints where optimism would otherwise dominate.
+## Tasks
+1. {task title}
+   - Description: {what to do}
+   - Dependencies: {task-1, task-2, or none}
+   - Acceptance Criteria: {concrete condition}
+   - Files: {file path}
 
-Details: [references/estimation-and-risk-controls.md](references/estimation-and-risk-controls.md)
+## Verification Strategy
+{how to verify the implementation}
 
-### Failure modes and mitigation (summary)
+## Rollback Strategy
+{how to revert if needed}
 
-How plans fail through hidden dependencies, stale assumptions, and fake milestones, plus how to make those failures visible early.
+## Risks & Open Questions
+- {risk or question}
+```
 
-Details: [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md)
+### Framework mode (code)
 
-### Versions (summary)
+The planNode must call the LLM and parse the response as JSON:
 
-Version notes for planning references, terminology, or framework-specific execution contexts when they affect recommended structure.
+```json
+{
+  "goal": "clarified goal",
+  "scope": "in scope / out of scope",
+  "constraints": ["constraint 1"],
+  "assumptions": ["assumption 1"],
+  "affectedFiles": ["src/file1.ts"],
+  "tasks": [
+    {
+      "title": "Task title",
+      "description": "What to do",
+      "dependencies": ["task-1"],
+      "acceptanceCriteria": ["condition 1"],
+      "files": ["src/file1.ts"]
+    }
+  ],
+  "verificationStrategy": "how to verify",
+  "rollbackStrategy": "how to revert",
+  "risks": ["risk 1"]
+}
+```
 
-Details: [references/versions.md](references/versions.md)
+The code then renders this JSON into the same PLAN.md markdown format as the plugin mode.
 
-## Suggested response format
+## Operating Principles
 
-1. **Context** — Objective, scope boundary, constraints, stakeholders, and planning horizon.
-2. **Planning model** — Explain the decomposition, dependency shape, and why this level of detail is appropriate.
-3. **Plan** — Phases, milestones, owners/dependencies, and verification points.
-4. **Risks and controls** — Key assumptions, blockers, and re-planning triggers.
-5. **Residual risks** — What remains uncertain or outside current scope.
+- Planning is mandatory before implementation.
+- Small steps are easier to verify and recover.
+- Verification belongs in the plan, not just at the end.
+- Dependencies must be explicit so sequencing can be verified.
+- Plans should minimize room for interpretation and scope drift.
+- Rollback strategy is required, not optional.
+- Behavior changes should name the delta spec artifact early.
+- A plan is a control loop, not a frozen artifact — adapt when evidence changes.
 
-## Resources in this skill
+## Reasoning Procedure
 
-| Topic | File |
-|-------|------|
-| Plan system model and feedback loops | [references/plan-system-model-and-feedback-loops.md](references/plan-system-model-and-feedback-loops.md) |
-| Scope and decomposition | [references/scope-and-decomposition.md](references/scope-and-decomposition.md) |
-| Sequencing and dependencies | [references/sequencing-and-dependencies.md](references/sequencing-and-dependencies.md) |
-| Estimation and risk controls | [references/estimation-and-risk-controls.md](references/estimation-and-risk-controls.md) |
-| Failure modes and mitigation | [references/failure-modes-detection-mitigation.md](references/failure-modes-detection-mitigation.md) |
-| Decision framework and trade-offs | [references/decision-framework-and-trade-offs.md](references/decision-framework-and-trade-offs.md) |
-| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
-| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
-| Tips and tricks | [references/tips-and-tricks.md](references/tips-and-tricks.md) |
-| Edge cases | [references/edge-cases.md](references/edge-cases.md) |
-| Quality validation and guardrails | [references/quality-validation-and-guardrails.md](references/quality-validation-and-guardrails.md) |
-| Integration map | [references/integration-map.md](references/integration-map.md) |
-| Version notes | [references/versions.md](references/versions.md) |
+1. Restate the goal and the scope that must be planned.
+2. Check available context, constraints, and approvals from DISCUSSION.md.
+3. Identify affected files and systems.
+4. Decompose into small, dependency-ordered tasks.
+5. Define verification and rollback before writing the first task.
+6. Stop and report blocked if the scope or approval is unclear.
 
-## Quick example
+## Action Loop
 
-**Input:** "Break this platform rewrite into phases we can actually ship."
-- Start by naming the outcome, boundaries, and irreversible dependencies before listing tasks.
-- Use a phase plan with checkpoints tied to user-visible or operational evidence.
-- **Verify:** Each phase has a clear exit criterion and no hidden prerequisite is left unstated.
+- Thought: identify the next planning decision (task, dependency, or risk).
+- Action: decompose or document the decision.
+- Observation: record the exact plan element.
+- Repeat until the plan is explicit and executable.
 
-**Input (tricky):** "Leadership wants a quarter-long plan but requirements are still moving weekly."
-- Use rolling-wave detail: near-term milestones precise, later phases intentionally coarse.
-- Surface uncertainty explicitly instead of fabricating confidence.
-- **Verify:** The plan includes re-planning triggers and assumptions that can be revisited.
+## Checklist Before Done
 
-**Input (cross-skill):** "Plan a feature that needs app changes, API work, and zero-downtime rollout."
-- Pair domain skills for implementation depth and **`deployment-pro`** for rollout ordering.
-- Sequence compatibility work before the cutover milestone instead of treating deploy as an afterthought.
-- **Verify:** Cross-team dependencies and release checkpoints are visible in the plan.
-
-## Checklist before calling the skill done
-
-- [ ] Objective, scope boundary, constraints, and planning horizon confirmed first (Think Before Coding)
-- [ ] Minimum executable plan chosen; no unnecessary process layers added (Simplicity First)
-- [ ] Only the relevant plan slices or milestones were changed (Surgical Changes)
-- [ ] Success criteria, checkpoints, and re-planning triggers are explicit (Goal-Driven Execution)
-- [ ] Milestones describe outcomes or evidence, not just activity
-- [ ] Dependencies and external owners are surfaced honestly
-- [ ] Estimate uncertainty is represented appropriately for the current facts
-- [ ] Residual unknowns and off-scope items are documented clearly
+- [ ] Goal and scope are restated from discussion
+- [ ] Constraints and assumptions are documented
+- [ ] Affected files are listed
+- [ ] Tasks are ordered, concrete, and independently verifiable
+- [ ] Dependencies between tasks are explicit
+- [ ] Acceptance criteria are defined for each task
+- [ ] Verification strategy is defined
+- [ ] Rollback strategy is defined
+- [ ] Risks and open questions are surfaced
+- [ ] PLAN.md is saved and implementation has not started

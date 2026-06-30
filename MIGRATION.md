@@ -39,12 +39,12 @@ Còn lại: test cài thật vào Claude Code qua `/plugin marketplace add truon
 ## Phase B — Methodology spine (xương sống process) ✅ (xong)
 
 - [x] Định nghĩa workflow top-level → `content/workflows/engineering-spine.md`
-  (9 bước: discussing-goals → brainstorming → writing-plans → worktrees → TDD →
-  executing-plans → code-review → verification → remembering).
+  (8 bước: discussing-pro → planning-pro → executing-pro → worktrees → TDD →
+  code-review → verification → remembering).
 - [x] Surface process skills hiện có làm backbone — chúng đã có sẵn từ
   `ai-engineering-harness` + `agentic-sdlc` đã merge; spine map đúng tên skill thật.
 - [x] `using-aix` trỏ tới spine với **tên skill thật** (verify: hook inject 3374 chars,
-  chứa `discussing-goals`, `executing-plans`).
+  chứa `discussing-pro`, `executing-pro`).
 
 Phát hiện: aix **đã có sẵn** toàn bộ methodology skills từ repo merge — Phase B chủ yếu là
 *wiring*, không phải viết mới.

@@ -36,15 +36,14 @@ The default methodology the plugin gives an agent. Each step is a real process s
 
 | # | Step | Skill |
 |---|------|-------|
-| 1 | Align | `discussing-goals` |
-| 2 | Shape | `brainstorming` |
-| 3 | Plan | `writing-plans` |
+| 1 | Align & Shape | `discussing-pro` |
+| 2 | Plan | `planning-pro` |
+| 3 | Execute | `executing-pro` |
 | 4 | Isolate | `using-git-worktrees` |
 | 5 | Test-first | `test-driven-development` |
-| 6 | Execute | `executing-plans` |
-| 7 | Review | `requesting-code-review` / `code-review` |
-| 8 | Verify | `verification-before-completion` |
-| 9 | Remember | `remembering` |
+| 6 | Review | `requesting-code-review` / `code-review` |
+| 7 | Verify | `verification-before-completion` |
+| 8 | Remember | `remembering` |
 
 See [`content/workflows/engineering-spine.md`](./content/workflows/engineering-spine.md) for the full flow.
 
@@ -73,7 +72,7 @@ aix also ships a TypeScript monorepo for authoring, compiling, and (optionally) 
 
 Only when there is **no interactive host** to be the runtime — e.g. a CI job or batch pipeline that
 must drive the SDLC loop unattended. In that path the engine writes generated code to
-`.aix/runtime/generated/<session>/` for review (never directly into `src/`), tracks USD budget with a
+`.aix/sessions/<session>/generated/` for review (never directly into `src/`), tracks USD budget with a
 hard-stop, and fails loud in mock mode. **In Claude Code / Cursor / any interactive agent, you do not
 need the engine** — install the plugin and let the host drive the spine.
 
@@ -97,7 +96,7 @@ aix install --provider <claude|cursor|codex|gemini> [--dry-run] [--force] [--all
 aix context build [path] | query "<q>"
 aix run "<task>"            # guardrail mode (human-reviewed phase loop)
 aix run "<task>" --auto     # headless engine (writes generated code to
-                            #   .aix/runtime/generated/<session>/ for review, not into src/)
+                            #   .aix/sessions/<session>/generated/ for review, not into src/)
 aix run "<task>" --dry-run  # preview phases + token estimate, no execution
 aix verify | ship
 aix memory push|search|list|get

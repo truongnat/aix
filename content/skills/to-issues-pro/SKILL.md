@@ -43,8 +43,8 @@ Convert a high-level plan, PRD, or GitHub issue into independently-implementable
 |-------|----------------|
 | **`to-prd-pro`** | Produce the PRD before decomposing into issues |
 | **`planning-pro`** | Sequence issues across milestones |
-| **`executing-plans-pro`** | Execute individual issues once created |
-| **`writing-plans-pro`** | Write detailed implementation plans per issue |
+| **`executing-pro`** | Execute individual issues once created |
+| **`planning-pro`** | Write detailed implementation plans per issue |
 
 ## When to use
 

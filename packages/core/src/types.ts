@@ -53,11 +53,20 @@ export interface BudgetState {
   readonly usdLimit: number;
   readonly tokensInPhase: number;
   readonly tokenWarnThreshold: number;
+  readonly tokenContextLimit: number;
+  readonly usdWarnThreshold: number;
+}
+
+export interface BudgetWarning {
+  readonly code: 'CONTEXT_HIGH' | 'BUDGET_HIGH' | 'CONTEXT_CRITICAL' | 'BUDGET_CRITICAL';
+  readonly message: string;
+  readonly recoverable: boolean;
 }
 
 export interface BudgetTracker {
   addUsage(state: SessionState, usd: number, tokens: number): SessionState;
   checkHardStop(state: SessionState): Result<void>;
+  checkBeforeCall(state: SessionState): { ok: true } | { ok: false; warnings: BudgetWarning[] };
   shouldCompact(state: SessionState): boolean;
 }
 

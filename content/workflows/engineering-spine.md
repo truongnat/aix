@@ -9,15 +9,14 @@
 
 | # | Step | Skill (invoke via `Skill` tool) | Purpose |
 |---|------|----------------------------------|---------|
-| 1 | Align | `discussing-goals` | Agree what success means before acting |
-| 2 | Shape | `brainstorming` | Explore alternatives, surface spec in chunks |
-| 3 | Plan | `writing-plans` | Small verifiable tasks, concrete file paths |
+| 1 | Align & Shape | `discussing-pro` | Clarify goals, explore alternatives, surface spec in chunks |
+| 2 | Plan | `planning-pro` | Task breakdown, dependencies, acceptance criteria, rollback |
+| 3 | Execute | `executing-pro` | Dependency-aware task execution with checkpoints |
 | 4 | Isolate | `using-git-worktrees` | Branch + clean baseline |
 | 5 | Test-first | `test-driven-development` | RED → GREEN → refactor |
-| 6 | Execute | `executing-plans` | Subagent per task, two-stage review |
-| 7 | Review | `requesting-code-review` / `code-review` | Security + quality pass |
-| 8 | Verify | `verification-before-completion` | Prove it works before "done" |
-| 9 | Remember | `remembering` | Record what was learned |
+| 6 | Review | `requesting-code-review` / `code-review` | Security + quality pass |
+| 7 | Verify | `verification-before-completion` | Prove it works before "done" |
+| 8 | Remember | `remembering` | Record what was learned |
 
 **Supporting skills:** `mapping-codebase`, `debugging-investigation`,
 `tool-discovery-skill`, `gatekeeper-skill`, `report-writer`, `writing-skills`.

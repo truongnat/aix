@@ -19,7 +19,7 @@ x-compatible: [claude, cursor, codex, gemini]
 You have aix. aix gives you two things:
 
 1. **A skill library** — 160+ skills. Two kinds:
-   - **Process skills** (the methodology spine): how to work — `brainstorming`,
+   - **Process skills** (the methodology spine): how to work — `discussing-pro`,
      `router-pro`, `tool-discovery-skill`, planning, TDD, review, ship.
    - **Domain skills** (the library): deep references — `react-pro`, `aws-pro`,
      `api-design-pro`, and many more.
@@ -43,16 +43,13 @@ the proven path, not optional decoration.
 Unless the user asks for something quick, follow this spine. Each step is a real
 aix process skill — invoke it via the `Skill` tool by the name in backticks:
 
-1. **`discussing-goals`** — align on what success actually means before anything.
-2. **`brainstorming`** — for fuzzy problems: explore alternatives, surface the
-   spec in digestible chunks, get agreement before any code.
-3. **`writing-plans`** — break the work into small, verifiable tasks with concrete
+1. **`discussing-pro`** — align on what success actually means and explore alternatives before anything.
+3. **`planning-pro`** — break the work into small, verifiable tasks with concrete
    file paths and verification steps.
 4. **`using-git-worktrees`** — isolate the work on a branch with a clean baseline.
 5. **`test-driven-development`** — write the test first, watch it fail, implement,
    watch it pass.
-6. **`executing-plans`** — dispatch focused subagents (the host's Task tool) per
-   task; review each for spec compliance, then code quality.
+6. **`executing-pro`** — dependency-aware task execution with checkpoints.
 7. **`requesting-code-review`** / **`code-review`** — security + quality pass.
 8. **`verification-before-completion`** — prove it works before declaring done.
 9. **`remembering`** — record what was learned.

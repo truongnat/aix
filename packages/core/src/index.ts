@@ -8,7 +8,7 @@ export type {
   Result, AppError,
   SessionState, EvidenceEntry,
   PhaseTransition, PhaseGuard,
-  BudgetState, BudgetTracker,
+  BudgetState, BudgetTracker, BudgetWarning,
   SystemPromptParts,
 } from './types.js';
 

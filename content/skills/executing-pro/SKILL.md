@@ -1,0 +1,172 @@
+---
+name: executing-pro
+description: >-
+  Production-grade plan execution: executing approved plans step by step with
+  dependency-aware task sequencing, checkpoint verification, adaptive
+  replanning, progress tracking, and completion verification — plus execution
+  cycle (execute → checkpoint → adapt → close), failure modes (ignoring
+  dependencies, skipping checkpoints, rigid adherence to outdated plans), and
+  quality guardrails (checkpoint gates, dependency respect, completion
+  verification)
+x-kind: domain
+x-version: 0.1.0
+x-roles:
+  - planner
+x-tags:
+  - execution
+x-compatible:
+  - claude
+  - cursor
+  - codex
+  - gemini
+---
+
+# Plan Execution (professional)
+
+## Purpose
+
+Execute an approved plan step by step without drifting scope or skipping state updates — with dependency-aware task sequencing, checkpoint verification, and adaptive replanning when evidence changes the path.
+
+This is the **single execution skill** for the core flow. It replaces `executing-plans` and `executing-plans-pro`.
+
+## When To Use
+
+- after `planning-pro` has produced PLAN.md with tasks and dependencies
+- when resuming planned implementation work
+- when executing tasks in sequence with dependency awareness
+- when adapting execution based on progress or blockers
+
+## When Not To Use
+
+- before a plan exists — use `planning-pro` first
+- when the goal is still unclear — use `discussing-pro` first
+- when the work is a pure review with no implementation
+- when only reading or verifying existing code
+
+## Inputs
+
+- PLAN.md (from `planning-pro`) with tasks, dependencies, acceptance criteria
+- current task list and execution state
+- checkpoint strategy: where to pause and verify
+- adaptation rules: when and how to replan
+
+## Workflow
+
+### 1. Context Review
+Re-read the current plan before editing. Confirm the current slice, dependencies, checkpoints, and adaptation rules.
+
+Output: confirmed context.
+
+### 2. Execute Next Task
+Execute the next smallest planned task respecting dependency order. Keep the change surgical and in scope.
+
+Output: completed task.
+
+### 3. Checkpoint & Verify
+Pause at defined checkpoints. Verify acceptance criteria for completed work. If a checkpoint fails, diagnose and fix before continuing.
+
+Output: checkpoint result (pass/fail).
+
+### 4. Adapt or Continue
+If assumptions or scope change materially, stop and re-plan using `planning-pro`. Otherwise, continue to the next task.
+
+Output: adaptation decision.
+
+### 5. Update State
+Update task and state artifacts as progress changes. Document deviations or blockers.
+
+Output: updated execution state.
+
+### 6. Completion Verification
+Verify all tasks are complete with acceptance evidence. Document completion status and residual risks.
+
+Output: completion report.
+
+## Output Contract
+
+### Plugin mode (agent reads skill)
+
+The agent must produce an execution summary containing:
+
+- **Context** — Current plan slice, dependencies, environment, and checkpoint strategy
+- **Execution status** — What tasks were executed and why this order is correct
+- **Checkpoint results** — What was verified, what passed, and what failed or blocked
+- **Adaptation** — Any replanning decision and its trigger
+- **Residual risks** — Remaining blockers, unknowns, or follow-up dependencies
+
+#### Crash Recovery
+
+Save progress after every major step (task start, task complete, checkpoint verify) to enable crash recovery:
+
+1. Save state to `.aix/sessions/<session-id>/state.json` (JSON-serialized `EngineState`)
+2. Append step events to `.aix/sessions/<session-id>/checkpoint.log` (JSON lines with `ts`, `event`, `node`, `durationMs`)
+3. On restart, load `state.json` and resume from the last completed step
+4. If `state.json` is missing, start fresh from PLAN.md
+
+### Framework mode (code)
+
+The graph handles execution via `coderNode` + `reviewerNode`. Each task from PLAN.md is dispatched to `coderNode` which produces code, then `reviewerNode` validates against acceptance criteria. The execution loop continues until all tasks are done or the retry limit is reached.
+
+```json
+{
+  "taskIndex": 0,
+  "taskTitle": "Add input validation",
+  "status": "in-progress",
+  "output": "summary of what was done",
+  "checkpointResult": "pass",
+  "filesWritten": ["src/validate.ts"]
+}
+```
+
+## Operating Principles
+
+- The plan is the source of execution truth.
+- Small steps reduce risk and rework.
+- Unplanned discoveries should be documented, not hidden.
+- Verification preparation should happen continuously without replacing the verify phase.
+- Dependencies are gating facts — respect prerequisite order even when a downstream task looks easy.
+- Checkpoints are not optional — pause at defined verification points instead of assuming progress implies correctness.
+- Adapt with evidence — replan only when blockers, results, or constraints actually change the path.
+- Completion means verified state — "Task done" requires acceptance evidence, not just attempted work.
+
+## Reasoning Procedure
+
+1. Restate the approved step and the artifact it should change.
+2. Check the current session state and any blockers before acting.
+3. Derive the smallest execution action that matches the plan.
+4. Stop and report blocked if the step is not approved or cannot be verified.
+
+## Action Loop
+
+- Thought: identify the next approved step and required evidence.
+- Action: edit the planned artifact or run the planned command.
+- Observation: record the actual result and whether it matched the step.
+- Repeat until the step is complete or blocked.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| Execution cycle | [references/execution-cycle.md](references/execution-cycle.md) |
+| Dependency-aware execution | [references/dependency-aware-execution.md](references/dependency-aware-execution.md) |
+| Checkpoint discipline | [references/checkpoint-discipline.md](references/checkpoint-discipline.md) |
+| Completion verification | [references/completion-verification.md](references/completion-verification.md) |
+| Adaptive replanning | [references/adaptive-replanning.md](references/adaptive-replanning.md) |
+| Progress tracking | [references/progress-tracking.md](references/progress-tracking.md) |
+| Execution documentation | [references/execution-documentation.md](references/execution-documentation.md) |
+| Decision framework | [references/decision-framework.md](references/decision-framework.md) |
+| Decision tree | [references/decision-tree.md](references/decision-tree.md) |
+| Anti-patterns | [references/anti-patterns.md](references/anti-patterns.md) |
+| Failure modes | [references/failure-modes.md](references/failure-modes.md) |
+| Integration map | [references/integration-map.md](references/integration-map.md) |
+
+## Checklist Before Done
+
+- [ ] The active plan was re-read
+- [ ] Work stayed within scope
+- [ ] Dependency order was respected
+- [ ] Checkpoints were verified
+- [ ] State or task tracking was updated
+- [ ] Deviations were documented or re-planned
+- [ ] Completion status is tied to verified outcomes, not just attempted work
+- [ ] Remaining blockers or next-step handoffs are documented clearly

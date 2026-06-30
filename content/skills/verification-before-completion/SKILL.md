@@ -26,7 +26,7 @@ Prevent optimistic completion claims by forcing the final status to match the ac
 ## When Not To Use
 
 - when no relevant work exists yet
-- when only brainstorming or planning is happening
+- when only discussing or planning is happening
 - when the verification artifact already contains complete, fresh evidence and no ambiguity remains
 
 ## Inputs

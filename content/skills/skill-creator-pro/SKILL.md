@@ -40,7 +40,7 @@ Guide the creation of a new skill from requirements gathering through to a compl
 |-------|----------------|
 | **`skills-self-review-pro`** | Audit the new skill immediately after creation |
 | **`repo-tooling-pro`** | Rebuild skill_index.json after adding the skill |
-| **`writing-plans-pro`** | Write the implementation plan for a skill-shaped task |
+| **`planning-pro`** | Write the implementation plan for a skill-shaped task |
 
 ## When to use
 

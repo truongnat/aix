@@ -134,18 +134,22 @@ export class ApiRuntimeProvider implements RuntimeProvider {
 
   constructor() {
     this.id = process.env.AIX_PROVIDER ?? 'anthropic';
-    this.#apiKey = process.env.ANTHROPIC_API_KEY ?? process.env.OPENAI_API_KEY ?? '';
+    this.#apiKey = process.env.ANTHROPIC_API_KEY ?? process.env.OPENAI_API_KEY ?? process.env.GROQ_API_KEY ?? '';
     this.#apiUrl = this.id === 'anthropic'
       ? 'https://api.anthropic.com/v1/messages'
-      : 'https://api.openai.com/v1/chat/completions';
+      : this.id === 'groq'
+        ? 'https://api.groq.com/openai/v1/chat/completions'
+        : 'https://api.openai.com/v1/chat/completions';
     this.#model = this.id === 'anthropic'
       ? (process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-6')
-      : (process.env.OPENAI_MODEL ?? 'gpt-4o');
+      : this.id === 'groq'
+        ? (process.env.GROQ_MODEL ?? 'llama3-70b-8192')
+        : (process.env.OPENAI_MODEL ?? 'gpt-4o');
   }
 
   async call(opts: ModelCallOptions): Promise<ModelCallResponse> {
     if (!this.#apiKey) {
-      console.warn('[provider] No API key found (ANTHROPIC_API_KEY or OPENAI_API_KEY). Falling back to mock.');
+      console.warn('[provider] No API key found (ANTHROPIC_API_KEY, OPENAI_API_KEY, or GROQ_API_KEY). Falling back to mock.');
       return new MockRuntimeProvider().call(opts);
     }
 
@@ -189,7 +193,7 @@ export class ApiRuntimeProvider implements RuntimeProvider {
     return { content, tokens, usd };
   }
 
-  async #callOpenAI(opts: ModelCallOptions): Promise<ModelCallResponse> {
+  async #callOpenAI(opts: ModelCallOptions, attempt = 1): Promise<ModelCallResponse> {
     const res = await fetch(this.#apiUrl, {
       method: 'POST',
       headers: {
@@ -209,6 +213,12 @@ export class ApiRuntimeProvider implements RuntimeProvider {
 
     if (!res.ok) {
       const result = redact(await res.text());
+      if (res.status === 429 && attempt < 4) {
+        const delay = Math.min(1000 * 2 ** attempt, 8000);
+        console.warn(`[provider] Rate limited (429). Retrying in ${delay}ms (attempt ${attempt}/3)...`);
+        await new Promise(r => setTimeout(r, delay));
+        return this.#callOpenAI(opts, attempt + 1);
+      }
       throw new Error(`OpenAI API error: ${res.status} ${result.clean}`);
     }
 
@@ -226,9 +236,9 @@ export class ApiRuntimeProvider implements RuntimeProvider {
 }
 
 export function createProvider(): RuntimeProvider {
-  if (process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY) {
+  if (process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY || process.env.GROQ_API_KEY) {
     return new ApiRuntimeProvider();
   }
-  console.warn('[provider] No API key configured. Using mock provider. Set ANTHROPIC_API_KEY or OPENAI_API_KEY.');
+  console.warn('[provider] No API key configured. Using mock provider. Set ANTHROPIC_API_KEY, OPENAI_API_KEY, or GROQ_API_KEY.');
   return new MockRuntimeProvider();
 }

@@ -1,0 +1,196 @@
+---
+name: discussing-pro
+description: >-
+  Production-grade goal discussion and solution exploration: clarifying vague
+  requests into concrete engineering objectives with explicit scope, constraints,
+  success criteria, scored option comparison, tradeoff analysis, and
+  recommendation — plus structured ideation with Socratic questioning,
+  divergence/convergence flow, and assumption surfacing
+x-kind: domain
+x-version: 0.1.0
+x-roles:
+  - planner
+x-tags:
+  - discussion
+  - ideation
+x-compatible:
+  - claude
+  - cursor
+  - codex
+  - gemini
+---
+
+# Goal Discussion & Solution Exploration (professional)
+
+## Purpose
+
+Turn a vague request into an implementation-ready direction by clarifying the goal, surfacing constraints, comparing alternatives, and recommending an approach — before any planning or coding begins.
+
+This is the **single discuss skill** for the core flow. It replaces `discussing-goals`, `brainstorming`, and `brainstorming-pro`.
+
+## When To Use
+
+- when requirements are ambiguous or the solution shape is fuzzy
+- before `planning-pro` on non-trivial feature or refactor work
+- when multiple realistic approaches need a concise tradeoff discussion
+- when the goal, constraints, or success criteria are not yet explicit
+
+## When Not To Use
+
+- when goal, scope, and constraints are already documented clearly (DISCUSSION.md exists)
+- when only executing an approved plan with no open requirement questions
+- when the task is only verification, review, or reading
+
+## Inputs
+
+- current request / task description
+- active goal, discussion, and state artifacts
+- repo constraints, hazards, and prior decisions when present
+- codebase context and knowledge base
+
+## Workflow
+
+### 1. Problem Clarification
+Restate the ask in concrete engineering terms. Separate confirmed requirements from assumptions.
+
+Output: clarified problem statement.
+
+### 2. Value & Utility Validation
+Assess if the problem is a critical pain point/blocker or a low-value "nice-to-have." Define at least one concrete metric of success (e.g., build speedup, error rate drop, interface simplified). Verify security/data integrity implications and legal/license compliance.
+
+Output: success criteria and utility assessment.
+
+### 3. Prior Art & KB Lookup
+Search the codebase history and knowledge base (using query/grep tools) to verify if a similar solution pattern or helper library already exists.
+
+Output: prior art notes.
+
+### 4. Divergence — Generate Options
+Explore the solution space broadly. Use Socratic questioning to surface alternatives — see [references/socratic-techniques.md](references/socratic-techniques.md).
+
+Generate at least 3 distinct approaches. Document the assumptions behind each — see [references/ideation-system-model.md](references/ideation-system-model.md) for the divergence → exploration → convergence model.
+
+Output: candidate options list with assumptions.
+
+### 5. Structured Evaluation & Tradeoff Matrix
+Compare each option against scored dimensions:
+
+| Dimension | Meaning |
+|-----------|---------|
+| Value | Direct business/engineering value |
+| Effort Fit | Implementation complexity and repo fit |
+| Risk | Rollback complexity, security exposure, boundary risk |
+| Fit | How well it satisfies constraints and success criteria |
+
+Assess boundary limits (what each option solves vs. what it leaves out). Ensure the selected solution uses an extensible interface contract that does not lock in the architecture.
+
+Output: scored option table with tradeoffs.
+
+### 6. Recommendation
+Recommend one option and provide a transparent, detailed justification explaining why it best fits the current repo, what tradeoffs were prioritized, and why the alternatives were bypassed.
+
+Output: recommendation with rationale.
+
+### 7. Final Alignment Confirmation
+Restate the recommended approach, decomposed stages, and scope. Request final confirmation from the user to verify mutual understanding before handing off to the planning phase.
+
+Output: confirmed direction.
+
+### 8. Save Artifact
+Write DISCUSSION.md in the session artifacts directory. If a previous version exists, archive it first (with timestamp) and add a reference link at the top of the new file.
+
+## Output Contract
+
+### Plugin mode (agent reads skill)
+
+The agent must produce DISCUSSION.md containing:
+
+```markdown
+# Discussion
+
+## Goal
+{clarified goal in concrete engineering terms}
+
+## Constraints
+- {constraint or assumption}
+
+## Options Compared
+| Option | Value | Effort Fit | Risk | Fit | Total |
+|--------|-------|------------|------|-----|-------|
+| Option A | 8 | 7 | 6 | 9 | 18 |
+| Option B | 6 | 8 | 4 | 7 | 17 |
+
+## Recommendation
+**Option A**
+
+### Rationale
+{detailed justification referencing constraints, utility, security, and compliance}
+```
+
+### Framework mode (code)
+
+The discussNode must call the LLM and parse the response as JSON:
+
+```json
+{
+  "goal": "clarified goal in concrete engineering terms",
+  "constraints": ["constraint 1", "constraint 2"],
+  "options": [
+    {
+      "name": "Option A",
+      "value": 8,
+      "effortFit": 7,
+      "risk": 6,
+      "fit": 9
+    }
+  ],
+  "recommendation": "Name of the recommended option",
+  "rationale": "Detailed justification referencing constraints, utility, security, and compliance. Explain why alternatives were bypassed."
+}
+```
+
+The code then renders this JSON into the same DISCUSSION.md markdown format as the plugin mode.
+
+## Operating Principles
+
+- Clarify before committing.
+- Reduce ambiguity before implementation.
+- Prioritize security (access control, input validation), data integrity (atomic writes, schema validation, idempotency), and legal/license compliance as core design requirements.
+- Prefer the smallest viable approach.
+- Keep tradeoffs explicit and short.
+- Do not invent requirements to make the design feel complete.
+- Make tradeoffs and known limitations explicit.
+- Document assumptions as assumptions, not settled requirements.
+
+## Reasoning Procedure
+
+1. Restate the problem and the decision the user is trying to make.
+2. List the concrete constraints and what is still unknown.
+3. Compare a few viable directions and note the tradeoffs.
+4. Stop and report blocked if the decision depends on missing context.
+
+## Action Loop
+
+- Thought: identify the next constraint, risk, or option that matters.
+- Action: inspect the goal artifact or ask one clarifying question.
+- Observation: capture the new constraint or choice exactly.
+- Repeat until the direction is implementation-ready.
+
+## Resources in this skill
+
+| Topic | File |
+|-------|------|
+| **Ideation system model** | [references/ideation-system-model.md](references/ideation-system-model.md) |
+| Socratic questioning techniques | [references/socratic-techniques.md](references/socratic-techniques.md) |
+| Failure modes | [references/failure-modes.md](references/failure-modes.md) |
+
+## Checklist Before Done
+
+- [ ] The problem is stated concretely
+- [ ] Constraints and success criteria are explicit
+- [ ] At least 3 distinct options were compared
+- [ ] One approach was recommended with rationale
+- [ ] Security, data integrity, and compliance were assessed
+- [ ] Assumptions are labeled as assumptions
+- [ ] DISCUSSION.md is saved (previous version archived if present)
+- [ ] The result is ready for planning

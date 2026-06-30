@@ -5,6 +5,22 @@ export interface PlanDoc {
   readonly steps: readonly string[];
 }
 
+export interface ScoredOption {
+  readonly name: string;
+  readonly value: number;
+  readonly effortFit: number;
+  readonly risk: number;
+  readonly fit: number;
+}
+
+export interface DiscussionDoc {
+  readonly goal: string;
+  readonly constraints: readonly string[];
+  readonly options: readonly ScoredOption[];
+  readonly recommendation: string;
+  readonly rationale: string;
+}
+
 export interface TaskItem {
   readonly id: string;
   readonly description: string;
@@ -22,6 +38,7 @@ export interface TicketPlan {
 
 export interface EngineState {
   readonly session: SessionState;
+  readonly discussion?: DiscussionDoc;
   readonly plan?: PlanDoc;
   readonly rules?: readonly string[];
   readonly tasks: readonly TaskItem[];

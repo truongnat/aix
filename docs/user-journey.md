@@ -31,23 +31,22 @@ flowchart TD
 
     subgraph WORK["③  USER GIAO VIỆC → AGENT CHẠY SPINE"]
         C0["User: 'làm tính năng X'"]
-        C1["1· discussing-goals<br/>chốt thế nào là xong"]
-        C2["2· brainstorming<br/>khám phá phương án"]
-        C3["3· writing-plans<br/>task nhỏ, verify được"]
+        C1["1· discussing-pro<br/>chốt goal + khám phá phương án"]
+        C2["2· planning-pro<br/>task nhỏ, verify được"]
         C4["4· using-git-worktrees<br/>nhánh sạch"]
         C5["5· test-driven-development<br/>RED → GREEN → refactor"]
-        C6["6· executing-plans<br/>subagent native / Task"]
-        C7["7· code-review<br/>security + chất lượng"]
-        C8["8· verification-before-completion<br/>chứng minh chạy được"]
-        C9["9· remembering<br/>ghi lại điều học được"]
-        C0 --> C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8 --> C9
+        C3["3· executing-pro<br/>dependency-aware execution"]
+        C6["6· code-review<br/>security + chất lượng"]
+        C7["7· verification-before-completion<br/>chứng minh chạy được"]
+        C8["8· remembering<br/>ghi lại điều học được"]
+        C0 --> C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8
     end
 
     A2 -.->|"lần sau mở session"| B1
     B4 ==> C0
 
-    C7 -->|"có vấn đề"| C5
-    C8 -->|"chưa đạt"| C6
+    C6 -->|"có vấn đề"| C5
+    C7 -->|"chưa đạt"| C3
 
     HOST(["🧠 HOST AGENT = RUNTIME<br/>tự chạy spine bằng subagent của chính nó"])
     HOST -.->|"điều phối"| WORK
@@ -93,18 +92,17 @@ process skill thật, gọi qua Skill tool:
 
 | # | Bước | Skill | Mục đích |
 |---|------|-------|----------|
-| 1 | Align | `discussing-goals` | Chốt thế nào là "xong" trước khi làm |
-| 2 | Shape | `brainstorming` | Khám phá phương án, surface spec theo từng phần |
-| 3 | Plan | `writing-plans` | Chia task nhỏ, verify được, đường dẫn file cụ thể |
+| 1 | Align & Shape | `discussing-pro` | Chốt goal + khám phá phương án, surface spec |
+| 2 | Plan | `planning-pro` | Chia task nhỏ, verify được, đường dẫn file cụ thể |
+| 3 | Execute | `executing-pro` | Dependency-aware task execution với checkpoints |
 | 4 | Isolate | `using-git-worktrees` | Nhánh + baseline sạch |
 | 5 | Test-first | `test-driven-development` | RED → GREEN → refactor |
-| 6 | Execute | `executing-plans` | Mỗi task một subagent (Task tool của host), review 2 tầng |
-| 7 | Review | `requesting-code-review` / `code-review` | Soi security + chất lượng |
-| 8 | Verify | `verification-before-completion` | Chứng minh chạy được trước khi tuyên bố done |
-| 9 | Remember | `remembering` | Ghi lại điều học được |
+| 6 | Review | `requesting-code-review` / `code-review` | Soi security + chất lượng |
+| 7 | Verify | `verification-before-completion` | Chứng minh chạy được trước khi tuyên bố done |
+| 8 | Remember | `remembering` | Ghi lại điều học được |
 
-**Vòng lặp ngược:** review (7) phát hiện vấn đề → quay lại TDD (5); verify (8) chưa đạt → quay lại
-execute (6). Spine không phải đường thẳng một chiều.
+**Vòng lặp ngược:** review (6) phát hiện vấn đề → quay lại TDD (5); verify (7) chưa đạt → quay lại
+execute (3). Spine không phải đường thẳng một chiều.
 
 **Skill hỗ trợ:** `mapping-codebase`, `debugging-investigation`, `tool-discovery-skill`,
 `gatekeeper-skill`, `report-writer`, `writing-skills`. **Hợp đồng vận hành:** `using-harness`.
@@ -116,7 +114,7 @@ execute (6). Spine không phải đường thẳng một chiều.
 | **Runtime** | Host agent (Claude Code/Cursor…) | LangGraph.js engine |
 | **Khi nào** | Có host tương tác (mặc định) | Không có host: CI / batch unattended |
 | **Subagent** | Task tool native của host | Node của graph |
-| **Output** | Agent ghi thẳng vào repo | `.aix/runtime/generated/<session>/` để review |
+| **Output** | Agent ghi thẳng vào repo | `.aix/sessions/<session>/generated/` để review |
 
 Trong Claude Code / Cursor / bất kỳ agent tương tác nào → **không cần engine**: cài plugin và để
 host chạy spine.

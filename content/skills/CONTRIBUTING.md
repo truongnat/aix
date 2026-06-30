@@ -46,7 +46,7 @@ of truth — if this table and the code disagree, the code wins.
 ### `x-kind` — pick the right one
 
 - **`domain`** — a deep reference for a technology/area (`react-pro`, `aws-pro`). Most skills.
-- **`process`** — *how to work*: a methodology step (`writing-plans`, `test-driven-development`).
+- **`process`** — *how to work*: a methodology step (`planning-pro`, `test-driven-development`).
   These form the [engineering spine](../workflows/engineering-spine.md).
 - **`reference`** — a lookup/cheatsheet with little prescriptive process.
 
