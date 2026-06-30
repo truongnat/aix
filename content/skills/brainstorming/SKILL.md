@@ -38,7 +38,7 @@ Shape a vague request into an implementation-ready direction before detailed pla
 ## Workflow
 
 1. Restate the problem in concrete engineering terms.
-2. Value & Utility Validation: Assess if the problem is a critical pain point/blocker or a low-value "nice-to-have" addition. Define at least one concrete metric of success (e.g., build speedup, error rate drop, interface simplified).
+2. Value & Utility Validation: Assess if the problem is a critical pain point/blocker or a low-value "nice-to-have" addition. Define at least one concrete metric of success (e.g., build speedup, error rate drop, interface simplified). Verify any security/data integrity implications and legal/license compliance (e.g. license compatibility, copyright rules, or GDPR).
 3. Separate confirmed requirements from assumptions.
 4. Prior Art & KB Lookup: Search the codebase history and knowledge base (using query/grep tools) to verify if a similar solution pattern or helper library already exists.
 5. Problem Decomposition (Divide & Conquer): For large/complex tasks, decompose the problem into modular, independent sub-problems. Define the boundaries and interface/API specifications between them first.
@@ -57,6 +57,9 @@ Shape a vague request into an implementation-ready direction before detailed pla
 ## Operating Principles
 
 - Clarify before committing.
+- Prioritize security (access control, input validation), data integrity (atomic writes, schema validation, idempotency), and legal/license compliance as core design requirements.
+- Assess and document the boundary limitations (what is solved vs. what is left out) of the chosen approach.
+- Ensure the selected solution uses an extensible interface contract that does not lock in the architecture.
 - Prefer the smallest viable approach.
 - Keep tradeoffs explicit and short.
 - Do not invent requirements to make the design feel complete.

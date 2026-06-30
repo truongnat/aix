@@ -40,16 +40,17 @@ Turn a vague request into a clear engineering objective with explicit scope, con
 1. Restate the ask in concrete engineering terms.
 2. Separate confirmed requirements from assumptions.
 3. Prior Art & KB Lookup: Search the codebase history and knowledge base (using query/grep tools) to check if the problem or a similar solved pattern/library helper already exists.
-4. Identify constraints, risks, utility (is it a critical pain point or vanity request?), and success criteria.
-5. Compare exactly three realistic options with scored dimensions (Value, Effort fit, Risk, Fit) and explicit trade-offs.
+4. Identify constraints, risks, utility (is it a critical pain point or vanity request?), security/data integrity considerations, legal/license/copyright compliance, and success criteria.
+5. Compare exactly three realistic options with scored dimensions (Value, Effort fit, Risk, Fit) and explicit trade-offs. Each option must evaluate its boundary limits (what it solves vs. what it leaves out) and ensure it doesn't lock the system's interface contract.
 6. Recommend the highest total; let the user pick via structured question tool when available.
 7. Capture the decision basis, scores, and selection in a discussion artifact.
 
 ## Operating Principles
 
 - Reduce ambiguity before implementation.
-- Prefer smaller scope when value is similar.
-- Make tradeoffs explicit.
+- Prioritize security (access control, input sanitization), data integrity (atomic writes, schema validation, idempotency), and legal/license compliance as core requirements.
+- Prefer smaller scope when value is similar, without sacrificing architecture extensibility.
+- Make tradeoffs and known limitations explicit.
 - Do not invent hidden requirements or fake certainty.
 
 ## Reasoning Procedure
