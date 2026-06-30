@@ -38,16 +38,21 @@ Shape a vague request into an implementation-ready direction before detailed pla
 ## Workflow
 
 1. Restate the problem in concrete engineering terms.
-2. Separate confirmed requirements from assumptions.
-3. Prior Art & KB Lookup: Search the codebase history and knowledge base (using query/grep tools) to verify if a similar solution pattern or helper library already exists.
-4. Problem Decomposition (Divide & Conquer): For large/complex tasks, decompose the problem into modular, independent sub-problems. Define the boundaries and interface/API specifications between them first.
-5. Trade-off Matrix Comparison: Evaluate approaches against structured dimensions:
+2. Value & Utility Validation: Assess if the problem is a critical pain point/blocker or a low-value "nice-to-have" addition. Define at least one concrete metric of success (e.g., build speedup, error rate drop, interface simplified).
+3. Separate confirmed requirements from assumptions.
+4. Prior Art & KB Lookup: Search the codebase history and knowledge base (using query/grep tools) to verify if a similar solution pattern or helper library already exists.
+5. Problem Decomposition (Divide & Conquer): For large/complex tasks, decompose the problem into modular, independent sub-problems. Define the boundaries and interface/API specifications between them first.
+6. Value Milestones: Establish clear progressive stages to reach the goal:
+   - *Milestone 1 (Minimum Viable Solution):* Resolves the primary critical path.
+   - *Milestone 2 (Validation & Metrics):* Verifies that the defined success metrics are met.
+   - *Milestone 3 (Polishing & Edge Cases):* Hardens, secures, and documents the code.
+7. Trade-off Matrix Comparison: Evaluate approaches against structured dimensions:
    - *Complexity & Maintenance:* Long-term maintenance and integration code cost.
    - *Performance & Resource Impact:* Performance cost and resource overhead.
    - *Time-to-Value vs. Effort:* Direct business value versus implementation complexity.
    - *Safety & Boundary Risks:* Rollback complexity, security exposure, and fail-safe defaults.
-6. Recommend one option and explain why it best fits the current repo.
-7. Hand off the clarified direction to discussion or planning artifacts.
+8. Recommend one option and explain why it best fits the current repo.
+9. Hand off the clarified direction to discussion or planning artifacts.
 
 ## Operating Principles
 

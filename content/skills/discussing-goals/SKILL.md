@@ -40,7 +40,7 @@ Turn a vague request into a clear engineering objective with explicit scope, con
 1. Restate the ask in concrete engineering terms.
 2. Separate confirmed requirements from assumptions.
 3. Prior Art & KB Lookup: Search the codebase history and knowledge base (using query/grep tools) to check if the problem or a similar solved pattern/library helper already exists.
-4. Identify constraints, risks, and success criteria.
+4. Identify constraints, risks, utility (is it a critical pain point or vanity request?), and success criteria.
 5. Compare exactly three realistic options with scored dimensions (Value, Effort fit, Risk, Fit) and explicit trade-offs.
 6. Recommend the highest total; let the user pick via structured question tool when available.
 7. Capture the decision basis, scores, and selection in a discussion artifact.
