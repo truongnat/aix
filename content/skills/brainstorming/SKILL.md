@@ -52,7 +52,8 @@ Shape a vague request into an implementation-ready direction before detailed pla
    - *Time-to-Value vs. Effort:* Direct business value versus implementation complexity.
    - *Safety & Boundary Risks:* Rollback complexity, security exposure, and fail-safe defaults.
 8. Recommend one option and explain why it best fits the current repo.
-9. Hand off the clarified direction to discussion or planning artifacts.
+9. Final Alignment Confirmation: Restate the recommended approach, decomposed stages, and scope. Request final confirmation from the user to verify mutual understanding before handing off to the planning phase.
+10. Hand off the confirmed direction to discussion or planning artifacts.
 
 ## Operating Principles
 
