@@ -1,39 +1,25 @@
-# aix — AI Engineering Platform
+# aix
 
-> An AI engineering platform / plugin: an opinionated SDLC methodology plus a
-> 158‑skill library, activated at session start. **The host agent is the runtime** —
-> aix is the playbook and the library, not a separate engine you invoke.
+> AI engineering methodology + 160+ skills, delivered as a Claude Code plugin.
 
-**Status:** v1 (active development). ESM, Node 22, strict TypeScript.
+**The host agent is the runtime**. aix is the playbook and the skill library — not a separate engine you invoke.
 
-## How it works (the plugin model)
+## How it works
 
-On `/plugin install`:
-
-1. A `SessionStart` hook injects one entry-point skill — [`using-aix`](./content/skills/using-aix/SKILL.md) —
-   into the agent's context. It explains the methodology spine and how to reach every other skill.
-2. All 158 skills under [`content/skills/`](./content/skills) become available to the host's **`Skill`
-   tool** (declared via `"skills"` in [`.claude-plugin/plugin.json`](./.claude-plugin/plugin.json)).
-3. The agent works the engineering spine, dispatching
-   **its own native subagents** (the host's `Task` tool) per plan task. There is no aix runtime engine
-   in this path — the host *is* the runtime.
-
-```bash
+```
+git clone https://github.com/truongnat/aix
 # In Claude Code:
-/plugin marketplace add truongnat/aix
-/plugin install aix
+/plugin install /path/to/aix
 ```
 
-## Why
+On start, a `SessionStart` hook injects [`using-aix`](./content/skills/using-aix/SKILL.md) into context. It explains the 8-step engineering spine and how to reach any of the 160+ skills via the host's `Skill` tool.
 
-Six separate repos (`ai-engineering-harness`, `agentic-sdlc`, `skills`, `docs-wiki`, `system-design-skills`, `dev-memory`) had overlapping skills, installers, and knowledge tooling in incompatible formats. `aix` merges them into one canonical source (`content/`), one registry, one CLI, and one provider compiler. The original repos are preserved under [`imports/`](./imports) (git subtree, history intact; kept locally, not tracked).
+No engine, no runtime — just skills the agent pulls in when needed.
 
 ## The engineering spine
 
-Each step is a process skill invoked via the `Skill` tool:
-
-| # | Step | Skill |
-|---|------|-------|
+| # | Phase | Skill |
+|---|-------|-------|
 | 1 | Align & Shape | `discussing-pro` |
 | 2 | Plan | `planning-pro` |
 | 3 | Isolate | `git-worktree-pro` |
@@ -43,79 +29,73 @@ Each step is a process skill invoked via the `Skill` tool:
 | 7 | Verify | `verify-pro` |
 | 8 | Remember | `remember-pro` |
 
-## Supporting tooling (the monorepo)
+## Providers
 
-aix also ships a TypeScript monorepo for authoring, compiling, and running the library outside an interactive host. This is **secondary** to the plugin path.
+Install skills to other AI coding tools:
+
+```bash
+npx @x/cli install --all --provider cursor|codex|gemini
+```
+
+## Monorepo
+
+13 packages for authoring, compiling, and headless execution:
 
 | Package | Role |
-|---|---|
-| `@x/core` | Shared types, phase machine, guards, budget tracker |
-| `@x/registry` | `SKILL.md` schema (Zod), loader, catalog, migrator |
+|---------|------|
+| `@x/registry` | SKILL.md schema (Zod), loader, catalog |
 | `@x/policy` | Secret/PII redaction, shell denylist |
-| `@x/providers` | Compile-time adapters (Claude/Cursor/Codex/Gemini) + runtime LLM provider |
-| `@x/compiler` | Idempotent file emitter (hash + generated-marker) |
-| `@x/context` | Code analysis, RAG index/query, wiki generation |
-| `@x/memory` | Markdown-first store + KB adapter |
+| `@x/providers` | Compile-time adapters + runtime LLM client |
+| `@x/compiler` | Idempotent file emitter |
+| `@x/context` | Code analysis, RAG, wiki generation |
+| `@x/memory` | Markdown store for durable memory |
 | `@x/prompt` | Prompt assembly + linter |
-| `@x/preview` | Tiered preview (Mermaid / image / HTML) |
-| `@x/hitl` | Human-in-the-loop decision channel |
+| `@x/engine` | Headless SDLC runner for CI/batch |
+| `@x/cli` | Command surface |
+| `@x/core` | Types, phase machine, guards |
 | `@x/evals` | A/B harness + rubric scoring |
-| `@x/engine` | **Optional headless runner** — autonomous SDLC graph with checkpointing, budget guards, structured logging. For CI/batch runs without an interactive host. |
-| `@x/cli` | The `aix` command surface (authoring + compile + headless run) |
-| `services/kb-server` | SQLite-backed knowledge base with in-memory cache |
-
-### When to use `@x/engine`
-
-Only when there is **no interactive host** — e.g. a CI job or batch pipeline that
-must drive the SDLC loop unattended. **In Claude Code / Cursor / any
-interactive agent, install the plugin and let the host drive the spine.**
+| `@x/hitl` | Human-in-the-loop channel |
+| `@x/preview` | Mermaid / image / HTML preview |
+| `services/kb-server` | SQLite knowledge base |
 
 ## Quick start
 
 ```bash
 pnpm install
 pnpm build
-pnpm lint
 pnpm test
 ```
 
 ## CLI
 
 ```bash
-aix install --provider <claude|cursor|codex|gemini> [--all]
+aix install --all [--provider <claude|cursor|codex|gemini>]
 aix run "<task>"
-aix verify | ship
+aix skills list | show <name> | validate
 aix memory push|search|list|get
-aix skills list | show <name>
+aix verify | ship
+aix eval <suite>
 aix doctor
 ```
 
-## Knowledge base
-
-`services/kb-server` is a SQLite-backed service (no external dependencies):
-
-```bash
-cd services/kb-server
-cp .env.example .env
-pnpm dev
-```
-
-API keys are generated server-side, stored as bcrypt hashes, and verified per request.
-
-## Security model
-
-- **Redaction at the boundary:** all memory writes pass through `@x/policy.redact` before hitting disk — secrets become `••••`.
-- **Shell denylist** and **budget hard-stop** guard the headless engine path.
-
-## Repository layout
+## Repository
 
 ```
-.claude-plugin/  plugin manifest
-content/         canonical source: skills (158), rules, workflows
-packages/        @x/* packages (authoring, compile, engine)
-services/        kb-server (SQLite)
-imports/         original repos (git subtree, untracked)
+.claude-plugin/   Plugin manifest
+hooks/            SessionStart → injects using-aix + starts kb-server
+content/
+  skills/         160+ domain, process, and reference skills
+  rules/          Spine guardrail rules
+  workflows/      Engineering spine flow
+packages/         13 @x/* TypeScript packages
+services/         kb-server (SQLite, NestJS)
+apps/             Docs site + tooling
 ```
+
+## Security
+
+- Secrets redacted at the boundary via `@x/policy` before hitting disk
+- Shell denylist + budget hard-stop guard the headless engine
 
 ## License
 
