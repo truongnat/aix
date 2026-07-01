@@ -44,15 +44,13 @@ Unless the user asks for something quick, follow this spine. Each step is a real
 aix process skill — invoke it via the `Skill` tool by the name in backticks:
 
 1. **`discussing-pro`** — align on what success actually means and explore alternatives before anything.
-3. **`planning-pro`** — break the work into small, verifiable tasks with concrete
-   file paths and verification steps.
-4. **`using-git-worktrees`** — isolate the work on a branch with a clean baseline.
-5. **`test-driven-development`** — write the test first, watch it fail, implement,
-   watch it pass.
-6. **`executing-pro`** — dependency-aware task execution with checkpoints.
-7. **`requesting-code-review`** / **`code-review`** — security + quality pass.
-8. **`verification-before-completion`** — prove it works before declaring done.
-9. **`remembering`** — record what was learned.
+2. **`planning-pro`** — break the work into small, verifiable tasks with concrete file paths and verification steps.
+3. **`using-git-worktrees`** — check git status, summarize diffs for user confirmation, and isolate the work on a branch with a clean baseline.
+4. **`test-driven-development`** — write tests first (Phase A) to define/reproduce, then implement and verify (Phase B).
+5. **`executing-pro`** — dependency-aware task execution with checkpoints.
+6. **`requesting-code-review`** / **`code-review`** — security + quality pass.
+7. **`verification-before-completion`** — prove it works before declaring done.
+8. **`remembering`** — record what was learned.
 
 Supporting skills: `mapping-codebase` (orient in unfamiliar code),
 `debugging-investigation` (systematic root-cause), `writing-skills` (author new

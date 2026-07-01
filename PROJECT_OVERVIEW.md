@@ -72,9 +72,9 @@ Mỗi tác vụ được thực thi thông qua một chuỗi các kỹ năng quy
 
 1. **`discussing-pro`**: Trao đổi làm rõ yêu cầu, thảo luận các phương án thiết kế trước khi code.
 2. **`planning-pro`**: Lập kế hoạch chi tiết, chia nhỏ tác vụ và xác định rõ các file thay đổi cùng cách thức xác minh.
-3. **`using-git-worktrees`**: Tạo nhánh làm việc độc lập trên Git để giữ sạch môi trường phát triển gốc.
-4. **`test-driven-development`**: Viết kiểm thử trước (Test-First), chạy thử để thấy lỗi, sau đó mới viết code logic.
-5. **`executing-pro`**: Tiến hành code theo kế hoạch và thực hiện tạo các checkpoint thường xuyên.
+3. **`using-git-worktrees`**: Kiểm tra trạng thái Git, hiển thị tóm tắt thay đổi và yêu cầu người dùng xác nhận, sau đó tạo nhánh làm việc độc lập trên Git để giữ sạch môi trường phát triển gốc.
+4. **`test-driven-development`**: Viết kiểm thử trước để phát hiện & định nghĩa hành vi (Phase A - RED), sau đó viết code logic tối thiểu và chạy lại kiểm thử để đảm bảo hoàn thành (Phase B - GREEN).
+5. **`executing-pro`**: Tiến hành code thực thi theo kế hoạch và thực hiện tạo các checkpoint thường xuyên.
 6. **`requesting-code-review`** & **`code-review`**: Đánh giá chất lượng và kiểm tra bảo mật cho mã nguồn.
 7. **`verification-before-completion`**: Xác minh kỹ lưỡng và chạy lại tất cả các kịch bản test trước khi đóng tác vụ.
 8. **`remembering`**: Lưu lại các bài học kinh nghiệm và kiến thức mới phát hiện được.

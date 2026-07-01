@@ -33,9 +33,9 @@ flowchart TD
         C0["User: 'làm tính năng X'"]
         C1["1· discussing-pro<br/>chốt goal + khám phá phương án"]
         C2["2· planning-pro<br/>task nhỏ, verify được"]
-        C4["4· using-git-worktrees<br/>nhánh sạch"]
-        C5["5· test-driven-development<br/>RED → GREEN → refactor"]
-        C3["3· executing-pro<br/>dependency-aware execution"]
+        C3["3· using-git-worktrees<br/>kiểm tra & cô lập nhánh"]
+        C4["4· test-driven-development<br/>RED → GREEN → refactor"]
+        C5["5· executing-pro<br/>dependency-aware execution"]
         C6["6· code-review<br/>security + chất lượng"]
         C7["7· verification-before-completion<br/>chứng minh chạy được"]
         C8["8· remembering<br/>ghi lại điều học được"]
@@ -45,8 +45,8 @@ flowchart TD
     A2 -.->|"lần sau mở session"| B1
     B4 ==> C0
 
-    C6 -->|"có vấn đề"| C5
-    C7 -->|"chưa đạt"| C3
+    C6 -->|"có vấn đề"| C4
+    C7 -->|"chưa đạt"| C5
 
     HOST(["🧠 HOST AGENT = RUNTIME<br/>tự chạy spine bằng subagent của chính nó"])
     HOST -.->|"điều phối"| WORK
@@ -87,22 +87,22 @@ Sau bước này không cần làm gì thêm. Plugin tự kích hoạt ở mọi
 > · gọi `Skill` trực tiếp nếu đã biết tên.
 
 ### ③ User giao việc → agent chạy spine
-Trừ khi user yêu cầu nhanh-gọn, agent đi theo **engineering spine** 9 bước. Mỗi bước là một
+Trừ khi user yêu cầu nhanh-gọn, agent đi theo **engineering spine** 8 bước. Mỗi bước là một
 process skill thật, gọi qua Skill tool:
 
 | # | Bước | Skill | Mục đích |
 |---|------|-------|----------|
 | 1 | Align & Shape | `discussing-pro` | Chốt goal + khám phá phương án, surface spec |
 | 2 | Plan | `planning-pro` | Chia task nhỏ, verify được, đường dẫn file cụ thể |
-| 3 | Execute | `executing-pro` | Dependency-aware task execution với checkpoints |
-| 4 | Isolate | `using-git-worktrees` | Nhánh + baseline sạch |
-| 5 | Test-first | `test-driven-development` | RED → GREEN → refactor |
+| 3 | Isolate | `using-git-worktrees` | Kiểm tra git status & diff, xin confirm của user, nhánh + baseline sạch |
+| 4 | Test-first | `test-driven-development` | Viết test trước để định nghĩa/phát hiện (Phase A) và đảm bảo hoàn thành (Phase B) |
+| 5 | Execute | `executing-pro` | Dependency-aware task execution với checkpoints |
 | 6 | Review | `requesting-code-review` / `code-review` | Soi security + chất lượng |
 | 7 | Verify | `verification-before-completion` | Chứng minh chạy được trước khi tuyên bố done |
 | 8 | Remember | `remembering` | Ghi lại điều học được |
 
-**Vòng lặp ngược:** review (6) phát hiện vấn đề → quay lại TDD (5); verify (7) chưa đạt → quay lại
-execute (3). Spine không phải đường thẳng một chiều.
+**Vòng lặp ngược:** review (6) phát hiện vấn đề → quay lại TDD (4); verify (7) chưa đạt → quay lại
+execute (5). Spine không phải đường thẳng một chiều.
 
 **Skill hỗ trợ:** `mapping-codebase`, `debugging-investigation`, `tool-discovery-skill`,
 `gatekeeper-skill`, `report-writer`, `writing-skills`. **Hợp đồng vận hành:** `using-harness`.
