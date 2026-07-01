@@ -11,8 +11,97 @@ import { RedactedMemoryStore, MarkdownStore } from '@x/memory';
 import { PolicyEngine } from '@x/policy';
 import { ClackHitlChannel } from '@x/hitl';
 import { DEFAULT_SYSTEM_PARTS } from '@x/prompt';
+import { execSync as realExecSync } from 'node:child_process';
+import { createProvider } from '@x/providers';
 
 const PHASES: readonly Phase[] = ['discuss', 'plan', 'run', 'verify', 'ship', 'remember'];
+
+let clackPrompts: any = p;
+export function setClackPrompts(mockPrompts: any): void {
+  clackPrompts = mockPrompts;
+}
+
+let runExecSync = realExecSync;
+export function setExecSync(mockExecSync: typeof realExecSync): void {
+  runExecSync = mockExecSync;
+}
+
+export async function handleGitCheckIfDirty(): Promise<'proceed' | 'cancel'> {
+  let isGitRepo = false;
+  try {
+    runExecSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' });
+    isGitRepo = true;
+  } catch {
+    return 'proceed';
+  }
+
+  if (!isGitRepo) return 'proceed';
+
+  let statusOutput = '';
+  try {
+    statusOutput = runExecSync('git status --porcelain', { encoding: 'utf-8' }).trim();
+  } catch {
+    return 'proceed';
+  }
+
+  if (!statusOutput) {
+    return 'proceed';
+  }
+
+  clackPrompts.log.warn('Git working directory is dirty (has uncommitted changes).');
+
+  const filesList = statusOutput.split('\n').map(line => line.trim()).join('\n  ');
+  let diffText = '';
+  try {
+    diffText = runExecSync('git diff HEAD', { encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 }).trim();
+  } catch {
+    // ignore diff error
+  }
+
+  let summary = 'Modified files:\n  ' + filesList;
+  if (diffText) {
+    const s = clackPrompts.spinner();
+    try {
+      const provider = createProvider();
+      s.start('Analyzing uncommitted changes...');
+      const response = await provider.call({
+        system: 'You are a helpful coding assistant. Summarize the following git diff in 1-2 concise sentences, explaining what these unsaved changes do.',
+        user: `Git status:\n${statusOutput}\n\nGit diff:\n${diffText.slice(0, 10000)}`
+      });
+      s.stop('Analysis complete.');
+      summary = `Uncommitted Changes Summary:\n${response.content}\n\nModified files:\n  ${filesList}`;
+    } catch (err) {
+      s.stop('Analysis failed.');
+    }
+  }
+
+  clackPrompts.note(summary, 'Current Git Changes');
+
+  const choice = await clackPrompts.select({
+    message: 'How would you like to handle these uncommitted changes?',
+    options: [
+      { value: 'proceed', label: 'Proceed with dirty workspace', hint: 'Keep current changes and start execution' },
+      { value: 'stash', label: 'Stash changes', hint: 'Run "git stash" to clean the workspace, then start execution' },
+      { value: 'cancel', label: 'Cancel', hint: 'Abort execution' }
+    ]
+  });
+
+  if (clackPrompts.isCancel(choice) || choice === 'cancel') {
+    return 'cancel';
+  }
+
+  if (choice === 'stash') {
+    try {
+      runExecSync('git stash', { stdio: 'inherit' });
+      clackPrompts.log.success('Successfully stashed changes.');
+    } catch (err) {
+      clackPrompts.log.error(`Failed to stash changes: ${err}`);
+      return 'cancel';
+    }
+  }
+
+  return 'proceed';
+}
 
 export function registerRunCommand(program: Command): void {
   program
@@ -240,6 +329,11 @@ async function handleGuardrail(task: string): Promise<void> {
       state = engineState.session;
       await store.save(engineState);
     } else if (phase === 'run') {
+      const gitResult = await handleGitCheckIfDirty();
+      if (gitResult === 'cancel') {
+        p.outro('Run aborted by user.');
+        return;
+      }
       const graph = new EngineGraph(store);
       engineState = await graph.run(engineState);
       state = engineState.session;

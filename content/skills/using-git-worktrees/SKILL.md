@@ -37,11 +37,19 @@ Use optional git worktree isolation when it materially reduces execution risk wi
 
 ## Workflow
 
-1. Decide whether isolation is actually needed for this run.
-2. Prefer an existing native or team-approved isolation mechanism.
-3. If using a project-local worktree, verify it will not pollute tracked files.
-4. Record the chosen execution context in state or task notes when it affects the workflow.
-5. Continue with normal execution and verification discipline.
+1. Check current Git status (run `git status` or equivalent) to identify the current branch, base branch (e.g., `develop`, `develop-xxx`), and check if the working directory is clean.
+2. If the Git workspace is dirty (has modified or untracked files) and the agent needs to stash, switch branch, or checkout a worktree:
+   - Run `git diff` (or equivalent) to inspect the modified code and changes.
+   - Present a clear summary/explanation of what those modified files do to the user.
+   - Ask the user to confirm the action (stash, switch, or worktree checkout) while displaying the summary of changes first.
+3. Confirm with the user whether they need to create/checkout a new branch or worktree first:
+   - If the current branch name already aligns with the plan's objectives, skip branching/isolation.
+   - If the workspace has unrelated dirty/untracked changes and the user approved stashing/cleaning, execute `git stash`.
+   - If the dirty changes are intentional and part of the planned work (explicitly approved by the user), accept them and proceed.
+   - Ensure the repository state is clean (or isolated via worktree/new branch) before beginning execution, unless intentional changes are explicitly approved.
+4. If using a project-local worktree, verify it will not pollute tracked files.
+5. Record the chosen execution context in state or task notes when it affects the workflow.
+6. Continue with normal execution and verification discipline.
 
 ## Operating Principles
 
@@ -52,10 +60,10 @@ Use optional git worktree isolation when it materially reduces execution risk wi
 
 ## Reasoning Procedure
 
-1. Restate the isolation need and the branch/worktree constraints.
-2. Check the existing repo state before creating or switching worktrees.
-3. Pick the smallest safe git action for the current change.
-4. Stop and report blocked if isolation cannot be established safely.
+1. Run `git status` and determine the base branch and workspace state.
+2. Analyze if the current branch matches the plan, or if there are unsaved changes. If there are dirty changes, run `git diff` to inspect and summarize them.
+3. Propose options to the user: branching, worktree checkout, or stashing. Display the summary of modified files and request explicit confirmation before running any git modifying command.
+4. Stop and report blocked if isolation cannot be established safely or if the user rejects the proposed git state.
 
 ## Action Loop
 
@@ -98,7 +106,10 @@ This skill must produce:
 
 ## Checklist Before Done
 
-- [ ] Isolation need was evaluated
+- [ ] Git status and base branch were checked
+- [ ] Dirty changes were analyzed with `git diff` and summarized for the user before any stash/switch action
+- [ ] User was consulted and explicitly confirmed the proposed git action based on the changes summary
+- [ ] Intentional dirty changes were explicitly accepted or resolved (stashed)
 - [ ] The chosen setup matches repo risk
 - [ ] No tracked-file pollution was introduced
 - [ ] The execution context is documented if relevant

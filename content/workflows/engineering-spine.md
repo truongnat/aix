@@ -11,9 +11,9 @@
 |---|------|----------------------------------|---------|
 | 1 | Align & Shape | `discussing-pro` | Clarify goals, explore alternatives, surface spec in chunks |
 | 2 | Plan | `planning-pro` | Task breakdown, dependencies, acceptance criteria, rollback |
-| 3 | Execute | `executing-pro` | Dependency-aware task execution with checkpoints |
-| 4 | Isolate | `using-git-worktrees` | Branch + clean baseline |
-| 5 | Test-first | `test-driven-development` | RED → GREEN → refactor |
+| 3 | Isolate | `using-git-worktrees` | Branch + clean baseline |
+| 4 | Test-first | `test-driven-development` | RED → GREEN → refactor |
+| 5 | Execute | `executing-pro` | Dependency-aware task execution with checkpoints |
 | 6 | Review | `requesting-code-review` / `code-review` | Security + quality pass |
 | 7 | Verify | `verification-before-completion` | Prove it works before "done" |
 | 8 | Remember | `remembering` | Record what was learned |

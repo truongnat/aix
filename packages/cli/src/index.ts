@@ -36,3 +36,5 @@ const isMain = process.argv[1]?.endsWith('/dist/index.js') ?? false;
 if (isMain) {
   program.parse(process.argv);
 }
+
+export { handleGitCheckIfDirty, setClackPrompts, setExecSync } from './commands/run.js';
