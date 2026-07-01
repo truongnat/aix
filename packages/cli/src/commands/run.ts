@@ -401,10 +401,24 @@ async function handleGuardrail(task: string): Promise<void> {
     if (phase === 'discuss') {
       engineState = await discussNode(engineState);
       state = engineState.session;
+      state = loop.addEvidence(state, {
+        phase: 'discuss',
+        kind: 'artifact',
+        summary: 'Generated DISCUSSION.md',
+        ref: join(getSessionDir(state.id), 'DISCUSSION.md'),
+      });
+      engineState = { ...engineState, session: state };
       await store.save(engineState);
     } else if (phase === 'plan') {
       engineState = await planNode(engineState);
       state = engineState.session;
+      state = loop.addEvidence(state, {
+        phase: 'plan',
+        kind: 'artifact',
+        summary: 'Generated PLAN.md',
+        ref: join(getSessionDir(state.id), 'PLAN.md'),
+      });
+      engineState = { ...engineState, session: state };
       await store.save(engineState);
     } else if (phase === 'run') {
       const gitResult = await handleGitCheckIfDirty();
@@ -418,6 +432,14 @@ async function handleGuardrail(task: string): Promise<void> {
 
       await store.save(engineState);
       await writeReviewArtifact(state.id, engineState);
+      state = loop.addEvidence(state, {
+        phase: 'run',
+        kind: 'artifact',
+        summary: 'Generated REVIEW.md',
+        ref: join(getSessionDir(state.id), 'REVIEW.md'),
+      });
+      engineState = { ...engineState, session: state };
+      await store.save(engineState);
       await redactedMemory.push({
         id: `${state.id}-${phase}-result-${Date.now()}`,
         kind: 'evidence',
@@ -437,8 +459,24 @@ async function handleGuardrail(task: string): Promise<void> {
       });
     } else if (phase === 'verify') {
       await writeVerifyArtifact(state.id, engineState);
+      state = loop.addEvidence(state, {
+        phase: 'verify',
+        kind: 'artifact',
+        summary: 'Generated VERIFY.md',
+        ref: join(getSessionDir(state.id), 'VERIFY.md'),
+      });
+      engineState = { ...engineState, session: state };
+      await store.save(engineState);
     } else if (phase === 'remember') {
       await writeRememberArtifact(state.id, engineState);
+      state = loop.addEvidence(state, {
+        phase: 'remember',
+        kind: 'artifact',
+        summary: 'Generated REMEMBER.md',
+        ref: join(getSessionDir(state.id), 'REMEMBER.md'),
+      });
+      engineState = { ...engineState, session: state };
+      await store.save(engineState);
     }
 
     try {

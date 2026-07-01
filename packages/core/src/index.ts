@@ -5,7 +5,7 @@ export {
 
 export type {
   Phase, Provider, SkillKind, Role,
-  Result, AppError,
+  AppErrorCode, Result, AppError,
   SessionState, EvidenceEntry,
   PhaseTransition, PhaseGuard,
   BudgetState, BudgetTracker, BudgetWarning,

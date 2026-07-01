@@ -3,13 +3,23 @@ import { AppError, ok, fail } from './errors.js';
 
 export function createBudgetTracker(): BudgetTracker {
   return {
-    addUsage(state: SessionState, usd: number, tokens: number): SessionState {
+    addUsage(
+      state: SessionState,
+      usd: number,
+      tokens: number,
+      promptTokens?: number,
+      completionTokens?: number
+    ): SessionState {
+      const pTokens = promptTokens ?? Math.round(tokens * 0.8);
+      const cTokens = completionTokens ?? (tokens - pTokens);
       return {
         ...state,
         budget: {
           ...state.budget,
           usdSpent: state.budget.usdSpent + usd,
           tokensInPhase: state.budget.tokensInPhase + tokens,
+          promptTokensInPhase: state.budget.promptTokensInPhase + pTokens,
+          completionTokensInPhase: state.budget.completionTokensInPhase + cTokens,
         },
       };
     },
@@ -82,6 +92,8 @@ export function createDefaultBudgetState(usdLimit: number = 10): BudgetState {
     usdSpent: 0,
     usdLimit,
     tokensInPhase: 0,
+    promptTokensInPhase: 0,
+    completionTokensInPhase: 0,
     tokenWarnThreshold: 64000,
     tokenContextLimit: 200000,
     usdWarnThreshold: 0.8,

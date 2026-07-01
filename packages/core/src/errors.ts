@@ -1,11 +1,11 @@
-import type { Result } from './types.js';
+import type { Result, AppErrorCode } from './types.js';
 
 export class AppError extends Error {
-  readonly code: string;
+  readonly code: AppErrorCode;
   readonly path: string | undefined;
   readonly cause: unknown | undefined;
 
-  constructor(opts: { code: string; message: string; cause?: unknown; path?: string }) {
+  constructor(opts: { code: AppErrorCode; message: string; cause?: unknown; path?: string }) {
     super(opts.message);
     this.name = 'AppError';
     this.code = opts.code;

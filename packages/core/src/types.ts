@@ -12,8 +12,24 @@ export type Result<T, E = AppError> =
   | { ok: true; value: T }
   | { ok: false; error: E };
 
+export type AppErrorCode =
+  | 'VALIDATION'
+  | 'BUDGET'
+  | 'CONTEXT'
+  | 'PHASE'
+  | 'GUARD'
+  | 'GUARD_DISCUSS_MISSING'
+  | 'GUARD_PLAN_MISSING'
+  | 'GUARD_REVIEW_MISSING'
+  | 'GUARD_VERIFY_MISSING'
+  | 'GUARD_REMEMBER_MISSING'
+  | 'POLICY'
+  | 'IO'
+  | 'WARN'
+  | 'UNEXPECTED';
+
 export interface AppError {
-  readonly code: string;
+  readonly code: AppErrorCode;
   readonly message: string;
   readonly cause: unknown | undefined;
   readonly path: string | undefined;
@@ -34,6 +50,7 @@ export interface EvidenceEntry {
   readonly kind: 'note' | 'artifact' | 'decision' | 'eval';
   readonly summary: string;
   readonly ref?: string;
+  readonly contentHash?: string;
   readonly at: string;
 }
 
@@ -52,6 +69,8 @@ export interface BudgetState {
   readonly usdSpent: number;
   readonly usdLimit: number;
   readonly tokensInPhase: number;
+  readonly promptTokensInPhase: number;
+  readonly completionTokensInPhase: number;
   readonly tokenWarnThreshold: number;
   readonly tokenContextLimit: number;
   readonly usdWarnThreshold: number;
@@ -64,7 +83,13 @@ export interface BudgetWarning {
 }
 
 export interface BudgetTracker {
-  addUsage(state: SessionState, usd: number, tokens: number): SessionState;
+  addUsage(
+    state: SessionState,
+    usd: number,
+    tokens: number,
+    promptTokens?: number,
+    completionTokens?: number
+  ): SessionState;
   checkHardStop(state: SessionState): Result<void>;
   checkBeforeCall(state: SessionState): { ok: true } | { ok: false; warnings: BudgetWarning[] };
   shouldCompact(state: SessionState): boolean;
