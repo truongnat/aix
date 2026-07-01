@@ -1,63 +1,71 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
+import { join } from 'node:path';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import bcrypt from 'bcryptjs';
-import { Neo4jService } from '../neo4j/neo4j.service.js';
 
 const BCRYPT_ROUNDS = 10;
 const KEY_PREFIX = 'kb_live_';
 const KEY_TOTAL_LENGTH = 8 + 64; // prefix (kb_live_) + hex (randomBytes(32))
 
+interface StoredKey {
+  hashedKey: string;
+  label: string;
+  createdAt: string;
+}
+
+/**
+ * File-backed auth for local kb-server.
+ * API keys are bcrypt-hashed and stored in KB_DATA_DIR/api-keys.json.
+ * No external DB required.
+ */
 @Injectable()
 export class AuthService {
-  readonly #neo4j: Neo4jService;
-  readonly #log = new Logger(AuthService.name);
+  readonly #logger = new Logger(AuthService.name);
+  readonly #keysFile: string;
 
-  constructor(neo4j: Neo4jService) {
-    this.#neo4j = neo4j;
+  constructor() {
+    const dataDir = process.env.KB_DATA_DIR ?? join(process.env.HOME ?? process.env.USERPROFILE ?? '.', '.aix', 'kb');
+    mkdirSync(dataDir, { recursive: true });
+    this.#keysFile = join(dataDir, 'api-keys.json');
+    if (!existsSync(this.#keysFile)) {
+      writeFileSync(this.#keysFile, JSON.stringify([]), 'utf-8');
+    }
+    this.#logger.log(`API keys at ${this.#keysFile}`);
   }
 
-  async ensureSchema(): Promise<void> {
-    const session = this.#neo4j.session();
+  /** No-op: schema ensured in constructor. */
+  async ensureSchema(): Promise<void> {}
+
+  #readKeys(): StoredKey[] {
     try {
-      await session.run(`
-        CREATE CONSTRAINT IF NOT EXISTS FOR (k:ApiKey) REQUIRE k.hashedKey IS UNIQUE
-      `);
-    } finally {
-      await session.close();
+      return JSON.parse(readFileSync(this.#keysFile, 'utf-8')) as StoredKey[];
+    } catch {
+      return [];
     }
+  }
+
+  #writeKeys(keys: StoredKey[]): void {
+    writeFileSync(this.#keysFile, JSON.stringify(keys, null, 2), 'utf-8');
   }
 
   async generateKey(label: string): Promise<{ raw: string; hashed: string }> {
     const raw = KEY_PREFIX + randomBytes(32).toString('hex');
     const hashed = await bcrypt.hash(raw, BCRYPT_ROUNDS);
-    const session = this.#neo4j.session();
-    try {
-      await session.run(
-        `CREATE (k:ApiKey {hashedKey: $hashed, label: $label, createdAt: $createdAt})`,
-        { hashed, label, createdAt: new Date().toISOString() },
-      );
-    } finally {
-      await session.close();
-    }
+    const keys = this.#readKeys();
+    keys.push({ hashedKey: hashed, label, createdAt: new Date().toISOString() });
+    this.#writeKeys(keys);
     return { raw, hashed };
   }
 
   async validateKey(raw: string): Promise<boolean> {
     if (typeof raw !== 'string') return false;
     if (!raw.startsWith(KEY_PREFIX) || raw.length !== KEY_TOTAL_LENGTH) return false;
-    // TODO(V4-L1): add a non-secret key-id prefix to MATCH a single candidate,
-    // then bcrypt.compare once, avoiding O(n) bcrypt per request.
-    const session = this.#neo4j.session();
-    try {
-      const result = await session.run(`MATCH (k:ApiKey) RETURN k.hashedKey AS hashedKey`);
-      for (const record of result.records) {
-        const hashed = record.get('hashedKey') as string;
-        if (await bcrypt.compare(raw, hashed)) return true;
-      }
-      return false;
-    } finally {
-      await session.close();
+    const keys = this.#readKeys();
+    for (const entry of keys) {
+      if (await bcrypt.compare(raw, entry.hashedKey)) return true;
     }
+    return false;
   }
 
   validateMasterPassword(pwd: string): boolean {
