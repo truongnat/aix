@@ -19,12 +19,10 @@ const ADAPTERS: Record<Provider, ClaudeAdapter | CursorAdapter | CodexAdapter | 
 
 function findContentRoot(): string {
   const dir = fileURLToPath(new URL('.', import.meta.url));
+  // dir = packages/cli/dist → repo root is 3 levels up (dist→cli→packages→root)
   const candidates = [
-    join(process.cwd(), 'content'),
-    join(process.cwd(), '..', 'content'),
-    // dir = packages/cli/dist → repo root is 3 levels up (dist→cli→packages→root)
     join(dir, '..', '..', '..', 'content'),
-    join(dir, '..', '..', '..', '..', 'content'),
+    join(process.cwd(), 'content'),
   ];
   for (const c of candidates) {
     try {
@@ -34,7 +32,7 @@ function findContentRoot(): string {
       continue;
     }
   }
-  return join(process.cwd(), 'content');
+  return join(dir, '..', '..', '..', 'content');
 }
 
 async function loadAgents(contentRoot: string): Promise<AgentDef[]> {

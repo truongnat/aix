@@ -1,6 +1,7 @@
 ---
 name: tool-discovery-skill
-description: 'Skill: tool-discovery-skill'
+description: >+
+  'Skill: tool-discovery-skill'
 x-kind: process
 x-version: 0.1.0
 x-roles: []
@@ -11,6 +12,7 @@ x-compatible:
   - codex
   - gemini
 ---
+
 
 # tool-discovery
 

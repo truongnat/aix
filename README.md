@@ -1,20 +1,20 @@
 # aix — AI Engineering Platform
 
-> An AI engineering platform / plugin: an opinionated SDLC methodology (discuss → plan → execute) plus a
-> 159‑skill library (domain + process), activated at session start. **The host agent is the runtime** —
+> An AI engineering platform / plugin: an opinionated SDLC methodology plus a
+> 158‑skill library, activated at session start. **The host agent is the runtime** —
 > aix is the playbook and the library, not a separate engine you invoke.
 
 **Status:** v1 (active development). ESM, Node 22, strict TypeScript.
 
 ## How it works (the plugin model)
 
-aix follows the [superpowers](https://github.com/obra/superpowers) model. On `/plugin install`:
+On `/plugin install`:
 
 1. A `SessionStart` hook injects one entry-point skill — [`using-aix`](./content/skills/using-aix/SKILL.md) —
    into the agent's context. It explains the methodology spine and how to reach every other skill.
-2. All 159 skills under [`content/skills/`](./content/skills) become available to the host's **`Skill`
+2. All 158 skills under [`content/skills/`](./content/skills) become available to the host's **`Skill`
    tool** (declared via `"skills"` in [`.claude-plugin/plugin.json`](./.claude-plugin/plugin.json)).
-3. The agent works the [engineering spine](./content/workflows/engineering-spine.md), dispatching
+3. The agent works the engineering spine, dispatching
    **its own native subagents** (the host's `Task` tool) per plan task. There is no aix runtime engine
    in this path — the host *is* the runtime.
 
@@ -22,16 +22,15 @@ aix follows the [superpowers](https://github.com/obra/superpowers) model. On `/p
 # In Claude Code:
 /plugin marketplace add truongnat/aix
 /plugin install aix
-# New session → using-aix is injected → 159 skills reachable via the Skill tool.
 ```
 
 ## Why
 
-Six separate repos (`ai-engineering-harness`, `agentic-sdlc`, `skills`, `docs-wiki`, `system-design-skills`, `dev-memory`) had overlapping skills, installers, and knowledge tooling in four incompatible formats. `aix` merges them into one canonical source (`content/`), one registry, one CLI, and one provider compiler. The original repos are preserved under [`imports/`](./imports) (imported via `git subtree`, history intact; kept locally, not tracked).
+Six separate repos (`ai-engineering-harness`, `agentic-sdlc`, `skills`, `docs-wiki`, `system-design-skills`, `dev-memory`) had overlapping skills, installers, and knowledge tooling in incompatible formats. `aix` merges them into one canonical source (`content/`), one registry, one CLI, and one provider compiler. The original repos are preserved under [`imports/`](./imports) (git subtree, history intact; kept locally, not tracked).
 
 ## The engineering spine
 
-The default methodology the plugin gives an agent. Each step is a real process skill, invoked via the `Skill` tool:
+Each step is a process skill invoked via the `Skill` tool:
 
 | # | Step | Skill |
 |---|------|-------|
@@ -44,102 +43,79 @@ The default methodology the plugin gives an agent. Each step is a real process s
 | 7 | Verify | `verify-pro` |
 | 8 | Remember | `remember-pro` |
 
-See [`content/workflows/engineering-spine.md`](./content/workflows/engineering-spine.md) for the full flow.
-
 ## Supporting tooling (the monorepo)
 
-aix also ships a TypeScript monorepo for authoring, compiling, and (optionally) running the library outside an interactive host. This is **secondary** to the plugin path above.
+aix also ships a TypeScript monorepo for authoring, compiling, and running the library outside an interactive host. This is **secondary** to the plugin path.
 
 | Package | Role |
 |---|---|
-| `@x/core` | Shared types, phase machine, guards, budget tracker (USD + context window) |
+| `@x/core` | Shared types, phase machine, guards, budget tracker |
 | `@x/registry` | `SKILL.md` schema (Zod), loader, catalog, migrator |
-| `@x/policy` | Boundary redaction (20+ secret/PII patterns), shell denylist |
-| `@x/providers` | Compile-time adapters (Claude/Cursor/Codex/Gemini) + runtime LLM provider (Anthropic, OpenAI, Groq) |
-| `@x/compiler` | Idempotent, dry-run-capable file emitter (hash + generated-marker) |
-| `@x/context` | Regex-based code analysis, RAG index/query, wiki generation |
-| `@x/memory` | Markdown-first store + KB adapter, redaction-wrapped |
-| `@x/prompt` | Eval-driven prompt assembly + linter |
-| `@x/preview` | Tiered preview (Mermaid / image / HTML server) |
-| `@x/hitl` | Human-in-the-loop decision channel (always ≥2 options) |
+| `@x/policy` | Secret/PII redaction, shell denylist |
+| `@x/providers` | Compile-time adapters (Claude/Cursor/Codex/Gemini) + runtime LLM provider |
+| `@x/compiler` | Idempotent file emitter (hash + generated-marker) |
+| `@x/context` | Code analysis, RAG index/query, wiki generation |
+| `@x/memory` | Markdown-first store + KB adapter |
+| `@x/prompt` | Prompt assembly + linter |
+| `@x/preview` | Tiered preview (Mermaid / image / HTML) |
+| `@x/hitl` | Human-in-the-loop decision channel |
 | `@x/evals` | A/B harness + rubric scoring |
-| `@x/engine` | **Optional headless/CI runner** — autonomous SDLC graph (LangGraph.js) with file-based checkpointing, budget guardrails, and structured logging per step. For *non-interactive* runs (CI, batch). Not used by the plugin path; the host agent is the runtime there. |
+| `@x/engine` | **Optional headless runner** — autonomous SDLC graph with checkpointing, budget guards, structured logging. For CI/batch runs without an interactive host. |
 | `@x/cli` | The `aix` command surface (authoring + compile + headless run) |
-| `services/kb-server` | NestJS + Neo4j graph knowledge base (auth: master + bcrypt API keys) |
+| `services/kb-server` | SQLite-backed knowledge base with in-memory cache |
 
 ### When to use `@x/engine`
 
-Only when there is **no interactive host** to be the runtime — e.g. a CI job or batch pipeline that
-must drive the SDLC loop unattended. In that path the engine writes generated code to
-`.aix/sessions/<session>/generated/` for review (never directly into `src/`), tracks USD budget plus
-context-window usage with pre-flight checks and hard-stop, persists checkpoints to disk via
-`FileCheckpointer` for crash recovery, and fails loud in mock mode. **In Claude Code / Cursor / any
-interactive agent, you do not need the engine** — install the plugin and let the host drive the spine.
+Only when there is **no interactive host** — e.g. a CI job or batch pipeline that
+must drive the SDLC loop unattended. **In Claude Code / Cursor / any
+interactive agent, install the plugin and let the host drive the spine.**
 
-## Quick start (monorepo / authoring)
+## Quick start
 
 ```bash
 pnpm install
-pnpm build          # turbo build — ESM + d.ts for all packages
-pnpm lint           # tsc --noEmit across the workspace
-pnpm test           # node --test engine smoke tests
-aix doctor          # check Node / Neo4j / config (config is optional)
+pnpm build
+pnpm lint
+pnpm test
 ```
 
 ## CLI
 
 ```bash
-aix skills validate | list [--kind] [--role] | show <name> | migrate [--write]
-aix install --provider <claude|cursor|codex|gemini> [--dry-run] [--force] [--all]
-                            # secondary path: compile content/ into a provider's
-                            #   native format. For Claude Code, prefer the plugin.
-aix context build [path] | query "<q>"
-aix run "<task>"            # guardrail mode (human-reviewed phase loop)
-aix run "<task>" --auto     # headless engine (writes generated code to
-                            #   .aix/sessions/<session>/generated/ for review, not into src/)
-aix run "<task>" --dry-run  # preview phases + token estimate, no execution
+aix install --provider <claude|cursor|codex|gemini> [--all]
+aix run "<task>"
 aix verify | ship
 aix memory push|search|list|get
-aix eval <suite>
+aix skills list | show <name>
 aix doctor
 ```
 
 ## Knowledge base
 
-`services/kb-server` is a NestJS service backed by Neo4j (Meilisearch + Redis via Docker Compose):
+`services/kb-server` is a SQLite-backed service (no external dependencies):
 
 ```bash
 cd services/kb-server
-cp .env.example .env        # set NEO4J_PASSWORD and KB_MASTER_PASSWORD (required — fails closed)
-docker compose up
+cp .env.example .env
+pnpm dev
 ```
 
-API keys are generated server-side (`kb_live_<hex>`), stored as bcrypt hashes, and verified per request. The master password is required; the server refuses unauthenticated admin access.
+API keys are generated server-side, stored as bcrypt hashes, and verified per request.
 
 ## Security model
 
-- **Redaction at the boundary:** all memory writes pass through `@x/policy.redact` before hitting disk or the KB — secrets become `••••`. The KB never receives raw secrets.
-- **Shell denylist** and **budget hard-stop (USD + context window)** guard the headless engine path.
-- **Provider error bodies** are redacted before surfacing.
+- **Redaction at the boundary:** all memory writes pass through `@x/policy.redact` before hitting disk — secrets become `••••`.
+- **Shell denylist** and **budget hard-stop** guard the headless engine path.
 
 ## Repository layout
 
 ```
-.claude-plugin/  plugin.json + marketplace.json (the plugin manifest)
-hooks/           SessionStart hook that injects using-aix
-content/         canonical source: skills (159), agents, rules, workflows
-packages/        13 @x/* packages (authoring, compile, headless engine)
-services/        kb-server (NestJS + Neo4j)
-imports/         the 6 original repos (git subtree, history preserved; untracked)
-apps/docs        consolidated documentation
+.claude-plugin/  plugin manifest
+content/         canonical source: skills (158), rules, workflows
+packages/        @x/* packages (authoring, compile, engine)
+services/        kb-server (SQLite)
+imports/         original repos (git subtree, untracked)
 ```
-
-## Contributing
-
-`content/skills/` is the community-editable layer — add or improve a skill without touching the
-TypeScript packages. See [`content/skills/CONTRIBUTING.md`](./content/skills/CONTRIBUTING.md) for the
-layout, the `SKILL.md` frontmatter schema, and the checks your PR must pass. For *how to design* a
-good skill, invoke the `writing-skills` skill. Reviews are routed via [`.github/CODEOWNERS`](./.github/CODEOWNERS).
 
 ## License
 

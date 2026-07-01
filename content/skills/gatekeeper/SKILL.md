@@ -1,6 +1,7 @@
 ---
 name: gatekeeper-skill
-description: 'Skill: gatekeeper-skill'
+description: >+
+  'Skill: gatekeeper-skill'
 x-kind: process
 x-version: 0.1.0
 x-roles: []
@@ -11,6 +12,7 @@ x-compatible:
   - codex
   - gemini
 ---
+
 
 # gatekeeper
 

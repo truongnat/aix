@@ -10,6 +10,6 @@ export const SKILL_BODY_MAX_TOKENS = 5000;
 
 export const SKILL_NAME_MAX = 64;
 
-export const SKILL_DESC_MAX = 1024;
+export const SKILL_DESC_MAX = 2048;
 
 export const SCOPE = '@x';
