@@ -7,6 +7,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- **kb-server auto-start/stop**. `aix run --auto` and Guardrail mode now automatically ensure `kb-server` is running before execution and cleanly shut it down (using a new `POST /shutdown` endpoint) when the session finishes, cancels, or fails.
+- **kb-server plugin mode integration**. The Claude Code plugin mode (`hooks/session-start.sh`) now starts `kb-server` in the background and instructs the agent to run `aix kb stop` when finished.
+
 ### Fixed
 - **Engine now writes generated code to disk.** `coderNode` persists model output to
   a sandbox `.aix/generated/<sessionId>/` (path-traversal-guarded) instead of discarding

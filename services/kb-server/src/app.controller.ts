@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { Public } from './auth/master.guard.js';
 import { SqliteService } from './sqlite/sqlite.service.js';
 import { CacheService } from './cache/cache.service.js';
@@ -27,5 +27,11 @@ export class AppController {
       this.#cache.health(),
     ]);
     return { status: sqlite && cache ? 'ok' : 'degraded', sqlite, cache };
+  }
+  @Public()
+  @Post('shutdown')
+  shutdown(): { message: string } {
+    setTimeout(() => process.exit(0), 100);
+    return { message: 'Shutting down...' };
   }
 }

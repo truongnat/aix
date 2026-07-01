@@ -7,6 +7,11 @@ set -euo pipefail
 ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 SKILL="${ROOT}/content/skills/using-aix/SKILL.md"
 
+# Start kb-server in the background if it's not running
+if [ -f "${ROOT}/packages/cli/dist/index.js" ]; then
+  node "${ROOT}/packages/cli/dist/index.js" kb ensure >/dev/null 2>&1 &
+fi
+
 # node is the project runtime and gives us safe JSON escaping across platforms.
 node -e '
 const fs = require("fs");
@@ -17,7 +22,8 @@ const intro =
   "You have aix. The text below is your entry-point skill (using-aix): it explains " +
   "the default engineering methodology and how to reach every other aix skill via the " +
   "Skill tool (start with router-pro for broad requests, tool-discovery-skill to find by " +
-  "capability). Check for a relevant skill before any non-trivial task.\n\n";
+  "capability). Check for a relevant skill before any non-trivial task.\n" +
+  "Important: kb-server has been started in the background. When you finish your task, ALWAYS run `aix kb stop` to shut it down.\n\n";
 process.stdout.write(JSON.stringify({
   hookSpecificOutput: {
     hookEventName: "SessionStart",
