@@ -1,6 +1,6 @@
 ---
-name: using-git-worktrees
-description: 'Skill: using-git-worktrees'
+name: git-worktree-pro
+description: 'Skill: git-worktree-pro'
 x-kind: process
 x-version: 0.1.0
 x-roles: []
@@ -11,7 +11,7 @@ x-compatible:
   - codex
   - gemini
 ---
-# using-git-worktrees
+# git-worktree-pro
 
 ## Purpose
 

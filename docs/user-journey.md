@@ -33,8 +33,8 @@ flowchart TD
         C0["User: 'làm tính năng X'"]
         C1["1· discussing-pro<br/>chốt goal + khám phá phương án"]
         C2["2· planning-pro<br/>task nhỏ, verify được"]
-        C3["3· using-git-worktrees<br/>kiểm tra & cô lập nhánh"]
-        C4["4· test-driven-development<br/>RED → GREEN → refactor"]
+        C3["3· git-worktree-pro<br/>kiểm tra & cô lập nhánh"]
+        C4["4· ttd-pro<br/>RED → GREEN → refactor"]
         C5["5· executing-pro<br/>dependency-aware execution"]
         C6["6· code-review<br/>security + chất lượng"]
         C7["7· verification-before-completion<br/>chứng minh chạy được"]
@@ -94,8 +94,8 @@ process skill thật, gọi qua Skill tool:
 |---|------|-------|----------|
 | 1 | Align & Shape | `discussing-pro` | Chốt goal + khám phá phương án, surface spec |
 | 2 | Plan | `planning-pro` | Chia task nhỏ, verify được, đường dẫn file cụ thể |
-| 3 | Isolate | `using-git-worktrees` | Kiểm tra git status & diff, xin confirm của user, nhánh + baseline sạch |
-| 4 | Test-first | `test-driven-development` | Viết test trước để định nghĩa/phát hiện (Phase A) và đảm bảo hoàn thành (Phase B) |
+| 3 | Isolate | `git-worktree-pro` | Kiểm tra git status & diff, xin confirm của user, nhánh + baseline sạch |
+| 4 | Test-first | `ttd-pro` | Viết test trước để định nghĩa/phát hiện (Phase A) và đảm bảo hoàn thành (Phase B) |
 | 5 | Execute | `executing-pro` | Dependency-aware task execution với checkpoints |
 | 6 | Review | `requesting-code-review` / `code-review` | Soi security + chất lượng |
 | 7 | Verify | `verification-before-completion` | Chứng minh chạy được trước khi tuyên bố done |

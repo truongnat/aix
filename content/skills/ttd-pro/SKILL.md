@@ -1,6 +1,6 @@
 ---
-name: test-driven-development
-description: 'Skill: test-driven-development'
+name: ttd-pro
+description: 'Skill: ttd-pro'
 x-kind: process
 x-version: 0.1.0
 x-roles: []
@@ -11,7 +11,7 @@ x-compatible:
   - codex
   - gemini
 ---
-# test-driven-development
+# ttd-pro
 
 ## Purpose
 

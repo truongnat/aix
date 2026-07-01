@@ -45,8 +45,8 @@ aix process skill — invoke it via the `Skill` tool by the name in backticks:
 
 1. **`discussing-pro`** — align on what success actually means and explore alternatives before anything.
 2. **`planning-pro`** — break the work into small, verifiable tasks with concrete file paths and verification steps.
-3. **`using-git-worktrees`** — check git status, summarize diffs for user confirmation, and isolate the work on a branch with a clean baseline.
-4. **`test-driven-development`** — write tests first (Phase A) to define/reproduce, then implement and verify (Phase B).
+3. **`git-worktree-pro`** — check git status, summarize diffs for user confirmation, and isolate the work on a branch with a clean baseline.
+4. **`ttd-pro`** — write tests first (Phase A) to define/reproduce, then implement and verify (Phase B).
 5. **`executing-pro`** — dependency-aware task execution with checkpoints.
 6. **`requesting-code-review`** / **`code-review`** — security + quality pass.
 7. **`verification-before-completion`** — prove it works before declaring done.
