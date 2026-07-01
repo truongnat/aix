@@ -27,10 +27,10 @@ CORE PACKAGES (@x/*)
        ▼
 
 COMPILER (@x/compiler)
-  → Claude Code  (.claude/skills, .claude/agents, CLAUDE.md)
-  → Cursor       (.cursor/rules/, SKILL.md recursive)
-  → Codex        (AGENTS.md)
-  → Gemini CLI   (GEMINI.md, gemini-extension.json)
+  → Claude Code  (content/skills, .claude-plugin/plugin.json, CLAUDE.md)
+  → Cursor       (.cursor/rules/aix-skill-*.mdc)
+  → Codex        (compact AGENTS.md + .codex/ retrievable index/files)
+  → Gemini CLI   (compact GEMINI.md + skills/index.md + .gemini/settings.json)
 
        │
        ▼

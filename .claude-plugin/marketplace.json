@@ -1,5 +1,6 @@
 {
   "name": "aix",
+  "description": "AI engineering methodology spine and skill library for Claude Code.",
   "owner": {
     "name": "truongdq",
     "url": "https://github.com/truongnat"

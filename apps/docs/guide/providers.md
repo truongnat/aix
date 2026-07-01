@@ -19,32 +19,36 @@ npx aix install --provider gemini
 
 ### Claude Code
 ```
-~/.claude/
-├── skills/
-│   └── api-design/
-│       └── SKILL.md
-├── agents/
-│   └── code-reviewer.md
-└── CLAUDE.md
+content/skills/<skill>/SKILL.md
+.claude-plugin/plugin.json   ← skills: ["./content/skills/"]
+CLAUDE.md
+.claude/settings.json
 ```
 
 ### Cursor
 ```
 .cursor/
 └── rules/
-    └── api-design.md
+    ├── spine-guardrail.mdc
+    └── aix-skill-<skill>.mdc
 ```
 
 ### Codex
 ```
-AGENTS.md   ← tổng hợp rules + skills context
+AGENTS.md                 ← compact router, stays below Codex project doc cap
+.codex/skills/index.md    ← searchable skill catalog
+.codex/skills/<skill>.md  ← full skill body, opened on demand
+.codex/rules.md
 ```
 
 ### Gemini CLI
 ```
-GEMINI.md
+GEMINI.md                 ← compact router
+.gemini/settings.json     ← contextFileName: GEMINI.md
+.gemini/aix-rules.md
 gemini-extension.json
-skills/
+skills/index.md
+skills/<skill>.md
 agents/
 ```
 
@@ -54,8 +58,8 @@ Mỗi provider có adapter riêng trong `@x/providers`:
 
 | File | Provider |
 |------|---------|
-| `src/claude.ts` | Claude Code — SKILL.md, agents, hooks, MCP |
-| `src/cursor.ts` | Cursor — `.cursor/rules/` recursive scan |
-| `src/codex.ts` | Codex — `AGENTS.md` synthesis |
-| `src/gemini.ts` | Gemini CLI — `gemini-extension.json` |
+| `src/claude.ts` | Claude Code — canonical `content/skills`, plugin manifest, settings |
+| `src/cursor.ts` | Cursor — `.cursor/rules/aix-skill-*.mdc` |
+| `src/codex.ts` | Codex — compact `AGENTS.md` plus `.codex/` retrieval files |
+| `src/gemini.ts` | Gemini CLI — compact `GEMINI.md`, skill index, extension metadata |
 | `src/mcp/browser.ts` | Browser MCP (chrome-devtools / claude-in-chrome) |

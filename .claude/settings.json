@@ -1,0 +1,48 @@
+{
+  "hooks": {
+    "preToolUse": [
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/nextjs-security-scan/scripts/dependency-audit.sh"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/nextjs-security-scan/scripts/pattern-scanner.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/nextjs-security-scan/scripts/secret-scanner.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/senior-architect/scripts/architecture-diagram-generator.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/senior-architect/scripts/dependency-analyzer.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/senior-architect/scripts/project-architect.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/senior-backend/scripts/api-load-tester.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/senior-backend/scripts/api-scaffolder.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/senior-backend/scripts/database-migration-tool.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/senior-frontend/scripts/bundle-analyzer.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/senior-frontend/scripts/component-generator.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/senior-frontend/scripts/frontend-scaffolder.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/senior-security/scripts/secret-scanner.js"
+      },
+      {
+        "command": "/Users/truongdev/Documents/projects/products/aix/content/skills/senior-security/scripts/threat-modeler.js"
+      }
+    ]
+  }
+}
