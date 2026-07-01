@@ -37,18 +37,24 @@ Introduce or change behavior by defining evidence first, then implementing the s
 
 ## Workflow
 
-1. Define the failing check or expected behavior first.
-2. Run it and confirm the failure is meaningful.
-3. Implement the smallest change that should pass.
-4. Re-run the check and confirm it passes.
-5. Refactor only while keeping evidence green.
+The TDD process consists of two key testing phases around execution:
+
+### Phase A: Test to Detect & Define (Test để phát hiện và định nghĩa - BEFORE Execution)
+1. Write the test or check first to define the expected behavior (for features) or reproduce the issue (for bug fixes).
+2. Run the test and observe it fail (confirming a meaningful "RED" state). For bug fixes, this test MUST prove the existence of the bug. For features, it MUST prove the behavior does not yet exist.
+
+### Phase B: Test to Ensure Completion (Test để đảm bảo hoàn thành - AFTER Execution)
+3. Implement the minimal code changes necessary to satisfy the test.
+4. Re-run the test to confirm it now passes (confirming a valid "GREEN" state).
+5. Refactor the code as needed, running the test after each change to verify it remains green (regression protection).
 
 ## Operating Principles
 
-- Evidence comes before implementation.
-- Failures should be intentional, not accidental.
-- The smallest passing change is usually best.
-- Regression protection matters more than elegance.
+- **Dual-testing discipline**: Always separate tests into "define/reproduce" (before execution) and "verify/ensure completion" (after execution).
+- **Evidence comes before implementation**: Never write behavioral code without a failing test first.
+- **Failures must be intentional**: A test that passes before you write the code is not a valid definition of change.
+- **Smallest passing change**: Implement only what is required to pass the test; avoid scope creep.
+- **Regression protection**: Ensure the test persists to prevent future code changes from breaking the behavior.
 
 ## Reasoning Procedure
 
@@ -98,8 +104,7 @@ This skill must produce:
 
 ## Checklist Before Done
 
-- [ ] Behavior was defined before implementation
-- [ ] The initial failure was observed when applicable
-- [ ] The minimal change was made
-- [ ] The relevant checks now pass
+- [ ] Test to detect and define (Phase A) was written and observed to fail before implementation
+- [ ] The minimal changes were implemented
+- [ ] Test to ensure completion (Phase B) passes after implementation
 - [ ] Regression protection exists for the changed behavior
