@@ -14,9 +14,9 @@
 | 3 | Isolate | `git-worktree-pro` | Branch + clean baseline |
 | 4 | Test-first | `ttd-pro` | RED → GREEN → refactor |
 | 5 | Execute | `executing-pro` | Dependency-aware task execution with checkpoints |
-| 6 | Review | `requesting-code-review` / `code-review` | Security + quality pass |
-| 7 | Verify | `verification-before-completion` | Prove it works before "done" |
-| 8 | Remember | `remembering` | Record what was learned |
+| 6 | Review | `code-review-pro` | Security + quality pass |
+| 7 | Verify | `verify-pro` | Prove it works before "done" |
+| 8 | Remember | `remember-pro` | Record what was learned |
 
 **Supporting skills:** `mapping-codebase`, `debugging-investigation`,
 `tool-discovery-skill`, `gatekeeper-skill`, `report-writer`, `writing-skills`.

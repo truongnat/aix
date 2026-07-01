@@ -1,6 +1,6 @@
 ---
-name: code-review
-description: 'Skill: code-review'
+name: code-review-pro
+description: 'Skill: code-review-pro'
 x-kind: process
 x-version: 0.1.0
 x-roles: []
@@ -11,7 +11,7 @@ x-compatible:
   - codex
   - gemini
 ---
-# code-review
+# code-review-pro
 
 ## Purpose
 

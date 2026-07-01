@@ -1,6 +1,6 @@
 ---
-name: verification-before-completion
-description: 'Skill: verification-before-completion'
+name: verify-pro
+description: 'Skill: verify-pro'
 x-kind: process
 x-version: 0.1.0
 x-roles: []
@@ -11,7 +11,7 @@ x-compatible:
   - codex
   - gemini
 ---
-# verification-before-completion
+# verify-pro
 
 ## Purpose
 

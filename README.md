@@ -40,9 +40,9 @@ The default methodology the plugin gives an agent. Each step is a real process s
 | 3 | Isolate | `git-worktree-pro` |
 | 4 | Test-first | `ttd-pro` |
 | 5 | Execute | `executing-pro` |
-| 6 | Review | `requesting-code-review` / `code-review` |
-| 7 | Verify | `verification-before-completion` |
-| 8 | Remember | `remembering` |
+| 6 | Review | `code-review-pro` |
+| 7 | Verify | `verify-pro` |
+| 8 | Remember | `remember-pro` |
 
 See [`content/workflows/engineering-spine.md`](./content/workflows/engineering-spine.md) for the full flow.
 

@@ -1,6 +1,6 @@
 ---
-name: remembering
-description: 'Skill: remembering'
+name: remember-pro
+description: 'Skill: remember-pro'
 x-kind: process
 x-version: 0.1.0
 x-roles: []
@@ -11,7 +11,7 @@ x-compatible:
   - codex
   - gemini
 ---
-# remembering
+# remember-pro
 
 ## Purpose
 

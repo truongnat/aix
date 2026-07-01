@@ -75,9 +75,9 @@ Mỗi tác vụ được thực thi thông qua một chuỗi các kỹ năng quy
 3. **`git-worktree-pro`**: Kiểm tra trạng thái Git, hiển thị tóm tắt thay đổi và yêu cầu người dùng xác nhận, sau đó tạo nhánh làm việc độc lập trên Git để giữ sạch môi trường phát triển gốc.
 4. **`ttd-pro`**: Viết kiểm thử trước để phát hiện & định nghĩa hành vi (Phase A - RED), sau đó viết code logic tối thiểu và chạy lại kiểm thử để đảm bảo hoàn thành (Phase B - GREEN).
 5. **`executing-pro`**: Tiến hành code thực thi theo kế hoạch và thực hiện tạo các checkpoint thường xuyên.
-6. **`requesting-code-review`** & **`code-review`**: Đánh giá chất lượng và kiểm tra bảo mật cho mã nguồn.
-7. **`verification-before-completion`**: Xác minh kỹ lưỡng và chạy lại tất cả các kịch bản test trước khi đóng tác vụ.
-8. **`remembering`**: Lưu lại các bài học kinh nghiệm và kiến thức mới phát hiện được.
+6. **`code-review-pro`**: Đánh giá chất lượng và kiểm tra bảo mật cho mã nguồn.
+7. **`verify-pro`**: Xác minh kỹ lưỡng và chạy lại tất cả các kịch bản test trước khi đóng tác vụ.
+8. **`remember-pro`**: Lưu lại các bài học kinh nghiệm và kiến thức mới phát hiện được.
 
 ---
 

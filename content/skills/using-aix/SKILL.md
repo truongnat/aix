@@ -48,9 +48,9 @@ aix process skill — invoke it via the `Skill` tool by the name in backticks:
 3. **`git-worktree-pro`** — check git status, summarize diffs for user confirmation, and isolate the work on a branch with a clean baseline.
 4. **`ttd-pro`** — write tests first (Phase A) to define/reproduce, then implement and verify (Phase B).
 5. **`executing-pro`** — dependency-aware task execution with checkpoints.
-6. **`requesting-code-review`** / **`code-review`** — security + quality pass.
-7. **`verification-before-completion`** — prove it works before declaring done.
-8. **`remembering`** — record what was learned.
+6. **`code-review-pro`** — security + quality pass.
+7. **`verify-pro`** — prove it works before declaring done.
+8. **`remember-pro`** — record what was learned.
 
 Supporting skills: `mapping-codebase` (orient in unfamiliar code),
 `debugging-investigation` (systematic root-cause), `writing-skills` (author new

@@ -36,9 +36,9 @@ flowchart TD
         C3["3· git-worktree-pro<br/>kiểm tra & cô lập nhánh"]
         C4["4· ttd-pro<br/>RED → GREEN → refactor"]
         C5["5· executing-pro<br/>dependency-aware execution"]
-        C6["6· code-review<br/>security + chất lượng"]
-        C7["7· verification-before-completion<br/>chứng minh chạy được"]
-        C8["8· remembering<br/>ghi lại điều học được"]
+        C6["6· code-review-pro<br/>security + chất lượng"]
+        C7["7· verify-pro<br/>chứng minh chạy được"]
+        C8["8· remember-pro<br/>ghi lại điều học được"]
         C0 --> C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7 --> C8
     end
 
@@ -97,9 +97,9 @@ process skill thật, gọi qua Skill tool:
 | 3 | Isolate | `git-worktree-pro` | Kiểm tra git status & diff, xin confirm của user, nhánh + baseline sạch |
 | 4 | Test-first | `ttd-pro` | Viết test trước để định nghĩa/phát hiện (Phase A) và đảm bảo hoàn thành (Phase B) |
 | 5 | Execute | `executing-pro` | Dependency-aware task execution với checkpoints |
-| 6 | Review | `requesting-code-review` / `code-review` | Soi security + chất lượng |
-| 7 | Verify | `verification-before-completion` | Chứng minh chạy được trước khi tuyên bố done |
-| 8 | Remember | `remembering` | Ghi lại điều học được |
+| 6 | Review | `code-review-pro` | Soi security + chất lượng |
+| 7 | Verify | `verify-pro` | Chứng minh chạy được trước khi tuyên bố done |
+| 8 | Remember | `remember-pro` | Ghi lại điều học được |
 
 **Vòng lặp ngược:** review (6) phát hiện vấn đề → quay lại TDD (4); verify (7) chưa đạt → quay lại
 execute (5). Spine không phải đường thẳng một chiều.
