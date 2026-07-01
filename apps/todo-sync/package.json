@@ -1,0 +1,11 @@
+{
+  "name": "todo-sync-demo",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/**/*.test.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
