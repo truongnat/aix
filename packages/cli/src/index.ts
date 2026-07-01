@@ -32,7 +32,7 @@ export function run(args: string[]): void {
   program.parse(args, { from: 'user' });
 }
 
-const isMain = process.argv[1]?.endsWith('/dist/index.js') ?? false;
+const isMain = process.argv[1]?.replace(/\\/g, '/').endsWith('/dist/index.js') ?? false;
 if (isMain) {
   program.parse(process.argv);
 }
