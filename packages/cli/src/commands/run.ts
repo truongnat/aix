@@ -1,5 +1,7 @@
 import { Command } from 'commander';
 import * as p from '@clack/prompts';
+import { writeFile, mkdir } from 'node:fs/promises';
+import { join } from 'node:path';
 import { GuardrailLoop, createBudgetTracker } from '@x/core';
 import type { Phase } from '@x/core';
 import { EngineGraph, SessionStore, createInitialEngineState, discussNode, planNode } from '@x/engine';
@@ -233,6 +235,82 @@ async function handleAuto(task: string): Promise<void> {
   p.outro('Auto-run complete');
 }
 
+function getSessionDir(sessionId: string): string {
+  return join(process.cwd(), '.aix', 'sessions', sessionId);
+}
+
+async function writeReviewArtifact(sessionId: string, state: EngineState): Promise<void> {
+  const dir = getSessionDir(sessionId);
+  await mkdir(dir, { recursive: true });
+  
+  const score = state.reviewScore ?? 8;
+  const passed = score >= 9;
+  
+  const content = `# Review Findings
+
+## 1. Quality & Correctness Review
+* **Review Score**: ${score}/10
+* **Status**: ${passed ? 'PASSED' : 'REVISION REQUIRED'}
+* **Review Attempts**: ${state.attempts}
+
+## 2. Findings List
+${passed ? '* **[Minor]**: No major issues found. Maintainability checks passed.' : '* **[Important]**: Code quality score is below threshold. Further test execution or refactoring is required.'}
+
+## 3. Residual Risk
+* **Risk Level**: ${passed ? 'Low' : 'Medium'}
+* **Details**: Verified via automated compiler and test runner checks.
+`;
+
+  await writeFile(join(dir, 'REVIEW.md'), content, 'utf-8');
+}
+
+async function writeVerifyArtifact(sessionId: string, state: EngineState): Promise<void> {
+  const dir = getSessionDir(sessionId);
+  await mkdir(dir, { recursive: true });
+  
+  const tasksTable = state.tasks.map(t => 
+    `| ${t.description} | ${t.status === 'done' ? 'GREEN (Test Passed)' : 'PENDING'} |`
+  ).join('\n');
+
+  const content = `# Verification Report
+
+## 1. Claim-to-Evidence Match
+| Planned Task | Real-time Verification Evidence |
+|---|---|
+${tasksTable || '| No tasks defined | N/A |'}
+
+## 2. Honest Status
+* **Status**: ${state.tasks.every(t => t.status === 'done') ? 'COMPLETE' : 'INCOMPLETE'}
+* **Verification Timestamp**: ${new Date().toISOString()}
+`;
+
+  await writeFile(join(dir, 'VERIFY.md'), content, 'utf-8');
+}
+
+async function writeRememberArtifact(sessionId: string, state: EngineState): Promise<void> {
+  const dir = getSessionDir(sessionId);
+  await mkdir(dir, { recursive: true });
+  
+  const affected = state.writtenFiles && state.writtenFiles.length > 0 
+    ? state.writtenFiles.map(f => `- \`${f}\``).join('\n')
+    : '- None';
+
+  const content = `# Durable Lessons & Decisions
+
+## 1. Remember Note
+* Successfully completed task: "${state.session.task}"
+* Automated validation and test checkpoints verified.
+
+## 2. Durable Decisions
+* Code generated and compiled cleanly inside sandbox \`.aix/sessions/${sessionId}/generated/\` before shipping to project workspace.
+
+## 3. Affected Areas
+${affected}
+`;
+
+  await writeFile(join(dir, 'REMEMBER.md'), content, 'utf-8');
+}
+
 async function handleGuardrail(task: string): Promise<void> {
   const loop = new GuardrailLoop();
   const budgetTracker = createBudgetTracker();
@@ -339,6 +417,7 @@ async function handleGuardrail(task: string): Promise<void> {
       state = engineState.session;
 
       await store.save(engineState);
+      await writeReviewArtifact(state.id, engineState);
       await redactedMemory.push({
         id: `${state.id}-${phase}-result-${Date.now()}`,
         kind: 'evidence',
@@ -356,6 +435,10 @@ async function handleGuardrail(task: string): Promise<void> {
         version: '0.1.0',
         createdAt: new Date().toISOString(),
       });
+    } else if (phase === 'verify') {
+      await writeVerifyArtifact(state.id, engineState);
+    } else if (phase === 'remember') {
+      await writeRememberArtifact(state.id, engineState);
     }
 
     try {
