@@ -37,9 +37,9 @@ The default methodology the plugin gives an agent. Each step is a real process s
 |---|------|-------|
 | 1 | Align & Shape | `discussing-pro` |
 | 2 | Plan | `planning-pro` |
-| 3 | Execute | `executing-pro` |
-| 4 | Isolate | `using-git-worktrees` |
-| 5 | Test-first | `test-driven-development` |
+| 3 | Isolate | `using-git-worktrees` |
+| 4 | Test-first | `test-driven-development` |
+| 5 | Execute | `executing-pro` |
 | 6 | Review | `requesting-code-review` / `code-review` |
 | 7 | Verify | `verification-before-completion` |
 | 8 | Remember | `remembering` |
