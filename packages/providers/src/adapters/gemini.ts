@@ -15,51 +15,32 @@ export class GeminiAdapter implements ProviderAdapter {
   emit(input: CompileInput): readonly EmittedFile[] {
     const files: EmittedFile[] = [];
 
-    files.push({
-      path: 'GEMINI.md',
-      contents: `${HEADER}# aix\n\nThis repository has aix provider material for Gemini CLI.\n\n## Skills\n\nDo not expect the full skill catalog in this file. Search the on-disk index, then open the matching skill before acting:\n\n- Skill index: \`skills/index.md\`\n- Skill details: \`skills/<skill-name>.md\`\n\nUse \`rg \"<topic>\" skills/index.md skills\` to find relevant skills.\n\n## Rules\n\nProject rules live in \`.gemini/aix-rules.md\`.\n\n## Agents\n\nSpecialized agent prompts live in \`agents/\`.\n`,
-    });
-
-    files.push({
-      path: '.gemini/settings.json',
-      contents: JSON.stringify({
-        contextFileName: 'GEMINI.md',
-      }, null, 2),
-    });
-
-    files.push({
-      path: 'skills/index.md',
-      contents: renderSkillIndex(input),
-    });
-
+    // Output skills to .agents/skills/<skill.id>/SKILL.md for Antigravity auto-discovery
     for (const skill of input.skills) {
       files.push({
-        path: `skills/${skill.id}.md`,
+        path: `.agents/skills/${skill.id}/SKILL.md`,
         contents: renderSkillFile(skill),
       });
     }
 
+    // Rules go into .agents/AGENTS.md
     if (input.rules.length > 0) {
       files.push({
-        path: '.gemini/aix-rules.md',
+        path: '.agents/AGENTS.md',
         contents: renderRulesFile(input.rules),
       });
     }
 
     if (input.agents.length > 0) {
-      files.push({
-        path: 'agents/index.md',
-        contents: renderAgentIndex(input.agents),
-      });
-
       for (const agent of input.agents) {
         files.push({
-          path: `agents/${agent.name}.md`,
+          path: `.agents/subagents/${agent.name}.md`, // Optional subagent directory, depends on system but keeping it isolated
           contents: renderAgentFile(agent),
         });
       }
     }
 
+    // Keep the gemini-extension.json for compatibility if needed by the CLI
     files.push({
       path: 'gemini-extension.json',
       contents: JSON.stringify({
