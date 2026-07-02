@@ -1,12 +1,9 @@
 import type { Provider } from '@x/core';
 import type { ProviderAdapter, CompileInput, EmittedFile } from '../types.js';
 import {
-  HEADER,
   renderAgentFile,
-  renderAgentIndex,
   renderRulesFile,
   renderSkillFile,
-  renderSkillIndex,
 } from './compact-surface.js';
 
 export class GeminiAdapter implements ProviderAdapter {
