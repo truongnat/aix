@@ -1,15 +1,26 @@
 # aix
 
-> AI engineering methodology + 160+ skills, delivered as a Claude Code plugin.
+> AI engineering methodology + 160+ skills, delivered as a Claude Code and Codex plugin.
 
 **The host agent is the runtime**. aix is the playbook and the skill library — not a separate engine you invoke.
 
 ## How it works
 
-```
+```bash
 git clone https://github.com/truongnat/aix
-# In Claude Code:
+```
+
+Claude Code:
+
+```text
 /plugin install /path/to/aix
+```
+
+Codex:
+
+```bash
+codex plugin marketplace add truongnat/aix
+codex plugin add aix@aix
 ```
 
 On start, a `SessionStart` hook injects [`using-aix`](./content/skills/using-aix/SKILL.md) into context. It explains the 8-step engineering spine and how to reach any of the 160+ skills via the host's `Skill` tool.
@@ -81,7 +92,9 @@ aix doctor
 ## Repository
 
 ```
-.claude-plugin/   Plugin manifest
+.agents/plugins/  Codex marketplace entry for this repo
+.claude-plugin/   Claude Code plugin manifest
+.codex-plugin/    Codex plugin manifest
 hooks/            SessionStart → injects using-aix + starts kb-server
 content/
   skills/         160+ domain, process, and reference skills

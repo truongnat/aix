@@ -1,0 +1,40 @@
+{
+  "name": "aix",
+  "version": "0.1.0",
+  "description": "AI engineering methodology spine and reusable skill library for coding agents.",
+  "author": {
+    "name": "truongdq",
+    "url": "https://github.com/truongnat"
+  },
+  "homepage": "https://github.com/truongnat/aix",
+  "repository": "https://github.com/truongnat/aix",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "agent",
+    "skills",
+    "codex",
+    "claude",
+    "cursor",
+    "gemini"
+  ],
+  "skills": "./content/skills/",
+  "interface": {
+    "displayName": "aix",
+    "shortDescription": "Engineering spine and reusable skills for Codex.",
+    "longDescription": "Install aix to add the 8-step engineering methodology, reusable domain skills, and provider-aware workflow guidance to Codex.",
+    "developerName": "truongdq",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/truongnat/aix",
+    "defaultPrompt": [
+      "Use aix to plan and implement this task.",
+      "Find the right aix skill for this repo change.",
+      "Run the aix engineering spine for this request."
+    ],
+    "brandColor": "#2563EB"
+  }
+}
