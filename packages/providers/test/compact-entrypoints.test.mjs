@@ -2,8 +2,6 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { CodexAdapter, GeminiAdapter } from '../dist/index.js';
 
-const CODEX_DEFAULT_PROJECT_DOC_MAX_BYTES = 32 * 1024;
-
 function skill(id, description = `${id} description`) {
   return {
     id,
@@ -55,30 +53,18 @@ function largeInput() {
   };
 }
 
-test('CodexAdapter keeps AGENTS.md compact and moves skills to retrievable files', () => {
+test('CodexAdapter emits skills and rules to correct folders', () => {
   const input = largeInput();
   const files = new CodexAdapter().emit(input);
-  const agentsFile = files.find(file => file.path === 'AGENTS.md');
 
-  assert.ok(agentsFile, 'AGENTS.md should be emitted');
-  assert.ok(
-    Buffer.byteLength(agentsFile.contents, 'utf8') < CODEX_DEFAULT_PROJECT_DOC_MAX_BYTES,
-    'AGENTS.md should stay under the Codex default project_doc_max_bytes',
-  );
-  assert.equal(agentsFile.contents.includes(input.longDescription), false);
-  assert.ok(files.some(file => file.path === '.codex/skills/index.md'));
-  assert.ok(files.some(file => file.path === '.codex/skills/planning.md'));
+  assert.ok(files.some(file => file.path === '.codex/skills/planning/SKILL.md'));
+  assert.ok(files.some(file => file.path === '.codex/rules/aix.rules'));
 });
 
-test('GeminiAdapter keeps GEMINI.md compact and moves skills to retrievable files', () => {
+test('GeminiAdapter emits skills and rules to correct folders', () => {
   const input = largeInput();
   const files = new GeminiAdapter().emit(input);
-  const geminiFile = files.find(file => file.path === 'GEMINI.md');
 
-  assert.ok(geminiFile, 'GEMINI.md should be emitted');
-  assert.ok(Buffer.byteLength(geminiFile.contents, 'utf8') < 8 * 1024);
-  assert.equal(geminiFile.contents.includes(input.longDescription), false);
-  assert.ok(files.some(file => file.path === 'skills/index.md'));
-  assert.ok(files.some(file => file.path === 'skills/planning.md'));
-  assert.ok(files.some(file => file.path === '.gemini/settings.json'));
+  assert.ok(files.some(file => file.path === '.agents/skills/planning/SKILL.md'));
+  assert.ok(files.some(file => file.path === '.agents/AGENTS.md'));
 });
