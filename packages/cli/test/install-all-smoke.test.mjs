@@ -27,7 +27,7 @@ function walkFiles(dir) {
 
 function countSourceSkills() {
   return walkFiles(join(repoRoot, 'content/skills'))
-    .filter(file => file.endsWith('/SKILL.md'))
+    .filter(file => file.endsWith('SKILL.md'))
     .length;
 }
 
@@ -94,8 +94,8 @@ test('install --all writes provider artefacts with expected counts, schemas, and
     assert.deepEqual(counts, {
       claude: skillCount + agentCount + hasRules + 2,
       cursor: skillCount + ruleCount,
-      codex: skillCount + hasRules + agentOutputs + 2,
-      gemini: skillCount + hasRules + agentOutputs + 4,
+      codex: skillCount + hasRules + agentOutputs,
+      gemini: skillCount + hasRules + agentOutputs + 1,
     });
     assert.equal(new Set(writtenPaths).size, writtenPaths.length, 'install --all should not emit duplicate paths');
 
@@ -104,8 +104,8 @@ test('install --all writes provider artefacts with expected counts, schemas, and
       assert.ok(statSync(fullPath).isFile(), `${relativePath} should be written`);
     }
 
-    assert.ok(statSync(join(tmp, 'AGENTS.md')).size < 32 * 1024, 'AGENTS.md should stay below Codex default cap');
-    assert.ok(statSync(join(tmp, 'GEMINI.md')).size < 8 * 1024, 'GEMINI.md should stay compact');
+    assert.equal(existsSync(join(tmp, 'AGENTS.md')), false, 'AGENTS.md should not be emitted at root');
+    assert.equal(existsSync(join(tmp, 'GEMINI.md')), false, 'GEMINI.md should not be emitted at root');
     assert.equal(existsSync(join(tmp, 'SKILL.md')), false, 'Cursor install should not overwrite a root SKILL.md');
 
     const claudeManifest = readJson(join(tmp, '.claude-plugin/plugin.json'));
@@ -113,16 +113,15 @@ test('install --all writes provider artefacts with expected counts, schemas, and
     assert.deepEqual(claudeManifest.skills, ['./content/skills/']);
     assert.equal(claudeManifest.author.name, 'truongdq');
 
-    const geminiSettings = readJson(join(tmp, '.gemini/settings.json'));
-    assert.equal(geminiSettings.contextFileName, 'GEMINI.md');
+
 
     const geminiExtension = readJson(join(tmp, 'gemini-extension.json'));
     assert.equal(geminiExtension.name, 'aix');
     assert.equal(geminiExtension.skills.length, skillCount);
 
-    assert.equal(walkFiles(join(tmp, '.codex/skills')).filter(file => file.endsWith('.md')).length, skillCount + 1);
-    assert.equal(walkFiles(join(tmp, 'skills')).filter(file => file.endsWith('.md')).length, skillCount + 1);
-    assert.equal(walkFiles(join(tmp, 'content/skills')).filter(file => file.endsWith('/SKILL.md')).length, skillCount);
+    assert.equal(walkFiles(join(tmp, '.codex/skills')).filter(file => file.endsWith('.md')).length, skillCount);
+    assert.equal(walkFiles(join(tmp, '.agents/skills')).filter(file => file.endsWith('.md')).length, skillCount);
+    assert.equal(walkFiles(join(tmp, 'content/skills')).filter(file => file.endsWith('SKILL.md')).length, skillCount);
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }
