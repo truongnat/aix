@@ -10,6 +10,7 @@ x-compatible: [claude, cursor, codex, gemini]
 ---
 
 
+
 # Using aix
 
 You have aix. aix gives you two things:
@@ -33,6 +34,26 @@ tool** with the skill's name. To decide *which* skill:
 
 **Check for a relevant skill before starting any non-trivial task.** Skills are
 the proven path, not optional decoration.
+
+## Session artifacts (where to write spine outputs)
+
+Spine markdown files belong under **`.aix/sessions/<session-id>/`**, not `.planning/`
+(GSD uses `.planning/` — that is a different methodology).
+
+| Phase | File |
+|-------|------|
+| Discuss | `DISCUSSION.md` |
+| Plan | `PLAN.md` |
+| Review | `REVIEW.md` |
+| Verify | `VERIFY.md` |
+| Remember | `REMEMBER.md` |
+
+**Session ID:** short kebab-case from the task (e.g. `lac-hong-feedback-v2`). Reuse the
+existing folder when resuming the same work. Create the directory before the first write.
+Archive prior versions to `archive/` when regenerating.
+
+Full contract: `content/skills/_shared/session-artifacts-contract.md` (also enforced by
+`content/rules/core/spine-guardrail.md`).
 
 ## The default methodology (the spine)
 

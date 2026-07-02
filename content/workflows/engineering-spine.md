@@ -22,6 +22,10 @@
 `tool-discovery-skill`, `gatekeeper-skill`, `report-writer`, `writing-skills`.
 **Operating contract:** `using-harness`.
 
+**Session artifacts:** write spine outputs to `.aix/sessions/<session-id>/`
+(`DISCUSSION.md`, `PLAN.md`, `REVIEW.md`, `VERIFY.md`, `REMEMBER.md`). Not `.planning/`.
+See `content/skills/_shared/session-artifacts-contract.md`.
+
 ## Principles
 
 - **Check for a relevant skill before any non-trivial task.** Skills are the

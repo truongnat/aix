@@ -6,7 +6,10 @@
 You are operating within the `aix` engineering harness. To ensure high-quality software delivery and prevent regressions, you must strictly comply with the 8-step Engineering Spine.
 
 ## Mandatory Core Artifacts
-For any non-trivial task, you must generate and update the following artifacts inside the `.aix/sessions/<sessionId>/` directory:
+
+**Path:** `.aix/sessions/<sessionId>/` only. Do **not** use `.planning/` (GSD) or other harness folders for these files.
+
+For any non-trivial task, you must generate and update the following artifacts inside that directory:
 1. **DISCUSSION.md**: Created during Align & Shape to evaluate options, trade-offs, and recommend a path.
 2. **PLAN.md**: Created during Plan to list tasks, dependencies, file paths, and acceptance criteria.
 3. **REVIEW.md**: Created during Review to list findings, open questions, and residual risks.
