@@ -1,0 +1,14 @@
+{
+  "name": "aix",
+  "owner": {
+    "name": "truongdq",
+    "url": "https://github.com/truongnat"
+  },
+  "plugins": [
+    {
+      "name": "aix",
+      "source": "./",
+      "description": "AI engineering methodology spine + 160+ skill library, activated at session start."
+    }
+  ]
+}

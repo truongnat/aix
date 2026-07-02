@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# aix SessionStart hook for Cursor: inject using-aix entry-point skill.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="${CURSOR_PLUGIN_ROOT:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
+SKILL="${PLUGIN_ROOT}/content/skills/using-aix/SKILL.md"
+
+if [ -f "${PLUGIN_ROOT}/packages/cli/dist/index.js" ]; then
+  node "${PLUGIN_ROOT}/packages/cli/dist/index.js" kb ensure >/dev/null 2>&1 &
+fi
+
+node -e '
+const fs = require("fs");
+const path = process.argv[1];
+let body = "";
+try { body = fs.readFileSync(path, "utf8"); } catch { process.exit(0); }
+const intro =
+  "You have aix. The text below is your entry-point skill (using-aix): it explains " +
+  "the default engineering methodology and how to reach every other aix skill via the " +
+  "Skill tool (start with router-pro for broad requests, tool-discovery-skill to find by " +
+  "capability). Check for a relevant skill before any non-trivial task.\n" +
+  "Important: kb-server has been started in the background. When you finish your task, ALWAYS run `aix kb stop` to shut it down.\n\n";
+const sessionContext = intro + body;
+process.stdout.write(JSON.stringify({ additional_context: sessionContext }));
+' "$SKILL"

@@ -1,0 +1,23 @@
+{
+  "name": "aix",
+  "displayName": "aix",
+  "description": "AI engineering methodology spine + 160+ skill library. Brainstorm → plan → TDD → execute → review → verify → ship.",
+  "version": "0.1.0",
+  "author": {
+    "name": "truongdq",
+    "email": "truongdq.dev@gmail.com"
+  },
+  "homepage": "https://github.com/truongnat/aix",
+  "repository": "https://github.com/truongnat/aix",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "methodology",
+    "tdd",
+    "agents",
+    "workflows",
+    "best-practices"
+  ],
+  "skills": "./content/skills/",
+  "hooks": "./hooks/hooks-cursor.json"
+}
