@@ -1,0 +1,4 @@
+interface:
+  display_name: "I18n Checklist Runner"
+  short_description: "Check localization and locale issues"
+  default_prompt: "Use $i18n-checklist-runner to review this feature for localization and locale-related issues."

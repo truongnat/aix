@@ -1,0 +1,4 @@
+interface:
+  display_name: "Edge Case Brainstormer"
+  short_description: "Brainstorm edge cases and risks"
+  default_prompt: "Use $edge-case-brainstormer to brainstorm edge cases and what-if questions for this scenario."

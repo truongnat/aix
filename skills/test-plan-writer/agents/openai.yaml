@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Plan Writer"
+  short_description: "Draft sprint or release test plans"
+  default_prompt: "Use $test-plan-writer to draft a test plan for this sprint, release, or feature scope."

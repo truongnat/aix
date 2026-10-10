@@ -6,9 +6,9 @@ aix dùng một **canonical source** duy nhất (SKILL.md trung lập) và compi
 
 ```
 CANONICAL SOURCE
-  content/skills/**/SKILL.md
+  skills/**/SKILL.md
   content/agents/**/*.md
-  content/rules/**
+  rules/**
 
        │ đọc + validate (Zod)
        ▼
@@ -27,7 +27,7 @@ CORE PACKAGES (@x/*)
        ▼
 
 COMPILER (@x/compiler)
-  → Claude Code  (content/skills, .claude-plugin/plugin.json, CLAUDE.md)
+  → Claude Code  (skills, .claude-plugin/plugin.json, CLAUDE.md)
   → Cursor       (.cursor/rules/aix-skill-*.mdc)
   → Codex        (compact AGENTS.md + .codex/ retrievable index/files)
   → Gemini CLI   (compact GEMINI.md + skills/index.md + .gemini/settings.json)
@@ -36,7 +36,7 @@ COMPILER (@x/compiler)
        ▼
 
 CLI (@x/cli — bin: aix)
-  install · skills · context · run · verify · eval · memory · kb
+  install · skills · context · run · verify · eval · memory · init · plugin
 ```
 
 ## Package map
@@ -56,17 +56,6 @@ CLI (@x/cli — bin: aix)
 | `@x/compiler` | Canonical → provider artefacts |
 | `@x/providers` | Adapter Claude/Cursor/Codex/Gemini + MCP browser |
 | `@x/cli` | CLI entry point (`aix`) |
-
-## Service: kb-server
-
-`services/kb-server` là NestJS app chạy độc lập trên port 4000:
-
-- **Neo4j** — graph store cho Memory nodes (constraint unique id)
-- **Meilisearch** — full-text search index `memory`
-- **Redis** — cache tầng 1 (TTL 300s, best-effort)
-- **AuthService** — bcrypt-hash API keys, RBAC
-
-Mọi write vào KB phải qua `policy.redact()` trước — không bao giờ ghi secret thô.
 
 ## Hai chế độ chạy
 

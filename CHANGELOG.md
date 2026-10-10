@@ -5,12 +5,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased]
+## [0.2.0] — 2026-10-11
+
+### Changed (breaking)
+- **Redesigned to Agent Plugins 1.0 + Agent Skills spec.** Root `plugin.json` is now the
+  canonical manifest; vendor manifests live in `.claude-plugin/`, `.cursor-plugin/`,
+  `gemini-extension.json` (regenerable via `aix plugin build`).
+- **Skills moved to `skills/<name>/SKILL.md`** (spec layout, root level). The old
+  `content/skills/` layout and the flat `skills/*.md` export are gone.
+- **Frontmatter `x-*` → `metadata:` map.** `metadata.kind|version|tags|roles|compatible`;
+  `name` must equal directory name (enforced by the registry). Descriptions capped at 1024 chars.
+- **AGENTS.md is the canonical instruction file** (CLAUDE.md = `@AGENTS.md` import;
+  GEMINI.md thin pointer).
+- **Engineering spine is now a native Claude `workflows/` script** (`workflows/spine.js`)
+  — `SessionStart` hook injection removed.
 
 ### Added
-- **kb-server auto-start/stop**. `aix run --auto` and Guardrail mode now automatically ensure `kb-server` is running before execution and cleanly shut it down (using a new `POST /shutdown` endpoint) when the session finishes, cancels, or fails.
-- **kb-server plugin mode integration**. The Claude Code plugin mode (`hooks/session-start.sh`) now starts `kb-server` in the background and instructs the agent to run `aix kb stop` when finished.
+- `aix init` — scaffold `.aix/` + AGENTS.md section in a project.
+- `aix plugin build` — emit vendor manifests from canonical `plugin.json`.
+- `skills.sh.json` — skills.sh registry groupings; `npx skills add truongnat/aix` works.
+- `skills-release.json` — per-skill sha256; `aix doctor` flags stale installs.
+- **77 new skills** merged from `simple-skills`, `clean-code-skills`, `tester-skills`
+  (clean-code-* set, manual-QA toolkit, ba/design/expo/office/misc domains).
 
+### Removed
+- `services/kb-server`, `kb` CLI commands, `KbStore` — memory is `MarkdownStore` only.
+- `hooks/` (SessionStart injection), `.agents/`, `.cursor/`, `.claude/settings.json`,
+  `.codex-plugin/`, `apps/todo-sync`, stale `SKILL.md` root file.
+- Internal duplicates: `system-design-pro` (merged into `system-design`),
+  `test-driven-development-pro` (merged into `ttd-pro`).
+
+### Fixed
+- 4 dir↔frontmatter `name` mismatches (spec violation), 22 over-length descriptions.
+
+### Fixed (carried from unreleased)
 ### Fixed
 - **Engine now writes generated code to disk.** `coderNode` persists model output to
   a sandbox `.aix/generated/<sessionId>/` (path-traversal-guarded) instead of discarding

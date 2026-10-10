@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en" data-issue-id="ISS-000" data-session="">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visual decision — replace title</title>
+  <!-- Required CDNs: static open and server both use these -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- The template is self-contained; Tailwind is optional enhancement. -->
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { margin: 0; background: #f5f7fb; color: #172033; }
+    .ss-main, .ss-header-inner, .ss-footer-inner { max-width: 960px; margin: auto; padding: 1.25rem; }
+    .ss-card { margin: 1rem 0; padding: 1.25rem; background: white; border: 1px solid #d9e0ec; border-radius: 12px; }
+    .ss-overview, .ss-options, .ss-compare { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+    .ss-panel, .ss-option, .ss-compare > div { padding: .9rem; border: 1px solid #d9e0ec; border-radius: 8px; }
+    .ss-btn { cursor: pointer; padding: .55rem .8rem; border: 1px solid #aab6c9; border-radius: 7px; background: white; }
+    .ss-btn-primary, .recommended { border-color: #2856d7; }
+    .ss-textarea { width: 100%; min-height: 4rem; box-sizing: border-box; }
+  </style>
+</head>
+<body class="ss-page">
+  <div id="decision-banner" role="status" aria-live="polite">
+    <div class="ss-banner-inner">
+      <div class="ss-banner-mark" aria-hidden="true"></div>
+      <div class="ss-banner-copy"><strong></strong><span></span></div>
+    </div>
+  </div>
+
+  <a class="ss-skip" href="#main">Skip to content</a>
+
+  <header class="ss-header">
+    <div class="ss-header-inner">
+      <p class="ss-eyebrow">Issue ISS-000 · Awaiting decision</p>
+      <h1>Replace with the decision question</h1>
+      <p class="ss-prose">
+        <strong>Why a visual is needed:</strong>
+        Replace with the spatial/state ambiguity this page resolves.
+      </p>
+    </div>
+  </header>
+
+  <main id="main" class="ss-main">
+    <section class="ss-card" aria-labelledby="overview-heading">
+      <h2 id="overview-heading" class="ss-h2">Developer overview</h2>
+      <div class="ss-overview">
+        <div class="ss-panel"><strong>Status</strong>needs_info</div>
+        <div class="ss-panel"><strong>Blocking</strong>ISS-000</div>
+        <div class="ss-panel"><strong>Next action</strong>Choose one option</div>
+        <div class="ss-panel"><strong>Owner</strong>Product / BA</div>
+      </div>
+      <ul class="ss-prose">
+        <li>Replace with the vital few facts the chooser must see first.</li>
+        <li>Lists use <code>ss-prose</code> (or sit inside <code>ss-card</code>) so bullets keep padding.</li>
+      </ul>
+    </section>
+
+    <section class="ss-card" aria-labelledby="compare-heading">
+      <h2 id="compare-heading" class="ss-h2">Before / after (optional)</h2>
+      <div data-ss-compare-root data-ss-mode="both">
+        <div class="ss-toolbar">
+          <button type="button" class="ss-btn" data-ss-show="before">Before</button>
+          <button type="button" class="ss-btn" data-ss-show="after">After</button>
+          <button type="button" class="ss-btn" data-ss-show="both">Both</button>
+        </div>
+        <div class="ss-compare">
+          <div data-ss-pane="before"><strong>Before</strong><p class="ss-prose">Replace with current state.</p></div>
+          <div data-ss-pane="after"><strong>After</strong><p class="ss-prose">Replace with proposed state.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ss-card" aria-labelledby="options-heading">
+      <h2 id="options-heading" class="ss-h2">Options or states</h2>
+      <div class="ss-options" role="group" aria-label="Decision options">
+        <article class="ss-option recommended">
+          <span class="ss-tag">Recommended</span>
+          <h3>Option A</h3>
+          <div class="ss-state">Replace with a simple visual representation.</div>
+          <p>Benefit, limitation, risk.</p>
+          <button type="button" class="ss-btn ss-btn-primary" data-choice="A" data-issue-id="ISS-000">Choose A</button>
+        </article>
+        <article class="ss-option">
+          <h3>Option B</h3>
+          <div class="ss-state">Replace with a simple visual representation.</div>
+          <p>Benefit, limitation, risk.</p>
+          <button type="button" class="ss-btn" data-choice="B" data-issue-id="ISS-000">Choose B</button>
+        </article>
+      </div>
+      <div class="ss-field">
+        <label class="ss-label" for="decision-note">Optional note</label>
+        <textarea id="decision-note" class="ss-textarea" data-ss-note rows="2" placeholder="Why this option?"></textarea>
+        <p class="ss-hint">Record the selected option and note in the decision artifact.</p>
+      </div>
+    </section>
+
+    <section class="ss-card" aria-labelledby="comparison-heading">
+      <h2 id="comparison-heading" class="ss-h2">Decision comparison</h2>
+      <div class="ss-table-wrap">
+        <table class="ss-table">
+          <thead><tr><th scope="col">Criterion</th><th scope="col">Option A</th><th scope="col">Option B</th></tr></thead>
+          <tbody><tr><td>Replace criterion</td><td>TODO</td><td>TODO</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="ss-card" aria-labelledby="decision-heading">
+      <h2 id="decision-heading" class="ss-h2">Decision requested</h2>
+      <p class="ss-prose">State exactly what the user needs to confirm and what changes based on it.</p>
+      <p class="ss-prose">View statically via CDN, or open the generated HTML in a browser to record the choice.</p>
+    </section>
+  </main>
+
+  <footer class="ss-footer">
+    <div class="ss-footer-inner">
+      <p>Agent decision aid · Tailwind + anime.js CDN · Local theme helpers · Light enterprise theme</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+  <script>
+    document.querySelectorAll('[data-ss-show]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        var mode = button.dataset.ssShow;
+        document.querySelectorAll('[data-ss-pane]').forEach(function (pane) {
+          pane.hidden = mode !== 'both' && pane.dataset.ssPane !== mode;
+        });
+      });
+    });
+    document.querySelectorAll('[data-choice]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        document.querySelectorAll('[data-choice]').forEach(function (b) { b.removeAttribute('aria-pressed'); });
+        button.setAttribute('aria-pressed', 'true');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Risk-Based Prioritizer"
+  short_description: "Prioritize testing by risk"
+  default_prompt: "Use $risk-based-prioritizer to rank these features or test cases by risk and testing priority."

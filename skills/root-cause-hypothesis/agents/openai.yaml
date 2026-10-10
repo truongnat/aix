@@ -1,0 +1,4 @@
+interface:
+  display_name: "Root Cause Hypothesis"
+  short_description: "Narrow down intermittent bug causes"
+  default_prompt: "Use $root-cause-hypothesis to build testable hypotheses for this intermittent or hard-to-reproduce bug."

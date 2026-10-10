@@ -3,13 +3,16 @@ import { defineConfig } from "tsup";
 export default defineConfig({
   entry: ["src/index.ts"],
   format: ["esm"],
-  dts: true,
-  sourcemap: true,
+  dts: false,
+  sourcemap: false,
   clean: true,
   target: "es2023",
+  platform: "node",
   outDir: "dist",
-  external: [/@x\//],
+  bundle: true,
+  noExternal: [/^@x\//],
+  external: ["readline/promises"],
   banner: {
-    js: "#!/usr/bin/env node",
+    js: "#!/usr/bin/env node\nimport { createRequire } from 'module';\nconst require = createRequire(import.meta.url);",
   },
 });

@@ -20,13 +20,13 @@ KHÔNG ghi đè `src/` của user (vòng auto không có review → ghi thẳng 
 User tự review rồi apply.
 
 **Cần làm:**
-- [ ] `packages/engine/src/state.ts`: thêm `writtenFiles?: readonly string[]` vào `EngineState`.
-- [ ] `packages/engine/src/nodes/coder.ts`:
+- [x] `packages/engine/src/state.ts`: thêm `writtenFiles?: readonly string[]` vào `EngineState`.
+- [x] `packages/engine/src/nodes/coder.ts`:
   - Sau khi có `output`, ghi vào `.aix/generated/<sessionId>/<file>` (file lấy từ `ticketPlan.files[0]`,
     fallback `task-<id>.ts`).
   - Sanitize path: chặn `../` và leading `/` (path traversal).
   - Trả về `writtenFiles: [<đường dẫn đã ghi>]` (chỉ file MỚI; graph reducer sẽ cộng dồn).
-- [ ] `packages/engine/src/graph.ts`: thêm channel `writtenFiles` vào `GraphAnnotation`
+- [x] `packages/engine/src/graph.ts`: thêm channel `writtenFiles` vào `GraphAnnotation`
   với reducer cộng dồn (`(a,b)=>[...a,...b]`, default `[]`).
 
 **Acceptance:** `aix run --auto "viết hàm add"` tạo file thật dưới `.aix/generated/<id>/`.
@@ -39,11 +39,11 @@ User tự review rồi apply.
 hard-stop không bao giờ kích hoạt.
 
 **Cần làm:**
-- [ ] `packages/engine/src/nodes/coder.ts`: sau mỗi `provider.call()`, gọi
+- [x] `packages/engine/src/nodes/coder.ts`: sau mỗi `provider.call()`, gọi
   `createBudgetTracker().addUsage(state.session, response.usd, response.tokens)` →
   trả `session` đã cập nhật trong state.
-- [ ] Xác nhận `graph.ts` `routeLoopStart` đọc `checkHardStop(toEngineState(state))` → giờ thấy `usdSpent` thật.
-- [ ] `session` channel trong `GraphAnnotation` phải replace (last-write-wins) — đã đúng.
+- [x] Xác nhận `graph.ts` `routeLoopStart` đọc `checkHardStop(toEngineState(state))` → giờ thấy `usdSpent` thật.
+- [x] `session` channel trong `GraphAnnotation` phải replace (last-write-wins) — đã đúng.
 
 **Acceptance:** Sau auto-run, `final.session.budget.usdSpent > 0`; nếu vượt `usdLimit` → loop dừng.
 
@@ -54,11 +54,11 @@ hard-stop không bao giờ kích hoạt.
 **Vấn đề:** Không có API key → mock bịa `solution(input){return input}`, báo "Score 9/10, done".
 
 **Cần làm:**
-- [ ] `packages/cli/src/commands/run.ts` `handleAuto()`:
+- [x] `packages/cli/src/commands/run.ts` `handleAuto()`:
   - Phát hiện thiếu `ANTHROPIC_API_KEY`/`OPENAI_API_KEY` → in banner ⚠ **MOCK MODE** rõ ràng
     trước VÀ sau khi chạy ("output là placeholder, không phải code thật").
   - In `Budget: $X spent` + danh sách `writtenFiles`.
-- [ ] (Tùy chọn) `runtime.ts`: giữ warning hiện có nhưng nâng tông.
+- [x] (Tùy chọn) `runtime.ts`: giữ warning hiện có nhưng nâng tông.
 
 **Acceptance:** Chạy auto không key → có cảnh báo mock nổi bật, không thể nhầm là code thật.
 
@@ -67,12 +67,12 @@ hard-stop không bao giờ kích hoạt.
 ## T4 — Sửa README/CHANGELOG cho khớp thực tế 🟠
 
 **Cần làm:**
-- [ ] `README.md`:
+- [x] `README.md`:
   - Bảng packages, dòng `@x/context`: "Tree-sitter analysis" → "Regex-based code analysis
     (tree-sitter planned)".
   - Hạ tông phần engine: nói rõ "sinh artifacts vào sandbox `.aix/generated/` để review",
     không phải tự sửa source.
-- [ ] `CHANGELOG.md`: thêm mục cho các thay đổi T1–T3 (Unreleased).
+- [x] `CHANGELOG.md`: thêm mục cho các thay đổi T1–T3 (Unreleased).
 
 **Acceptance:** Không còn tuyên bố sai (tree-sitter, "tự code vào repo").
 
@@ -84,8 +84,8 @@ hard-stop không bao giờ kích hoạt.
 dùng `workspace:*` → publish sẽ vỡ.
 
 **Cần làm:**
-- [ ] Đặt `"private": true` cho cả 13 package `packages/*/package.json`.
-- [ ] (Để sau khi publish thật) thêm `files`, `license`, `repository`, đổi scope `@x`,
+- [x] Đặt `"private": true` cho cả 13 package `packages/*/package.json`.
+- [x] (Để sau khi publish thật) thêm `files`, `license`, `repository`, đổi scope `@x`,
   dùng changesets.
 
 **Acceptance:** `node -e` check tất cả package `private=true`.
@@ -97,11 +97,11 @@ dùng `workspace:*` → publish sẽ vỡ.
 **Vấn đề:** 1 test/repo, 0 runner; rule đòi 80%. Bug node-name từng lọt tới runtime.
 
 **Cần làm:**
-- [ ] Thêm vitest vào `packages/engine` (devDep + `vitest.config.ts` + script `test`).
-- [ ] Smoke test: `EngineGraph.run()` ở mock mode → chạy hết graph không throw,
+- [x] Thêm vitest vào `packages/engine` (devDep + `vitest.config.ts` + script `test`).
+- [x] Smoke test: `EngineGraph.run()` ở mock mode → chạy hết graph không throw,
   trả `reviewScore` number, `writtenFiles` có phần tử.
-- [ ] Test budget wiring: sau run, `session.budget.usdSpent > 0`.
-- [ ] Thêm task `test` vào `turbo.json` + CI `ci.yml` chạy `pnpm test`.
+- [x] Test budget wiring: sau run, `session.budget.usdSpent > 0`.
+- [x] Thêm task `test` vào `turbo.json` + CI `ci.yml` chạy `pnpm test`.
 
 **Acceptance:** `pnpm test` xanh; CI chạy test.
 
@@ -112,8 +112,8 @@ dùng `workspace:*` → publish sẽ vỡ.
 **Vấn đề:** 739 commit từ 6 repo cũ nung vào `.git` (41M); `imports/` 28M trên đĩa.
 
 **Cần làm (PHÁ HỦY — cần user xác nhận, KHÔNG tự chạy):**
-- [ ] `git filter-repo --path imports/ --invert-paths` để bỏ `imports/` khỏi lịch sử.
-- [ ] Xóa `imports/` khỏi đĩa nếu không cần tham chiếu.
+- [x] `git filter-repo --path imports/ --invert-paths` để bỏ `imports/` khỏi lịch sử.
+- [x] Xóa `imports/` khỏi đĩa nếu không cần tham chiếu.
 
 **Acceptance:** `.git` nhỏ lại đáng kể. (Chỉ làm khi user đồng ý vì rewrite history.)
 

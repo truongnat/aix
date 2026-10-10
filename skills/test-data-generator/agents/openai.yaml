@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Data Generator"
+  short_description: "Generate safe fake test data"
+  default_prompt: "Use $test-data-generator to generate valid, invalid, and boundary test data for these fields."

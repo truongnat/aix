@@ -1,0 +1,193 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Engineering Spine",
+      "description": "The aix methodology: discuss \u2192 plan \u2192 isolate \u2192 test-first \u2192 execute \u2192 review \u2192 verify \u2192 remember.",
+      "skills": [
+        "using-aix",
+        "using-harness",
+        "discussing-pro",
+        "planning-pro",
+        "git-worktree-pro",
+        "ttd-pro",
+        "executing-pro",
+        "code-review-pro",
+        "verify-pro",
+        "remember-pro"
+      ]
+    },
+    {
+      "title": "Frontend & Design",
+      "description": "UI engineering, design systems, accessibility, and platform-specific design guidance.",
+      "skills": [
+        "react-pro",
+        "nextjs-pro",
+        "vue-pro",
+        "angular-pro",
+        "design-system-pro",
+        "a11y-design-pro",
+        "accessibility-compliance",
+        "frontend-design",
+        "design-taste-frontend",
+        "ui-design-brain-pro",
+        "ui-stack-pro",
+        "ui-reverse-engineer-pro",
+        "ux-wireframe",
+        "visual-design-foundations",
+        "minimalist-ui",
+        "industrial-brutalist-ui",
+        "high-end-visual-design",
+        "web-component-design",
+        "3d-motion-pro",
+        "ui-ux-system-pro",
+        "expo-native-ui"
+      ]
+    },
+    {
+      "title": "Backend & Data",
+      "description": "APIs, databases, services, and distributed systems.",
+      "skills": [
+        "api-design-pro",
+        "api-security-pro",
+        "postgresql-pro",
+        "sql-data-access-pro",
+        "sql-optimization-patterns",
+        "nodejs-backend-patterns",
+        "microservices-patterns",
+        "auth-pro",
+        "auth-implementation-patterns",
+        "websocket-pro",
+        "stream-rtc-pro",
+        "database-migration",
+        "nestjs-neo4j-pro",
+        "redis-pro"
+      ]
+    },
+    {
+      "title": "Testing & Quality",
+      "description": "Test strategy, TDD, coverage, manual QA utilities, and review skills.",
+      "skills": [
+        "testing-pro",
+        "ttd-pro",
+        "e2e-testing-patterns",
+        "javascript-testing-patterns",
+        "testcase-generator",
+        "test-plan-writer",
+        "testcase-coverage-reviewer",
+        "test-data-generator",
+        "api-testcase-generator",
+        "api-response-validator",
+        "edge-case-brainstormer",
+        "exploratory-charter-builder",
+        "requirement-gap-checker",
+        "bug-report-writer",
+        "root-cause-hypothesis",
+        "repro-steps-verifier",
+        "risk-based-prioritizer",
+        "accessibility-checklist-runner",
+        "i18n-checklist-runner",
+        "automation-script-builder",
+        "browser-investigator",
+        "sql-analyzer",
+        "daily-report-writer",
+        "standup-notes-summarizer",
+        "bug-discovery-pro",
+        "debugging-investigation",
+        "debugging-strategies"
+      ]
+    },
+    {
+      "title": "Mobile",
+      "description": "Native and cross-platform mobile development.",
+      "skills": [
+        "android-pro",
+        "ios-pro",
+        "flutter-pro",
+        "react-native-pro",
+        "expo-data-fetching",
+        "expo-native-ui",
+        "mobile-design-pro"
+      ]
+    },
+    {
+      "title": "Clean Code & Architecture",
+      "description": "Code quality standards, clean architecture, refactoring, and design patterns.",
+      "skills": [
+        "clean-code",
+        "clean-code-error-handling",
+        "clean-code-formatting-hooks",
+        "clean-code-naming",
+        "clean-code-refactoring",
+        "clean-code-review",
+        "clean-architecture",
+        "architecture-patterns",
+        "architecture-decision-records",
+        "system-design"
+      ]
+    },
+    {
+      "title": "DevOps & Cloud",
+      "description": "CI/CD, containers, infrastructure, deployment, and observability.",
+      "skills": [
+        "ci-cd-pro",
+        "docker-pro",
+        "kubernetes-pro",
+        "infrastructure-as-code-pro",
+        "github-actions-templates",
+        "deployment-pro",
+        "deployment-pipeline-design",
+        "aws-pro",
+        "cloudflare-pro",
+        "vercel-deployment-pro",
+        "vps-devops-pro",
+        "hybrid-cloud-networking",
+        "distributed-tracing",
+        "sast-configuration",
+        "kubernetes-pro",
+        "network-infra-pro",
+        "deploy-workflow"
+      ]
+    },
+    {
+      "title": "AI & Agents",
+      "description": "Agent development, LLM integration, MCP, evals, and agent infrastructure.",
+      "skills": [
+        "ai-agents-pro",
+        "ai-integration-pro",
+        "ai-design-pro",
+        "ai-red-teaming-pro",
+        "agent-evaluation-pro",
+        "a2a-protocol-pro",
+        "ag-ui-pro",
+        "mcp-server-pro",
+        "claude-code-pro",
+        "cloud-native-agent-pro",
+        "self-improve-agent-pro"
+      ]
+    },
+    {
+      "title": "Docs & Productivity",
+      "description": "Office documents, reports, research, and workflow utilities.",
+      "skills": [
+        "docx",
+        "xlsx",
+        "pptx",
+        "pdf",
+        "office-common",
+        "excel-doc-convert",
+        "report-writer",
+        "research",
+        "web-research-pro",
+        "gap-analysis",
+        "biz-model",
+        "story-spec",
+        "specify",
+        "scaffold",
+        "git-operations-pro",
+        "repo-tooling-pro"
+      ]
+    }
+  ]
+}

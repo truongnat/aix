@@ -37,4 +37,4 @@
 npx aix skills list
 ```
 
-Hoặc đọc trực tiếp từ `content/skills/` trong monorepo — mỗi SKILL.md là self-contained.
+Hoặc đọc trực tiếp từ `skills/` trong monorepo — mỗi SKILL.md là self-contained.

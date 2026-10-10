@@ -1,0 +1,4 @@
+interface:
+  display_name: "Accessibility Checklist Runner"
+  short_description: "Run basic accessibility checks"
+  default_prompt: "Use $accessibility-checklist-runner to review this page or flow with a basic accessibility checklist."
