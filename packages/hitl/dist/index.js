@@ -11,11 +11,13 @@ function resolvePreviewTier(question, options) {
 }
 
 // src/channel.ts
-import * as readline from "readline/promises";
+import { createRequire as makeRequire } from "module";
 import { stdin as input, stdout as output } from "process";
 import { readFile } from "fs/promises";
 import { existsSync } from "fs";
 import { createPreviewServer } from "@x/preview";
+var require2 = makeRequire(import.meta.url);
+var readline = require2("node:readline/promises");
 var ConsoleHitlChannel = class {
   constructor(_previewBaseUrl) {
   }

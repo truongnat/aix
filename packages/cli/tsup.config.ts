@@ -10,8 +10,8 @@ export default defineConfig({
   platform: "node",
   outDir: "dist",
   bundle: true,
-  noExternal: [/^@x\//],
-  external: ["readline/promises"],
+  noExternal: [/^@x\//, /^(?!node:|readline).*/],
+  
   banner: {
     js: "#!/usr/bin/env node\nimport { createRequire } from 'module';\nconst require = createRequire(import.meta.url);",
   },

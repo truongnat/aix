@@ -1,4 +1,6 @@
-import * as readline from 'node:readline/promises';
+import { createRequire as makeRequire } from 'node:module';
+const require2 = makeRequire(import.meta.url);
+const readline = require2('node:readline/promises');
 import { stdin as input, stdout as output } from 'node:process';
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';

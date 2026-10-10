@@ -32,7 +32,12 @@ export function run(args: string[]): void {
   program.parse(args, { from: 'user' });
 }
 
-const isMain = process.argv[1]?.replace(/\\/g, '/').endsWith('/dist/index.js') ?? false;
+import { realpathSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+const entryArg = process.argv[1];
+const isMain = entryArg !== undefined
+  && realpathSync(entryArg, { throwIfNoEntry: false }) === fileURLToPath(import.meta.url);
 if (isMain) {
   program.parse(process.argv);
 }
