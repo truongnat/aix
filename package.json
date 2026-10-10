@@ -1,5 +1,5 @@
 {
-  "name": "aix",
+  "name": "aix-monorepo",
   "private": true,
   "version": "0.2.0",
   "description": "aix \u2014 AI Engineering Platform (TypeScript monorepo)",
@@ -21,18 +21,5 @@
   "engines": {
     "node": ">=22.0.0"
   },
-  "packageManager": "pnpm@9.15.0",
-  "bin": {
-    "aix": "./packages/cli/dist/index.js"
-  },
-  "files": [
-    "skills",
-    "rules",
-    "workflows",
-    "packages/cli/dist",
-    "plugin.json",
-    "AGENTS.md",
-    "skills.sh.json",
-    "skills-release.json"
-  ]
+  "packageManager": "pnpm@9.15.0"
 }
