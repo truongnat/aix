@@ -1,8 +1,7 @@
+import { findRepoRoot } from './skills.js';
 import { Command } from 'commander';
-import { statSync } from 'node:fs';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import type { Provider } from '@x/core';
 import { SkillRegistry } from '@x/registry';
 import { ClaudeAdapter, CursorAdapter, CodexAdapter, GeminiAdapter } from '@x/providers';
@@ -17,23 +16,7 @@ const ADAPTERS: Record<Provider, ClaudeAdapter | CursorAdapter | CodexAdapter | 
   gemini: new GeminiAdapter(),
 };
 
-function findContentRoot(): string {
-  const dir = fileURLToPath(new URL('.', import.meta.url));
-  // dir = packages/cli/dist → repo root is 3 levels up (dist→cli→packages→root)
-  const candidates = [
-    join(dir, '..', '..', '..', 'content'),
-    join(process.cwd(), 'content'),
-  ];
-  for (const c of candidates) {
-    try {
-      statSync(join(c, 'skills'));
-      return c;
-    } catch {
-      continue;
-    }
-  }
-  return join(dir, '..', '..', '..', 'content');
-}
+import { findRepoRoot } from './skills.js';
 
 async function loadAgents(contentRoot: string): Promise<AgentDef[]> {
   const agentsDir = join(contentRoot, 'agents');
@@ -94,7 +77,7 @@ export function registerInstallCommand(program: Command): void {
           ? [opts.provider as Provider]
           : ['claude'];
 
-      const contentRoot = findContentRoot();
+      const contentRoot = findRepoRoot();
       const registry = await SkillRegistry.load(contentRoot);
       const skills = registry.all();
       const catalog = registry.toCatalog();

@@ -83,7 +83,7 @@ Sau bước này không cần làm gì thêm. Plugin tự kích hoạt ở mọi
 4. **164 skills** trở nên gọi được qua **Skill tool** (khai báo `"skills": ["./content/skills/"]`
    trong `plugin.json`). Không skill nào khác bị inject inline — agent tự gọi khi cần.
 
-> Cách tìm skill: `router-pro` cho yêu cầu rộng/mơ hồ · `tool-discovery-skill` để tìm theo năng lực
+> Cách tìm skill: `router-pro` cho yêu cầu rộng/mơ hồ · `tool-discovery` để tìm theo năng lực
 > · gọi `Skill` trực tiếp nếu đã biết tên.
 
 ### ③ User giao việc → agent chạy spine
@@ -104,8 +104,8 @@ process skill thật, gọi qua Skill tool:
 **Vòng lặp ngược:** review (6) phát hiện vấn đề → quay lại TDD (4); verify (7) chưa đạt → quay lại
 execute (5). Spine không phải đường thẳng một chiều.
 
-**Skill hỗ trợ:** `mapping-codebase`, `debugging-investigation`, `tool-discovery-skill`,
-`gatekeeper-skill`, `report-writer`, `writing-skills`. **Hợp đồng vận hành:** `using-harness`.
+**Skill hỗ trợ:** `mapping-codebase`, `debugging-investigation`, `tool-discovery`,
+`gatekeeper`, `report-writer`, `writing-skills`. **Hợp đồng vận hành:** `using-harness`.
 
 ## Hai đường thực thi
 

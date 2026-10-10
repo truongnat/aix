@@ -1,12 +1,27 @@
 {
   "name": "aix",
-  "version": "0.1.0",
-  "description": "AI Engineering Platform",
+  "version": "0.2.0",
+  "description": "AI engineering methodology spine and reusable skill library for coding agents.",
   "author": {
     "name": "truongdq",
     "url": "https://github.com/truongnat"
   },
+  "homepage": "https://github.com/truongnat/aix",
+  "repository": "https://github.com/truongnat/aix",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "agent",
+    "skills",
+    "methodology",
+    "tdd",
+    "workflows"
+  ],
+  "displayName": "aix",
   "skills": [
-    "./content/skills/"
+    "./skills/"
+  ],
+  "workflows": [
+    "./workflows/"
   ]
 }

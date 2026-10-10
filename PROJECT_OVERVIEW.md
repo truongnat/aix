@@ -89,7 +89,7 @@ Thư viện skill nằm dưới thư mục [content/skills/](file:///C:/Users/tr
 Giúp định hình cách làm việc và điều phối của agent:
 - [using-aix](file:///C:/Users/truongdq/Documents/projects/aix/content/skills/using-aix/SKILL.md): Skill nhập môn điều hướng toàn bộ hệ thống.
 - `router-pro`: Phân tích yêu cầu và định tuyến đến các skill phù hợp.
-- `tool-discovery-skill`: Tìm kiếm nhanh công cụ/skill tương ứng với tính năng cần triển khai.
+- `tool-discovery`: Tìm kiếm nhanh công cụ/skill tương ứng với tính năng cần triển khai.
 - `debugging-investigation`: Quy trình chẩn đoán lỗi có hệ thống.
 
 ### B. Kỹ năng Chuyên môn (Domain Skills)

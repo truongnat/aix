@@ -9,11 +9,19 @@ function skill(id) {
     frontmatter: {
       name: id,
       description: `${id} description`,
-      'x-kind': 'workflow',
-      'x-version': '1.0.0',
-      'x-tags': ['test'],
-      'x-roles': [],
-      'x-compatible': ['claude', 'codex', 'cursor', 'gemini'],
+      metadata: {
+        kind: 'workflow',
+        version: '1.0.0',
+        tags: 'test',
+        compatible: 'claude,codex,cursor,gemini',
+      },
+    },
+    meta: {
+      kind: 'workflow',
+      version: '1.0.0',
+      tags: ['test'],
+      roles: [],
+      compatible: ['claude', 'codex', 'cursor', 'gemini'],
     },
     body: `${id} body`,
     bodyTokenEstimate: 10,
@@ -51,10 +59,10 @@ function parseFrontmatter(contents) {
 
 test('skill and Cursor rule artefacts put frontmatter before the generated marker', () => {
   const artefacts = [
-    new ClaudeAdapter().emit(input).find(file => file.path === 'content/skills/planning/SKILL.md'),
+    new ClaudeAdapter().emit(input).find(file => file.path === 'skills/planning/SKILL.md'),
     new CursorAdapter().emit(input).find(file => file.path === '.cursor/rules/aix-skill-planning.mdc'),
-    new CodexAdapter().emit(input).find(file => file.path === '.codex/skills/planning/SKILL.md'),
-    new GeminiAdapter().emit(input).find(file => file.path === '.agents/skills/planning/SKILL.md'),
+    new CodexAdapter().emit(input).find(file => file.path === 'skills/planning/SKILL.md'),
+    new GeminiAdapter().emit(input).find(file => file.path === 'skills/planning/SKILL.md'),
   ];
 
   for (const artefact of artefacts) {

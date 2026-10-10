@@ -2,7 +2,8 @@ import { readdir, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import matter from 'gray-matter';
 import { SKILL_BODY_MAX_TOKENS } from '@x/core';
-import type { SkillKind, Role, AppError } from '@x/core';
+import type { AppError } from '@x/core';
+import { parseMeta } from './schema.js';
 import { SkillFrontmatterSchema } from './schema.js';
 import type { SkillFrontmatter } from './schema.js';
 import type { LoadedSkill, SkillCatalogEntry } from './types.js';
@@ -99,11 +100,17 @@ export class SkillRegistry {
           }
         }
       }
+      // spec: frontmatter name MUST equal directory name
+      if (frontmatter.name !== dirName) {
+        console.warn(`[registry] SKIP ${dirName}: frontmatter name "${frontmatter.name}" ≠ dir name`);
+        continue;
+      }
 
       skills.push({
         id: frontmatter.name,
         dir: skillDir,
         frontmatter,
+        meta: parseMeta(frontmatter.metadata),
         body,
         bodyTokenEstimate: estimate,
         references,
@@ -123,12 +130,12 @@ export class SkillRegistry {
     return this.#skills.get(name);
   }
 
-  byKind(kind: SkillKind): readonly LoadedSkill[] {
-    return this.all().filter(s => s.frontmatter['x-kind'] === kind);
+  byKind(kind: string): readonly LoadedSkill[] {
+    return this.all().filter(s => s.meta.kind === kind);
   }
 
-  byRole(role: Role): readonly LoadedSkill[] {
-    return this.all().filter(s => s.frontmatter['x-roles'].includes(role));
+  byRole(role: string): readonly LoadedSkill[] {
+    return this.all().filter(s => s.meta.roles.includes(role));
   }
 
   search(query: string): readonly SkillCatalogEntry[] {
@@ -137,7 +144,7 @@ export class SkillRegistry {
       .filter(s =>
         s.id.toLowerCase().includes(q) ||
         s.frontmatter.description.toLowerCase().includes(q) ||
-        s.frontmatter['x-tags'].some(t => t.toLowerCase().includes(q))
+        s.meta.tags.some(t => t.toLowerCase().includes(q))
       )
       .map(s => this.#toEntry(s));
   }
@@ -165,11 +172,11 @@ export class SkillRegistry {
     return {
       name: skill.frontmatter.name,
       description: skill.frontmatter.description,
-      kind: skill.frontmatter['x-kind'],
-      tags: skill.frontmatter['x-tags'],
-      version: skill.frontmatter['x-version'],
-      roles: skill.frontmatter['x-roles'],
-      compatible: skill.frontmatter['x-compatible'],
+      kind: skill.meta.kind,
+      tags: skill.meta.tags,
+      version: skill.meta.version,
+      roles: skill.meta.roles,
+      compatible: skill.meta.compatible,
       dir: skill.dir,
     };
   }

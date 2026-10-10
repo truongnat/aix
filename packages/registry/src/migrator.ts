@@ -202,10 +202,15 @@ export async function migrateSkills(opts: {
             const parsed = matter(raw);
 
             // Normalize frontmatter to match registry schema
-            const knownKeys = new Set(['name', 'description', 'disable-model-invocation', 'user-invocable']);
+            const knownKeys = new Set(['name', 'description', 'license', 'compatibility', 'metadata', 'disable-model-invocation', 'user-invocable', 'allowed-tools']);
             const cleaned: Record<string, unknown> = {};
+            const meta: Record<string, string> = {};
             for (const [key, val] of Object.entries(parsed.data)) {
-              if (knownKeys.has(key) || key.startsWith('x-')) {
+              if (key.startsWith('x-')) {
+                // legacy aix fields → metadata map
+                const v = Array.isArray(val) ? val.join(',') : String(val);
+                meta[key.slice(2)] = v;
+              } else if (knownKeys.has(key)) {
                 cleaned[key] = val;
               }
             }
@@ -217,11 +222,6 @@ export async function migrateSkills(opts: {
             let skillName = String(cleaned['name']).toLowerCase().trim();
             skillName = skillName.replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
             if (!skillName) skillName = skill.name;
-            // Reject names containing claude/anthropic
-            if (/claude|anthropic/.test(skillName)) {
-              skillName = skillName.replace(/claude|anthropic/g, '').replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
-              if (!skillName || skillName.length < 2) skillName = 'specialized-pro';
-            }
             cleaned['name'] = skillName;
             if (!cleaned['description'] || String(cleaned['description']).trim() === '') {
               cleaned['description'] = `Skill: ${skillName}`;
@@ -229,11 +229,11 @@ export async function migrateSkills(opts: {
             if (typeof cleaned['description'] === 'string' && cleaned['description'].length > SKILL_DESC_MAX) {
               cleaned['description'] = (cleaned['description'] as string).slice(0, SKILL_DESC_MAX);
             }
-            cleaned['x-kind'] ??= skill.kind;
-            cleaned['x-version'] ??= '0.1.0';
-            cleaned['x-roles'] ??= [];
-            cleaned['x-tags'] ??= [];
-            cleaned['x-compatible'] ??= ['claude', 'cursor', 'codex', 'gemini'];
+            meta['kind'] ??= skill.kind;
+            meta['version'] ??= '0.1.0';
+            meta['compatible'] ??= 'claude,cursor,codex,gemini';
+            const existing = cleaned['metadata'] as Record<string, string> | undefined;
+            cleaned['metadata'] = { ...(existing ?? {}), ...meta };
 
             const engine = opts.policyEngine;
             if (engine) {

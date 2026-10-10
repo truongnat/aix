@@ -9,11 +9,18 @@ function skill(id, description = `${id} description`) {
     frontmatter: {
       name: id,
       description,
-      'x-kind': 'workflow',
-      'x-version': '1.0.0',
-      'x-tags': [],
-      'x-roles': [],
-      'x-compatible': ['codex', 'gemini'],
+      metadata: {
+        kind: 'workflow',
+        version: '1.0.0',
+        compatible: 'codex,gemini',
+      },
+    },
+    meta: {
+      kind: 'workflow',
+      version: '1.0.0',
+      tags: [],
+      roles: [],
+      compatible: ['codex', 'gemini'],
     },
     body: `${id} body`,
     bodyTokenEstimate: 10,
@@ -57,14 +64,14 @@ test('CodexAdapter emits skills and rules to correct folders', () => {
   const input = largeInput();
   const files = new CodexAdapter().emit(input);
 
-  assert.ok(files.some(file => file.path === '.codex/skills/planning/SKILL.md'));
-  assert.ok(files.some(file => file.path === '.codex/rules/aix.rules'));
+  assert.ok(files.some(file => file.path === 'skills/planning/SKILL.md'));
+  assert.ok(files.some(file => file.path === 'AGENTS.md'));
 });
 
 test('GeminiAdapter emits skills and rules to correct folders', () => {
   const input = largeInput();
   const files = new GeminiAdapter().emit(input);
 
-  assert.ok(files.some(file => file.path === '.agents/skills/planning/SKILL.md'));
-  assert.ok(files.some(file => file.path === '.agents/AGENTS.md'));
+  assert.ok(files.some(file => file.path === 'skills/planning/SKILL.md'));
+  assert.ok(files.some(file => file.path === 'AGENTS.md'));
 });

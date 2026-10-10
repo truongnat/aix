@@ -12,10 +12,10 @@ export class GeminiAdapter implements ProviderAdapter {
   emit(input: CompileInput): readonly EmittedFile[] {
     const files: EmittedFile[] = [];
 
-    // Output skills to .agents/skills/<skill.id>/SKILL.md for Antigravity auto-discovery
+    // Skills emit to skills/<id>/SKILL.md — spec layout + Gemini auto-discovery
     for (const skill of input.skills) {
       files.push({
-        path: `.agents/skills/${skill.id}/SKILL.md`,
+        path: `skills/${skill.id}/SKILL.md`,
         contents: renderSkillFile(skill),
       });
     }
@@ -23,7 +23,7 @@ export class GeminiAdapter implements ProviderAdapter {
     // Rules go into .agents/AGENTS.md
     if (input.rules.length > 0) {
       files.push({
-        path: '.agents/AGENTS.md',
+        path: 'AGENTS.md',
         contents: renderRulesFile(input.rules),
       });
     }
@@ -31,22 +31,21 @@ export class GeminiAdapter implements ProviderAdapter {
     if (input.agents.length > 0) {
       for (const agent of input.agents) {
         files.push({
-          path: `.agents/subagents/${agent.name}.md`, // Optional subagent directory, depends on system but keeping it isolated
+          path: `agents/${agent.name}.md`,
           contents: renderAgentFile(agent),
         });
       }
     }
 
-    // Keep the gemini-extension.json for compatibility if needed by the CLI
+    // gemini-extension.json: documented fields only — skills auto-discover from skills/
     files.push({
       path: 'gemini-extension.json',
       contents: JSON.stringify({
         name: 'aix',
-        version: '0.1.0',
-        description: 'AI Engineering Platform',
-        skills: input.skills.map(s => s.id),
-        agents: input.agents.map(a => a.name),
-        mcpServers: input.mcpServers.map(s => ({ name: s.name, transport: s.transport })),
+        version: '0.2.0',
+        description: 'AI Engineering Platform — skills, spine workflow, memory',
+        contextFileName: 'AGENTS.md',
+        mcpServers: Object.fromEntries(input.mcpServers.map(s => [s.name, { transport: s.transport }])),
       }, null, 2),
     });
 

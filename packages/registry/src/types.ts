@@ -1,10 +1,10 @@
-import type { SkillFrontmatter } from './schema.js';
-import type { SkillKind, Role, Provider, AppError } from '@x/core';
-
+import type { SkillFrontmatter, SkillMeta } from './schema.js';
+import type { AppError } from '@x/core';
 export interface LoadedSkill {
   readonly id: string;
   readonly dir: string;
   readonly frontmatter: SkillFrontmatter;
+  readonly meta: SkillMeta;
   readonly body: string;
   readonly bodyTokenEstimate: number;
   readonly references: readonly string[];
@@ -15,11 +15,11 @@ export interface LoadedSkill {
 export interface SkillCatalogEntry {
   readonly name: string;
   readonly description: string;
-  readonly kind: SkillKind;
+  readonly kind: string;
   readonly tags: readonly string[];
   readonly version: string;
-  readonly roles: readonly Role[];
-  readonly compatible: readonly Provider[];
+  readonly roles: readonly string[];
+  readonly compatible: readonly string[];
   readonly dir: string;
 }
 

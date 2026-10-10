@@ -12,10 +12,10 @@ export class CodexAdapter implements ProviderAdapter {
   emit(input: CompileInput): readonly EmittedFile[] {
     const files: EmittedFile[] = [];
 
-    // Output skills to .codex/skills/<skill.id>/SKILL.md for standard Codex plugin format
+    // Skills emit to skills/<id>/SKILL.md — Agent Plugins 1.0 fixed location
     for (const skill of input.skills) {
       files.push({
-        path: `.codex/skills/${skill.id}/SKILL.md`,
+        path: `skills/${skill.id}/SKILL.md`,
         contents: renderSkillFile(skill),
       });
     }
@@ -23,7 +23,7 @@ export class CodexAdapter implements ProviderAdapter {
     // Rules go into .codex/rules/aix.rules or default.rules
     if (input.rules.length > 0) {
       files.push({
-        path: '.codex/rules/aix.rules',
+        path: 'AGENTS.md',
         contents: renderRulesFile(input.rules),
       });
     }

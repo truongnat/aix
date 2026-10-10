@@ -44,11 +44,11 @@ export class PromptAssembler {
     const skillMetadata: SkillCatalogEntry[] = relevantSkills.map(s => ({
       name: s.frontmatter.name,
       description: s.frontmatter.description,
-      kind: s.frontmatter['x-kind'],
-      tags: s.frontmatter['x-tags'],
-      version: s.frontmatter['x-version'],
-      roles: s.frontmatter['x-roles'],
-      compatible: s.frontmatter['x-compatible'],
+      kind: s.meta.kind,
+      tags: s.meta.tags,
+      version: s.meta.version,
+      roles: s.meta.roles,
+      compatible: s.meta.compatible,
       dir: s.dir,
     }));
 

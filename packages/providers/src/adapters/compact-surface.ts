@@ -12,7 +12,10 @@ function yamlArray(values: readonly string[]): string {
 }
 
 export function renderSkillFile(skill: CompileInput['skills'][number]): string {
-  return `${FRONTMATTER_HEADER}name: ${yamlString(skill.frontmatter.name)}\ndescription: ${yamlString(skill.frontmatter.description)}\nx-kind: ${yamlString(skill.frontmatter['x-kind'])}\nx-version: ${yamlString(skill.frontmatter['x-version'])}\nx-tags: ${yamlArray(skill.frontmatter['x-tags'])}\nx-roles: ${yamlArray(skill.frontmatter['x-roles'])}\nx-compatible: ${yamlArray(skill.frontmatter['x-compatible'])}\n---\n\n${skill.body}`;
+  const meta = Object.entries(skill.frontmatter.metadata)
+    .map(([k, v]) => `  ${k}: ${yamlString(v)}`)
+    .join('\n');
+  return `${FRONTMATTER_HEADER}name: ${yamlString(skill.frontmatter.name)}\ndescription: ${yamlString(skill.frontmatter.description)}\nmetadata:\n${meta}\n---\n\n${skill.body}`;
 }
 
 export function renderSkillIndex(input: CompileInput): string {
@@ -21,9 +24,9 @@ export function renderSkillIndex(input: CompileInput): string {
     : input.skills.map(skill => ({
       name: skill.frontmatter.name,
       description: skill.frontmatter.description,
-      kind: skill.frontmatter['x-kind'],
-      version: skill.frontmatter['x-version'],
-      tags: skill.frontmatter['x-tags'],
+      kind: skill.meta.kind,
+      version: skill.meta.version,
+      tags: skill.meta.tags,
     }));
 
   const lines = entries

@@ -9,8 +9,7 @@ import type { EngineState } from '@x/engine';
 import { PromptAssembler } from '@x/prompt';
 import type { AssembleContext } from '@x/prompt';
 import { SkillRegistry } from '@x/registry';
-import { RedactedMemoryStore, MarkdownStore, KbStore } from '@x/memory';
-import { ensureKbServer } from '../kb-server-manager.js';
+import { RedactedMemoryStore, MarkdownStore } from '@x/memory';
 import { PolicyEngine } from '@x/policy';
 import { ClackHitlChannel } from '@x/hitl';
 import { DEFAULT_SYSTEM_PARTS } from '@x/prompt';
@@ -207,9 +206,6 @@ async function handleAuto(task: string): Promise<void> {
   const store = new SessionStore();
   const graph = new EngineGraph(store);
 
-  // Auto-start kb-server
-  const { ensureKbServer, shutdownKbServer } = await import('../kb-server-manager.js');
-  await ensureKbServer();
 
   p.intro(`Auto-running: "${task}"`);
   if (usingMock) {
@@ -239,8 +235,6 @@ async function handleAuto(task: string): Promise<void> {
   }
   p.outro('Auto-run complete');
 
-  // Shutdown kb-server when done
-  await shutdownKbServer();
 }
 
 function getSessionDir(sessionId: string): string {
@@ -324,13 +318,8 @@ async function handleGuardrail(task: string): Promise<void> {
   const budgetTracker = createBudgetTracker();
   const channel = new ClackHitlChannel();
   const policy = new PolicyEngine();
-  // --- KB Server: auto-start if not running, connect for this session ---
-  const kbUrl = await ensureKbServer();
-  const baseStore = kbUrl
-    ? new KbStore(kbUrl)
-    : new MarkdownStore();
-  const markdownStore = new MarkdownStore(); // still used by PromptAssembler for local context
-  const redactedMemory = new RedactedMemoryStore(baseStore, policy);
+  const markdownStore = new MarkdownStore();
+  const redactedMemory = new RedactedMemoryStore(markdownStore, policy);
   const registry = await SkillRegistry.load(process.cwd());
   const assembler = new PromptAssembler(
     registry,
@@ -349,8 +338,6 @@ async function handleGuardrail(task: string): Promise<void> {
     const budgetCheck = budgetTracker.checkHardStop(state);
     if (!budgetCheck.ok) {
       console.error(`\n  Budget exceeded: ${budgetCheck.error.message}`);
-      const { shutdownKbServer } = await import('../kb-server-manager.js');
-      await shutdownKbServer();
       process.exit(1);
     }
 
@@ -380,8 +367,6 @@ async function handleGuardrail(task: string): Promise<void> {
         summary: `User cancelled at ${phase}`,
       });
       p.outro('Run cancelled');
-      const { shutdownKbServer } = await import('../kb-server-manager.js');
-      await shutdownKbServer();
       return;
     }
 
@@ -441,8 +426,6 @@ async function handleGuardrail(task: string): Promise<void> {
       const gitResult = await handleGitCheckIfDirty();
       if (gitResult === 'cancel') {
         p.outro('Run aborted by user.');
-        const { shutdownKbServer } = await import('../kb-server-manager.js');
-        await shutdownKbServer();
         return;
       }
       const graph = new EngineGraph(store);
@@ -503,13 +486,9 @@ async function handleGuardrail(task: string): Promise<void> {
       console.log(`\n  ✓ Phase "${phase}" complete (now in "${state.phase}")\n`);
     } catch (err) {
       console.error(`\n  ✗ Phase "${phase}" failed: ${err}`);
-      const { shutdownKbServer } = await import('../kb-server-manager.js');
-      await shutdownKbServer();
       process.exit(1);
     }
   }
 
   p.outro(`Task complete — Session ${state.id}`);
-  const { shutdownKbServer } = await import('../kb-server-manager.js');
-  await shutdownKbServer();
 }

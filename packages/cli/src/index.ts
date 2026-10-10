@@ -6,16 +6,16 @@ import { registerRunCommand } from './commands/run.js';
 import { registerVerifyCommand } from './commands/verify.js';
 import { registerShipCommand } from './commands/ship.js';
 import { registerMemoryCommand } from './commands/memory.js';
-import { registerKbCommand } from './commands/kb.js';
 import { registerContextCommand } from './commands/context.js';
-import { registerEvalCommand } from './commands/eval.js';
+import { registerInitCommand } from './commands/init.js';
+import { registerPluginCommand } from './commands/plugin.js';
 
 const program = new Command();
 
 program
   .name('aix')
   .description('AI Engineering Platform')
-  .version('0.1.0');
+  .version('0.2.0');
 
 registerSkillsCommand(program);
 registerDoctorCommand(program);
@@ -24,9 +24,9 @@ registerRunCommand(program);
 registerVerifyCommand(program);
 registerShipCommand(program);
 registerMemoryCommand(program);
-registerKbCommand(program);
 registerContextCommand(program);
-registerEvalCommand(program);
+registerInitCommand(program);
+registerPluginCommand(program);
 
 export function run(args: string[]): void {
   program.parse(args, { from: 'user' });

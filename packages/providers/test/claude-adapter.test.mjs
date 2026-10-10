@@ -9,11 +9,18 @@ function skill(id) {
     frontmatter: {
       name: id,
       description: `${id} description`,
-      'x-kind': 'workflow',
-      'x-version': '1.0.0',
-      'x-tags': [],
-      'x-roles': [],
-      'x-compatible': ['claude'],
+      metadata: {
+        kind: 'workflow',
+        version: '1.0.0',
+        compatible: 'claude',
+      },
+    },
+    meta: {
+      kind: 'workflow',
+      version: '1.0.0',
+      tags: [],
+      roles: [],
+      compatible: ['claude'],
     },
     body: `${id} body`,
     bodyTokenEstimate: 10,
@@ -31,7 +38,7 @@ const emptyInput = {
   mcpServers: [],
 };
 
-test('ClaudeAdapter manifest points at the canonical content skills directory', () => {
+test('ClaudeAdapter manifest points at the canonical skills directory', () => {
   const files = new ClaudeAdapter().emit({
     ...emptyInput,
     skills: [skill('planning'), skill('review')],
@@ -41,12 +48,12 @@ test('ClaudeAdapter manifest points at the canonical content skills directory', 
   assert.ok(manifestFile, 'plugin manifest should be emitted');
 
   const manifest = JSON.parse(manifestFile.contents);
-  assert.deepEqual(manifest.skills, ['./content/skills/']);
+  assert.deepEqual(manifest.skills, ['./skills/']);
   assert.deepEqual(
     files
       .filter(file => file.path.endsWith('/SKILL.md'))
       .map(file => file.path)
       .sort(),
-    ['content/skills/planning/SKILL.md', 'content/skills/review/SKILL.md'],
+    ['skills/planning/SKILL.md', 'skills/review/SKILL.md'],
   );
 });

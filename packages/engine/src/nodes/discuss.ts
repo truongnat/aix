@@ -8,7 +8,7 @@ import type { EngineState, DiscussionDoc } from '../state.js';
 import { sessionArtifactPath, sessionArchiveDir } from '../session-store.js';
 import { checkBudget, formatBudgetWarnings } from '../budget-guard.js';
 
-const SKILLS_ROOT = process.env.AIX_CONTENT_ROOT ?? join(process.cwd(), 'content');
+const SKILLS_ROOT = process.env.AIX_CONTENT_ROOT ?? process.cwd();
 
 export async function discussNode(state: EngineState): Promise<EngineState> {
   if (state.discussion) return state;

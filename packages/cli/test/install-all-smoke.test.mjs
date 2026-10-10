@@ -26,19 +26,19 @@ function walkFiles(dir) {
 }
 
 function countSourceSkills() {
-  return walkFiles(join(repoRoot, 'content/skills'))
+  return walkFiles(join(repoRoot, 'skills'))
     .filter(file => file.endsWith('SKILL.md'))
     .length;
 }
 
 function countSourceRules() {
-  return walkFiles(join(repoRoot, 'content/rules'))
+  return walkFiles(join(repoRoot, 'rules'))
     .filter(file => file.endsWith('.md'))
     .length;
 }
 
 function countSourceAgents() {
-  return walkFiles(join(repoRoot, 'content/agents'))
+  return walkFiles(join(repoRoot, 'agents'))
     .filter(file => file.endsWith('.md'))
     .length;
 }
@@ -92,10 +92,14 @@ test('install --all writes provider artefacts with expected counts, schemas, and
     const { counts, writtenPaths } = parseInstallOutput(output);
 
     assert.deepEqual(counts, {
-      claude: skillCount + agentCount + hasRules + 2,
+      // claude emits first: skills/ + agents + CLAUDE.md(rules) + plugin.json
+      claude: skillCount + agentCount + hasRules + 1,
+      // cursor still uses per-skill .mdc rules + project rules
       cursor: skillCount + ruleCount,
-      codex: skillCount + hasRules + agentOutputs,
-      gemini: skillCount + hasRules + agentOutputs + 1,
+      // skills/ already written by claude (same hash → skipped); codex adds AGENTS.md + agents
+      codex: hasRules + agentOutputs,
+      // AGENTS.md deduped too; gemini adds agents + gemini-extension.json
+      gemini: agentCount + 1,
     });
     assert.equal(new Set(writtenPaths).size, writtenPaths.length, 'install --all should not emit duplicate paths');
 
@@ -104,24 +108,23 @@ test('install --all writes provider artefacts with expected counts, schemas, and
       assert.ok(statSync(fullPath).isFile(), `${relativePath} should be written`);
     }
 
-    assert.equal(existsSync(join(tmp, 'AGENTS.md')), false, 'AGENTS.md should not be emitted at root');
+    assert.equal(existsSync(join(tmp, 'AGENTS.md')), true, 'AGENTS.md should be emitted at root');
     assert.equal(existsSync(join(tmp, 'GEMINI.md')), false, 'GEMINI.md should not be emitted at root');
     assert.equal(existsSync(join(tmp, 'SKILL.md')), false, 'Cursor install should not overwrite a root SKILL.md');
 
     const claudeManifest = readJson(join(tmp, '.claude-plugin/plugin.json'));
     assert.equal(claudeManifest.name, 'aix');
-    assert.deepEqual(claudeManifest.skills, ['./content/skills/']);
+    assert.deepEqual(claudeManifest.skills, ['./skills/']);
     assert.equal(claudeManifest.author.name, 'truongdq');
 
 
 
     const geminiExtension = readJson(join(tmp, 'gemini-extension.json'));
     assert.equal(geminiExtension.name, 'aix');
-    assert.equal(geminiExtension.skills.length, skillCount);
+    assert.equal(geminiExtension.contextFileName, 'AGENTS.md');
 
-    assert.equal(walkFiles(join(tmp, '.codex/skills')).filter(file => file.endsWith('.md')).length, skillCount);
-    assert.equal(walkFiles(join(tmp, '.agents/skills')).filter(file => file.endsWith('.md')).length, skillCount);
-    assert.equal(walkFiles(join(tmp, 'content/skills')).filter(file => file.endsWith('SKILL.md')).length, skillCount);
+    // claude + codex + gemini all emit to the shared spec layout
+    assert.equal(walkFiles(join(tmp, 'skills')).filter(file => file.endsWith('SKILL.md')).length, skillCount);
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }

@@ -1,6 +1,6 @@
 {
   "name": "aix",
-  "description": "AI engineering methodology spine and skill library for Claude Code.",
+  "description": "AI engineering methodology spine and reusable skill library for coding agents.",
   "owner": {
     "name": "truongdq",
     "url": "https://github.com/truongnat"
@@ -9,7 +9,7 @@
     {
       "name": "aix",
       "source": "./",
-      "description": "AI engineering methodology spine + 160+ skill library, activated at session start. Install once; the agent uses it natively."
+      "description": "AI engineering methodology spine and reusable skill library for coding agents."
     }
   ]
 }

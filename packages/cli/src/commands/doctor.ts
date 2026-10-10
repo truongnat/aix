@@ -1,8 +1,8 @@
 import { Command } from 'commander';
 import { execSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-
+import { createHash } from 'node:crypto';
 export function registerDoctorCommand(program: Command): void {
   program
     .command('doctor')
@@ -30,15 +30,27 @@ export function registerDoctorCommand(program: Command): void {
       const cwd = process.cwd();
       console.log(`  CWD:  ${cwd}`);
 
-      try {
-        const res = await fetch('http://localhost:4000/health');
-        if (res.ok) {
-          console.log('  KB: connected (Neo4j)');
-        } else {
-          console.log('  KB: optional (markdown fallback active) — server unhealthy');
+      // stale-skill check: repo ships skills-release.json {name: sha256}
+      const manifestPath = join(cwd, 'skills-release.json');
+      if (existsSync(manifestPath) && existsSync(join(cwd, 'skills'))) {
+        try {
+          const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8')) as Record<string, string>;
+          const stale: string[] = [];
+          for (const [name, sha] of Object.entries(manifest)) {
+            const p = join(cwd, 'skills', name, 'SKILL.md');
+            if (!existsSync(p)) continue;
+            if (createHash('sha256').update(readFileSync(p)).digest('hex') !== sha) {
+              stale.push(name);
+            }
+          }
+          if (stale.length > 0) {
+            console.warn(`  Skills: ${stale.length} stale vs skills-release.json (update recommended)`);
+          } else {
+            console.log(`  Skills: ${Object.keys(manifest).length} up-to-date`);
+          }
+        } catch {
+          console.log('  Skills: manifest unreadable (skipped staleness check)');
         }
-      } catch {
-        console.log('  KB: optional (markdown fallback active)');
       }
 
       const hasRoot = existsSync(join(cwd, 'aix.json'));
@@ -50,17 +62,17 @@ export function registerDoctorCommand(program: Command): void {
         console.log('  Config: not found (optional — create aix.json to customize)');
       }
 
-      const contentDir = join(cwd, 'content');
-      if (existsSync(contentDir)) {
+      const skillsDir = join(cwd, 'skills');
+      if (existsSync(skillsDir)) {
         try {
-          execSync('ls', { cwd: contentDir, stdio: 'pipe' });
-          console.log(`  Dry-run: content/ readable (${contentDir})`);
+          execSync('ls', { cwd: skillsDir, stdio: 'pipe' });
+          console.log(`  Dry-run: skills/ readable (${skillsDir})`);
         } catch {
-          console.error('  Dry-run: content/ exists but not readable');
+          console.error('  Dry-run: skills/ exists but not readable');
           ok = false;
         }
       } else {
-        console.log('  Dry-run: content/ not found (skipping compile check)');
+        console.log('  Dry-run: skills/ not found (skipping compile check)');
       }
 
       if (ok) {
