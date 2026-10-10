@@ -1,0 +1,4 @@
+interface:
+  display_name: "API Testcase Generator"
+  short_description: "Generate API test cases from specs"
+  default_prompt: "Use $api-testcase-generator to create API test cases from this Swagger, Postman collection, or endpoint description."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "API Response Validator"
+  short_description: "Compare actual API responses"
+  default_prompt: "Use $api-response-validator to compare this actual API response with the expected response or schema."

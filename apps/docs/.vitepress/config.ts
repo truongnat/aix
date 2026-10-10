@@ -26,7 +26,6 @@ export default defineConfig({
           items: [
             { text: 'Skills & Progressive Disclosure', link: '/guide/skills' },
             { text: 'Providers & Compiler', link: '/guide/providers' },
-            { text: 'KB Server', link: '/guide/kb-server' },
             { text: 'Engine (Autonomous Mode)', link: '/guide/engine' },
           ],
         },

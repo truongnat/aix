@@ -23,29 +23,6 @@ npx aix install --provider codex
 npx aix install --provider gemini
 ```
 
-## Khởi động KB Server
-
-```bash
-cd services/kb-server
-cp .env.example .env
-# Đặt KB_MASTER_PASSWORD thành secret mạnh
-docker compose up -d
-```
-
-Kiểm tra kết nối:
-
-```bash
-npx aix doctor
-```
-
-Kết quả mong đợi:
-
-```
-✓ Provider     claude  (detected)
-✓ Skills       163 loaded
-✓ KB Server    connected  (neo4j ✓  meili ✓  redis ✓)
-✓ Policy       redaction active
-```
 
 ## Chạy lần đầu
 

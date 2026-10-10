@@ -1,0 +1,4 @@
+interface:
+  display_name: "Exploratory Charter Builder"
+  short_description: "Create exploratory testing charters"
+  default_prompt: "Use $exploratory-charter-builder to create a focused exploratory testing charter for this feature or area."

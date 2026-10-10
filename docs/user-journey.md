@@ -22,10 +22,10 @@ flowchart TD
     end
 
     subgraph START["②  MỖI SESSION MỚI (tự động)"]
-        B1{{"SessionStart hook<br/>matcher: startup·clear·compact"}}
-        B2["hooks/session-start.sh<br/>đọc using-aix/SKILL.md"]
+        B1{{"Plugin load<br/>skills auto-discovered"}}
+        B2["skills/ auto-discovery<br/>+ spine.js workflow"]
         B3["Inject 'using-aix' vào context agent<br/>+ framing: dùng Skill tool"]
-        B4["164 skills sẵn sàng qua Skill tool<br/>(plugin.json → content/skills/)"]
+        B4["231 skills sẵn sàng qua Skill tool<br/>(plugin.json → skills/)"]
         B1 --> B2 --> B3 --> B4
     end
 
@@ -74,14 +74,11 @@ flowchart TD
 
 Sau bước này không cần làm gì thêm. Plugin tự kích hoạt ở mọi session sau.
 
-### ② Mỗi session mới — tự động, user không thao tác
-1. **SessionStart hook** chạy với matcher `startup | clear | compact` (`hooks/hooks.json`).
-2. `hooks/session-start.sh` đọc `content/skills/using-aix/SKILL.md` và emit JSON
-   `hookSpecificOutput.additionalContext`.
-3. Skill **`using-aix`** được inject thẳng vào context: nó là tấm bản đồ — giải thích methodology
-   spine và cách với tới mọi skill khác.
-4. **164 skills** trở nên gọi được qua **Skill tool** (khai báo `"skills": ["./content/skills/"]`
-   trong `plugin.json`). Không skill nào khác bị inject inline — agent tự gọi khi cần.
+### ② Mỗi session mới — skills sẵn sàng, user không thao tác
+1. **231 skills** gọi được qua **Skill tool** (`skills/<name>/SKILL.md` auto-discovered).
+2. **`aix-spine` workflow** (`workflows/spine.js`) chạy 8 phase như orchestration native.
+3. Skill **`using-aix`** là tấm bản đồ — giải thích methodology spine và cách với tới mọi skill khác;
+   agent tự kích hoạt khi task match.
 
 > Cách tìm skill: `router-pro` cho yêu cầu rộng/mơ hồ · `tool-discovery` để tìm theo năng lực
 > · gọi `Skill` trực tiếp nếu đã biết tên.
@@ -121,6 +118,6 @@ host chạy spine.
 
 ## Liên quan
 - [README.md](../README.md) — tổng quan + cách cài
-- [content/workflows/engineering-spine.md](../content/workflows/engineering-spine.md) — chi tiết spine
-- [content/skills/CONTRIBUTING.md](../content/skills/CONTRIBUTING.md) — đóng góp skill
+- [workflows/engineering-spine.md](../workflows/engineering-spine.md) — chi tiết spine
+- [skills/CONTRIBUTING.md](../skills/CONTRIBUTING.md) — đóng góp skill
 - [MIGRATION.md](../MIGRATION.md) — lộ trình chuyển sang mô hình plugin (Phase A–E)

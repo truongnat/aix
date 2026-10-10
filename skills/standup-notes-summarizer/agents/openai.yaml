@@ -1,0 +1,4 @@
+interface:
+  display_name: "Standup Notes Summarizer"
+  short_description: "Create short standup updates"
+  default_prompt: "Use $standup-notes-summarizer to turn these notes into a short daily standup update."

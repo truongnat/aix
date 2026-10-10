@@ -19,8 +19,8 @@ npx aix install --provider gemini
 
 ### Claude Code
 ```
-content/skills/<skill>/SKILL.md
-.claude-plugin/plugin.json   ← skills: ["./content/skills/"]
+skills/<skill>/SKILL.md
+.claude-plugin/plugin.json   ← skills: ["./skills/"]
 CLAUDE.md
 .claude/settings.json
 ```
@@ -58,7 +58,7 @@ Mỗi provider có adapter riêng trong `@x/providers`:
 
 | File | Provider |
 |------|---------|
-| `src/claude.ts` | Claude Code — canonical `content/skills`, plugin manifest, settings |
+| `src/claude.ts` | Claude Code — canonical `skills`, plugin manifest, settings |
 | `src/cursor.ts` | Cursor — `.cursor/rules/aix-skill-*.mdc` |
 | `src/codex.ts` | Codex — compact `AGENTS.md` plus `.codex/` retrieval files |
 | `src/gemini.ts` | Gemini CLI — compact `GEMINI.md`, skill index, extension metadata |

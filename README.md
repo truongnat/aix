@@ -1,6 +1,6 @@
 # aix
 
-> AI engineering methodology + 160+ skills, delivered as a Claude Code and Codex plugin.
+> AI engineering methodology + 230+ skills, delivered as an Agent Plugins 1.0 plugin for Claude Code, Codex, Cursor, and Gemini.
 
 **The host agent is the runtime**. aix is the playbook and the skill library — not a separate engine you invoke.
 
@@ -23,9 +23,13 @@ codex plugin marketplace add truongnat/aix
 codex plugin add aix@aix
 ```
 
-On start, a `SessionStart` hook injects [`using-aix`](./content/skills/using-aix/SKILL.md) into context. It explains the 8-step engineering spine and how to reach any of the 160+ skills via the host's `Skill` tool.
+Any skill-aware agent:
 
-No engine, no runtime — just skills the agent pulls in when needed.
+```bash
+npx skills add truongnat/aix
+```
+
+Skills live at `skills/<name>/SKILL.md` (Agent Skills spec) and are auto-discovered by the host. The [`aix-spine`](./workflows/spine.js) workflow runs the full 8-phase engineering spine as native orchestration. No engine, no runtime — just skills the agent pulls in when needed.
 
 ## The engineering spine
 
@@ -40,12 +44,14 @@ No engine, no runtime — just skills the agent pulls in when needed.
 | 7 | Verify | `verify-pro` |
 | 8 | Remember | `remember-pro` |
 
+Session artifacts land in `.aix/sessions/<session-id>/` (`DISCUSSION.md`, `PLAN.md`, `REVIEW.md`, `VERIFY.md`, `REMEMBER.md`).
+
 ## Providers
 
 Install skills to other AI coding tools:
 
 ```bash
-npx @x/cli install --all --provider cursor|codex|gemini
+aix install --all --provider cursor|codex|gemini
 ```
 
 ## Monorepo
@@ -59,15 +65,14 @@ npx @x/cli install --all --provider cursor|codex|gemini
 | `@x/providers` | Compile-time adapters + runtime LLM client |
 | `@x/compiler` | Idempotent file emitter |
 | `@x/context` | Code analysis, RAG, wiki generation |
-| `@x/memory` | Markdown store for durable memory |
+| `@x/memory` | Markdown store for durable memory (grep-friendly) |
 | `@x/prompt` | Prompt assembly + linter |
-| `@x/engine` | Headless SDLC runner for CI/batch |
+| `@x/engine` | Headless SDLC runner for CI/batch (optional `--auto` path) |
 | `@x/cli` | Command surface |
 | `@x/core` | Types, phase machine, guards |
 | `@x/evals` | A/B harness + rubric scoring |
 | `@x/hitl` | Human-in-the-loop channel |
 | `@x/preview` | Mermaid / image / HTML preview |
-| `services/kb-server` | SQLite knowledge base |
 
 ## Quick start
 
@@ -80,29 +85,33 @@ pnpm test
 ## CLI
 
 ```bash
-aix install --all [--provider <claude|cursor|codex|gemini>]
-aix run "<task>"
+aix init                          # .aix/ dirs + AGENTS.md section in current project
+aix install --all [--provider X]  # emit provider artifacts
+aix run "<task>"                  # guardrail mode; --auto for headless
 aix skills list | show <name> | validate
-aix memory push|search|list|get
+aix skills migrate --from <dirs> --write
+aix memory push|search|list
+aix plugin build [--out dir]      # regenerate vendor manifests from plugin.json
 aix verify | ship
 aix eval <suite>
-aix doctor
+aix doctor                        # env + skills-release staleness check
 ```
 
 ## Repository
 
 ```
-.agents/plugins/  Codex marketplace entry for this repo
-.claude-plugin/   Claude Code plugin manifest
-.codex-plugin/    Codex plugin manifest
-hooks/            SessionStart → injects using-aix + starts kb-server
-content/
-  skills/         160+ domain, process, and reference skills
-  rules/          Spine guardrail rules
-  workflows/      Engineering spine flow
-packages/         13 @x/* TypeScript packages
-services/         kb-server (SQLite, NestJS)
-apps/             Docs site + tooling
+plugin.json         Agent Plugins 1.0 manifest (canonical)
+AGENTS.md           canonical agent instructions
+skills/             230+ skills — Agent Skills spec (<name>/SKILL.md)
+skills.sh.json      skills.sh registry groupings
+skills-release.json per-skill sha256 (staleness detection)
+workflows/          engineering-spine doc + spine.js workflow
+rules/              spine guardrail rules
+.claude-plugin/     Claude Code manifest + marketplace.json
+.cursor-plugin/     Cursor manifest
+gemini-extension.json Gemini extension manifest
+packages/           13 @x/* TypeScript packages
+apps/               Docs site
 ```
 
 ## Security
