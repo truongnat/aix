@@ -13,7 +13,7 @@ See **`decision-tree.md`**.
 
 ## SSR/SSG vs client render for SEO
 
-SSR/SSG improves **first paint** for crawlers; SPA acceptable only with verified rendering — **`nextjs-pro`**, **`react-pro`**.
+SSR/SSG improves **first paint** for crawlers; SPA acceptable only with verified rendering — **`nextjs-15-pro`**, **`react-pro`**.
 
 ---
 

@@ -29,7 +29,7 @@ This skill owns **typography, color, spacing, iconography and visual hierarchy f
 
 ## Cross-skill handoffs
 
-- `sk-design-system-pro` / `sk-design-system-patterns` for tokens, themes, and reusable component governance.
+- `sk-design-system-pro` / `sk-design-system-pro` for tokens, themes, and reusable component governance.
 - `sk-accessibility-compliance` for WCAG, keyboard, screen-reader, and assistive-technology requirements.
 - `sk-frontend-patterns` / `sk-web-component-design` for implementation and component API decisions.
 - `sk-frontend-design-pro` / `sk-ux-design-pro` for product-level visual direction and interaction design.

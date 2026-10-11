@@ -18,7 +18,7 @@ Make pages **discoverable**, **crawlable**, and **indexable** without wasting cr
 ## Rendering
 
 - **JavaScript** — Google can render JS but **budget** and **timing** matter; critical content and links should be available **early**; avoid infinite scroll without crawlable pagination fallback where needed.
-- **SSR/SSG/ISR** — Often better for SEO-critical pages than pure client-only shell (**`nextjs-pro`**).
+- **SSR/SSG/ISR** — Often better for SEO-critical pages than pure client-only shell (**`nextjs-15-pro`**).
 
 ## Performance signals (Core Web Vitals)
 

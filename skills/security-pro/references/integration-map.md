@@ -3,7 +3,7 @@
 | Combined skill | Why | `security-pro` owns | Other skill owns |
 |----------------|-----|----------------------|------------------|
 | **`nestjs-pro`** | HTTP API | Threats, authz rules, validation policy | Guards, pipes, filters, module wiring |
-| **`nextjs-pro`** | Web surface | CSP, cookie strategy, Server Action abuse, env leakage | Routing, cache, middleware mechanics |
+| **`nextjs-15-pro`** | Web surface | CSP, cookie strategy, Server Action abuse, env leakage | Routing, cache, middleware mechanics |
 | **`postgresql-pro`** | Data layer | RLS intent, least privilege | SQL, migrations, query patterns |
 | **`api-design-pro`** | Public contracts | Abuse cases, versioning, idempotency for sensitive ops | OpenAPI shape, pagination ergonomics |
 | **`auth-pro`** | Identity protocols | Session/JWT/OAuth threat framing | Provider wiring, token lifetimes in code |

@@ -1,60 +1,71 @@
 ---
 name: repro-steps-verifier
-description: Kiểm tra lại các bước tái hiện bug (reproduction steps) đã viết xem có đủ rõ ràng, đủ chi tiết để dev làm theo không, và chỉ ra chỗ mơ hồ/gộp bước. Dùng khi user đã viết steps nhưng muốn chắc chắn dev sẽ không hiểu nhầm hoặc không tái hiện được.
+description: "Audit a written set of bug reproduction steps for clarity: find merged steps, vague words, missing preconditions, missing concrete data, illogical ordering, and weak expected/actual anchoring. Use when the user already wrote repro steps and wants certainty a dev can follow them without misreading or failing to reproduce."
+metadata:
+  kind: "domain"
+  version: "0.2.0"
+  tags: "qa,bug-report,repro-steps,review"
 ---
 
 # Repro Steps Verifier
 
-## Quy ước timestamp và artifact
-Ngay khi bắt đầu chạy Skill, lấy timestamp hiện tại theo timezone của user/project, format `YYYY-MM-DD HH:mm:ss Z`.
+## Timestamp and artifact convention
+As soon as this skill starts, capture the current timestamp in the user's/project's timezone, formatted `YYYY-MM-DD HH:mm:ss Z`.
 
-Nếu có tạo file review repro steps, lưu theo cấu trúc:
+If review files are created, store them under:
 
 ```text
 artifacts/YYYY-MM-DD/repro-steps-verifier/HHmmss-short-bug-title/
 ```
 
-Mỗi artifact phải ghi `Session timestamp`, steps gốc, nhận xét từng bước, và steps đề xuất viết lại. Mọi output chính trong chat cũng phải hiển thị `Session timestamp`.
+Every artifact must record `Session timestamp`, the original steps, per-step review notes, and the proposed rewrite. All main chat output must also show `Session timestamp`.
 
-## Mục tiêu
-Rà soát một đoạn steps đã viết (không phải viết từ đầu như bug-report-writer) để tìm điểm mơ hồ khiến dev có thể tái hiện sai hoặc không tái hiện được.
+## Goal
+Review an existing set of steps (this skill reviews — `bug-report-writer` writes from scratch) and pinpoint the ambiguous spots that would make a dev reproduce the wrong thing or nothing at all.
 
-## Checklist rà soát
+## Review checklist
 
-Với mỗi bước trong steps, kiểm tra:
+Apply to each step:
 
-1. **Có gộp nhiều hành động vào 1 bước không?** (VD: "Đăng nhập và vào trang cài đặt" nên tách thành 2 bước riêng)
-2. **Có thiếu điều kiện tiền đề không?** (VD: bước 3 giả định user đã ở trạng thái nào đó nhưng không nói rõ từ bước trước)
-3. **Có dùng từ mơ hồ không?** (VD: "chọn 1 sản phẩm bất kỳ" — sản phẩm nào, có ảnh hưởng tới việc tái hiện không? Nếu bug chỉ xảy ra với sản phẩm cụ thể, phải nêu rõ)
-4. **Có thiếu dữ liệu cụ thể không?** (VD: "nhập số lượng lớn" — lớn là bao nhiêu, cần con số cụ thể)
-5. **Thứ tự các bước có logic không?** (bước sau có phụ thuộc bước trước đúng thứ tự thực tế không)
-6. **Kết quả mong đợi/thực tế có đính kèm rõ ở bước nào gây ra không?** (không chỉ ghi ở cuối chung chung mà không rõ xảy ra ở bước nào)
-7. **Thông tin handoff cho dev đã đủ chưa?** Environment/build, account/role, test data, expected/actual, evidence, tần suất tái hiện
+1. **Multiple actions merged?** — "Log in and go to settings" should be two steps. One step = one actor action + its immediate effect.
+2. **Hidden precondition?** — step 3 assumes a state set up by an unwritten step 0 ("open the order you created earlier" — which order? created how?).
+3. **Vague wording?** — "select any product" (does the bug need a specific one?), "enter a large quantity" (how large?), "wait a bit" (how long?), "it should work" (what does 'work' look like on screen?).
+4. **Missing concrete data?** — actual usernames, values, file names, option names as used during the real reproduction.
+5. **Logical order?** — later steps genuinely depend on earlier ones in the order a real user performs them; nothing relies on something done "before step 1" that isn't listed.
+6. **Expected/actual anchored?** — is it clear at WHICH step the failure appears, not just a trailing "but it doesn't work"?
+7. **Handoff complete?** — environment/build, account/role, test data, expected vs actual, evidence, reproduction frequency.
 
-## Quy trình
+## Process
 
-### Bước 1 — Đọc steps hiện có, đánh số lại nếu chưa được đánh số rõ
+### Step 1 — Read and renumber
+Read the provided steps; number them if not already numbered clearly.
 
-### Bước 2 — Với mỗi bước, áp checklist ở trên, đánh dấu:
-- OK — đủ rõ, dev có thể làm theo chính xác
-- CẦN LÀM RÕ — nêu chính xác chỗ nào mơ hồ và tại sao dev có thể hiểu sai
+### Step 2 — Mark each step
+- `OK` — clear enough for a dev to execute exactly.
+- `NEEDS CLARIFICATION` — state the exact ambiguity and how a dev could misread it.
 
-### Bước 3 — Xuất kết quả
+### Step 3 — Output
 
-```
+```text
 Session timestamp: [YYYY-MM-DD HH:mm:ss Z]
 
-Bước 1: [nội dung gốc] → OK / CẦN LÀM RÕ: [lý do + đề xuất viết lại]
-Bước 2: ...
-...
+Step 1: [original text] → OK / NEEDS CLARIFICATION: [reason + suggested rewrite]
+Step 2: ...
 
-Thông tin handoff còn thiếu:
-- [environment/build/account/test data/evidence/frequency nếu thiếu]
+Missing handoff info:
+- [environment/build/account/test data/evidence/frequency if absent]
 
-Steps đề xuất viết lại (nếu có bước cần chỉnh):
+Proposed rewrite (only if some steps need fixing):
 1. ...
 2. ...
 ```
 
-## Lưu ý
-Không viết lại toàn bộ steps nếu phần lớn đã ổn — chỉ đề xuất chỉnh sửa cho đúng những bước bị đánh dấu CẦN LÀM RÕ, để user dễ so sánh trước/sau.
+## Good vs bad examples
+- BAD: `3. Go to checkout and pay` → merged actions, no data.
+  GOOD: `3. Open the cart. 4. Click "Checkout". 5. Select payment method "Credit card". 6. Enter test card 4111 1111 1111 1111. 7. Click "Pay".`
+- BAD: `2. Select any item` → GOOD: `2. Select item "Blue T-shirt, size M" (SKU SHIRT-M-BLUE)`.
+- BAD: `5. An error appears` at the end → GOOD: expected/actual stated at the step where it happens: `6. Expected: confirmation screen. Actual: page reloads, cart still full.`
+
+## Notes
+- Do NOT rewrite all the steps when most are fine — only propose fixes for steps marked `NEEDS CLARIFICATION`, so the user can diff before/after.
+- If steps are fine but handoff info is missing, say the steps pass and list only the missing context — don't manufacture step issues that aren't there.

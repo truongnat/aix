@@ -16,7 +16,7 @@ Expert-level guidance for designing robust, scalable, and evolutionary software 
 
 ## Boundary
 
-This skill provides comprehensive software architecture guidance for designing systems across Web, Mobile, and Cloud. It focuses on architecture diagrams, system design patterns, tech stack decision frameworks, and dependency analysis. Implementation details are owned by framework-specific skills (e.g., `react-pro`, `nextjs-pro`).
+This skill provides comprehensive software architecture guidance for designing systems across Web, Mobile, and Cloud. It focuses on architecture diagrams, system design patterns, tech stack decision frameworks, and dependency analysis. Implementation details are owned by framework-specific skills (e.g., `react-pro`, `nextjs-15-pro`).
 
 ## When to use
 

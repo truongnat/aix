@@ -30,5 +30,5 @@ End-to-end **program** — not a one-time meta tag fix. Align with business goal
 
 ## Relationship to other skills
 
-- **Rendering** and **metadata** implementation: **`nextjs-pro`** / **`react-pro`**.
+- **Rendering** and **metadata** implementation: **`nextjs-15-pro`** / **`react-pro`**.
 - **CDN and caching** that affect TTFB: **`deployment-pro`**.

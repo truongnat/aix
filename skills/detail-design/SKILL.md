@@ -242,7 +242,7 @@ It does **not** own product discovery, system-level architecture choices, implem
 
 ## Cross-skill handoffs
 
-- sk-planning or sk-executing-pro for lifecycle orchestration; sk-specify or BA skills for requirements artifacts; sk-review for quality findings; sk-verify-pro for canonical claim-to-evidence decisions (sk-verification is a compatibility facade only).
+- sk-planning or sk-executing-pro for lifecycle orchestration; sk-specify or BA skills for requirements artifacts; sk-review for quality findings; sk-verify-pro for canonical claim-to-evidence decisions.
 
 ## Wave 3 evidence pack
 

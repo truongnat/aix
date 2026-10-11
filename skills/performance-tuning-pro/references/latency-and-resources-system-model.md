@@ -46,7 +46,7 @@ Profiling must distinguish **on-CPU** vs **off-CPU wait** — otherwise you opti
 
 | Layer | Typical signals | Often paired skill |
 |-------|-----------------|--------------------|
-| Browser | LCP, INP, long tasks | **`react-pro`**, **`nextjs-pro`** |
+| Browser | LCP, INP, long tasks | **`react-pro`**, **`nextjs-15-pro`** |
 | API / app | CPU samples, spans, event loop lag | **`nestjs-pro`**, framework skills |
 | Data | Query time, locks, buffer pool | **`postgresql-pro`** |
 | Cache | Hit rate, stampede, TTL | **`caching-pro`** |

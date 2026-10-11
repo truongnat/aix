@@ -5,7 +5,7 @@ Caches are **shared fast storage** — easy to **leak** or **poison**.
 ## Isolation
 
 - **Tenant / user** in **key prefix** — never cache **only** by guessable sequential id without auth binding.
-- **Shared CDN URL** must not serve **personalized** body — **`Cache-Control: private`** or vary correctly — **`nextjs-pro`**.
+- **Shared CDN URL** must not serve **personalized** body — **`Cache-Control: private`** or vary correctly — **`nextjs-15-pro`**.
 
 ## Threats
 

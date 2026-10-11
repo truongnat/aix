@@ -16,7 +16,7 @@ Comprehensive patterns for creating, maintaining, and managing Architecture Deci
 
 ## Boundary
 
-This skill owns the ADR record format and decision lifecycle. Use **`sk-system-design-pro`** or **`sk-clean-code-architecture-pro`** to analyze the architecture decision itself, then record the selected option here.
+This skill owns the ADR record format and decision lifecycle. Use **`sk-system-design-pro`** or **`sk-clean-architecture`** to analyze the architecture decision itself, then record the selected option here.
 
 ## When to Use This Skill
 

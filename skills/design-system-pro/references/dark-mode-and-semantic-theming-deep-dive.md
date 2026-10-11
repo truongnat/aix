@@ -1,6 +1,6 @@
 # Dark mode & semantic theming (deep dive)
 
-Practical detail for shipping **light + dark** (or multi-theme) products without “inverted light” bugs. Use with **`design-system-pro`** foundations and your stack’s token implementation (**`react-pro`** / **`nextjs-pro`**).
+Practical detail for shipping **light + dark** (or multi-theme) products without “inverted light” bugs. Use with **`design-system-pro`** foundations and your stack’s token implementation (**`react-pro`** / **`nextjs-15-pro`**).
 
 ## 1. Token layers (recommended mental model)
 
@@ -36,7 +36,7 @@ For each semantic token, define **light** and **dark** (and brand if needed):
 ## 5. System vs user preference
 
 - **`prefers-color-scheme`** — Good default for first visit.
-- **In-app toggle** — Persist choice (localStorage / account); avoid **flash** on load (inline script or SSR theme cookie — implementation: **`nextjs-pro`**).
+- **In-app toggle** — Persist choice (localStorage / account); avoid **flash** on load (inline script or SSR theme cookie — implementation: **`nextjs-15-pro`**).
 - **“Auto”** — Follow OS until user overrides; document behavior in settings.
 
 ## 6. Elevation without skeuomorphism

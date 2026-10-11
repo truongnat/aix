@@ -2,7 +2,7 @@
 
 ## Why
 
-Self-review scripts only check **heuristic** automation keywords and **repo** script references. **Stack** skills (`react-pro`, `nextjs-pro`, …) need **periodic** alignment with **current** framework docs and practices.
+Self-review scripts only check **heuristic** automation keywords and **repo** script references. **Stack** skills (`react-pro`, `nextjs-15-pro`, …) need **periodic** alignment with **current** framework docs and practices.
 
 ## Workflow (combine skills)
 

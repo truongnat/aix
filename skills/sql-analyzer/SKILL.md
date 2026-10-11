@@ -1,61 +1,88 @@
 ---
 name: sql-analyzer
-description: Dịch yêu cầu kiểm tra dữ liệu bằng ngôn ngữ tự nhiên thành câu lệnh SQL, chạy qua kết nối database (MCP) nếu có sẵn, và giải thích kết quả bằng ngôn ngữ dễ hiểu cho tester không rành SQL. Dùng khi user cần verify dữ liệu trong DB, hoặc khi dev đưa một câu SQL và user cần hiểu nó đang làm gì.
+description: "Translate natural-language data-check requests into SQL, run them through a read-only database MCP connection if available, and explain results in plain language for testers who aren't fluent in SQL. Use when the user needs to verify data in a DB, or when a dev hands them a SQL query they need to understand."
+metadata:
+  kind: "domain"
+  version: "0.2.0"
+  tags: "qa,sql,database,data-verification"
 ---
 
 # SQL Analyzer
 
-## Quy ước timestamp và artifact
-Ngay khi bắt đầu chạy Skill, lấy timestamp hiện tại theo timezone của user/project, format `YYYY-MM-DD HH:mm:ss Z`.
+## Timestamp and artifact convention
+As soon as this skill starts, capture the current timestamp in the user's/project's timezone, formatted `YYYY-MM-DD HH:mm:ss Z`.
 
-Nếu có tạo file kết quả, lưu theo cấu trúc:
+If result files are created, store them under:
 
 ```text
 artifacts/YYYY-MM-DD/sql-analyzer/HHmmss-short-topic/
 ```
 
-Mỗi artifact phải ghi `Session timestamp`, câu hỏi gốc, SQL đã chạy, kết luận, và các giới hạn dữ liệu nếu có. Mọi output chính trong chat cũng phải hiển thị `Session timestamp`.
+Every artifact must record `Session timestamp`, the original question, the SQL run, the conclusion, and data limitations. All main chat output must also show `Session timestamp`.
 
-## Điều kiện tiên quyết
-Skill này cần một kết nối MCP tới database (read-only) đã được thiết lập sẵn trong Claude Desktop/claude.ai. Nếu không có kết nối MCP database nào khả dụng trong phiên làm việc, KHÔNG tự bịa kết quả — báo cho user rằng cần kết nối MCP database trước, và có thể đề xuất tìm connector phù hợp.
+## Prerequisite
+This skill needs a **read-only database MCP connection** already set up in the session. If none is available, do NOT fabricate results — tell the user a database MCP connection is needed first and suggest finding a suitable connector. Writing a query draft for the user to run themselves is still allowed in this case.
 
-## Hai chế độ sử dụng
+## Two modes
 
-### Chế độ 1 — User mô tả điều cần kiểm tra bằng lời, Claude tự viết và chạy SQL
+### Mode 1 — User describes what to check; assistant writes and runs SQL
 
-**Quy trình:**
-1. Đọc yêu cầu của user (VD: "kiểm tra đơn hàng của user X có đúng trạng thái đã thanh toán không")
-2. Nếu thiếu thông tin để viết query chính xác — tên bảng, tên field, tiêu chí cụ thể là gì — hỏi lại ngắn gọn. Ví dụ hỏi: "Bạn biết tên bảng lưu đơn hàng không, hay để tôi tự tìm trong schema?"
-3. Nếu có thể, tự khám phá schema DB trước (liệt kê bảng, cột liên quan) thay vì đoán tên bảng
-4. Viết câu SQL, CHỈ dùng câu truy vấn đọc dữ liệu (`SELECT`, hoặc câu tương đương read-only tùy database). Không chạy bất kỳ câu lệnh ghi/xóa/sửa schema nào.
-5. Chạy query, lấy kết quả
-6. Giải thích kết quả bằng ngôn ngữ thường, không dùng thuật ngữ SQL — trả lời thẳng câu hỏi ban đầu của user (đúng/sai, có/không, số lượng bao nhiêu)
-7. Đính kèm câu SQL đã chạy để user có thể lưu lại tham khảo sau
+1. Read the request (e.g. "check whether user X's order shows as paid").
+2. If details needed for a correct query are missing — table name, field name, the exact criterion — ask briefly: *"Do you know which table stores orders, or should I discover it from the schema?"*
+3. **Explore the schema before guessing**: list tables, inspect columns of candidates — never guess table/column names when a schema lookup is possible.
+4. Write the SQL — **read-only only** (`SELECT` or the equivalent for the database). Never any write/delete/schema statement.
+5. Run it, get results.
+6. Explain the result in plain language, no SQL jargon — answer the original question directly (yes/no, correct/incorrect, count).
+7. Attach the executed SQL so the user can save it for later reference.
 
-### Chế độ 2 — Dev đưa sẵn một câu SQL, user muốn hiểu nó làm gì
+Example flow:
 
-**Quy trình:**
-1. Đọc câu SQL được đưa
-2. Giải thích từng phần bằng ngôn ngữ thường: câu này lấy dữ liệu gì, từ bảng nào, điều kiện lọc là gì, join với bảng nào để làm gì
-3. Nếu user muốn, chỉ chạy thử khi câu SQL là read-only. Nếu câu SQL có thao tác ghi/xóa/sửa schema, chỉ giải thích ý nghĩa và rủi ro, không chạy.
-4. Nếu câu SQL có vẻ phức tạp (nhiều join, subquery), chia nhỏ giải thích theo từng bước thay vì giải thích một lần toàn bộ
+```text
+User: "check if order 1289 is actually paid"
 
-## Nguyên tắc an toàn
-- KHÔNG BAO GIỜ chạy lệnh ghi/xóa/sửa dữ liệu hoặc schema (`INSERT`, `UPDATE`, `DELETE`, `DROP`, `TRUNCATE`, `ALTER`, `CREATE`, `MERGE`, stored procedure có side effect), kể cả khi user xác nhận.
-- Nếu user cần câu lệnh ghi dữ liệu cho môi trường test, chỉ được phép viết draft để dev/DBA tự review và chạy.
-- Nếu không chắc câu lệnh có read-only hay không, không chạy và hỏi lại.
-- Nếu kết quả trả về nhạy cảm (thông tin cá nhân khách hàng), chỉ hiển thị phần cần thiết để trả lời câu hỏi, không liệt kê thừa các field nhạy cảm không liên quan.
+Discovered schema: orders(id, status, paid_at), payments(order_id, amount, state)
 
-## Format kết quả
-Trả lời trực tiếp câu hỏi trước, sau đó mới đến chi tiết:
+Query run:
+SELECT o.id, o.status, o.paid_at, p.state AS payment_state, p.amount
+FROM orders o LEFT JOIN payments p ON p.order_id = o.id
+WHERE o.id = 1289;
 
+Conclusion: No — the order exists but status is 'pending' and there is
+no successful payment row attached (payments row shows state='failed').
 ```
-Kết luận: [Đúng/Sai/Có/Không + số liệu cụ thể]
+
+### Mode 2 — Dev hands over a SQL query; user wants to understand it
+
+1. Read the provided SQL.
+2. Explain each part in plain language: what data it fetches, from which tables, what the filters mean, what each JOIN is for.
+3. For complex queries (multiple joins, subqueries), break the explanation into stages rather than explaining the whole thing at once.
+4. Only run it if it's read-only. If the query contains writes/deletes/schema changes, explain what it does and its risk — do not execute.
+
+## Safety rules
+- NEVER execute write/delete/schema statements (`INSERT`, `UPDATE`, `DELETE`, `DROP`, `TRUNCATE`, `ALTER`, `CREATE`, `MERGE`, stored procedures with side effects) — even if the user confirms.
+- If the user needs write statements for test data setup, only draft the SQL for a dev/DBA to review and run.
+- When unsure whether a statement is read-only, don't run it — ask.
+- If results contain PII (customer names, emails, phones), show only what's needed to answer the question; don't dump extra sensitive columns.
+- Common QA read patterns worth knowing: verify status after an action, count rows matching criteria, check for orphaned duplicates, confirm a record doesn't exist.
+
+## Output format
+Answer the question first, details after:
+
+```text
+Conclusion: [Yes/No/Specific numbers]
 
 Session timestamp: [YYYY-MM-DD HH:mm:ss Z]
 
-Câu SQL đã chạy:
+SQL executed:
 [query]
 
-Giải thích: [diễn giải ngắn gọn ý nghĩa kết quả]
+Explanation: [plain-language interpretation of the result]
+
+Limitations: [e.g. "checked staging DB only" / "result is a point-in-time snapshot"]
 ```
+
+## Anti-patterns
+- Guessing table names instead of inspecting the schema.
+- Dumping a 200-row result — summarize to answer the question, attach the query for reproduction.
+- Answering with the SQL but no plain-language conclusion — the conclusion IS the deliverable.
+- Running `UPDATE … WHERE id=…` "just to fix test data" — that's what the safety rules prohibit; draft it for the dev instead.

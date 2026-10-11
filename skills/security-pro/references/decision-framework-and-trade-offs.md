@@ -18,7 +18,7 @@ Use **`decision-tree.md`** for token storage and IDOR branches.
 |----------------------------------|------------------------------|
 | First-party web with same-site model | SPAs with API-only backends; mobile native |
 
-**Trade-off:** cookies need **CSRF** strategy; bearer in browser needs **XSS** discipline — **`decision-tree.md`**, **`nextjs-pro`**.
+**Trade-off:** cookies need **CSRF** strategy; bearer in browser needs **XSS** discipline — **`decision-tree.md`**, **`nextjs-15-pro`**.
 
 ---
 
@@ -34,7 +34,7 @@ Use **`decision-tree.md`** for token storage and IDOR branches.
 
 ## Strict CSP vs third-party scripts
 
-Stricter **CSP** reduces XSS blast radius but can **break** analytics, payment widgets, or A/B scripts — document **nonce/hash** policy and exceptions — **`nextjs-pro`**.
+Stricter **CSP** reduces XSS blast radius but can **break** analytics, payment widgets, or A/B scripts — document **nonce/hash** policy and exceptions — **`nextjs-15-pro`**.
 
 ---
 

@@ -44,4 +44,4 @@ React may **interrupt** low-priority renders. **`startTransition`** marks update
 
 ## SSR and two trees
 
-With SSR, the **server** produces HTML; the **client** must match the **first client render**. Mismatches → **hydration errors** — browser-only values must not appear on first paint — pair **`nextjs-pro`** for RSC boundaries.
+With SSR, the **server** produces HTML; the **client** must match the **first client render**. Mismatches → **hydration errors** — browser-only values must not appear on first paint — pair **`nextjs-15-pro`** for RSC boundaries.

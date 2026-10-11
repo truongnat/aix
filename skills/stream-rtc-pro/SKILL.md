@@ -40,7 +40,7 @@ Use [WebRTC](https://w3c.github.io/webrtc-pc/), RTP/RTCP RFCs, and [MDN WebRTC](
 | **`security-pro`** | AuthZ on join, DTLS/SRTP assumptions, recording consent |
 | **`deployment-pro`** | TURN/SFU rollout, geo, autoscale |
 | **`network-infra-pro`** | Firewalls, UDP/TCP paths, path MTU |
-| **`nestjs-pro`** / **`nextjs-pro`** | Signaling/control servers |
+| **`nestjs-pro`** / **`nextjs-15-pro`** | Signaling/control servers |
 | **`react-native-pro`** | Mobile RTC lifecycle |
 | **`api-design-pro`** | Control APIs without RTC depth |
 

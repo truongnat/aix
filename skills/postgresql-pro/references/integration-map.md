@@ -2,7 +2,7 @@
 
 | Combined skill | Why | `postgresql-pro` owns | Other skill owns |
 |----------------|-----|----------------------|------------------|
-| **`nestjs-pro`** / **`nextjs-pro`** | App talks to Postgres | Policies, migrations, query plans | ORM APIs, connection in request, serverless pool quirks |
+| **`nestjs-pro`** / **`nextjs-15-pro`** | App talks to Postgres | Policies, migrations, query plans | ORM APIs, connection in request, serverless pool quirks |
 | **`sql-data-access-pro`** | SQLite locally vs Postgres; portable SQL | MVCC/types/portability gaps vs server Postgres | Embedded file DB scripts |
 | **`deployment-pro`** | Migrations in prod | Ordering, locks, `CONCURRENTLY`, rollback SQL | Pipeline gates, secrets for DB URLs |
 | **`security-pro`** | Data protection | Least privilege roles, RLS, encryption at rest awareness | App-level authz, logging policy |

@@ -2,7 +2,7 @@
 
 | Skill | When |
 |-------|------|
-| **`nextjs-pro`** | Metadata API, `sitemap.ts`, `robots.ts`, App Router rendering. |
+| **`nextjs-15-pro`** | Metadata API, `sitemap.ts`, `robots.ts`, App Router rendering. |
 | **`react-pro`** | SPA head, crawlable shell, hydration. |
 | **`deployment-pro`** | CDN, cache headers, TTFB, global crawl. |
 | **`testing-pro`** | CI checks for critical meta/status (optional). |

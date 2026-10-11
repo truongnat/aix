@@ -55,7 +55,7 @@ Use official [React Native](https://reactnative.dev/) and [Expo](https://docs.ex
 
 ## When not to use
 
-- **Pure web React** (Next, DOM) — **`react-pro`** / **`nextjs-pro`**.
+- **Pure web React** (Next, DOM) — **`react-pro`** / **`nextjs-15-pro`**.
 - **Native-only** Swift/Kotlin feature without RN bridge context — Apple/Google docs + minimal RN handoff.
 - **Backend API design** as primary topic — **`api-design-pro`** / **`nestjs-pro`** (pair for mobile client).
 

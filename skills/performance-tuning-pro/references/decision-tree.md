@@ -20,7 +20,7 @@ Profiler shows mostly on-CPU vs blocked on I/O / locks?
 
 ```
 Slow in browser (LCP, INP)?
-└── Network, JS bundle, rendering — combine with **`react-pro`** / **`nextjs-pro`**
+└── Network, JS bundle, rendering — combine with **`react-pro`** / **`nextjs-15-pro`**
 
 Slow API?
 ├── Single query dominates? → **`postgresql-pro`**

@@ -26,7 +26,7 @@ Use official [HTTP Semantics RFC ••••](https://www.rfc-editor.org/rfc/rf
 
 ## Boundary
 
-**`api-design-pro`** owns **contract shape**, **resource/action model**, **mutation and query semantics**, **versioning**, **pagination**, **error/idempotency/retry story**, **workflow-oriented endpoints**, **async and webhook patterns** at the design level, and **integration maps** to other skills. It does **not** replace **`nestjs-pro`** / **`nextjs-pro`** for framework wiring, **`graphql-pro`** for GraphQL-only schema work, or **`security-pro`** for full threat modeling — pair as needed.
+**`api-design-pro`** owns **contract shape**, **resource/action model**, **mutation and query semantics**, **versioning**, **pagination**, **error/idempotency/retry story**, **workflow-oriented endpoints**, **async and webhook patterns** at the design level, and **integration maps** to other skills. It does **not** replace **`nestjs-pro`** / **`nextjs-15-pro`** for framework wiring, **`graphql-pro`** for GraphQL-only schema work, or **`security-pro`** for full threat modeling — pair as needed.
 
 ## Related skills (this repo)
 

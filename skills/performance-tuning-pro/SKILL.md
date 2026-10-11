@@ -41,7 +41,7 @@ Use official [MDN Performance APIs](https://developer.mozilla.org/en-US/docs/Web
 | **`deployment-pro`** / **`docker-pro`** | CPU/mem limits, scaling, cold start |
 | **`network-infra-pro`** | Edge latency, TLS, CDN behavior |
 | **`algorithm-pro`** | Complexity and data-structure choices |
-| **`nestjs-pro`** / **`nextjs-pro`** / **`react-pro`** | Framework-specific rendering and API paths |
+| **`nestjs-pro`** / **`nextjs-15-pro`** / **`react-pro`** | Framework-specific rendering and API paths |
 | **`websocket-pro`** / **`stream-rtc-pro`** | Streaming backpressure |
 
 ## When to use

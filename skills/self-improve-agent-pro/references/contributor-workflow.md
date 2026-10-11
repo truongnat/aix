@@ -42,12 +42,12 @@ Use this when a bug fix yields **reusable** routing/history knowledge: put the *
 
 | What | Where |
 |------|--------|
-| Case / solution / prevention (browser Back vs in-app after **edit** routes) | **`nextjs-pro`** → [Edge cases — Browser history and edit flows](/skills/nextjs-pro/references/edge-cases.md#browser-history-and-edit-flows) |
+| Case / solution / prevention (browser Back vs in-app after **edit** routes) | **`nextjs-15-pro`** → [Edge cases — Browser history and edit flows](/skills/nextjs-15-pro/references/edge-cases.md#browser-history-and-edit-flows) |
 | Contributor steps (branch, commit, PR) | This document — [Step-by-Step Process](#step-by-step-process) |
 
-**Case:** After **list → detail → edit**, two **browser** Back operations should return to **list**. If the second Back from detail incorrectly returns to **edit**, the history stack and “leave edit” handlers are out of sync (see `nextjs-pro` section above).
+**Case:** After **list → detail → edit**, two **browser** Back operations should return to **list**. If the second Back from detail incorrectly returns to **edit**, the history stack and “leave edit” handlers are out of sync (see `nextjs-15-pro` section above).
 
-**Solution:** Document the pattern in **`nextjs-pro/references/edge-cases.md`**; link from here so self-improve readers know where the harvested edge case lives.
+**Solution:** Document the pattern in **`nextjs-15-pro/references/edge-cases.md`**; link from here so self-improve readers know where the harvested edge case lives.
 
 **Prevention:** Before closing the contributor PR, confirm the new text is **framework-level**, not a dump of one app’s file names — and add a regression note (e.g. two consecutive browser Backs on edit).
 

@@ -5,7 +5,7 @@ description: >+
 
   Use this skill when implementing or reviewing JavaScript/TypeScript application logic at the language/runtime level, debugging tricky behavior, or handling edge cases in browser/Node projects.
 
-  Combine with **`testing-pro`**, **`security-pro`**, **`typescript-pro`**, **`code-packaging-pro`**, and stack skills (**`react-pro`**, **`nestjs-pro`**, **`nextjs-pro`**) per integration map.
+  Combine with **`testing-pro`**, **`security-pro`**, **`typescript-pro`**, **`code-packaging-pro`**, and stack skills (**`react-pro`**, **`nestjs-pro`**, **`nextjs-15-pro`**) per integration map.
 
   Triggers: "javascript", "js", "event loop", "promise", "closure", "this", "prototype", "hoisting", "microtask", "edge case", "tip", "trick", "await", "async", "TypeError", "ReferenceError", "undefined is not a function", "ESM", "CommonJS", "cjs", "mjs", "import.meta"
 metadata:
@@ -38,7 +38,7 @@ Use official [MDN JavaScript docs](https://developer.mozilla.org/en-US/docs/Web/
 | **`typescript-pro`** | Types, `strict`, narrowing — stronger guarantees |
 | **`code-packaging-pro`** | `exports`, dual publish, conditional exports |
 | **`react-pro`** | Client bundles, hydration, browser APIs |
-| **`nestjs-pro`** / **`nextjs-pro`** | Server/framework-specific JS patterns |
+| **`nestjs-pro`** / **`nextjs-15-pro`** | Server/framework-specific JS patterns |
 
 ## When to use
 

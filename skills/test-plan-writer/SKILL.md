@@ -1,82 +1,87 @@
 ---
 name: test-plan-writer
-description: "Viết test plan cho sprint, release hoặc một nhóm feature từ danh sách scope, requirement, timeline và nguồn lực QA. Dùng khi tester hoặc QA lead cần xác định phạm vi test, out of scope, test approach, môi trường, dữ liệu, rủi ro, entry/exit criteria và ước lượng thời gian."
+description: "Write a test plan for a sprint, release, or feature group from scope lists, requirements, timeline, and QA capacity. Use when a tester or QA lead must define test scope, out-of-scope, approach, environments, data, risks, entry/exit criteria, and effort estimates — not for a single feature's test cases."
+metadata:
+  kind: "domain"
+  version: "0.2.0"
+  tags: "qa,test-plan,release,strategy"
 ---
 
 # Test Plan Writer
 
-## Quy ước timestamp và artifact
-Ngay khi bắt đầu chạy Skill, lấy timestamp hiện tại theo timezone của user/project, format `YYYY-MM-DD HH:mm:ss Z`.
+## Timestamp and artifact convention
+As soon as this skill starts, capture the current timestamp in the user's/project's timezone, formatted `YYYY-MM-DD HH:mm:ss Z`.
 
-Nếu có tạo file test plan, lưu theo cấu trúc:
+If test plan files are created, store them under:
 
 ```text
 artifacts/YYYY-MM-DD/test-plan-writer/HHmmss-release-or-sprint/
 ```
 
-Mỗi artifact phải ghi `Session timestamp`, nguồn scope, assumption, phần còn thiếu và test plan cuối cùng.
+Every artifact must record `Session timestamp`, scope source, assumptions, outstanding gaps, and the final plan.
 
-## Mục tiêu
-Tạo test plan ngắn gọn, đủ dùng cho sprint/release, không chỉ tập trung vào một feature đơn lẻ.
+## Goal
+A compact, usable test plan at sprint/release level — what gets tested, what doesn't, by whom, when it's done — not a disguised test-case list.
 
-## Script hỗ trợ
-Nếu scope đầu vào đến từ file hoặc URL, ưu tiên chạy support script ở chế độ `--report` trước:
+## Support scripts
+If scope arrives via file or URL, prefer `--report` mode first:
 
-- `safe_download.py` cho tài liệu scope ở URL
-- `read_excel.py` cho danh sách feature/test scope trong CSV/XLSX
-- `read_pdf.py` cho BRD/spec ở PDF
-- `read_docx.py` cho BRD/spec ở Word `.docx`
+- `safe_download.py` for scope documents at a URL
+- `read_excel.py` for feature/test-scope lists in CSV/XLSX
+- `read_pdf.py` for BRD/spec PDFs
+- `read_docx.py` for BRD/spec Word documents
 
-## Quy trình
+## Process
 
-### Bước 1 - Thu thập scope
-Nếu danh sách feature ở dạng Excel/CSV, chạy `read_excel.py --report` trước để biết sheet, header và sample rows trước khi viết test plan.
+### Step 1 — Collect scope
+- Feature list in Excel/CSV → `read_excel.py --report` first for sheets, headers, sample rows.
+- BRD in `.docx` → `read_docx.py --report` for paragraph/table structure before summarizing.
 
-Nếu BRD/scope ở dạng Word `.docx`, chạy `read_docx.py --report` trước để biết cấu trúc đoạn và bảng trước khi tóm phạm vi test.
+Determine:
+- Features/changes in the sprint or release.
+- What must be tested AND what is explicitly out of scope.
+- Timeline, deadline, participants, environments.
+- Known risks, dependencies, test data, accounts/roles.
+- Test types needed: smoke, functional, regression, API, UI, compatibility, exploratory.
 
-Xác định:
+If key info is missing, ask the top 3 highest-impact questions first.
 
-- Danh sách feature/change trong sprint hoặc release.
-- Phạm vi cần test và không test.
-- Timeline, deadline, người tham gia, môi trường.
-- Risk đã biết, dependency, dữ liệu test, tài khoản/role.
-- Loại test cần chạy: smoke, functional, regression, API, UI, compatibility, exploratory.
+### Step 2 — Analyze risk and effort per feature
+Assess each item on: user/business impact, usage frequency, change complexity, dependencies, bug history, and estimated test effort. This is a lightweight version of `risk-based-prioritizer` — reuse its scoring if the user wants a formal ranking.
 
-Nếu thiếu, hỏi tối đa 3 câu quan trọng nhất trước.
+### Step 3 — Write the plan
+The plan must make four things unambiguous: WHAT is tested, WHAT is not, WHO owns it, WHEN it's done (exit criteria). Keep it short — a plan nobody reads is worthless.
 
-### Bước 2 - Phân tích rủi ro và effort
-Với từng feature, đánh giá:
-
-- Impact tới người dùng hoặc nghiệp vụ.
-- Tần suất sử dụng.
-- Độ phức tạp thay đổi.
-- Phụ thuộc hệ thống khác.
-- Lịch sử bug hoặc khu vực hay lỗi.
-- Thời gian test ước lượng.
-
-### Bước 3 - Viết test plan
-Test plan phải rõ cái gì test, cái gì không test, ai phụ trách và khi nào kết thúc được.
-
-## Format output
+## Output format
 
 ```text
 Session timestamp: [YYYY-MM-DD HH:mm:ss Z]
 
 # Test Plan: [Sprint/Release/Feature group]
 
-## 1. Mục tiêu
-## 2. Phạm vi test
-## 3. Out of scope
-## 4. Test approach
-## 5. Môi trường và dữ liệu test
-## 6. Resource và timeline
-## 7. Risk và mitigation
-## 8. Entry criteria
-## 9. Exit criteria
-## 10. Deliverables
-## 11. Câu hỏi cần làm rõ
+## 1. Objective
+## 2. Test scope          (features + test types, tied to risk)
+## 3. Out of scope        (explicit — prevents scope-creep disputes)
+## 4. Test approach       (levels: API/UI/exploratory; who does what)
+## 5. Environment & test data
+## 6. Resources & timeline (people, days, milestones)
+## 7. Risks & mitigations
+## 8. Entry criteria       (what must be true before testing starts:
+                           e.g. build deployed, test data ready, critical blockers fixed)
+## 9. Exit criteria        (what defines "done":
+                           e.g. all P0/P1 cases run, no open Critical bugs,
+                           coverage % for new features)
+## 10. Deliverables        (reports, test case docs, sign-off)
+## 11. Open questions
 ```
 
-## Lưu ý
-- Không biến test plan thành danh sách test case chi tiết.
-- Nếu timeline quá gấp, nêu rõ phần phải ưu tiên và phần có thể giảm phạm vi.
+## Guidance on the hard parts
+- **Entry criteria** are the gate to START; **exit criteria** the gate to STOP — the most-often-missing sections, and the ones that prevent "are we done yet?" debates.
+- **Out of scope** must name items explicitly ("payment gateway sandbox only", "no performance testing this sprint") — implicit exclusions cause release-day surprises.
+- **Risks** need an owner and a mitigation, not just a list ("env unstable → mitigation: smoke-run nightly, owner: DevOps").
+- If the timeline is tight, state clearly which scope would shrink first — tie back to the risk analysis.
+
+## Anti-patterns
+- Writing a test plan that is secretly a list of test cases — cases live in `testcase-generator` output.
+- Vague criteria: "testing is complete when all tests pass" — pass of WHAT set? Define it.
+- Sections copied from a template with placeholder-ish content — drop sections that genuinely don't apply rather than leaving filler.

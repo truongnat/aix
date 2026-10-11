@@ -7,7 +7,7 @@ description: >+
 
   Do not use as the only skill for framework-specific wiring, IdP portal configuration, deep pentesting, or full database schema design — combine with stack and security skills (see Boundary).
 
-  Use **with** **`security-pro`** for broader threat modeling and hardening, **`nestjs-pro`** / **`nextjs-pro`** for framework wiring, **`postgresql-pro`** for data-layer policy/RLS boundaries, and **`testing-pro`** for auth regression and abuse-case tests.
+  Use **with** **`security-pro`** for broader threat modeling and hardening, **`nestjs-pro`** / **`nextjs-15-pro`** for framework wiring, **`postgresql-pro`** for data-layer policy/RLS boundaries, and **`testing-pro`** for auth regression and abuse-case tests.
 
   Triggers: "authentication", "authorization", "auth", "login", "session", "session management", "JWT", "OAuth", "OIDC",
 metadata:
@@ -34,7 +34,7 @@ Use standards and vendor docs as authority for protocol details: [OAuth 2.0 (RFC
 | Skill | When to combine with **`auth-pro`** |
 |-------|-------------------------------------|
 | **`security-pro`** | Threat modeling, abuse scenarios, defense-in-depth controls |
-| **`nestjs-pro`** / **`nextjs-pro`** | Guards/middleware/session wiring and framework APIs |
+| **`nestjs-pro`** / **`nextjs-15-pro`** | Guards/middleware/session wiring and framework APIs |
 | **`postgresql-pro`** | RLS and data ownership constraints for authz enforcement |
 | **`testing-pro`** | Auth flow tests, permission regression, token/session abuse tests |
 
@@ -50,7 +50,7 @@ Use standards and vendor docs as authority for protocol details: [OAuth 2.0 (RFC
 
 ## When not to use
 
-- **Framework wiring only** — route guards, middleware order, cookie APIs, DI (**`nestjs-pro`**, **`nextjs-pro`**) without an auth architecture question.
+- **Framework wiring only** — route guards, middleware order, cookie APIs, DI (**`nestjs-pro`**, **`nextjs-15-pro`**) without an auth architecture question.
 - **IdP / vendor admin** — Azure AD/Okta/GCP IAM console steps, SAML metadata exchange, SLAs — use vendor docs + often **`security-pro`** for review.
 - **Database mechanics as the main ask** — RLS SQL, indexes, migrations — primary owner is **`postgresql-pro`** (pair with this skill for policy intent).
 - **Deep pentest / formal threat modeling** — primary owner **`security-pro`**.
@@ -210,7 +210,7 @@ Details: [references/versions.md](/skills/auth-pro/references/versions.md)
 
 ## Cross-skill handoffs
 
-**`security-pro`** (threat model), **`nestjs-pro`** / **`nextjs-pro`** (wiring), **`postgresql-pro`** (RLS), **`deployment-pro`** (secrets/TLS posture), **`testing-pro`** (abuse tests).
+**`security-pro`** (threat model), **`nestjs-pro`** / **`nextjs-15-pro`** (wiring), **`postgresql-pro`** (RLS), **`deployment-pro`** (secrets/TLS posture), **`testing-pro`** (abuse tests).
 
 Details: [references/integration-map.md](/skills/auth-pro/references/integration-map.md)
 

@@ -14,12 +14,12 @@
   - `ag-ui-pro`: Agent-interactive components and patterns.
   - `frontend-design-pro`: Visual design, accessibility, brand consistency.
 
-## react-pro / nextjs-pro
+## react-pro / nextjs-15-pro
 
 - **When**: Implementing in React / Next.js.
 - **Ownership split**:
   - `ag-ui-pro`: Agent-specific components and state management.
-  - `react-pro` / `nextjs-pro`: Framework patterns, routing, SSR considerations.
+  - `react-pro` / `nextjs-15-pro`: Framework patterns, routing, SSR considerations.
 
 ## a2a-protocol-pro
 

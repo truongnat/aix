@@ -1,60 +1,79 @@
 ---
 name: risk-based-prioritizer
-description: "Xếp hạng module, feature hoặc test case theo rủi ro khi thời gian test bị giới hạn. Dùng khi tester cần quyết định test phần nào trước dựa trên impact, tần suất sử dụng, độ phức tạp thay đổi, lịch sử bug, dependency, dữ liệu nhạy cảm và mức độ ảnh hưởng tới người dùng."
+description: "Rank modules, features, or test cases by risk when test time is limited. Use when a tester must decide what to test first — scoring each item on user impact, usage frequency, change complexity, dependencies, bug history, sensitive data, and detectability, then grouping into Must test / Should test / Can defer."
+metadata:
+  kind: "domain"
+  version: "0.2.0"
+  tags: "qa,risk,prioritization,test-strategy"
 ---
 
 # Risk-Based Prioritizer
 
-## Quy ước timestamp và artifact
-Ngay khi bắt đầu chạy Skill, lấy timestamp hiện tại theo timezone của user/project, format `YYYY-MM-DD HH:mm:ss Z`.
+## Timestamp and artifact convention
+As soon as this skill starts, capture the current timestamp in the user's/project's timezone, formatted `YYYY-MM-DD HH:mm:ss Z`.
 
-Nếu có tạo file ưu tiên test, lưu theo cấu trúc:
+If prioritization files are created, store them under:
 
 ```text
 artifacts/YYYY-MM-DD/risk-based-prioritizer/HHmmss-scope/
 ```
 
-Mỗi artifact phải ghi `Session timestamp`, scope đầu vào, scoring rule, bảng ưu tiên và assumption.
+Every artifact must record `Session timestamp`, the input scope, the scoring rules used, the priority table, and assumptions.
 
-## Mục tiêu
-Giúp tester chọn đúng phần cần test trước khi không đủ thời gian test toàn bộ.
+## Goal
+Help a tester pick the RIGHT things to test first when there isn't time to test everything — with reasons tied to criteria, not gut feeling.
 
-## Scoring
-Chấm mỗi item từ 1 đến 5 theo các tiêu chí:
+## Scoring model
+Score each item 1–5 per criterion:
 
-- User/business impact.
-- Tần suất sử dụng.
-- Độ phức tạp thay đổi.
-- Dependency với hệ thống khác.
-- Lịch sử bug hoặc khu vực hay regression.
-- Dữ liệu nhạy cảm, tiền, quyền truy cập hoặc compliance.
-- Mức độ khó rollback hoặc khó phát hiện lỗi.
+| Criterion | 1 (low risk) | 5 (high risk) |
+|---|---|---|
+| User/business impact if broken | Few users notice | Blocks revenue/core flow |
+| Usage frequency | Rarely touched | Used constantly |
+| Change complexity | Trivial diff | Touches many modules/layers |
+| Dependencies | Standalone | Integrates with other systems |
+| Bug history / regression-proneness | Never broken | Breaks every release |
+| Sensitive data / money / permissions / compliance | None | Directly handles |
+| Detectability & rollback | Obvious + easy rollback | Silent failure + hard rollback |
 
-Risk score = tổng điểm. Nếu tiêu chí nào không có dữ liệu, ghi `Unknown` và hỏi lại nếu ảnh hưởng lớn.
+`Risk score = sum of all criterion scores` (max 35).
 
-## Quy trình
+If data for a criterion is unknown, mark it `Unknown`, do not guess a 3 — and ask if that criterion carries real weight for the decision.
 
-1. Đọc danh sách module/feature/test case.
-2. Chuẩn hóa thành từng item độc lập.
-3. Chấm điểm theo tiêu chí trên.
-4. Xếp nhóm ưu tiên: `Must test`, `Should test`, `Can defer`.
-5. Đề xuất test focus và phần có thể giảm scope.
+## Process
 
-## Format output
+1. Read the item list (modules, features, or test cases).
+2. Normalize into independent items — one row per thing that could be tested separately.
+3. Score each criterion. Briefly justify high scores (≥4) so the table is auditable.
+4. Group by score bands (adjust to context, but default):
+   - `Must test`: score ≥ 24, OR any single criterion at 5 involving money/permissions/data loss
+   - `Should test`: 15–23
+   - `Can defer`: ≤ 14, assuming nothing critical was Unknown
+5. Propose a focus order and explicitly state which areas could have scope reduced.
+
+A single-criterion-5 (e.g. "handles payment data") can override a middling total — say so when it does.
+
+## Output format
 
 ```text
 Session timestamp: [YYYY-MM-DD HH:mm:ss Z]
+Scope: [sprint/release/item list source]
+Capacity: [days/time available if known]
 
-| Rank | Item | Risk Score | Priority | Lý do | Test focus | Có thể bỏ qua? |
+| Rank | Item | Score | Priority | Rationale | Test focus | Deferrable? |
 |---|---:|---:|---|---|---|---|
+| 1 | Payment retry flow | 29 | Must test | money + retry logic changed | double-charge, idempotency | No |
 
-Khuyến nghị:
-- Test trước: [...]
-- Test nếu còn thời gian: [...]
-- Có thể defer: [...]
-- Cần hỏi thêm: [...]
+Recommendation:
+- Test first: [...]
+- Test if time remains: [...]
+- Can defer: [...]
+- Need more info: [...]
 ```
 
-## Lưu ý
-- Không chỉ ưu tiên theo cảm tính. Luôn nêu lý do theo tiêu chí.
-- Nếu user đưa sẵn deadline hoặc số ngày công QA, dùng thông tin đó để đề xuất phạm vi thực tế.
+## Anti-patterns
+- Averaging risk so everything lands in "Should test" — force a real ordering.
+- Prioritizing by what's easiest or fastest to test — risk decides, not convenience.
+- Prioritizing by recency ("it's new so it's risky") — newness is one signal, not the score.
+- Treating `Unknown` as low risk — flag it; an unknown on a sensitive criterion should escalate to "Need more info," not quietly defer.
+- Ignoring the user's stated capacity — if they give a deadline or QA-days, map Must/Should/Defer onto that realistic capacity.

@@ -17,4 +17,4 @@
 
 ## Handoff clarity
 
-- Separate **UX recommendation** from **implementation estimate** — defer LOC to **`react-pro`** / **`nextjs-pro`**.
+- Separate **UX recommendation** from **implementation estimate** — defer LOC to **`react-pro`** / **`nextjs-15-pro`**.

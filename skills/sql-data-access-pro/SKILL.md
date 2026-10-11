@@ -40,7 +40,7 @@ Use [SQLite](https://www.sqlite.org/docs.html) and [Python sqlite3](https://docs
 | **`postgresql-pro`** | Server Postgres, RLS, migrations, ops, heavy concurrency |
 | **`data-analysis-pro`** | Pandas / Parquet after SQL export |
 | **`security-pro`** | Injection policy, credentials, PII |
-| **`nestjs-pro`** / **`nextjs-pro`** | ORM and app connection lifecycle |
+| **`nestjs-pro`** / **`nextjs-15-pro`** | ORM and app connection lifecycle |
 | **`performance-tuning-pro`** | Large exports, memory, I/O batching |
 | **`content-analysis-pro`** | `.db` attached without SQL goal — clarify intent |
 

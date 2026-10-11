@@ -19,7 +19,7 @@ Master proven backend architecture patterns including Clean Architecture, Hexago
 
 ## Boundary
 
-This is a foundational pattern reference for Clean/Hexagonal/DDD concepts. Use **`sk-clean-code-architecture-pro`** as the canonical owner for production boundary design, dependency direction, migration sequencing, and architecture trade-offs.
+This is a foundational pattern reference for Clean/Hexagonal/DDD concepts. Use **`sk-clean-architecture`** as the canonical owner for production boundary design, dependency direction, migration sequencing, and architecture trade-offs.
 
 ## When to Use This Skill
 
@@ -166,7 +166,7 @@ For detailed DDD bounded context mapping, full multi-service project trees, Anti
 
 ## Related Skills
 
-- `sk-microservices-patterns` — Apply these architecture patterns when decomposing a monolith into services
+- `sk-microservices-pro` — Apply these architecture patterns when decomposing a monolith into services
 - `cqrs-implementation` — Use Clean Architecture as the structural foundation for CQRS command/query separation
 - `saga-orchestration` — Sagas require well-defined aggregate boundaries, which DDD tactical patterns provide
 - `event-store-design` — Domain events produced by aggregates feed directly into an event store

@@ -34,7 +34,7 @@
 | Failure mode | Detection | Mitigation |
 |--------------|-----------|------------|
 | **Hydration mismatch** | Console #418 / text mismatch | Defer client-only values to `useEffect`; match server output — **`edge-cases.md`** |
-| **Client module in RSC** | Build error or wrong tree | `"use client"` boundary; no server import of client-only — **`nextjs-pro`** |
+| **Client module in RSC** | Build error or wrong tree | `"use client"` boundary; no server import of client-only — **`nextjs-15-pro`** |
 
 ---
 

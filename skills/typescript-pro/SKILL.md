@@ -5,7 +5,7 @@ description: >+
 
   Use this skill when the user works on TypeScript, tsconfig, type inference, generics, mapped/conditional/template-literal types, utility types (Partial, Required, Pick, Omit, Record, ReturnType, etc.), declaration files (.d.ts), type narrowing, discriminated unions, module resolution, path aliases, strict null checks, type guards, satisfies operator, const assertions, or migrating JavaScript to TypeScript.
 
-  Combine with **`javascript-pro`** for runtime JS semantics, **`react-pro`** / **`nextjs-pro`** / **`nestjs-pro`** for framework typing, **`testing-pro`** for test utility typing.
+  Combine with **`javascript-pro`** for runtime JS semantics, **`react-pro`** / **`nextjs-15-pro`** / **`nestjs-pro`** for framework typing, **`testing-pro`** for test utility typing.
 
   Triggers: "TypeScript", "tsconfig", "type error", "TS2322", "TS2532", "TS18048", "generic", "interface",
 metadata:
@@ -35,7 +35,7 @@ Use official [TypeScript docs](https://www.typescriptlang.org/docs/) for languag
 |-------|----------------|
 | **`javascript-pro`** | Runtime behavior (closures, prototypes, async) underlies the issue |
 | **`react-pro`** | TSX, props, hook generics |
-| **`nextjs-pro`** | App Router types, `metadata`, server/client boundaries |
+| **`nextjs-15-pro`** | App Router types, `metadata`, server/client boundaries |
 | **`nestjs-pro`** | Decorator metadata, controller/service DTO types |
 | **`testing-pro`** | Mock typing, helper generics |
 

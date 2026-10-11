@@ -1,92 +1,93 @@
 ---
 name: daily-report-writer
-description: Tổng hợp công việc đã làm trong ngày/tuần thành report gửi lead, dựa trên mô tả rời rạc của user (task đã làm, bug đã tìm, test case đã viết...). Dùng khi user cần gửi báo cáo tiến độ hàng ngày hoặc cuối tuần nhưng chỉ nhớ được lộn xộn những gì đã làm.
+description: "Compile the day's (or week's) QA work into a clear report for the lead, from the user's scattered recollection of tasks done, bugs found, and test cases written. Use when the user must send a daily or end-of-week progress report but only remembers fragments of what they did."
+metadata:
+  kind: "domain"
+  version: "0.2.0"
+  tags: "qa,report,daily-report,progress"
 ---
 
 # Daily Report Writer
 
-## Quy ước timestamp và artifact
-Ngay khi bắt đầu chạy Skill, lấy timestamp hiện tại theo timezone của user/project, format `YYYY-MM-DD HH:mm:ss Z`.
+## Timestamp and artifact convention
+As soon as this skill starts, capture the current timestamp in the user's/project's timezone, formatted `YYYY-MM-DD HH:mm:ss Z`.
 
-Nếu có tạo file daily/weekly report, lưu theo cấu trúc:
+If report files are created, store them under:
 
 ```text
 artifacts/YYYY-MM-DD/daily-report-writer/HHmmss-report-scope/
 ```
 
-Mỗi artifact phải ghi `Session timestamp`, `Report date`, nguồn activity đã dùng, activity bị loại vì khác ngày nếu có, và report cuối cùng. Mọi output chính trong chat cũng phải hiển thị `Session timestamp`.
+Every artifact must record `Session timestamp`, `Report date`, activity sources used, any activity excluded for belonging to a different date, and the final report. All main chat output must also show `Session timestamp`.
 
-## Mục tiêu
-Nhận danh sách công việc user kể lại (có thể rời rạc, không theo thứ tự, thiếu ngữ cảnh) và tổng hợp thành report rõ ràng, có cấu trúc, dễ đọc cho lead.
+## Goal
+Take a fragmented, unordered, context-thin list of what the user did and produce a structured, lead-readable progress report.
 
-## Script hỗ trợ
-Nếu cần tạo artifact cho chính report cuối cùng, dùng `artifact_init.py --report` trước để chốt folder output.
+## Support scripts
+- `artifact_init.py --report` to create the output folder for the final report.
+- `artifact_index.py --report REPORT_DATE` to index the day's activity from `artifacts/REPORT_DATE/*/` when summarizing from prior artifacts.
+- `artifact_packager.py --report` on the daily-report run folder when the whole bundle goes to the lead or to archive.
 
-Nếu cần tổng hợp activity từ artifact đã tạo trong ngày, dùng `artifact_index.py --report REPORT_DATE` trước để index đúng:
+## Process
 
-```text
-artifacts/REPORT_DATE/*/
-```
+### Step 1 — Collect content
+Fix `Report date` first. If the user doesn't specify a date, use the current date in the user's/project's timezone.
 
-Nếu cần bàn giao toàn bộ report artifact cho lead hoặc lưu trữ, dùng `artifact_packager.py --report` trước trên đúng thư mục daily report run.
-
-## Quy trình
-
-### Bước 1 — Thu thập nội dung
-Xác định `Report date` trước. Nếu user không nói ngày cụ thể, dùng ngày hiện tại theo timezone user/project.
-
-Chỉ dùng activity thuộc đúng `Report date` cho daily report. Nếu đọc từ artifact folder, chỉ đọc:
+Only use activity belonging to `Report date` for a daily report. When reading from artifacts, only read:
 
 ```text
 artifacts/REPORT_DATE/*/
 ```
 
-Không đưa activity của ngày khác vào daily report, trừ khi user nói rõ muốn report tuần hoặc muốn include ngày cụ thể khác.
+Never blend other days' activity into a daily report unless the user explicitly asks for a weekly report or names specific extra dates. When indexing artifacts, runs from other dates must be listed separately as excluded — not silently ignored.
 
-Nếu đọc từ artifact folder, chỉ dùng dữ liệu từ `artifact_index.py` của đúng `Report date`; mọi run ở ngày khác phải ghi riêng là bị loại.
+Ask the user (if not already provided): which tasks/features were worked on that day, any bugs found, anything blocked or waiting on someone.
 
-Hỏi user (nếu chưa cung cấp đủ): trong đúng ngày report đã làm những task/feature nào, có phát hiện bug gì không, có gì đang bị block/cần hỗ trợ không.
+If the user gives only a brief list, don't interrogate — compose a draft from what's there, then ask one follow-up only if an important section is missing (e.g. user never mentioned blockers).
 
-Nếu user chỉ liệt kê ngắn gọn, không cần hỏi dồn dập — có thể tổng hợp trước với thông tin hiện có rồi hỏi bổ sung 1 lần nếu thấy thiếu mục quan trọng (VD: user không nhắc gì tới việc có bị block hay không).
+### Step 2 — Classify content into groups
+- **Completed**: tasks/features fully tested, bugs reported
+- **In progress**: unfinished tasks — include rough progress
+- **Issues found**: bugs/blockers discovered, with impact
+- **Needs help / waiting on**: waiting for dev fix, waiting for info, blocked by what
+- **Test metrics**: cases executed/passed/failed/blocked — only if the user provided numbers
+- **Risks & next plan**: remaining risk, owner, ETA, next action
 
-### Bước 2 — Phân loại nội dung theo nhóm
+### Step 3 — Output in a short, scannable format
 
-- **Đã hoàn thành**: task/feature đã test xong, bug đã report
-- **Đang thực hiện**: task đang làm dở, tiến độ bao nhiêu %
-- **Phát hiện vấn đề**: bug/blocker tìm được, mức độ ảnh hưởng
-- **Cần hỗ trợ/đang chờ**: đang chờ dev fix, chờ thông tin từ ai, hoặc bị block bởi gì
-- **Số liệu test**: số test case đã chạy/pass/fail/blocked nếu user có cung cấp
-- **Rủi ro và kế hoạch tiếp theo**: risk còn lại, owner, ETA, next action
-
-### Bước 3 — Xuất report theo format ngắn gọn, dễ đọc (không dài dòng)
-
-```
-## Báo cáo [ngày/tuần]
+```text
+## Report [date/week]
 
 **Session timestamp:** [YYYY-MM-DD HH:mm:ss Z]
 **Report date:** [YYYY-MM-DD]
 
-**Đã hoàn thành:**
-- [task/feature] — [kết quả ngắn gọn]
+**Completed:**
+- [task/feature] — [short result]
 
-**Đang thực hiện:**
-- [task] — [tiến độ]
+**In progress:**
+- [task] — [progress]
 
-**Vấn đề phát hiện:**
-- [bug/issue] — [mức độ, đã report chưa]
+**Issues found:**
+- [bug/issue] — [severity, reported yet?]
 
-**Cần hỗ trợ:**
-- [nội dung cần hỗ trợ/đang chờ]
+**Needs help:**
+- [what is needed / waiting on]
 
-**Số liệu test:**
-- [executed/pass/fail/blocked nếu có]
+**Test metrics:**
+- [executed/pass/fail/blocked if provided]
 
-**Rủi ro / kế hoạch tiếp theo:**
+**Risks / next plan:**
 - [risk, owner, ETA, next action]
 ```
 
-## Nguyên tắc viết
-- Ngắn gọn, mỗi dòng 1 ý, không viết văn dài dòng — lead cần đọc nhanh, không cần kể chuyện
-- Không tự thêm task mà user không nhắc tới
-- Không trộn activity khác ngày vào daily report. Nếu thấy activity khác ngày, ghi riêng là "Không đưa vào report vì khác ngày".
-- Nếu một mục không có gì (VD: không có gì cần hỗ trợ), bỏ qua mục đó thay vì viết "Không có" cho tất cả các mục rỗng
+## Writing rules
+- One idea per line — the lead scans, nobody wants a narrative essay.
+- Never add tasks the user didn't mention.
+- Never mix in activity from other dates; if spotted, list it separately as "excluded — different date."
+- If a section is genuinely empty (e.g. nothing blocked), drop the section entirely rather than writing "None" everywhere.
+- For weekly reports, state the date range explicitly and aggregate rather than listing every day separately.
+
+## Anti-patterns
+- Inflating "worked on X" into "completed X" — keep the user's actual status.
+- Fabricating test metrics the user never gave.
+- Copying the user's raw messy list into the report without classification — classification IS the value.

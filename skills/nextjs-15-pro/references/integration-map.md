@@ -1,6 +1,6 @@
-# Integration map — nextjs-pro
+# Integration map — nextjs-15-pro
 
-| Combined skill | Why | `nextjs-pro` owns | Other skill owns |
+| Combined skill | Why | `nextjs-15-pro` owns | Other skill owns |
 |----------------|-----|-------------------|------------------|
 | **`react-pro`** | Client UI | `"use client"` placement, hydration | Hooks, a11y, component patterns |
 | **`security-pro`** | Exposure surface | Middleware, env boundaries, Server Action abuse | Threat model, CSP, auth policy |

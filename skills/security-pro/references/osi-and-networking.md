@@ -1,6 +1,6 @@
 # OSI model and networking (security lens)
 
-Reference for **where** controls and failures sit on the path from wire to application. Use alongside threat modeling — not a substitute for stack-specific hardening in `nestjs-pro` / `nextjs-pro` / etc.
+Reference for **where** controls and failures sit on the path from wire to application. Use alongside threat modeling — not a substitute for stack-specific hardening in `nestjs-pro` / `nextjs-15-pro` / etc.
 
 ## OSI — seven layers (mnemonic: **P**lease **D**o **N**ot **T**hrow **S**ausage **P**izza **A**way)
 

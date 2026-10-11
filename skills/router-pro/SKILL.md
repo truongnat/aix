@@ -106,17 +106,17 @@ Router output must reflect **actual workspace / task stack**, not defaults from 
 2. **Map UI / app-layer work to the matching skill**:
    - Flutter widgets, Riverpod, Dart async → **`flutter-pro`** (not `react-pro`).
    - React web (SPA/Vite/webpack) → **`react-pro`**.
-   - Next App Router / RSC → **`nextjs-pro`**.
+   - Next App Router / RSC → **`nextjs-15-pro`**.
    - React Native / Expo → **`react-native-pro`**.
 3. **Cross-cutting** skills stay stack-agnostic: **`testing-pro`**, **`auth-pro`**, **`security-pro`**, **`api-design-pro`**, **`postgresql-pro`**, **`docker-pro`**, etc., combined with the **correct** stack skill.
-4. **Forbidden**: recommending **`react-pro`** or **`nextjs-pro`** for a **Flutter/Dart-only** task (and the reverse). If uncertain, say so and list **both** hypotheses with what evidence would decide.
+4. **Forbidden**: recommending **`react-pro`** or **`nextjs-15-pro`** for a **Flutter/Dart-only** task (and the reverse). If uncertain, say so and list **both** hypotheses with what evidence would decide.
 
 **Quick reference**
 
 | Signals | Prefer (app layer) |
 |--------|---------------------|
 | `pubspec.yaml`, `.dart`, Flutter/Riverpod | **`flutter-pro`** |
-| Next.js routes, `next/font`, middleware | **`nextjs-pro`** |
+| Next.js routes, `next/font`, middleware | **`nextjs-15-pro`** |
 | `*.tsx` in CRA/Vite, no Next | **`react-pro`** |
 | `expo`, `react-native` | **`react-native-pro`** |
 
@@ -203,7 +203,7 @@ Details: [references/template-catalog.md](references/template-catalog.md)
 - **Verify:** The output names one workflow and one template with a clear order.
 
 **Input (cross-skill):** "How should I approach adding auth to a Next.js app with API changes?"
-- Route to **`auth-pro`** plus **`nextjs-pro`**, and optionally **`api-design-pro`** if contract changes are substantial.
+- Route to **`auth-pro`** plus **`nextjs-15-pro`**, and optionally **`api-design-pro`** if contract changes are substantial.
 - Clarify ownership before any implementation starts.
 - **Verify:** The decomposition is minimal and covers both app and API concerns without extra routing noise.
 

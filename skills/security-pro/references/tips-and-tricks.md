@@ -1,6 +1,6 @@
 # Tips and tricks
 
-Platform-agnostic practices; stack-specific wiring (Nest guards, Next middleware) belongs in **`nestjs-pro`** / **`nextjs-pro`** etc.
+Platform-agnostic practices; stack-specific wiring (Nest guards, Next middleware) belongs in **`nestjs-pro`** / **`nextjs-15-pro`** etc.
 
 ## Authentication and sessions
 

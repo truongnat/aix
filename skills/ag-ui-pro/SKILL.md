@@ -34,7 +34,7 @@ Use the official [AG-UI specification](https://docs.ag-ui.com) and [CopilotKit d
 |-------|--------------------------------------|
 | **`ai-integration-pro`** | When designing the agent backend that powers the UI |
 | **`frontend-design-pro`** | When designing the visual aesthetic and component style |
-| **`react-pro`** / **`nextjs-pro`** | When implementing in React / Next.js |
+| **`react-pro`** / **`nextjs-15-pro`** | When implementing in React / Next.js |
 | **`a2a-protocol-pro`** | When the frontend interacts with a multi-agent system |
 | **`auth-pro`** | When the UI needs user authentication and authorization |
 
@@ -52,7 +52,7 @@ Use the official [AG-UI specification](https://docs.ag-ui.com) and [CopilotKit d
 
 - **Backend agent logic** (prompts, tools, RAG, memory) — use **`ai-integration-pro`**.
 - **General frontend design** (aesthetics, layout, accessibility) — use **`frontend-design-pro`**.
-- **Static content rendering** without agent interactivity — use **`react-pro`** / **`nextjs-pro`**.
+- **Static content rendering** without agent interactivity — use **`react-pro`** / **`nextjs-15-pro`**.
 
 ## Required inputs
 
@@ -136,7 +136,7 @@ Details: [references/generative-ui.md](references/generative-ui.md)
 
 - **`ai-integration-pro`** — when designing the agent backend that powers the UI.
 - **`frontend-design-pro`** — when designing the visual aesthetic and component style.
-- **`react-pro`** / **`nextjs-pro`** — when implementing in React / Next.js.
+- **`react-pro`** / **`nextjs-15-pro`** — when implementing in React / Next.js.
 - **`a2a-protocol-pro`** — when the frontend interacts with a multi-agent system.
 - **`auth-pro`** — when the UI needs user authentication and authorization.
 

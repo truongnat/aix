@@ -12,7 +12,7 @@ metadata:
 
 ## Boundary
 
-This skill provides comprehensive backend development guidance for building scalable backend systems using NodeJS, Express, Go, Python, Postgres, GraphQL, REST APIs. It focuses on API scaffolding, database optimization, security implementation, and performance tuning. It does NOT cover frontend development (use react-pro, nextjs-pro), database schema design (use database-specific skills), or infrastructure (use devops-specific skills).
+This skill provides comprehensive backend development guidance for building scalable backend systems using NodeJS, Express, Go, Python, Postgres, GraphQL, REST APIs. It focuses on API scaffolding, database optimization, security implementation, and performance tuning. It does NOT cover frontend development (use react-pro, nextjs-15-pro), database schema design (use database-specific skills), or infrastructure (use devops-specific skills).
 
 ## When to use
 
@@ -26,7 +26,7 @@ Use this skill when:
 - API scaffolding
 
 DO NOT use this skill for:
-- Frontend development (use react-pro, nextjs-pro skills)
+- Frontend development (use react-pro, nextjs-15-pro skills)
 - Database schema design (use database-specific skills)
 - Infrastructure deployment (use ci-cd-pro, docker-pro skills)
 - Mobile backend (use mobile-specific skills)

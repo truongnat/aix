@@ -81,7 +81,7 @@ Create or revise skills so they remain clear, bounded, validated, and consistent
 Input: The user wants a short review note explaining the gap.
 
 Output:
-- Updated existing skill: verification/prompt.md regained the missing operational hook guidance.
+- Updated existing skill: verify-pro/prompt.md regained the missing operational hook guidance.
 - Preserved required headings: yes.
 - Validation rules updated: yes, if the conformance eval needs a new required check.
 

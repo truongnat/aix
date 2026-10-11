@@ -1,13 +1,7 @@
 ---
 name: web-research-pro
-description: >+
-  "Production-grade multi-step web and technical research: verification model (source hierarchy, triangulation), failure modes (single weak source, SEO drift, 404/link rot, fabricated citations), decision trade-offs (depth vs time, KB-first vs web-first, archive vs live), quality guardrails (no invented URLs or benchmarks; uncertainty explicit)."
-
-  Use this skill for **general multi-step research** needing reliable answers from external sources (framework docs, APIs, standards, changelogs, resolving 404s) — or when combining local KB with web verification. For market-analysis deliverables (TAM/SAM/SOM, competitor positioning, GTM briefs) use `market-research-pro` instead; it owns research framing and synthesis for market decisions while this skill owns the search/verify/cite method.
-
-  Use **with** **`repo-tooling-pro`** when the corpus is **this** repo’s KB; **`security-pro`** when sources might touch **secrets** or **unsafe** links; **`planning-pro`** when research informs release decisions.
-
-  Triggers: "search the docs", "official documentation", "404", "source evaluation", "citation", "compare sou
+description: >-
+  Production-grade multi-step web and technical research: source hierarchy, triangulation, handling link rot and SEO drift, no invented URLs or benchmarks. Use for general multi-step research needing reliable external answers — framework docs, APIs, standards, changelogs. For market-analysis deliverables (TAM/SAM/SOM, competitor positioning, GTM briefs) use market-research-pro instead.
 metadata:
   compatible: "claude,cursor,codex,gemini"
   kind: "domain"

@@ -38,7 +38,7 @@ Run after adding, renaming, or substantially editing any skill's frontmatter or 
 Before scoring or naming **framework** skills, resolve **stack context** (see `SKILL.md` — Stack context resolution).
 
 1. **Collect signals**: `pubspec.yaml` / `.dart` → Flutter; `next.config.*` → Next; `package.json` with Vite/CRA and no Next → React web; user-stated stack.
-2. **Filter ineligible skills**: for a Flutter task, do not output `react-pro` or `nextjs-pro` for the **app/UI** layer. For a React SPA task, do not output `flutter-pro` for UI.
+2. **Filter ineligible skills**: for a Flutter task, do not output `react-pro` or `nextjs-15-pro` for the **app/UI** layer. For a React SPA task, do not output `flutter-pro` for UI.
 3. **Optional scoring tweak** (when building a ranked list): add a **stack match bonus** to the domain skill that matches the resolved stack, and **down-rank** skills that are known-wrong stack for the same layer (e.g. `react-pro` when `pubspec.yaml` is present and the task is `lib/**` UI).
 
 **Example (correct):** "Fix Riverpod provider in `lib/features/calendar/...`" + `pubspec.yaml` in repo → top app skill **`flutter-pro`**, plus `testing-pro` if tests are in `test/**`.

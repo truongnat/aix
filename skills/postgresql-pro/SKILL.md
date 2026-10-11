@@ -38,7 +38,7 @@ Use official [PostgreSQL documentation](https://www.postgresql.org/docs/) for ve
 | Skill | When to combine |
 |-------|----------------|
 | **`sql-data-access-pro`** | SQLite locally; SQL portability vs Postgres |
-| **`nestjs-pro`** / **`nextjs-pro`** | ORM, request-scoped connections, serverless pools |
+| **`nestjs-pro`** / **`nextjs-15-pro`** | ORM, request-scoped connections, serverless pools |
 | **`deployment-pro`** | Migration windows, secrets, rollout |
 | **`security-pro`** | Threat model beyond DB roles |
 | **`auth-pro`** | Tokens and identity feeding RLS context |

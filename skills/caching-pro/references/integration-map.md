@@ -4,7 +4,7 @@
 |-------|------|
 | **`deployment-pro`** | CDN deploy, cache purge, rollout, circuit breaker rollout. |
 | **`network-infra-pro`** | Edge, TLS, LB cache headers path, partition behavior. |
-| **`nextjs-pro`** / **`react-pro`** | Data cache, SWR/React Query, RSC cache. |
+| **`nextjs-15-pro`** / **`react-pro`** | Data cache, SWR/React Query, RSC cache. |
 | **`postgresql-pro`** | Query shape, replicas, read-after-write vs replica lag. |
 | **`sql-data-access-pro`** | Fix queries before masking with cache. |
 | **`performance-tuning-pro`** | End-to-end latency and profiling. |

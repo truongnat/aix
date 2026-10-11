@@ -32,13 +32,13 @@ Use platform **Human Interface Guidelines** and **Material Design** (or your cho
 
 ## Boundary
 
-**`design-system-pro`** owns **what** should look and behave like at the UX/UI layer: tokens, patterns, themes, a11y baselines, data presentation ethics, governance. Framework skills (**`react-pro`**, **`nextjs-pro`**, **`react-native-pro`**, …) own **how** to implement components and APIs. **`testing-pro`** owns **automated** visual and a11y gates in CI.
+**`design-system-pro`** owns **what** should look and behave like at the UX/UI layer: tokens, patterns, themes, a11y baselines, data presentation ethics, governance. Framework skills (**`react-pro`**, **`nextjs-15-pro`**, **`react-native-pro`**, …) own **how** to implement components and APIs. **`testing-pro`** owns **automated** visual and a11y gates in CI.
 
 ## Related skills (this repo)
 
 | Skill | When to combine with `design-system-pro` |
 |-------|----------------------------------------|
-| **`react-pro`** / **`nextjs-pro`** | Implementing components, CSS/Tailwind, App Router layouts |
+| **`react-pro`** / **`nextjs-15-pro`** | Implementing components, CSS/Tailwind, App Router layouts |
 | **`mobile-design-pro`** | Touch targets, safe areas, mobile navigation — **before** copying web pixels to native |
 | **`react-native-pro`** / **`flutter-pro`** | RN/Flutter APIs, navigation, lists, performance |
 | **`electron-pro`** / **`tauri-pro`** | Desktop windowing, shortcuts, dense layouts |
@@ -59,7 +59,7 @@ Use platform **Human Interface Guidelines** and **Material Design** (or your cho
 
 ## When not to use
 
-- **Pure framework/API implementation** with no UX/system question — **`react-pro`** / **`nextjs-pro`** / …
+- **Pure framework/API implementation** with no UX/system question — **`react-pro`** / **`nextjs-15-pro`** / …
 - **SEO/CWV audit as the main question** — **`seo-pro`** (pair when marketing + DS overlap).
 - **Accessibility legal interpretation** — this skill gives **product baseline**; compliance scope needs human/legal review.
 
@@ -198,7 +198,7 @@ Details: [references/versions.md](references/versions.md)
 - **Verify:** The visual direction still supports hierarchy and accessibility on target devices.
 
 **Input (cross-skill):** "We need a design system for a copilot interface implemented in Next.js."
-- Pair **`nextjs-pro`** for implementation mechanics and let **`design-system-pro`** define streaming, citation, and tool-state patterns.
+- Pair **`nextjs-15-pro`** for implementation mechanics and let **`design-system-pro`** define streaming, citation, and tool-state patterns.
 - Keep system language and framework wiring clearly separated.
 - **Verify:** The system spec can be translated into components without inventing new UX rules mid-build.
 

@@ -1,13 +1,19 @@
 ---
 name: market-research-pro
-description: >+
-  "Production-grade market research: evidence and sizing system model, failure modes (single-source TAM, spurious precision, category mismatch, stale data), decision trade-offs (top-down vs bottom-up, breadth vs depth, speed vs rigor), quality guardrails (no fabricated market sizes; cite source+date+geo)."
+description: >-
+  Production-grade market research: evidence and sizing system model, failure
+  modes (single-source TAM, spurious precision, category mismatch, stale data),
+  decision trade-offs (top-down vs bottom-up, breadth vs depth, speed vs rigor),
+  quality guardrails (no fabricated market sizes; cite source+date+geo).
 
-  Use this skill when the question is about **markets**: validate market opportunity, compare competitors, estimate market size with assumptions, identify ICP segments, prioritize country/vertical expansion, or produce an executive-style market brief with citations and explicit confidence levels. For general-purpose source gathering and citation verification on any topic, use `web-research-pro` instead.
+  Use when the question is about markets: validate market opportunity, compare
+  competitors, estimate market size with assumptions, identify ICP segments,
+  prioritize expansion, or produce a market brief with citations and confidence
+  levels. For general-purpose source gathering and citation verification, use
+  `web-research-pro` instead.
 
-  Use **with** **`web-research-pro`** for official and current external sources, **`business-analysis-pro`** to convert findings into requirements/roadmaps, and **`data-analysis-pro`** when survey or tabular datasets need numeric analysis. This skill (`market-research-pro`) owns **research framing and synthesis quality**; other skills own deep implementation or analytics details.
-
-  Triggers: "market research", "TAM", "SAM", "SOM", "competi
+  Triggers: "market research", "TAM", "SAM", "SOM", "competitive analysis",
+  "ICP", "market sizing", "market brief".
 metadata:
   compatible: "claude,cursor,codex,gemini"
   kind: "domain"

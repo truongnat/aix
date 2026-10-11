@@ -24,7 +24,7 @@ Treat **provider release notes** and **library majors** as primary sources; this
 
 ## Auth.js / NextAuth.js
 
-- **Major migrations** rename exports and session callbacks; JWT vs database session strategy affects **SSR** cookie behavior — follow official migration guide for your major and pair with `**nextjs-pro`**.
+- **Major migrations** rename exports and session callbacks; JWT vs database session strategy affects **SSR** cookie behavior — follow official migration guide for your major and pair with `**nextjs-15-pro`**.
 - **OAuth provider configs** drift with IdP dashboards; duplicate config in code and portal must stay aligned.
 
 ## Passport.js ecosystem

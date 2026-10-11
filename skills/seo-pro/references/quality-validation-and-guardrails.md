@@ -31,4 +31,4 @@
 
 - [ ] Duplicate URL strategy stated — **`technical-seo-and-crawl.md`**.
 - [ ] Measurement plan (GSC segments, dates) — **`seo-flow-and-lifecycle.md`**.
-- [ ] Framework implementation delegated with hooks — **`nextjs-pro`** / **`react-pro`**.
+- [ ] Framework implementation delegated with hooks — **`nextjs-15-pro`** / **`react-pro`**.

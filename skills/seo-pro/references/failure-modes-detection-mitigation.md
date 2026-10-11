@@ -21,7 +21,7 @@
 
 | Failure mode | Detection | Mitigation |
 |--------------|-----------|------------|
-| **Empty shell to bot** | Fetch+render diff | SSR/SSG hooks — **`nextjs-pro`**, **`react-pro`** |
+| **Empty shell to bot** | Fetch+render diff | SSR/SSG hooks — **`nextjs-15-pro`**, **`react-pro`** |
 
 ---
 

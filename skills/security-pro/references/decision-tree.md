@@ -39,5 +39,5 @@ Backend fetches user-supplied URL or webhook callback?
 
 ```
 Fix needs framework wiring (Guard, middleware, RLS policy)?
-└── security-pro defines the rule; nestjs-pro / nextjs-pro / postgresql-pro implements
+└── security-pro defines the rule; nestjs-pro / nextjs-15-pro / postgresql-pro implements
 ```

@@ -10,4 +10,4 @@
 
 ## App frameworks
 
-- Next.js **fetch** cache defaults changed across majors — align with **`nextjs-pro`**.
+- Next.js **fetch** cache defaults changed across majors — align with **`nextjs-15-pro`**.

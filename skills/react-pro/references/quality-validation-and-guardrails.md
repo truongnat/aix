@@ -13,7 +13,7 @@
 
 - Confirm **`react` / `react-dom`** major from `package.json` before suggesting APIs (e.g. `use`, `useEffectEvent`, concurrent defaults).
 - **Do not invent** hook names, compiler directives, or framework-specific file conventions — cite [react.dev](https://react.dev/) or the meta-framework docs.
-- Next.js / Remix **layer rules** on top of React — defer to **`nextjs-pro`** when uncertain.
+- Next.js / Remix **layer rules** on top of React — defer to **`nextjs-15-pro`** when uncertain.
 
 ---
 

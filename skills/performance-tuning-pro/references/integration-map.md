@@ -8,7 +8,7 @@
 | **`algorithm-pro`** | Complexity | Picking lower-complexity structures after profiling | Formal proofs |
 | **`testing-pro`** | Regressions | Perf budgets, regression scenarios | Test layout, fixtures |
 | **`repo-tooling-pro`** | Repeatability | Scripted benchmarks / CI hooks | Pipeline wiring |
-| **`nestjs-pro`** / **`nextjs-pro`** | Framework hot paths | Measurement placement, tracing hooks | Framework APIs, RSC/server split |
+| **`nestjs-pro`** / **`nextjs-15-pro`** | Framework hot paths | Measurement placement, tracing hooks | Framework APIs, RSC/server split |
 | **`websocket-pro`** / **`stream-rtc-pro`** | Real-time backpressure | Latency under sustained streams | Protocol semantics |
 | **`docker-pro`** / **`deployment-pro`** | Runtime limits | CPU/mem impact on tail latency | Orchestration, rollout |
 

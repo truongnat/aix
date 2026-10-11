@@ -1,57 +1,73 @@
 ---
 name: test-data-generator
-description: "Sinh dữ liệu test giả cho form, API hoặc database seed phục vụ tester manual. Dùng khi cần tên, email, số điện thoại, địa chỉ Việt Nam, mã số, ngày tháng, dữ liệu hợp lệ/không hợp lệ, boundary, dữ liệu Unicode, dữ liệu dài hoặc bộ dữ liệu theo locale mà không dùng thông tin cá nhân thật."
+description: "Generate fake test data for forms, API requests, or database seeding. Use when a manual tester needs names, emails, phone numbers, addresses, codes, dates — valid, invalid, boundary, Unicode, extra-long, or locale-specific sets — without using anyone's real personal information."
+metadata:
+  kind: "domain"
+  version: "0.2.0"
+  tags: "qa,test-data,faker,data-generation"
 ---
 
 # Test Data Generator
 
-## Quy ước timestamp và artifact
-Ngay khi bắt đầu chạy Skill, lấy timestamp hiện tại theo timezone của user/project, format `YYYY-MM-DD HH:mm:ss Z`.
+## Timestamp and artifact convention
+As soon as this skill starts, capture the current timestamp in the user's/project's timezone, formatted `YYYY-MM-DD HH:mm:ss Z`.
 
-Nếu có tạo file dữ liệu, lưu theo cấu trúc:
+If data files are created, store them under:
 
 ```text
 artifacts/YYYY-MM-DD/test-data-generator/HHmmss-data-purpose/
 ```
 
-Mỗi artifact phải ghi `Session timestamp`, mục đích dữ liệu, field list, rule và dữ liệu đã sinh.
+Every artifact must record `Session timestamp`, data purpose, field list, rules, and the generated data.
 
-## Mục tiêu
-Tạo dữ liệu test giả, rõ mục đích, không dùng thông tin cá nhân thật, có cả valid và invalid data.
+## Goal
+Produce clearly-fake, purpose-labeled test data — covering valid, invalid, boundary, and locale-specific shapes — with zero real personal information.
 
-## Quy trình
+## Process
 
-### Bước 1 - Xác định field và rule
-Hỏi hoặc đọc từ input:
+### Step 1 — Identify fields and rules
+Ask or extract from input:
+- Field names, data types, required/optional.
+- Format, min/max, enum values, uniqueness constraints.
+- **Locale** — default `vi-VN` if the user doesn't specify, but always state which locale was assumed.
+- How many records.
+- Purpose: form testing, API request bodies, boundary checks, negative testing, CSV import, DB seed.
 
-- Tên field, kiểu dữ liệu, required/optional.
-- Format, min/max, enum, unique constraint.
-- Locale: mặc định `vi-VN` nếu user không nói.
-- Số lượng record cần tạo.
-- Mục đích: form test, API request, boundary, negative, import CSV.
+If the target system has specific rules (e.g. "phone must start with 09x"), get them — fake data that violates the real format is useless for valid-path testing.
 
-### Bước 2 - Sinh dữ liệu theo nhóm
+### Step 2 — Generate by group
+- **Valid**: well-formed, readable, varied.
+- **Invalid**: wrong format, missing required, wrong type, over limits.
+- **Boundary**: min, max, min−1, max+1, empty, extremely long.
+- **Locale**: Vietnamese names with diacritics, fake VN phone numbers, fake VN addresses.
+- **Unicode/special**: emoji, special characters, leading/trailing whitespace, accented characters.
 
-- Valid data: dữ liệu hợp lệ, dễ đọc.
-- Invalid data: sai format, thiếu required, sai type, vượt giới hạn.
-- Boundary data: min, max, min-1, max+1, rỗng, rất dài.
-- Locale data: tiếng Việt có dấu, số điện thoại VN giả, địa chỉ VN giả.
-- Unicode/special: emoji, ký tự đặc biệt, khoảng trắng đầu/cuối.
-
-## Format output
+## Output format
 
 ```text
 Session timestamp: [YYYY-MM-DD HH:mm:ss Z]
-Purpose: [form/API/import/...]
-Locale: [vi-VN/en-US/...]
+Purpose: [form / API / import / ...]
+Locale: [vi-VN / en-US / ...]
+Rules applied: [key constraints used]
 
-| Case | Field | Value | Valid? | Mục đích |
+| Case | Field | Value | Valid? | Purpose |
 |---|---|---|---|---|
+| valid-01 | email | nguyen.an@example.com | yes | happy path |
+| invalid-03 | email | not-an-email | no | format validation |
+| boundary-01 | age | 17 (min-1) | no | boundary below |
+| unicode-01 | fullName | Nguyễn Thị Hồng Nhung 🌸 | yes | diacritics + emoji |
 ```
 
-Nếu user cần CSV hoặc JSON, tạo file tương ứng trong artifact folder.
+When the user needs CSV or JSON, produce the matching file in the artifact folder — CSV with proper escaping for commas/quotes/newlines.
 
-## Quy tắc an toàn
-- Không tạo dữ liệu trông như thông tin cá nhân thật của người thật.
-- Email nên dùng domain an toàn như `example.com`.
-- Số điện thoại, địa chỉ, mã định danh phải là dữ liệu giả và ghi rõ là fake.
+## Safety rules
+- Never generate data that could be a real person's actual info — no real phone numbers, ID numbers, or plausible full identity sets.
+- Emails: use safe domains — `example.com`, `example.org`, `*.test`.
+- Phones/addresses/ID numbers: visibly fake (e.g. `0900000xxx` patterns, fictional streets) and labeled as fake.
+- If the user asks for data that mimics a specific real person/record, decline that part and offer structurally-equivalent fake data instead.
+
+## Anti-patterns
+- Generating only valid data — the invalid/boundary rows are usually the point of the request.
+- Data that looks real but doesn't match the system's actual constraints (e.g. 10-digit phone when the system requires 11).
+- Mixing valid and invalid rows without labeling — the `Valid?`/`Purpose` columns are what make the set usable.
+- "Sample" strings like `test test test` or `asdf` — lazy data can't exercise real validation or expose display bugs.

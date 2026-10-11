@@ -5,7 +5,7 @@ description: >+
 
   Use this skill for cloud/on-prem topology, connectivity diagnosis, mTLS east-west, hardening service-to-service paths, and rollout safety for network changes.
 
-  Use **with** **`deployment-pro`**, **`security-pro`**, **`caching-pro`**, **`nextjs-pro`**, **`nestjs-pro`**, **`microservices-pro`**, **`postgresql-pro`**, **`ci-cd-pro`**, **`docker-pro`**.
+  Use **with** **`deployment-pro`**, **`security-pro`**, **`caching-pro`**, **`nextjs-15-pro`**, **`nestjs-pro`**, **`microservices-pro`**, **`postgresql-pro`**, **`ci-cd-pro`**, **`docker-pro`**.
 
   Triggers: "network", "infra", "VPC", "subnet", "NAT", "load balancer", "reverse proxy", "ingress", "egress", "DNS", "TLS", "service mesh", "connectivity", "latency", "firewall", "security group", "NACL", "MTU", "asy
 metadata:
@@ -35,7 +35,7 @@ Use [AWS VPC](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vp
 |-------|----------------|
 | **`deployment-pro`** | Canary/rollback for DNS/LB/mesh changes |
 | **`security-pro`** | Zero trust, WAF posture, segmentation policy |
-| **`nextjs-pro`** | Edge/CDN/cache interaction |
+| **`nextjs-15-pro`** | Edge/CDN/cache interaction |
 | **`nestjs-pro`** | Proxy timeouts, upstream pools |
 | **`caching-pro`** | CDN vs origin headers |
 | **`microservices-pro`** | East-west architecture |

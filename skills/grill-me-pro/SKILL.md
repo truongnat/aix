@@ -34,7 +34,7 @@ Interview the user relentlessly about a plan or design — **one question at a t
 | **`to-prd-pro`** | Capture resolved decisions as a PRD after the interview |
 | **`discussing-pro`** | Clarify goals and explore alternatives before narrowing |
 | **`business-analysis-pro`** | Validate user stories and domain model |
-| **`clean-code-architecture-pro`** | Stress-test architectural decisions |
+| **`clean-architecture`** | Stress-test architectural decisions |
 
 ## When to use
 

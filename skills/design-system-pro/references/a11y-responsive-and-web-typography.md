@@ -39,4 +39,4 @@
 ## Relationship to other skills
 
 - **`mobile-design-pro`** — **Native** iOS/Android patterns, safe areas, platform navigation — not the same as CSS `@media` alone.
-- **`react-pro`** / **`nextjs-pro`** — Implementation of `prefers-reduced-motion`, `next/font`, CSS modules, Tailwind breakpoints.
+- **`react-pro`** / **`nextjs-15-pro`** — Implementation of `prefers-reduced-motion`, `next/font`, CSS modules, Tailwind breakpoints.

@@ -12,10 +12,9 @@ description: >-
   prod-only mitigation), observability-linked deploy markers, OIDC/supply-chain
   pointers — cross-stack orchestration narrative, not vendor-docs paste."
 
-  Use when designing pipelines, promoting builds, choosing rollout strategies,
-  debugging failed deploys, zero-downtime migrations, rollback, GitOps drift,
-  multi-region concerns — on any platform. For Vercel-specific config
-  (`vercel.json`, Edge Runtime, ISR, Vercel KV/Postgres/Blob) use
+  Use when designing pipelines, promoting builds, choosing rollout strategy,
+  debugging failed deploys, zero-downtime migrations, rollback, GitOps drift, or
+  multi-region — any platform. For Vercel-specific config use
   `vercel-deployment-pro` instead.
 metadata:
   compatible: 'claude,cursor,codex,gemini'
@@ -48,7 +47,7 @@ Use your cloud or platform **official docs** for exact syntax; this skill encode
 | **`network-infra-pro`** | LB, DNS, TLS, multi-region traffic |
 | **`caching-pro`** | CDN purge, cache busting with deploy |
 | **`api-design-pro`** | Backward-compatible contracts during rollouts |
-| **`nextjs-pro`** / **`nestjs-pro`** | Framework deploy targets |
+| **`nextjs-15-pro`** / **`nestjs-pro`** | Framework deploy targets |
 | **`electron-pro`** / **`tauri-pro`** | Desktop release channels |
 
 ## When to use
@@ -179,7 +178,7 @@ Details: [references/versions.md](references/versions.md)
 - **Verify:** Old and new app versions both operate during rollout and rollback window.
 
 **Input (cross-skill):** "A Next.js release shows new HTML but stale JS in some regions."
-- Pair **`caching-pro`** and **`nextjs-pro`** to reason about asset versioning and CDN/router behavior.
+- Pair **`caching-pro`** and **`nextjs-15-pro`** to reason about asset versioning and CDN/router behavior.
 - Fix the release ordering and cache strategy instead of masking the issue with blanket purges.
 - **Verify:** HTML and asset versions stay aligned across regions after promotion.
 

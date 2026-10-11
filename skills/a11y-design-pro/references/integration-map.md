@@ -8,7 +8,7 @@ a11y-design-pro
 │     When: Color contrast violations require updating design tokens
 │     Handoff: Failing color pairs + required replacement values
 │
-├── → react-pro / nextjs-pro
+├── → react-pro / nextjs-15-pro
 │     When: ARIA patterns need to be implemented as React components/hooks
 │     Handoff: ARIA pattern spec from references/aria-patterns.md
 │

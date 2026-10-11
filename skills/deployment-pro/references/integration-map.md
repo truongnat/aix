@@ -9,7 +9,7 @@
 | **`git-operations-pro`** | Tags, release branches, merge hygiene |
 | **`ci-cd-pro`** | Workflow graph, concurrency, reusable deploy jobs |
 | **`network-infra-pro`** | LB, DNS, TLS, topology for traffic shift / multi-region |
-| **`nextjs-pro`** / **`nestjs-pro`** | Framework-specific deploy targets (Vercel, Node containers) |
+| **`nextjs-15-pro`** / **`nestjs-pro`** | Framework-specific deploy targets (Vercel, Node containers) |
 | **`electron-pro`** / **`tauri-pro`** | Desktop release channels and auto-update |
 | **`caching-pro`** | CDN cache invalidation, rollout interaction with edge cache |
 | **`api-design-pro`** | Contract compatibility across rolling deploys |

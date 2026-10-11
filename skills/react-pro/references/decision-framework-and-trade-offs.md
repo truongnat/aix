@@ -26,7 +26,7 @@ Use **`decision-tree.md`** for quick branches.
 
 | Source | Fit |
 |--------|-----|
-| **URL / server** | Shareable truth; avoid duplicating in client without reason — **`nextjs-pro`** |
+| **URL / server** | Shareable truth; avoid duplicating in client without reason — **`nextjs-15-pro`** |
 | **Colocated** | Leaf UI toggles |
 | **Store (Zustand/Redux)** | Cross-cutting client concerns; document boundaries |
 

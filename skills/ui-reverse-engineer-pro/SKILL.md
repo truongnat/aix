@@ -37,7 +37,7 @@ Transform images, screenshots, mockups, or reference UIs into clean, maintainabl
 **Defers to:**
 - **`design-system-pro`** — Design tokens, component library architecture, design system implementation
 - **`react-pro`** — React-specific implementation, hooks, state management, SSR/hydration
-- **`nextjs-pro`** — Next.js-specific patterns, routing, Server Components, RSC
+- **`nextjs-15-pro`** — Next.js-specific patterns, routing, Server Components, RSC
 - **`react-native-pro`** — React Native-specific layout, safe areas, mobile UX patterns
 - **`flutter-pro`** — Flutter widget trees, platform-specific considerations
 - **`image-processing-pro`** — Raster image manipulation (resize, crop, format conversion) before analysis
@@ -46,7 +46,7 @@ Transform images, screenshots, mockups, or reference UIs into clean, maintainabl
 **Related skills (this repo):**
 - `design-system-pro` — Design system architecture and token systems
 - `react-pro` — React implementation patterns
-- `nextjs-pro` — Next.js-specific UI patterns
+- `nextjs-15-pro` — Next.js-specific UI patterns
 - `react-native-pro` — Mobile-specific UI considerations
 - `flutter-pro` — Flutter widget architecture
 

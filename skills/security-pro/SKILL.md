@@ -34,14 +34,14 @@ Use [OWASP](https://owasp.org/) (Top 10, ASVS, cheat sheets) and your org’s po
 
 ## Boundary
 
-**`security-pro`** owns **threat framing**, **control selection**, **cross-cutting AppSec/network patterns**, and **assessment ethics** across all surfaces. **`api-security-pro`** owns **API-surface depth** (OWASP API Top 10, BOLA/BFLA, OAuth2/JWT/rate-limit specifics) when an API audit is the primary deliverable. **`nestjs-pro`** / **`nextjs-pro`** / **`postgresql-pro`** own **framework-specific implementation**. **`auth-pro`** owns **identity protocol and provider integration** detail when it dominates. **`network-infra-pro`** owns **VPC/firewall design** as primary deliverable; **`security-pro`** contributes **threats and control intent**.
+**`security-pro`** owns **threat framing**, **control selection**, **cross-cutting AppSec/network patterns**, and **assessment ethics** across all surfaces. **`api-security-pro`** owns **API-surface depth** (OWASP API Top 10, BOLA/BFLA, OAuth2/JWT/rate-limit specifics) when an API audit is the primary deliverable. **`nestjs-pro`** / **`nextjs-15-pro`** / **`postgresql-pro`** own **framework-specific implementation**. **`auth-pro`** owns **identity protocol and provider integration** detail when it dominates. **`network-infra-pro`** owns **VPC/firewall design** as primary deliverable; **`security-pro`** contributes **threats and control intent**.
 
 ## Related skills (this repo)
 
 | Skill | When to combine |
 |-------|----------------|
 | **`nestjs-pro`** | Guards, ValidationPipe, HTTP error hygiene |
-| **`nextjs-pro`** | Middleware, cookies, CSP, Server Actions, `NEXT_PUBLIC_` |
+| **`nextjs-15-pro`** | Middleware, cookies, CSP, Server Actions, `NEXT_PUBLIC_` |
 | **`postgresql-pro`** | RLS, roles, `BYPASSRLS` |
 | **`api-design-pro`** | Abuse-resistant API shape |
 | **`auth-pro`** | OAuth/OIDC/session flows |
@@ -67,7 +67,7 @@ Do **not** duplicate framework wiring — state **invariant** here, **implementa
 
 - **Illegal or unauthorized** exploitation instructions — refuse; offer **defensive** and **authorized** alternatives — **`quality-validation-and-guardrails.md`**.
 - **Pure legal/compliance certification** as sole topic — involve legal counsel; this skill provides technical control mapping only.
-- **Framework-only** “how do I add a route” without security angle — lead with **`nestjs-pro`** / **`nextjs-pro`**.
+- **Framework-only** “how do I add a route” without security angle — lead with **`nestjs-pro`** / **`nextjs-15-pro`**.
 
 ## Required inputs
 

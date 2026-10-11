@@ -5,7 +5,7 @@ description: >+
 
   Use this skill when the user asks about organic search visibility, Google Search Console, Bing Webmaster, robots.txt, XML sitemaps, canonical and hreflang, meta titles/descriptions, structured data (JSON-LD), E-E-A-T, internal linking, JavaScript SEO, duplicate content, pagination, international SEO, or Core Web Vitals vs SEO.
 
-  Use **with** **`nextjs-pro`** (Metadata API, `sitemap.ts`, `robots.ts`, RSC/SSR for crawlable HTML), **`react-pro`** (SPA rendering constraints, document head), **`deployment-pro`** (CDN, caching, TTFB). This skill (`seo-pro`) owns **search strategy and SEO mechanics**; framework skills own **framework-specific implementation**.
+  Use **with** **`nextjs-15-pro`** (Metadata API, `sitemap.ts`, `robots.ts`, RSC/SSR for crawlable HTML), **`react-pro`** (SPA rendering constraints, document head), **`deployment-pro`** (CDN, caching, TTFB). This skill (`seo-pro`) owns **search strategy and SEO mechanics**; framework skills own **framework-specific implementation**.
 
   Triggers: "SEO", "organic search", "Google Search Console", "
 metadata:
@@ -27,13 +27,13 @@ Use [Google Search Central](https://developers.google.com/search/docs) and [Bing
 
 ## Boundary
 
-**`seo-pro`** owns **search strategy**, **technical/on-page SEO patterns**, **measurement framing**, and **lifecycle**. **`nextjs-pro`** / **`react-pro`** own **implementation** of metadata, routing, and rendering. **`deployment-pro`** owns **CDN/edge** operations as primary topic.
+**`seo-pro`** owns **search strategy**, **technical/on-page SEO patterns**, **measurement framing**, and **lifecycle**. **`nextjs-15-pro`** / **`react-pro`** own **implementation** of metadata, routing, and rendering. **`deployment-pro`** owns **CDN/edge** operations as primary topic.
 
 ## Related skills (this repo)
 
 | Skill | When to combine with `seo-pro` |
 |-------|--------------------------------|
-| **`nextjs-pro`** | `generateMetadata`, `sitemap.ts` / `robots.ts`, App Router SSR/SSG, URL structure |
+| **`nextjs-15-pro`** | `generateMetadata`, `sitemap.ts` / `robots.ts`, App Router SSR/SSG, URL structure |
 | **`react-pro`** | Client-heavy apps; head management; hydration and crawlable output |
 | **`deployment-pro`** | CDN, edge caching, headers affecting TTFB and global crawl |
 | **`testing-pro`** | Contract or smoke tests for critical meta/HTTP status in CI (optional) |

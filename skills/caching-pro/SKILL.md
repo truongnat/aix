@@ -5,7 +5,7 @@ description: >+
 
   Use when speeding reads, cutting DB/API load, designing Redis or in-memory tiers, troubleshooting stale data, reviewing cache safety, or aligning HTTP/CDN behavior with correctness.
 
-  Use with nextjs-pro, postgresql-pro, sql-data-access-pro, deployment-pro, security-pro, api-design-pro as needed.
+  Use with nextjs-15-pro, postgresql-pro, sql-data-access-pro, deployment-pro, security-pro, api-design-pro as needed.
 
   Triggers: "caching", "cache strategy", "Redis", "TTL", "
 metadata:
@@ -27,13 +27,13 @@ Use official [Redis docs](https://redis.io/docs/latest/) and [HTTP caching docs 
 
 ## Boundary
 
-**`caching-pro`** owns **cache architecture**, **correctness boundaries** (staleness, isolation), **invalidation strategy**, **resilience** when cache or origin struggles, and **capacity/cost framing**. Paired skills own **framework cache APIs** (**`nextjs-pro`**), **SQL tuning** (**`postgresql-pro`**, **`sql-data-access-pro`**), **deployment mechanics** (**`deployment-pro`**), and **abuse/threat models** (**`security-pro`**).
+**`caching-pro`** owns **cache architecture**, **correctness boundaries** (staleness, isolation), **invalidation strategy**, **resilience** when cache or origin struggles, and **capacity/cost framing**. Paired skills own **framework cache APIs** (**`nextjs-15-pro`**), **SQL tuning** (**`postgresql-pro`**, **`sql-data-access-pro`**), **deployment mechanics** (**`deployment-pro`**), and **abuse/threat models** (**`security-pro`**).
 
 ## Related skills (this repo)
 
 | Skill | When to combine with `caching-pro` |
 |-------|------------------------------------|
-| **`nextjs-pro`** | App Router, ISR, RSC, framework-level cache controls |
+| **`nextjs-15-pro`** | App Router, ISR, RSC, framework-level cache controls |
 | **`postgresql-pro`** | Query shape, replicas, consistency vs read scaling |
 | **`sql-data-access-pro`** | Fix data access before masking with cache |
 | **`deployment-pro`** | Rollout, canary, purge, feature-flagged cache changes |
@@ -205,7 +205,7 @@ Details: [references/anti-patterns.md](/skills/caching-pro/references/anti-patte
 
 ### Cross-skill handoffs (summary)
 
-**`deployment-pro`**, **`network-infra-pro`**, **`nextjs-pro`**, **`postgresql-pro`**, **`security-pro`**, **`api-design-pro`**, **`performance-tuning-pro`**.
+**`deployment-pro`**, **`network-infra-pro`**, **`nextjs-15-pro`**, **`postgresql-pro`**, **`security-pro`**, **`api-design-pro`**, **`performance-tuning-pro`**.
 
 Details: [references/integration-map.md](/skills/caching-pro/references/integration-map.md)
 
@@ -267,7 +267,7 @@ Details: [references/versions.md](/skills/caching-pro/references/versions.md)
 ### 3 — Cross-skill
 
 **Input:** Next.js global HTML at CDN.  
-**Expected output:** **`nextjs-pro`** semantics + **`caching-pro`** headers/purge + **`security-pro`** if personalized.
+**Expected output:** **`nextjs-15-pro`** semantics + **`caching-pro`** headers/purge + **`security-pro`** if personalized.
 
 ## Checklist before calling the skill done
 

@@ -33,7 +33,7 @@ Use [WCAG 2.2](https://www.w3.org/WAI/WCAG22/quickref/), [ARIA Authoring Practic
 | Skill | When to combine with **`a11y-design-pro`** |
 |-------|---------------------------------------------|
 | **`design-system-pro`** | When fixing contrast requires updating design tokens |
-| **`react-pro`** / **`nextjs-pro`** | When implementing ARIA in React components |
+| **`react-pro`** / **`nextjs-15-pro`** | When implementing ARIA in React components |
 | **`ai-design-pro`** | When AI-generated color palettes must pass WCAG contrast |
 | **`testing-pro`** | When integrating axe-core into a test suite |
 | **`frontend-design-pro`** | When accessibility fixes affect responsive layout |

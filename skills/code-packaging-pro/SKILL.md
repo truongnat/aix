@@ -39,7 +39,7 @@ Use **[Python packaging](https://packaging.python.org/)** and **GitHub Actions**
 | **`ci-cd-pro`** | Workflow patterns, concurrency, reusable workflows |
 | **`docker-pro`** | Advanced BuildKit, layer optimization |
 | **`javascript-pro`** / **`cli-pro`** | npm publish, `bin` entry when shipping CLI |
-| **`nestjs-pro`** / **`nextjs-pro`** | Framework-specific container or output |
+| **`nestjs-pro`** / **`nextjs-15-pro`** | Framework-specific container or output |
 
 ## When to use
 

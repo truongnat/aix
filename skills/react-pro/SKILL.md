@@ -29,17 +29,17 @@ metadata:
 
 Skill text is **English**; answer in the user’s preferred language when rules or the conversation specify it.
 
-Use official [React](https://react.dev/) docs for API truth; this skill encodes **rendering discipline**, **effect correctness**, **accessibility defaults**, and **SSR/hydration awareness** — not framework-specific routing or server cache (see **`nextjs-pro`**). Confirm **React major**, **meta-framework** (Vite/Next/Remix), and **SSR vs SPA** when known.
+Use official [React](https://react.dev/) docs for API truth; this skill encodes **rendering discipline**, **effect correctness**, **accessibility defaults**, and **SSR/hydration awareness** — not framework-specific routing or server cache (see **`nextjs-15-pro`**). Confirm **React major**, **meta-framework** (Vite/Next/Remix), and **SSR vs SPA** when known.
 
 ## Boundary
 
-**`react-pro`** owns **React component model** (hooks, JSX, composition, web DOM semantics, client-side performance patterns, hydration on the web). **`nextjs-pro`** owns **Next.js App Router**, **RSC**, **`fetch` caching**, **middleware**, and **deployment-shaped** React. **`react-native-pro`** owns **React Native / Expo** platform APIs. **`testing-pro`** owns **test pyramid and CI** beyond component examples.
+**`react-pro`** owns **React component model** (hooks, JSX, composition, web DOM semantics, client-side performance patterns, hydration on the web). **`nextjs-15-pro`** owns **Next.js App Router**, **RSC**, **`fetch` caching**, **middleware**, and **deployment-shaped** React. **`react-native-pro`** owns **React Native / Expo** platform APIs. **`testing-pro`** owns **test pyramid and CI** beyond component examples.
 
 ## Related skills (this repo)
 
 | Skill | When to combine |
 |-------|----------------|
-| **`nextjs-pro`** | RSC, `"use client"`, Server Actions, Next data/cache |
+| **`nextjs-15-pro`** | RSC, `"use client"`, Server Actions, Next data/cache |
 | **`react-native-pro`** | RN lists, native modules, EAS |
 | **`testing-pro`** | RTL, Vitest/Jest, Playwright, CI |
 | **`typescript-pro`** | TSX types, generics, strictness |
@@ -56,7 +56,7 @@ Use official [React](https://react.dev/) docs for API truth; this skill encodes 
 
 ## When not to use
 
-- **Next.js-specific** routing, `fetch` revalidation, middleware — **`nextjs-pro`**.
+- **Next.js-specific** routing, `fetch` revalidation, middleware — **`nextjs-15-pro`**.
 - **React Native** screens and native build issues — **`react-native-pro`**.
 - **Pure backend** API design — **`api-design-pro`** / **`nestjs-pro`** (pair for client consumption).
 
@@ -149,7 +149,7 @@ Details: [references/decision-framework-and-trade-offs.md](references/decision-f
 
 **Input (cross-skill):** "Server Component fetches data but I need client interactivity."
 - **Boundary:** Keep data fetching in the Server Component; pass data as props to a `"use client"` child that owns the interactive state.
-- Pair **`nextjs-pro`** for RSC/Actions specifics, **`typescript-pro`** for typed props across the boundary.
+- Pair **`nextjs-15-pro`** for RSC/Actions specifics, **`typescript-pro`** for typed props across the boundary.
 - **Verify:** RSC payload in Network tab, no unnecessary client bundle increase.
 
 ## Checklist before calling the skill done

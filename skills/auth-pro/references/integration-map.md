@@ -3,7 +3,7 @@
 | Skill | When |
 |-------|------|
 | **`security-pro`** | Threat model, OWASP ASVS alignment, OAuth hardening, fraud/abuse, logging redaction |
-| **`nestjs-pro`** / **`nextjs-pro`** | Session middleware, guards, cookie APIs, SSR auth |
+| **`nestjs-pro`** / **`nextjs-15-pro`** | Session middleware, guards, cookie APIs, SSR auth |
 | **`postgresql-pro`** | User tables, RLS, tenant columns, audit fields |
 | **`deployment-pro`** | Secrets rotation, TLS termination, env separation |
 | **`testing-pro`** | Auth integration tests, negative tests, token abuse cases |
