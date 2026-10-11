@@ -18,6 +18,5 @@
     "workflows"
   ],
   "displayName": "aix",
-  "skills": "./skills/",
-  "rules": "./rules/"
+  "skills": "./skills/"
 }

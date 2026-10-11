@@ -1,9 +1,12 @@
 ---
 name: pdf
 description: >-
-  Create, inspect, edit, and validate PDF files with strict supported-lossless
-  coverage manifests (Python/pypdf/pdfplumber/reportlab). Use when the user
-  mentions PDF, pages, extract text, merge/reorder pages, or PDF metadata.
+  Create, inspect, edit, merge/split/rotate, watermark, encrypt, and validate
+  PDF files, fill PDF forms, and OCR scanned PDFs — with strict
+  supported-lossless coverage manifests (Python: pypdf, pdfplumber, reportlab,
+  pdf2image, pytesseract; JS form-filling scripts included). Use when the user
+  mentions PDF, pages, extract text/tables, merge/reorder pages, PDF forms,
+  watermarks, or PDF metadata.
 metadata:
   kind: "domain"
   version: "0.1.0"
@@ -85,7 +88,31 @@ Produce a document/media artifact with input and output paths, coverage/quality 
 
 ## Cross-skill handoffs
 
-- sk-pdf-pro for advanced PDF workflows; sk-docx/sk-xlsx for source formats; sk-ocr-pro for dense/scanned OCR; sk-docs for content interpretation.
+- sk-docx/sk-xlsx for source formats; sk-ocr-pro for dense/scanned OCR; sk-docs for content interpretation.
+
+## Library and tool guide
+
+- **pypdf** — merge, split, rotate, encrypt/decrypt, metadata.
+- **pdfplumber** — text and table extraction (extract_text / extract_tables).
+- **reportlab** — create PDFs (Canvas or Platypus). NEVER use Unicode sub/superscript glyphs in ReportLab fonts (renders as black boxes); use `<sub>` / `<super>` markup in Paragraph instead.
+- **pdf2image + pytesseract** — OCR scanned PDFs (convert pages to images first).
+- **pdfimages / pdftotext / qpdf / pdftk** — CLI extraction, merge/split/rotate, decrypt.
+- **Form filling** — follow `references/forms.md`: check fillable fields first, extract field info JSON, fill via JS scripts in `scripts/` (check-fillable-fields, extract-form-field-info, fill-fillable-fields, fill-pdf-form-with-annotations, check-bounding-boxes, convert-pdf-to-images, create-validation-image).
+- **Advanced** — pypdfium2 rendering and JS libraries (pdf-lib): see `references/advanced-reference.md`.
+
+### Common recipes
+
+| Task | Best tool | Hint |
+|------|-----------|------|
+| Merge PDFs | pypdf / qpdf | `writer.add_page(page)` or `qpdf --empty --pages a.pdf b.pdf -- out.pdf` |
+| Split PDFs | pypdf / qpdf | One page per file; `qpdf in.pdf --pages . 1-5 -- out.pdf` |
+| Extract text | pdfplumber / pdftotext | `page.extract_text()`; `pdftotext -layout` preserves layout |
+| Extract tables | pdfplumber | `page.extract_tables()` → pandas |
+| Create PDFs | reportlab | Canvas or Platypus |
+| Watermark | pypdf | `page.merge_page(watermark)` |
+| Encrypt | pypdf | `writer.encrypt(user, owner)` |
+| OCR scanned | pytesseract | pdf2image → `image_to_string` |
+| Fill forms | pdf-lib / pypdf | see `references/forms.md` |
 ## Worked scenarios and evidence
 
 Read [`references/worked-scenarios-and-evidence.md`](./references/worked-scenarios-and-evidence.md) for one positive and one negative/edge fixture with expected output-level evidence and canonical handoff.

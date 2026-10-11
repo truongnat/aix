@@ -106,7 +106,6 @@ skills/             230+ skills — Agent Skills spec (<name>/SKILL.md)
 skills.sh.json      skills.sh registry groupings
 skills-release.json per-skill sha256 (staleness detection)
 workflows/          engineering-spine doc + spine.js workflow
-rules/              spine guardrail rules
 .claude-plugin/     Claude Code manifest + marketplace.json
 .cursor-plugin/     Cursor manifest
 gemini-extension.json Gemini extension manifest

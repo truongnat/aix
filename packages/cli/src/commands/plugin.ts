@@ -37,7 +37,6 @@ export function registerPluginCommand(program: Command): void {
           ...base,
           displayName: 'aix',
           skills: './skills/',
-          rules: './rules/',
         },
         'gemini-extension.json': {
           name: base.name,

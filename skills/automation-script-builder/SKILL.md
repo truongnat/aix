@@ -1,68 +1,78 @@
 ---
 name: automation-script-builder
-description: Chuyển kịch bản test thủ công lặp lại thành script automation (Playwright/Selenium), kèm giải thích từng dòng cho người mới học automation. Dùng khi user muốn tự động hóa một luồng test hay lặp lại (regression), hoặc muốn học automation qua ví dụ thực tế thay vì học lý thuyết trước.
+description: "Turn a manual test scenario into a working automation script (Playwright or Selenium) with line-by-line explanations for beginners. Use when a tester wants to automate a repeated regression flow, or wants to learn automation through a concrete real example instead of theory-first."
+metadata:
+  kind: "domain"
+  version: "0.2.0"
+  tags: "qa,automation,playwright,selenium"
 ---
 
 # Automation Script Builder
 
-## Quy ước timestamp và artifact
-Ngay khi bắt đầu chạy Skill, lấy timestamp hiện tại theo timezone của user/project, format `YYYY-MM-DD HH:mm:ss Z`.
+## Timestamp and artifact convention
+As soon as this skill starts, capture the current timestamp in the user's/project's timezone, formatted `YYYY-MM-DD HH:mm:ss Z`.
 
-Nếu có tạo file script, lưu theo cấu trúc:
+If script files are created, store them under:
 
 ```text
 artifacts/YYYY-MM-DD/automation-script-builder/HHmmss-flow-slug/
 ```
 
-Mỗi artifact phải ghi `Session timestamp`, test case nguồn, script, cách chạy, dependencies, và những phần cần user/dev xác nhận. Mọi output chính trong chat cũng phải hiển thị `Session timestamp`.
+Every artifact must record `Session timestamp`, the source test case, the script, how to run it, dependencies, and items needing user/dev confirmation. All main chat output must also show `Session timestamp`.
 
-## Mục tiêu
-Biến một kịch bản test case đã có (dạng steps thủ công) thành script automation chạy được, đồng thời giải thích để user (đang học automation) hiểu được TẠI SAO viết như vậy, không chỉ đưa code.
+## Goal
+Convert an existing manual test case (or a plain-language flow description) into a runnable automation script — and explain it so a tester learning automation understands WHY each part is written that way, not just receives code to copy.
 
-## Quy trình
+## Process
 
-### Bước 1 — Nhận input
-Input có thể là: một test case cụ thể (từ testcase-generator), hoặc user mô tả luồng thao tác bằng lời.
+### Step 1 — Gather input
+Input can be a specific test case (e.g. produced by `testcase-generator`) or a free-text flow description.
 
-Nếu thiếu thông tin kỹ thuật cần thiết, hỏi lại:
-- Trang web dùng framework gì không quan trọng, nhưng cần biết: các selector có ổn định không (id, data-testid) hay phải dùng text/class dễ đổi
-- Ưu tiên dùng Playwright hay Selenium (nếu user chưa có kinh nghiệm, mặc định đề xuất Playwright vì cú pháp hiện đại, dễ học hơn)
-- Ngôn ngữ: JavaScript/TypeScript hay Python (hỏi user quen ngôn ngữ nào hơn)
-- Test data lấy từ đâu, có cần cleanup sau khi chạy không, và assertion quan trọng nhất là gì
+If technical details are missing, ask — but only what changes the script:
+- **Selector stability**: does the app expose `id`/`data-testid`/stable roles, or only fragile classes/text? This decides the whole locator strategy.
+- **Tool**: Playwright or Selenium? If the user has no preference and no legacy constraints, default to **Playwright** (modern API, auto-waiting, less boilerplate — easier to learn).
+- **Language**: JavaScript/TypeScript or Python — ask which the user is more comfortable with.
+- **Test data**: where does it come from, does anything need cleanup after the run?
+- **The single most important assertion**: what proves the test passed? (URL change? element text? record created?)
+- **Environment**: target URL, login needed, test account available?
 
-### Bước 2 — Viết script theo cấu trúc rõ ràng
+### Step 2 — Write the script with a clear structure
+Always separate three blocks: **Setup** (open page, preconditions) → **Action** (the main interaction steps) → **Assertion** (verify the expected result). Never write a script that clicks through steps with no real assertion at the end.
 
-Luôn tách theo 3 phần chuẩn: Setup (mở trang, điều kiện đầu vào) → Action (các bước thao tác chính) → Assertion (kiểm tra kết quả mong đợi).
-
-### Bước 3 — Giải thích SONG SONG với code, không phải sau code
-
-Với mỗi khối lệnh, thêm comment giải thích ngắn gọn NGAY TRÊN dòng đó bằng tiếng Việt, giải thích ý nghĩa chứ không dịch từng từ khóa. Ví dụ:
+### Step 3 — Explain alongside the code, not after it
+For each code block, put a short explanatory comment directly above the line — explain intent, don't translate keywords. Prefer the language the user communicates in for comments.
 
 ```javascript
-// Chờ trang load xong và element login xuất hiện, tránh lỗi vì thao tác quá nhanh
-await page.waitForSelector('#login-button');
+// Wait until the login button is rendered before interacting —
+// acting too early is the #1 cause of flaky tests.
+await page.getByRole('button', { name: 'Log in' }).click();
 
-// Click vào nút login
-await page.click('#login-button');
-
-// Kiểm tra: sau khi login, phải chuyển hướng sang trang chủ
-await expect(page).toHaveURL('/home');
+// Web-first assertion: Playwright retries until the URL matches
+// or times out — no manual sleep needed.
+await expect(page).toHaveURL(/.*\/home/);
 ```
 
-### Bước 4 — Đưa ra file hoàn chỉnh + tóm tắt
+### Step 4 — Deliver a complete file + summary
+After the code, give a 2–3 sentence summary: what the script does, the exact command to run it, what must be installed/configured first (e.g. `npm i -D @playwright/test && npx playwright install`), and `Session timestamp`.
 
-Sau đoạn code, tóm tắt ngắn gọn 2-3 câu: script này làm gì, chạy bằng lệnh gì, cần cài gì trước khi chạy (npm install, cấu hình gì), và `Session timestamp`.
+Example minimal Playwright project kickoff to include when relevant:
 
-## Nguyên tắc cho người mới học automation
-- Ưu tiên selector ổn định theo thứ tự: `data-testid`/test id, accessible role/name, label text; tránh CSS class động, XPath dài, hoặc text dễ đổi nếu có lựa chọn tốt hơn
-- Dùng web-first assertion và wait theo trạng thái UI cụ thể; không dùng sleep cố định trừ khi giải thích rõ đây là workaround tạm thời
-- Mỗi script phải có assertion kiểm tra kết quả thật, không chỉ click qua các bước
-- Nếu script tạo dữ liệu, phải có setup/cleanup hoặc ghi rõ dữ liệu cần chuẩn bị trước
-- Ghi chú rủi ro flaky nếu flow phụ thuộc network chậm, animation, email/SMS OTP, captcha, hoặc dữ liệu dùng chung
-- Không dùng thuật ngữ không giải thích (VD: nếu dùng "fixture", "hook" phải giải thích ngắn gọn nghĩa là gì trong ngữ cảnh này)
-- Ưu tiên code đơn giản, dễ đọc hơn là code tối ưu/ngắn gọn nhưng khó hiểu
-- Nếu có cách viết "hay" nhưng khó hiểu với người mới, chọn cách dễ hiểu trước, có thể ghi chú "cách viết ngắn gọn hơn" ở cuối như một lựa chọn nâng cao
-- Khi user hỏi lại "tại sao lại viết như vậy", luôn giải thích được lý do, không chỉ nói "đây là cách chuẩn"
+```bash
+npm init -y
+npm i -D @playwright/test
+npx playwright install chromium
+npx playwright test login.spec.js --headed
+```
 
-## Giới hạn
-Claude không tự chạy được script trên máy user (trừ khi có MCP/Computer Use phù hợp) — Skill này tập trung vào việc VIẾT và GIẢI THÍCH script, việc chạy thử là do user thực hiện trên môi trường của họ, trừ khi đã xác nhận có kết nối chạy được.
+## Rules for beginner-friendly automation
+- **Selector priority** (best → worst): `data-testid`/`data-test` attribute → accessible role + name → label text → stable `id` → text content → CSS class → long XPath. Avoid dynamic classes (`css-1x2y3z`), positional selectors (`div:nth-child(7)`), and full-page XPaths whenever a better option exists — explain the trade-off when you pick a fragile one.
+- Use **web-first assertions** and state-based waits (`waitForSelector`, `expect(...).toBeVisible()`), never fixed `sleep`/`waitForTimeout` — if you must use one as a temporary workaround, comment explicitly that it is a workaround and why.
+- Every script needs at least one real assertion of an outcome, not just "no exception thrown."
+- If the script creates data, include setup/cleanup or state clearly what data must exist beforehand.
+- Flag **flakiness risks** honestly: slow network, animations, email/SMS OTP, captcha, shared test data, time-dependent logic.
+- Do not use unexplained jargon: if you write `fixture`, `hook`, or `page object`, add a one-line plain explanation of what it means here.
+- Prefer simple readable code over clever compact code. If a "nicer" version exists but is harder to read, offer it at the end as an advanced alternative — never replace the readable version with it.
+- When the user asks "why did you write it like this", always give the concrete reason — never "because that's the standard way."
+
+## Scope limit
+The assistant usually cannot execute the script on the user's machine (unless a suitable MCP/Computer Use connection exists). This skill focuses on WRITING and EXPLAINING the script; the user runs it in their own environment. State this explicitly unless a working execution path has been confirmed.

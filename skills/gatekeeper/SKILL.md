@@ -1,7 +1,7 @@
 ---
 name: gatekeeper
-description: >+
-  'Skill: gatekeeper'
+description: >-
+  Decides whether the next command or action is allowed based on available evidence, permission mode, and safety rules. Use before running destructive, irreversible, or ambiguous commands, or when an action's blast radius is unclear.
 metadata:
   compatible: "claude,cursor,codex,gemini"
   kind: "process"
@@ -90,4 +90,4 @@ Block when verification is pending, blocked, stale, or lacks evidence.
 ## References
 
 - `references/gate-contract.md`
-- `prompt.md`
+- `references/prompt.md`

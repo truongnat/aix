@@ -38,7 +38,13 @@ Also in the same folder (engine / long runs):
 - When regenerating, archive the prior file to `archive/<NAME>.<timestamp>.md` and link it at the top of the new file.
 - Do **not** write spine artifacts to `.planning/`, repo root, or `docs/` by default.
 
+## Execution rules
+
+- **No blind workspace mutation**: check `git status` and diff before overwriting files.
+- **Test-first**: write a failing test (RED) before implementation code, then drive it GREEN.
+- **Verification gating**: declare done only with passing test/run evidence — never stale output.
+- **Durable memory**: anything worth preserving goes in `REMEMBER.md` before the session ends.
+
 ## Related
 
-- Rule: `content/rules/core/spine-guardrail.md`
-- Entry: `content/skills/using-aix/SKILL.md`
+- Entry: `skills/using-aix/SKILL.md`

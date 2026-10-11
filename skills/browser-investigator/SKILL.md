@@ -1,77 +1,88 @@
 ---
 name: browser-investigator
-description: Tự động điều tra lỗi trên web/app bằng cách đọc network request/response, console log, và DOM state, thay vì user phải tự mở DevTools inspect thủ công. Dùng khi user không có source code, chỉ test được qua giao diện web/app, và cần tìm nguyên nhân kỹ thuật của một hiện tượng lỗi.
+description: "Investigate a web/app bug from the outside by reading network requests/responses, console logs, and DOM state through a browser MCP connection. Use when the tester has no source code access and needs a technical hypothesis for a visible defect — what request failed, what error fired, what the DOM actually shows."
+metadata:
+  kind: "domain"
+  version: "0.2.0"
+  tags: "qa,debug,browser,devtools,investigation"
 ---
 
 # Browser Investigator
 
-## Quy ước timestamp và artifact
-Ngay khi bắt đầu chạy Skill, lấy timestamp hiện tại theo timezone của user/project, format `YYYY-MM-DD HH:mm:ss Z`.
+## Timestamp and artifact convention
+As soon as this skill starts, capture the current timestamp in the user's/project's timezone, formatted `YYYY-MM-DD HH:mm:ss Z`.
 
-Nếu có tạo file điều tra, lưu theo cấu trúc:
+If investigation files are created, store them under:
 
 ```text
 artifacts/YYYY-MM-DD/browser-investigator/HHmmss-short-issue/
 ```
 
-Mỗi artifact phải ghi `Session timestamp`, URL, bước tái hiện, dữ liệu console/network/DOM đã quan sát, và phần dữ liệu đã che nếu có thông tin nhạy cảm. Mọi output chính trong chat cũng phải hiển thị `Session timestamp`.
+Every artifact must record `Session timestamp`, URL, reproduction steps, observed console/network/DOM data, and redacted portions if sensitive data appeared. All main chat output must also show `Session timestamp`.
 
-## Điều kiện tiên quyết
-Skill này cần một kết nối MCP tới trình duyệt (ví dụ Claude in Chrome) đã được thiết lập trong phiên làm việc. Nếu không có, báo cho user và đề xuất kết nối trước, không tự suy đoán network/console log nếu không thực sự đọc được.
+## Prerequisite
+This skill requires a live browser MCP connection (e.g. Claude in Chrome) in the session. If none is available, tell the user and suggest connecting one — never fabricate network/console findings you could not actually read.
 
-## Quy trình
+## Support scripts
+If evidence files need normalizing before synthesis, prefer `--report` mode first:
 
-## Script hỗ trợ
-Nếu cần lưu hoặc chuẩn hóa evidence file trước khi tổng hợp, ưu tiên chạy support script ở chế độ `--report` trước:
+- `evidence_manifest.py` for screenshots, logs, HAR files, JSON responses, or attached evidence
+- `har_summarizer.py` for `.har` files — summarizes method, URL, status, host, slow requests
+- `session_timeline_builder.py` to order all evidence files in a run chronologically
+- `artifact_packager.py` to zip the full evidence bundle for handoff to devs
+- `redact_sensitive.py` if text evidence contains tokens, emails, phones, or secrets
 
-- `evidence_manifest.py` cho screenshot, log, HAR, JSON response hoặc file evidence đi kèm
-- `har_summarizer.py` cho file `.har` để tóm method, URL, status, host và request chậm
-- `session_timeline_builder.py` để gom timeline file evidence trong một run artifact
-- `artifact_packager.py` để zip toàn bộ evidence trước khi gửi dev
-- `redact_sensitive.py` nếu evidence text có token, email, phone hoặc secret
+## Process
 
-### Bước 1 — Xác nhận hiện tượng cần điều tra
-Hỏi rõ (nếu chưa rõ): hiện tượng lỗi là gì, xảy ra ở bước nào, có tái hiện lại được ngay bây giờ không.
+### Step 1 — Confirm the phenomenon
+Ask (if unclear): what exactly is the bug behavior, at which step does it appear, and can it be reproduced right now?
 
-### Bước 2 — Tái hiện và quan sát
-1. Điều hướng tới đúng bước gây lỗi qua trình duyệt
-2. Trong lúc thao tác, quan sát và ghi lại:
-   - Console log: có error/warning nào xuất hiện không, nội dung là gì
-   - Network requests: method, URL/path, status code, request payload tóm tắt, response excerpt, request ID/correlation ID nếu có
-   - DOM state: phần tử nào không hiển thị đúng, class/attribute có gì lạ so với kỳ vọng
-   - Evidence: timestamp, URL hiện tại, screenshot/video/HAR/log nếu có thể lấy
+### Step 2 — Reproduce and observe
+1. Navigate through the browser to the exact step that triggers the issue.
+2. While acting, observe and record:
+   - **Console**: errors/warnings that appear, their exact text
+   - **Network**: method, URL/path, status code, summarized request payload, response excerpt, request/correlation ID if present
+   - **DOM state**: which element renders wrong, unusual classes/attributes vs expected
+   - **Evidence**: timestamp, current URL, screenshot/video/HAR/log when obtainable
 
-### Bước 3 — Phân tích và kết luận
-Không chỉ liệt kê dữ liệu thô — phải diễn giải ý nghĩa:
-- Nếu network trả về lỗi 4xx/5xx: giải thích khả năng nguyên nhân (client gửi sai request, hay server xử lý lỗi)
-- Nếu console có error: dịch nghĩa error đó thường liên quan tới vấn đề gì (không cần đúng 100% vì không có source, nhưng đưa ra giả thuyết hợp lý)
-- Nếu DOM không đúng: mô tả cụ thể phần tử nào, khác gì so với trạng thái mong đợi
+### Step 3 — Interpret, don't just dump raw data
+Read the failure signature:
+- `4xx` — likely client-side: wrong request payload, missing auth header, wrong URL.
+- `5xx` — likely server-side failure.
+- **No request fired at all** — the click handler may be broken, blocked by validation, or the button disabled: a frontend bug, not backend.
+- `0`/`(failed)`/`CORS` — network-level or CORS issue.
+- Response is `200` but UI shows error — data-shape mismatch; frontend may expect a field the response lacks.
+- Console `TypeError`/`undefined is not a function` after a response — frontend crashed processing it.
+- Stale-looking data with a `304`/cache response — possible caching bug.
+- DOM element exists but `hidden`/`display:none` — logic reached a different branch than expected.
 
-### Bước 4 — Xuất kết quả theo format
+State each interpretation as a hypothesis with a confidence level, never as certainty — you see the outside of the system, not the code.
 
-```
-Hiện tượng: [mô tả ngắn]
+### Step 4 — Report in the standard format
+
+```text
+Phenomenon: [short description]
 
 Session timestamp: [YYYY-MM-DD HH:mm:ss Z]
 
-Những gì quan sát được:
-- Console: [log/error cụ thể, hoặc "không có gì bất thường"]
-- Network: [method/path/status/request payload summary/response summary/request ID nếu có]
-- DOM: [phần tử liên quan, trạng thái thực tế]
+Observed:
+- Console: [specific logs/errors, or "nothing abnormal"]
+- Network: [method/path/status/payload summary/response summary/request ID]
+- DOM: [relevant element, actual state vs expected]
 
 Evidence table:
-| Thời điểm | URL | Step | Evidence | Ghi chú |
+| Time | URL | Step | Evidence | Note |
 |---|---|---|---|---|
 
-Giả thuyết nguyên nhân: [phân tích, đưa ra khả năng — không khẳng định chắc chắn nếu không có source]
+Root-cause hypothesis: [analysis + likelihood — mark confidence, do not claim certainty without source access]
 
-Thông tin nên đính kèm khi báo dev: [request/response cụ thể, screenshot console nếu cần]
+Attach for devs: [specific request/response, console screenshot, HAR section]
 ```
 
-## Lưu ý
-- Đây là công cụ hỗ trợ ĐIỀU TRA, không thay thế việc dev tự debug bằng source code. Kết quả đưa ra là giả thuyết dựa trên quan sát bên ngoài, cần nói rõ mức độ chắc chắn.
-- Nếu phát hiện thông tin nhạy cảm trong network request/response (token, password, dữ liệu cá nhân), không hiển thị nguyên văn — che hoặc rút gọn phần nhạy cảm khi báo cáo lại.
-- Nếu có nhiều file evidence, tạo manifest trước bằng `evidence_manifest.py --report` để biết file count, MIME type và dấu hiệu dữ liệu nhạy cảm trước khi đính kèm.
-- Nếu có file HAR, chạy `har_summarizer.py --report` trước để rút gọn network thành phần có ý nghĩa thay vì đọc tay cả file.
-- Trước khi bàn giao artifact cho dev, có thể chạy `session_timeline_builder.py --report` rồi `artifact_packager.py --report` để kiểm tra đủ evidence và thứ tự thời gian.
-- Kết quả từ Skill này nên được chuyển tiếp trực tiếp làm input cho `bug-report-writer` nếu xác nhận đây là bug thật.
+## Notes
+- This is an INVESTIGATION aid, not a replacement for source-level debugging. Findings are external-observation hypotheses.
+- If network data contains sensitive info (tokens, passwords, PII), never quote it verbatim — mask or truncate the sensitive part.
+- Many evidence files? Run `evidence_manifest.py --report` first for file count, MIME types, and sensitive-data flags before attaching.
+- Have a HAR? Run `har_summarizer.py --report` to reduce it to meaningful entries instead of reading the raw file.
+- Before handing off, optionally run `session_timeline_builder.py --report` then `artifact_packager.py --report` to verify evidence completeness and ordering.
+- If confirmed as a real bug, hand the output directly to `bug-report-writer`.

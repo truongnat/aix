@@ -1,7 +1,7 @@
 ---
 name: tool-discovery
-description: >+
-  'Skill: tool-discovery'
+description: >-
+  Detects available local tools, CLIs, and runtimes, then routes work by actual capability instead of assumed tool names. Use when the right tool for a job is unclear, in fresh environments, or when a command fails because a tool is missing.
 metadata:
   compatible: "claude,cursor,codex,gemini"
   kind: "process"
@@ -88,4 +88,4 @@ Return blocked when a required capability has no safe fallback and the next step
 ## References
 
 - `references/routing-table.md`
-- `prompt.md`
+- `references/prompt.md`
