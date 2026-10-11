@@ -115,3 +115,16 @@ This skill must produce:
 - [ ] No tracked-file pollution was introduced
 - [ ] The execution context is documented if relevant
 - [ ] Work can proceed without hidden assumptions
+
+## Example
+
+Spin up an isolated worktree for a hotfix without disturbing the main checkout:
+
+```bash
+# Create a worktree on a new branch off origin/main
+git worktree add ../repo-hotfix -b hotfix/login-crash origin/main
+cd ../repo-hotfix && git status        # clean tree, independent HEAD
+# After merging, remove the worktree and prune the reference
+cd ../repo-main && git worktree remove ../repo-hotfix
+git worktree list && git worktree prune
+```

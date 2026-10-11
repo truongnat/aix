@@ -196,6 +196,24 @@ Details: [references/versions.md](/skills/cli-pro/references/versions.md)
 **Input (cross-skill):** Ship Python CLI on PyPI with completions.  
 **Expected output:** **`code-packaging-pro`** for entry points; **this skill** for `--help`, exit codes, completion generation; **`testing-pro`** for subprocess tests.
 
+
+```ts
+#!/usr/bin/env node
+import { Command } from 'commander';
+
+const program = new Command();
+program
+  .name('deployx')
+  .requiredOption('-e, --env <name>', 'target environment')
+  .option('--dry-run', 'print plan without applying', false)
+  .option('--force', 'skip interactive confirmation', false)
+  .action(async (opts) => {
+    if (!opts.dryRun && !opts.force && !process.stdout.isTTY) process.exit(2); // refuse non-TTY destructive run
+    console.error(`deploying to ${opts.env}`); // logs on stderr, data on stdout
+  });
+await program.parseAsync(process.argv);
+```
+
 ## Checklist before calling the skill done
 
 ### Contract

@@ -181,6 +181,36 @@ Details: [references/integration-map.md](references/integration-map.md)
 - **`frontend-design-pro`**: Visual style, accessibility, responsive layout.
 - **Verify:** Each skill owns a clear slice; UI does not duplicate backend logic.
 
+## Example
+
+```ts
+// Consume an AG-UI event stream (SSE) — render tokens as they arrive
+const source = new EventSource('/api/agent/run?threadId=t_42');
+
+source.addEventListener('TEXT_MESSAGE_CONTENT', (e) => {
+  const { delta } = JSON.parse(e.data);
+  appendToken(delta); // streaming — no polling
+});
+
+source.addEventListener('TOOL_CALL_START', (e) => {
+  const { toolCallName } = JSON.parse(e.data);
+  if (toolCallName === 'delete_record') {
+    requestHumanApproval(toolCallName); // HITL before destructive actions
+  }
+});
+
+source.addEventListener('RUN_ERROR', () => {
+  showRetry('Agent run failed — retry?');
+  source.close();
+});
+
+source.addEventListener('RUN_FINISHED', () => source.close());
+```
+
+```json
+{ "type": "STATE_SNAPSHOT", "snapshot": { "cart": { "items": [], "totalCents": 0 } } }
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Assumptions stated explicitly; asked when uncertain (Think Before Coding)

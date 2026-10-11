@@ -180,6 +180,36 @@ Details: [references/versions.md](references/versions.md)
 - Separate immediate data-access needs from the longer-term storage migration path.
 - **Verify:** The current local access is stable and the reasons for handoff are explicit.
 
+## Example
+
+```ts
+import Database from 'better-sqlite3';
+
+// Read-only open for export work; explicit path, no writable intent
+const db = new Database('./data/app.db', { readonly: true, fileMustExist: true });
+
+// Parameterized query — never string-concatenate user input
+const stmt = db.prepare(`
+  SELECT id, email, created_at
+  FROM users
+  WHERE status = ? AND created_at >= ?
+  ORDER BY id
+`);
+
+const activeUsers = stmt.all('active', '2026-01-01T00:00:00Z');
+
+// Writable path: enable WAL and keep the transaction short
+const writable = new Database('./data/app.db');
+writable.pragma('journal_mode = WAL');
+const insertAudit = writable.prepare(
+  'INSERT INTO audit_log (user_id, action) VALUES (?, ?)',
+);
+const logExport = writable.transaction((ids: number[]) => {
+  for (const id of ids) insertAudit.run(id, 'csv_export');
+});
+logExport(activeUsers.map((u) => u.id));
+```
+
 ## Checklist before calling the skill done
 
 - [ ] File trust, read/write intent, and true storage target confirmed first (Think Before Coding)

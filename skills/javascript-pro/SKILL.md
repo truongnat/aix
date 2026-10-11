@@ -160,6 +160,23 @@ Details: [references/versions.md](references/versions.md)
 - Move browser-only work to the correct lifecycle instead of sprinkling global guards everywhere.
 - **Verify:** Server render stays deterministic and client hydration no longer diverges.
 
+
+```ts
+const controller = new AbortController();
+searchInput.addEventListener('input', debounce(async (e) => {
+  controller.abort();                       // cancel in-flight request
+  const next = new AbortController();
+  const res = await fetch(`/api/search?q=${encodeURIComponent(e.target.value)}`,
+    { signal: next.signal });
+  renderResults(await res.json());
+}, 200));
+
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Runtime targets, module system, and execution context confirmed before proposing a fix (Think Before Coding)

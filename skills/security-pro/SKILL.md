@@ -200,6 +200,31 @@ Details: [references/versions.md](references/versions.md)
 - Restrict secret access and action trust paths rather than patching symptoms ad hoc.
 - **Verify:** Forked PR jobs cannot access protected secrets and logs stay redacted.
 
+## Example
+
+```ts
+import { createHash, timingSafeEqual } from 'node:crypto';
+
+// Object-level authorization (BOLA/IDOR): check ownership, not just auth
+export async function getOrder(req: AuthedRequest, orderId: string) {
+  const order = await db.query(
+    'SELECT id, tenant_id, status FROM orders WHERE id = $1',
+    [orderId], // parameterized — never interpolate user input
+  );
+  if (!order || order.tenant_id !== req.user.tenantId) {
+    return { status: 404 }; // 404, not 403 — don't leak existence
+  }
+  return { status: 200, body: order };
+}
+
+// Timing-safe secret comparison for webhook signatures
+export function verifySignature(payload: string, signature: string, secret: string) {
+  const expected = createHash('sha256').update(payload + secret).digest();
+  const given = Buffer.from(signature, 'hex');
+  return given.length === expected.length && timingSafeEqual(given, expected);
+}
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Trust boundaries, data sensitivity, tenancy, and attacker model confirmed first (Think Before Coding)

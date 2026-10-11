@@ -161,6 +161,21 @@ Details: [references/decision-tree.md](references/decision-tree.md)
 3. Code: `session.run` with `$id`, `$title`, `$tags`; `finally { session.close() }`
 4. Residual risks: duplicate constraint creation if split across services
 
+
+```ts
+const session = this.neo4j.driver.session();
+try {
+  await session.run(
+    `MERGE (s:Solution {id: $id}) SET s.title = $title
+     WITH s UNWIND $tags AS tag
+     MERGE (t:Tag {name: tag}) MERGE (s)-[:TAGGED]->(t)`,
+    { id, title, tags },
+  );
+} finally {
+  await session.close();
+}
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Assumptions stated explicitly; asked when uncertain (Think Before Coding)

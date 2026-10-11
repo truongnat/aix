@@ -116,3 +116,17 @@ Block or escalate when:
 - [ ] Risks were identified or ruled out
 - [ ] Missing verification was called out if present
 - [ ] Findings are concrete enough to act on
+
+## Example
+
+Structured PR review pass before writing any comment:
+
+```bash
+# Read the diff and the intent together, not the diff alone
+gh pr view 412 --json title,body,files
+gh pr diff 412 --name-only
+# Check the risky paths first: migrations, auth, concurrency
+gh pr diff 412 | grep -nE "ALTER TABLE|password|await Promise" 
+# Verify CI and unresolved threads before approving
+gh pr checks 412 && gh pr review 412 --approve
+```

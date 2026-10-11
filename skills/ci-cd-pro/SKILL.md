@@ -230,6 +230,22 @@ Details: [references/versions.md](/skills/ci-cd-pro/references/versions.md)
 **Input:** Fork PR needs preview deploy.  
 **Expected output:** **Context/Problem** fork trust; **Decision** no prod secrets on fork; **Implementation** trusted workflow pattern or **`workflow_run`** sketch; **Failure modes** secret exfiltration; **`security-pro`**.
 
+
+```yaml
+name: ci
+on: { push: { branches: [main] }, pull_request: {} }
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v4.1.0 SHA-pinned
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npm run lint && npm test -- --coverage
+      - run: npm run build
+```
+
 ## Checklist before calling the skill done
 
 ### Pipeline correctness

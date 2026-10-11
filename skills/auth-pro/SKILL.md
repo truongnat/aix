@@ -269,6 +269,22 @@ Skip sections only if clearly N/A; say why.
 **Input:** Multi-tenant SaaS — ensure tenant A cannot read tenant B’s rows.  
 **Expected output:** **`auth-pro`** identity + policy; **`postgresql-pro`** RLS and indexes; **`nestjs-pro`** transaction + `SET LOCAL` if applicable.
 
+
+```ts
+// Express middleware: verify RS256 JWT, reject bad/expired tokens
+export function requireAuth(req, res, next) {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'missing_token' });
+  try {
+    req.user = jwt.verify(token, process.env.JWT_PUBLIC_KEY,
+      { algorithms: ['RS256'], issuer: 'https://auth.example.com', audience: 'api' });
+    next();
+  } catch {
+    res.status(401).json({ error: 'invalid_or_expired_token' });
+  }
+}
+```
+
 ## Checklist before calling the skill done
 
 ### Always (every review)

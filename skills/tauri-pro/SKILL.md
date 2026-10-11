@@ -116,6 +116,41 @@ Response shape:
 - Propose the smallest safe config/code changes first.
 - Verify in a packaged build rather than stopping at dev-mode success.
 
+## Example
+
+```rust
+// src-tauri/src/lib.rs — command boundary stays thin; logic lives in core fns
+use tauri::Manager;
+
+#[tauri::command]
+async fn read_project_file(app: tauri::AppHandle, name: String) -> Result<String, String> {
+    // Resolve inside the app data dir — never trust an absolute path from the webview
+    let dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?
+        .join("projects");
+    let path = dir.join(&name);
+    if !path.starts_with(&dir) {
+        return Err("path escapes project directory".into());
+    }
+    tokio::fs::read_to_string(path).await.map_err(|e| e.to_string())
+}
+
+pub fn run() {
+    tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![read_project_file])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
+}
+```
+
+Grant the command narrowly in `capabilities/default.json` — least privilege, not `"*`:
+
+```json
+{ "permissions": ["core:default", "fs:allow-app-data-read"] }
+```
+
 ## Checklist before calling the skill done
 
 - Tauri version and platform assumptions are explicit.

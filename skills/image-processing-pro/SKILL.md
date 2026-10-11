@@ -179,3 +179,18 @@ Details: [references/versions.md](references/versions.md)
 - [ ] Metadata handling is intentional
 - [ ] Batch overwrite and path safety are considered where relevant
 - [ ] Residual fidelity or codec caveats are documented
+
+## Example
+
+EXIF-aware resize and metadata strip for web publishing (sharp):
+
+```ts
+import sharp from "sharp";
+await sharp("raw.jpg")
+  .rotate()                          // honor EXIF orientation before resize
+  .resize({ width: 1600, withoutEnlargement: true })
+  .webp({ quality: 82 })
+  .toFile("out.webp");               // metadata stripped by default
+// JPEG has no alpha — flatten explicitly instead of silent degradation
+await sharp("logo.png").flatten({ background: "#fff" }).jpeg().toFile("logo.jpg");
+```

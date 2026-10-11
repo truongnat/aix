@@ -141,6 +141,26 @@ Details: [references/testing-iac.md](references/testing-iac.md)
   4. Add OPA policy check before apply → verify: [policy violations block merge]
 - Pair with **`ci-cd-pro`** for pipeline YAML.
 
+
+```hcl
+resource "aws_s3_bucket" "assets" {
+  bucket = "acme-assets-prod"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "assets" {
+  bucket = aws_s3_bucket.assets.id
+  rule {
+    apply_server_side_encryption_by_default { sse_algorithm = "AES256" }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "assets" {
+  bucket                  = aws_s3_bucket.assets.id
+  block_public_acls       = true
+  block_public_policy     = true
+}
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Confirmed IaC tool version and state backend before writing any code (Think Before Coding)

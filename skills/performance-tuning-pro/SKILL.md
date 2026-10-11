@@ -182,3 +182,17 @@ Details: [references/versions.md](references/versions.md)
 - [ ] Bottleneck diagnosis is supported by evidence
 - [ ] Trade-offs among latency, throughput, cost, and correctness are acknowledged
 - [ ] Residual measurement or scaling risks are documented
+
+## Example
+
+Locate the real bottleneck before tuning — capture a CPU profile under the same load shape:
+
+```bash
+# Baseline first: reproduce the regression, then profile the slow endpoint
+node --cpu-prof --cpu-prof-name=before.cpuprofile server.js &
+wrk -t4 -c100 -d30s http://localhost:3000/api/search
+kill %1
+# Compare against the post-fix profile; optimize the proven hot frame only
+node --cpu-prof --cpu-prof-name=after.cpuprofile server.js &
+wrk -t4 -c100 -d30s http://localhost:3000/api/search && kill %1
+```

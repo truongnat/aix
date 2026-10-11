@@ -194,6 +194,33 @@ Details: [references/integration-map.md](references/integration-map.md)
 - Keep **`mcp-server-pro`** ownership of the MCP primitive design and transport configuration.
 - **Verify:** Each skill owns a clear slice; no duplicated auth advice.
 
+## Example
+
+```ts
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { z } from 'zod';
+
+const server = new McpServer({ name: 'orders-mcp', version: '1.0.0' });
+
+server.tool(
+  'get_order',
+  'Fetch a single order by ID for the authenticated tenant',
+  { orderId: z.string().regex(/^ord_[a-z0-9]+$/).describe('Order ID, e.g. ord_9f3k2') },
+  async ({ orderId }) => {
+    const order = await db.query(
+      'SELECT id, status, total_cents FROM orders WHERE id = $1',
+      [orderId],
+    );
+    return {
+      content: [{ type: 'text', text: JSON.stringify(order ?? { error: 'not_found' }) }],
+    };
+  },
+);
+
+await server.connect(new StdioServerTransport());
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Assumptions stated explicitly; asked when uncertain (Think Before Coding)

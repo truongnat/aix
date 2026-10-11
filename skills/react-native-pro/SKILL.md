@@ -180,6 +180,44 @@ Details: [references/versions.md](references/versions.md)
 - Stabilize item identity and render cost before replacing the whole list stack.
 - **Verify:** Scrolling and gestures remain smooth on target devices with representative data volume.
 
+## Example
+
+```tsx
+import { useCallback } from 'react';
+import { FlatList, Pressable, StyleSheet, Text } from 'react-native';
+
+type Order = { id: string; title: string; total: number };
+
+const renderItem = ({ item }: { item: Order }) => (
+  <Pressable
+    accessibilityRole="button"
+    accessibilityLabel={`Order ${item.title}`}
+    style={styles.row}
+  >
+    <Text>{item.title}</Text>
+    <Text>${item.total.toFixed(2)}</Text>
+  </Pressable>
+);
+
+export function OrderList({ orders }: { orders: Order[] }) {
+  const keyExtractor = useCallback((o: Order) => o.id, []);
+  return (
+    <FlatList
+      data={orders}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      windowSize={7}
+      removeClippedSubviews
+      initialNumToRender={12}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', justifyContent: 'space-between', padding: 16 },
+});
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Workflow, SDK/RN versions, and target platforms confirmed before proposing changes (Think Before Coding)

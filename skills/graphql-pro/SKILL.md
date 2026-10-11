@@ -167,6 +167,24 @@ Details: [references/versions.md](references/versions.md)
 - Ensure resolver logic and data-layer isolation tell the same truth.
 - **Verify:** Unauthorized fields resolve safely and tenant data cannot be inferred through query shape.
 
+
+```ts
+const typeDefs = /* GraphQL */ `
+  type Query { user(id: ID!): User }
+  type User { id: ID!, name: String!, posts: [Post!]! }
+`;
+
+const resolvers = {
+  Query: {
+    user: (_p, { id }, { loaders, auth }) =>
+      auth.canRead(id) ? loaders.user.load(id) : null, // batch via DataLoader
+  },
+  User: {
+    posts: (user, _a, { loaders }) => loaders.postsByUser.load(user.id),
+  },
+};
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Server stack, graph topology, and client query patterns confirmed first (Think Before Coding)

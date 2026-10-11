@@ -176,6 +176,27 @@ Details: [references/versions.md](references/versions.md)
 - Avoid inventing token semantics inside code.
 - **Verify:** Theme mapping is consistent and the widgets consume it predictably across screens.
 
+
+```dart
+class UserList extends StatelessWidget {
+  const UserList({super.key, required this.users});
+  final Future<List<User>> users;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<User>>(
+      future: users,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const CircularProgressIndicator();
+        return ListView(children: [
+          for (final u in snapshot.data!) ListTile(title: Text(u.name)),
+        ]);
+      },
+    );
+  }
+}
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Flutter/Dart version, target platforms, and runtime context confirmed first (Think Before Coding)

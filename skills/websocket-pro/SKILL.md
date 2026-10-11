@@ -109,6 +109,48 @@ Response shape:
 - Recommend the smallest transport and infra changes first.
 - Validate with controlled disconnect tests and production telemetry.
 
+## Example
+
+```ts
+import { WebSocketServer, WebSocket } from 'ws';
+
+const wss = new WebSocketServer({ port: 8080 });
+const HEARTBEAT_MS = 30_000;
+
+wss.on('connection', (ws) => {
+  let alive = true;
+  ws.on('pong', () => (alive = true));
+
+  const beat = setInterval(() => {
+    if (!alive) return ws.terminate(); // dead peer, drop it
+    alive = false;
+    ws.ping();
+  }, HEARTBEAT_MS);
+
+  ws.on('message', (raw, isBinary) => {
+    let msg: { type: string; id?: string };
+    try {
+      msg = JSON.parse(raw.toString());
+    } catch {
+      return ws.close(1003, 'invalid JSON');
+    }
+    if (msg.type === 'echo') ws.send(raw, { binary: isBinary });
+  });
+
+  ws.on('close', () => clearInterval(beat));
+});
+
+// Client: bounded reconnect, not an instant retry loop
+function connect(url: string, attempt = 0) {
+  const ws = new WebSocket(url);
+  ws.onclose = () => {
+    const delay = Math.min(1000 * 2 ** attempt, 15_000);
+    setTimeout(() => connect(url, attempt + 1), delay);
+  };
+  return ws;
+}
+```
+
 ## Checklist before calling the skill done
 
 - Topology, scale, and network-edge assumptions are explicit.

@@ -51,3 +51,22 @@ For a release or handoff, package each result with `Claim`, `Criteria`, `Evidenc
 ## Worked scenarios and evidence
 
 Read [`references/worked-scenarios-and-evidence.md`](./references/worked-scenarios-and-evidence.md) for one positive and one negative/edge fixture with expected output-level evidence and canonical handoff.
+
+## Example
+
+```ts
+import { describe, expect, it, vi } from 'vitest';
+import { fetchUsers } from './users';
+
+vi.stubGlobal('fetch', vi.fn(async () =>
+  new Response(JSON.stringify([{ id: 1, name: 'An' }]), { status: 200 }),
+));
+
+describe('fetchUsers', () => {
+  it('maps API rows to domain users', async () => {
+    const users = await fetchUsers();
+    expect(users).toEqual([{ id: 1, name: 'An' }]);
+    expect(fetch).toHaveBeenCalledWith('/api/users', expect.any(Object));
+  });
+});
+```

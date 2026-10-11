@@ -169,6 +169,20 @@ Details: [references/versions.md](references/versions.md)
 - Keep ownership and outbox behavior explicit.
 - **Verify:** Event flow, dedupe, and data consistency expectations are stated and testable.
 
+
+```ts
+// orders service: outbox pattern — write event atomically with the entity
+await db.transaction(async (tx) => {
+  await tx.insert(orders).values({ id: orderId, status: 'created' });
+  await tx.insert(outbox).values({
+    aggregateId: orderId,
+    type: 'order.created',
+    payload: { orderId, total },
+  });
+});
+// relay publishes outbox rows to the broker with idempotent consumer keys
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Service boundaries, ownership, data stores, and SLOs confirmed first (Think Before Coding)

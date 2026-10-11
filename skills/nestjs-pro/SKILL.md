@@ -177,6 +177,24 @@ Details: [references/versions.md](references/versions.md)
 - Ensure tenant context is set on the real connection/transaction boundary, not only on request DTOs.
 - **Verify:** Cross-tenant access tests fail under the same pool mode used in production.
 
+
+```ts
+@Controller('users')
+export class UsersController {
+  constructor(private readonly users: UsersService) {}
+
+  @Get(':id')
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.users.findById(id);
+  }
+
+  @Post()
+  create(@Body() dto: CreateUserDto) { // class-validator on the DTO
+    return this.users.create(dto);
+  }
+}
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Nest version, adapter, ORM, and transport confirmed before proposing changes (Think Before Coding)

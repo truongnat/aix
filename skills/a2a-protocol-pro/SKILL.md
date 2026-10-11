@@ -183,6 +183,38 @@ Details: [references/integration-map.md](references/integration-map.md)
 - **`security-pro`**: Threat model the support data access boundaries.
 - **Verify:** Each skill owns a clear slice; no duplicated auth or UI logic.
 
+## Example
+
+```json
+{
+  "name": "triage-agent",
+  "description": "Routes incoming support tasks to the knowledge or escalation agent",
+  "url": "https://agents.example.com/triage",
+  "version": "1.2.0",
+  "capabilities": { "streaming": true, "pushNotifications": false },
+  "authentication": { "schemes": ["OAuth2"] },
+  "defaultInputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["application/json"],
+  "skills": [
+    {
+      "id": "route-task",
+      "name": "Route support task",
+      "description": "Classifies intent and assigns the task to a downstream agent",
+      "tags": ["routing", "support"],
+      "examples": ["Customer can't log in after password reset"]
+    }
+  ]
+}
+```
+
+```ts
+// Client: submit a task with a timeout — never wait forever (deadlock guard)
+const task = await a2aClient.tasks.send({
+  message: { role: 'user', parts: [{ kind: 'text', text: 'Refund request #4821' }] },
+});
+const result = await a2aClient.tasks.wait(task.id, { timeoutMs: 30_000 });
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Assumptions stated explicitly; asked when uncertain (Think Before Coding)

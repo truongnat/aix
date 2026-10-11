@@ -192,3 +192,18 @@ Details: [references/versions.md](references/versions.md)
 - [ ] Health signals and rollback or forward-fix path are defined
 - [ ] Cache/client/schema compatibility is addressed where relevant
 - [ ] Residual irreversible steps or observability gaps are documented
+
+## Example
+
+Zero-downtime rolling deploy with readiness gates and a verified rollback path:
+
+```bash
+# Build an immutable artifact and push it before touching traffic
+docker build -t registry.example.com/api:1.4.2 .
+docker push registry.example.com/api:1.4.2
+# Roll out gradually; the readiness gate must pass before old pods drain
+kubectl set image deployment/api api=registry.example.com/api:1.4.2
+kubectl rollout status deployment/api --timeout=120s
+# If error rate rises, restore the previous ReplicaSet exactly
+kubectl rollout undo deployment/api && kubectl rollout status deployment/api
+```

@@ -185,3 +185,17 @@ Details: [references/versions.md](references/versions.md)
 - [ ] Artifact rebuild triggers are correctly distinguished
 - [ ] Performance guidance is tied to batch size or environment context where relevant
 - [ ] Remaining environment or stale-artifact caveats are documented
+
+## Example
+
+Smallest correct pipeline after editing one skill — validate, then rebuild only the skill index:
+
+```bash
+# From repo root, with dist/ built (npm run build if missing)
+node packages/cli/dist/index.js skills validate
+node packages/cli/dist/index.js skills list --json | jq '.skills | length'
+node packages/cli/dist/index.js skills index build
+# Many KB questions at once: batch beats N cold `query-kb` runs
+node packages/cli/dist/index.js query-kb-batch --file questions.txt
+node packages/cli/dist/index.js kb verify
+```

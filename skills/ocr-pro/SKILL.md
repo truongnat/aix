@@ -179,3 +179,16 @@ Details: [references/ocr-performance.md](references/ocr-performance.md)
 - [ ] Language/model support is explicit
 - [ ] Latency and accuracy trade-offs are acknowledged
 - [ ] Residual recognition or integration caveats are documented
+
+## Example
+
+Tesseract pipeline with explicit preprocessing for Japanese receipts:
+
+```bash
+# Normalize first: OCR accuracy depends on input quality, not the engine flag
+convert receipt.jpg -colorspace Gray -resize 200% -sharpen 0x1 receipt_prep.png
+# Japanese + English, page segmentation mode 6 (uniform block of text)
+tesseract receipt_prep.png out -l jpn+eng --psm 6
+# Inspect confidence to catch low-quality fields before trusting output
+tesseract receipt_prep.png out -l jpn --psm 6 tsv && awk -F'\t' '$11 < 60 {print $12}' out.tsv
+```

@@ -152,6 +152,48 @@ Details: [references/decision-framework-and-trade-offs.md](references/decision-f
 - Pair **`nextjs-15-pro`** for RSC/Actions specifics, **`typescript-pro`** for typed props across the boundary.
 - **Verify:** RSC payload in Network tab, no unnecessary client bundle increase.
 
+## Example
+
+```tsx
+function useDebouncedValue<T>(value: T, delayMs = 300): T {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebounced(value), delayMs);
+    return () => window.clearTimeout(id); // cleanup prevents stale updates
+  }, [value, delayMs]);
+
+  return debounced;
+}
+
+export function SearchResults({ query }: { query: string }) {
+  const debouncedQuery = useDebouncedValue(query);
+  const [results, setResults] = useState<SearchHit[]>([]);
+
+  useEffect(() => {
+    if (!debouncedQuery) return setResults([]);
+    const controller = new AbortController();
+    fetch(`/api/search?q=${encodeURIComponent(debouncedQuery)}`, {
+      signal: controller.signal,
+    })
+      .then((r) => r.json())
+      .then(setResults)
+      .catch((err) => {
+        if (err.name !== 'AbortError') throw err;
+      });
+    return () => controller.abort();
+  }, [debouncedQuery]);
+
+  return (
+    <ul>
+      {results.map((hit) => (
+        <li key={hit.id}>{hit.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
 ## Checklist before calling the skill done
 
 - [ ] React version and framework confirmed before writing any code (Think Before Coding)

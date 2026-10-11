@@ -154,3 +154,20 @@ Details: [references/failure-modes.md](references/failure-modes.md)
 - [ ] Fix is surgical — no unrelated code touched
 - [ ] No new regressions introduced
 - [ ] Root cause documented in commit message or incident note
+
+## Example
+
+Instrument first, hypothesize second — capture the failing path before it becomes a 500:
+
+```ts
+// Wrap the handler so the real error and stack are logged, not swallowed
+app.post("/orders", async (req, res, next) => {
+  try {
+    const order = await createOrder(req.body);
+    res.json(order);
+  } catch (err) {
+    logger.error({ err, body: req.body }, "createOrder failed");
+    next(err); // observability first; the fix follows the evidence
+  }
+});
+```

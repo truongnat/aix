@@ -162,6 +162,27 @@ Details: [references/decision-tree.md](references/decision-tree.md)
 3. Code: `docker-compose.yml` with `depends_on` + `condition: service_healthy` on neo4j, meilisearch, redis
 4. Residual risks: Neo4j `start_period` too short causes API crash-loop; never `down -v` without backup
 
+
+```yaml
+services:
+  api:
+    build: .
+    ports: ["3000:3000"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_started }
+  db:
+    image: postgres:16-alpine
+    environment: { POSTGRES_PASSWORD: dev }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+  redis:
+    image: redis:7-alpine
+volumes: { pgdata: {} }
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Assumptions stated explicitly; asked when uncertain (Think Before Coding)

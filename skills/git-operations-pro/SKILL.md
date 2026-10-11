@@ -192,3 +192,17 @@ Details: [references/versions.md](references/versions.md)
 - [ ] Inspection steps precede destructive operations
 - [ ] Secret incidents include rotation or security follow-up where relevant
 - [ ] Residual release or collaboration risks are documented
+
+## Example
+
+Revert a bad merge on shared `main` without rewriting published history:
+
+```bash
+git checkout main && git pull --ff-only
+# Find the offending merge commit
+git log --oneline --merges -5
+# Revert with the correct mainline parent (-m 1 keeps main's side)
+git revert -m 1 <merge-sha> --no-edit
+# Verify the tree matches the pre-merge state
+git diff <merge-sha>~1..HEAD --stat && git push origin main
+```

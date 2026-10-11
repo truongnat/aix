@@ -184,6 +184,30 @@ Details: [references/versions.md](references/versions.md)
 - Use expand/migrate/contract instead of a one-shot lock-heavy migration.
 - **Verify:** Old and new app versions both work during rollout, and migration lock/replica impact stays within bounds.
 
+## Example
+
+```sql
+CREATE TABLE orders (
+    id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    tenant_id  uuid        NOT NULL REFERENCES tenants (id),
+    status     text        NOT NULL DEFAULT 'pending'
+                           CHECK (status IN ('pending', 'paid', 'shipped', 'cancelled')),
+    created_at timestamptz NOT NULL DEFAULT now()
+);
+
+-- Narrow index matching the hot filter + sort
+CREATE INDEX orders_tenant_status_created_idx
+    ON orders (tenant_id, status, created_at DESC);
+
+-- Verify the access path before shipping the index
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT id, created_at
+FROM orders
+WHERE tenant_id = $1 AND status = 'pending'
+ORDER BY created_at DESC
+LIMIT 50;
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Postgres version, workload shape, migration tool, and pool mode confirmed before proposing changes (Think Before Coding)

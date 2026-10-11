@@ -263,6 +263,22 @@ Details: [references/versions.md](/skills/caching-pro/references/versions.md)
 **Input:** Next.js global HTML at CDN.  
 **Expected output:** **`nextjs-15-pro`** semantics + **`caching-pro`** headers/purge + **`security-pro`** if personalized.
 
+
+```ts
+import { createClient } from 'redis';
+const redis = createClient({ url: 'redis://localhost:6379' });
+
+export async function getOrSet<T>(key: string, ttlSec: number, load: () => Promise<T>): Promise<T> {
+  const hit = await redis.get(key);
+  if (hit !== null) return JSON.parse(hit);
+  const value = await load();
+  await redis.set(key, JSON.stringify(value), { EX: ttlSec }); // write-through on miss
+  return value;
+}
+
+const product = await getOrSet('product:42', 300, () => db.products.findById(42));
+```
+
 ## Checklist before calling the skill done
 
 ### Strategy & correctness

@@ -220,3 +220,16 @@ Details: [references/template-catalog.md](references/template-catalog.md)
 - [ ] Prompt optimization preserves the user’s original goal
 - [ ] Templates are used only when they add real structure
 - [ ] Residual ambiguities are called out rather than hidden
+
+## Example
+
+Route a mixed request by repo signals before naming skills:
+
+```bash
+# Detect the stack first — never route to react-pro on a Dart repo
+ls pubspec.yaml package.json go.mod 2>/dev/null
+# Flutter repo signals → route app-layer work to flutter-pro
+grep -l "riverpod" pubspec.yaml && echo "route: flutter-pro + systematic-debugging-pro"
+# Check which skills exist before naming them in the route
+ls ~/.claude/skills/ | grep -E "flutter|testing|debug"
+```

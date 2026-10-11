@@ -119,3 +119,17 @@ This skill must produce:
 - [ ] Status was downgraded if proof was incomplete
 - [ ] Human checks are explicit when required
 - [ ] The final wording does not overclaim
+
+## Example
+
+Verification script — prove the claimed behavior, not just that code compiles:
+
+```bash
+# Fresh-check variant: rerun the actual failing scenario end to end
+npm test -- orders.spec.ts 2>&1 | tee /tmp/test.log
+grep -q "3 passed" /tmp/test.log || { echo "FAIL: tests did not pass"; exit 1; }
+# Verify the observable behavior, not the implementation detail
+curl -sf http://localhost:3000/api/orders | jq '.items | length'
+# Report evidence: command run, output seen, criterion met
+echo "VERIFIED: endpoint returns 200 with non-empty items"
+```

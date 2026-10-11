@@ -187,6 +187,25 @@ Details: [references/versions.md](references/versions.md)
 - Keep image and pipeline responsibilities separate.
 - **Verify:** CI builds the same image contract locally and remotely, then pushes the expected digest.
 
+
+```Dockerfile
+# syntax=docker/dockerfile:1
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build && npm prune --omit=dev
+
+FROM node:20-alpine AS runtime
+WORKDIR /app
+USER node
+COPY --from=build --chown=node:node /app/node_modules ./node_modules
+COPY --from=build --chown=node:node /app/dist ./dist
+EXPOSE 3000
+CMD ["node", "dist/main.js"]
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Runtime, architecture, and target environment confirmed first (Think Before Coding)

@@ -84,3 +84,16 @@ Detailed pattern documentation lives in `references/details.md`. Read that file 
 Produce an accessibility audit or implementation artifact with WCAG target, findings by severity, affected paths/components, evidence, remediation, and verification steps.
 
 Use `references/audit-and-remediation-matrix.md` to triage severity, reproduce issues, run manual assistive-technology checks, assign remediation, and prove regression fixes.
+
+## Example
+
+Automated axe/pa11y audit as the first pass before manual review:
+
+```bash
+# Run axe-core against a built page — catches contrast, labels, ARIA misuse
+npx pa11y --standard WCAG2AA --reporter json http://localhost:3000/checkout
+# In-browser axe for a full violation report with element targets
+npx axe http://localhost:3000/checkout --exit
+# CI gate: fail the build on any critical violation
+npx pa11y --threshold 0 http://localhost:3000/checkout
+```

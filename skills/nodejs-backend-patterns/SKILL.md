@@ -67,3 +67,34 @@ Produce a Node.js backend implementation or review artifact with runtime choices
 ## Cross-skill handoffs
 
 - sk-security-pro for threat controls; sk-testing-pro for verification; sk-deployment-pro for runtime rollout; relevant framework/domain skill for implementation detail.
+
+## Example
+
+```ts
+import express from 'express';
+import { z } from 'zod';
+
+const app = express();
+app.use(express.json({ limit: '100kb' }));
+
+const CreateUser = z.object({
+  email: z.string().email(),
+  role: z.enum(['admin', 'member']).default('member'),
+});
+
+app.post('/v1/users', async (req, res, next) => {
+  try {
+    const body = CreateUser.parse(req.body); // validate at the boundary
+    const user = await db.query(
+      'INSERT INTO users (email, role) VALUES ($1, $2) RETURNING id, email, role',
+      [body.email, body.role], // parameterized, pooled connection
+    );
+    res.status(201).json(user.rows[0]);
+  } catch (err) {
+    next(err); // centralized error handler shapes the response
+  }
+});
+
+app.get('/healthz', (_req, res) => res.json({ status: 'ok' }));
+```
+

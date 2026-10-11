@@ -175,6 +175,31 @@ Details: [references/versions.md](references/versions.md)
 - Use integration tests against a real database role instead of mocking the authorization boundary away.
 - **Verify:** Allowed tenant passes, forbidden tenant fails, and policy behavior matches production role semantics.
 
+## Example
+
+```ts
+import { describe, expect, it, vi } from 'vitest';
+
+describe('checkout total', () => {
+  it('applies a 10% coupon to the item subtotal', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-11T12:00:00Z'));
+
+    const order = checkout({
+      items: [{ sku: 'BOOK-1', unitPrice: 4000, qty: 2 }],
+      coupon: 'SAVE10',
+    });
+
+    // Assert the user-visible outcome, not internal calls
+    expect(order.subtotalCents).toBe(8000);
+    expect(order.discountCents).toBe(800);
+    expect(order.totalCents).toBe(7200);
+
+    vi.useRealTimers();
+  });
+});
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Stack, runner, and CI target confirmed before proposing tests (Think Before Coding)

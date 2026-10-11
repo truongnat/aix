@@ -179,6 +179,27 @@ Details: [references/versions.md](references/versions.md)
 - Do not let renderer implementation choices widen desktop privileges.
 - **Verify:** Renderer UI works while main/preload boundaries remain explicit and minimal.
 
+
+```ts
+// main.ts — minimal IPC boundary
+import { app, BrowserWindow, ipcMain } from 'electron';
+import path from 'node:path';
+
+ipcMain.handle('read-config', () => readUserConfig()); // main owns filesystem
+
+app.whenReady().then(() => {
+  const win = new BrowserWindow({
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  });
+  win.loadFile('dist/index.html');
+});
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Electron version, OS targets, and process boundary confirmed first (Think Before Coding)

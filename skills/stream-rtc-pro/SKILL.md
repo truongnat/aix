@@ -115,6 +115,43 @@ Response shape:
 - Propose the minimum operational fixes first: relay coverage, timeout tuning, join diagnostics.
 - Validate with corp-network test scenarios and connection-state telemetry.
 
+## Example
+
+```ts
+const pc = new RTCPeerConnection({
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    {
+      urls: ['turns:turn.example.com:443?transport=tcp'], // TLS fallback for strict firewalls
+      username: 'rtc-user',
+      credential: process.env.TURN_SECRET,
+    },
+  ],
+});
+
+pc.onicecandidate = ({ candidate }) => {
+  if (candidate) signaling.send({ type: 'ice', candidate });
+};
+
+pc.onconnectionstatechange = () => {
+  console.log('connectionState:', pc.connectionState); // failed → check TURN reachability
+};
+
+// Perfect-negotiation offer flow (polite peer pattern)
+signaling.onmessage = async (msg) => {
+  if (msg.type === 'offer') {
+    await pc.setRemoteDescription(msg.sdp);
+    await pc.setLocalDescription();
+    signaling.send({ type: 'answer', sdp: pc.localDescription });
+  } else if (msg.type === 'ice') {
+    await pc.addIceCandidate(msg.candidate);
+  }
+};
+
+const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+for (const track of stream.getTracks()) pc.addTrack(track, stream);
+```
+
 ## Checklist before calling the skill done
 
 - Topology, scale, and latency goals are explicit.

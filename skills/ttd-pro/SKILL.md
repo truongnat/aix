@@ -115,3 +115,18 @@ This skill must produce:
 - [ ] The minimal changes were implemented
 - [ ] Test to ensure completion (Phase B) passes after implementation
 - [ ] Regression protection exists for the changed behavior
+
+## Example
+
+Phase A RED test — written before implementation, expected to fail:
+
+```ts
+// RED: this test must fail until createOrder handles the edge case
+import { describe, it, expect } from "vitest";
+describe("createOrder", () => {
+  it("rejects empty items with a domain error, not a crash", () => {
+    // Phase A: failing test defines the contract
+    expect(() => createOrder({ items: [] })).toThrow(EmptyOrderError);
+  });
+});
+```

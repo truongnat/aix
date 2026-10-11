@@ -116,3 +116,16 @@ Produce a document/media artifact with input and output paths, coverage/quality 
 ## Worked scenarios and evidence
 
 Read [`references/worked-scenarios-and-evidence.md`](./references/worked-scenarios-and-evidence.md) for one positive and one negative/edge fixture with expected output-level evidence and canonical handoff.
+
+## Example
+
+Merge and extract text from a PDF with the canonical tools:
+
+```bash
+# Merge with qpdf (pypdf equivalent: writer.add_page)
+qpdf --empty --pages cover.pdf report.pdf -- merged.pdf
+# Layout-preserving text extraction for downstream analysis
+pdftotext -layout merged.pdf out.txt
+# Scanned pages need OCR: render to image first, then tesseract
+pdftoppm -png -r 300 scan.pdf page && tesseract page-1.png out -l eng
+```

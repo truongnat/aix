@@ -143,6 +143,40 @@ Details: [references/tsconfig.md](references/tsconfig.md)
 - Pair **`react-pro`** for component patterns; **`javascript-pro`** when the bug has a runtime (not type) dimension.
 - **Verify:** TS errors at the JSX call site for missing required props; optional props accept `undefined`.
 
+## Example
+
+```ts
+// Discriminated union + exhaustive narrowing — no `as`, no `any`
+type ApiResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: { code: string; message: string } };
+
+interface User {
+  id: string;
+  email: string;
+  role: 'admin' | 'member'; // required literal, not `string`
+}
+
+async function fetchUser(id: string): Promise<ApiResult<User>> {
+  const res = await fetch(`/api/users/${encodeURIComponent(id)}`);
+  if (!res.ok) {
+    return { ok: false, error: { code: `HTTP_${res.status}`, message: res.statusText } };
+  }
+  const body: unknown = await res.json(); // unknown at the trust boundary
+  if (typeof body === 'object' && body !== null && 'id' in body && 'email' in body) {
+    return { ok: true, data: body as User }; // safe: runtime shape checked above
+  }
+  return { ok: false, error: { code: 'BAD_SHAPE', message: 'Unexpected payload' } };
+}
+
+const result = await fetchUser('u_42');
+if (result.ok) {
+  console.log(result.data.email); // narrowed to User
+} else {
+  console.error(result.error.code); // narrowed to error branch
+}
+```
+
 ## Checklist before calling the skill done
 
 - [ ] TypeScript version and `strict` flags confirmed before writing types (Think Before Coding)

@@ -54,3 +54,16 @@ Use `references/incident-evidence-matrix.md` for production incidents or regress
 ## Worked scenarios and evidence
 
 Read [`references/worked-scenarios-and-evidence.md`](./references/worked-scenarios-and-evidence.md) for one positive and one negative/edge fixture with expected output-level evidence and canonical handoff.
+
+## Example
+
+Bisect a regression across history, then confirm with a minimal repro:
+
+```bash
+# Automate the search: script exits 0=good, 1=bad
+git bisect start && git bisect bad HEAD && git bisect good v1.9.0
+git bisect run ./repro-fails.sh          # finds the exact introducing commit
+git bisect reset
+# Inspect the culprit commit before proposing any fix
+git show <culprit-sha> --stat && git log -1 --format=%B <culprit-sha>
+```

@@ -178,6 +178,17 @@ Details: [references/versions.md](references/versions.md)
 - Keep network transport and service contract concerns explicit.
 - **Verify:** The path enforces the intended trust policy without breaking service reachability.
 
+
+```bash
+# DNS + TLS reachability check for api.example.com
+dig +short api.example.com A
+dig +short api.example.com AAAA
+curl -sI https://api.example.com/health --connect-timeout 5
+openssl s_client -connect api.example.com:443 -servername api.example.com </dev/null 2>/dev/null \
+  | openssl x509 -noout -subject -issuer -dates
+traceroute -T -p 443 api.example.com
+```
+
 ## Checklist before calling the skill done
 
 - [ ] Provider, zones, path shape, and compliance constraints confirmed first (Think Before Coding)

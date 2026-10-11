@@ -230,6 +230,52 @@ Details: [references/versions.md](/skills/api-design-pro/references/versions.md)
 **Input:** "Should cancel be PATCH status or POST /cancel?"  
 **Expected output:** **Workflow** guidance: explicit **cancel** action, guards, **409** on illegal transition; avoid silent PATCH foot-guns.
 
+## Example
+
+```yaml
+openapi: 3.1.0
+info:
+  title: Orders API
+  version: 1.4.0
+paths:
+  /v1/orders:
+    post:
+      summary: Create an order
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, maxLength: 64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [sku, qty]
+                    properties:
+                      sku: { type: string }
+                      qty: { type: integer, minimum: 1 }
+      responses:
+        '201':
+          description: Order created
+          headers:
+            Location: { schema: { type: string } }
+        '409':
+          description: Idempotency key reused with a different payload
+        '422':
+          description: Validation failure
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+```
+
 ## Checklist before calling the skill done
 
 ### Core contract
