@@ -15,7 +15,7 @@ metadata:
 
 You have aix. aix gives you two things:
 
-1. **A skill library** — 230+ skills. Two kinds:
+1. **A skill library** — 223 skills. Two kinds:
    - **Process skills** (the methodology spine): how to work — `discussing-pro`,
      `router-pro`, `tool-discovery`, planning, TDD, review, ship.
    - **Domain skills** (the library): deep references — `react-pro`, `aws-pro`,

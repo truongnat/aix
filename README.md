@@ -1,6 +1,6 @@
 # aix
 
-> AI engineering methodology + 230+ skills, delivered as an Agent Plugins 1.0 plugin for Claude Code, Codex, Cursor, and Gemini.
+> AI engineering methodology + 223 skills, delivered as an Agent Plugins 1.0 plugin for Claude Code, Codex, Cursor, and Gemini.
 
 **The host agent is the runtime**. aix is the playbook and the skill library — not a separate engine you invoke.
 
@@ -102,11 +102,13 @@ aix doctor                        # env + skills-release staleness check
 ```
 plugin.json         Agent Plugins 1.0 manifest (canonical)
 AGENTS.md           canonical agent instructions
-skills/             230+ skills — Agent Skills spec (<name>/SKILL.md)
+skills/             223 skills — Agent Skills spec (<name>/SKILL.md)
 skills.sh.json      skills.sh registry groupings
 skills-release.json per-skill sha256 (staleness detection)
 workflows/          engineering-spine doc + spine.js workflow
 rules/core/         spine operating contract (drives CLAUDE.md/AGENTS.md output)
+hooks/              SessionStart hook — injects using-aix at session start
+evals/              plugin eval cases (experimental.evals)
 .claude-plugin/     Claude Code manifest + marketplace.json
 .cursor-plugin/     Cursor manifest
 gemini-extension.json Gemini extension manifest

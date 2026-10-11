@@ -25,7 +25,7 @@ flowchart TD
         B1{{"Plugin load<br/>skills auto-discovered"}}
         B2["skills/ auto-discovery<br/>+ spine.js workflow"]
         B3["Inject 'using-aix' vào context agent<br/>+ framing: dùng Skill tool"]
-        B4["231 skills sẵn sàng qua Skill tool<br/>(plugin.json → skills/)"]
+        B4["223 skills sẵn sàng qua Skill tool<br/>(plugin.json → skills/)"]
         B1 --> B2 --> B3 --> B4
     end
 
@@ -75,7 +75,7 @@ flowchart TD
 Sau bước này không cần làm gì thêm. Plugin tự kích hoạt ở mọi session sau.
 
 ### ② Mỗi session mới — skills sẵn sàng, user không thao tác
-1. **231 skills** gọi được qua **Skill tool** (`skills/<name>/SKILL.md` auto-discovered).
+1. **223 skills** gọi được qua **Skill tool** (`skills/<name>/SKILL.md` auto-discovered).
 2. **`aix-spine` workflow** (`workflows/spine.js`) chạy 8 phase như orchestration native.
 3. Skill **`using-aix`** là tấm bản đồ — giải thích methodology spine và cách với tới mọi skill khác;
    agent tự kích hoạt khi task match.
