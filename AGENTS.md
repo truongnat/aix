@@ -9,6 +9,7 @@ plugin.json          Agent Plugins 1.0 manifest (canonical)
 AGENTS.md            this file — canonical agent instructions
 skills/<name>/       skills in Agent Skills spec format (SKILL.md + references/scripts)
 workflows/           engineering-spine doc + spine.js (Claude workflows)
+rules/core/          spine operating contract → provider instruction files
 .claude-plugin/      Claude Code manifest + marketplace.json
 .cursor-plugin/      Cursor manifest
 gemini-extension.json Gemini extension manifest
