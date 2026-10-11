@@ -32,6 +32,7 @@ export function registerPluginCommand(program: Command): void {
           displayName: 'aix',
           skills: ['./skills/'],
           workflows: ['./workflows/'],
+          experimental: { evals: './evals/' },
         },
         '.cursor-plugin/plugin.json': {
           ...base,
