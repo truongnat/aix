@@ -1,13 +1,7 @@
 ---
 name: caching-pro
 description: >+
-  "Professional distributed and multi-layer caching: patterns (cache-aside, read/write-through, write-behind), end-to-end data flows (read, write, invalidate, warm, refresh), formal consistency models (read-after-write, bounded staleness, eventual, session/monotonic hints), write-path ordering and dual-write risks, L1/L2/CDN architectures and cross-layer invalidation, failure modes (outage, partition, eviction storm, stale forever), stampede and resilience (circuit breaker, backoff), cost and capacity modeling, security (tenant isolation, poisoning, auth-aware keys), lifecycle (warm, expire, evict, rebuild), key/TTL design, observability, and operational rollout."
-
-  Use when speeding reads, cutting DB/API load, designing Redis or in-memory tiers, troubleshooting stale data, reviewing cache safety, or aligning HTTP/CDN behavior with correctness.
-
-  Use with nextjs-15-pro, postgresql-pro, sql-data-access-pro, deployment-pro, security-pro, api-design-pro as needed.
-
-  Triggers: "caching", "cache strategy", "Redis", "TTL", "
+  "Professional distributed and multi-layer caching: patterns (cache-aside, read/write-through, write-behind), end-to-end data flows (read, write, invalidate, warm, refresh), formal consistency models (read-after-write, bounded staleness, eventual, session/monotonic hints), write-path ordering and dual-write risks, L1/L2/CDN architectures and cross-layer invalidation, failure modes (outage, partition, eviction storm, stale forever), stampede and resilience (circuit breaker, backoff), cost and capacity modeling, security (tenant isolation, poisoning, auth-aware keys), lifecycle (warm, expire, evict, rebuild), key/TTL design, observability, and operational rollout." Use when speeding reads, cutting DB/API load, designing Redis or in-memory tiers, troubleshooting stale data, reviewing cache safety, or aligning HTTP/CDN behavior with correctness. Triggers: caching, cache strategy, Redis, TTL.
 metadata:
   compatible: "claude,cursor,codex,gemini"
   kind: "domain"

@@ -1,13 +1,7 @@
 ---
 name: seo-pro
 description: >+
-  "Production-grade SEO: organic search lifecycle system model, failure modes (index bloat, JS rendering gaps, soft 404, mis-attribution), decision trade-offs (SSR vs client, indexing aggressiveness, rich results vs maintenance), quality guardrails (no guaranteed rankings; cite Search Central / Bing)."
-
-  Use this skill when the user asks about organic search visibility, Google Search Console, Bing Webmaster, robots.txt, XML sitemaps, canonical and hreflang, meta titles/descriptions, structured data (JSON-LD), E-E-A-T, internal linking, JavaScript SEO, duplicate content, pagination, international SEO, or Core Web Vitals vs SEO.
-
-  Use **with** **`nextjs-15-pro`** (Metadata API, `sitemap.ts`, `robots.ts`, RSC/SSR for crawlable HTML), **`react-pro`** (SPA rendering constraints, document head), **`deployment-pro`** (CDN, caching, TTFB). This skill (`seo-pro`) owns **search strategy and SEO mechanics**; framework skills own **framework-specific implementation**.
-
-  Triggers: "SEO", "organic search", "Google Search Console", "
+  "Production-grade SEO: organic search lifecycle system model, failure modes (index bloat, JS rendering gaps, soft 404, mis-attribution), decision trade-offs (SSR vs client, indexing aggressiveness, rich results vs maintenance), quality guardrails (no guaranteed rankings; cite Search Central / Bing)." Use this skill when the user asks about organic search visibility, Google Search Console, Bing Webmaster, robots.txt, XML sitemaps, canonical and hreflang, meta titles/descriptions, structured data (JSON-LD), E-E-A-T, internal linking, JavaScript SEO, duplicate content, pagination, international SEO, or Core Web Vitals vs SEO. Use **with** **`nextjs-15-pro`** (Metadata API, `sitemap.ts`, `robots.ts`, RSC/SSR for crawlable HTML), **`react-pro`** (SPA rendering constraints, document head), **`deployment-pro`** (CDN, caching, TTFB). Triggers: SEO, organic search, Google Search Console.
 metadata:
   compatible: "claude,cursor,codex,gemini"
   kind: "domain"
