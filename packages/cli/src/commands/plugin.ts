@@ -31,6 +31,7 @@ export function registerPluginCommand(program: Command): void {
           ...base,
           displayName: 'aix',
           skills: ['./skills/'],
+          hooks: './hooks/hooks.json',
           workflows: ['./workflows/'],
           experimental: { evals: './evals/' },
         },

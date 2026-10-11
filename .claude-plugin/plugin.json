@@ -26,5 +26,6 @@
   ],
   "experimental": {
     "evals": "./evals/"
-  }
+  },
+  "hooks": "./hooks/hooks.json"
 }

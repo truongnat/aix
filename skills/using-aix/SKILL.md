@@ -24,7 +24,8 @@ You have aix. aix gives you two things:
 
 ## How to reach the other skills
 
-**Use the `Skill` tool** with the skill's name to load any other skill. To decide *which* skill:
+This skill is injected at session start (SessionStart hook). For everything else, **use the `Skill`
+tool** with the skill's name. To decide *which* skill:
 
 - For a broad or ambiguous request, invoke **`router-pro`** — it analyses the
   request, sharpens the prompt, and routes to the right skill(s)/workflow.

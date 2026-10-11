@@ -75,19 +75,6 @@ Apply **Karpathy principles** throughout: Think Before Coding, Simplicity First,
 5. **Define success criteria** (auth test cases, penetration test results, compliance checklist); loop until verified (**Goal-Driven Execution**).
 6. **Respond** using **Suggested response format (STRICT)**; note token leakage, privilege escalation, and revocation gaps.
 
-### Operating principles
-
-1. **Think Before Coding** — State assumptions: threat model, IdP constraints, compliance requirements. Ask when uncertain.
-2. **Simplicity First** — Start with basic auth (session/JWT); add SSO/MFA/audit only when justified.
-3. **Surgical Changes** — Only touch auth code related to the request. Don't refactor unrelated user management.
-4. **Goal-Driven Execution** — Define auth test cases, penetration test scope, compliance checklist upfront.
-5. **Identity proofing before access** — authn strength must match risk level.
-6. **Authz is server-side truth** — never trust client role claims without verification.
-7. **Least privilege by default** — deny-first policy and scoped permissions.
-8. **Short-lived credentials** — minimize token/session lifetime and rotate secrets.
-9. **Explicit lifecycle controls** — issuance, refresh, revocation, and auditability are mandatory.
-10. **Method follows context** — choose protocols by actor, trust, and operational constraints.
-
 ### Identity, trust, and session (system model) (summary)
 
 Actors, credential classes, authz surface, lifecycle — **`identity-trust-session-system-model.md`**.
