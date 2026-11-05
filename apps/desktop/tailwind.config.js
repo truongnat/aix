@@ -7,10 +7,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#090a0f',
-        surface: '#12141c',
-        'surface-elevated': '#1a1d29',
-        border: 'rgba(255, 255, 255, 0.08)',
+        background: '#08090d',
+        surface: '#0e1017',
+        'surface-elevated': '#141720',
+        border: 'rgba(255, 255, 255, 0.05)',
         primary: {
           DEFAULT: '#3b82f6',
           hover: '#2563eb',

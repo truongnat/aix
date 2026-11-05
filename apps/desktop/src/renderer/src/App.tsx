@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from './components/Sidebar';
 import type { NavTab } from './components/Sidebar';
 import { ChatCanvas } from './components/ChatCanvas';
 import { InspectorDrawer } from './components/InspectorDrawer';
+import type { DrawerTab } from './components/InspectorDrawer';
 import { DashboardPage } from './pages/DashboardPage';
 import { SpinePage } from './pages/SpinePage';
 import { SkillsPage } from './pages/SkillsPage';
@@ -18,36 +19,52 @@ export const App: React.FC = () => {
   const [sessions, setSessions] = useState<readonly DesktopSessionSummary[]>([]);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [selectedArtifact, setSelectedArtifact] = useState<string | null>(null);
+  const [drawerRequest, setDrawerRequest] = useState<{ tab: DrawerTab; seq: number } | undefined>(undefined);
+  const [activeSessionId, setActiveSessionId] = useState<string | undefined>(undefined);
 
-  const refreshData = () => {
+  const refreshData = useCallback(() => {
     if (typeof window !== 'undefined' && window.aixAPI) {
       window.aixAPI.listSessions().then(setSessions).catch(console.error);
       window.aixAPI.getStatus().then(setStatus).catch(console.error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     refreshData();
-  }, []);
+  }, [refreshData]);
 
   const handleOpenArtifact = (art: string) => {
     setSelectedArtifact(art);
+    setDrawerRequest((prev) => ({ tab: 'artifacts', seq: (prev?.seq ?? 0) + 1 }));
+    setDrawerOpen(true);
+  };
+
+  const handleToggleDrawer = (tab: DrawerTab) => {
+    if (drawerOpen && drawerRequest?.tab === tab) {
+      setDrawerOpen(false);
+      return;
+    }
+    setDrawerRequest((prev) => ({ tab, seq: (prev?.seq ?? 0) + 1 }));
     setDrawerOpen(true);
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#090a0f] text-slate-200 select-none">
+    <div className="flex h-screen w-screen overflow-hidden bg-background text-slate-200 select-none">
       <Sidebar currentTab={currentTab} onSelectTab={setCurrentTab} status={status} />
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         <div className="flex-1 flex overflow-hidden">
           <main className="flex-1 overflow-y-auto">
-            {currentTab === 'chat' && (
+            <div className={currentTab === 'chat' ? 'h-full flex flex-col' : 'hidden'}>
               <ChatCanvas
                 sessions={sessions}
                 onOpenArtifact={handleOpenArtifact}
                 onRefreshSessions={refreshData}
+                onSessionChange={setActiveSessionId}
+                onToggleDrawer={handleToggleDrawer}
+                drawerTab={drawerOpen ? (drawerRequest?.tab ?? null) : null}
+                onNavigate={setCurrentTab}
               />
-            )}
+            </div>
             {currentTab === 'dashboard' && (
               <DashboardPage status={status} sessions={sessions} onNavigate={setCurrentTab} />
             )}
@@ -66,6 +83,8 @@ export const App: React.FC = () => {
             sessions={sessions}
             status={status}
             onRefreshData={refreshData}
+            requestedTab={drawerRequest}
+            activeSessionId={activeSessionId}
           />
         </div>
 

@@ -23,6 +23,7 @@ const api: AixDesktopAPI = {
   runVerify: (sessionId, command) => ipcRenderer.invoke('verify:run', sessionId, command),
   startSpine: (task, mode) => ipcRenderer.invoke('spine:start', task, mode),
   respondHitl: (requestId, decision, note) => ipcRenderer.invoke('spine:respondHitl', requestId, decision, note),
+  abortSpine: (sessionId) => ipcRenderer.invoke('spine:abort', sessionId),
   onSpineEvent: (callback) => {
     const listener = (_: unknown, event: unknown) => {
       callback(event as DesktopSpineEvent);

@@ -24,7 +24,7 @@ interface ProviderCardInfo {
   readonly icon: string;
 }
 
-const PROVIDERS: readonly ProviderCardInfo[] = [
+export const PROVIDERS: readonly ProviderCardInfo[] = [
   {
     id: 'inferx',
     name: 'InferX DeepSeek',
@@ -231,7 +231,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 font-mono"
               >
                 {currentProviderInfo?.models.map((m) => (
-                  <option key={m} value={m} className="bg-[#0f111a] text-white">
+                  <option key={m} value={m} className="bg-surface-elevated text-white">
                     {m}
                   </option>
                 ))}

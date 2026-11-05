@@ -92,6 +92,14 @@ export const SpinePage: React.FC<SpinePageProps> = ({ sessions, onRefreshSession
         ]);
         setSelectedSessionId(event.sessionId);
         onRefreshSessions?.();
+      } else if (event.type === 'aborted') {
+        setIsRunning(false);
+        setPendingHitl(null);
+        setCurrentRunningPhase(null);
+        setLogs((prev) => [
+          ...prev,
+          { message: `Session ${event.sessionId} stopped by user`, timestamp: new Date().toLocaleTimeString() },
+        ]);
       } else if (event.type === 'error') {
         setIsRunning(false);
         setLogs((prev) => [
@@ -164,7 +172,7 @@ export const SpinePage: React.FC<SpinePageProps> = ({ sessions, onRefreshSession
             className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono"
           >
             {sessions.map((s) => (
-              <option key={s.id} value={s.id} className="bg-[#0f111a] text-white">
+              <option key={s.id} value={s.id} className="bg-surface-elevated text-white">
                 {s.id}
               </option>
             ))}
@@ -305,7 +313,7 @@ export const SpinePage: React.FC<SpinePageProps> = ({ sessions, onRefreshSession
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-6">
           <form
             onSubmit={handleStartRun}
-            className="bg-[#0f111a] border border-white/10 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+            className="bg-surface-elevated border border-white/10 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
           >
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h2 className="text-base font-bold text-white flex items-center gap-2">

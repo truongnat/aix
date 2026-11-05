@@ -33,12 +33,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
   ];
 
   return (
-    <aside className="w-64 bg-[#0d0f17] border-r border-white/5 flex flex-col justify-between select-none">
+    <aside className="w-60 bg-surface border-r border-white/5 flex flex-col justify-between select-none">
       <div>
         {/* Brand Header */}
         <div className="p-5 flex items-center gap-3 border-b border-white/5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <Layers className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-400/20 flex items-center justify-center">
+            <Layers className="w-4 h-4 text-indigo-300" />
           </div>
           <div>
             <div className="font-bold text-base tracking-tight text-white flex items-center gap-2">
@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
           <button
             type="button"
             onClick={() => onSelectTab('chat')}
-            className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-blue-600/20 transition-all"
+            className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs flex items-center justify-center gap-1.5 transition-colors"
           >
             <Plus className="w-3.5 h-3.5" /> Launch New Task
           </button>
@@ -71,13 +71,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors border ${
                   isActive
-                    ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
+                    ? 'bg-white/[0.05] text-white border-white/5'
+                    : 'text-slate-400 border-transparent hover:text-slate-200 hover:bg-white/[0.03]'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} />
                 {item.label}
               </button>
             );

@@ -41,7 +41,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ status, sessions, 
         </button>
       </div>
       {/* Active AI Intelligence Widget */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-900/20 via-indigo-900/10 to-purple-900/20 border border-blue-500/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-4 rounded-2xl bg-surface border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
             <Cpu className="w-5 h-5 text-blue-400" />

@@ -23,13 +23,13 @@ export interface SpineStepInfo {
 
 export const PIPELINE_STEPS: readonly SpineStepInfo[] = [
   { id: 'discuss', name: 'Discuss', role: 'Architect', icon: MessageSquare, artifact: 'DISCUSSION.md' },
-  { id: 'plan', name: 'Plan', role: 'Planner', icon: FileSpreadsheet, artifact: 'PLAN.md' },
+  { id: 'plan', name: 'Plan', role: 'Tasks Checklist', icon: FileSpreadsheet, artifact: 'PLAN.md' },
   { id: 'worktree', name: 'Worktree', role: 'Git Guard', icon: GitBranch, artifact: null },
-  { id: 'tdd', name: 'TDD', role: 'QA Lead', icon: FlaskConical, artifact: null },
-  { id: 'run', name: 'Execute', role: 'Coder', icon: Code2, artifact: null },
-  { id: 'run', name: 'Review', role: 'Security Reviewer', icon: ShieldCheck, artifact: 'REVIEW.md' },
-  { id: 'verify', name: 'Verify', role: 'Verifier', icon: CheckCircle2, artifact: 'VERIFY.md' },
-  { id: 'remember', name: 'Remember', role: 'Curator', icon: Brain, artifact: 'REMEMBER.md' },
+  { id: 'tdd', name: 'TDD', role: 'Test First RED', icon: FlaskConical, artifact: null },
+  { id: 'run', name: 'Code', role: 'GREEN Implementation', icon: Code2, artifact: null },
+  { id: 'run', name: 'Review', role: 'Security Audit', icon: ShieldCheck, artifact: 'REVIEW.md' },
+  { id: 'verify', name: 'Verify', role: 'Sandbox Execution', icon: CheckCircle2, artifact: 'VERIFY.md' },
+  { id: 'remember', name: 'Remember', role: 'Durable Memory', icon: Brain, artifact: 'REMEMBER.md' },
 ];
 
 interface SpinePipelineVisualizerProps {
@@ -46,7 +46,7 @@ export const SpinePipelineVisualizer: React.FC<SpinePipelineVisualizerProps> = (
   onSelectArtifact,
 }) => {
   return (
-    <div className="p-6 rounded-2xl bg-gradient-to-b from-white/[0.03] to-white/[0.01] border border-white/5 space-y-4">
+    <div className="p-6 rounded-2xl bg-surface border border-white/5 space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-blue-400 block">

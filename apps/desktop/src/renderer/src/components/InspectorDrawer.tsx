@@ -29,6 +29,9 @@ interface InspectorDrawerProps {
   sessions: readonly DesktopSessionSummary[];
   status: DesktopSystemStatus | null;
   onRefreshData?: () => void;
+  /** `seq` changes on every request so asking for the same tab again still switches to it. */
+  requestedTab?: { readonly tab: DrawerTab; readonly seq: number };
+  activeSessionId?: string;
 }
 
 export type DrawerTab = 'artifacts' | 'verify' | 'kb' | 'memory';
@@ -40,6 +43,8 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   sessions,
   status,
   onRefreshData,
+  requestedTab,
+  activeSessionId,
 }) => {
   const [tab, setTab] = useState<DrawerTab>('artifacts');
   const [selectedSessionId, setSelectedSessionId] = useState<string>(sessions[0]?.id ?? '');
@@ -66,6 +71,14 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
       setTab('artifacts');
     }
   }, [activeArtifactName]);
+
+  useEffect(() => {
+    if (requestedTab) setTab(requestedTab.tab);
+  }, [requestedTab]);
+
+  useEffect(() => {
+    if (activeSessionId) setSelectedSessionId(activeSessionId);
+  }, [activeSessionId]);
 
   useEffect(() => {
     if (sessions.length > 0 && !selectedSessionId) {
@@ -130,15 +143,15 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   });
 
   return (
-    <aside className="w-[480px] bg-[#0c0d14] border-l border-white/5 flex flex-col h-full shrink-0 z-20 shadow-2xl">
+    <aside className="w-[440px] bg-surface border-l border-white/5 flex flex-col h-full shrink-0 z-20">
       {/* Drawer Header with Tabs */}
-      <div className="p-3 border-b border-white/5 flex items-center justify-between bg-black/20">
+      <div className="h-12 px-3 border-b border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => setTab('artifacts')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-              tab === 'artifacts' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`px-2.5 py-1.5 rounded-md text-[12px] font-medium flex items-center gap-1.5 transition-colors ${
+              tab === 'artifacts' ? 'bg-white/[0.07] text-white' : 'text-slate-500 hover:text-slate-200'
             }`}
           >
             <FileCode2 className="w-3.5 h-3.5" /> Artifacts
@@ -146,8 +159,8 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
           <button
             type="button"
             onClick={() => setTab('verify')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-              tab === 'verify' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`px-2.5 py-1.5 rounded-md text-[12px] font-medium flex items-center gap-1.5 transition-colors ${
+              tab === 'verify' ? 'bg-white/[0.07] text-white' : 'text-slate-500 hover:text-slate-200'
             }`}
           >
             <ShieldCheck className="w-3.5 h-3.5" /> Verify
@@ -155,8 +168,8 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
           <button
             type="button"
             onClick={() => setTab('kb')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-              tab === 'kb' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`px-2.5 py-1.5 rounded-md text-[12px] font-medium flex items-center gap-1.5 transition-colors ${
+              tab === 'kb' ? 'bg-white/[0.07] text-white' : 'text-slate-500 hover:text-slate-200'
             }`}
           >
             <Server className="w-3.5 h-3.5" /> KB Server
@@ -164,8 +177,8 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
           <button
             type="button"
             onClick={() => setTab('memory')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-              tab === 'memory' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`px-2.5 py-1.5 rounded-md text-[12px] font-medium flex items-center gap-1.5 transition-colors ${
+              tab === 'memory' ? 'bg-white/[0.07] text-white' : 'text-slate-500 hover:text-slate-200'
             }`}
           >
             <Brain className="w-3.5 h-3.5" /> Memory
@@ -196,7 +209,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
                 className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-mono max-w-[200px] truncate"
               >
                 {sessions.map((s) => (
-                  <option key={s.id} value={s.id} className="bg-[#0f111a] text-white">
+                  <option key={s.id} value={s.id} className="bg-surface-elevated text-white">
                     {s.id}
                   </option>
                 ))}
@@ -251,7 +264,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono"
                 >
                   {sessions.map((s) => (
-                    <option key={s.id} value={s.id} className="bg-[#0f111a] text-white">
+                    <option key={s.id} value={s.id} className="bg-surface-elevated text-white">
                       {s.id}
                     </option>
                   ))}

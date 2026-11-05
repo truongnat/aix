@@ -118,7 +118,8 @@ export type DesktopSpineEvent =
   | { readonly type: 'log'; readonly sessionId: string; readonly message: string; readonly timestamp: string }
   | { readonly type: 'hitl'; readonly sessionId: string; readonly request: DesktopHitlRequest }
   | { readonly type: 'complete'; readonly sessionId: string; readonly checkpointId: string; readonly artifacts: readonly string[] }
-  | { readonly type: 'error'; readonly sessionId: string; readonly error: string };
+  | { readonly type: 'error'; readonly sessionId: string; readonly error: string }
+  | { readonly type: 'aborted'; readonly sessionId: string };
 
 export interface AixDesktopAPI {
   // System
@@ -147,6 +148,7 @@ export interface AixDesktopAPI {
   runVerify(sessionId: string, command: string): Promise<DesktopVerificationResult>;
   startSpine(task: string, mode?: 'auto' | 'guided'): Promise<{ sessionId: string }>;
   respondHitl(requestId: string, decision: 'approve' | 'revise' | 'cancel', note?: string): Promise<void>;
+  abortSpine(sessionId: string): Promise<boolean>;
   onSpineEvent(callback: (event: DesktopSpineEvent) => void): () => void;
 }
 

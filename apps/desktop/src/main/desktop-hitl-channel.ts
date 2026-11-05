@@ -56,4 +56,13 @@ export class DesktopHitlChannel implements HitlChannel {
     pending.resolve({ chosen, note });
     return true;
   }
+
+  /** Releases every pending gate as `cancel` so an aborted run parked at a gate can unwind. */
+  cancelAll(note: string): void {
+    for (const pending of this.#pending.values()) {
+      clearTimeout(pending.timer);
+      pending.resolve({ chosen: 'cancel', note });
+    }
+    this.#pending.clear();
+  }
 }

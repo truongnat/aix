@@ -16,7 +16,7 @@ interface StatusBarProps {
 
 export const StatusBar: React.FC<StatusBarProps> = ({ status, onNavigate }) => {
   return (
-    <footer className="h-7 bg-[#0b0c13] border-t border-white/5 px-4 flex items-center justify-between text-[11px] text-slate-400 select-none z-40">
+    <footer className="h-7 bg-surface border-t border-white/5 px-4 flex items-center justify-between text-[11px] text-slate-400 select-none z-40">
       {/* Left: AI Model Badge */}
       <div className="flex items-center gap-3">
         <button

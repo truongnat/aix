@@ -56,6 +56,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
   const policy = new PolicyEngine();
   const memoryStore = new RedactedMemoryStore(new MarkdownStore(storageRoot), policy);
   const activeChannels = new Map<string, DesktopHitlChannel>();
+  const activeRuns = new Map<string, AbortController>();
   let cachedRegistry: SkillRegistry | null = null;
 
   async function getRegistry(): Promise<SkillRegistry> {
@@ -581,6 +582,15 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     return false;
   });
 
+  // Cooperative stop: the run checks the signal between phases, so a phase already in flight finishes first.
+  ipcMain.handle('spine:abort', async (_, sessionId: string): Promise<boolean> => {
+    const controller = activeRuns.get(sessionId);
+    if (!controller) return false;
+    controller.abort();
+    activeChannels.get(sessionId)?.cancelAll('Stopped by user');
+    return true;
+  });
+
   ipcMain.handle('spine:start', async (event, task: string, mode?: 'auto' | 'guided'): Promise<{ sessionId: string }> => {
     if (typeof task !== 'string' || !task.trim() || task.length > 10000) {
       throw new Error('Task prompt must be a non-empty string under 10000 characters');
@@ -591,6 +601,9 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     const sessionId = session.id;
     const hitlChannel = new DesktopHitlChannel(webContents, sessionId);
     activeChannels.set(sessionId, hitlChannel);
+    const controller = new AbortController();
+    const { signal } = controller;
+    activeRuns.set(sessionId, controller);
 
     (async () => {
       try {
@@ -622,6 +635,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         emitLog(`Started new session ${sessionId} for task: "${task}"`);
 
         // Phase 1: Discuss
+        signal.throwIfAborted();
         emitPhase('discuss');
         emitLog('Executing Step 1: Discussing architecture and trade-offs...');
         engineState = await discussNode(engineState);
@@ -642,8 +656,9 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
             });
             if (resp.chosen === 'cancel') {
               emitLog('Session cancelled by user');
-              return;
+              controller.abort();
             }
+            signal.throwIfAborted();
             if (resp.chosen === 'revise') {
               emitLog(`Revision requested: ${resp.note ?? 're-evaluating discussion'}`);
               engineState = await discussNode(engineState);
@@ -655,6 +670,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         }
 
         // Phase 2: Plan
+        signal.throwIfAborted();
         emitPhase('plan');
         emitLog('Executing Step 2: Planning tasks and acceptance criteria...');
         engineState = await planNode(engineState);
@@ -675,8 +691,9 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
             });
             if (resp.chosen === 'cancel') {
               emitLog('Session cancelled by user');
-              return;
+              controller.abort();
             }
+            signal.throwIfAborted();
             if (resp.chosen === 'revise') {
               emitLog(`Revision requested: ${resp.note ?? 're-evaluating plan'}`);
               engineState = await planNode(engineState);
@@ -688,6 +705,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         }
 
         // Phase 3: Run / Execution
+        signal.throwIfAborted();
         emitPhase('run');
         emitLog('Executing Step 4 & 5: Running tasks in sandbox with TDD & Coder...');
         const graph = new EngineGraph(store);
@@ -696,9 +714,11 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         emitLog(`Execution completed with score: ${engineState.reviewScore}/10`);
 
         // Phase 4: Verify
+        signal.throwIfAborted();
         emitPhase('verify');
         emitLog('Generated REVIEW.md and prepared sandbox for verification');
 
+        signal.throwIfAborted();
         const sessionFolder = join(storageRoot, '.aix', 'sessions', sessionId);
         const files = await readdir(sessionFolder).catch(() => []);
         const artifacts = files.filter(f => f.endsWith('.md'));
@@ -712,7 +732,11 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
           });
         }
       } catch (err: unknown) {
-        if (!webContents.isDestroyed()) {
+        if (signal.aborted) {
+          if (!webContents.isDestroyed()) {
+            webContents.send('spine:event', { type: 'aborted', sessionId });
+          }
+        } else if (!webContents.isDestroyed()) {
           webContents.send('spine:event', {
             type: 'error',
             sessionId,
@@ -721,6 +745,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         }
       } finally {
         activeChannels.delete(sessionId);
+        activeRuns.delete(sessionId);
       }
     })();
 

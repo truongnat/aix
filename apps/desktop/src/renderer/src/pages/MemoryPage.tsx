@@ -212,7 +212,7 @@ export const MemoryPage: React.FC = () => {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-6">
           <form
             onSubmit={handleCreateMemory}
-            className="bg-[#0f111a] border border-white/10 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
+            className="bg-surface-elevated border border-white/10 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
           >
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h2 className="text-base font-bold text-white flex items-center gap-2">
