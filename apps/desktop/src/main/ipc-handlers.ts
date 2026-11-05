@@ -1,7 +1,7 @@
 import { app, dialog, ipcMain } from 'electron';
-import { readdir, readFile, stat, unlink } from 'node:fs/promises';
-import { join, resolve, relative, isAbsolute } from 'node:path';
-import { exec, execFile } from 'node:child_process';
+import { readdir, readFile, stat, unlink, writeFile, mkdir } from 'node:fs/promises';
+import { join, resolve, relative, isAbsolute, dirname } from 'node:path';
+import { exec, execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
 import { SkillRegistry } from '@x/registry';
 import { MarkdownStore, RedactedMemoryStore } from '@x/memory';
@@ -25,6 +25,10 @@ import type {
   DesktopSessionSummary,
   DesktopVerificationResult,
   DesktopSystemStatus,
+  DesktopAiConfig,
+  DesktopTestConnectionResult,
+  DesktopKbStatus,
+  AiProviderId,
 } from '../shared/api.js';
 
 const execFileAsync = promisify(execFile);
@@ -60,17 +64,49 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     return cachedRegistry;
   }
 
+  const aiConfigFile = join(storageRoot, '.aix', 'ai-config.json');
+  const kbPasswordFile = join(storageRoot, '.aix', 'kb-master-password.txt');
+
+  async function loadAiConfig(): Promise<{ provider: AiProviderId; model: string; apiKey: string; baseUrl?: string }> {
+    try {
+      const raw = await readFile(aiConfigFile, 'utf-8');
+      const parsed = JSON.parse(raw);
+      return {
+        provider: parsed.provider ?? 'anthropic',
+        model: parsed.model ?? 'claude-3-5-sonnet-20241022',
+        apiKey: parsed.apiKey ?? process.env['ANTHROPIC_API_KEY'] ?? process.env['OPENAI_API_KEY'] ?? process.env['GROQ_API_KEY'] ?? '',
+        baseUrl: parsed.baseUrl,
+      };
+    } catch {
+      return {
+        provider: (process.env['AIX_PROVIDER'] as AiProviderId) ?? 'anthropic',
+        model: process.env['ANTHROPIC_MODEL'] ?? 'claude-3-5-sonnet-20241022',
+        apiKey: process.env['ANTHROPIC_API_KEY'] ?? process.env['OPENAI_API_KEY'] ?? process.env['GROQ_API_KEY'] ?? '',
+        baseUrl: undefined,
+      };
+    }
+  }
+
+  async function checkKbHealth(): Promise<{ online: boolean; port: number; url: string }> {
+    for (const port of [4000, 3001]) {
+      try {
+        const res = await fetch(`http://127.0.0.1:${port}/health`, { signal: AbortSignal.timeout(600) });
+        if (res.ok) {
+          return { online: true, port, url: `http://127.0.0.1:${port}` };
+        }
+      } catch {
+        // Continue to next port
+      }
+    }
+    return { online: false, port: 4000, url: 'http://127.0.0.1:4000' };
+  }
+
   // System Status
   ipcMain.handle('system:getStatus', async (): Promise<DesktopSystemStatus> => {
     const registry = await getRegistry();
     const memories = await memoryStore.list();
-    let kbOnline = false;
-    try {
-      const res = await fetch('http://127.0.0.1:3001/health', { signal: AbortSignal.timeout(1000) });
-      kbOnline = res.ok;
-    } catch {
-      kbOnline = false;
-    }
+    const kb = await checkKbHealth();
+    const ai = await loadAiConfig();
 
     return {
       appVersion: app ? app.getVersion() : '0.1.0',
@@ -79,7 +115,130 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
       cwd: repoRoot,
       skillsCount: registry.all().length,
       memoryCount: memories.length,
-      kbServiceOnline: kbOnline,
+      kbServiceOnline: kb.online,
+      kbPort: kb.port,
+      activeAiProvider: ai.provider,
+      activeAiModel: ai.model,
+    };
+  });
+
+  // AI Configuration & Testing
+  ipcMain.handle('ai:getConfig', async (): Promise<DesktopAiConfig> => {
+    const cfg = await loadAiConfig();
+    return {
+      provider: cfg.provider,
+      model: cfg.model,
+      hasApiKey: Boolean(cfg.apiKey),
+      baseUrl: cfg.baseUrl,
+    };
+  });
+
+  ipcMain.handle('ai:setConfig', async (_, newConfig: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string }) => {
+    const existing = await loadAiConfig();
+    const finalApiKey = newConfig.apiKey?.trim() ? newConfig.apiKey.trim() : existing.apiKey;
+    const finalConfig = {
+      provider: newConfig.provider,
+      model: newConfig.model.trim(),
+      apiKey: finalApiKey,
+      baseUrl: newConfig.baseUrl?.trim() || undefined,
+    };
+
+    await mkdir(dirname(aiConfigFile), { recursive: true });
+    await writeFile(aiConfigFile, JSON.stringify(finalConfig, null, 2), 'utf-8');
+
+    process.env['AIX_PROVIDER'] = finalConfig.provider;
+    if (finalConfig.apiKey) {
+      if (finalConfig.provider === 'anthropic') {
+        process.env['ANTHROPIC_API_KEY'] = finalConfig.apiKey;
+        process.env['ANTHROPIC_MODEL'] = finalConfig.model;
+      } else if (finalConfig.provider === 'openai') {
+        process.env['OPENAI_API_KEY'] = finalConfig.apiKey;
+        process.env['OPENAI_MODEL'] = finalConfig.model;
+      } else if (finalConfig.provider === 'groq') {
+        process.env['GROQ_API_KEY'] = finalConfig.apiKey;
+        process.env['GROQ_MODEL'] = finalConfig.model;
+      }
+    }
+
+    return { ok: true };
+  });
+
+  ipcMain.handle('ai:testConnection', async (_, testParams?: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string }): Promise<DesktopTestConnectionResult> => {
+    const current = await loadAiConfig();
+    const provider = testParams?.provider ?? current.provider;
+    const model = testParams?.model ?? current.model;
+    const apiKey = testParams?.apiKey?.trim() ? testParams.apiKey.trim() : current.apiKey;
+    const baseUrl = testParams?.baseUrl?.trim() ? testParams.baseUrl.trim() : current.baseUrl;
+
+    if (provider === 'mock') {
+      return { ok: true, latencyMs: 5, message: 'Mock provider active (offline mode)' };
+    }
+
+    if (!apiKey && provider !== 'ollama') {
+      return { ok: false, latencyMs: 0, message: 'Missing API Key', error: `Missing API Key for provider "${provider}"` };
+    }
+
+    const start = Date.now();
+    try {
+      if (provider === 'anthropic') {
+        const url = baseUrl || 'https://api.anthropic.com/v1/messages';
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: 'user', content: 'ping' }],
+            max_tokens: 5,
+          }),
+          signal: AbortSignal.timeout(10000),
+        });
+        const latencyMs = Date.now() - start;
+        if (!res.ok) {
+          const errText = await res.text();
+          return { ok: false, latencyMs, message: 'Anthropic API error', error: `Anthropic API error (${res.status}): ${errText.slice(0, 160)}` };
+        }
+        return { ok: true, latencyMs, message: `Connected to Anthropic (${model}) in ${latencyMs}ms` };
+      }
+
+      if (provider === 'openai' || provider === 'groq' || provider === 'ollama') {
+        const url = baseUrl || (provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : provider === 'ollama' ? 'http://127.0.0.1:11434/v1/chat/completions' : 'https://api.openai.com/v1/chat/completions');
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            model,
+            messages: [{ role: 'user', content: 'ping' }],
+            max_tokens: 5,
+          }),
+          signal: AbortSignal.timeout(10000),
+        });
+        const latencyMs = Date.now() - start;
+        if (!res.ok) {
+          const errText = await res.text();
+          return { ok: false, latencyMs, message: `${provider.toUpperCase()} API error`, error: `${provider.toUpperCase()} API error (${res.status}): ${errText.slice(0, 160)}` };
+        }
+        return { ok: true, latencyMs, message: `Connected to ${provider.toUpperCase()} (${model}) in ${latencyMs}ms` };
+      }
+
+      return { ok: false, latencyMs: 0, message: 'Unsupported provider', error: `Unsupported provider: ${provider}` };
+    } catch (err: unknown) {
+      return { ok: false, latencyMs: Date.now() - start, message: 'Connection failed', error: String(err) };
+    }
+  });
+
+  ipcMain.handle('system:getKbStatus', async (): Promise<DesktopKbStatus> => {
+    const h = await checkKbHealth();
+    return {
+      online: h.online,
+      port: h.port,
+      url: h.url,
     };
   });
 
@@ -267,17 +426,63 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         message: 'Standalone KB service management via pnpm is only available in development mode. In production, run the standalone KB container or service.',
       };
     }
-    if (action === 'start') {
+
+    async function getMasterPassword(): Promise<string> {
       try {
-        const child = exec('pnpm --filter @x/kb-server start', { cwd: repoRoot });
+        return (await readFile(kbPasswordFile, 'utf-8')).trim();
+      } catch {
+        const generated = 'aix-kb-master-' + crypto.randomUUID().slice(0, 8);
+        await mkdir(dirname(kbPasswordFile), { recursive: true });
+        await writeFile(kbPasswordFile, generated, 'utf-8');
+        return generated;
+      }
+    }
+
+    if (action === 'start') {
+      const currentHealth = await checkKbHealth();
+      if (currentHealth.online) {
+        return { ok: true, message: `KB Service is already running at ${currentHealth.url}` };
+      }
+
+      const masterPassword = await getMasterPassword();
+      const kbMain = join(repoRoot, 'services', 'kb-server', 'dist', 'main.js');
+
+      try {
+        const child = spawn(process.execPath, [kbMain], {
+          detached: true,
+          stdio: 'ignore',
+          cwd: repoRoot,
+          env: {
+            ...process.env,
+            PORT: '4000',
+            KB_HOST: '127.0.0.1',
+            KB_MASTER_PASSWORD: masterPassword,
+          },
+        });
         child.unref();
-        return { ok: true, message: 'KB Service starting in background' };
+
+        // Poll health up to 4.5 seconds
+        const start = Date.now();
+        while (Date.now() - start < 4500) {
+          await new Promise(r => setTimeout(r, 400));
+          const h = await checkKbHealth();
+          if (h.online) {
+            return { ok: true, message: `KB Server launched successfully on http://127.0.0.1:${h.port}!` };
+          }
+        }
+
+        return { ok: false, message: 'KB Server was spawned but health check timed out. Verify services/kb-server/dist/main.js' };
       } catch (err: unknown) {
-        return { ok: false, message: String(err) };
+        return { ok: false, message: `Failed to spawn KB server: ${String(err)}` };
       }
     } else {
+      const masterPassword = await getMasterPassword();
       try {
-        await fetch('http://127.0.0.1:3001/api/v1/shutdown', { method: 'POST' }).catch(() => {});
+        await fetch('http://127.0.0.1:4000/shutdown', {
+          method: 'POST',
+          headers: { 'x-master-password': masterPassword },
+          signal: AbortSignal.timeout(2000),
+        }).catch(() => {});
         return { ok: true, message: 'KB Service shutdown signal sent' };
       } catch (err: unknown) {
         return { ok: false, message: String(err) };

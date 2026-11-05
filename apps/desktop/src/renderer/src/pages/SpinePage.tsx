@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { MarkdownRenderer } from '../components/MarkdownRenderer';
+import { SpinePipelineVisualizer } from '../components/SpinePipelineVisualizer';
 import {
   CheckCircle2,
   Clock,
@@ -170,56 +172,13 @@ export const SpinePage: React.FC<SpinePageProps> = ({ sessions, onRefreshSession
         </div>
       </div>
 
-      {/* 8-Step Interactive Stepper */}
-      <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">The 8-Step Spine Pipeline</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
-          {SPINE_STEPS.map((step, idx) => {
-            const hasArtifact = step.artifact && selectedSession?.artifacts.includes(step.artifact);
-            const isLive = currentRunningPhase === step.id;
-            const isCurrentTab = step.artifact === activeArtifact;
-
-            return (
-              <div
-                key={`${step.id}-${idx}`}
-                onClick={() => step.artifact && setActiveArtifact(step.artifact)}
-                className={`p-3.5 rounded-xl border transition-all text-left flex flex-col justify-between ${
-                  step.artifact ? 'cursor-pointer' : 'opacity-70'
-                } ${
-                  isLive
-                    ? 'bg-blue-600/20 border-blue-500 shadow-md animate-pulse'
-                    : isCurrentTab
-                    ? 'bg-blue-600/10 border-blue-500/40 shadow-sm'
-                    : hasArtifact
-                    ? 'bg-emerald-500/5 border-emerald-500/20'
-                    : 'bg-white/[0.01] border-white/5'
-                }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-white">{step.label}</span>
-                    {isLive ? (
-                      <Loader2 className="w-3.5 h-3.5 text-blue-400 animate-spin" />
-                    ) : hasArtifact ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    ) : (
-                      <Clock className="w-3.5 h-3.5 text-slate-600" />
-                    )}
-                  </div>
-                  <p className="text-[11px] text-slate-400 leading-snug">{step.desc}</p>
-                </div>
-
-                {step.artifact && (
-                  <div className="mt-3 pt-2 border-t border-white/5 text-[10px] font-mono text-slate-500 flex items-center gap-1">
-                    <FileText className="w-3 h-3 text-slate-400" />
-                    {step.artifact}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* 8-Step Interactive Stepper Visualizer */}
+      <SpinePipelineVisualizer
+        currentPhase={currentRunningPhase}
+        activeArtifact={activeArtifact}
+        availableArtifacts={selectedSession?.artifacts ?? []}
+        onSelectArtifact={setActiveArtifact}
+      />
 
       {/* Live Logs Terminal (when running or has logs) */}
       {logs.length > 0 && (
@@ -270,9 +229,7 @@ export const SpinePage: React.FC<SpinePageProps> = ({ sessions, onRefreshSession
             {loadingContent ? (
               <div className="text-slate-500 text-sm py-12 text-center">Loading artifact content...</div>
             ) : (
-              <pre className="font-mono text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
-                {artifactContent}
-              </pre>
+              <MarkdownRenderer content={artifactContent} />
             )}
           </div>
         </div>

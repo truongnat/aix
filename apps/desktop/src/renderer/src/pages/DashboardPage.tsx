@@ -8,6 +8,8 @@ import {
   ShieldAlert,
   Play,
   Terminal,
+  Cpu,
+  Sliders,
 } from 'lucide-react';
 import type { DesktopSystemStatus, DesktopSessionSummary } from '@shared/api';
 import type { NavTab } from '../components/Sidebar';
@@ -38,6 +40,37 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ status, sessions, 
           <Play className="w-4 h-4 fill-white" /> Start New Spine Run
         </button>
       </div>
+      {/* Active AI Intelligence Widget */}
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-900/20 via-indigo-900/10 to-purple-900/20 border border-blue-500/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
+            <Cpu className="w-5 h-5 text-blue-400" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs uppercase font-bold tracking-wider text-slate-400">Active AI Intelligence:</span>
+              <span className="font-bold text-sm text-white uppercase">{status?.activeAiProvider ?? 'Anthropic'}</span>
+              <span className="font-mono text-xs px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                {status?.activeAiModel ?? 'claude-3-5-sonnet'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Powering the 8-step spine (Architect, Planner, Coder, Reviewer, Verifier).
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onNavigate('settings')}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium text-xs transition-all border border-white/10"
+          >
+            <Sliders className="w-3.5 h-3.5 text-blue-400" /> Switch Model / API Key
+          </button>
+        </div>
+      </div>
+
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

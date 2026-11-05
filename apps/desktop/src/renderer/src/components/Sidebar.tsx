@@ -7,10 +7,11 @@ import {
   ShieldCheck,
   Server,
   Layers,
+  Sliders,
 } from 'lucide-react';
 import type { DesktopSystemStatus } from '@shared/api';
 
-export type NavTab = 'dashboard' | 'spine' | 'skills' | 'memory' | 'verify';
+export type NavTab = 'dashboard' | 'spine' | 'skills' | 'memory' | 'verify' | 'settings';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -25,6 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
     { id: 'skills' as NavTab, label: 'Skill Library (160)', icon: Sparkles },
     { id: 'memory' as NavTab, label: 'Memory Hub', icon: BrainCircuit },
     { id: 'verify' as NavTab, label: 'Sandbox & Verify', icon: ShieldCheck },
+    { id: 'settings' as NavTab, label: 'AI Model Hub', icon: Sliders },
   ];
 
   return (

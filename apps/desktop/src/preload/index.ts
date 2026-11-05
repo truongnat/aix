@@ -3,6 +3,10 @@ import type { AixDesktopAPI, DesktopSpineEvent } from '../shared/api.js';
 
 const api: AixDesktopAPI = {
   getStatus: () => ipcRenderer.invoke('system:getStatus'),
+  getAiConfig: () => ipcRenderer.invoke('ai:getConfig'),
+  setAiConfig: (config) => ipcRenderer.invoke('ai:setConfig', config),
+  testAiConnection: (config) => ipcRenderer.invoke('ai:testConnection', config),
+  getKbStatus: () => ipcRenderer.invoke('system:getKbStatus'),
 
   listSkills: (category) => ipcRenderer.invoke('skills:list', category),
   getSkill: (name) => ipcRenderer.invoke('skills:get', name),

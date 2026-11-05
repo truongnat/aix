@@ -55,6 +55,32 @@ export interface DesktopSystemStatus {
   readonly skillsCount: number;
   readonly memoryCount: number;
   readonly kbServiceOnline: boolean;
+  readonly kbPort: number;
+  readonly activeAiProvider: string;
+  readonly activeAiModel: string;
+}
+
+export type AiProviderId = 'anthropic' | 'openai' | 'groq' | 'ollama' | 'mock';
+
+export interface DesktopAiConfig {
+  readonly provider: AiProviderId;
+  readonly model: string;
+  readonly hasApiKey: boolean;
+  readonly baseUrl?: string;
+}
+
+export interface DesktopTestConnectionResult {
+  readonly ok: boolean;
+  readonly latencyMs: number;
+  readonly message: string;
+  readonly error?: string;
+}
+
+export interface DesktopKbStatus {
+  readonly online: boolean;
+  readonly port: number;
+  readonly url: string;
+  readonly error?: string;
 }
 
 export interface DesktopHitlOption {
@@ -80,6 +106,11 @@ export type DesktopSpineEvent =
 export interface AixDesktopAPI {
   // System
   getStatus(): Promise<DesktopSystemStatus>;
+  getAiConfig(): Promise<DesktopAiConfig>;
+  setAiConfig(config: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string }): Promise<{ ok: boolean }>;
+  testAiConnection(config?: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string }): Promise<DesktopTestConnectionResult>;
+  getKbStatus(): Promise<DesktopKbStatus>;
+
 
   // Skills
   listSkills(category?: SkillCategory): Promise<readonly DesktopSkillSummary[]>;
