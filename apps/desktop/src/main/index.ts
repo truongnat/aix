@@ -1,17 +1,33 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, session, shell } from 'electron';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { registerIpcHandlers } from './ipc-handlers.js';
+import { registerIpcHandlers, isAllowedNavigationUrl } from './ipc-handlers.js';
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
-// Repo root is 4 levels up: dist/main -> main -> dist -> desktop -> apps -> root
-const repoRoot = join(currentDir, '..', '..', '..', '..');
 
-// On Linux environments (Ubuntu 24 unprivileged namespaces, Wayland, or VMs without hardware GPU)
+// On Linux environments
 if (process.platform === 'linux') {
-  app.commandLine.appendSwitch('no-sandbox');
   app.disableHardwareAcceleration();
+  app.commandLine.appendSwitch('disable-dev-shm-usage');
+  // Safe container / explicit fallback
+  if (!app.isPackaged && (process.env['ELECTRON_NO_SANDBOX'] === '1' || process.env['CI'])) {
+    app.commandLine.appendSwitch('no-sandbox');
+  }
 }
+
+// In packaged app: resourcesPath contains bundled resources (skills)
+// In dev: repoRoot is 4 levels up
+const isPackaged = app.isPackaged;
+const repoRoot = isPackaged
+  ? process.resourcesPath
+  : join(currentDir, '..', '..', '..', '..');
+
+// For user data (sessions, runtime memory, checkpoints):
+// In dev: repoRoot
+// In packaged app: app.getPath('userData')
+const storageRoot = isPackaged
+  ? app.getPath('userData')
+  : repoRoot;
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -32,10 +48,33 @@ function createWindow(): void {
     },
   });
 
-  registerIpcHandlers(repoRoot);
+
+
+  // Security: Deny window popups, open external links in default OS browser
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https:') || url.startsWith('http:')) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
+
+  const appHtmlPath = join(currentDir, '../renderer/index.html');
+
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (isAllowedNavigationUrl(url, appHtmlPath, isPackaged)) return;
+    event.preventDefault();
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+        shell.openExternal(url);
+      }
+    } catch {
+      // Invalid URL
+    }
+  });
 
   const devServerUrl = process.env['VITE_DEV_SERVER_URL'];
-  if (devServerUrl) {
+  if (devServerUrl && !isPackaged) {
     mainWindow.loadURL(devServerUrl);
   } else {
     mainWindow.loadFile(join(currentDir, '../renderer/index.html'));
@@ -47,6 +86,19 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  // Security: Strict Content-Security-Policy header
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' http://127.0.0.1:*;",
+        ],
+      },
+    });
+  });
+
+  registerIpcHandlers({ repoRoot, storageRoot });
   createWindow();
 
   app.on('activate', () => {

@@ -57,6 +57,26 @@ export interface DesktopSystemStatus {
   readonly kbServiceOnline: boolean;
 }
 
+export interface DesktopHitlOption {
+  readonly id: string;
+  readonly label: string;
+  readonly summary: string;
+}
+
+export interface DesktopHitlRequest {
+  readonly id: string;
+  readonly question: string;
+  readonly options: readonly DesktopHitlOption[];
+  readonly tier: 0 | 1 | 2;
+}
+
+export type DesktopSpineEvent =
+  | { readonly type: 'phase'; readonly sessionId: string; readonly phase: Phase }
+  | { readonly type: 'log'; readonly sessionId: string; readonly message: string; readonly timestamp: string }
+  | { readonly type: 'hitl'; readonly sessionId: string; readonly request: DesktopHitlRequest }
+  | { readonly type: 'complete'; readonly sessionId: string; readonly checkpointId: string; readonly artifacts: readonly string[] }
+  | { readonly type: 'error'; readonly sessionId: string; readonly error: string };
+
 export interface AixDesktopAPI {
   // System
   getStatus(): Promise<DesktopSystemStatus>;
@@ -65,16 +85,21 @@ export interface AixDesktopAPI {
   listSkills(category?: SkillCategory): Promise<readonly DesktopSkillSummary[]>;
   getSkill(name: string): Promise<DesktopSkillDetail | undefined>;
   validateSkills(): Promise<{ valid: number; warnings: string[]; errors: string[] }>;
-
+  getSkillReference(skillName: string, refPath: string): Promise<string | undefined>;
+  installProvider(provider: Provider): Promise<{ ok: boolean; written: number; skipped: number }>;
   // Memory
   listMemories(): Promise<readonly DesktopMemoryRecord[]>;
   searchMemories(query: string): Promise<readonly DesktopMemoryRecord[]>;
   pushMemory(title: string, body: string, tags?: string[]): Promise<{ ok: boolean; id: string }>;
-
+  deleteMemory(id: string): Promise<{ ok: boolean }>;
+  toggleKbService(action: 'start' | 'stop'): Promise<{ ok: boolean; message: string }>;
   // Sessions & Spine
   listSessions(): Promise<readonly DesktopSessionSummary[]>;
   getSessionArtifact(sessionId: string, artifactName: string): Promise<string | undefined>;
   runVerify(sessionId: string, command: string): Promise<DesktopVerificationResult>;
+  startSpine(task: string, mode?: 'auto' | 'guided'): Promise<{ sessionId: string }>;
+  respondHitl(requestId: string, decision: 'approve' | 'revise' | 'cancel', note?: string): Promise<void>;
+  onSpineEvent(callback: (event: DesktopSpineEvent) => void): () => void;
 }
 
 declare global {

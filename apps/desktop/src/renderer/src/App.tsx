@@ -13,14 +13,16 @@ export const App: React.FC = () => {
   const [status, setStatus] = useState<DesktopSystemStatus | null>(null);
   const [sessions, setSessions] = useState<readonly DesktopSessionSummary[]>([]);
 
-  useEffect(() => {
-    // Only call Electron IPC if window.aixAPI is available
+  const refreshSessions = () => {
     if (typeof window !== 'undefined' && window.aixAPI) {
-      window.aixAPI.getStatus().then(setStatus).catch(console.error);
       window.aixAPI.listSessions().then(setSessions).catch(console.error);
+      window.aixAPI.getStatus().then(setStatus).catch(console.error);
     }
-  }, []);
+  };
 
+  useEffect(() => {
+    refreshSessions();
+  }, []);
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#090a0f] text-slate-200">
       <Sidebar currentTab={currentTab} onSelectTab={setCurrentTab} status={status} />
@@ -28,7 +30,7 @@ export const App: React.FC = () => {
         {currentTab === 'dashboard' && (
           <DashboardPage status={status} sessions={sessions} onNavigate={setCurrentTab} />
         )}
-        {currentTab === 'spine' && <SpinePage sessions={sessions} />}
+        {currentTab === 'spine' && <SpinePage sessions={sessions} onRefreshSessions={refreshSessions} />}
         {currentTab === 'skills' && <SkillsPage />}
         {currentTab === 'memory' && <MemoryPage />}
         {currentTab === 'verify' && <VerifyPage sessions={sessions} />}

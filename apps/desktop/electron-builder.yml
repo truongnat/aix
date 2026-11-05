@@ -1,0 +1,36 @@
+appId: com.aix.desktop
+productName: aix
+executableName: aix
+artifactName: '${productName}-${version}-${os}-${arch}.${ext}'
+
+directories:
+  output: release/${version}
+
+files:
+  - dist/main/**/*
+  - dist/preload/**/*
+  - dist/renderer/**/*
+  - package.json
+
+extraResources:
+  - from: ../../skills
+    to: skills
+    filter:
+      - '**/*'
+
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Development
+  synopsis: AI Engineering Mission Control & Methodology Spine
+  description: The Engineering Control Plane for AI coding agents with 160 skills and 8-step spine.
+
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.developer-tools
+  hardenedRuntime: true
+  gatekeeperAssess: false
+

@@ -6,9 +6,13 @@ import {
   ExternalLink,
   Copy,
   Check,
+  Download,
+  Loader2,
+  FileText,
+  ChevronRight,
 } from 'lucide-react';
 import type { DesktopSkillSummary, DesktopSkillDetail } from '@shared/api';
-import type { SkillCategory } from '@x/core';
+import type { SkillCategory, Provider } from '@x/core';
 
 const CATEGORIES: { slug: SkillCategory | 'all'; label: string }[] = [
   { slug: 'all', label: 'All Categories' },
@@ -28,8 +32,17 @@ export const SkillsPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<SkillCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSkill, setSelectedSkill] = useState<DesktopSkillDetail | null>(null);
-  const [loadingDetail, setLoadingDetail] = useState<boolean>(false);
+  const [, setLoadingDetail] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+
+  // Reference Content Viewer
+  const [activeRefPath, setActiveRefPath] = useState<string | null>(null);
+  const [activeRefContent, setActiveRefContent] = useState<string | null>(null);
+  const [loadingRef, setLoadingRef] = useState<boolean>(false);
+
+  // Provider Install State
+  const [installingProvider, setInstallingProvider] = useState<Provider | null>(null);
+  const [installStatus, setInstallStatus] = useState<string | null>(null);
 
   useEffect(() => {
     window.aixAPI.listSkills().then(setSkills);
@@ -50,6 +63,8 @@ export const SkillsPage: React.FC = () => {
 
   const handleOpenDetail = async (name: string) => {
     setLoadingDetail(true);
+    setActiveRefPath(null);
+    setActiveRefContent(null);
     try {
       const detail = await window.aixAPI.getSkill(name);
       setSelectedSkill(detail ?? null);
@@ -64,20 +79,76 @@ export const SkillsPage: React.FC = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleOpenReference = async (skillName: string, refFull: string) => {
+    const filename = refFull.split('/').pop() ?? '';
+    const relPath = `references/${filename}`;
+    setActiveRefPath(filename);
+    setLoadingRef(true);
+    try {
+      const content = await window.aixAPI.getSkillReference(skillName, relPath);
+      setActiveRefContent(content ?? 'Reference content not found.');
+    } catch (err: unknown) {
+      setActiveRefContent(`Error reading reference: ${String(err)}`);
+    } finally {
+      setLoadingRef(false);
+    }
+  };
+
+  const handleInstallToProvider = async (p: Provider) => {
+    setInstallingProvider(p);
+    setInstallStatus(null);
+    try {
+      const res = await window.aixAPI.installProvider(p);
+      setInstallStatus(`Successfully installed to ${p}! (Written: ${res.written}, Skipped: ${res.skipped})`);
+    } catch (err: unknown) {
+      setInstallStatus(`Installation failed: ${String(err)}`);
+    } finally {
+      setInstallingProvider(null);
+      setTimeout(() => setInstallStatus(null), 4000);
+    }
+  };
+
   return (
     <div className="p-8 space-y-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
-          Canonical Skill Library
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-            {skills.length} Skills
-          </span>
-        </h1>
-        <p className="text-sm text-slate-400 mt-1">
-          Explore production-grade domain, methodology, and automation skills structured across 9 categories.
-        </p>
+      {/* Header & Quick Installs */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
+            Canonical Skill Library
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              {skills.length} Skills
+            </span>
+          </h1>
+          <p className="text-sm text-slate-400 mt-1">
+            Explore production-grade domain, methodology, and automation skills structured across 9 categories.
+          </p>
+        </div>
+
+        {/* 1-Click Install to Providers */}
+        <div className="flex items-center gap-2">
+          {(['claude', 'cursor', 'codex'] as Provider[]).map((prov) => (
+            <button
+              key={prov}
+              disabled={installingProvider !== null}
+              onClick={() => handleInstallToProvider(prov)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 text-xs font-medium transition-all"
+            >
+              {installingProvider === prov ? (
+                <Loader2 className="w-3 h-3 animate-spin text-blue-400" />
+              ) : (
+                <Download className="w-3 h-3 text-slate-400" />
+              )}
+              Sync {prov.toUpperCase()}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {installStatus && (
+        <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-medium">
+          {installStatus}
+        </div>
+      )}
 
       {/* Search & Category Pills */}
       <div className="space-y-4">
@@ -149,7 +220,7 @@ export const SkillsPage: React.FC = () => {
       {/* Skill Detail Modal */}
       {selectedSkill && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <div className="bg-[#0f111a] border border-white/10 rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-[#0f111a] border border-white/10 rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Modal Header */}
             <div className="p-6 border-b border-white/10 flex items-start justify-between">
               <div>
@@ -182,16 +253,49 @@ export const SkillsPage: React.FC = () => {
               </div>
 
               {selectedSkill.references.length > 0 && (
-                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-2">
-                  <span className="font-semibold text-white block">Bundled Deep References:</span>
-                  <div className="grid grid-cols-2 gap-1.5 text-slate-400">
-                    {selectedSkill.references.map((ref: string) => (
-                      <span key={ref} className="font-mono text-[11px] truncate flex items-center gap-1">
-                        <ExternalLink className="w-3 h-3 text-slate-500" />
-                        {ref.split('/').slice(-2).join('/')}
-                      </span>
-                    ))}
+                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-3">
+                  <span className="font-semibold text-white block">Bundled Deep References (Click to Read):</span>
+                  <div className="grid grid-cols-2 gap-2 text-slate-400">
+                    {selectedSkill.references.map((ref: string) => {
+                      const fname = ref.split('/').pop() ?? '';
+                      return (
+                        <button
+                          key={ref}
+                          onClick={() => handleOpenReference(selectedSkill.name, ref)}
+                          className="font-mono text-[11px] truncate p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-blue-500/30 flex items-center justify-between text-left group transition-all"
+                        >
+                          <span className="flex items-center gap-1.5 truncate">
+                            <FileText className="w-3.5 h-3.5 text-blue-400" />
+                            {fname}
+                          </span>
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400" />
+                        </button>
+                      );
+                    })}
                   </div>
+
+                  {activeRefPath && (
+                    <div className="p-4 rounded-xl bg-black/60 border border-blue-500/20 space-y-2 mt-3">
+                      <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                        <span className="font-mono text-blue-400 font-bold flex items-center gap-1.5">
+                          <ExternalLink className="w-3.5 h-3.5" /> {activeRefPath}
+                        </span>
+                        <button
+                          onClick={() => setActiveRefPath(null)}
+                          className="text-slate-500 hover:text-white text-[11px]"
+                        >
+                          Close
+                        </button>
+                      </div>
+                      {loadingRef ? (
+                        <div className="text-slate-500 py-4 text-center">Loading reference...</div>
+                      ) : (
+                        <pre className="font-mono text-[11px] text-slate-300 whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto">
+                          {activeRefContent}
+                        </pre>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 

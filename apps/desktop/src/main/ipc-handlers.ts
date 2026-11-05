@@ -1,12 +1,23 @@
-import { ipcMain } from 'electron';
-import { readdir, readFile, stat } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
-import { exec } from 'node:child_process';
+import { app, dialog, ipcMain } from 'electron';
+import { readdir, readFile, stat, unlink } from 'node:fs/promises';
+import { join, resolve, relative, isAbsolute } from 'node:path';
+import { exec, execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { SkillRegistry } from '@x/registry';
 import { MarkdownStore, RedactedMemoryStore } from '@x/memory';
 import { PolicyEngine } from '@x/policy';
-import type { SkillCategory, Phase } from '@x/core';
+import { GuardrailLoop } from '@x/core';
+import type { SkillCategory, Phase, Provider } from '@x/core';
+import { Compiler } from '@x/compiler';
+import { ClaudeAdapter, CursorAdapter, CodexAdapter, GeminiAdapter } from '@x/providers';
+import {
+  EngineGraph,
+  SessionStore,
+  createInitialEngineState,
+  discussNode,
+  planNode,
+} from '@x/engine';
+import { DesktopHitlChannel } from './desktop-hitl-channel.js';
 import type {
   DesktopSkillSummary,
   DesktopSkillDetail,
@@ -16,11 +27,30 @@ import type {
   DesktopSystemStatus,
 } from '../shared/api.js';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
-export function registerIpcHandlers(repoRoot: string): void {
+export {
+  ALLOWED_TEST_PRESETS,
+  validateVerificationCommand,
+  isPathContained,
+  isAllowedNavigationUrl,
+} from '../shared/security.js';
+import {
+  validateVerificationCommand,
+  isPathContained,
+} from '../shared/security.js';
+
+export interface IpcHandlerPaths {
+  readonly repoRoot: string;
+  readonly storageRoot?: string;
+}
+
+export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
+  const repoRoot = typeof paths === 'string' ? paths : paths.repoRoot;
+  const storageRoot = typeof paths === 'string' ? paths : (paths.storageRoot ?? paths.repoRoot);
   const policy = new PolicyEngine();
-  const memoryStore = new RedactedMemoryStore(new MarkdownStore(repoRoot), policy);
+  const memoryStore = new RedactedMemoryStore(new MarkdownStore(storageRoot), policy);
+  const activeChannels = new Map<string, DesktopHitlChannel>();
   let cachedRegistry: SkillRegistry | null = null;
 
   async function getRegistry(): Promise<SkillRegistry> {
@@ -43,7 +73,7 @@ export function registerIpcHandlers(repoRoot: string): void {
     }
 
     return {
-      appVersion: '0.1.0',
+      appVersion: app ? app.getVersion() : '0.1.0',
       nodeVersion: process.version,
       platform: process.platform,
       cwd: repoRoot,
@@ -72,6 +102,7 @@ export function registerIpcHandlers(repoRoot: string): void {
   });
 
   ipcMain.handle('skills:get', async (_, name: string): Promise<DesktopSkillDetail | undefined> => {
+    if (!/^[a-z0-9-]+$/.test(name)) return undefined;
     const registry = await getRegistry();
     const s = registry.get(name);
     if (!s) return undefined;
@@ -102,6 +133,80 @@ export function registerIpcHandlers(repoRoot: string): void {
       valid: registry.all().length,
       warnings,
       errors: fatal,
+    };
+  });
+
+  ipcMain.handle('skills:getReference', async (_, skillName: string, refPath: string): Promise<string | undefined> => {
+    const registry = await getRegistry();
+    const s = registry.get(skillName);
+    if (!s) return undefined;
+
+    if (!isPathContained(s.dir, refPath)) return undefined;
+    const fullPath = resolve(s.dir, refPath);
+    try {
+      return await readFile(fullPath, 'utf-8');
+    } catch {
+      return undefined;
+    }
+  });
+
+  ipcMain.handle('system:installProvider', async (_, provider: Provider, targetDir?: string) => {
+    if (!['claude', 'cursor', 'codex', 'gemini'].includes(provider)) {
+      throw new Error(`Invalid provider: ${String(provider)}`);
+    }
+    let targetRoot: string;
+    if (app && app.isPackaged) {
+      if (targetDir) {
+        targetRoot = resolve(targetDir);
+      } else {
+        const res = await dialog.showOpenDialog({
+          title: `Select Project Directory to Sync ${provider.toUpperCase()}`,
+          properties: ['openDirectory', 'createDirectory'],
+        });
+        if (res.canceled || !res.filePaths[0]) {
+          return { ok: false, written: 0, skipped: 0 };
+        }
+        targetRoot = res.filePaths[0];
+      }
+    } else {
+      targetRoot = targetDir ? resolve(targetDir) : repoRoot;
+    }
+
+    try {
+      const dirStat = await stat(targetRoot);
+      if (!dirStat.isDirectory()) return { ok: false, written: 0, skipped: 0 };
+    } catch {
+      return { ok: false, written: 0, skipped: 0 };
+    }
+    const registry = await getRegistry();
+    const skills = registry.all();
+    const catalog = registry.toCatalog();
+
+    const adapters = {
+      claude: new ClaudeAdapter(),
+      cursor: new CursorAdapter(),
+      codex: new CodexAdapter(),
+      gemini: new GeminiAdapter(),
+    };
+
+    const compiler = new Compiler(adapters);
+    const result = await compiler.compile({
+      skills,
+      catalog,
+      agents: [],
+      rules: [],
+      mcpServers: [],
+    }, {
+      provider,
+      targetRoot,
+      dryRun: false,
+      force: true,
+    });
+
+    return {
+      ok: true,
+      written: result.written.length,
+      skipped: result.skipped.length,
     };
   });
 
@@ -144,9 +249,45 @@ export function registerIpcHandlers(repoRoot: string): void {
     return { ok: true, id };
   });
 
+  ipcMain.handle('memory:delete', async (_, id: string): Promise<{ ok: boolean }> => {
+    if (!/^[a-zA-Z0-9_-]+$/.test(id)) return { ok: false };
+    const filePath = join(storageRoot, '.aix', 'runtime', 'memory', `${id}.md`);
+    try {
+      await unlink(filePath);
+      return { ok: true };
+    } catch {
+      return { ok: false };
+    }
+  });
+
+  ipcMain.handle('system:toggleKbService', async (_, action: 'start' | 'stop') => {
+    if (app && app.isPackaged) {
+      return {
+        ok: false,
+        message: 'Standalone KB service management via pnpm is only available in development mode. In production, run the standalone KB container or service.',
+      };
+    }
+    if (action === 'start') {
+      try {
+        const child = exec('pnpm --filter @x/kb-server start', { cwd: repoRoot });
+        child.unref();
+        return { ok: true, message: 'KB Service starting in background' };
+      } catch (err: unknown) {
+        return { ok: false, message: String(err) };
+      }
+    } else {
+      try {
+        await fetch('http://127.0.0.1:3001/api/v1/shutdown', { method: 'POST' }).catch(() => {});
+        return { ok: true, message: 'KB Service shutdown signal sent' };
+      } catch (err: unknown) {
+        return { ok: false, message: String(err) };
+      }
+    }
+  });
+
   // Sessions & Spine
   ipcMain.handle('spine:listSessions', async (): Promise<readonly DesktopSessionSummary[]> => {
-    const sessionsDir = join(repoRoot, '.aix', 'sessions');
+    const sessionsDir = join(storageRoot, '.aix', 'sessions');
     const sessions: DesktopSessionSummary[] = [];
     try {
       const dirs = await readdir(sessionsDir);
@@ -182,10 +323,10 @@ export function registerIpcHandlers(repoRoot: string): void {
   });
 
   ipcMain.handle('spine:getArtifact', async (_, sessionId: string, artifactName: string): Promise<string | undefined> => {
-    // Sanitize path
+    if (!/^[a-zA-Z0-9_-]+$/.test(sessionId)) return undefined;
     const safeArtifact = artifactName.replace(/[^A-Za-z0-9_.-]/g, '');
-    const artifactPath = resolve(repoRoot, '.aix', 'sessions', sessionId, safeArtifact);
-    const expectedDir = resolve(repoRoot, '.aix', 'sessions', sessionId);
+    const artifactPath = resolve(storageRoot, '.aix', 'sessions', sessionId, safeArtifact);
+    const expectedDir = resolve(storageRoot, '.aix', 'sessions', sessionId);
     if (!artifactPath.startsWith(expectedDir)) return undefined;
 
     try {
@@ -195,9 +336,189 @@ export function registerIpcHandlers(repoRoot: string): void {
     }
   });
 
+  // Live Spine Runner & HITL
+  ipcMain.handle('spine:respondHitl', async (_, requestId: string, decision: 'approve' | 'revise' | 'cancel', note?: string): Promise<boolean> => {
+    for (const channel of activeChannels.values()) {
+      if (channel.respond(requestId, decision, note)) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  ipcMain.handle('spine:start', async (event, task: string, mode?: 'auto' | 'guided'): Promise<{ sessionId: string }> => {
+    if (typeof task !== 'string' || !task.trim() || task.length > 10000) {
+      throw new Error('Task prompt must be a non-empty string under 10000 characters');
+    }
+    const webContents = event.sender;
+    const loop = new GuardrailLoop();
+    const session = await loop.createSession(task);
+    const sessionId = session.id;
+    const hitlChannel = new DesktopHitlChannel(webContents, sessionId);
+    activeChannels.set(sessionId, hitlChannel);
+
+    (async () => {
+      try {
+        const store = new SessionStore(join(storageRoot, '.aix', 'sessions'));
+        let engineState = createInitialEngineState(session);
+        await store.save(engineState);
+
+        const emitLog = (msg: string) => {
+          if (!webContents.isDestroyed()) {
+            webContents.send('spine:event', {
+              type: 'log',
+              sessionId,
+              message: msg,
+              timestamp: new Date().toLocaleTimeString(),
+            });
+          }
+        };
+
+        const emitPhase = (p: Phase) => {
+          if (!webContents.isDestroyed()) {
+            webContents.send('spine:event', {
+              type: 'phase',
+              sessionId,
+              phase: p,
+            });
+          }
+        };
+
+        emitLog(`Started new session ${sessionId} for task: "${task}"`);
+
+        // Phase 1: Discuss
+        emitPhase('discuss');
+        emitLog('Executing Step 1: Discussing architecture and trade-offs...');
+        engineState = await discussNode(engineState);
+        await store.save(engineState);
+        emitLog('Generated DISCUSSION.md artifact');
+
+        if (mode === 'guided') {
+          let proceed = false;
+          while (!proceed) {
+            const resp = await hitlChannel.ask({
+              question: 'Proceed to Planning phase?',
+              options: [
+                { id: 'approve', label: 'Approve', summary: 'Proceed to Plan' },
+                { id: 'revise', label: 'Revise', summary: 'Request adjustments to Discussion' },
+                { id: 'cancel', label: 'Cancel', summary: 'Abort spine execution' },
+              ],
+              tier: 0,
+            });
+            if (resp.chosen === 'cancel') {
+              emitLog('Session cancelled by user');
+              return;
+            }
+            if (resp.chosen === 'revise') {
+              emitLog(`Revision requested: ${resp.note ?? 're-evaluating discussion'}`);
+              engineState = await discussNode(engineState);
+              await store.save(engineState);
+            } else {
+              proceed = true;
+            }
+          }
+        }
+
+        // Phase 2: Plan
+        emitPhase('plan');
+        emitLog('Executing Step 2: Planning tasks and acceptance criteria...');
+        engineState = await planNode(engineState);
+        await store.save(engineState);
+        emitLog(`Generated PLAN.md artifact with ${engineState.tasks.length} task(s)`);
+
+        if (mode === 'guided') {
+          let proceed = false;
+          while (!proceed) {
+            const resp = await hitlChannel.ask({
+              question: 'Approve execution plan?',
+              options: [
+                { id: 'approve', label: 'Approve', summary: 'Proceed to TDD & Execution' },
+                { id: 'revise', label: 'Revise', summary: 'Request adjustments to Plan' },
+                { id: 'cancel', label: 'Cancel', summary: 'Abort spine execution' },
+              ],
+              tier: 0,
+            });
+            if (resp.chosen === 'cancel') {
+              emitLog('Session cancelled by user');
+              return;
+            }
+            if (resp.chosen === 'revise') {
+              emitLog(`Revision requested: ${resp.note ?? 're-evaluating plan'}`);
+              engineState = await planNode(engineState);
+              await store.save(engineState);
+            } else {
+              proceed = true;
+            }
+          }
+        }
+
+        // Phase 3: Run / Execution
+        emitPhase('run');
+        emitLog('Executing Step 4 & 5: Running tasks in sandbox with TDD & Coder...');
+        const graph = new EngineGraph(store);
+        engineState = await graph.run(engineState);
+        await store.save(engineState);
+        emitLog(`Execution completed with score: ${engineState.reviewScore}/10`);
+
+        // Phase 4: Verify
+        emitPhase('verify');
+        emitLog('Generated REVIEW.md and prepared sandbox for verification');
+
+        const sessionFolder = join(storageRoot, '.aix', 'sessions', sessionId);
+        const files = await readdir(sessionFolder).catch(() => []);
+        const artifacts = files.filter(f => f.endsWith('.md'));
+
+        if (!webContents.isDestroyed()) {
+          webContents.send('spine:event', {
+            type: 'complete',
+            sessionId,
+            checkpointId: sessionId,
+            artifacts,
+          });
+        }
+      } catch (err: unknown) {
+        if (!webContents.isDestroyed()) {
+          webContents.send('spine:event', {
+            type: 'error',
+            sessionId,
+            error: String(err),
+          });
+        }
+      } finally {
+        activeChannels.delete(sessionId);
+      }
+    })();
+
+    return { sessionId };
+  });
+
   // Verification Runner in Sandbox
   ipcMain.handle('verify:run', async (_, sessionId: string, command: string): Promise<DesktopVerificationResult> => {
-    const sessionDir = resolve(repoRoot, '.aix', 'sessions', sessionId);
+    if (!/^[a-zA-Z0-9_-]+$/.test(sessionId) || !command.trim()) {
+      return {
+        ok: false,
+        exitCode: 1,
+        command,
+        stdout: '',
+        stderr: 'Invalid sessionId or empty command',
+        durationMs: 0,
+        generatedFilesCount: 0,
+      };
+    }
+
+    const validation = validateVerificationCommand(command);
+    if (!validation.ok) {
+      return {
+        ok: false,
+        exitCode: 1,
+        command,
+        stdout: '',
+        stderr: `Blocked: ${validation.error}`,
+        durationMs: 0,
+        generatedFilesCount: 0,
+      };
+    }
+    const sessionDir = resolve(storageRoot, '.aix', 'sessions', sessionId);
     const generatedDir = join(sessionDir, 'generated');
 
     // Security check: denylist command check
@@ -232,8 +553,9 @@ export function registerIpcHandlers(repoRoot: string): void {
 
     const start = Date.now();
     try {
-      const { stdout, stderr } = await execAsync(command, {
+      const { stdout, stderr } = await execFileAsync(validation.binaryName, validation.args, {
         cwd: generatedDir,
+        shell: false,
         timeout: 30000,
         maxBuffer: 4 * 1024 * 1024,
       });
