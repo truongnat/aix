@@ -1,8 +1,8 @@
 # Contributing skills to aix
 
-`content/skills/` is the **community-editable layer** of aix. Everything here is the canonical
-source — the plugin loads these directly (`"skills": ["./content/skills/"]` in
-[`.claude-plugin/plugin.json`](../../.claude-plugin/plugin.json)) and the CLI compiles them to other
+`skills/` is the **community-editable layer** of aix. Everything here is the canonical
+source — the plugin loads these directly (`"skills": ["./skills/"]` in
+[`.claude-plugin/plugin.json`](../.claude-plugin/plugin.json)) and the CLI compiles them to other
 providers. You don't need to touch the TypeScript packages to add or improve a skill.
 
 For the deeper *how to design a good skill* guidance, invoke the **`writing-skills`** skill. This file
@@ -11,10 +11,10 @@ is the contribution contract: layout, schema, and the checks your PR must pass.
 ## Layout
 
 Skills are organized into **category subdirectories**. One skill = one directory under
-`content/skills/<category>/`, containing a `SKILL.md`:
+`skills/<category>/`, containing a `SKILL.md`:
 
 ```
-content/skills/
+skills/
 ├── methodology/          # process / methodology skills
 │   └── planning-pro/
 │       ├── SKILL.md      # required — frontmatter + body
@@ -42,7 +42,7 @@ container — its subdirectories are loaded as skills. Any other top-level direc
 
 ## SKILL.md frontmatter schema
 
-Validated by Zod in [`packages/registry/src/schema.ts`](../../packages/registry/src/schema.ts). Source
+Validated by Zod in [`packages/registry/src/schema.ts`](../packages/registry/src/schema.ts). Source
 of truth — if this table and the code disagree, the code wins.
 
 | Field | Required | Type / rule | Default |
@@ -64,12 +64,12 @@ of truth — if this table and the code disagree, the code wins.
 
 - **`domain`** — a deep reference for a technology/area (`react-pro`, `aws-pro`). Most skills.
 - **`process`** — *how to work*: a methodology step (`planning-pro`, `ttd-pro`).
-  These form the [engineering spine](../workflows/engineering-spine.md).
+  These form the [engineering spine](../content/workflows/engineering-spine.md).
 - **`reference`** — a lookup/cheatsheet with little prescriptive process.
 
 ### Example (inside a category dir)
 
-Place the skill at `content/skills/backend/my-new-skill/SKILL.md`:
+Place the skill at `skills/backend/my-new-skill/SKILL.md`:
 
 ```markdown
 ---
@@ -105,12 +105,12 @@ aix skills show my-new-skill   # eyeball the parsed result
 Checklist:
 
 - [ ] `aix skills validate` passes with **0 new SKIP**.
-- [ ] `name` is unique across `content/skills/` (no duplicate skill names).
+- [ ] `name` is unique across `skills/` (no duplicate skill names).
 - [ ] `description` actually describes *when to use* the skill, within 1024 chars.
 - [ ] Skill lives in the correct category subdirectory (or `x-category` set explicitly).
 - [ ] Correct `x-kind`; add `x-roles`/`x-tags`/`x-category` if they help discovery.
 - [ ] No secrets, no PII, no machine-absolute paths in the skill body.
 - [ ] Long material lives in `references/`, not inline.
 
-A maintainer (see [`.github/CODEOWNERS`](../../.github/CODEOWNERS)) reviews changes under
-`content/`. Process skills (`x-kind: process`) get extra scrutiny — they change how every agent works.
+A maintainer (see [`.github/CODEOWNERS`](../.github/CODEOWNERS)) reviews changes under
+`skills/`. Process skills (`x-kind: process`) get extra scrutiny — they change how every agent works.

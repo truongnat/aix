@@ -5,7 +5,7 @@
 set -euo pipefail
 
 ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-SKILL="${ROOT}/content/skills/methodology/using-aix/SKILL.md"
+SKILL="${ROOT}/skills/methodology/using-aix/SKILL.md"
 
 # node is the project runtime and gives us safe JSON escaping across platforms.
 node -e '

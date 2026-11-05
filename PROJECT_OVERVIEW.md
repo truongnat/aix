@@ -4,8 +4,7 @@
 
 **Host agent là runtime.** aix cung cấp phương pháp kỹ thuật tám bước và thư viện skill;
 không yêu cầu engine headless để dùng plugin. Thư viện canonical hiện có **160 SKILL.md**
-được tổ chức theo 9 category trong [content/skills/](content/skills/). Các file `skills/*.md` ở root là bản mirror cũ,
-không phải một thư viện bổ sung hay nguồn authoring thứ hai.
+được tổ chức theo 9 category trực tiếp trong [skills/](skills/).
 
 ```mermaid
 flowchart TD
@@ -25,7 +24,8 @@ flowchart TD
 |---|---|
 | [.claude-plugin/](.claude-plugin/) và [.codex-plugin/](.codex-plugin/) | Manifest plugin |
 | [hooks/](hooks/) | Inject skill nhập môn; yêu cầu KB startup tùy chọn nếu CLI đã build |
-| [content/](content/) | Nguồn canonical của skill, rule và workflow |
+| [skills/](skills/) | Nguồn canonical của 160 skills phân theo 9 category |
+| [content/](content/) | Nguồn canonical của rule và workflow |
 | [packages/](packages/) | 13 package TypeScript quản lý bằng pnpm/Turborepo |
 | [services/kb-server/](services/kb-server/) | NestJS, SQLite/FTS5, cache trong process |
 | [apps/docs/](apps/docs/) | Tài liệu VitePress |

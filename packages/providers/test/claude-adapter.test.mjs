@@ -41,12 +41,12 @@ test('ClaudeAdapter manifest points at the canonical content skills directory', 
   assert.ok(manifestFile, 'plugin manifest should be emitted');
 
   const manifest = JSON.parse(manifestFile.contents);
-  assert.deepEqual(manifest.skills, ['./content/skills/']);
+  assert.deepEqual(manifest.skills, ['./skills/']);
   assert.deepEqual(
     files
       .filter(file => file.path.endsWith('/SKILL.md'))
       .map(file => file.path)
       .sort(),
-    ['content/skills/planning/SKILL.md', 'content/skills/review/SKILL.md'],
+    ['skills/planning/SKILL.md', 'skills/review/SKILL.md'],
   );
 });

@@ -41,4 +41,4 @@ Also in the same folder (engine / long runs):
 ## Related
 
 - Rule: `content/rules/core/spine-guardrail.md`
-- Entry: `content/skills/using-aix/SKILL.md`
+- Entry: `skills/methodology/using-aix/SKILL.md`

@@ -16,7 +16,7 @@ x-category: methodology
 
 You have aix. aix gives you two things:
 
-1. **A canonical skill library** — 160 skills in 9 categories under `content/skills/`.
+1. **A canonical skill library** — 160 skills in 9 categories under `skills/`.
    - **`methodology/`** — how to work: `discussing-pro`, `planning-pro`, `ttd-pro`,
      `executing-pro`, `code-review-pro`, `verify-pro`, `remember-pro`, `router-pro`,
      `karpathy-coding-pro`, `systematic-debugging-pro`, `testing-pro`, and more.
@@ -68,7 +68,7 @@ Spine markdown files belong under **`.aix/sessions/<session-id>/`**, not `.plann
 existing folder when resuming the same work. Create the directory before the first write.
 Archive prior versions to `archive/` when regenerating.
 
-Full contract: `content/skills/_shared/session-artifacts-contract.md` (also enforced by
+Full contract: `skills/_shared/session-artifacts-contract.md` (also enforced by
 `content/rules/core/spine-guardrail.md`).
 
 ## The default methodology (the spine)

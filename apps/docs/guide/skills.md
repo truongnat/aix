@@ -2,8 +2,8 @@
 
 ## Canonical source
 
-Author skills in `content/skills/<category>/<directory>/SKILL.md`. The current library contains 160
-canonical skill files organized into 9 categories; root `skills/*.md` are legacy mirrors, not additional skills.
+Author skills in `skills/<category>/<directory>/SKILL.md`. The current library contains 160
+canonical skill files organized into 9 categories.
 The host resolves the frontmatter `name`, which matches the directory name.
 
 | Layer | Content | Loading |

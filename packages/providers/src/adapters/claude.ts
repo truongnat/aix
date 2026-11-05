@@ -12,7 +12,7 @@ export class ClaudeAdapter implements ProviderAdapter {
 
     for (const skill of input.skills) {
       files.push({
-        path: `content/skills/${skill.id}/SKILL.md`,
+        path: `skills/${skill.id}/SKILL.md`,
         contents: `${FRONTMATTER_HEADER}name: ${skill.frontmatter.name}\ndescription: ${skill.frontmatter.description}\nx-kind: ${skill.frontmatter['x-kind']}\nx-version: ${skill.frontmatter['x-version']}\nx-tags: [${skill.frontmatter['x-tags'].join(', ')}]\nx-roles: [${skill.frontmatter['x-roles'].join(', ')}]\nx-compatible: [${skill.frontmatter['x-compatible'].join(', ')}]\n---\n\n${skill.body}`,
       });
     }
@@ -45,7 +45,7 @@ export class ClaudeAdapter implements ProviderAdapter {
           name: 'truongdq',
           url: 'https://github.com/truongnat',
         },
-        skills: ['./content/skills/'],
+        skills: ['./skills/'],
       }, null, 2),
     });
 

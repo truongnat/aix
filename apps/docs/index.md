@@ -32,7 +32,7 @@ features:
 
   - icon: 📦
     title: Canonical Skill Library
-    details: Domain skills, process workflows, and reference guides authored under content/skills with metadata, instructions, and on-demand resources.
+    details: Domain skills, process workflows, and reference guides authored under skills/ with metadata, instructions, and on-demand resources.
 
   - icon: ⚡
     title: pnpm + Turborepo

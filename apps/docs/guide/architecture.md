@@ -2,12 +2,12 @@
 
 ## Primary runtime: the host coding agent
 
-The plugin exposes canonical skills from `content/skills/`. A SessionStart hook injects
+The plugin exposes canonical skills from `skills/`. A SessionStart hook injects
 `using-aix`; the host selects domain/process skills and executes the eight-step engineering
 spine with its own tools. The optional TypeScript runner is a separate headless generation path.
 
-`content/skills/` is the authoring source. Root `skills/*.md` files are legacy mirrors, not
-additional skills. `aix skills list` generates a local catalog; `aix skills validate` includes
+`skills/` is the canonical authoring source containing 160 skills in 9 categories.
+`aix skills list` generates a local catalog; `aix skills validate` includes
 invalid YAML/frontmatter and duplicate-name diagnostics instead of silently ignoring them.
 
 ## Package map

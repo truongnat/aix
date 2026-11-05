@@ -33,7 +33,13 @@ export class SkillRegistry {
   }
 
   static async load(contentRoot: string): Promise<SkillRegistry> {
-    const skillsDir = join(contentRoot, 'skills');
+    let skillsDir = join(contentRoot, 'skills');
+    try {
+      const s = await stat(skillsDir);
+      if (!s.isDirectory()) skillsDir = contentRoot;
+    } catch {
+      skillsDir = contentRoot;
+    }
     const skills: LoadedSkill[] = [];
     const errors: AppError[] = [];
 

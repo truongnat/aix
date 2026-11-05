@@ -4,7 +4,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="${CURSOR_PLUGIN_ROOT:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
-SKILL="${PLUGIN_ROOT}/content/skills/methodology/using-aix/SKILL.md"
+SKILL="${PLUGIN_ROOT}/skills/methodology/using-aix/SKILL.md"
 
 node -e '
 const fs = require("fs");

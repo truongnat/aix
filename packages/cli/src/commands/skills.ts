@@ -8,20 +8,23 @@ import { PolicyEngine } from '@x/policy';
 
 function findContentRoot(): string {
   const dir = fileURLToPath(new URL('.', import.meta.url));
-  // dir = packages/cli/dist → repo root is 3 levels up (dist→cli→packages→root)
+  const repoRoot = join(dir, '..', '..', '..');
   const candidates = [
-    join(dir, '..', '..', '..', 'content'),
-    join(process.cwd(), 'content'),
+    join(process.cwd(), 'skills'),
+    join(repoRoot, 'skills'),
+    join(process.cwd(), 'content', 'skills'),
+    join(repoRoot, 'content', 'skills'),
   ];
   for (const c of candidates) {
     try {
-      statSync(join(c, 'skills'));
-      return c;
+      if (statSync(c).isDirectory()) {
+        return join(c, '..');
+      }
     } catch {
       continue;
     }
   }
-  return join(dir, '..', '..', '..', 'content');
+  return repoRoot;
 }
 
 export function registerSkillsCommand(program: Command): void {
@@ -103,12 +106,12 @@ export function registerSkillsCommand(program: Command): void {
 
   skills
     .command('migrate')
-    .description('Migrate skills from imports/ into content/skills/')
+    .description('Migrate skills from imports/ into skills/')
     .option('--write', 'Write files (default: dry-run only)')
     .action(async (opts: { write?: boolean }) => {
       const report = await migrateSkills({
         sources: ['imports/skills/skills', 'imports/system-design-skills', 'imports/ai-engineering-harness/skills', 'imports/dev-memory/skills'],
-        outDir: 'content/skills',
+        outDir: 'skills',
         ...(opts.write ? { write: true, policyEngine: new PolicyEngine() } : {}),
       });
 

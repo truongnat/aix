@@ -51,7 +51,7 @@ function parseFrontmatter(contents) {
 
 test('skill and Cursor rule artefacts put frontmatter before the generated marker', () => {
   const artefacts = [
-    new ClaudeAdapter().emit(input).find(file => file.path === 'content/skills/planning/SKILL.md'),
+    new ClaudeAdapter().emit(input).find(file => file.path === 'skills/planning/SKILL.md'),
     new CursorAdapter().emit(input).find(file => file.path === '.cursor/rules/aix-skill-planning.mdc'),
     new CodexAdapter().emit(input).find(file => file.path === '.codex/skills/planning/SKILL.md'),
     new GeminiAdapter().emit(input).find(file => file.path === '.agents/skills/planning/SKILL.md'),

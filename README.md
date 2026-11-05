@@ -23,7 +23,7 @@ codex plugin marketplace add truongnat/aix
 codex plugin add aix@aix
 ```
 
-On start, a `SessionStart` hook injects [`using-aix`](./content/skills/methodology/using-aix/SKILL.md) into context. It explains the 8-step engineering spine and how to reach the canonical skills via the host's `Skill` tool.
+On start, a `SessionStart` hook injects [`using-aix`](./skills/methodology/using-aix/SKILL.md) into context. It explains the 8-step engineering spine and how to reach the canonical skills via the host's `Skill` tool.
 
 No engine, no runtime — just skills the agent pulls in when needed.
 
@@ -105,8 +105,8 @@ exercise your acceptance criteria; a successful arbitrary command is not a corre
 The unsupported `ship` command has been removed. No command automatically applies generated
 files to project source or deploys them.
 
-`content/skills/` is the authoring source. Root `skills/*.md` files are legacy mirrors,
-not additional skills. `aix skills list` regenerates the local catalog from canonical content;
+`skills/` is the canonical authoring source containing 160 skills organized in 9 categories.
+`aix skills list` regenerates the local catalog from canonical content;
 validation includes invalid YAML/frontmatter and duplicate identifiers.
 
 ## Repository
@@ -116,8 +116,8 @@ validation includes invalid YAML/frontmatter and duplicate identifiers.
 .claude-plugin/   Claude Code plugin manifest
 .codex-plugin/    Codex plugin manifest
 hooks/            SessionStart → injects using-aix; requests optional KB startup if built
+skills/           Canonical domain, process, and reference skills in 9 categories
 content/
-  skills/         Canonical domain, process, and reference skills
   rules/          Spine guardrail rules
   workflows/      Engineering spine flow
 packages/         13 @x/* TypeScript packages

@@ -18,6 +18,6 @@
     "workflows",
     "best-practices"
   ],
-  "skills": "./content/skills/",
+  "skills": "./skills/",
   "hooks": "./hooks/hooks-cursor.json"
 }

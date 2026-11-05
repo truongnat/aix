@@ -26,7 +26,7 @@ function walkFiles(dir) {
 }
 
 function countSourceSkills() {
-  return walkFiles(join(repoRoot, 'content/skills'))
+  return walkFiles(join(repoRoot, 'skills'))
     .filter(file => file.endsWith('SKILL.md'))
     .length;
 }
@@ -110,7 +110,7 @@ test('install --all writes provider artefacts with expected counts, schemas, and
 
     const claudeManifest = readJson(join(tmp, '.claude-plugin/plugin.json'));
     assert.equal(claudeManifest.name, 'aix');
-    assert.deepEqual(claudeManifest.skills, ['./content/skills/']);
+    assert.deepEqual(claudeManifest.skills, ['./skills/']);
     assert.equal(claudeManifest.author.name, 'truongdq');
 
 
@@ -121,7 +121,7 @@ test('install --all writes provider artefacts with expected counts, schemas, and
 
     assert.equal(walkFiles(join(tmp, '.codex/skills')).filter(file => file.endsWith('.md')).length, skillCount);
     assert.equal(walkFiles(join(tmp, '.agents/skills')).filter(file => file.endsWith('.md')).length, skillCount);
-    assert.equal(walkFiles(join(tmp, 'content/skills')).filter(file => file.endsWith('SKILL.md')).length, skillCount);
+    assert.equal(walkFiles(join(tmp, 'skills')).filter(file => file.endsWith('SKILL.md')).length, skillCount);
   } finally {
     rmSync(tmp, { recursive: true, force: true });
   }

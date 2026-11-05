@@ -8,15 +8,15 @@
   },
   "license": "MIT",
   "skills": [
-    "./content/skills/",
-    "./content/skills/methodology/",
-    "./content/skills/frontend/",
-    "./content/skills/backend/",
-    "./content/skills/infrastructure/",
-    "./content/skills/data/",
-    "./content/skills/ai-agents/",
-    "./content/skills/security/",
-    "./content/skills/design/",
-    "./content/skills/business/"
+    "./skills/",
+    "./skills/methodology/",
+    "./skills/frontend/",
+    "./skills/backend/",
+    "./skills/infrastructure/",
+    "./skills/data/",
+    "./skills/ai-agents/",
+    "./skills/security/",
+    "./skills/design/",
+    "./skills/business/"
   ]
 }

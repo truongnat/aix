@@ -25,7 +25,7 @@ node packages/cli/dist/index.js install --provider cursor --dry-run
 pnpm run doctor
 ```
 
-`content/skills/` is the canonical library. The primary Claude/Codex plugin workflow uses
+`skills/` is the canonical library. The primary Claude/Codex plugin workflow uses
 the host agent as runtime; see the repository README for plugin installation commands.
 
 ## Optional local KB

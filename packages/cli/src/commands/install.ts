@@ -19,24 +19,33 @@ const ADAPTERS: Record<Provider, ClaudeAdapter | CursorAdapter | CodexAdapter | 
 
 function findContentRoot(): string {
   const dir = fileURLToPath(new URL('.', import.meta.url));
-  // dir = packages/cli/dist → repo root is 3 levels up (dist→cli→packages→root)
+  const repoRoot = join(dir, '..', '..', '..');
   const candidates = [
-    join(dir, '..', '..', '..', 'content'),
-    join(process.cwd(), 'content'),
+    join(process.cwd(), 'skills'),
+    join(repoRoot, 'skills'),
+    join(process.cwd(), 'content', 'skills'),
+    join(repoRoot, 'content', 'skills'),
   ];
   for (const c of candidates) {
     try {
-      statSync(join(c, 'skills'));
-      return c;
+      if (statSync(c).isDirectory()) {
+        return join(c, '..');
+      }
     } catch {
       continue;
     }
   }
-  return join(dir, '..', '..', '..', 'content');
+  return repoRoot;
 }
 
 async function loadAgents(contentRoot: string): Promise<AgentDef[]> {
-  const agentsDir = join(contentRoot, 'agents');
+  const candidates = [join(contentRoot, 'agents'), join(contentRoot, 'content', 'agents')];
+  let agentsDir = candidates[0]!;
+  for (const c of candidates) {
+    try {
+      if ((await stat(c)).isDirectory()) { agentsDir = c; break; }
+    } catch { continue; }
+  }
   const agents: AgentDef[] = [];
   try {
     const items = await readdir(agentsDir);
@@ -56,7 +65,13 @@ async function loadAgents(contentRoot: string): Promise<AgentDef[]> {
 }
 
 async function loadRules(contentRoot: string): Promise<RuleDoc[]> {
-  const rulesDir = join(contentRoot, 'rules');
+  const candidates = [join(contentRoot, 'rules'), join(contentRoot, 'content', 'rules')];
+  let rulesDir = candidates[0]!;
+  for (const c of candidates) {
+    try {
+      if ((await stat(c)).isDirectory()) { rulesDir = c; break; }
+    } catch { continue; }
+  }
   const rules: RuleDoc[] = [];
   try {
     const categories = await readdir(rulesDir);
