@@ -1,7 +1,7 @@
 {
   "name": "aix",
-  "version": "0.1.0",
-  "description": "AI engineering methodology spine and reusable skill library for coding agents.",
+  "version": "0.2.0",
+  "description": "AI engineering methodology spine and 160 reusable domain skills in 9 categories for coding agents.",
   "author": {
     "name": "truongdq",
     "url": "https://github.com/truongnat"

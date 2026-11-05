@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { SKILL_KINDS, PROVIDERS, ROLES, SKILL_NAME_MAX, SKILL_DESC_MAX } from '@x/core';
+import { SKILL_KINDS, PROVIDERS, ROLES, SKILL_NAME_MAX, SKILL_DESC_MAX, SKILL_CATEGORIES } from '@x/core';
 
 const skillFrontmatterBase = z.object({
   name: z.string()
@@ -25,6 +25,8 @@ const skillFrontmatterBase = z.object({
   'x-roles': z.array(z.enum(ROLES)).default([]),
 
   'x-compatible': z.array(z.enum(PROVIDERS)).default([...PROVIDERS]),
+
+  'x-category': z.enum(SKILL_CATEGORIES).optional(),
 });
 
 const knownKeys = new Set(Object.keys(skillFrontmatterBase.shape));

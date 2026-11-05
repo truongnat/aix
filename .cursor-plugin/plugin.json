@@ -1,8 +1,8 @@
 {
   "name": "aix",
   "displayName": "aix",
-  "description": "AI engineering methodology spine + 160+ skill library. Brainstorm → plan → TDD → execute → review → verify → ship.",
-  "version": "0.1.0",
+  "description": "AI engineering methodology spine + 160 skills in 9 categories. Brainstorm → plan → TDD → execute → review → verify → remember.",
+  "version": "0.2.0",
   "author": {
     "name": "truongdq",
     "email": "truongdq.dev@gmail.com"

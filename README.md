@@ -1,6 +1,6 @@
 # aix
 
-> AI engineering methodology + 158 canonical skills, delivered as a Claude Code and Codex plugin.
+> AI engineering methodology + 160 canonical skills across 9 categories, delivered as a Claude Code and Codex plugin.
 
 **The host agent is the runtime**. aix is the playbook and the skill library — not a separate engine you invoke.
 
@@ -23,7 +23,7 @@ codex plugin marketplace add truongnat/aix
 codex plugin add aix@aix
 ```
 
-On start, a `SessionStart` hook injects [`using-aix`](./content/skills/using-aix/SKILL.md) into context. It explains the 8-step engineering spine and how to reach the canonical skills via the host's `Skill` tool.
+On start, a `SessionStart` hook injects [`using-aix`](./content/skills/methodology/using-aix/SKILL.md) into context. It explains the 8-step engineering spine and how to reach the canonical skills via the host's `Skill` tool.
 
 No engine, no runtime — just skills the agent pulls in when needed.
 

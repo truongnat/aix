@@ -49,22 +49,9 @@ export class ClaudeAdapter implements ProviderAdapter {
       }, null, 2),
     });
 
-    const hooks: Record<string, { command: string }[]> = {};
-    for (const skill of input.skills) {
-      for (const script of skill.scripts) {
-        const hookType = script.endsWith('.pre.js') ? 'preToolUse'
-          : script.endsWith('.post.js') ? 'postToolUse'
-          : 'preToolUse';
-        if (!hooks[hookType]) hooks[hookType] = [];
-        hooks[hookType]!.push({ command: script });
-      }
-    }
-
     files.push({
       path: '.claude/settings.json',
-      contents: JSON.stringify({
-        hooks,
-      }, null, 2),
+      contents: JSON.stringify({}, null, 2),
     });
 
     return files;

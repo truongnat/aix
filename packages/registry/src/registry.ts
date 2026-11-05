@@ -1,8 +1,8 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import matter from 'gray-matter';
-import { SKILL_BODY_MAX_TOKENS, ValidationError } from '@x/core';
-import type { SkillKind, Role, AppError } from '@x/core';
+import { SKILL_BODY_MAX_TOKENS, ValidationError, SKILL_CATEGORIES } from '@x/core';
+import type { SkillKind, Role, AppError, SkillCategory } from '@x/core';
 import { SkillFrontmatterSchema } from './schema.js';
 import type { SkillFrontmatter } from './schema.js';
 import type { LoadedSkill, SkillCatalogEntry } from './types.js';
@@ -37,108 +37,126 @@ export class SkillRegistry {
     const skills: LoadedSkill[] = [];
     const errors: AppError[] = [];
 
-    let skillDirs: string[];
+    let topEntries: string[];
     try {
-      skillDirs = await readdir(skillsDir);
+      topEntries = await readdir(skillsDir);
     } catch {
       return new SkillRegistry([]);
     }
 
-    for (const dirName of skillDirs.sort()) {
-      const skillDir = join(skillsDir, dirName);
-      let dirStat;
-      try {
-        dirStat = await stat(skillDir);
-      } catch {
-        continue;
-      }
-      if (!dirStat.isDirectory()) continue;
+    for (const topName of topEntries.sort()) {
+      const topPath = join(skillsDir, topName);
+      let topStat;
+      try { topStat = await stat(topPath); } catch { continue; }
+      if (!topStat.isDirectory()) continue;
 
-      const skillMdPath = join(skillDir, 'SKILL.md');
-      let mdStat;
-      try {
-        mdStat = await stat(skillMdPath);
-      } catch {
-        continue;
-      }
-      if (!mdStat.isFile()) continue;
+      // Category container: has no SKILL.md directly but its name is a known category.
+      // Scan one level deeper for skill subdirs.
+      const isCategory = (SKILL_CATEGORIES as readonly string[]).includes(topName);
+      const hasSKILL = await stat(join(topPath, 'SKILL.md')).then(s => s.isFile()).catch(() => false);
 
-      let parsed: matter.GrayMatterFile<string>;
-      try {
-        parsed = matter(await readFile(skillMdPath, 'utf-8'));
-      } catch (cause) {
-        errors.push(new ValidationError(
-          `Skill "${dirName}" frontmatter could not be read or parsed`,
-          { path: skillMdPath, cause },
-        ));
-        continue;
-      }
-      const result = SkillFrontmatterSchema.safeParse(parsed.data);
-
-      if (!result.success) {
-        errors.push(new ValidationError(
-          `Skill "${dirName}" frontmatter invalid — ${result.error.issues.map(i => i.message).join('; ')}`,
-          { path: skillMdPath },
-        ));
-        continue;
-      }
-
-      const frontmatter: SkillFrontmatter = result.data;
-      const body = parsed.content;
-      const estimate = tokenEstimate(body);
-
-      if (estimate > SKILL_BODY_MAX_TOKENS) {
-        console.warn(`[registry] WARN ${dirName}: body ~${estimate} tokens (max ${SKILL_BODY_MAX_TOKENS})`);
-      }
-
-      const references: string[] = [];
-      const scripts: string[] = [];
-      const assets: string[] = [];
-
-      const subDirs: string[] = [];
-      try {
-        for (const entry of await readdir(skillDir)) {
-          const subPath = join(skillDir, entry);
-          const subStat = await stat(subPath);
-          if (subStat.isDirectory()) {
-            subDirs.push(entry);
-          }
+      if (isCategory && !hasSKILL) {
+        // recurse into category dir
+        let subEntries: string[];
+        try { subEntries = await readdir(topPath); } catch { continue; }
+        for (const subName of subEntries.sort()) {
+          const subPath = join(topPath, subName);
+          let subStat;
+          try { subStat = await stat(subPath); } catch { continue; }
+          if (!subStat.isDirectory()) continue;
+          const loaded = await SkillRegistry.#loadSkillDir(subPath, subName, errors, topName as SkillCategory);
+          if (loaded) skills.push(loaded);
         }
-      } catch {
-        // no subdirectories
+      } else {
+        // flat skill at top level (backward-compat) or skill with x-category in frontmatter
+        const loaded = await SkillRegistry.#loadSkillDir(topPath, topName, errors, undefined);
+        if (loaded) skills.push(loaded);
       }
-
-      for (const subDir of subDirs) {
-        const subPath = join(skillDir, subDir);
-        const target = subDir === 'references' ? references
-          : subDir === 'scripts' ? scripts
-          : subDir === 'assets' ? assets
-          : null;
-
-        if (target) {
-          try {
-            for (const file of await readdir(subPath)) {
-              target.push(join(subPath, file));
-            }
-          } catch {
-            // empty dir
-          }
-        }
-      }
-
-      skills.push({
-        id: frontmatter.name,
-        dir: skillDir,
-        frontmatter,
-        body,
-        bodyTokenEstimate: estimate,
-        references,
-        scripts,
-        assets,
-      });
     }
 
     return new SkillRegistry(skills, errors);
+  }
+
+  static async #loadSkillDir(
+    skillDir: string,
+    dirName: string,
+    errors: AppError[],
+    categoryOverride: SkillCategory | undefined,
+  ): Promise<LoadedSkill | null> {
+    const skillMdPath = join(skillDir, 'SKILL.md');
+    let mdStat;
+    try { mdStat = await stat(skillMdPath); } catch { return null; }
+    if (!mdStat.isFile()) return null;
+
+    let parsed: matter.GrayMatterFile<string>;
+    try {
+      parsed = matter(await readFile(skillMdPath, 'utf-8'));
+    } catch (cause) {
+      errors.push(new ValidationError(
+        `Skill "${dirName}" frontmatter could not be read or parsed`,
+        { path: skillMdPath, cause },
+      ));
+      return null;
+    }
+
+    const result = SkillFrontmatterSchema.safeParse(parsed.data);
+    if (!result.success) {
+      errors.push(new ValidationError(
+        `Skill "${dirName}" frontmatter invalid — ${result.error.issues.map(i => i.message).join('; ')}`,
+        { path: skillMdPath },
+      ));
+      return null;
+    }
+
+    const frontmatter: SkillFrontmatter = result.data;
+    const body = parsed.content;
+    const estimate = tokenEstimate(body);
+    if (estimate > SKILL_BODY_MAX_TOKENS) {
+      console.warn(`[registry] WARN ${dirName}: body ~${estimate} tokens (max ${SKILL_BODY_MAX_TOKENS})`);
+    }
+
+    const references: string[] = [];
+    const scripts: string[] = [];
+    const assets: string[] = [];
+
+    const subDirs: string[] = [];
+    try {
+      for (const entry of await readdir(skillDir)) {
+        const subPath = join(skillDir, entry);
+        const subStat = await stat(subPath);
+        if (subStat.isDirectory()) subDirs.push(entry);
+      }
+    } catch { /* no subdirectories */ }
+
+    for (const subDir of subDirs) {
+      const subPath = join(skillDir, subDir);
+      const target = subDir === 'references' ? references
+        : subDir === 'scripts' ? scripts
+        : subDir === 'assets' ? assets
+        : null;
+      if (target) {
+        try {
+          for (const file of await readdir(subPath)) {
+            target.push(join(subPath, file));
+          }
+        } catch { /* empty dir */ }
+      }
+    }
+
+    const category: SkillCategory | undefined =
+      categoryOverride ?? (frontmatter['x-category'] as SkillCategory | undefined);
+
+    return {
+      id: frontmatter.name,
+      dir: skillDir,
+      frontmatter,
+      body,
+      category,
+      bodyTokenEstimate: estimate,
+      references,
+      scripts,
+      assets,
+    };
   }
 
   all(): readonly LoadedSkill[] {
@@ -155,6 +173,10 @@ export class SkillRegistry {
 
   byRole(role: Role): readonly LoadedSkill[] {
     return this.all().filter(s => s.frontmatter['x-roles'].includes(role));
+  }
+
+  byCategory(category: SkillCategory): readonly LoadedSkill[] {
+    return this.all().filter(s => s.category === category);
   }
 
   search(query: string): readonly SkillCatalogEntry[] {
@@ -196,6 +218,7 @@ export class SkillRegistry {
       version: skill.frontmatter['x-version'],
       roles: skill.frontmatter['x-roles'],
       compatible: skill.frontmatter['x-compatible'],
+      category: skill.category,
       dir: skill.dir,
     };
   }

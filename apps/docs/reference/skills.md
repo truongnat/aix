@@ -1,6 +1,6 @@
 # Skills Catalog
 
-The canonical library currently contains 158 `SKILL.md` files under `content/skills/`.
+The canonical library currently contains 160 `SKILL.md` files organized in 9 categories under `content/skills/`.
 Generate the current machine-local catalog instead of relying on a copied list of names:
 
 ```bash

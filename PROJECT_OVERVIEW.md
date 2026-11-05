@@ -3,8 +3,8 @@
 ## Mục tiêu và mô hình thực thi
 
 **Host agent là runtime.** aix cung cấp phương pháp kỹ thuật tám bước và thư viện skill;
-không yêu cầu engine headless để dùng plugin. Thư viện canonical hiện có **158 SKILL.md**
-trong [content/skills/](content/skills/). Các file `skills/*.md` ở root là bản mirror cũ,
+không yêu cầu engine headless để dùng plugin. Thư viện canonical hiện có **160 SKILL.md**
+được tổ chức theo 9 category trong [content/skills/](content/skills/). Các file `skills/*.md` ở root là bản mirror cũ,
 không phải một thư viện bổ sung hay nguồn authoring thứ hai.
 
 ```mermaid

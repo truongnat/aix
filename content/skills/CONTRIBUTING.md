@@ -10,19 +10,35 @@ is the contribution contract: layout, schema, and the checks your PR must pass.
 
 ## Layout
 
-One skill = one directory under `content/skills/`, containing a `SKILL.md`:
+Skills are organized into **category subdirectories**. One skill = one directory under
+`content/skills/<category>/`, containing a `SKILL.md`:
 
 ```
-content/skills/<skill-name>/
-├── SKILL.md            # required — frontmatter + body
-├── references/         # optional — L3 deep-dive docs, loaded on demand
-└── examples/           # optional — sample inputs/outputs
+content/skills/
+├── methodology/          # process / methodology skills
+│   └── planning-pro/
+│       ├── SKILL.md      # required — frontmatter + body
+│       ├── references/   # optional — L3 deep-dive docs, loaded on demand
+│       └── examples/     # optional — sample inputs/outputs
+├── frontend/             # UI frameworks, mobile, design systems
+├── backend/              # server frameworks, languages, APIs
+├── infrastructure/       # DevOps, CI/CD, cloud, containers
+├── data/                 # databases, analytics, ML, caching
+├── ai-agents/            # LLM integration, MCP, computer-use, browser/desktop automation
+├── security/             # auth, secrets, pentest, compliance
+├── design/               # UX, accessibility, design systems, 3D
+└── business/             # product, finance, consulting, marketing
 ```
 
-- The directory name should match the skill's `name` (recommended, not enforced — the host keys
-  skills by the frontmatter `name`).
-- Keep `SKILL.md` focused; push long reference material into `references/` (progressive disclosure:
-  L1 = description, L2 = SKILL.md body, L3 = references).
+The registry recurses **exactly one level** into category dirs. Any directory at the top
+level whose name is a known category slug (`methodology`, `frontend`, …) is treated as a
+container — its subdirectories are loaded as skills. Any other top-level directory with a
+`SKILL.md` is loaded as a flat (uncategorized) skill for backward-compatibility.
+
+- The directory name should match the skill's `name` (recommended, not enforced — the host
+  keys skills by the frontmatter `name`).
+- Keep `SKILL.md` focused; push long reference material into `references/` (progressive
+  disclosure: L1 = description, L2 = SKILL.md body, L3 = references).
 
 ## SKILL.md frontmatter schema
 
@@ -38,6 +54,7 @@ of truth — if this table and the code disagree, the code wins.
 | `x-tags` | — | `string[]` | `[]` |
 | `x-roles` | — | subset of `planner` \| `coder` \| `reviewer` \| `architect` | `[]` |
 | `x-compatible` | — | subset of `claude` \| `cursor` \| `codex` \| `gemini` | all four |
+| `x-category` | — | one of the 9 category slugs (see layout above) — inferred from filesystem when inside a category dir | `undefined` |
 | `disable-model-invocation` | — | boolean | — |
 | `user-invocable` | — | boolean | — |
 
@@ -50,7 +67,9 @@ of truth — if this table and the code disagree, the code wins.
   These form the [engineering spine](../workflows/engineering-spine.md).
 - **`reference`** — a lookup/cheatsheet with little prescriptive process.
 
-### Example
+### Example (inside a category dir)
+
+Place the skill at `content/skills/backend/my-new-skill/SKILL.md`:
 
 ```markdown
 ---
@@ -63,12 +82,17 @@ x-version: 0.1.0
 x-tags: [example, getting-started]
 x-roles: [coder, reviewer]
 x-compatible: [claude, cursor, codex, gemini]
+x-category: backend
 ---
 
 # My New Skill
 
 Body in Markdown. Lead with the most useful thing. Link L3 detail from `references/`.
 ```
+
+`x-category` is optional when the skill is inside a known category directory — the registry
+infers it from the filesystem path. Set it explicitly only when the category can't be inferred
+(e.g. a flat top-level skill added for backward-compatibility).
 
 ## Before you open a PR
 
@@ -83,7 +107,8 @@ Checklist:
 - [ ] `aix skills validate` passes with **0 new SKIP**.
 - [ ] `name` is unique across `content/skills/` (no duplicate skill names).
 - [ ] `description` actually describes *when to use* the skill, within 1024 chars.
-- [ ] Correct `x-kind`; add `x-roles`/`x-tags` if they help discovery.
+- [ ] Skill lives in the correct category subdirectory (or `x-category` set explicitly).
+- [ ] Correct `x-kind`; add `x-roles`/`x-tags`/`x-category` if they help discovery.
 - [ ] No secrets, no PII, no machine-absolute paths in the skill body.
 - [ ] Long material lives in `references/`, not inline.
 

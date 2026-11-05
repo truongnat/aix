@@ -6,6 +6,20 @@ export const PROVIDERS = ['claude', 'cursor', 'codex', 'gemini'] as const;
 
 export const ROLES = ['planner', 'coder', 'reviewer', 'architect'] as const;
 
+export const SKILL_CATEGORIES = [
+  'methodology',
+  'frontend',
+  'backend',
+  'infrastructure',
+  'data',
+  'ai-agents',
+  'security',
+  'design',
+  'business',
+  'tooling',
+] as const;
+
+export type SkillCategory = (typeof SKILL_CATEGORIES)[number];
 export const SKILL_BODY_MAX_TOKENS = 5000;
 
 export const SKILL_NAME_MAX = 64;

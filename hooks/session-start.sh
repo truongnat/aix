@@ -5,12 +5,7 @@
 set -euo pipefail
 
 ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-SKILL="${ROOT}/content/skills/using-aix/SKILL.md"
-
-# Start kb-server in the background if it's not running
-if [ -f "${ROOT}/packages/cli/dist/index.js" ]; then
-  node "${ROOT}/packages/cli/dist/index.js" kb ensure >/dev/null 2>&1 &
-fi
+SKILL="${ROOT}/content/skills/methodology/using-aix/SKILL.md"
 
 # node is the project runtime and gives us safe JSON escaping across platforms.
 node -e '
@@ -23,8 +18,9 @@ const intro =
   "the default engineering methodology and how to reach every other aix skill via the " +
   "Skill tool (start with router-pro for broad requests, tool-discovery-skill to find by " +
   "capability). Check for a relevant skill before any non-trivial task.\n" +
-  "KB startup is optional: a built CLI triggers a background startup attempt, not a readiness guarantee. " +
-  "Use `aix kb status` to check it. Only use `aix kb stop` when explicitly managing that service; do not stop a reused/shared service automatically.\n\n";
+  "Memory defaults to plain Markdown in `.aix/runtime/memory/`; use native host file tools. " +
+  "Search local memory before work. The optional KB service requires separate, explicit setup; " +
+  "this hook only injects context and never starts services or creates credentials.\n\n";
 process.stdout.write(JSON.stringify({
   hookSpecificOutput: {
     hookEventName: "SessionStart",

@@ -1,7 +1,8 @@
 export {
-  PHASES, SKILL_KINDS, PROVIDERS, ROLES,
+  PHASES, SKILL_KINDS, PROVIDERS, ROLES, SKILL_CATEGORIES,
   SKILL_BODY_MAX_TOKENS, SKILL_NAME_MAX, SKILL_DESC_MAX, SCOPE,
 } from './constants.js';
+export type { SkillCategory } from './constants.js';
 
 export type {
   Phase, Provider, SkillKind, Role,
