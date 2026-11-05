@@ -1,0 +1,99 @@
+import React from 'react';
+import {
+  LayoutDashboard,
+  Workflow,
+  Sparkles,
+  BrainCircuit,
+  ShieldCheck,
+  Server,
+  Layers,
+} from 'lucide-react';
+import type { DesktopSystemStatus } from '@shared/api';
+
+export type NavTab = 'dashboard' | 'spine' | 'skills' | 'memory' | 'verify';
+
+interface SidebarProps {
+  currentTab: NavTab;
+  onSelectTab: (tab: NavTab) => void;
+  status: DesktopSystemStatus | null;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, status }) => {
+  const navItems = [
+    { id: 'dashboard' as NavTab, label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'spine' as NavTab, label: 'Engineering Spine', icon: Workflow },
+    { id: 'skills' as NavTab, label: 'Skill Library (160)', icon: Sparkles },
+    { id: 'memory' as NavTab, label: 'Memory Hub', icon: BrainCircuit },
+    { id: 'verify' as NavTab, label: 'Sandbox & Verify', icon: ShieldCheck },
+  ];
+
+  return (
+    <aside className="w-64 bg-[#0d0f17] border-r border-white/5 flex flex-col justify-between select-none">
+      <div>
+        {/* Brand Header */}
+        <div className="p-5 flex items-center gap-3 border-b border-white/5">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+            <Layers className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <div className="font-bold text-base tracking-tight text-white flex items-center gap-2">
+              aix
+              <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                Desktop
+              </span>
+            </div>
+            <div className="text-xs text-slate-400 font-medium">Mission Control</div>
+          </div>
+        </div>
+
+        {/* Navigation Items */}
+        <nav className="p-3 space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onSelectTab(item.id)}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  isActive
+                    ? 'bg-blue-600/10 text-blue-400 border border-blue-500/20 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
+                }`}
+              >
+                <Icon className={`w-4 h-4 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Footer System Status */}
+      <div className="p-4 m-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-2.5">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-slate-400 flex items-center gap-1.5 font-medium">
+            <Server className="w-3.5 h-3.5" /> KB Service
+          </span>
+          <span
+            className={`flex items-center gap-1.5 text-[11px] font-semibold ${
+              status?.kbServiceOnline ? 'text-emerald-400' : 'text-slate-400'
+            }`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                status?.kbServiceOnline ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'
+              }`}
+            />
+            {status?.kbServiceOnline ? 'Online' : 'Offline (Opt-in)'}
+          </span>
+        </div>
+
+        <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
+          <span>Skills: {status?.skillsCount ?? 160}</span>
+          <span>Node {status?.nodeVersion ?? '22.x'}</span>
+        </div>
+      </div>
+    </aside>
+  );
+};
