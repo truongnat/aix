@@ -132,19 +132,27 @@ export class ApiRuntimeProvider implements RuntimeProvider {
   readonly #apiUrl: string;
   readonly #model: string;
 
-  constructor() {
-    this.id = process.env.AIX_PROVIDER ?? 'anthropic';
-    this.#apiKey = process.env.ANTHROPIC_API_KEY ?? process.env.OPENAI_API_KEY ?? process.env.GROQ_API_KEY ?? '';
-    this.#apiUrl = this.id === 'anthropic'
-      ? 'https://api.anthropic.com/v1/messages'
-      : this.id === 'groq'
-        ? 'https://api.groq.com/openai/v1/chat/completions'
-        : 'https://api.openai.com/v1/chat/completions';
-    this.#model = this.id === 'anthropic'
-      ? (process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-6')
-      : this.id === 'groq'
-        ? (process.env.GROQ_MODEL ?? 'llama3-70b-8192')
-        : (process.env.OPENAI_MODEL ?? 'gpt-4o');
+  constructor(opts?: { provider?: string; apiKey?: string; apiUrl?: string; model?: string }) {
+    this.id = opts?.provider ?? process.env.AIX_PROVIDER ?? 'anthropic';
+    this.#apiKey = opts?.apiKey ?? process.env.AIX_API_KEY ?? process.env.ANTHROPIC_API_KEY ?? process.env.OPENAI_API_KEY ?? process.env.GROQ_API_KEY ?? process.env.INFERX_API_KEY ?? '';
+    this.#apiUrl = opts?.apiUrl ?? process.env.AIX_API_URL ?? (
+      this.id === 'anthropic'
+        ? 'https://api.anthropic.com/v1/messages'
+        : this.id === 'groq'
+          ? 'https://api.groq.com/openai/v1/chat/completions'
+          : this.id === 'inferx'
+            ? 'https://model.inferx.net/endpoints/v1/chat/completions'
+            : 'https://api.openai.com/v1/chat/completions'
+    );
+    this.#model = opts?.model ?? process.env.AIX_MODEL ?? (
+      this.id === 'anthropic'
+        ? (process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-6')
+        : this.id === 'groq'
+          ? (process.env.GROQ_MODEL ?? 'llama3-70b-8192')
+          : this.id === 'inferx'
+            ? (process.env.INFERX_MODEL ?? 'deepseek-v4.1-flash-1017-basic')
+            : (process.env.OPENAI_MODEL ?? 'gpt-4o')
+    );
   }
 
   async call(opts: ModelCallOptions): Promise<ModelCallResponse> {

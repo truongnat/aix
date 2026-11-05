@@ -8,10 +8,12 @@ import {
   Server,
   Layers,
   Sliders,
+  MessageSquareCode,
+  Plus,
 } from 'lucide-react';
 import type { DesktopSystemStatus } from '@shared/api';
 
-export type NavTab = 'dashboard' | 'spine' | 'skills' | 'memory' | 'verify' | 'settings';
+export type NavTab = 'chat' | 'dashboard' | 'spine' | 'skills' | 'memory' | 'verify' | 'settings';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -21,6 +23,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, status }) => {
   const navItems = [
+    { id: 'chat' as NavTab, label: 'Agent Chat Canvas', icon: MessageSquareCode },
     { id: 'dashboard' as NavTab, label: 'Dashboard', icon: LayoutDashboard },
     { id: 'spine' as NavTab, label: 'Engineering Spine', icon: Workflow },
     { id: 'skills' as NavTab, label: 'Skill Library (160)', icon: Sparkles },
@@ -46,6 +49,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
             </div>
             <div className="text-xs text-slate-400 font-medium">Mission Control</div>
           </div>
+        </div>
+
+        {/* Quick Launch Action */}
+        <div className="p-3 pb-1">
+          <button
+            type="button"
+            onClick={() => onSelectTab('chat')}
+            className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-blue-600/20 transition-all"
+          >
+            <Plus className="w-3.5 h-3.5" /> Launch New Task
+          </button>
         </div>
 
         {/* Navigation Items */}

@@ -1,6 +1,7 @@
 import { app, dialog, ipcMain } from 'electron';
 import { readdir, readFile, stat, unlink, writeFile, mkdir } from 'node:fs/promises';
 import { join, resolve, relative, isAbsolute, dirname } from 'node:path';
+import { homedir } from 'node:os';
 import { exec, execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
 import { SkillRegistry } from '@x/registry';
@@ -78,6 +79,27 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         baseUrl: parsed.baseUrl,
       };
     } catch {
+      let ompKey = '';
+      let ompUrl = '';
+      try {
+        const ompYml = await readFile(join(homedir(), '.omp', 'agent', 'models.yml'), 'utf-8');
+        const keyMatch = ompYml.match(/apiKey:\s*([^\s\r\n]+)/);
+        const urlMatch = ompYml.match(/baseUrl:\s*([^\s\r\n]+)/);
+        if (keyMatch?.[1]) ompKey = keyMatch[1];
+        if (urlMatch?.[1]) ompUrl = urlMatch[1];
+      } catch {
+        // no omp models.yml
+      }
+
+      if (ompKey) {
+        return {
+          provider: 'inferx',
+          model: 'deepseek-v4.1-flash-1017-basic',
+          apiKey: ompKey,
+          baseUrl: ompUrl || 'https://model.inferx.net/endpoints/v1',
+        };
+      }
+
       return {
         provider: (process.env['AIX_PROVIDER'] as AiProviderId) ?? 'anthropic',
         model: process.env['ANTHROPIC_MODEL'] ?? 'claude-3-5-sonnet-20241022',
@@ -204,8 +226,16 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         return { ok: true, latencyMs, message: `Connected to Anthropic (${model}) in ${latencyMs}ms` };
       }
 
-      if (provider === 'openai' || provider === 'groq' || provider === 'ollama') {
-        const url = baseUrl || (provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions' : provider === 'ollama' ? 'http://127.0.0.1:11434/v1/chat/completions' : 'https://api.openai.com/v1/chat/completions');
+      if (provider === 'inferx' || provider === 'openai' || provider === 'groq' || provider === 'ollama') {
+        const url = baseUrl || (
+          provider === 'inferx'
+            ? 'https://model.inferx.net/endpoints/v1/chat/completions'
+            : provider === 'groq'
+              ? 'https://api.groq.com/openai/v1/chat/completions'
+              : provider === 'ollama'
+                ? 'http://127.0.0.1:11434/v1/chat/completions'
+                : 'https://api.openai.com/v1/chat/completions'
+        );
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
         if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 

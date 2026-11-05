@@ -26,9 +26,17 @@ interface ProviderCardInfo {
 
 const PROVIDERS: readonly ProviderCardInfo[] = [
   {
+    id: 'inferx',
+    name: 'InferX DeepSeek',
+    desc: 'DeepSeek V4.1 Flash 1017 reasoning endpoint (omp pre-configured).',
+    defaultModel: 'deepseek-v4.1-flash-1017-basic',
+    models: ['deepseek-v4.1-flash-1017-basic'],
+    icon: '⚡',
+  },
+  {
     id: 'anthropic',
-    name: 'Anthropic',
-    desc: 'Recommended. Industry-leading reasoning and coding craft.',
+    name: 'Anthropic Claude',
+    desc: 'Subscription & API. Industry-leading reasoning and coding craft.',
     defaultModel: 'claude-3-5-sonnet-20241022',
     models: ['claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-7-sonnet'],
     icon: '🟣',
@@ -98,7 +106,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
     const providerInfo = PROVIDERS.find((item) => item.id === p);
     if (providerInfo) {
       setModel(providerInfo.defaultModel);
-      if (p === 'ollama') {
+      if (p === 'inferx') {
+        setBaseUrl('https://model.inferx.net/endpoints/v1');
+      } else if (p === 'ollama') {
         setBaseUrl('http://127.0.0.1:11434/v1/chat/completions');
       } else {
         setBaseUrl('');
@@ -253,7 +263,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   placeholder={
-                    selectedProvider === 'anthropic'
+                    selectedProvider === 'inferx'
+                      ? 'ix_... (Pre-configured from ~/.omp/agent/models.yml)'
+                      : selectedProvider === 'anthropic'
                       ? 'sk-ant-api03-...'
                       : selectedProvider === 'openai'
                       ? 'sk-proj-...'

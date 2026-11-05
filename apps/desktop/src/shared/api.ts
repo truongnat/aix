@@ -60,7 +60,24 @@ export interface DesktopSystemStatus {
   readonly activeAiModel: string;
 }
 
-export type AiProviderId = 'anthropic' | 'openai' | 'groq' | 'ollama' | 'mock';
+export type AiProviderId = 'inferx' | 'anthropic' | 'openai' | 'groq' | 'ollama' | 'mock';
+
+export interface DesktopChatMessage {
+  readonly id: string;
+  readonly role: 'user' | 'assistant' | 'system';
+  readonly content: string;
+  readonly timestamp: string;
+  readonly phase?: Phase;
+  readonly stepCard?: {
+    readonly step: string;
+    readonly role: string;
+    readonly status: 'running' | 'completed' | 'waiting_approval' | 'failed';
+    readonly artifactName?: string;
+    readonly artifactContent?: string;
+    readonly summary?: string;
+  };
+  readonly hitlRequest?: DesktopHitlRequest;
+}
 
 export interface DesktopAiConfig {
   readonly provider: AiProviderId;
