@@ -1,5 +1,6 @@
 import { app, dialog, ipcMain } from 'electron';
 import { readdir, readFile, stat, unlink, writeFile, mkdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { join, resolve, relative, isAbsolute, dirname } from 'node:path';
 import { homedir } from 'node:os';
 import { exec, execFile, spawn } from 'node:child_process';
@@ -48,6 +49,121 @@ import {
 export interface IpcHandlerPaths {
   readonly repoRoot: string;
   readonly storageRoot?: string;
+}
+
+export async function getMasterPassword(storageRoot: string): Promise<string> {
+  const passwordFile = join(storageRoot, '.aix', 'kb-master-password.txt');
+  try {
+    return (await readFile(passwordFile, 'utf-8')).trim();
+  } catch {
+    const generated = 'aix-kb-master-' + crypto.randomUUID().slice(0, 8);
+    await mkdir(dirname(passwordFile), { recursive: true });
+    await writeFile(passwordFile, generated, 'utf-8');
+    return generated;
+  }
+}
+
+export async function checkKbHealth(): Promise<{ online: boolean; port: number; url: string }> {
+  for (const port of [4000, 3001]) {
+    try {
+      const res = await fetch(`http://127.0.0.1:${port}/health`, { signal: AbortSignal.timeout(600) });
+      if (res.ok) {
+        return { online: true, port, url: `http://127.0.0.1:${port}` };
+      }
+    } catch {
+      // Continue to next port
+    }
+  }
+  return { online: false, port: 4000, url: 'http://127.0.0.1:4000' };
+}
+
+export function findNodeBinary(): string {
+  if (process.env['NODE'] && existsSync(process.env['NODE'])) return process.env['NODE'];
+  const candidates = [
+    join(homedir(), '.local', 'share', 'mise', 'installs', 'node', 'lts', 'bin', 'node'),
+    join(homedir(), '.local', 'share', 'mise', 'installs', 'node', '24.21.0', 'bin', 'node'),
+    join(homedir(), '.nvm', 'versions', 'node', 'default', 'bin', 'node'),
+    '/usr/local/bin/node',
+    '/usr/bin/node',
+  ];
+  for (const c of candidates) {
+    if (existsSync(c)) return c;
+  }
+  return 'node';
+}
+
+export async function ensureKbServerRunning(paths: { repoRoot: string; storageRoot?: string }): Promise<{ ok: boolean; port: number; url: string; message: string }> {
+  const storageRoot = paths.storageRoot ?? paths.repoRoot;
+  const currentHealth = await checkKbHealth();
+  if (currentHealth.online) {
+    return { ok: true, port: currentHealth.port, url: currentHealth.url, message: `KB Service is already running at ${currentHealth.url}` };
+  }
+
+  const masterPassword = await getMasterPassword(storageRoot);
+  const kbMain = join(paths.repoRoot, 'services', 'kb-server', 'dist', 'main.js');
+
+  try {
+    const nodeBin = findNodeBinary();
+    const child = spawn(nodeBin, [kbMain], {
+      detached: true,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      cwd: paths.repoRoot,
+      env: {
+        ...process.env,
+        PATH: `${dirname(nodeBin)}:${process.env['PATH'] ?? ''}`,
+        PORT: '4000',
+        KB_HOST: '127.0.0.1',
+        KB_MASTER_PASSWORD: masterPassword,
+      },
+    });
+
+    let stderrBuffer = '';
+    child.stderr?.on('data', (d: Buffer) => {
+      stderrBuffer += d.toString();
+    });
+
+    child.on('error', (err: Error) => {
+      console.error('[kb-server-spawn-error]', err);
+    });
+
+    child.unref();
+
+    // Poll health up to 5 seconds
+    const start = Date.now();
+    while (Date.now() - start < 5000) {
+      await new Promise(r => setTimeout(r, 250));
+      const h = await checkKbHealth();
+      if (h.online) {
+        return { ok: true, port: h.port, url: h.url, message: `KB Server launched successfully on http://127.0.0.1:${h.port}!` };
+      }
+    }
+
+    return {
+      ok: false,
+      port: 4000,
+      url: 'http://127.0.0.1:4000',
+      message: `KB Server spawned with ${nodeBin} but timed out: ${stderrBuffer.trim() || 'Health check timed out'}`,
+    };
+  } catch (err: unknown) {
+    return { ok: false, port: 4000, url: 'http://127.0.0.1:4000', message: `Failed to spawn KB server: ${String(err)}` };
+  }
+}
+
+export async function shutdownKbServer(paths: { storageRoot?: string }): Promise<{ ok: boolean; message: string }> {
+  const storageRoot = paths.storageRoot ?? join(homedir(), '.aix');
+  const masterPassword = await getMasterPassword(storageRoot);
+  for (const port of [4000, 3001]) {
+    try {
+      await fetch(`http://127.0.0.1:${port}/shutdown`, {
+        method: 'POST',
+        headers: { 'x-master-password': masterPassword },
+        signal: AbortSignal.timeout(1500),
+      }).catch(() => {});
+    } catch {
+      // ignore
+    }
+  }
+  return { ok: true, message: 'KB Service shutdown signal sent' };
 }
 
 export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
@@ -110,19 +226,6 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     }
   }
 
-  async function checkKbHealth(): Promise<{ online: boolean; port: number; url: string }> {
-    for (const port of [4000, 3001]) {
-      try {
-        const res = await fetch(`http://127.0.0.1:${port}/health`, { signal: AbortSignal.timeout(600) });
-        if (res.ok) {
-          return { online: true, port, url: `http://127.0.0.1:${port}` };
-        }
-      } catch {
-        // Continue to next port
-      }
-    }
-    return { online: false, port: 4000, url: 'http://127.0.0.1:4000' };
-  }
 
   // System Status
   ipcMain.handle('system:getStatus', async (): Promise<DesktopSystemStatus> => {
@@ -451,73 +554,10 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
   });
 
   ipcMain.handle('system:toggleKbService', async (_, action: 'start' | 'stop') => {
-    if (app && app.isPackaged) {
-      return {
-        ok: false,
-        message: 'Standalone KB service management via pnpm is only available in development mode. In production, run the standalone KB container or service.',
-      };
-    }
-
-    async function getMasterPassword(): Promise<string> {
-      try {
-        return (await readFile(kbPasswordFile, 'utf-8')).trim();
-      } catch {
-        const generated = 'aix-kb-master-' + crypto.randomUUID().slice(0, 8);
-        await mkdir(dirname(kbPasswordFile), { recursive: true });
-        await writeFile(kbPasswordFile, generated, 'utf-8');
-        return generated;
-      }
-    }
-
     if (action === 'start') {
-      const currentHealth = await checkKbHealth();
-      if (currentHealth.online) {
-        return { ok: true, message: `KB Service is already running at ${currentHealth.url}` };
-      }
-
-      const masterPassword = await getMasterPassword();
-      const kbMain = join(repoRoot, 'services', 'kb-server', 'dist', 'main.js');
-
-      try {
-        const child = spawn(process.execPath, [kbMain], {
-          detached: true,
-          stdio: 'ignore',
-          cwd: repoRoot,
-          env: {
-            ...process.env,
-            PORT: '4000',
-            KB_HOST: '127.0.0.1',
-            KB_MASTER_PASSWORD: masterPassword,
-          },
-        });
-        child.unref();
-
-        // Poll health up to 4.5 seconds
-        const start = Date.now();
-        while (Date.now() - start < 4500) {
-          await new Promise(r => setTimeout(r, 400));
-          const h = await checkKbHealth();
-          if (h.online) {
-            return { ok: true, message: `KB Server launched successfully on http://127.0.0.1:${h.port}!` };
-          }
-        }
-
-        return { ok: false, message: 'KB Server was spawned but health check timed out. Verify services/kb-server/dist/main.js' };
-      } catch (err: unknown) {
-        return { ok: false, message: `Failed to spawn KB server: ${String(err)}` };
-      }
+      return await ensureKbServerRunning({ repoRoot, storageRoot });
     } else {
-      const masterPassword = await getMasterPassword();
-      try {
-        await fetch('http://127.0.0.1:4000/shutdown', {
-          method: 'POST',
-          headers: { 'x-master-password': masterPassword },
-          signal: AbortSignal.timeout(2000),
-        }).catch(() => {});
-        return { ok: true, message: 'KB Service shutdown signal sent' };
-      } catch (err: unknown) {
-        return { ok: false, message: String(err) };
-      }
+      return await shutdownKbServer({ storageRoot });
     }
   });
 

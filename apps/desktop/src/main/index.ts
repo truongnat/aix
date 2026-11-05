@@ -1,7 +1,7 @@
 import { app, BrowserWindow, session, shell } from 'electron';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { registerIpcHandlers, isAllowedNavigationUrl } from './ipc-handlers.js';
+import { registerIpcHandlers, isAllowedNavigationUrl, ensureKbServerRunning, shutdownKbServer } from './ipc-handlers.js';
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 
@@ -9,8 +9,8 @@ const currentDir = dirname(fileURLToPath(import.meta.url));
 if (process.platform === 'linux') {
   app.disableHardwareAcceleration();
   app.commandLine.appendSwitch('disable-dev-shm-usage');
-  // Safe container / explicit fallback
-  if (!app.isPackaged && (process.env['ELECTRON_NO_SANDBOX'] === '1' || process.env['CI'])) {
+  // Safe development / container fallback
+  if (!app.isPackaged) {
     app.commandLine.appendSwitch('no-sandbox');
   }
 }
@@ -101,6 +101,10 @@ app.whenReady().then(() => {
   registerIpcHandlers({ repoRoot, storageRoot });
   createWindow();
 
+  // Start KB Server automatically together with app on startup
+  ensureKbServerRunning({ repoRoot, storageRoot })
+    .then(res => console.log('[desktop]', res.message))
+    .catch((err: unknown) => console.warn('[desktop] Failed to auto-start KB Server:', err));
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
@@ -112,4 +116,8 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('before-quit', () => {
+  shutdownKbServer({ storageRoot }).catch(() => {});
 });
