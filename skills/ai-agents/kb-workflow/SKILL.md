@@ -4,15 +4,15 @@ description: >-
   Memory and Knowledge Base lifecycle for agents: search before work, write structured
   solutions after solving problems, choose the right storage tier. Default memory is
   Markdown files in .aix/runtime/memory/ — always available, no install required.
-  Optional: start the KB service (Neo4j + Meilisearch + Redis) for graph traversal and
-  full-text search. Use this skill when saving a solution, documenting a fix, searching
+  Optional: start the KB service (SQLite/FTS5 knowledge base) for HTTP search and
+  multi-project querying. Use this skill when saving a solution, documenting a fix, searching
   for existing knowledge, or managing agent memory.
 
   Triggers: "kb", "knowledge base", "solution", "push", "search knowledge", "save this",
   "document this", "write solution", "skill kb", "memory", "remember this"
 x-kind: domain
 x-version: 0.2.0
-x-tags: [memory, knowledge-base, markdown, neo4j, meilisearch, solution, search]
+x-tags: [memory, knowledge-base, markdown, sqlite, fts5, solution, search]
 x-roles: [coder, architect, planner]
 x-compatible: [claude, cursor, codex, gemini]
 x-category: ai-agents

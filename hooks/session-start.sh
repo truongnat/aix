@@ -18,6 +18,9 @@ const intro =
   "the default engineering methodology and how to reach every other aix skill via the " +
   "Skill tool (start with router-pro for broad requests, tool-discovery-skill to find by " +
   "capability). Check for a relevant skill before any non-trivial task.\n" +
+  "Important: spine artifacts (DISCUSSION.md, PLAN.md, REVIEW.md, VERIFY.md, REMEMBER.md) " +
+  "must be written under `.aix/sessions/<session-id>/` — never `.planning/` (GSD is a different harness). " +
+  "Pick a kebab-case session-id from the task; reuse an existing session folder when resuming.\n" +
   "Memory defaults to plain Markdown in `.aix/runtime/memory/`; use native host file tools. " +
   "Search local memory before work. The optional KB service requires separate, explicit setup; " +
   "this hook only injects context and never starts services or creates credentials.\n\n";

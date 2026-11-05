@@ -18,7 +18,18 @@
     "cursor",
     "gemini"
   ],
-  "skills": "./skills/",
+  "skills": [
+    "./skills/",
+    "./skills/methodology/",
+    "./skills/frontend/",
+    "./skills/backend/",
+    "./skills/infrastructure/",
+    "./skills/data/",
+    "./skills/ai-agents/",
+    "./skills/security/",
+    "./skills/design/",
+    "./skills/business/"
+  ],
   "interface": {
     "displayName": "aix",
     "shortDescription": "Engineering spine and reusable skills for Codex.",

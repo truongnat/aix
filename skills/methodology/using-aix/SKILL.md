@@ -51,6 +51,10 @@ tool** with the skill's name. To decide *which* skill:
 **Check for a relevant skill before starting any non-trivial task.** Skills are
 the proven path, not optional decoration.
 
+## Memory & Previous Lessons
+
+Before beginning non-trivial work, **search `.aix/runtime/memory/`** using standard file/grep tools (or `aix memory search "<query>"`). Prior sessions record durable lessons, constraints, and bug fixes here to prevent rediscovering known hazards.
+
 ## Session artifacts (where to write spine outputs)
 
 Spine markdown files belong under **`.aix/sessions/<session-id>/`**, not `.planning/`

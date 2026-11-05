@@ -1,7 +1,10 @@
 ---
 name: tool-discovery-skill
-description: >+
-  'Skill: tool-discovery-skill'
+description: >-
+  Discover, inspect, and route available local tools, CLI utilities, and MCP
+  servers by capability rather than memory. Use when deciding which tool or
+  skill fits a task or when inspecting local environment capabilities. Triggers:
+  "find tool", "discover capability", "tool discovery", "what tools available".
 x-kind: process
 x-version: 0.1.0
 x-roles: []

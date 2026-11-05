@@ -1,7 +1,10 @@
 ---
 name: gatekeeper-skill
-description: >+
-  'Skill: gatekeeper-skill'
+description: >-
+  Enforce policy, security, and verification gates before dangerous operations
+  or transitions. Evaluates evidence against rules and explicitly allows or
+  blocks actions. Use before deployment, publishing, irreversible mutations, or
+  merging. Triggers: "gate", "check gate", "gatekeeper", "allow or block".
 x-kind: process
 x-version: 0.1.0
 x-roles: []
@@ -22,7 +25,7 @@ Decide whether the next command is allowed based on available evidence.
 
 ## When To Use
 
-- before `harness-ship`
+- before shipping, deploying, or releasing
 - after verification and optional review
 - when a explicit allow/block decision is required
 
@@ -67,7 +70,7 @@ Input: VERIFY.md is fresh and review findings are resolved.
 Output:
 - Decision: allow.
 - Reason: fresh evidence supports ship readiness.
-- Next command: harness-ship.
+- Next command: complete deliverable and release.
 
 ### Example 2
 
