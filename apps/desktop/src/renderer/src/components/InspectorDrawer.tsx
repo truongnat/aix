@@ -108,6 +108,16 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
     }
   }, [tab]);
 
+  // Close on Escape
+  useEffect(() => {
+    if (!isOpen) return;
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onEsc);
+    return () => window.removeEventListener('keydown', onEsc);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleRunVerify = async (e: React.FormEvent) => {
@@ -188,7 +198,9 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10"
+          aria-label="Close Inspector Drawer"
+          title="Close drawer (Esc)"
+          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
         >
           <X className="w-4 h-4" />
         </button>

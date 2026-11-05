@@ -66,17 +66,14 @@ export interface DesktopChatMessage {
   readonly id: string;
   readonly role: 'user' | 'assistant' | 'system';
   readonly content: string;
-  readonly timestamp: string;
+  readonly startedAt?: number;
+  readonly endedAt?: number;
+  readonly timestamp?: string;
+  readonly status?: 'running' | 'done' | 'error' | 'stopped';
+  readonly modelLabel?: string;
   readonly phase?: Phase;
-  readonly stepCard?: {
-    readonly step: string;
-    readonly role: string;
-    readonly status: 'running' | 'completed' | 'waiting_approval' | 'failed';
-    readonly artifactName?: string;
-    readonly artifactContent?: string;
-    readonly summary?: string;
-  };
-  readonly hitlRequest?: DesktopHitlRequest;
+  readonly logs?: readonly { readonly message: string; readonly timestamp: string }[];
+  readonly artifacts?: readonly string[];
 }
 
 export interface DesktopAiConfig {
@@ -149,6 +146,8 @@ export interface AixDesktopAPI {
   startSpine(task: string, mode?: 'auto' | 'guided'): Promise<{ sessionId: string }>;
   respondHitl(requestId: string, decision: 'approve' | 'revise' | 'cancel', note?: string): Promise<void>;
   abortSpine(sessionId: string): Promise<boolean>;
+  getSessionChat(sessionId: string): Promise<readonly DesktopChatMessage[]>;
+  saveSessionChat(sessionId: string, messages: readonly DesktopChatMessage[]): Promise<{ ok: boolean }>;
   onSpineEvent(callback: (event: DesktopSpineEvent) => void): () => void;
 }
 

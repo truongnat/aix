@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MarkdownRenderer } from '../components/MarkdownRenderer';
 import { SpinePipelineVisualizer } from '../components/SpinePipelineVisualizer';
 import {
@@ -22,6 +22,7 @@ import type { Phase } from '@x/core';
 interface SpinePageProps {
   sessions: readonly DesktopSessionSummary[];
   onRefreshSessions?: () => void;
+  onNavigate?: (tab: 'chat' | 'dashboard' | 'spine' | 'skills' | 'memory' | 'verify' | 'settings') => void;
 }
 
 const SPINE_STEPS: { id: Phase | 'worktree' | 'tdd'; label: string; desc: string; artifact: string | null }[] = [
@@ -35,7 +36,8 @@ const SPINE_STEPS: { id: Phase | 'worktree' | 'tdd'; label: string; desc: string
   { id: 'remember', label: '8. Remember', desc: 'Durable lessons & memory', artifact: 'REMEMBER.md' },
 ];
 
-export const SpinePage: React.FC<SpinePageProps> = ({ sessions, onRefreshSessions }) => {
+export const SpinePage: React.FC<SpinePageProps> = ({ sessions, onRefreshSessions, onNavigate }) => {
+  const selectedSessionIdRef = useRef('');
   const [selectedSessionId, setSelectedSessionId] = useState<string>(sessions[0]?.id ?? '');
   const [activeArtifact, setActiveArtifact] = useState<string>('PLAN.md');
   const [artifactContent, setArtifactContent] = useState<string>('');
@@ -54,6 +56,7 @@ export const SpinePage: React.FC<SpinePageProps> = ({ sessions, onRefreshSession
   useEffect(() => {
     if (sessions.length > 0 && !selectedSessionId) {
       setSelectedSessionId(sessions[0]?.id ?? '');
+      selectedSessionIdRef.current = sessions[0]?.id ?? '';
     }
   }, [sessions]);
 
@@ -76,6 +79,7 @@ export const SpinePage: React.FC<SpinePageProps> = ({ sessions, onRefreshSession
   useEffect(() => {
     if (!window.aixAPI?.onSpineEvent) return;
     const unsub = window.aixAPI.onSpineEvent((event: DesktopSpineEvent) => {
+      if (event.sessionId !== selectedSessionIdRef.current) return;
       if (event.type === 'log') {
         setLogs((prev) => [...prev, { message: event.message, timestamp: event.timestamp }]);
       } else if (event.type === 'phase') {

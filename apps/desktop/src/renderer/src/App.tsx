@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from './components/Sidebar';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import type { NavTab } from './components/Sidebar';
 import { ChatCanvas } from './components/ChatCanvas';
 import { InspectorDrawer } from './components/InspectorDrawer';
@@ -49,43 +50,48 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background text-slate-200 select-none">
+    <div className="flex h-screen w-screen overflow-hidden bg-background text-slate-200">
       <Sidebar currentTab={currentTab} onSelectTab={setCurrentTab} status={status} />
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         <div className="flex-1 flex overflow-hidden">
           <main className="flex-1 overflow-y-auto">
             <div className={currentTab === 'chat' ? 'h-full flex flex-col' : 'hidden'}>
-              <ChatCanvas
-                sessions={sessions}
-                onOpenArtifact={handleOpenArtifact}
-                onRefreshSessions={refreshData}
-                onSessionChange={setActiveSessionId}
-                onToggleDrawer={handleToggleDrawer}
-                drawerTab={drawerOpen ? (drawerRequest?.tab ?? null) : null}
-                onNavigate={setCurrentTab}
-              />
+              <ErrorBoundary label="Agent Chat Canvas">
+                <ChatCanvas
+                  sessions={sessions}
+                  onOpenArtifact={handleOpenArtifact}
+                  onRefreshSessions={refreshData}
+                  onSessionChange={(s) => setActiveSessionId(s ?? undefined)}
+                  onToggleDrawer={handleToggleDrawer}
+                  drawerTab={drawerOpen ? (drawerRequest?.tab ?? null) : null}
+                  onNavigate={setCurrentTab}
+                />
+              </ErrorBoundary>
             </div>
-            {currentTab === 'dashboard' && (
-              <DashboardPage status={status} sessions={sessions} onNavigate={setCurrentTab} />
-            )}
-            {currentTab === 'spine' && <SpinePage sessions={sessions} onRefreshSessions={refreshData} />}
-            {currentTab === 'skills' && <SkillsPage />}
-            {currentTab === 'memory' && <MemoryPage />}
-            {currentTab === 'verify' && <VerifyPage sessions={sessions} />}
-            {currentTab === 'settings' && <SettingsPage onConfigUpdated={refreshData} />}
+            <ErrorBoundary label={currentTab}>
+              {currentTab === 'dashboard' && (
+                <DashboardPage status={status} sessions={sessions} onNavigate={setCurrentTab} />
+              )}
+              {currentTab === 'spine' && <SpinePage sessions={sessions} onRefreshSessions={refreshData} />}
+              {currentTab === 'skills' && <SkillsPage />}
+              {currentTab === 'memory' && <MemoryPage />}
+              {currentTab === 'verify' && <VerifyPage sessions={sessions} />}
+              {currentTab === 'settings' && <SettingsPage onConfigUpdated={refreshData} />}
+            </ErrorBoundary>
           </main>
-
           {/* Right Inspector Drawer */}
-          <InspectorDrawer
-            isOpen={drawerOpen}
-            onClose={() => setDrawerOpen(false)}
-            activeArtifactName={selectedArtifact}
-            sessions={sessions}
-            status={status}
-            onRefreshData={refreshData}
-            requestedTab={drawerRequest}
-            activeSessionId={activeSessionId}
-          />
+          <ErrorBoundary label="Inspector Drawer">
+            <InspectorDrawer
+              isOpen={drawerOpen}
+              onClose={() => setDrawerOpen(false)}
+              activeArtifactName={selectedArtifact}
+              sessions={sessions}
+              status={status}
+              onRefreshData={refreshData}
+              requestedTab={drawerRequest}
+              activeSessionId={activeSessionId}
+            />
+          </ErrorBoundary>
         </div>
 
         {/* Global Bottom Status Bar */}

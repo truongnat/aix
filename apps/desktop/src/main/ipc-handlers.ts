@@ -30,6 +30,7 @@ import type {
   DesktopAiConfig,
   DesktopTestConnectionResult,
   DesktopKbStatus,
+  DesktopChatMessage,
   AiProviderId,
 } from '../shared/api.js';
 
@@ -609,6 +610,32 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
       return await readFile(artifactPath, 'utf-8');
     } catch {
       return undefined;
+    }
+  });
+
+  ipcMain.handle('spine:getSessionChat', async (_, sessionId: string): Promise<readonly DesktopChatMessage[]> => {
+    if (!/^[a-zA-Z0-9_-]+$/.test(sessionId)) return [];
+    const chatFile = join(storageRoot, '.aix', 'sessions', sessionId, 'chat.jsonl');
+    try {
+      const raw = await readFile(chatFile, 'utf-8');
+      const lines = raw.split('\n').filter(Boolean);
+      return lines.map(line => JSON.parse(line) as DesktopChatMessage);
+    } catch {
+      return [];
+    }
+  });
+
+  ipcMain.handle('spine:saveSessionChat', async (_, sessionId: string, messages: readonly DesktopChatMessage[]): Promise<{ ok: boolean }> => {
+    if (!/^[a-zA-Z0-9_-]+$/.test(sessionId)) return { ok: false };
+    const sessionDir = join(storageRoot, '.aix', 'sessions', sessionId);
+    const chatFile = join(sessionDir, 'chat.jsonl');
+    try {
+      await mkdir(sessionDir, { recursive: true });
+      const content = messages.map(m => JSON.stringify(m)).join('\n') + '\n';
+      await writeFile(chatFile, content, 'utf-8');
+      return { ok: true };
+    } catch {
+      return { ok: false };
     }
   });
 

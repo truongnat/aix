@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import {
   ArrowUp,
+  ArrowDown,
   Square,
   Layers,
   Brain,
@@ -16,12 +17,14 @@ import {
   ShieldAlert,
   Settings2,
   CornerDownLeft,
+  Plus,
 } from 'lucide-react';
 import type {
   DesktopSessionSummary,
   DesktopHitlRequest,
   DesktopSpineEvent,
   DesktopAiConfig,
+  DesktopChatMessage,
 } from '@shared/api';
 import type { Phase } from '@x/core';
 import { MarkdownRenderer } from './MarkdownRenderer';
@@ -50,7 +53,7 @@ interface ChatCanvasProps {
   sessions: readonly DesktopSessionSummary[];
   onOpenArtifact: (artifact: string) => void;
   onRefreshSessions?: () => void;
-  onSessionChange?: (sessionId: string) => void;
+  onSessionChange?: (sessionId: string | null) => void;
   onToggleDrawer: (tab: DrawerTab) => void;
   drawerTab: DrawerTab | null;
   onNavigate: (tab: NavTab) => void;
@@ -113,7 +116,7 @@ const StepStatusIcon: React.FC<{ status: StepStatus }> = ({ status }) => {
   return <span className="w-1.5 h-1.5 rounded-full bg-white/15" />;
 };
 
-const SpineStepCards: React.FC<{ msg: ChatMessage; onOpenArtifact: (a: string) => void }> = ({
+const SpineStepCards = React.memo<{ msg: ChatMessage; onOpenArtifact: (a: string) => void }>(({
   msg,
   onOpenArtifact,
 }) => {
@@ -159,9 +162,9 @@ const SpineStepCards: React.FC<{ msg: ChatMessage; onOpenArtifact: (a: string) =
       })}
     </div>
   );
-};
+});
 
-const ReasoningBlock: React.FC<{ msg: ChatMessage; now: number }> = ({ msg, now }) => {
+const ReasoningBlock = React.memo<{ msg: ChatMessage; now: number }>(({ msg, now }) => {
   const running = msg.status === 'running';
   const [open, setOpen] = useState<boolean>(running);
   const logs = msg.logs ?? [];
@@ -200,7 +203,7 @@ const ReasoningBlock: React.FC<{ msg: ChatMessage; now: number }> = ({ msg, now 
       )}
     </div>
   );
-};
+});
 
 const Kbd: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <kbd className="px-1 py-px rounded border border-white/10 bg-white/5 font-mono text-[10px] text-slate-400">
@@ -219,7 +222,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputPrompt, setInputPrompt] = useState<string>('');
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [currentSessionId, setCurrentSessionId] = useState<string>('');
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [runMode, setRunMode] = useState<'guided' | 'auto'>('guided');
   const [aiConfig, setAiConfig] = useState<DesktopAiConfig | null>(null);
   const [modelMenuOpen, setModelMenuOpen] = useState<boolean>(false);
@@ -231,7 +234,9 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
   const runRef = useRef<{ msgId: string; sessionId: string | null; active: boolean } | null>(null);
   const stoppedSessionsRef = useRef(new Set<string>());
   const hitlCardRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [showScrollBottom, setShowScrollBottom] = useState<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const refreshRef = useRef(onRefreshSessions);
   refreshRef.current = onRefreshSessions;
@@ -239,10 +244,31 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
   useEffect(() => {
     window.aixAPI.getAiConfig().then(setAiConfig).catch(console.error);
   }, []);
+  useEffect(() => {
+    if (!currentSessionId) return;
+    window.aixAPI.getSessionChat(currentSessionId).then((history) => {
+      if (history && history.length > 0) {
+        setMessages(history as unknown as ChatMessage[]);
+      }
+    }).catch(console.error);
+  }, [currentSessionId]);
+  const handleScroll = () => {
+    const el = timelineRef.current;
+    if (!el) return;
+    const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+    setShowScrollBottom(!isAtBottom);
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setShowScrollBottom(false);
+  };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, pendingHitl]);
+    if (!showScrollBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, pendingHitl, showScrollBottom]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -261,11 +287,19 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
     setMessages((prev) => prev.map((m) => (m.id === msgId ? patch(m) : m)));
 
   const finishRun = (msgId: string, patch: Partial<ChatMessage>) => {
-    if (runRef.current) runRef.current.active = false;
+    const run = runRef.current;
+    if (run) run.active = false;
     setIsRunning(false);
     setPendingHitl(null);
     setHitlNote('');
-    patchRunMessage(msgId, (m) => ({ ...m, ...patch, endedAt: Date.now() }));
+    setMessages((prev) => {
+      const updated = prev.map((m) => (m.id === msgId ? { ...m, ...patch, endedAt: Date.now() } : m));
+      const targetSession = run?.sessionId || currentSessionId;
+      if (targetSession) {
+        window.aixAPI.saveSessionChat(targetSession, updated as unknown as readonly DesktopChatMessage[]).catch(console.error);
+      }
+      return updated;
+    });
   };
 
   useEffect(() => {
@@ -280,7 +314,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
         case 'log':
           patchRunMessage(msgId, (m) => ({
             ...m,
-            logs: [...(m.logs ?? []), { message: event.message, timestamp: event.timestamp }],
+            logs: [...(m.logs ?? []), { message: event.message, timestamp: event.timestamp }].slice(-200),
           }));
           break;
         case 'phase':
@@ -364,6 +398,16 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
     finishRun(run.msgId, { status: 'stopped', content: '**Execution stopped by user.**' });
   };
 
+  const handleNewChat = () => {
+    if (isRunning) {
+      if (!confirm('A task is currently running. Stop it and start a new task?')) return;
+      handleStop();
+    }
+    setCurrentSessionId(null);
+    setMessages([]);
+    onSessionChange?.(null);
+  };
+
   const handleHitlDecision = async (decision: 'approve' | 'revise' | 'cancel') => {
     if (!pendingHitl) return;
     const reqId = pendingHitl.id;
@@ -379,22 +423,47 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
   useEffect(() => {
     if (!pendingHitl) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.isComposing) return; // IME (e.g. Telex) commit, not a decision
-      if (e.target instanceof HTMLButtonElement) return; // let the focused button handle its own Enter
-      // Only when focus is nowhere or inside the gate card, so Enter in the drawer/composer never approves.
+      if (e.isComposing) return;
+      if (e.target instanceof HTMLButtonElement) return;
+
+      const isInput = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
       const inCard = e.target instanceof Node && hitlCardRef.current?.contains(e.target);
       if (e.target !== document.body && !inCard) return;
-      if (e.key === 'Enter' && !e.shiftKey) {
+
+      if (isInput) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          // Cmd/Ctrl+Enter explicitly approves even with text in note
+          if (e.metaKey || e.ctrlKey) {
+            void hitlDecisionRef.current('approve');
+          } else if (hitlNote.trim()) {
+            // Plain Enter with text in note submits Revise
+            void hitlDecisionRef.current('revise');
+          } else {
+            // Plain Enter with empty note approves
+            void hitlDecisionRef.current('approve');
+          }
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          (e.target as HTMLElement).blur();
+        }
+        return;
+      }
+
+      // When focus is outside input:
+      if (e.key === 'Enter') {
         e.preventDefault();
         void hitlDecisionRef.current('approve');
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        void hitlDecisionRef.current('cancel');
+        if (confirm('Cancel this spine run?')) {
+          void hitlDecisionRef.current('cancel');
+        }
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [pendingHitl]);
+  }, [pendingHitl, hitlNote]);
 
   const handleComposerKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
@@ -422,18 +491,29 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
         <div className="flex items-center gap-2 text-[12px] min-w-0">
           <span className="font-medium text-slate-200">Agent</span>
           <span className="text-slate-700">/</span>
-          <span className="font-mono text-slate-500 truncate">{currentSessionId || 'new session'}</span>
+          <span className="font-mono text-slate-400 truncate">{currentSessionId || 'new session'}</span>
         </div>
-        {isRunning && (
-          <span className="flex items-center gap-1.5 text-[11px] text-blue-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            Running
-          </span>
-        )}
+        <div className="flex items-center gap-3">
+          {isRunning ? (
+            <span className="flex items-center gap-1.5 text-[11px] text-blue-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+              Running
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={handleNewChat}
+              title="Start a new task (Clear canvas)"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" /> New Task
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Timeline */}
-      <div className="flex-1 overflow-y-auto px-6 py-8 select-text">
+      <div ref={timelineRef} onScroll={handleScroll} className="flex-1 overflow-y-auto px-6 py-8 select-text">
         {messages.length === 0 ? (
           <div className="max-w-2xl mx-auto pt-16 space-y-8">
             <div className="space-y-3">
@@ -552,23 +632,27 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                     <button
                       type="button"
                       onClick={() => void handleHitlDecision('approve')}
-                      className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium transition-colors"
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium transition-colors"
                     >
-                      Approve <CornerDownLeft className="w-3 h-3 opacity-70" />
+                      Approve <Kbd>⌘↵</Kbd>
                     </button>
                     <button
                       type="button"
                       onClick={() => void handleHitlDecision('revise')}
-                      className="px-3.5 py-2 rounded-lg border border-white/10 hover:bg-white/5 text-slate-200 text-[12px] font-medium transition-colors"
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-white/10 hover:bg-white/5 text-slate-200 text-[12px] font-medium transition-colors"
                     >
-                      Request revise
+                      Request revise {hitlNote.trim() ? <Kbd>↵</Kbd> : null}
                     </button>
                     <button
                       type="button"
-                      onClick={() => void handleHitlDecision('cancel')}
+                      onClick={() => {
+                        if (confirm('Cancel this spine run?')) {
+                          void handleHitlDecision('cancel');
+                        }
+                      }}
                       className="ml-auto flex items-center gap-2 px-3 py-2 rounded-lg text-rose-300 hover:bg-rose-500/10 text-[12px] font-medium transition-colors"
                     >
-                      Cancel run <Kbd>Esc</Kbd>
+                      Cancel run
                     </button>
                   </div>
                 </div>
@@ -577,6 +661,16 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
           </div>
         )}
         <div ref={messagesEndRef} />
+        {showScrollBottom && (
+          <button
+            type="button"
+            onClick={scrollToBottom}
+            aria-label="Scroll to newest messages"
+            className="fixed bottom-24 right-1/2 translate-x-1/2 z-30 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium shadow-lg shadow-black/50 backdrop-blur-sm transition-all"
+          >
+            <ArrowDown className="w-3.5 h-3.5" /> New updates
+          </button>
+        )}
       </div>
 
       {/* Composer */}
@@ -664,9 +758,10 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                   key={tab}
                   type="button"
                   title={label}
+                  aria-label={label}
                   onClick={() => onToggleDrawer(tab)}
                   className={`p-1.5 rounded-md transition-colors ${
-                    drawerTab === tab ? 'bg-white/[0.08] text-white' : 'text-slate-500 hover:text-slate-200 hover:bg-white/5'
+                    drawerTab === tab ? 'bg-white/[0.08] text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -678,6 +773,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                   type="button"
                   onClick={handleStop}
                   title="Stop execution"
+                  aria-label="Stop execution"
                   className="flex items-center gap-1.5 pl-2 pr-2.5 py-1.5 rounded-md bg-white/[0.06] hover:bg-rose-500/15 border border-white/10 hover:border-rose-400/30 text-slate-200 hover:text-rose-200 text-[11px] font-medium transition-colors"
                 >
                   <Square className="w-3 h-3 fill-current" /> Stop
@@ -687,8 +783,9 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                   type="button"
                   disabled={!inputPrompt.trim()}
                   onClick={() => void handleSendMessage(inputPrompt)}
-                  title="Run (Enter)"
-                  className="p-1.5 rounded-md bg-blue-600 hover:bg-blue-500 disabled:bg-white/[0.06] disabled:text-slate-600 text-white transition-colors"
+                  title="Run prompt (Enter)"
+                  aria-label="Send prompt"
+                  className="p-1.5 rounded-md bg-blue-600 hover:bg-blue-500 disabled:bg-white/[0.06] disabled:text-slate-500 text-white transition-colors"
                 >
                   <ArrowUp className="w-4 h-4" />
                 </button>
@@ -696,7 +793,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
             </div>
           </div>
         </div>
-        <div className="max-w-3xl mx-auto mt-1.5 px-1 flex items-center gap-3 text-[10px] text-slate-600">
+        <div className="max-w-3xl mx-auto mt-1.5 px-1 flex items-center gap-3 text-[10px] text-slate-400">
           <span>
             <Kbd>Enter</Kbd> run · <Kbd>Shift+Enter</Kbd> newline
           </span>

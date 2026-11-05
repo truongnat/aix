@@ -24,6 +24,8 @@ const api: AixDesktopAPI = {
   startSpine: (task, mode) => ipcRenderer.invoke('spine:start', task, mode),
   respondHitl: (requestId, decision, note) => ipcRenderer.invoke('spine:respondHitl', requestId, decision, note),
   abortSpine: (sessionId) => ipcRenderer.invoke('spine:abort', sessionId),
+  getSessionChat: (sessionId) => ipcRenderer.invoke('spine:getSessionChat', sessionId),
+  saveSessionChat: (sessionId, messages) => ipcRenderer.invoke('spine:saveSessionChat', sessionId, messages),
   onSpineEvent: (callback) => {
     const listener = (_: unknown, event: unknown) => {
       callback(event as DesktopSpineEvent);

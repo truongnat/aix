@@ -278,7 +278,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
                 <button
                   type="button"
                   onClick={() => setShowKey(!showKey)}
-                  className="absolute right-3 top-3 text-slate-500 hover:text-white"
+                  aria-label={showKey ? 'Hide secret API key' : 'Show secret API key'}
+                  title={showKey ? 'Hide secret API key' : 'Show secret API key'}
+                  className="absolute right-3 top-3 text-slate-400 hover:text-white transition-colors"
                 >
                   {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
