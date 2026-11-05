@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { join, dirname } from 'node:path';
-import { createBudgetTracker } from '@x/core';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
+import { createBudgetTracker, ValidationError } from '@x/core';
 import type { EngineState, TaskItem } from '../state.js';
 import { createProvider, type RuntimeProvider } from '@x/providers';
 import { sessionGeneratedDir } from '../session-store.js';
@@ -70,14 +70,14 @@ async function writeOutput(
   if (redact(relPath).findings.some(finding => finding.type === 'secret')) {
     throw new Error('Generated file path contains a recognized secret; no output was written');
   }
-  // Strip leading ../ and absolute prefixes plus any embedded ../ segments to
-  // prevent path traversal out of the sandbox; the result is always confined
-  // to .aix/sessions/<sessionId>/generated/.
-  const safe = relPath
-    .replace(/^(\.\.[/\\])+/, '')
-    .replace(/^[/\\]+/, '')
-    .replace(/\.\.[/\\]/g, '');
-  const dest = join(sessionGeneratedDir(sessionId), safe);
+  // Resolve then verify containment: string-stripping `../` is bypassable
+  // (e.g. `....//` collapses to `../`), so reject anything escaping the sandbox.
+  const root = resolve(sessionGeneratedDir(sessionId));
+  const dest = resolve(root, relPath);
+  const rel = relative(root, dest);
+  if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
+    throw new ValidationError('Generated file path escapes the session sandbox; no output was written');
+  }
   await mkdir(dirname(dest), { recursive: true });
   await writeFile(dest, content, 'utf-8');
   return [dest.replace(/\\/g, '/')];

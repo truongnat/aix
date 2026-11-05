@@ -17,7 +17,13 @@ interface PatternDef {
   regex: RegExp;
 }
 
+const SENSITIVE_KEY = /(?:password|passwd|secret|token|api[_-]?key|auth[_-]?token|access[_-]?token|bearer)/i;
+// Env-style references (${VAR}, $VAR) name a secret without holding it, so they stay readable.
+const SECRET_REFERENCE = /^\$\{?[A-Za-z_][A-Za-z0-9_]*\}?$/;
+
 const PATTERNS: PatternDef[] = [
+  // Quoted JSON/YAML value under a sensitive key; lookbehind keeps the key and quotes intact.
+  { type: 'secret', subtype: 'json-key-value', regex: /(?<=["']?[\w-]*(?:password|passwd|secret|token|api[_-]?key|auth[_-]?token|access[_-]?token)[\w-]*["']?\s*[:=]\s*["'])[^"'\n]+(?=["'])/gi },
   { type: 'secret', subtype: 'api-key', regex: /(?:api[_-]?key|apikey|api[_-]?secret)[=:]\s*['"]?([a-zA-Z0-9_\-]{16,64})['"]?/gi },
   { type: 'secret', subtype: 'bearer-token', regex: /(?:Bearer\s+)([a-zA-Z0-9_\-.\+=]{20,2048})/g },
   { type: 'secret', subtype: 'jwt', regex: /eyJ[a-zA-Z0-9_\-]+\.eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+/g },
@@ -69,7 +75,12 @@ export function redactStrings<T>(value: T): T {
   if (Array.isArray(value)) return value.map(item => redactStrings(item)) as T;
   if (value !== null && typeof value === 'object') {
     return Object.fromEntries(
-      Object.entries(value).map(([key, item]) => [key, redactStrings(item)]),
+      Object.entries(value).map(([key, item]) => [
+        key,
+        typeof item === 'string' && SENSITIVE_KEY.test(key) && !SECRET_REFERENCE.test(item)
+          ? '[REDACTED]'
+          : redactStrings(item),
+      ]),
     ) as T;
   }
   return value;

@@ -1,5 +1,5 @@
 import type { Phase, PhaseGuard, Result, SessionState } from './types.js';
-import { AppError, ok, fail } from './errors.js';
+import { AppError, ValidationError, ok, fail } from './errors.js';
 
 const PHASE_ORDER: readonly Phase[] = ['start', 'discuss', 'plan', 'run', 'verify', 'remember'];
 
@@ -35,6 +35,11 @@ export class PhaseMachine {
   }
 
   rewind(state: SessionState, to: Phase, reason: string): SessionState {
+    const fromIdx = PHASE_ORDER.indexOf(state.phase);
+    const toIdx = PHASE_ORDER.indexOf(to);
+    if (toIdx === -1 || toIdx >= fromIdx) {
+      throw new ValidationError(`Cannot rewind from "${state.phase}" to "${to}": target must be an earlier phase`);
+    }
     return {
       ...state,
       phase: to,
@@ -53,6 +58,6 @@ export class PhaseMachine {
   canAdvanceTo(from: Phase, to: Phase): boolean {
     const fromIdx = PHASE_ORDER.indexOf(from);
     const toIdx = PHASE_ORDER.indexOf(to);
-    return fromIdx !== -1 && toIdx !== -1 && toIdx >= fromIdx;
+    return fromIdx !== -1 && toIdx === fromIdx + 1;
   }
 }

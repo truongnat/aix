@@ -31,3 +31,38 @@ test('redaction does not mistake source numeric literals, timestamps, IDs, or ha
   }
   assert.equal(policy.redact('Call +1 (415) 555-2671').clean.includes('555-2671'), false);
 });
+
+test('redact masks quoted JSON/YAML secret values while keeping the key', () => {
+  const cases = [
+    ['{"password": "my_secret_pass"}', 'my_secret_pass'],
+    ['{"api_key": "sk-1234567890abcdef"}', 'sk-1234567890abcdef'],
+    ['{"access_token": "token-xyz"}', 'token-xyz'],
+    ['{"client_secret" : "secret-987"}', 'secret-987'],
+    ["password: 'yaml_pass'", 'yaml_pass'],
+  ];
+  for (const [input, value] of cases) {
+    const { clean, findings } = policy.redact(input);
+    assert.equal(clean.includes(value), false, clean);
+    assert.equal(clean.includes(input.match(/^\{?["']?([\w-]+)/)[1]), true, clean);
+    assert.ok(findings.length > 0);
+  }
+});
+
+test('redactStrings masks string values under sensitive keys in nested objects', () => {
+  const clean = policy.redactStrings({
+    credentials: { password: 'plain_password', apiKey: 'secret_api_key', ttl: 60, ref: '${API_TOKEN}' },
+    authToken: 'abc',
+  });
+  assert.deepEqual(clean, {
+    credentials: { password: '[REDACTED]', apiKey: '[REDACTED]', ttl: 60, ref: '${API_TOKEN}' },
+    authToken: '[REDACTED]',
+  });
+  assert.deepEqual(policy.redactStrings({ api_key: '${API_KEY}' }), { api_key: '${API_KEY}' });
+});
+
+test('key-based redaction leaves ordinary keys alone', () => {
+  const data = { username: 'john', name: 'project-alpha', id: 'task-1' };
+  assert.deepEqual(policy.redactStrings(data), data);
+  const json = JSON.stringify(data);
+  assert.equal(policy.redact(json).clean, json);
+});

@@ -3,7 +3,7 @@ import * as p from '@clack/prompts';
 import { writeFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { GuardrailLoop, createBudgetTracker } from '@x/core';
-import type { Phase } from '@x/core';
+import type { Phase, SessionState } from '@x/core';
 import { EngineGraph, SessionStore, createInitialEngineState, discussNode, planNode } from '@x/engine';
 import type { EngineState } from '@x/engine';
 import { PromptAssembler } from '@x/prompt';
@@ -18,6 +18,12 @@ import { execSync as realExecSync } from 'node:child_process';
 import { createProvider } from '@x/providers';
 
 const PHASES: readonly Phase[] = ['discuss', 'plan', 'run'];
+
+/** "Revise" returns to plan; at plan or earlier the current phase simply re-runs. */
+export function revisePhase(loop: GuardrailLoop, state: SessionState, phase: Phase): SessionState {
+  if (PHASES.indexOf(phase) <= PHASES.indexOf('plan')) return state;
+  return loop.rewindTo(state, 'plan', `User requested revision during ${phase}`);
+}
 
 let clackPrompts: any = p;
 export function setClackPrompts(mockPrompts: any): void {
@@ -286,7 +292,11 @@ async function handleGuardrail(task: string): Promise<void> {
   p.intro(redactStrings(`Guardrail: "${task}"`));
   console.log(`Session: ${state.id}\n`);
 
-  for (const phase of PHASES) {
+  state = await loop.advancePhase(state);
+
+  // Driven by state.phase (not a for-index) so a rewind re-enters the right phase.
+  while (PHASES.includes(state.phase)) {
+    const phase = state.phase;
     const budgetCheck = budgetTracker.checkHardStop(state);
     if (!budgetCheck.ok) {
       console.error(`\n  Budget exceeded: ${budgetCheck.error.message}`);
@@ -323,16 +333,17 @@ async function handleGuardrail(task: string): Promise<void> {
     }
 
     if (decision.chosen === 'revise') {
-      state = loop.rewindTo(state, 'plan', `User requested revision during ${phase}`);
-      console.log(`  ↺ Revised back to "plan"\n`);
+      state = revisePhase(loop, state, phase);
+      console.log(`  ↺ Revising "${state.phase}"\n`);
       continue;
     }
 
-    state = loop.addEvidence({ ...state, phase }, {
+    state = loop.addEvidence(state, {
       phase,
       kind: 'decision',
       summary: `User approved ${phase}`,
     });
+    engineState = { ...engineState, session: state };
 
     await redactedMemory.push({
       id: `${state.id}-${phase}-${Date.now()}`,

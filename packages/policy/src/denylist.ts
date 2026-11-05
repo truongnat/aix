@@ -1,9 +1,10 @@
 import type { Result } from '@x/core';
 
 const DENY_PATTERNS: RegExp[] = [
-  /rm\s+-rf\s+\//,
+  // Recursive rm (any flag order: -rf, -fr, -R, -f -r, --recursive) aimed at /, /*, ~, ~/*, $HOME.
+  /\brm\s+(?:-{1,2}[\w-]+\s+)*?(?:-[a-zA-Z]*[rR][a-zA-Z]*|--recursive)\s+(?:-{1,2}[\w-]+\s+)*(?:\/|~|\$HOME|\$\{HOME\})\/?\*?(?=\s|$|[;&|])/,
   />\s*\/dev\/sda/,
-  /:(){ :\|:& };:/,
+  /: ?\(\) ?\{.*?:\|:.*?& ?\} ?; ?:?/,
   /mkfs\.\w+/,
   /dd\s+if=\/dev\/zero/,
   /wget\s+.*\|\s*bash/,
@@ -13,18 +14,16 @@ const DENY_PATTERNS: RegExp[] = [
   /\/(etc|usr|var|bin|sbin)\/.*>/,
   /drop\s+table/i,
   /truncate\s+table/i,
-  /shutdown\s+-[rh]/,
-  /reboot/,
-  /halt/,
+  // `\b` alone would still match `reboot-docs`; hyphen/dot neighbours mean a compound word, not the command.
+  /(?<![\w.-])(?:halt|reboot|shutdown|poweroff)(?![\w.-])/,
   /init\s+0/,
-  /poweroff/,
+  // sudo/su anywhere a new command can start, not just at the beginning of the line.
+  /(?:^|[;&|(`])\s*(?:sudo|su)(?=\s|$)/,
   /killall/,
   /pkill\s+-9/,
 ];
 
 const DENY_PREFIXES: string[] = [
-  'sudo',
-  'su ',
   'passwd',
 ];
 

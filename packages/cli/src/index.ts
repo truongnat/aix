@@ -38,4 +38,4 @@ if (isMain) {
   });
 }
 
-export { handleGitCheckIfDirty, setClackPrompts, setExecSync } from './commands/run.js';
+export { handleGitCheckIfDirty, revisePhase, setClackPrompts, setExecSync } from './commands/run.js';

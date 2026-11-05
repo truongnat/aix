@@ -16,5 +16,6 @@ export type {
 export { AppError as AppErrorClass, ValidationError, ok, fail } from './errors.js';
 export { PhaseMachine } from './phase-machine.js';
 export { createDefaultGuards } from './guards.js';
+export type { GuardOptions } from './guards.js';
 export { GuardrailLoop } from './guardrail-loop.js';
 export { createBudgetTracker, createDefaultBudgetState } from './budget.js';
