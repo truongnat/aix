@@ -1,40 +1,20 @@
 # Skills Catalog
 
-163 SKILL.md được tổ chức theo category.
-
-## Domain Skills
-
-| Skill | Mô tả |
-|-------|-------|
-| `api-design-pro` | REST, GraphQL, gRPC API design patterns |
-| `database-optimization` | Query tuning, indexing, schema design |
-| `security-review` | OWASP Top 10, auth, injection prevention |
-| `performance-profiling` | Bottleneck analysis, caching, bundle size |
-| `system-design` | Distributed systems, scalability, trade-offs |
-
-## Process Skills
-
-| Skill | Mô tả |
-|-------|-------|
-| `code-review` | Structured review checklist |
-| `debug-systematic` | Scientific debugging method |
-| `incident-response` | On-call runbook |
-| `release-process` | Semver, changelog, deploy checklist |
-| `refactor-guide` | Safe refactoring patterns |
-
-## Reference Skills
-
-| Skill | Mô tả |
-|-------|-------|
-| `adr-template` | Architecture Decision Record |
-| `anti-patterns` | Common architectural mistakes |
-| `sre-practices` | SLO, SLA, error budget |
-| `multi-tenancy` | Isolation patterns |
-
-## Xem catalog đầy đủ
+The canonical library currently contains 158 `SKILL.md` files under `content/skills/`.
+Generate the current machine-local catalog instead of relying on a copied list of names:
 
 ```bash
-npx aix skills list
+node packages/cli/dist/index.js skills validate
+node packages/cli/dist/index.js skills list
+node packages/cli/dist/index.js skills show <frontmatter-name>
 ```
 
-Hoặc đọc trực tiếp từ `content/skills/` trong monorepo — mỗi SKILL.md là self-contained.
+`catalog.json` contains names, descriptions, kinds, roles and compatibility metadata. It is
+local generated output and may contain machine-specific paths; do not commit it.
+
+Examples of current process skills: `discussing-pro`, `planning-pro`, `ttd-pro`,
+`executing-pro`, `code-review-pro`, `verify-pro`, `remember-pro`. Domain examples include
+`api-design-pro`, `typescript-pro`, `react-pro`, `nestjs-pro`, and `postgresql-pro`.
+
+Root `skills/*.md` files are legacy mirrors. Author changes in canonical content; the host
+plugin reads that content directly, while `aix install` emits provider-specific configuration.

@@ -4,6 +4,8 @@ import { AuthService } from './auth.service.js';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+export const MASTER_ONLY_KEY = 'masterOnly';
+export const MasterOnly = () => SetMetadata(MASTER_ONLY_KEY, true);
 
 @Injectable()
 export class MasterGuard implements CanActivate {
@@ -25,6 +27,11 @@ export class MasterGuard implements CanActivate {
     const req = context.switchToHttp().getRequest<{ headers: Record<string, string> }>();
     const pwd = req.headers['x-master-password'] as string | undefined;
     if (pwd && this.#auth.validateMasterPassword(pwd)) return true;
+    const masterOnly = this.#reflector.getAllAndOverride<boolean>(MASTER_ONLY_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (masterOnly) return false;
     const key = req.headers['x-api-key'] as string | undefined;
     if (key) return this.#auth.validateKey(key);
     return false;

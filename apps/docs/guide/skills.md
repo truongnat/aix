@@ -1,61 +1,48 @@
 # Skills & Progressive Disclosure
 
-## SKILL.md là gì?
+## Canonical source
 
-`SKILL.md` là format chuẩn xuyên-provider — chạy trên Claude Code, Cursor, Codex, Gemini CLI và 8+ agent framework khác.
+Author skills in `content/skills/<directory>/SKILL.md`. The current library contains 158
+canonical skill files; root `skills/*.md` are legacy mirrors, not additional skills.
+The host resolves the frontmatter `name`, which may differ from the directory name.
 
-```
-.claude/skills/
-└── api-design/
-    ├── SKILL.md          ← L1 (luôn load) + L2 (khi kích hoạt)
-    └── references/
-        ├── patterns.md   ← L3 (lazy load khi cần)
-        └── examples.md
-```
+| Layer | Content | Loading |
+|---|---|---|
+| Metadata | Name, description, kind and tags | Host discovery/catalog |
+| Instructions | Skill body | When selected |
+| Resources | References, scripts and assets | On demand |
 
-## Progressive Disclosure 3 tầng
+The registry warns when the estimated body exceeds 5000 tokens. This is an estimate, not
+a guarantee of host context cost.
 
-| Tầng | Khi nào load | Chi phí | Nội dung |
-|------|-------------|---------|----------|
-| **L1 · Metadata** | Luôn (khởi động) | ~100 token/skill | `name` + `description` frontmatter |
-| **L2 · Instructions** | Khi skill được kích hoạt | < 5k token | Thân SKILL.md |
-| **L3 · Resources** | Khi cần (đọc qua bash) | Không giới hạn | `references/`, `scripts/`, `assets/` |
-
-→ Cho phép cài **163+ skill mà không phình context**, vì L1 chỉ ~100 token.
-
-## Cấu trúc SKILL.md
+## Metadata example
 
 ```yaml
 ---
-name: api-design-pro          # ≤ 64 ký tự, kebab-case, không chứa "claude"/"anthropic"
-description: |                # ≤ 1024 ký tự, phải nêu CÁI GÌ + KHI NÀO dùng
-  Expert API design guidance covering REST, GraphQL, and gRPC.
-  Use when designing new APIs or reviewing existing contracts.
+name: example-domain-skill
+description: Domain guidance and the situations in which it applies.
+x-kind: domain
+x-version: 0.1.0
+x-tags: [example]
+x-roles: [coder, reviewer]
+x-compatible: [claude, cursor, codex, gemini]
 ---
-
-# API Design Pro
-
-## Principles
-...
 ```
 
-## Catalog
+Kinds are `domain`, `process`, and `reference`. Names are lowercase kebab-case, at most 64
+characters, and cannot contain `claude` or `anthropic`. Description is required and limited
+to 2048 characters. See the registry schema and canonical contribution guide for full rules.
+
+## Inspect and validate
 
 ```bash
-# Xem tất cả skills
-npx aix skills list
-
-# Tìm kiếm
-npx aix skills search "rate limiting"
-
-# Chi tiết một skill
-npx aix skills show api-design-pro
+node packages/cli/dist/index.js skills list
+node packages/cli/dist/index.js skills show api-design-pro
+node packages/cli/dist/index.js skills validate
+node packages/cli/dist/index.js skills validate --content-root /path/to/content
 ```
 
-## Categories trong catalog
-
-aix có 163 SKILL.md phân vào các nhóm:
-
-- **Domain skills** — api-design, database, security, performance, testing...
-- **Process skills** — code-review, debug, incident-response, release...
-- **Reference** — system-design, ADR, anti-patterns, SRE, multi-tenancy...
+`list` writes the machine-local generated `catalog.json`. Validation reports malformed YAML,
+invalid frontmatter and duplicate identifiers with file paths, retaining the first valid
+entry instead of silently overwriting it. Fatal diagnostics exit nonzero; body-size warnings
+remain nonfatal. A successful validation does not execute any skill's instructions.

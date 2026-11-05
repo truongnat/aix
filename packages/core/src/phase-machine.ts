@@ -1,7 +1,7 @@
 import type { Phase, PhaseGuard, Result, SessionState } from './types.js';
 import { AppError, ok, fail } from './errors.js';
 
-const PHASE_ORDER: readonly Phase[] = ['start', 'discuss', 'plan', 'run', 'verify', 'ship', 'remember'];
+const PHASE_ORDER: readonly Phase[] = ['start', 'discuss', 'plan', 'run', 'verify', 'remember'];
 
 export class PhaseMachine {
   readonly #guards: readonly PhaseGuard[];

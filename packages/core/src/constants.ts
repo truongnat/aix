@@ -1,4 +1,4 @@
-export const PHASES = ['start', 'discuss', 'plan', 'run', 'verify', 'ship', 'remember'] as const;
+export const PHASES = ['start', 'discuss', 'plan', 'run', 'verify', 'remember'] as const;
 
 export const SKILL_KINDS = ['domain', 'process', 'reference'] as const;
 

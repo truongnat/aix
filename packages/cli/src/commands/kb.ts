@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { ensureKbServer, KB_URL } from '../kb-server-manager.js';
+import { ensureKbServer, getKbCredentials, KB_URL } from '../kb-server-manager.js';
 
 const HEALTH_ENDPOINT = `${KB_URL}/health`;
 
@@ -11,6 +11,18 @@ async function fetchHealth(): Promise<{ ok: boolean; data?: unknown }> {
   } catch {
     return { ok: false };
   }
+}
+
+async function fetchMemory(path: string): Promise<unknown> {
+  const { apiKey, masterPassword } = getKbCredentials();
+  const headers: Record<string, string> = apiKey
+    ? { 'x-api-key': apiKey }
+    : masterPassword ? { 'x-master-password': masterPassword } : {};
+  const response = await fetch(`${KB_URL}/api/v1/memory${path}`, { headers });
+  if (!response.ok) {
+    throw new Error(`kb-server request failed (HTTP ${response.status}); check KB_API_KEY or KB_MASTER_PASSWORD`);
+  }
+  return response.json();
 }
 
 export function registerKbCommand(program: Command): void {
@@ -77,8 +89,7 @@ export function registerKbCommand(program: Command): void {
         process.exit(1);
       }
       const params = new URLSearchParams({ q: query, k: opts.limit });
-      const res = await fetch(`${KB_URL}/api/v1/memory/search?${params}`);
-      const data = await res.json();
+      const data = await fetchMemory(`/search?${params}`);
       console.log(JSON.stringify(data, null, 2));
     });
 
@@ -94,8 +105,7 @@ export function registerKbCommand(program: Command): void {
       }
       const params = new URLSearchParams();
       if (opts.kind) params.set('kind', opts.kind);
-      const res = await fetch(`${KB_URL}/api/v1/memory?${params}`);
-      const data = await res.json();
+      const data = await fetchMemory(`?${params}`);
       console.log(JSON.stringify(data, null, 2));
     });
 }

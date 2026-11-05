@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { redact, redactStrings } from '@x/policy';
 import { SqliteService, type KbRecord } from '../sqlite/sqlite.service.js';
 import { CacheService } from '../cache/cache.service.js';
 
@@ -16,10 +17,15 @@ export class KbService {
   }
 
   async push(rec: KbRecord): Promise<void> {
-    this.#sqlite.upsert(rec);
+    if (typeof rec.id !== 'string' || redact(rec.id).findings.some(finding => finding.type === 'secret')) {
+      throw new BadRequestException('Memory record ID must be a string without recognized secrets');
+    }
+    const { id, ...content } = rec;
+    const sanitized = { id, ...redactStrings(content) };
+    this.#sqlite.upsert(sanitized);
     // Invalidate stale caches
     await this.#cache.delByPattern(`${SEARCH_PREFIX}*`);
-    await this.#cache.del(`${GET_PREFIX}${rec.id}`);
+    await this.#cache.del(`${GET_PREFIX}${sanitized.id}`);
   }
 
   async search(query: string, k = 10): Promise<KbRecord[]> {

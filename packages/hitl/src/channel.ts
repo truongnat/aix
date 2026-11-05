@@ -54,18 +54,27 @@ export class ConsoleHitlChannel implements HitlChannel {
     }
 
     let closeServer: (() => Promise<void>) | undefined;
-    let webChosenId: string | undefined;
-
+    let settled = false;
+    let terminal: readline.Interface | undefined;
     let resolveChoice!: (value: DecisionResponse) => void;
-    const choicePromise = new Promise<DecisionResponse>((resolve) => {
-      resolveChoice = resolve;
+    let rejectChoice!: (error: Error) => void;
+    const choicePromise = new Promise<DecisionResponse>((resolve, reject) => {
+      resolveChoice = (value) => {
+        if (settled) return;
+        settled = true;
+        resolve(value);
+      };
+      rejectChoice = (error) => {
+        if (settled) return;
+        settled = true;
+        reject(error);
+      };
     });
 
     if (req.tier >= 1) {
       try {
         const server = createPreviewServer();
         const started = await server.start(previews, req.question, (id) => {
-          webChosenId = id;
           resolveChoice({ chosen: id, note: 'Selected via web preview panel' });
         });
         closeServer = started.close;
@@ -80,6 +89,8 @@ export class ConsoleHitlChannel implements HitlChannel {
 
     const promptTerminal = async () => {
       const rl = readline.createInterface({ input, output });
+      terminal = rl;
+      rl.once('close', () => rejectChoice(new Error('Terminal input closed before a decision was completed')));
       try {
         for (let i = 0; i < req.options.length; i++) {
           const opt = req.options[i]!;
@@ -89,40 +100,39 @@ export class ConsoleHitlChannel implements HitlChannel {
         }
 
         const answer = await rl.question(`Choose (1-${req.options.length}) or select in browser: `);
-        if (webChosenId) return;
+        if (settled) return;
 
-        const idx = parseInt(answer, 10) - 1;
-        if (idx < 0 || idx >= req.options.length) {
-          console.log('Invalid choice, defaulting to first option');
-          resolveChoice({ chosen: req.options[0]!.id });
-          return;
+        const trimmedAnswer = answer.trim();
+        const selected = Number(trimmedAnswer);
+        if (!/^\d+$/.test(trimmedAnswer) || !Number.isSafeInteger(selected) || selected < 1 || selected > req.options.length) {
+          throw new Error(`Invalid choice: enter a whole number from 1 to ${req.options.length}`);
         }
+        const idx = selected - 1;
 
         const note = await rl.question('Note (optional, press Enter to skip): ');
-        if (webChosenId) return;
+        if (settled) return;
 
         const trimmedNote = note.trim();
         resolveChoice({
           chosen: req.options[idx]!.id,
           ...(trimmedNote.length > 0 ? { note: trimmedNote } : {}),
         });
-      } catch {
-        if (!webChosenId) {
-          resolveChoice({ chosen: req.options[0]!.id });
-        }
+      } catch (error) {
+        rejectChoice(error instanceof Error ? error : new Error(String(error)));
       } finally {
         rl.close();
       }
     };
 
-    promptTerminal();
+    void promptTerminal();
 
-    const choice = await choicePromise;
-
-    if (closeServer) {
-      await closeServer();
+    try {
+      return await choicePromise;
+    } finally {
+      terminal?.close();
+      if (closeServer) {
+        await closeServer();
+      }
     }
-
-    return choice;
   }
 }

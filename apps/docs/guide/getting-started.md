@@ -2,71 +2,59 @@
 
 ## Requirements
 
-- **Node.js 22 LTS** or later
-- **pnpm 9+**
-- **Docker** (for KB server — Neo4j, Meilisearch, Redis)
+- A current Node 22 release (22.13 or newer) or Node 24.
+- pnpm 9.15.0, as pinned by the workspace.
+- Docker only if choosing container deployment; the local SQLite KB needs no external services.
 
-## Install
-
-```bash
-npx aix install
-```
-
-Tự động phát hiện provider (Claude Code, Cursor, Codex, Gemini CLI) và compile skills ra đúng format.
-
-### Chỉ định provider cụ thể
+## Build the private workspace
 
 ```bash
-npx aix install --provider claude
-npx aix install --provider cursor
-npx aix install --provider codex
-npx aix install --provider gemini
+git clone https://github.com/truongnat/aix
+cd aix
+pnpm install --frozen-lockfile --ignore-scripts
+pnpm build
+pnpm lint
+pnpm test
 ```
 
-## Khởi động KB Server
+These packages are not published npm installation targets. Use the local built CLI:
 
 ```bash
-cd services/kb-server
-cp .env.example .env
-# Đặt KB_MASTER_PASSWORD thành secret mạnh
-docker compose up -d
+node packages/cli/dist/index.js skills validate
+node packages/cli/dist/index.js install --provider cursor --dry-run
+pnpm run doctor
 ```
 
-Kiểm tra kết nối:
+`content/skills/` is the canonical library. The primary Claude/Codex plugin workflow uses
+the host agent as runtime; see the repository README for plugin installation commands.
+
+## Optional local KB
 
 ```bash
-npx aix doctor
+node packages/cli/dist/index.js kb ensure
+node packages/cli/dist/index.js kb status
 ```
 
-Kết quả mong đợi:
+The CLI creates a private random management credential when it starts its own service.
+The service uses SQLite/FTS5 and an in-memory cache, with loopback binding by default.
+For standalone/Compose operation and existing service credentials, see [KB Server](./kb-server).
+Doctor reports environment/configuration and optional KB health; it is not a test runner.
 
-```
-✓ Provider     claude  (detected)
-✓ Skills       163 loaded
-✓ KB Server    connected  (neo4j ✓  meili ✓  redis ✓)
-✓ Policy       redaction active
-```
-
-## Chạy lần đầu
-
-### Guardrail mode (có người duyệt)
+## Generate and explicitly verify
 
 ```bash
-npx aix run "Add rate limiting to the auth API"
+node packages/cli/dist/index.js run "<your task>" --auto
+node packages/cli/dist/index.js verify <printed-session-id> --command "<your actual verification command>"
 ```
 
-aix dẫn qua từng phase: `Start → Discuss → Plan → Run → Verify → Ship`, dừng lại chờ xác nhận ở mỗi bước.
+Omit `--auto` for human approval. Configure the correct runtime provider/key for real model
+output; absent credentials deliberately produce labeled mock artifacts. Generation stays
+inside `.aix/sessions/<id>/generated/`. Heuristic scores are not verification; the explicit
+command must check your actual acceptance criteria and runs with your user's permissions.
+There is no automatic application to source, shipment or deployment.
 
-### Autonomous mode
+## Next
 
-```bash
-npx aix run "Add rate limiting to the auth API" --auto
-```
-
-LangGraph.js engine chạy tự động loop đến khi reviewer chấm ≥ 9/10 hoặc đụng budget limit.
-
-## Tiếp theo
-
-- [Architecture](./architecture) — hiểu cách các package kết nối
-- [Skills & Progressive Disclosure](./skills) — cách SKILL.md hoạt động
-- [CLI Reference](/reference/cli) — tất cả lệnh
+- [Architecture](./architecture)
+- [Skills & Progressive Disclosure](./skills)
+- [CLI Reference](/reference/cli)

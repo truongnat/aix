@@ -36,6 +36,16 @@ export interface TicketPlan {
   readonly acceptanceCriteria: readonly string[];
 }
 
+export interface VerificationEvidence {
+  readonly status: 'passed' | 'failed';
+  readonly command: string;
+  readonly cwd: string;
+  readonly exitCode: number;
+  readonly output: string;
+  readonly checkedAt: string;
+  readonly files: Readonly<Record<string, string>>;
+}
+
 export interface EngineState {
   readonly session: SessionState;
   readonly discussion?: DiscussionDoc;
@@ -43,11 +53,13 @@ export interface EngineState {
   readonly rules?: readonly string[];
   readonly tasks: readonly TaskItem[];
   readonly current?: TaskItem;
+  /** Text quality heuristic only; never evidence of executable correctness. */
   readonly reviewScore?: number;
   readonly attempts: number;
   readonly ticketPlans?: readonly TicketPlan[];
   readonly coderOutput?: string;
   readonly writtenFiles?: readonly string[];
+  readonly verification?: VerificationEvidence;
 }
 
 export function createInitialEngineState(session: SessionState): EngineState {

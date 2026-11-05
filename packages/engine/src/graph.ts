@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { StateGraph, Annotation, END, START } from '@langchain/langgraph';
 import { FileCheckpointer } from './file-checkpointer.js';
 import type { SessionState } from '@x/core';
+import { redactStrings } from '@x/policy';
 import type { EngineState, PlanDoc, DiscussionDoc, TaskItem, TicketPlan } from './state.js';
 import {
   discussNode, planNode, rulesNode, tasksNode, pickNode,
@@ -15,8 +16,6 @@ import {
 import { SessionStore } from './session-store.js';
 import { checkBudget, formatBudgetWarnings } from './budget-guard.js';
 
-const MAX_ATTEMPTS = 3;
-const PASS_THRESHOLD = 9;
 
 // --- State annotation ---
 
@@ -64,7 +63,7 @@ async function appendLog(sessionId: string, entry: Record<string, unknown>): Pro
   try {
     const logDir = join(process.cwd(), '.aix', 'sessions', sessionId);
     await mkdir(logDir, { recursive: true });
-    const line = JSON.stringify({ ts: new Date().toISOString(), ...entry }) + '\n';
+    const line = JSON.stringify(redactStrings({ ts: new Date().toISOString(), ...entry })) + '\n';
     await appendFile(join(logDir, 'checkpoint.log'), line, 'utf-8');
   } catch {
     // swallow log errors
@@ -201,12 +200,8 @@ function buildGraph(
     .addConditionalEdges('ticketPlan', (state: GraphState) =>
       state._interrupted ? END : 'coder')
     .addEdge('coder', 'reviewer')
-    .addConditionalEdges('reviewer', (state: GraphState) => {
-      const score = state.reviewScore ?? 0;
-      if (score >= PASS_THRESHOLD || state.attempts >= MAX_ATTEMPTS) return END;
-      if (!state.tasks.some(t => t.status === 'pending')) return END;
-      return 'loopStart';
-    })
+    .addConditionalEdges('reviewer', (state: GraphState) =>
+      state.tasks.some(t => t.status === 'pending') ? 'loopStart' : END)
     .compile({ checkpointer });
 }
 
@@ -252,7 +247,11 @@ export class EngineGraph {
     const start = Date.now();
     const result = await this.#graph.invoke(
       { ...initial, _interrupted: false },
-      { configurable: { thread_id: initial.session.id } },
+      {
+        configurable: { thread_id: initial.session.id },
+        // Planning discovers task count at runtime; pending work and budget terminate the loop.
+        recursionLimit: Number.MAX_SAFE_INTEGER,
+      },
     );
     const duration = Date.now() - start;
 
@@ -275,7 +274,10 @@ export class EngineGraph {
     const start = Date.now();
     const result = await this.#graph.invoke(
       null as unknown as GraphState,
-      { configurable: { thread_id: state.session.id } },
+      {
+        configurable: { thread_id: state.session.id },
+        recursionLimit: Number.MAX_SAFE_INTEGER,
+      },
     );
     const duration = Date.now() - start;
 

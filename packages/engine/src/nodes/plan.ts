@@ -7,6 +7,7 @@ import { createProvider, type RuntimeProvider } from '@x/providers';
 import type { EngineState, PlanDoc } from '../state.js';
 import { sessionArtifactPath, sessionArchiveDir } from '../session-store.js';
 import { checkBudget, formatBudgetWarnings } from '../budget-guard.js';
+import { redactStrings } from '@x/policy';
 
 const SKILLS_ROOT = process.env.AIX_CONTENT_ROOT ?? join(process.cwd(), 'content');
 
@@ -82,13 +83,15 @@ Each task must be concrete, independently verifiable, and have explicit dependen
   } catch {
     planData = {};
   }
+  planData = redactStrings(planData);
+  tasks = redactStrings(tasks);
 
   const steps = tasks.length > 0
     ? tasks.map(t => String(t.title ?? t.description ?? ''))
-    : [state.session.task];
+    : [redactStrings(state.session.task)];
 
   const plan: PlanDoc = {
-    goal: typeof planData.goal === 'string' ? planData.goal : goal,
+    goal: typeof planData.goal === 'string' ? planData.goal : redactStrings(goal),
     steps,
   };
 

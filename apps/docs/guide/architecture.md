@@ -1,78 +1,61 @@
 # Architecture
 
-## "Author Once, Compile to Every Provider"
+## Primary runtime: the host coding agent
 
-aix dùng một **canonical source** duy nhất (SKILL.md trung lập) và compile ra artefact riêng cho từng provider — y như TypeScript compiler xuất nhiều target.
+The plugin exposes canonical skills from `content/skills/`. A SessionStart hook injects
+`using-aix`; the host selects domain/process skills and executes the eight-step engineering
+spine with its own tools. The optional TypeScript runner is a separate headless generation path.
 
-```
-CANONICAL SOURCE
-  content/skills/**/SKILL.md
-  content/agents/**/*.md
-  content/rules/**
-
-       │ đọc + validate (Zod)
-       ▼
-
-CORE PACKAGES (@x/*)
-  @x/core       — phase state machine, guards, system prompt
-  @x/registry   — skill loader/validator/catalog
-  @x/context    — code analysis + RAG index
-  @x/memory     — markdown-first + Graph KB interface
-  @x/engine     — LangGraph.js autonomous loop + budget
-  @x/policy     — redaction (20+ patterns)
-  @x/prompt     — prompt assembly + linter
-  @x/evals      — A/B eval harness
-
-       │
-       ▼
-
-COMPILER (@x/compiler)
-  → Claude Code  (content/skills, .claude-plugin/plugin.json, CLAUDE.md)
-  → Cursor       (.cursor/rules/aix-skill-*.mdc)
-  → Codex        (compact AGENTS.md + .codex/ retrievable index/files)
-  → Gemini CLI   (compact GEMINI.md + skills/index.md + .gemini/settings.json)
-
-       │
-       ▼
-
-CLI (@x/cli — bin: aix)
-  install · skills · context · run · verify · eval · memory · kb
-```
+`content/skills/` is the authoring source. Root `skills/*.md` files are legacy mirrors, not
+additional skills. `aix skills list` generates a local catalog; `aix skills validate` includes
+invalid YAML/frontmatter and duplicate-name diagnostics instead of silently ignoring them.
 
 ## Package map
 
-| Package | Vai trò |
-|---------|---------|
-| `@x/core` | SessionState, phase machine, guards, system prompt |
-| `@x/registry` | Load SKILL.md, validate frontmatter (Zod), catalog JSON |
-| `@x/context` | Phân tích code (regex + AST), RAG in-memory |
-| `@x/memory` | Ghi/đọc markdown + interface tới KB server |
-| `@x/engine` | LangGraph.js StateGraph (plan→rules→tasks→pick→ticketPlan→coder→reviewer) |
-| `@x/policy` | `policy.redact()` — strip secrets trước khi ghi memory |
-| `@x/hitl` | `ClackHitlChannel.ask()` — human-in-the-loop interrupt |
-| `@x/prompt` | Assemble system prompt, linter |
-| `@x/preview` | HTTP preview server cho compiled artefacts |
-| `@x/evals` | Rubric scoring, A/B harness |
-| `@x/compiler` | Canonical → provider artefacts |
-| `@x/providers` | Adapter Claude/Cursor/Codex/Gemini + MCP browser |
-| `@x/cli` | CLI entry point (`aix`) |
+| Package | Responsibility |
+|---|---|
+| `@x/core` | Session types, evidence guards, phase machine and budget tracking |
+| `@x/registry` | Canonical skill loader, Zod validation and catalog |
+| `@x/policy` | Secret/PII redaction and shell-command denylist |
+| `@x/providers` | Claude/Cursor/Codex/Gemini configuration adapters and runtime model clients |
+| `@x/compiler` | Hash-based idempotent file emission and conflict protection |
+| `@x/context` | Regex source analysis and default in-memory vector search |
+| `@x/memory` | Markdown storage, authenticated KB adapter and redaction wrapper |
+| `@x/prompt` | Prompt assembly and linting |
+| `@x/engine` | LangGraph generation, file checkpoints and sandboxed artifacts |
+| `@x/evals` | Heuristic text rubric and A/B harness; not executable verification |
+| `@x/hitl` | Explicit terminal/Clack decisions; invalid or closed input aborts |
+| `@x/preview` | Loopback preview server and rendering helpers |
+| `@x/cli` | Command composition and explicit persisted-session verification |
 
-## Service: kb-server
+## Author once, emit provider configuration
 
-`services/kb-server` là NestJS app chạy độc lập trên port 4000:
+The registry loads canonical skill metadata/body. Provider adapters produce Claude plugin
+skills, Cursor `.cursor/rules/aix-skill-*.mdc`, Codex `.codex/skills/` and `.codex/rules/`,
+and Gemini `.agents/skills/`, `.agents/AGENTS.md` and extension configuration. The compiler
+skips identical content and refuses to overwrite unmarked user files without `--force`.
 
-- **Neo4j** — graph store cho Memory nodes (constraint unique id)
-- **Meilisearch** — full-text search index `memory`
-- **Redis** — cache tầng 1 (TTL 300s, best-effort)
-- **AuthService** — bcrypt-hash API keys, RBAC
+## Knowledge service
 
-Mọi write vào KB phải qua `policy.redact()` trước — không bao giờ ghi secret thô.
+`services/kb-server` is a NestJS HTTP service using Node's built-in SQLite, FTS5 and a
+process-local cache. It does not require Neo4j, Meilisearch or Redis. Memory endpoints are
+under `/api/v1/memory`; health reports `{ status, sqlite, cache }`.
 
-## Hai chế độ chạy
+Memory requests require `x-api-key` or `x-master-password`. Shutdown requires the master
+password specifically. Standalone binding defaults to `127.0.0.1`; Compose binds inside its
+container and publishes only on the host's loopback interface. Direct KB writes and local
+memory/session metadata are redacted before persistence. Generated source with detected
+secrets is rejected, not silently rewritten.
 
+## Generation is not verification
+
+```bash
+aix run "<task>"          # human approval at generation boundaries
+aix run "<task>" --auto   # no human approval; same sandbox output boundary
+aix verify <session-id> --command "<your verification command>"
 ```
-aix run "<task>"        → Guardrail mode
-aix run "<task>" --auto → Autonomous mode (LangGraph.js engine)
-```
 
-Cả hai dùng chung `@x/registry`, `@x/context`, `@x/memory`.
+The runner processes pending generation tasks until exhausted, interrupted or budget-stopped.
+The reviewer text score cannot certify correctness. Output remains under
+`.aix/sessions/<id>/generated/`; the explicit verification command runs there and records its
+exit code, redacted output and generated-file hashes. There is no shipping/deployment command.

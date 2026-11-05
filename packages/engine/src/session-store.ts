@@ -1,11 +1,20 @@
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
+import { redact } from '@x/policy';
 import type { EngineState } from './state.js';
+import { redactEngineState } from './persistence-redaction.js';
 
 export const SESSIONS_ROOT = join(process.cwd(), '.aix', 'sessions');
 
+function assertSessionId(id: string): void {
+  if (redact(id).findings.some(finding => finding.type === 'secret')) {
+    throw new Error('Session ID contains a recognized secret');
+  }
+}
+
 export function sessionDir(sessionId: string): string {
+  assertSessionId(sessionId);
   return join(SESSIONS_ROOT, sessionId);
 }
 
@@ -33,11 +42,12 @@ export class SessionStore {
   }
 
   async save(state: EngineState): Promise<string> {
-    const id = state.session.id;
+    const clean = redactEngineState(state);
+    const id = clean.session.id;
     const dir = join(this.#root, id);
     await mkdir(dir, { recursive: true });
     const path = join(dir, 'state.json');
-    await writeFile(path, JSON.stringify(state, null, 2), 'utf-8');
+    await writeFile(path, JSON.stringify(clean, null, 2), 'utf-8');
     return id;
   }
 

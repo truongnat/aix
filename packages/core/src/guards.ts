@@ -18,24 +18,6 @@ function createEvidenceGuard(): PhaseGuard {
   };
 }
 
-function createShipNeedsVerifyGuard(): PhaseGuard {
-  return {
-    id: 'ship-needs-verify',
-    async check(state: SessionState): Promise<Result<void>> {
-      if (state.phase === 'ship') {
-        const verifyEvidence = state.evidence.filter(e => e.phase === 'verify');
-        if (verifyEvidence.length < 1) {
-          return fail(new AppError({
-            code: 'GUARD',
-            message: 'Cannot advance to "ship" phase unless verify phase has evidence',
-          }));
-        }
-      }
-      return ok(undefined);
-    },
-  };
-}
-
 function createStartHasTaskGuard(): PhaseGuard {
   return {
     id: 'start-has-task',
@@ -154,7 +136,6 @@ function createRememberArtifactGuard(): PhaseGuard {
 export function createDefaultGuards(): PhaseGuard[] {
   return [
     createEvidenceGuard(),
-    createShipNeedsVerifyGuard(),
     createStartHasTaskGuard(),
     createDiscussArtifactGuard(),
     createPlanArtifactGuard(),

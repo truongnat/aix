@@ -4,7 +4,7 @@ layout: home
 hero:
   name: aix
   text: Author Once,<br>Compile to Every Provider
-  tagline: Unified TypeScript platform for AI engineering skills, knowledge base, and autonomous agent workflows.
+  tagline: Engineering methodology and canonical skills for host coding agents, with optional generation and knowledge tooling.
   actions:
     - theme: brand
       text: Get Started
@@ -19,22 +19,22 @@ features:
     details: Write SKILL.md once. Compile to Claude Code, Cursor, Codex, and Gemini CLI automatically — no manual sync.
 
   - icon: 🧠
-    title: Graph Knowledge Base
-    details: Neo4j graph store + Meilisearch full-text search + Redis cache. Persistent memory across sessions with semantic search.
+    title: SQLite Knowledge Base
+    details: SQLite/FTS5 with authenticated memory access and a process-local cache. No external graph/search/cache services required.
 
   - icon: 🤖
-    title: Autonomous Engine
-    details: LangGraph.js-powered autonomous loop with budget hard-stop, human-in-the-loop interrupts, and session checkpointing.
+    title: Headless Generation
+    details: Optional LangGraph generation with budgets, explicit approvals and file checkpoints. Correctness requires a separate user-supplied verification command.
 
   - icon: 🔒
     title: Policy & Redaction
-    details: Every memory write goes through policy.redact() — 20+ regex patterns strip secrets, tokens, and PII before storage.
+    details: Session and memory strings are sanitized before persistence; generated source with detected secrets is rejected rather than silently rewritten.
 
   - icon: 📦
-    title: 163+ Skills
-    details: Domain skills, process workflows, and reference guides — all progressive-disclosure 3-tier (L1 metadata, L2 body, L3 references).
+    title: Canonical Skill Library
+    details: Domain skills, process workflows, and reference guides authored under content/skills with metadata, instructions, and on-demand resources.
 
   - icon: ⚡
     title: pnpm + Turborepo
-    details: 14-package monorepo with incremental builds. Sub-second lint, parallel execution, and zero redundant work.
+    details: 13 TypeScript packages plus service, docs and demo workspaces, with dependency-aware builds and test commands.
 ---

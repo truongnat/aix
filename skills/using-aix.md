@@ -12,9 +12,9 @@ x-version: 0.1.0
 
 You have aix. aix gives you two things:
 
-1. **A skill library** — 160+ skills. Two kinds:
+1. **A canonical skill library** under `content/skills/`. Two kinds:
    - **Process skills** (the methodology spine): how to work — `discussing-pro`,
-     `router-pro`, `tool-discovery-skill`, planning, TDD, review, ship.
+     `router-pro`, `tool-discovery-skill`, planning, TDD, review, and verification.
    - **Domain skills** (the library): deep references — `react-pro`, `aws-pro`,
      `api-design-pro`, and many more.
 2. **A methodology** — a default flow you follow unless told otherwise.

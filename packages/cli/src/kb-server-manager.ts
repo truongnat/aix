@@ -11,14 +11,22 @@
  */
 
 import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import {
+  chmodSync, closeSync, constants, existsSync, fchmodSync, fstatSync, linkSync,
+  mkdirSync, openSync, readFileSync, unlinkSync, writeFileSync,
+} from 'node:fs';
+import { randomBytes } from 'node:crypto';
+import { homedir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const KB_PORT = Number(process.env.KB_PORT ?? 4000);
-const KB_URL = `http://localhost:${KB_PORT}`;
+const KB_HOST = process.env.KB_HOST ?? '127.0.0.1';
+const connectHost = KB_HOST === '0.0.0.0' ? '127.0.0.1' : KB_HOST === '::' ? '::1' : KB_HOST;
+const KB_URL = `http://${connectHost.includes(':') ? `[${connectHost}]` : connectHost}:${KB_PORT}`;
 const HEALTH_ENDPOINT = `${KB_URL}/health`;
 const MAX_WAIT_MS = 8000;
+let spawnedServer = false;
 const POLL_INTERVAL_MS = 300;
 
 async function isAlive(): Promise<boolean> {
@@ -56,16 +64,20 @@ async function pollUntilAlive(maxMs: number): Promise<boolean> {
 }
 
 function spawnServer(mainJs: string): void {
-  const masterPassword = process.env.KB_MASTER_PASSWORD ?? 'aix-local-dev';
+  const masterPassword = process.env.KB_MASTER_PASSWORD || getLocalMasterPassword(true);
   const child = spawn(process.execPath, [mainJs], {
     detached: true,
     stdio: 'ignore',
     env: {
       ...process.env,
       PORT: String(KB_PORT),
+      KB_HOST,
       KB_MASTER_PASSWORD: masterPassword,
     },
   });
+  spawnedServer = child.pid !== undefined;
+  child.once('exit', () => { spawnedServer = false; });
+  child.once('error', () => { spawnedServer = false; });
   child.unref(); // Let the parent process exit independently.
 }
 
@@ -97,21 +109,71 @@ export async function ensureKbServer(): Promise<string | null> {
 }
 
 /**
- * Returns the API key from env, or undefined (unauthenticated local dev).
+ * Resolve the same management secret for startup, memory access, and shutdown.
+ * A private file keeps the local default stable across independent CLI processes.
  */
-export function getKbApiKey(): string | undefined {
-  return process.env.KB_API_KEY;
+export function getKbCredentials(): { apiKey?: string; masterPassword?: string } {
+  const apiKey = process.env.KB_API_KEY || undefined;
+  if (process.env.KB_MASTER_PASSWORD) return { ...(apiKey ? { apiKey } : {}), masterPassword: process.env.KB_MASTER_PASSWORD };
+  if (apiKey) return { apiKey };
+  return { masterPassword: getLocalMasterPassword(true) };
 }
 
-export async function shutdownKbServer(): Promise<void> {
-  if (await isAlive()) {
+function getLocalMasterPassword(create: true): string;
+function getLocalMasterPassword(create: false): string | undefined;
+function getLocalMasterPassword(create: boolean): string | undefined {
+  const dataDir = process.env.KB_DATA_DIR ?? join(homedir(), '.aix', 'kb');
+  const passwordFile = join(dataDir, 'master-password');
+  if (!create && !existsSync(passwordFile)) return undefined;
+  mkdirSync(dataDir, { recursive: true, mode: 0o700 });
+  chmodSync(dataDir, 0o700);
+
+  if (!existsSync(passwordFile)) {
+    // Publish a fully written file atomically, including when two CLI processes start together.
+    const temporaryFile = join(dataDir, `.master-password-${randomBytes(16).toString('hex')}`);
+    writeFileSync(temporaryFile, randomBytes(32).toString('hex'), { mode: 0o600, flag: 'wx' });
     try {
-      console.log(`[kb] Shutting down kb-server at ${KB_URL}...`);
-      await fetch(`${KB_URL}/shutdown`, { method: 'POST' });
-    } catch {
-      // ignore
+      try {
+        linkSync(temporaryFile, passwordFile);
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
+      }
+    } finally {
+      unlinkSync(temporaryFile);
     }
   }
+
+  const descriptor = openSync(passwordFile, constants.O_RDONLY | constants.O_NOFOLLOW);
+  let masterPassword: string;
+  try {
+    const info = fstatSync(descriptor);
+    if (!info.isFile() || (process.getuid && info.uid !== process.getuid())) {
+      throw new Error('[kb] management credential must be a regular file owned by the current user');
+    }
+    fchmodSync(descriptor, 0o600);
+    masterPassword = readFileSync(descriptor, 'utf8').trim();
+    if (!/^[a-f0-9]{64}$/.test(masterPassword)) {
+      throw new Error('[kb] invalid local management credential; restore the private credential file or set KB_MASTER_PASSWORD');
+    }
+  } finally {
+    closeSync(descriptor);
+  }
+  return masterPassword;
+}
+
+export async function shutdownKbServer(opts?: { ownedOnly?: boolean }): Promise<void> {
+  if (opts?.ownedOnly && !spawnedServer) return;
+  if (!(await isAlive())) return;
+  const masterPassword = process.env.KB_MASTER_PASSWORD || getLocalMasterPassword(false);
+  if (!masterPassword) throw new Error('[kb] shutdown requires KB_MASTER_PASSWORD or an existing local management credential');
+  console.log(`[kb] Shutting down kb-server at ${KB_URL}...`);
+  const response = await fetch(`${KB_URL}/shutdown`, {
+    method: 'POST',
+    headers: { 'x-master-password': masterPassword },
+    signal: AbortSignal.timeout(2000),
+  });
+  if (!response.ok) throw new Error(`[kb] shutdown failed (HTTP ${response.status}); check KB_MASTER_PASSWORD`);
+  spawnedServer = false;
 }
 
 export { KB_URL };

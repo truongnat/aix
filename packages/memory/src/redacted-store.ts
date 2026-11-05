@@ -11,6 +11,9 @@ export class RedactedMemoryStore implements MemoryStore {
   }
 
   async push(rec: MemoryRecord): Promise<void> {
+    if (this.#policy.redact(rec.id).findings.some(finding => finding.type === 'secret')) {
+      throw new Error('Memory record ID contains a recognized secret');
+    }
     const clean = this.#redact(rec);
     await this.#inner.push(clean);
   }
@@ -43,6 +46,7 @@ export class RedactedMemoryStore implements MemoryStore {
       ...rec,
       title: titleResult.clean,
       body: bodyResult.clean,
+      tags: rec.tags.map(tag => this.#policy.redact(tag).clean),
     };
   }
 }

@@ -10,14 +10,14 @@ import { PromptAssembler } from '@x/prompt';
 import type { AssembleContext } from '@x/prompt';
 import { SkillRegistry } from '@x/registry';
 import { RedactedMemoryStore, MarkdownStore, KbStore } from '@x/memory';
-import { ensureKbServer } from '../kb-server-manager.js';
-import { PolicyEngine } from '@x/policy';
+import { ensureKbServer, getKbCredentials, shutdownKbServer } from '../kb-server-manager.js';
+import { PolicyEngine, redactStrings } from '@x/policy';
 import { ClackHitlChannel } from '@x/hitl';
 import { DEFAULT_SYSTEM_PARTS } from '@x/prompt';
 import { execSync as realExecSync } from 'node:child_process';
 import { createProvider } from '@x/providers';
 
-const PHASES: readonly Phase[] = ['discuss', 'plan', 'run', 'verify', 'ship', 'remember'];
+const PHASES: readonly Phase[] = ['discuss', 'plan', 'run'];
 
 let clackPrompts: any = p;
 export function setClackPrompts(mockPrompts: any): void {
@@ -119,17 +119,17 @@ export function registerRunCommand(program: Command): void {
         return;
       }
 
-      if (opts.resume) {
-        await handleResume(opts.resume);
-        return;
+      try {
+        if (opts.resume) {
+          await handleResume(opts.resume);
+        } else if (opts.auto) {
+          await handleAuto(task);
+        } else {
+          await handleGuardrail(task);
+        }
+      } finally {
+        await shutdownKbServer({ ownedOnly: true });
       }
-
-      if (opts.auto) {
-        await handleAuto(task);
-        return;
-      }
-
-      await handleGuardrail(task);
     });
 }
 
@@ -189,17 +189,12 @@ async function handleResume(checkpointId: string): Promise<void> {
   const final = await graph.resume(saved);
   const checkpointId2 = await store.save(final);
 
-  const score = final.reviewScore ?? 0;
-  const passed = score >= 9;
-  p.outro(
-    passed
-      ? `Resume complete — Score: ${score}/10 (Checkpoint: ${checkpointId2})`
-      : `Resume complete — Score: ${score}/10 (below threshold) — Checkpoint: ${checkpointId2}`,
-  );
+  await writeGenerationArtifacts(final);
+  reportGeneration(final, checkpointId2);
 }
 
 async function handleAuto(task: string): Promise<void> {
-  const usingMock = !process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY;
+  const usingMock = !process.env.ANTHROPIC_API_KEY && !process.env.OPENAI_API_KEY && !process.env.GROQ_API_KEY;
 
   const loop = new GuardrailLoop();
   const session = { ...(await loop.createSession(task)), mode: 'autonomous' as const };
@@ -208,12 +203,11 @@ async function handleAuto(task: string): Promise<void> {
   const graph = new EngineGraph(store);
 
   // Auto-start kb-server
-  const { ensureKbServer, shutdownKbServer } = await import('../kb-server-manager.js');
   await ensureKbServer();
 
-  p.intro(`Auto-running: "${task}"`);
+  p.intro(redactStrings(`Auto-running: "${task}"`));
   if (usingMock) {
-    console.warn('\n  ⚠  MOCK MODE — no ANTHROPIC_API_KEY or OPENAI_API_KEY set.');
+    console.warn('\n  ⚠  MOCK MODE — no supported provider API key is configured.');
     console.warn('     Generated code is PLACEHOLDER, not produced by a real model.');
     console.warn('     Set an API key for real output.\n');
   }
@@ -221,7 +215,7 @@ async function handleAuto(task: string): Promise<void> {
   const final = await graph.run(initial);
   const id = await store.save(final);
 
-  console.log(`Score:    ${final.reviewScore ?? 0}/10`);
+  console.log(`Heuristic text score (not correctness verification): ${final.reviewScore ?? 0}/10`);
   console.log(`Budget:   $${final.session.budget.usdSpent.toFixed(4)} of $${final.session.budget.usdLimit.toFixed(2)}`);
 
   const written = final.writtenFiles ?? [];
@@ -237,86 +231,33 @@ async function handleAuto(task: string): Promise<void> {
   if (usingMock) {
     console.warn('\n  ⚠  Reminder: output above is MOCK placeholder, not real code.\n');
   }
-  p.outro('Auto-run complete');
-
-  // Shutdown kb-server when done
-  await shutdownKbServer();
+  await writeGenerationArtifacts(final);
+  reportGeneration(final, id);
 }
 
 function getSessionDir(sessionId: string): string {
   return join(process.cwd(), '.aix', 'sessions', sessionId);
 }
 
-async function writeReviewArtifact(sessionId: string, state: EngineState): Promise<void> {
-  const dir = getSessionDir(sessionId);
+async function writeGenerationArtifacts(state: EngineState): Promise<void> {
+  const dir = getSessionDir(state.session.id);
   await mkdir(dir, { recursive: true });
-  
-  const score = state.reviewScore ?? 8;
-  const passed = score >= 9;
-  
-  const content = `# Review Findings
-
-## 1. Quality & Correctness Review
-* **Review Score**: ${score}/10
-* **Status**: ${passed ? 'PASSED' : 'REVISION REQUIRED'}
-* **Review Attempts**: ${state.attempts}
-
-## 2. Findings List
-${passed ? '* **[Minor]**: No major issues found. Maintainability checks passed.' : '* **[Important]**: Code quality score is below threshold. Further test execution or refactoring is required.'}
-
-## 3. Residual Risk
-* **Risk Level**: ${passed ? 'Low' : 'Medium'}
-* **Details**: Verified via automated compiler and test runner checks.
-`;
-
-  await writeFile(join(dir, 'REVIEW.md'), content, 'utf-8');
+  const rows = state.tasks.map(task => `| ${task.description} | ${task.status} |`).join('\n');
+  const review = `# Heuristic Review\n\nText score: ${state.reviewScore ?? 'unavailable'}/10\n\nThis score measures text structure and word overlap. It is not a correctness or safety verdict. No compiler, test runner, or deployment was executed by this review.\n\n| Planned task | Generation status |\n|---|---|\n${rows}\n`;
+  const verify = `# Verification\n\nStatus: NOT RUN\n\nGeneration does not imply correctness. Run an explicit check against these artifacts:\n\n\`\`\`sh\naix verify ${state.session.id} --command \"<your verification command>\"\n\`\`\`\n\nThe command runs inside generated/. Select checks that exercise the actual acceptance criteria.\n`;
+  const remember = `# Generation Notes\n\nTask: ${state.session.task}\n\nOutput remains in the session's generated/ directory. No project source was overwritten, no tests were claimed, and nothing was shipped.\n\nGenerated paths:\n${(state.writtenFiles ?? []).map(file => `- ${file}`).join('\n')}\n`;
+  await Promise.all([
+    writeFile(join(dir, 'REVIEW.md'), redactStrings(review), 'utf8'),
+    writeFile(join(dir, 'VERIFY.md'), redactStrings(verify), 'utf8'),
+    writeFile(join(dir, 'REMEMBER.md'), redactStrings(remember), 'utf8'),
+  ]);
 }
 
-async function writeVerifyArtifact(sessionId: string, state: EngineState): Promise<void> {
-  const dir = getSessionDir(sessionId);
-  await mkdir(dir, { recursive: true });
-  
-  const tasksTable = state.tasks.map(t => 
-    `| ${t.description} | ${t.status === 'done' ? 'GREEN (Test Passed)' : 'PENDING'} |`
-  ).join('\n');
-
-  const content = `# Verification Report
-
-## 1. Claim-to-Evidence Match
-| Planned Task | Real-time Verification Evidence |
-|---|---|
-${tasksTable || '| No tasks defined | N/A |'}
-
-## 2. Honest Status
-* **Status**: ${state.tasks.every(t => t.status === 'done') ? 'COMPLETE' : 'INCOMPLETE'}
-* **Verification Timestamp**: ${new Date().toISOString()}
-`;
-
-  await writeFile(join(dir, 'VERIFY.md'), content, 'utf-8');
-}
-
-async function writeRememberArtifact(sessionId: string, state: EngineState): Promise<void> {
-  const dir = getSessionDir(sessionId);
-  await mkdir(dir, { recursive: true });
-  
-  const affected = state.writtenFiles && state.writtenFiles.length > 0 
-    ? state.writtenFiles.map(f => `- \`${f}\``).join('\n')
-    : '- None';
-
-  const content = `# Durable Lessons & Decisions
-
-## 1. Remember Note
-* Successfully completed task: "${state.session.task}"
-* Automated validation and test checkpoints verified.
-
-## 2. Durable Decisions
-* Code generated and compiled cleanly inside sandbox \`.aix/sessions/${sessionId}/generated/\` before shipping to project workspace.
-
-## 3. Affected Areas
-${affected}
-`;
-
-  await writeFile(join(dir, 'REMEMBER.md'), content, 'utf-8');
+function reportGeneration(state: EngineState, id: string): void {
+  const generated = state.tasks.filter(task => task.status === 'done').length;
+  const complete = state.tasks.length > 0 && generated === state.tasks.length;
+  p.outro(`Artifacts generated: ${generated}/${state.tasks.length} tasks — verification NOT RUN — Session ${id}`);
+  if (!complete) process.exitCode = 1;
 }
 
 async function handleGuardrail(task: string): Promise<void> {
@@ -327,7 +268,7 @@ async function handleGuardrail(task: string): Promise<void> {
   // --- KB Server: auto-start if not running, connect for this session ---
   const kbUrl = await ensureKbServer();
   const baseStore = kbUrl
-    ? new KbStore(kbUrl)
+    ? new KbStore(kbUrl, undefined, getKbCredentials())
     : new MarkdownStore();
   const markdownStore = new MarkdownStore(); // still used by PromptAssembler for local context
   const redactedMemory = new RedactedMemoryStore(baseStore, policy);
@@ -342,15 +283,13 @@ async function handleGuardrail(task: string): Promise<void> {
   let state = await loop.createSession(task);
   let engineState: EngineState = createInitialEngineState(state);
 
-  p.intro(`Guardrail: "${task}"`);
+  p.intro(redactStrings(`Guardrail: "${task}"`));
   console.log(`Session: ${state.id}\n`);
 
   for (const phase of PHASES) {
     const budgetCheck = budgetTracker.checkHardStop(state);
     if (!budgetCheck.ok) {
       console.error(`\n  Budget exceeded: ${budgetCheck.error.message}`);
-      const { shutdownKbServer } = await import('../kb-server-manager.js');
-      await shutdownKbServer();
       process.exit(1);
     }
 
@@ -380,8 +319,6 @@ async function handleGuardrail(task: string): Promise<void> {
         summary: `User cancelled at ${phase}`,
       });
       p.outro('Run cancelled');
-      const { shutdownKbServer } = await import('../kb-server-manager.js');
-      await shutdownKbServer();
       return;
     }
 
@@ -391,7 +328,7 @@ async function handleGuardrail(task: string): Promise<void> {
       continue;
     }
 
-    state = loop.addEvidence(state, {
+    state = loop.addEvidence({ ...state, phase }, {
       phase,
       kind: 'decision',
       summary: `User approved ${phase}`,
@@ -441,8 +378,6 @@ async function handleGuardrail(task: string): Promise<void> {
       const gitResult = await handleGitCheckIfDirty();
       if (gitResult === 'cancel') {
         p.outro('Run aborted by user.');
-        const { shutdownKbServer } = await import('../kb-server-manager.js');
-        await shutdownKbServer();
         return;
       }
       const graph = new EngineGraph(store);
@@ -450,7 +385,7 @@ async function handleGuardrail(task: string): Promise<void> {
       state = engineState.session;
 
       await store.save(engineState);
-      await writeReviewArtifact(state.id, engineState);
+      await writeGenerationArtifacts(engineState);
       state = loop.addEvidence(state, {
         phase: 'run',
         kind: 'artifact',
@@ -470,46 +405,24 @@ async function handleGuardrail(task: string): Promise<void> {
           attempts: engineState.attempts,
           tasksDone: engineState.tasks.filter(t => t.status === 'done').length,
           tasksTotal: engineState.tasks.length,
-          reviewFailed: (engineState.reviewScore ?? 0) < 9 && engineState.attempts >= 3,
+          verificationStatus: 'not-run',
         }),
         tags: [phase, 'result'],
         version: '0.1.0',
         createdAt: new Date().toISOString(),
       });
-    } else if (phase === 'verify') {
-      await writeVerifyArtifact(state.id, engineState);
-      state = loop.addEvidence(state, {
-        phase: 'verify',
-        kind: 'artifact',
-        summary: 'Generated VERIFY.md',
-        ref: join(getSessionDir(state.id), 'VERIFY.md'),
-      });
-      engineState = { ...engineState, session: state };
-      await store.save(engineState);
-    } else if (phase === 'remember') {
-      await writeRememberArtifact(state.id, engineState);
-      state = loop.addEvidence(state, {
-        phase: 'remember',
-        kind: 'artifact',
-        summary: 'Generated REMEMBER.md',
-        ref: join(getSessionDir(state.id), 'REMEMBER.md'),
-      });
-      engineState = { ...engineState, session: state };
-      await store.save(engineState);
     }
 
     try {
       state = await loop.advancePhase(state);
-      console.log(`\n  ✓ Phase "${phase}" complete (now in "${state.phase}")\n`);
+      engineState = { ...engineState, session: state };
+      await store.save(engineState);
+      console.log(`\n  ✓ Generation phase "${phase}" finished (now in "${state.phase}")\n`);
     } catch (err) {
       console.error(`\n  ✗ Phase "${phase}" failed: ${err}`);
-      const { shutdownKbServer } = await import('../kb-server-manager.js');
-      await shutdownKbServer();
       process.exit(1);
     }
   }
 
-  p.outro(`Task complete — Session ${state.id}`);
-  const { shutdownKbServer } = await import('../kb-server-manager.js');
-  await shutdownKbServer();
+  reportGeneration(engineState, state.id);
 }

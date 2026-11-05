@@ -30,8 +30,9 @@ export function registerSkillsCommand(program: Command): void {
   skills
     .command('validate')
     .description('Validate all SKILL.md frontmatter')
-    .action(async () => {
-      const registry = await SkillRegistry.load(findContentRoot());
+    .option('--content-root <path>', 'Validate skills from an explicit content directory')
+    .action(async (opts: { contentRoot?: string }) => {
+      const registry = await SkillRegistry.load(opts.contentRoot ?? findContentRoot());
       const errors = registry.validateAll();
       const warnings = errors.filter(e => e.code === 'WARN');
       const fatal = errors.filter(e => e.code !== 'WARN');
@@ -41,7 +42,7 @@ export function registerSkillsCommand(program: Command): void {
         console.warn(`  WARN: ${w.message}`);
       }
       for (const e of fatal) {
-        console.error(`  ERROR: ${e.message}`);
+        console.error(`  ERROR: ${e.path ? `${e.path}: ` : ''}${e.message}`);
       }
 
       if (fatal.length > 0) {

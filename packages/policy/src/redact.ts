@@ -34,7 +34,7 @@ const PATTERNS: PatternDef[] = [
   { type: 'secret', subtype: 'private-key', regex: /private[_-]?key[=:]\s*['"]?([a-zA-Z0-9_\-+\/=]{16,})['"]?/gi },
   { type: 'pii', subtype: 'email', regex: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g },
   { type: 'pii', subtype: 'ip-address', regex: /\b(?:\d{1,3}\.){3}\d{1,3}\b/g },
-  { type: 'pii', subtype: 'phone', regex: /\b\+?\d{1,3}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}\b/g },
+  { type: 'pii', subtype: 'phone', regex: /(?<![\w.-])(?:\+\d{1,3}[-.\s]?)?(?:\(\d{3}\)[-.\s]?|\d{3}[-.\s])\d{3}[-.\s]\d{4}(?![\w.-])/g },
   { type: 'pii', subtype: 'ssn', regex: /\b\d{3}-\d{2}-\d{4}\b/g },
   { type: 'pii', subtype: 'credit-card', regex: /\b(?:\d{4}[-\s]?){3}\d{4}\b/g },
 ];
@@ -61,4 +61,16 @@ export function redact(input: string): RedactResult {
   }
 
   return { clean: clean, findings: allFindings };
+}
+
+/** Redact string values in JSON-shaped data without rewriting keys or scalar types. */
+export function redactStrings<T>(value: T): T {
+  if (typeof value === 'string') return redact(value).clean as T;
+  if (Array.isArray(value)) return value.map(item => redactStrings(item)) as T;
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, redactStrings(item)]),
+    ) as T;
+  }
+  return value;
 }

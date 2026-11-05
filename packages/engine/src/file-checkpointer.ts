@@ -3,19 +3,31 @@ import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 import { BaseCheckpointSaver, copyCheckpoint, getCheckpointId, type Checkpoint, type CheckpointListOptions, type CheckpointMetadata, type CheckpointTuple } from '@langchain/langgraph-checkpoint';
 import type { RunnableConfig } from '@langchain/core/runnables';
+import { redact, redactStrings } from '@x/policy';
+import { redactEngineChannel, redactEngineChannels } from './persistence-redaction.js';
 
 const DEFAULT_NS = '__default__';
 
+function assertIdentity(value: string): void {
+  if (redact(value).findings.some(finding => finding.type === 'secret')) {
+    throw new Error('Checkpoint identity contains a recognized secret');
+  }
+}
+
 function nsDir(root: string, threadId: string, checkpointNs: string): string {
+  assertIdentity(threadId);
+  assertIdentity(checkpointNs);
   const ns = checkpointNs || DEFAULT_NS;
   return join(root, threadId, 'checkpoints', ns);
 }
 
 function checkpointPath(root: string, threadId: string, checkpointNs: string, checkpointId: string): string {
+  assertIdentity(checkpointId);
   return join(nsDir(root, threadId, checkpointNs), `${checkpointId}.ckpt.json`);
 }
 
 function writesPath(root: string, threadId: string, checkpointNs: string, checkpointId: string): string {
+  assertIdentity(checkpointId);
   return join(nsDir(root, threadId, checkpointNs), `${checkpointId}.writes.json`);
 }
 
@@ -115,21 +127,22 @@ export class FileCheckpointer extends BaseCheckpointSaver {
     const threadId = config.configurable?.thread_id;
     const checkpointNs = (config.configurable?.checkpoint_ns as string | undefined) ?? '';
     const preparedCheckpoint = copyCheckpoint(checkpoint);
+    preparedCheckpoint.channel_values = redactEngineChannels(preparedCheckpoint.channel_values);
 
     if (typeof threadId !== 'string') {
       throw new Error('Failed to put checkpoint: thread_id is required');
     }
+    const ckptFile = checkpointPath(this.#root, threadId, checkpointNs, checkpoint.id);
+    const parentCheckpointId = config.configurable?.checkpoint_id as string | undefined;
+    if (parentCheckpointId !== undefined) assertIdentity(parentCheckpointId);
 
     const dir = nsDir(this.#root, threadId, checkpointNs);
     await mkdir(dir, { recursive: true });
 
     const [[, serializedCheckpoint], [, serializedMetadata]] = await Promise.all([
       this.serde.dumpsTyped(preparedCheckpoint),
-      this.serde.dumpsTyped(metadata),
+      this.serde.dumpsTyped(redactStrings(metadata)),
     ]);
-
-    const ckptFile = checkpointPath(this.#root, threadId, checkpointNs, checkpoint.id);
-    const parentCheckpointId = config.configurable?.checkpoint_id as string | undefined;
 
     await writeFile(ckptFile, JSON.stringify({
       checkpoint: Array.from(serializedCheckpoint),
@@ -157,11 +170,15 @@ export class FileCheckpointer extends BaseCheckpointSaver {
     if (typeof checkpointId !== 'string') {
       throw new Error('Failed to put writes: checkpoint_id is required');
     }
+    const writesFile = writesPath(this.#root, threadId, checkpointNs, checkpointId);
+    assertIdentity(taskId);
+    for (const [channel] of writes) assertIdentity(channel);
+    const preparedWrites = writes.map(([channel, value]) => [
+      channel, redactEngineChannel(channel, value),
+    ] as const);
 
     const dir = nsDir(this.#root, threadId, checkpointNs);
     await mkdir(dir, { recursive: true });
-
-    const writesFile = writesPath(this.#root, threadId, checkpointNs, checkpointId);
 
     let existing: Array<[string, string, number[]]> = [];
     if (existsSync(writesFile)) {
@@ -173,7 +190,7 @@ export class FileCheckpointer extends BaseCheckpointSaver {
       }
     }
 
-    for (const [channel, value] of writes) {
+    for (const [channel, value] of preparedWrites) {
       const [, serialized] = await this.serde.dumpsTyped(value);
       existing.push([taskId, channel, Array.from(serialized)]);
     }

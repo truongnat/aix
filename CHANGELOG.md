@@ -8,12 +8,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- **kb-server auto-start/stop**. `aix run --auto` and Guardrail mode now automatically ensure `kb-server` is running before execution and cleanly shut it down (using a new `POST /shutdown` endpoint) when the session finishes, cancels, or fails.
-- **kb-server plugin mode integration**. The Claude Code plugin mode (`hooks/session-start.sh`) now starts `kb-server` in the background and instructs the agent to run `aix kb stop` when finished.
+- **kb-server auto-start/stop**. CLI runs ensure the service is available and only automatically stop instances started by the same CLI process; reused/shared services are left running.
+- **kb-server plugin integration**. Session hooks request optional background startup when the CLI is built. Context does not claim startup succeeded or instruct automatic shutdown of shared services.
 
 ### Fixed
+- Reject invalid, partial, empty and closed terminal approval input instead of selecting the first option; browser decisions close pending terminal input.
+- Retain invalid YAML/frontmatter and duplicate skill-name diagnostics so `skills validate` fails accurately. Add `--content-root` for explicit validation targets.
+- Generate all planned tasks rather than stopping at a text-score threshold or global three-task limit. Heuristic scores no longer claim correctness or successful test execution.
+- Make `verify <session-id> --command <command>` execute a trusted user-supplied check in generated output, persist real exit/output and file hashes, and invalidate stale success on failed/missing/changed output.
+- Wire KB credentials through adapters and CLI callers; HTTP 401/403 fails explicitly instead of silently falling back to Markdown.
 - **Engine now writes generated code to disk.** `coderNode` persists model output to
-  a sandbox `.aix/generated/<sessionId>/` (path-traversal-guarded) instead of discarding
+  sandbox `.aix/sessions/<sessionId>/generated/` (path-traversal-guarded) instead of discarding
   it. The autonomous loop produces real, reviewable artefacts — it never clobbers `src/`.
 - **Budget hard-stop is now wired.** `coderNode` feeds real provider `usd`/`tokens` back
   into the session via `BudgetTracker.addUsage()`. `checkHardStop` now sees actual spend;
@@ -28,10 +33,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   `aix context build .` ignores `imports/`; `aix run --dry-run` added.
 
 ### Changed
+- Align KB deployment, environment settings and documentation with SQLite/FTS5 and the in-memory cache; remove obsolete Neo4j/Meilisearch/Redis containers.
+- Document canonical skill ownership and replace stale copied catalog/count claims.
 - All 13 `@x/*` packages set to `private: true` until publish metadata
   (`files`, `license`, `repository`, scope) is in place.
 - README: corrected `@x/context` description (regex-based, not tree-sitter) and
   documented the engine's sandbox output behaviour.
+
+### Security
+- Redact structured session metadata, serialized checkpoints and local/remote memory strings before persistence; reject secret-bearing generated source rather than rewriting executable code.
+- Require master-password authorization for shutdown; ordinary memory API keys cannot terminate the service. Bind standalone service and Compose's published host port to loopback by default.
+- Replace the fixed local startup password with a stable random private management credential. API-key-only access does not create local credentials.
+
+### Removed
+- Remove the unsupported `ship` CLI command, automatic shipping phase, and fabricated compiler/test/deployment success claims. Generation does not apply files to project source.
 
 ---
 

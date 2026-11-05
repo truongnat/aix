@@ -23,7 +23,8 @@ const intro =
   "the default engineering methodology and how to reach every other aix skill via the " +
   "Skill tool (start with router-pro for broad requests, tool-discovery-skill to find by " +
   "capability). Check for a relevant skill before any non-trivial task.\n" +
-  "Important: kb-server has been started in the background. When you finish your task, ALWAYS run `aix kb stop` to shut it down.\n\n";
+  "KB startup is optional: a built CLI triggers a background startup attempt, not a readiness guarantee. " +
+  "Use `aix kb status` to check it. Only use `aix kb stop` when explicitly managing that service; do not stop a reused/shared service automatically.\n\n";
 process.stdout.write(JSON.stringify({
   hookSpecificOutput: {
     hookEventName: "SessionStart",

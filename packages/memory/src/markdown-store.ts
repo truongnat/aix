@@ -1,6 +1,7 @@
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { MemoryRecord, MemoryStore } from './types.js';
+import { redact, redactStrings } from '@x/policy';
 
 const MEMORY_DIR = '.aix/runtime/memory';
 
@@ -69,9 +70,12 @@ export class MarkdownStore implements MemoryStore {
   }
 
   async push(rec: MemoryRecord): Promise<void> {
+    if (redact(rec.id).findings.some(finding => finding.type === 'secret')) {
+      throw new Error('Memory record ID contains a recognized secret');
+    }
     const dir = join(this.#baseDir, MEMORY_DIR);
     await mkdir(dir, { recursive: true });
-    const content = recordToMarkdown(rec);
+    const content = recordToMarkdown({ ...redactStrings(rec), id: rec.id });
     await writeFile(join(dir, `${rec.id}.md`), content, 'utf-8');
   }
 

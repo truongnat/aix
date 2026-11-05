@@ -1,7 +1,7 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import matter from 'gray-matter';
-import { SKILL_BODY_MAX_TOKENS } from '@x/core';
+import { SKILL_BODY_MAX_TOKENS, ValidationError } from '@x/core';
 import type { SkillKind, Role, AppError } from '@x/core';
 import { SkillFrontmatterSchema } from './schema.js';
 import type { SkillFrontmatter } from './schema.js';
@@ -13,14 +13,29 @@ function tokenEstimate(text: string): number {
 
 export class SkillRegistry {
   readonly #skills: Map<string, LoadedSkill>;
+  readonly #loadErrors: readonly AppError[];
 
-  constructor(skills: readonly LoadedSkill[]) {
-    this.#skills = new Map(skills.map(s => [s.id, s]));
+  constructor(skills: readonly LoadedSkill[], loadErrors: readonly AppError[] = []) {
+    this.#skills = new Map();
+    const errors = [...loadErrors];
+    for (const skill of skills) {
+      const existing = this.#skills.get(skill.id);
+      if (existing) {
+        errors.push(new ValidationError(
+          `Duplicate skill name "${skill.id}" also declared in ${existing.dir}`,
+          { path: join(skill.dir, 'SKILL.md') },
+        ));
+        continue;
+      }
+      this.#skills.set(skill.id, skill);
+    }
+    this.#loadErrors = errors;
   }
 
   static async load(contentRoot: string): Promise<SkillRegistry> {
     const skillsDir = join(contentRoot, 'skills');
     const skills: LoadedSkill[] = [];
+    const errors: AppError[] = [];
 
     let skillDirs: string[];
     try {
@@ -29,7 +44,7 @@ export class SkillRegistry {
       return new SkillRegistry([]);
     }
 
-    for (const dirName of skillDirs) {
+    for (const dirName of skillDirs.sort()) {
       const skillDir = join(skillsDir, dirName);
       let dirStat;
       try {
@@ -48,12 +63,23 @@ export class SkillRegistry {
       }
       if (!mdStat.isFile()) continue;
 
-      const raw = await readFile(skillMdPath, 'utf-8');
-      const parsed = matter(raw);
+      let parsed: matter.GrayMatterFile<string>;
+      try {
+        parsed = matter(await readFile(skillMdPath, 'utf-8'));
+      } catch (cause) {
+        errors.push(new ValidationError(
+          `Skill "${dirName}" frontmatter could not be read or parsed`,
+          { path: skillMdPath, cause },
+        ));
+        continue;
+      }
       const result = SkillFrontmatterSchema.safeParse(parsed.data);
 
       if (!result.success) {
-        console.warn(`[registry] SKIP ${dirName}: frontmatter invalid — ${result.error.issues.map(i => i.message).join('; ')}`);
+        errors.push(new ValidationError(
+          `Skill "${dirName}" frontmatter invalid — ${result.error.issues.map(i => i.message).join('; ')}`,
+          { path: skillMdPath },
+        ));
         continue;
       }
 
@@ -112,7 +138,7 @@ export class SkillRegistry {
       });
     }
 
-    return new SkillRegistry(skills);
+    return new SkillRegistry(skills, errors);
   }
 
   all(): readonly LoadedSkill[] {
@@ -147,7 +173,7 @@ export class SkillRegistry {
   }
 
   validateAll(): readonly AppError[] {
-    const errors: AppError[] = [];
+    const errors: AppError[] = [...this.#loadErrors];
     for (const skill of this.#skills.values()) {
       if (skill.bodyTokenEstimate > SKILL_BODY_MAX_TOKENS) {
         errors.push({

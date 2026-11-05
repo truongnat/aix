@@ -12,7 +12,8 @@ async function bootstrap(): Promise<void> {
   app.enableShutdownHooks();
 
   const port = process.env.PORT ?? 4000;
-  await app.listen(port);
-  console.log(`[kb-server] running on http://localhost:${port}`);
+  const host = process.env.KB_HOST ?? '127.0.0.1';
+  await app.listen(port, host);
+  console.log(`[kb-server] running on http://${host.includes(':') ? `[${host}]` : host}:${port}`);
 }
 bootstrap();

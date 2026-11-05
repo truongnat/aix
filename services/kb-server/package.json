@@ -6,13 +6,15 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
-    "dev": "KB_MASTER_PASSWORD=dev node --watch dist/main.js",
-    "lint": "tsc --noEmit"
+    "dev": "node --watch dist/main.js",
+    "lint": "tsc --noEmit",
+    "test": "node --test \"test/**/*.test.mjs\""
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "@x/policy": "workspace:*",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.0",
     "bcryptjs": "^2.4.0"

@@ -1,106 +1,108 @@
 # CLI Reference
 
-## `aix install`
+Packages are private. Build the checkout, then use `node packages/cli/dist/index.js` wherever
+examples below say `aix`. Run `aix <command> --help` for authoritative flags.
 
-Compile canonical skills ra provider artefacts.
+## Provider installation
 
 ```bash
-aix install [--provider <name>] [--dry-run]
+aix install --provider claude
+aix install --provider cursor --dry-run
+aix install --all
 ```
 
-| Flag | Default | Mô tả |
-|------|---------|-------|
-| `--provider` | auto-detect | `claude` \| `cursor` \| `codex` \| `gemini` |
-| `--dry-run` | false | Preview changes không ghi file |
+Default provider is Claude. `--all` selects all four providers; it is not a filter for
+`--provider`. Existing unmarked user files are conflicts unless `--force` is explicitly used.
 
-## `aix run`
-
-Chạy task với AI agent.
+## Generate artifacts
 
 ```bash
-aix run "<task>" [--auto] [--budget <usd>] [--provider <name>]
+aix run "<task>"
+aix run "<task>" --auto
+aix run "<task>" --dry-run
+aix run "<task>" --resume <session-id>
 ```
 
-| Flag | Default | Mô tả |
-|------|---------|-------|
-| `--auto` | false | Autonomous mode (LangGraph.js engine) |
-| `--budget` | `2.0` | USD budget hard limit |
-| `--provider` | auto-detect | Provider để dùng cho coder/reviewer |
+Default mode asks for human approval. `--auto` bypasses those approvals, not budget checks
+or the output sandbox. Missing provider keys activates explicitly labeled mock generation.
+Generation processes the planned tasks and writes under `.aix/sessions/<id>/generated/`.
+Text scores are heuristic; no generated status or score means tests passed.
 
-**Guardrail mode** (default): dừng tại mỗi phase `Start → Discuss → Plan → Run → Verify → Ship`.
-
-**Autonomous mode** (`--auto`): chạy loop tự động đến khi score ≥ 9/10 hoặc hết budget.
-
-## `aix skills`
-
-Quản lý skills catalog.
+## Verify a persisted session
 
 ```bash
-aix skills list [--category <name>]
-aix skills search "<query>"
+aix verify <session-id> --command "node --test"
+```
+
+The command is explicitly supplied by you and executes inside that session's `generated/`
+directory with your account's permissions. Choose checks that exercise the actual output.
+Missing sessions, incomplete generation and missing output are errors. The command's real
+exit code, redacted output and generated-file SHA-256 values are saved to `state.json` and
+`VERIFY.md`. Failed rechecks invalidate prior success; changed output during verification
+cannot pass. Nothing is deployed or copied into project source.
+
+The unsupported `aix ship` command and automatic shipping phase were removed. Use your
+project's actual reviewed deployment workflow; the CLI does not invent one.
+
+## Skills
+
+```bash
+aix skills validate [--content-root <content-directory>]
+aix skills list [--kind <kind>] [--role <role>]
 aix skills show <name>
+aix skills migrate [--write]
 ```
 
-## `aix context`
+Validation includes malformed YAML, invalid metadata and duplicate names; fatal errors produce
+a nonzero exit. Body-size warnings remain warnings. `list` regenerates the local catalog
+from canonical content. Migration defaults to dry-run; `--write` changes canonical files.
 
-Phân tích codebase.
+## Context
 
 ```bash
-aix context build [--path <dir>] [--lang <language>]
-aix context query "<question>"
-aix context wiki [--out <dir>]
+aix context build [path]
+aix context query "<question>" [--top 5]
 ```
 
-## `aix memory`
+The default analyzer/search are regex-based and in-memory, with the CLI's saved local index.
+No `context wiki` subcommand is currently registered.
 
-Đọc/ghi memory qua KB server.
+## Local Markdown memory
 
 ```bash
-aix memory push "<content>"
+aix memory push "<title>" "<body>" [--kind decision] [--tags tag1,tag2]
 aix memory search "<query>"
-aix memory get <id>
+aix memory list [--kind decision]
 ```
 
-## `aix kb`
+These commands use redacted local Markdown storage. They do not automatically select the
+remote KB. There is no registered `memory get` subcommand.
 
-Quản lý KB server connection.
+## Knowledge service
 
 ```bash
+aix kb ensure
+aix kb start
 aix kb status
-aix kb connect --url <url> --key <api-key>
+aix kb list [--kind decision]
+aix kb search "<query>" [--limit 10]
+aix kb stop
 ```
 
-## `aix doctor`
+`start` and `ensure` request local startup. `KB_PORT` selects the service port; credentials
+come from `KB_API_KEY`, `KB_MASTER_PASSWORD`, or the private CLI-managed credential. Rejected
+credentials fail nonzero. Explicit stop requires administrative authorization; API keys
+are for memory access only. No `kb connect` subcommand is registered.
 
-Kiểm tra toàn bộ setup.
+## Diagnostics and evaluation
 
 ```bash
 aix doctor
+aix eval list
+aix eval run <suite> [--variant <name>]
 ```
 
-Kiểm tra: provider detection, skills loaded, KB server health, policy redaction.
-
-## `aix eval`
-
-Chạy A/B eval harness.
-
-```bash
-aix eval run --variants a.md,b.md --cases cases.json
-aix eval report
-```
-
-## `aix verify`
-
-Verify output của run trước.
-
-```bash
-aix verify [--session <id>]
-```
-
-## `aix ship`
-
-Mark session hoàn thành và sync memory.
-
-```bash
-aix ship [--session <id>]
-```
+Doctor checks Node/pnpm, optional configuration/content and KB health; it does not run tests
+or validate every skill. In the repository use `pnpm run doctor`: bare `pnpm doctor` is
+pnpm's own diagnostic command. Eval suites live in `.aix/static/evals/`; the current CLI
+evaluation runner is explicitly mocked and must not be treated as real-model verification.

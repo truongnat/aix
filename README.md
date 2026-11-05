@@ -1,6 +1,6 @@
 # aix
 
-> AI engineering methodology + 160+ skills, delivered as a Claude Code and Codex plugin.
+> AI engineering methodology + 158 canonical skills, delivered as a Claude Code and Codex plugin.
 
 **The host agent is the runtime**. aix is the playbook and the skill library — not a separate engine you invoke.
 
@@ -23,7 +23,7 @@ codex plugin marketplace add truongnat/aix
 codex plugin add aix@aix
 ```
 
-On start, a `SessionStart` hook injects [`using-aix`](./content/skills/using-aix/SKILL.md) into context. It explains the 8-step engineering spine and how to reach any of the 160+ skills via the host's `Skill` tool.
+On start, a `SessionStart` hook injects [`using-aix`](./content/skills/using-aix/SKILL.md) into context. It explains the 8-step engineering spine and how to reach the canonical skills via the host's `Skill` tool.
 
 No engine, no runtime — just skills the agent pulls in when needed.
 
@@ -45,7 +45,7 @@ No engine, no runtime — just skills the agent pulls in when needed.
 Install skills to other AI coding tools:
 
 ```bash
-npx @x/cli install --all --provider cursor|codex|gemini
+node packages/cli/dist/index.js install --provider cursor
 ```
 
 ## Monorepo
@@ -72,7 +72,7 @@ npx @x/cli install --all --provider cursor|codex|gemini
 ## Quick start
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile --ignore-scripts
 pnpm build
 pnpm test
 ```
@@ -80,14 +80,34 @@ pnpm test
 ## CLI
 
 ```bash
-aix install --all [--provider <claude|cursor|codex|gemini>]
-aix run "<task>"
-aix skills list | show <name> | validate
-aix memory push|search|list|get
-aix verify | ship
+aix install --all
+aix install --provider cursor
+aix run "<task>" [--auto]
+aix skills validate [--content-root <content-directory>]
+aix skills list
+aix skills show <name>
+aix memory push "<title>" "<body>"
+aix memory search "<query>"
+aix memory list
+aix verify <session-id> --command "<your verification command>"
+aix kb status
 aix eval <suite>
 aix doctor
 ```
+
+The workspace packages are private; build locally and use `node packages/cli/dist/index.js`
+in place of `aix` unless the executable is installed locally.
+
+`run` generates artifacts, not verified or shipped code. Its text score is heuristic.
+`verify` executes only your explicitly supplied command inside the session's `generated/`
+directory and records its real exit/output plus generated-file hashes. Choose checks that
+exercise your acceptance criteria; a successful arbitrary command is not a correctness proof.
+The unsupported `ship` command has been removed. No command automatically applies generated
+files to project source or deploys them.
+
+`content/skills/` is the authoring source. Root `skills/*.md` files are legacy mirrors,
+not additional skills. `aix skills list` regenerates the local catalog from canonical content;
+validation includes invalid YAML/frontmatter and duplicate identifiers.
 
 ## Repository
 
@@ -95,9 +115,9 @@ aix doctor
 .agents/plugins/  Codex marketplace entry for this repo
 .claude-plugin/   Claude Code plugin manifest
 .codex-plugin/    Codex plugin manifest
-hooks/            SessionStart → injects using-aix + starts kb-server
+hooks/            SessionStart → injects using-aix; requests optional KB startup if built
 content/
-  skills/         160+ domain, process, and reference skills
+  skills/         Canonical domain, process, and reference skills
   rules/          Spine guardrail rules
   workflows/      Engineering spine flow
 packages/         13 @x/* TypeScript packages
@@ -107,8 +127,13 @@ apps/             Docs site + tooling
 
 ## Security
 
-- Secrets redacted at the boundary via `@x/policy` before hitting disk
-- Shell denylist + budget hard-stop guard the headless engine
+- Sensitive session/checkpoint prose and memory content are redacted before persistence.
+  Accepted resource IDs and operational paths retain their identity; secret-bearing
+  identifiers/paths and generated source are rejected instead of silently rewritten.
+- Invalid/closed approval input aborts. KB memory routes require a key or master password;
+  shutdown requires the master password. The standalone service binds loopback by default.
+- Budget guards constrain model execution. Text scoring and a shell denylist are not
+  substitutes for executable correctness checks or an OS security sandbox.
 
 ## License
 

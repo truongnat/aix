@@ -33,7 +33,7 @@ export function registerDoctorCommand(program: Command): void {
       try {
         const res = await fetch('http://localhost:4000/health');
         if (res.ok) {
-          console.log('  KB: connected (Neo4j)');
+          console.log('  KB: connected (SQLite/FTS5)');
         } else {
           console.log('  KB: optional (markdown fallback active) — server unhealthy');
         }

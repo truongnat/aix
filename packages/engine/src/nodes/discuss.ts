@@ -7,6 +7,7 @@ import { createProvider, type RuntimeProvider } from '@x/providers';
 import type { EngineState, DiscussionDoc } from '../state.js';
 import { sessionArtifactPath, sessionArchiveDir } from '../session-store.js';
 import { checkBudget, formatBudgetWarnings } from '../budget-guard.js';
+import { redactStrings } from '@x/policy';
 
 const SKILLS_ROOT = process.env.AIX_CONTENT_ROOT ?? join(process.cwd(), 'content');
 
@@ -85,6 +86,7 @@ Keep analysis thorough but concise.`;
     };
   }
 
+  discussion = redactStrings(discussion);
   await writeDiscussionArtifact(state.session.id, discussion);
 
   const tracker = createBudgetTracker();
