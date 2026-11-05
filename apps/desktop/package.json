@@ -11,7 +11,7 @@
     "build:renderer": "vite build",
     "build": "pnpm build:main && pnpm build:preload && pnpm build:renderer",
     "lint": "tsc --noEmit",
-    "start": "electron dist/main/index.js"
+    "start": "electron --no-sandbox dist/main/index.js"
   },
   "dependencies": {
     "@x/core": "workspace:*",

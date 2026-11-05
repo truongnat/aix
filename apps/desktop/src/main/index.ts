@@ -7,6 +7,12 @@ const currentDir = dirname(fileURLToPath(import.meta.url));
 // Repo root is 4 levels up: dist/main -> main -> dist -> desktop -> apps -> root
 const repoRoot = join(currentDir, '..', '..', '..', '..');
 
+// On Linux environments (Ubuntu 24 unprivileged namespaces, Wayland, or VMs without hardware GPU)
+if (process.platform === 'linux') {
+  app.commandLine.appendSwitch('no-sandbox');
+  app.disableHardwareAcceleration();
+}
+
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow(): void {

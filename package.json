@@ -10,7 +10,9 @@
     "test": "turbo run test",
     "check": "turbo run check",
     "clean": "turbo run clean",
-    "doctor": "node packages/cli/dist/index.js doctor"
+    "doctor": "node packages/cli/dist/index.js doctor",
+    "desktop": "pnpm --filter @x/desktop start",
+    "desktop:build": "pnpm --filter @x/desktop build"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
