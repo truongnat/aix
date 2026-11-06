@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Brain,
   Search,
@@ -13,10 +13,17 @@ import {
   Loader2,
 } from 'lucide-react';
 import type { DesktopMemoryRecord, DesktopSystemStatus } from '@shared/api';
+import { PageHeader } from '../components/ui/PageHeader';
+import { ConfirmDialog } from '../components/ui/Modal';
+import { MarkdownRenderer } from '../components/MarkdownRenderer';
 
 export const MemoryPage: React.FC = () => {
   const [memories, setMemories] = useState<readonly DesktopMemoryRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const searchQueryRef = useRef('');
+  const memoryRequestIdRef = useRef(0);
+  const [loadingMemories, setLoadingMemories] = useState<boolean>(true);
+  const [memoryError, setMemoryError] = useState<string | null>(null);
   const [status, setStatus] = useState<DesktopSystemStatus | null>(null);
   const [togglingKb, setTogglingKb] = useState<boolean>(false);
   const [kbMessage, setKbMessage] = useState<string | null>(null);
@@ -27,10 +34,33 @@ export const MemoryPage: React.FC = () => {
   const [newBody, setNewBody] = useState<string>('');
   const [newTags, setNewTags] = useState<string>('');
   const [saving, setSaving] = useState<boolean>(false);
+  const [deleteTarget, setDeleteTarget] = useState<DesktopMemoryRecord | null>(null);
+
+  const loadMemories = (query = searchQueryRef.current) => {
+    const requestId = ++memoryRequestIdRef.current;
+    const request = query.trim()
+      ? window.aixAPI.searchMemories(query.trim())
+      : window.aixAPI.listMemories();
+    setLoadingMemories(true);
+    request
+      .then((records) => {
+        if (requestId !== memoryRequestIdRef.current) return;
+        setMemories(records);
+        setMemoryError(null);
+      })
+      .catch((error: unknown) => {
+        if (requestId === memoryRequestIdRef.current) setMemoryError(`Could not load memories: ${String(error)}`);
+      })
+      .finally(() => {
+        if (requestId === memoryRequestIdRef.current) setLoadingMemories(false);
+      });
+  };
 
   const loadData = () => {
-    window.aixAPI.listMemories().then(setMemories);
-    window.aixAPI.getStatus().then(setStatus).catch(() => {});
+    loadMemories();
+    window.aixAPI.getStatus().then(setStatus).catch((error: unknown) => {
+      setMemoryError(`Could not load service status: ${String(error)}`);
+    });
   };
 
   useEffect(() => {
@@ -40,12 +70,9 @@ export const MemoryPage: React.FC = () => {
   }, []);
 
   const handleSearch = (query: string) => {
+    searchQueryRef.current = query;
     setSearchQuery(query);
-    if (!query.trim()) {
-      window.aixAPI.listMemories().then(setMemories);
-    } else {
-      window.aixAPI.searchMemories(query).then(setMemories);
-    }
+    loadMemories(query);
   };
 
   const handleCreateMemory = async (e: React.FormEvent) => {
@@ -60,15 +87,22 @@ export const MemoryPage: React.FC = () => {
       setNewBody('');
       setNewTags('');
       loadData();
+    } catch (error: unknown) {
+      setMemoryError(`Could not save memory: ${String(error)}`);
     } finally {
       setSaving(false);
     }
   };
 
   const handleDeleteMemory = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this memory record?')) return;
-    await window.aixAPI.deleteMemory(id);
-    loadData();
+    try {
+      await window.aixAPI.deleteMemory(id);
+      loadData();
+    } catch (error: unknown) {
+      setMemoryError(`Could not delete memory: ${String(error)}`);
+    } finally {
+      setDeleteTarget(null);
+    }
   };
 
   const handleToggleKb = async () => {
@@ -79,6 +113,8 @@ export const MemoryPage: React.FC = () => {
       const res = await window.aixAPI.toggleKbService(action);
       setKbMessage(res.message);
       setTimeout(loadData, 1500);
+    } catch (error: unknown) {
+      setKbMessage(`Could not ${action} KB service: ${String(error)}`);
     } finally {
       setTogglingKb(false);
       setTimeout(() => setKbMessage(null), 3500);
@@ -88,20 +124,10 @@ export const MemoryPage: React.FC = () => {
   return (
     <div className="p-8 space-y-6 max-w-7xl mx-auto">
       {/* Header & KB Service Controller */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
-            Durable Memory Hub
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
-              {memories.length} Entries
-            </span>
-          </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Tier 1 Markdown memory saved locally in <code className="text-slate-300">.aix/runtime/memory/</code>.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
+      <PageHeader
+        title="Durable Memory Hub"
+        description={<span>Tier 1 Markdown memory saved locally in <code className="text-slate-300">.aix/runtime/memory/</code>.</span>}
+        actions={<>
           {/* KB Service Toggle */}
           <div className="flex items-center gap-2 p-1.5 pl-3 rounded-xl bg-white/[0.02] border border-white/5 text-xs text-slate-300">
             <Server className="w-3.5 h-3.5 text-slate-400" />
@@ -137,14 +163,14 @@ export const MemoryPage: React.FC = () => {
           >
             <Plus className="w-3.5 h-3.5" /> Record Memory
           </button>
-        </div>
-      </div>
-
+        </>}
+      />
       {kbMessage && (
-        <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-medium">
+        <div role="status" className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-medium">
           {kbMessage}
         </div>
       )}
+      {memoryError && <div role="alert" className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs">{memoryError}</div>}
 
       {/* Search Bar */}
       <div className="relative">
@@ -160,9 +186,11 @@ export const MemoryPage: React.FC = () => {
 
       {/* Memory Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {memories.length === 0 ? (
+        {loadingMemories && memories.length === 0 ? (
+          <div role="status" className="col-span-2 text-center py-16 text-slate-500 text-sm border border-dashed border-white/10 rounded-2xl">Loading memories…</div>
+        ) : memories.length === 0 ? (
           <div className="col-span-2 text-center py-16 text-slate-500 text-sm border border-dashed border-white/10 rounded-2xl">
-            No memories found matching your search. Create one using the button above.
+            {searchQuery.trim() ? 'No memories match this search.' : 'No memories saved yet. Create one using the button above.'}
           </div>
         ) : (
           memories.map((m) => (
@@ -178,16 +206,18 @@ export const MemoryPage: React.FC = () => {
                       {m.kind}
                     </span>
                     <button
-                      onClick={() => handleDeleteMemory(m.id)}
-                      className="p-1 rounded text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 transition-colors opacity-0 group-hover:opacity-100"
+                      onClick={() => setDeleteTarget(m)}
+                      aria-label={`Delete memory: ${m.title}`}
+                      title={`Delete memory: ${m.title}`}
+                      className="p-1 rounded text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 transition-colors opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-rose-400"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
-                <p className="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed line-clamp-4">
-                  {m.body}
-                </p>
+                <div className="text-xs text-slate-300 leading-relaxed line-clamp-4">
+                  <MarkdownRenderer content={m.body} />
+                </div>
               </div>
 
               <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-500">
@@ -212,15 +242,19 @@ export const MemoryPage: React.FC = () => {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-6">
           <form
             onSubmit={handleCreateMemory}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="memory-modal-title"
             className="bg-surface-elevated border border-white/10 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
           >
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
+              <h2 id="memory-modal-title" className="text-base font-bold text-white flex items-center gap-2">
                 <Brain className="w-4 h-4 text-purple-400" /> Record Durable Lesson
               </h2>
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
+                aria-label="Close memory entry dialog"
                 className="p-1 rounded-lg text-slate-400 hover:text-white"
               >
                 <X className="w-4 h-4" />
@@ -281,6 +315,16 @@ export const MemoryPage: React.FC = () => {
           </form>
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Delete memory record"
+        message={`Delete "${deleteTarget?.title ?? ''}" permanently? This durable lesson will be removed from local memory.`}
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => { if (deleteTarget) void handleDeleteMemory(deleteTarget.id); }}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 };

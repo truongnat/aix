@@ -30,6 +30,7 @@ const storageRoot = isPackaged
   : repoRoot;
 
 let mainWindow: BrowserWindow | null = null;
+let isFinalQuit = false;
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -98,6 +99,8 @@ app.whenReady().then(() => {
     });
   });
 
+  process.env['AIX_SESSIONS_ROOT'] = join(storageRoot, '.aix', 'sessions');
+  process.env['AIX_CONTENT_ROOT'] = join(repoRoot, 'skills');
   registerIpcHandlers({ repoRoot, storageRoot });
   createWindow();
 
@@ -118,6 +121,16 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('before-quit', () => {
-  shutdownKbServer({ storageRoot }).catch(() => {});
+app.on('before-quit', (event) => {
+  if (isFinalQuit) return;
+  event.preventDefault();
+  void shutdownKbServer({ storageRoot, onlyIfOwned: true })
+    .then((result) => {
+      if (!result.ok) console.warn('[desktop]', result.message);
+    })
+    .catch((error: unknown) => console.warn('[desktop] KB shutdown failed:', error))
+    .finally(() => {
+      isFinalQuit = true;
+      app.quit();
+    });
 });

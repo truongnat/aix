@@ -1,5 +1,5 @@
-import { app, dialog, ipcMain } from 'electron';
-import { readdir, readFile, stat, unlink, writeFile, mkdir } from 'node:fs/promises';
+import { app, dialog, ipcMain, safeStorage } from 'electron';
+import { readdir, readFile, stat, unlink, writeFile, mkdir, chmod } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, resolve, relative, isAbsolute, dirname } from 'node:path';
 import { homedir } from 'node:os';
@@ -7,7 +7,8 @@ import { exec, execFile, spawn } from 'node:child_process';
 import { promisify } from 'node:util';
 import { SkillRegistry } from '@x/registry';
 import { MarkdownStore, RedactedMemoryStore } from '@x/memory';
-import { PolicyEngine } from '@x/policy';
+import { PolicyEngine, redactStrings } from '@x/policy';
+import { createProvider } from '@x/providers';
 import { GuardrailLoop } from '@x/core';
 import type { SkillCategory, Phase, Provider } from '@x/core';
 import { Compiler } from '@x/compiler';
@@ -33,8 +34,12 @@ import type {
   DesktopChatMessage,
   AiProviderId,
 } from '../shared/api.js';
+import { providerEnvironmentFor } from '../shared/desktop-logic.js';
+import { applyClaudeSubscriptionEnv, clearClaudeSubscriptionEnv, ensureClaudeSubscriptionToken, listCliSubscriptions } from './cli-subscription.js';
+import { detectModelSources, ensureSourceEnv } from './model-sources.js';
 
 const execFileAsync = promisify(execFile);
+let kbServerStartedByApp = false;
 
 export {
   ALLOWED_TEST_PRESETS,
@@ -55,11 +60,15 @@ export interface IpcHandlerPaths {
 export async function getMasterPassword(storageRoot: string): Promise<string> {
   const passwordFile = join(storageRoot, '.aix', 'kb-master-password.txt');
   try {
-    return (await readFile(passwordFile, 'utf-8')).trim();
-  } catch {
+    const password = (await readFile(passwordFile, 'utf-8')).trim();
+    await chmod(passwordFile, 0o600);
+    return password;
+  } catch (error: unknown) {
+    if (!(error instanceof Error) || !('code' in error) || error.code !== 'ENOENT') throw error;
     const generated = 'aix-kb-master-' + crypto.randomUUID().slice(0, 8);
     await mkdir(dirname(passwordFile), { recursive: true });
-    await writeFile(passwordFile, generated, 'utf-8');
+    await writeFile(passwordFile, generated, { encoding: 'utf-8', mode: 0o600 });
+    await chmod(passwordFile, 0o600);
     return generated;
   }
 }
@@ -84,6 +93,8 @@ export function findNodeBinary(): string {
     join(homedir(), '.local', 'share', 'mise', 'installs', 'node', 'lts', 'bin', 'node'),
     join(homedir(), '.local', 'share', 'mise', 'installs', 'node', '24.21.0', 'bin', 'node'),
     join(homedir(), '.nvm', 'versions', 'node', 'default', 'bin', 'node'),
+    '/opt/homebrew/bin/node',
+    '/opt/homebrew/opt/node/bin/node',
     '/usr/local/bin/node',
     '/usr/bin/node',
   ];
@@ -101,17 +112,39 @@ export async function ensureKbServerRunning(paths: { repoRoot: string; storageRo
   }
 
   const masterPassword = await getMasterPassword(storageRoot);
-  const kbMain = join(paths.repoRoot, 'services', 'kb-server', 'dist', 'main.js');
+  const serviceRoot = app.isPackaged
+    ? join(paths.repoRoot, 'kb-server')
+    : join(paths.repoRoot, 'services', 'kb-server');
+  const kbMain = join(serviceRoot, 'dist', 'main.js');
+  if (!existsSync(kbMain)) {
+    return {
+      ok: false,
+      port: 4000,
+      url: 'http://127.0.0.1:4000',
+      message: 'KB server runtime is not bundled with this build. Start the KB service separately or use a development build.',
+    };
+  }
 
   try {
     const nodeBin = findNodeBinary();
+    const { stdout: nodeVersionOutput } = await execFileAsync(nodeBin, ['--version'], { timeout: 3000 });
+    const nodeMajor = Number(/^v?(\d+)/.exec(nodeVersionOutput.trim())?.[1] ?? 0);
+    if (nodeMajor < 22) {
+      return {
+        ok: false,
+        port: 4000,
+        url: 'http://127.0.0.1:4000',
+        message: `KB Server requires Node.js 22 or newer for node:sqlite; found ${nodeVersionOutput.trim() || 'unknown version'}.`,
+      };
+    }
     const child = spawn(nodeBin, [kbMain], {
       detached: true,
       stdio: ['ignore', 'pipe', 'pipe'],
-      cwd: paths.repoRoot,
+      cwd: serviceRoot,
       env: {
         ...process.env,
         PATH: `${dirname(nodeBin)}:${process.env['PATH'] ?? ''}`,
+        ...(app.isPackaged ? { NODE_ENV: 'production' } : {}),
         PORT: '4000',
         KB_HOST: '127.0.0.1',
         KB_MASTER_PASSWORD: masterPassword,
@@ -119,11 +152,13 @@ export async function ensureKbServerRunning(paths: { repoRoot: string; storageRo
     });
 
     let stderrBuffer = '';
+    const spawnState: { error?: Error } = {};
     child.stderr?.on('data', (d: Buffer) => {
       stderrBuffer += d.toString();
     });
 
     child.on('error', (err: Error) => {
+      spawnState.error = err;
       console.error('[kb-server-spawn-error]', err);
     });
 
@@ -133,8 +168,10 @@ export async function ensureKbServerRunning(paths: { repoRoot: string; storageRo
     const start = Date.now();
     while (Date.now() - start < 5000) {
       await new Promise(r => setTimeout(r, 250));
+      if (spawnState.error) break;
       const h = await checkKbHealth();
       if (h.online) {
+        kbServerStartedByApp = true;
         return { ok: true, port: h.port, url: h.url, message: `KB Server launched successfully on http://127.0.0.1:${h.port}!` };
       }
     }
@@ -143,28 +180,38 @@ export async function ensureKbServerRunning(paths: { repoRoot: string; storageRo
       ok: false,
       port: 4000,
       url: 'http://127.0.0.1:4000',
-      message: `KB Server spawned with ${nodeBin} but timed out: ${stderrBuffer.trim() || 'Health check timed out'}`,
+      message: spawnState.error
+        ? `Could not spawn KB Server: ${spawnState.error.message}`
+        : `KB Server started with ${nodeBin} but health check timed out: ${stderrBuffer.trim() || 'Health check timed out'}`,
     };
   } catch (err: unknown) {
     return { ok: false, port: 4000, url: 'http://127.0.0.1:4000', message: `Failed to spawn KB server: ${String(err)}` };
   }
 }
 
-export async function shutdownKbServer(paths: { storageRoot?: string }): Promise<{ ok: boolean; message: string }> {
+export async function shutdownKbServer(paths: { storageRoot?: string; onlyIfOwned?: boolean }): Promise<{ ok: boolean; message: string }> {
+  if (paths.onlyIfOwned && !kbServerStartedByApp) {
+    return { ok: true, message: 'Leaving the pre-existing KB service running.' };
+  }
   const storageRoot = paths.storageRoot ?? join(homedir(), '.aix');
   const masterPassword = await getMasterPassword(storageRoot);
+  let stopped = false;
   for (const port of [4000, 3001]) {
     try {
-      await fetch(`http://127.0.0.1:${port}/shutdown`, {
+      const response = await fetch(`http://127.0.0.1:${port}/shutdown`, {
         method: 'POST',
         headers: { 'x-master-password': masterPassword },
         signal: AbortSignal.timeout(1500),
-      }).catch(() => {});
-    } catch {
-      // ignore
+      });
+      stopped ||= response.ok;
+    } catch (error: unknown) {
+      if (!(error instanceof TypeError)) throw error;
     }
   }
-  return { ok: true, message: 'KB Service shutdown signal sent' };
+  if (stopped) kbServerStartedByApp = false;
+  return stopped
+    ? { ok: true, message: 'KB Service shutdown signal sent.' }
+    : { ok: false, message: 'KB Service did not accept the shutdown request; it may be owned by another process.' };
 }
 
 export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
@@ -186,45 +233,122 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
   const aiConfigFile = join(storageRoot, '.aix', 'ai-config.json');
   const kbPasswordFile = join(storageRoot, '.aix', 'kb-master-password.txt');
 
-  async function loadAiConfig(): Promise<{ provider: AiProviderId; model: string; apiKey: string; baseUrl?: string }> {
+  const providerKeys: Readonly<Record<AiProviderId, string>> = {
+    inferx: 'INFERX_API_KEY',
+    anthropic: 'ANTHROPIC_API_KEY',
+    openai: 'OPENAI_API_KEY',
+    groq: 'GROQ_API_KEY',
+    ollama: '',
+    codex: '',
+    mock: '',
+  };
+  const defaultModels: Readonly<Record<AiProviderId, string>> = {
+    inferx: 'deepseek-v4.1-flash-1017-basic',
+    anthropic: 'claude-sonnet-4-6',
+    openai: 'gpt-4o',
+    groq: 'llama3-70b-8192',
+    ollama: 'deepseek-r1:latest',
+    codex: 'gpt-5.1-codex-max',
+    mock: 'mock-engine-v1',
+  };
+
+  async function saveAiConfig(config: { provider: AiProviderId; model: string; apiKey: string; baseUrl?: string; useSubscription?: boolean }): Promise<void> {
+    const persisted: Record<string, string> = {
+      provider: config.provider,
+      model: config.model,
+    };
+    if (config.useSubscription) persisted['authMode'] = 'subscription';
+    if (config.apiKey) {
+      if (safeStorage.isEncryptionAvailable()) {
+        persisted['apiKeyEncrypted'] = safeStorage.encryptString(config.apiKey).toString('base64');
+      } else {
+        persisted['apiKey'] = config.apiKey;
+      }
+    }
+    if (config.baseUrl) persisted['baseUrl'] = config.baseUrl;
+    await mkdir(dirname(aiConfigFile), { recursive: true });
+    await writeFile(aiConfigFile, JSON.stringify(persisted, null, 2), { encoding: 'utf-8', mode: 0o600 });
+    await chmod(aiConfigFile, 0o600);
+  }
+
+  async function applyAiConfigToRuntime(config: { provider: AiProviderId; model: string; apiKey: string; baseUrl?: string; useSubscription?: boolean }): Promise<void> {
+    delete process.env['AIX_API_KEY'];
+    delete process.env['AIX_API_URL'];
+    delete process.env['AIX_OAUTH_TOKEN'];
+    delete process.env['AIX_OAUTH_ACCOUNT_ID'];
+    Object.assign(process.env, providerEnvironmentFor(config));
+    if (config.provider === 'codex') {
+      // Pulls the Codex CLI's ChatGPT subscription token into the engine env.
+      await ensureSourceEnv('codex');
+    } else if (config.useSubscription && config.provider === 'anthropic') {
+      // Pulls a valid Claude Code subscription token (refreshing if needed)
+      // into AIX_OAUTH_TOKEN for the engine — no API key required.
+      await applyClaudeSubscriptionEnv();
+    }
+  }
+
+  async function loadAiConfig(): Promise<{ provider: AiProviderId; model: string; apiKey: string; baseUrl?: string; useSubscription?: boolean }> {
+    let raw: string;
     try {
-      const raw = await readFile(aiConfigFile, 'utf-8');
-      const parsed = JSON.parse(raw);
-      return {
-        provider: parsed.provider ?? 'anthropic',
-        model: parsed.model ?? 'claude-3-5-sonnet-20241022',
-        apiKey: parsed.apiKey ?? process.env['ANTHROPIC_API_KEY'] ?? process.env['OPENAI_API_KEY'] ?? process.env['GROQ_API_KEY'] ?? '',
-        baseUrl: parsed.baseUrl,
-      };
-    } catch {
+      raw = await readFile(aiConfigFile, 'utf-8');
+    } catch (error: unknown) {
+      if (!(error instanceof Error) || !('code' in error) || error.code !== 'ENOENT') throw error;
       let ompKey = '';
       let ompUrl = '';
       try {
         const ompYml = await readFile(join(homedir(), '.omp', 'agent', 'models.yml'), 'utf-8');
-        const keyMatch = ompYml.match(/apiKey:\s*([^\s\r\n]+)/);
-        const urlMatch = ompYml.match(/baseUrl:\s*([^\s\r\n]+)/);
-        if (keyMatch?.[1]) ompKey = keyMatch[1];
-        if (urlMatch?.[1]) ompUrl = urlMatch[1];
-      } catch {
-        // no omp models.yml
+        ompKey = ompYml.match(/apiKey:\s*([^\s\r\n]+)/)?.[1] ?? '';
+        ompUrl = ompYml.match(/baseUrl:\s*([^\s\r\n]+)/)?.[1] ?? '';
+      } catch (ompError: unknown) {
+        if (!(ompError instanceof Error) || !('code' in ompError) || ompError.code !== 'ENOENT') throw ompError;
       }
-
       if (ompKey) {
-        return {
-          provider: 'inferx',
-          model: 'deepseek-v4.1-flash-1017-basic',
-          apiKey: ompKey,
-          baseUrl: ompUrl || 'https://model.inferx.net/endpoints/v1',
-        };
+        return { provider: 'inferx', model: defaultModels.inferx, apiKey: ompKey, baseUrl: ompUrl || 'https://model.inferx.net/endpoints/v1/chat/completions' };
       }
 
+      const requestedProvider = process.env['AIX_PROVIDER'] as AiProviderId | undefined;
+      const provider = requestedProvider && requestedProvider in defaultModels ? requestedProvider : 'anthropic';
+      const keyName = providerKeys[provider];
+      const modelEnvName = `${provider.toUpperCase()}_MODEL`;
+      const envKey = keyName ? process.env[keyName] ?? '' : '';
+      // No stored config: prefer the Claude Code CLI subscription when the
+      // user has one and no API key is present — zero-key default.
+      const subscriptions = provider === 'anthropic' && !envKey ? await listCliSubscriptions() : [];
       return {
-        provider: (process.env['AIX_PROVIDER'] as AiProviderId) ?? 'anthropic',
-        model: process.env['ANTHROPIC_MODEL'] ?? 'claude-3-5-sonnet-20241022',
-        apiKey: process.env['ANTHROPIC_API_KEY'] ?? process.env['OPENAI_API_KEY'] ?? process.env['GROQ_API_KEY'] ?? '',
-        baseUrl: undefined,
+        provider,
+        model: process.env['AIX_MODEL'] ?? process.env[modelEnvName] ?? defaultModels[provider],
+        apiKey: envKey,
+        useSubscription: provider === 'anthropic' && !envKey && (subscriptions[0]?.detected ?? false),
       };
     }
+
+    await chmod(aiConfigFile, 0o600);
+    const parsed = JSON.parse(raw) as {
+      provider?: AiProviderId;
+      model?: string;
+      apiKey?: string;
+      apiKeyEncrypted?: string;
+      baseUrl?: string;
+      authMode?: string;
+    };
+    const provider = parsed.provider && Object.hasOwn(defaultModels, parsed.provider) ? parsed.provider : 'anthropic';
+    let apiKey = parsed.apiKey ?? '';
+    if (parsed.apiKeyEncrypted) {
+      if (!safeStorage.isEncryptionAvailable()) throw new Error('Cannot decrypt the saved provider key on this device');
+      apiKey = safeStorage.decryptString(Buffer.from(parsed.apiKeyEncrypted, 'base64'));
+    } else if (apiKey && safeStorage.isEncryptionAvailable()) {
+      await saveAiConfig({ provider, model: parsed.model ?? defaultModels[provider], apiKey, baseUrl: parsed.baseUrl, useSubscription: parsed.authMode === 'subscription' });
+    }
+    const providerEnvKey = providerKeys[provider];
+    const envKey = providerEnvKey ? process.env[providerEnvKey] ?? '' : '';
+    const useSubscription = parsed.authMode === 'subscription' && !apiKey && !envKey;
+    return {
+      provider,
+      model: parsed.model ?? defaultModels[provider],
+      apiKey: apiKey || envKey,
+      baseUrl: parsed.baseUrl,
+      useSubscription,
+    };
   }
 
 
@@ -257,63 +381,97 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
       model: cfg.model,
       hasApiKey: Boolean(cfg.apiKey),
       baseUrl: cfg.baseUrl,
+      useSubscription: cfg.useSubscription ?? false,
     };
   });
 
-  ipcMain.handle('ai:setConfig', async (_, newConfig: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string }) => {
+  ipcMain.handle('ai:detectSources', async () => detectModelSources());
+
+  ipcMain.handle('ai:setConfig', async (_, newConfig: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string; useSubscription?: boolean; sourceId?: string }) => {
     const existing = await loadAiConfig();
-    const finalApiKey = newConfig.apiKey?.trim() ? newConfig.apiKey.trim() : existing.apiKey;
+    if (!Object.hasOwn(defaultModels, newConfig.provider)) throw new Error('Unsupported AI provider');
+    const model = newConfig.model.trim();
+    if (!model) throw new Error('Model name is required');
+    const useSubscription = (newConfig.sourceId === 'claude-code' || newConfig.useSubscription === true)
+      && newConfig.provider === 'anthropic';
+    if (newConfig.sourceId === 'claude-code') {
+      // Fail early with a clear message if no CLI subscription is usable.
+      await applyClaudeSubscriptionEnv();
+    }
+    if (newConfig.sourceId === 'codex' && newConfig.provider === 'codex') {
+      await ensureSourceEnv('codex');
+    }
+    const finalApiKey = newConfig.apiKey?.trim()
+      ? newConfig.apiKey.trim()
+      : useSubscription || newConfig.provider === 'codex'
+        ? ''
+        : existing.provider === newConfig.provider ? existing.apiKey : '';
     const finalConfig = {
       provider: newConfig.provider,
-      model: newConfig.model.trim(),
+      model,
       apiKey: finalApiKey,
       baseUrl: newConfig.baseUrl?.trim() || undefined,
+      useSubscription,
     };
 
-    await mkdir(dirname(aiConfigFile), { recursive: true });
-    await writeFile(aiConfigFile, JSON.stringify(finalConfig, null, 2), 'utf-8');
-
-    process.env['AIX_PROVIDER'] = finalConfig.provider;
-    if (finalConfig.apiKey) {
-      if (finalConfig.provider === 'anthropic') {
-        process.env['ANTHROPIC_API_KEY'] = finalConfig.apiKey;
-        process.env['ANTHROPIC_MODEL'] = finalConfig.model;
-      } else if (finalConfig.provider === 'openai') {
-        process.env['OPENAI_API_KEY'] = finalConfig.apiKey;
-        process.env['OPENAI_MODEL'] = finalConfig.model;
-      } else if (finalConfig.provider === 'groq') {
-        process.env['GROQ_API_KEY'] = finalConfig.apiKey;
-        process.env['GROQ_MODEL'] = finalConfig.model;
-      }
-    }
+    await saveAiConfig(finalConfig);
+    await applyAiConfigToRuntime(finalConfig);
 
     return { ok: true };
   });
 
-  ipcMain.handle('ai:testConnection', async (_, testParams?: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string }): Promise<DesktopTestConnectionResult> => {
+  ipcMain.handle('ai:testConnection', async (_, testParams?: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string; useSubscription?: boolean }): Promise<DesktopTestConnectionResult> => {
     const current = await loadAiConfig();
     const provider = testParams?.provider ?? current.provider;
     const model = testParams?.model ?? current.model;
-    const apiKey = testParams?.apiKey?.trim() ? testParams.apiKey.trim() : current.apiKey;
-    const baseUrl = testParams?.baseUrl?.trim() ? testParams.baseUrl.trim() : current.baseUrl;
+    const useSubscription = provider === 'anthropic'
+      && (testParams ? testParams.useSubscription === true : current.useSubscription === true);
+    const apiKey = testParams?.apiKey?.trim()
+      ? testParams.apiKey.trim()
+      : provider === current.provider ? current.apiKey : '';
+    const baseUrl = testParams?.baseUrl?.trim()
+      ? testParams.baseUrl.trim()
+      : provider === current.provider ? current.baseUrl : undefined;
 
     if (provider === 'mock') {
       return { ok: true, latencyMs: 5, message: 'Mock provider active (offline mode)' };
     }
 
-    if (!apiKey && provider !== 'ollama') {
+    if (provider === 'codex') {
+      const start = Date.now();
+      try {
+        await ensureSourceEnv('codex');
+        const codexProvider = createProvider({ ...process.env, AIX_PROVIDER: 'codex', AIX_MODEL: model });
+        await codexProvider.call({ system: 'ping', user: 'Reply with OK', maxTokens: 16 });
+        return { ok: true, latencyMs: Date.now() - start, message: `Connected via Codex subscription (${model}) in ${Date.now() - start}ms` };
+      } catch (error: unknown) {
+        return { ok: false, latencyMs: Date.now() - start, message: 'Codex subscription unavailable', error: String(error instanceof Error ? error.message : error) };
+      }
+    }
+
+    if (!apiKey && !useSubscription && provider !== 'ollama') {
       return { ok: false, latencyMs: 0, message: 'Missing API Key', error: `Missing API Key for provider "${provider}"` };
     }
 
     const start = Date.now();
     try {
       if (provider === 'anthropic') {
+        let oauthToken = '';
+        if (useSubscription) {
+          try {
+            oauthToken = await ensureClaudeSubscriptionToken();
+          } catch (error: unknown) {
+            return { ok: false, latencyMs: 0, message: 'Claude subscription unavailable', error: String(error instanceof Error ? error.message : error) };
+          }
+        }
         const url = baseUrl || 'https://api.anthropic.com/v1/messages';
         const res = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-api-key': apiKey,
+            ...(oauthToken
+              ? { 'Authorization': `Bearer ${oauthToken}`, 'anthropic-beta': 'oauth-2025-04-20' }
+              : { 'x-api-key': apiKey }),
             'anthropic-version': '2023-06-01',
           },
           body: JSON.stringify({
@@ -662,6 +820,8 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     if (typeof task !== 'string' || !task.trim() || task.length > 10000) {
       throw new Error('Task prompt must be a non-empty string under 10000 characters');
     }
+    if (activeRuns.size > 0) throw new Error('A spine run is already active. Stop it before starting another run.');
+    await applyAiConfigToRuntime(await loadAiConfig());
     const webContents = event.sender;
     const loop = new GuardrailLoop();
     const session = await loop.createSession(task);
@@ -774,19 +934,25 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         // Phase 3: Run / Execution
         signal.throwIfAborted();
         emitPhase('run');
-        emitLog('Executing Step 4 & 5: Running tasks in sandbox with TDD & Coder...');
+        emitLog('Generating implementation and running the engine quality heuristic. Worktree isolation, test-first execution, and verification are not run by this desktop runner.');
         const graph = new EngineGraph(store);
         engineState = await graph.run(engineState);
         await store.save(engineState);
-        emitLog(`Execution completed with score: ${engineState.reviewScore}/10`);
-
-        // Phase 4: Verify
-        signal.throwIfAborted();
-        emitPhase('verify');
-        emitLog('Generated REVIEW.md and prepared sandbox for verification');
+        emitLog(`Generation finished. Output review heuristic: ${engineState.reviewScore ?? 'unavailable'}/10; executable verification was not run.`);
 
         signal.throwIfAborted();
         const sessionFolder = join(storageRoot, '.aix', 'sessions', sessionId);
+        const reviewPath = join(sessionFolder, 'REVIEW.md');
+        await writeFile(reviewPath, [
+          '# Generated Output Review',
+          '',
+          `Heuristic score: ${engineState.reviewScore ?? 'unavailable'}/10`,
+          '',
+          'This is a text-quality heuristic only. It is not a security audit and does not prove that generated code compiles or passes tests.',
+          '',
+          'Executable verification: NOT RUN. Use the Verify page after reviewing the generated files.',
+          '',
+        ].join('\n'), 'utf-8');
         const files = await readdir(sessionFolder).catch(() => []);
         const artifacts = files.filter(f => f.endsWith('.md'));
 
@@ -796,6 +962,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
             sessionId,
             checkpointId: sessionId,
             artifacts,
+            generatedFilesCount: engineState.writtenFiles?.length ?? 0,
           });
         }
       } catch (err: unknown) {
@@ -819,7 +986,62 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     return { sessionId };
   });
 
-  // Verification Runner in Sandbox
+  async function persistVerificationResult(sessionId: string, command: string, result: DesktopVerificationResult): Promise<void> {
+    const store = new SessionStore(join(storageRoot, '.aix', 'sessions'));
+    const state = await store.load(sessionId);
+    if (!state) throw new Error(`Session ${sessionId} was not found while saving verification evidence`);
+
+    const checkedAt = new Date().toISOString();
+    const verifyPath = join(storageRoot, '.aix', 'sessions', sessionId, 'VERIFY.md');
+    const output = redactStrings(`${result.stdout}${result.stderr}`);
+    const status = result.ok ? 'passed' as const : 'failed' as const;
+    await writeFile(verifyPath, [
+      '# Verification Run',
+      '',
+      `Status: ${status.toUpperCase()}`,
+      `Command: ${redactStrings(command)}`,
+      `Checked at: ${checkedAt}`,
+      `Exit code: ${result.exitCode}`,
+      `Generated files observed: ${result.generatedFilesCount}`,
+      '',
+      'This records the supplied test command result only; it is not proof that every acceptance criterion passed.',
+      '',
+      '## Output',
+      '',
+      '```text',
+      output,
+      '```',
+      '',
+    ].join('\n'), 'utf-8');
+    await store.save({
+      ...state,
+      session: {
+        ...state.session,
+        phase: 'verify',
+        evidence: [
+          ...state.session.evidence.filter(entry => entry.phase !== 'verify'),
+          {
+            phase: 'verify',
+            kind: result.ok ? 'artifact' : 'eval',
+            summary: result.ok ? 'User-selected verification command exited successfully' : 'User-selected verification command failed',
+            at: checkedAt,
+            ref: verifyPath,
+          },
+        ],
+      },
+      verification: {
+        status,
+        command: redactStrings(command),
+        cwd: join(dirname(verifyPath), 'generated'),
+        exitCode: result.exitCode,
+        output,
+        checkedAt,
+        files: {},
+      },
+    });
+  }
+
+  // Commands run with the current user's OS permissions; generated/ is a working directory, not an OS sandbox.
   ipcMain.handle('verify:run', async (_, sessionId: string, command: string): Promise<DesktopVerificationResult> => {
     if (!/^[a-zA-Z0-9_-]+$/.test(sessionId) || !command.trim()) {
       return {
@@ -866,19 +1088,26 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     try {
       const files = await readdir(generatedDir);
       filesCount = files.length;
-    } catch {
-      return {
-        ok: false,
-        exitCode: 1,
-        command,
-        stdout: '',
-        stderr: `Generated sandbox does not exist for session ${sessionId}`,
-        durationMs: 0,
-        generatedFilesCount: 0,
-      };
+    } catch (error: unknown) {
+      if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+        return {
+          ok: false,
+          exitCode: 1,
+          command,
+          stdout: '',
+          stderr: `Generated output does not exist for session ${sessionId}`,
+          durationMs: 0,
+          generatedFilesCount: 0,
+        };
+      }
+      throw error;
     }
 
+    // Confirmation happens in the renderer with an in-app dialog before this
+    // IPC is invoked; the main process never shows native dialogs here.
+
     const start = Date.now();
+    let result: DesktopVerificationResult;
     try {
       const { stdout, stderr } = await execFileAsync(validation.binaryName, validation.args, {
         cwd: generatedDir,
@@ -886,21 +1115,21 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         timeout: 30000,
         maxBuffer: 4 * 1024 * 1024,
       });
-      return {
+      result = {
         ok: true,
         exitCode: 0,
         command,
-        stdout,
-        stderr,
+        stdout: redactStrings(stdout),
+        stderr: redactStrings(stderr),
         durationMs: Date.now() - start,
         generatedFilesCount: filesCount,
       };
     } catch (err: unknown) {
       const errorObj = err && typeof err === 'object' ? (err as Record<string, unknown>) : {};
       const exitCode = typeof errorObj['code'] === 'number' ? errorObj['code'] : 1;
-      const stdout = typeof errorObj['stdout'] === 'string' ? errorObj['stdout'] : '';
-      const stderr = typeof errorObj['stderr'] === 'string' ? errorObj['stderr'] : String(err);
-      return {
+      const stdout = redactStrings(typeof errorObj['stdout'] === 'string' ? errorObj['stdout'] : '');
+      const stderr = redactStrings(typeof errorObj['stderr'] === 'string' ? errorObj['stderr'] : String(err));
+      result = {
         ok: false,
         exitCode,
         command,
@@ -910,5 +1139,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         generatedFilesCount: filesCount,
       };
     }
+    await persistVerificationResult(sessionId, command, result);
+    return result;
   });
 }

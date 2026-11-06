@@ -60,7 +60,7 @@ export interface DesktopSystemStatus {
   readonly activeAiModel: string;
 }
 
-export type AiProviderId = 'inferx' | 'anthropic' | 'openai' | 'groq' | 'ollama' | 'mock';
+export type AiProviderId = 'inferx' | 'anthropic' | 'openai' | 'groq' | 'ollama' | 'codex' | 'mock';
 
 export interface DesktopChatMessage {
   readonly id: string;
@@ -74,6 +74,7 @@ export interface DesktopChatMessage {
   readonly phase?: Phase;
   readonly logs?: readonly { readonly message: string; readonly timestamp: string }[];
   readonly artifacts?: readonly string[];
+  readonly generatedFilesCount?: number;
 }
 
 export interface DesktopAiConfig {
@@ -81,6 +82,19 @@ export interface DesktopAiConfig {
   readonly model: string;
   readonly hasApiKey: boolean;
   readonly baseUrl?: string;
+  readonly useSubscription?: boolean;
+}
+
+export interface DesktopModelSource {
+  readonly id: 'claude-code' | 'codex' | 'antigravity' | 'gemini' | 'ollama' | 'anthropic-key' | 'openai-key' | 'groq-key' | 'inferx-key' | 'mock';
+  readonly name: string;
+  readonly provider: AiProviderId;
+  readonly authNote: string;
+  readonly detected: boolean;
+  /** True when the app can route calls through this source today. */
+  readonly usable: boolean;
+  readonly note: string;
+  readonly models: readonly string[];
 }
 
 export interface DesktopTestConnectionResult {
@@ -114,7 +128,7 @@ export type DesktopSpineEvent =
   | { readonly type: 'phase'; readonly sessionId: string; readonly phase: Phase }
   | { readonly type: 'log'; readonly sessionId: string; readonly message: string; readonly timestamp: string }
   | { readonly type: 'hitl'; readonly sessionId: string; readonly request: DesktopHitlRequest }
-  | { readonly type: 'complete'; readonly sessionId: string; readonly checkpointId: string; readonly artifacts: readonly string[] }
+  | { readonly type: 'complete'; readonly sessionId: string; readonly checkpointId: string; readonly artifacts: readonly string[]; readonly generatedFilesCount: number }
   | { readonly type: 'error'; readonly sessionId: string; readonly error: string }
   | { readonly type: 'aborted'; readonly sessionId: string };
 
@@ -122,8 +136,9 @@ export interface AixDesktopAPI {
   // System
   getStatus(): Promise<DesktopSystemStatus>;
   getAiConfig(): Promise<DesktopAiConfig>;
-  setAiConfig(config: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string }): Promise<{ ok: boolean }>;
-  testAiConnection(config?: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string }): Promise<DesktopTestConnectionResult>;
+  detectModelSources(): Promise<readonly DesktopModelSource[]>;
+  setAiConfig(config: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string; useSubscription?: boolean; sourceId?: string }): Promise<{ ok: boolean }>;
+  testAiConnection(config?: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string; useSubscription?: boolean }): Promise<DesktopTestConnectionResult>;
   getKbStatus(): Promise<DesktopKbStatus>;
 
 

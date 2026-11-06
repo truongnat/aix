@@ -21,6 +21,8 @@ import type {
   DesktopMemoryRecord,
 } from '@shared/api';
 import { MarkdownRenderer } from './MarkdownRenderer';
+import { Select } from './ui/Select';
+import { ConfirmDialog } from './ui/Modal';
 
 interface InspectorDrawerProps {
   isOpen: boolean;
@@ -56,6 +58,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   const [verifyCommand, setVerifyCommand] = useState<string>('pnpm test');
   const [runningVerify, setRunningVerify] = useState<boolean>(false);
   const [verifyResult, setVerifyResult] = useState<DesktopVerificationResult | null>(null);
+  const [pendingVerify, setPendingVerify] = useState<string | null>(null);
 
   // KB Service State
   const [togglingKb, setTogglingKb] = useState<boolean>(false);
@@ -120,13 +123,27 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
 
   if (!isOpen) return null;
 
-  const handleRunVerify = async (e: React.FormEvent) => {
+  const handleRunVerify = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSessionId || !verifyCommand.trim()) return;
+    setPendingVerify(verifyCommand.trim());
+  };
+
+  const executeVerify = async (command: string) => {
     setRunningVerify(true);
     try {
-      const res = await window.aixAPI.runVerify(selectedSessionId, verifyCommand.trim());
+      const res = await window.aixAPI.runVerify(selectedSessionId, command);
       setVerifyResult(res);
+    } catch (error: unknown) {
+      setVerifyResult({
+        ok: false,
+        exitCode: 1,
+        command: verifyCommand.trim(),
+        stdout: '',
+        stderr: `Could not run or save verification evidence: ${String(error)}`,
+        durationMs: 0,
+        generatedFilesCount: 0,
+      });
     } finally {
       setRunningVerify(false);
     }
@@ -215,17 +232,14 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Session Artifacts
               </span>
-              <select
+              <Select
+                className="max-w-[200px]"
                 value={selectedSessionId}
-                onChange={(e) => setSelectedSessionId(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-mono max-w-[200px] truncate"
-              >
-                {sessions.map((s) => (
-                  <option key={s.id} value={s.id} className="bg-surface-elevated text-white">
-                    {s.id}
-                  </option>
-                ))}
-              </select>
+                ariaLabel="Session artifacts viewer"
+                options={sessions.map((s) => ({ value: s.id, label: s.id }))}
+                onChange={setSelectedSessionId}
+                emptyLabel="No sessions yet"
+              />
             </div>
 
             {/* Artifact Pills */}
@@ -263,24 +277,20 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
             <div className="space-y-1">
               <span className="text-xs font-bold text-white block">Execute Sandbox Test</span>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Runs strictly whitelisted test runners in isolated <code className="text-slate-300">generated/</code> sandbox.
+                Runs a whitelisted command in <code className="text-slate-300">generated/</code> with your normal account permissions. This is not an OS sandbox; review generated scripts before running them.
               </p>
             </div>
 
             <form onSubmit={handleRunVerify} className="space-y-3">
               <div className="space-y-1">
                 <label className="text-[10px] uppercase font-bold text-slate-500">Target Session:</label>
-                <select
+                <Select
                   value={selectedSessionId}
-                  onChange={(e) => setSelectedSessionId(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono"
-                >
-                  {sessions.map((s) => (
-                    <option key={s.id} value={s.id} className="bg-surface-elevated text-white">
-                      {s.id}
-                    </option>
-                  ))}
-                </select>
+                  ariaLabel="Verify target session"
+                  options={sessions.map((s) => ({ value: s.id, label: s.id }))}
+                  onChange={setSelectedSessionId}
+                  emptyLabel="No sessions yet"
+                />
               </div>
 
               <div className="space-y-1">
@@ -417,6 +427,21 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={pendingVerify !== null}
+        title="Run local verification command?"
+        message="This command is not sandboxed and will run with your account permissions. Review generated scripts before continuing."
+        detail={pendingVerify ?? ''}
+        confirmLabel="Run command"
+        destructive
+        onConfirm={() => {
+          const command = pendingVerify;
+          setPendingVerify(null);
+          if (command) void executeVerify(command);
+        }}
+        onCancel={() => setPendingVerify(null)}
+      />
     </aside>
   );
 };

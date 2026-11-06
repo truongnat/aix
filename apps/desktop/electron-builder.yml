@@ -17,6 +17,10 @@ extraResources:
     to: skills
     filter:
       - '**/*'
+  - from: dist/kb-server
+    to: kb-server
+    filter:
+      - '**/*'
 
 linux:
   target:
@@ -33,4 +37,3 @@ mac:
   category: public.app-category.developer-tools
   hardenedRuntime: true
   gatekeeperAssess: false
-

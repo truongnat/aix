@@ -26,9 +26,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
     { id: 'chat' as NavTab, label: 'Agent Chat Canvas', icon: MessageSquareCode },
     { id: 'dashboard' as NavTab, label: 'Dashboard', icon: LayoutDashboard },
     { id: 'spine' as NavTab, label: 'Engineering Spine', icon: Workflow },
-    { id: 'skills' as NavTab, label: 'Skill Library (160)', icon: Sparkles },
+    { id: 'skills' as NavTab, label: `Skill Library (${status?.skillsCount ?? '…'})`, icon: Sparkles },
     { id: 'memory' as NavTab, label: 'Memory Hub', icon: BrainCircuit },
-    { id: 'verify' as NavTab, label: 'Sandbox & Verify', icon: ShieldCheck },
+    { id: 'verify' as NavTab, label: 'Test Runner', icon: ShieldCheck },
     { id: 'settings' as NavTab, label: 'AI Model Hub', icon: Sliders },
   ];
 
@@ -70,6 +70,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
             return (
               <button
                 key={item.id}
+                type="button"
+                aria-current={isActive ? 'page' : undefined}
                 onClick={() => onSelectTab(item.id)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors border ${
                   isActive
@@ -101,13 +103,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
                 status?.kbServiceOnline ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'
               }`}
             />
-            {status?.kbServiceOnline ? 'Online' : 'Offline (Opt-in)'}
+            {status?.kbServiceOnline ? 'Online' : status ? 'Offline' : 'Checking…'}
           </span>
         </div>
 
         <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-slate-400">
-          <span>Skills: {status?.skillsCount ?? 160}</span>
-          <span>Node {status?.nodeVersion ?? '22.x'}</span>
+          <span>Skills: {status?.skillsCount ?? '—'}</span>
+          <span>Node {status?.nodeVersion ?? '—'}</span>
         </div>
       </div>
     </aside>

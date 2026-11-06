@@ -24,6 +24,7 @@ import type {
   DesktopHitlRequest,
   DesktopSpineEvent,
   DesktopAiConfig,
+  DesktopModelSource,
   DesktopChatMessage,
 } from '@shared/api';
 import type { Phase } from '@x/core';
@@ -32,6 +33,7 @@ import { PIPELINE_STEPS } from './SpinePipelineVisualizer';
 import { PROVIDERS } from '../pages/SettingsPage';
 import type { DrawerTab } from './InspectorDrawer';
 import type { NavTab } from './Sidebar';
+import { ConfirmDialog } from './ui/Modal';
 
 type RunStatus = 'running' | 'done' | 'error' | 'stopped';
 type StepStatus = 'pending' | 'active' | 'done' | 'failed' | 'stopped';
@@ -47,6 +49,7 @@ interface ChatMessage {
   readonly phase?: Phase;
   readonly logs?: readonly { message: string; timestamp: string }[];
   readonly artifacts?: readonly string[];
+  readonly generatedFilesCount?: number;
 }
 
 interface ChatCanvasProps {
@@ -66,11 +69,11 @@ const QUICK_PROMPTS = [
   'Add Playwright browser automation test flow for user checkout',
 ];
 
-/** Backend phases cover the 8 spine steps in ranges: `run` spans Worktree → Review (steps 3–6). */
+/** Backend phases map only to work the desktop runner actually performs. */
 const PHASE_STEP_RANGE: Partial<Record<Phase, readonly [number, number]>> = {
   discuss: [0, 0],
   plan: [1, 1],
-  run: [2, 5],
+  run: [4, 5],
   verify: [6, 6],
   remember: [7, 7],
 };
@@ -96,10 +99,12 @@ const modelLabelFor = (cfg: DesktopAiConfig | null) => {
 };
 
 function stepStatuses(msg: ChatMessage): StepStatus[] {
-  const remembered = msg.artifacts?.includes('REMEMBER.md') ?? false;
   if (msg.status === 'done') {
-    // The runner never emits `remember`; step 8 is done only if its artifact exists.
-    return PIPELINE_STEPS.map((_, i) => (i < 7 || remembered ? 'done' : 'pending'));
+    return PIPELINE_STEPS.map((step, index) => {
+      if (step.artifact) return msg.artifacts?.includes(step.artifact) ? 'done' : 'pending';
+      if (index === 4 && (msg.generatedFilesCount ?? 0) > 0) return 'done';
+      return 'pending';
+    });
   }
   const range = msg.phase ? PHASE_STEP_RANGE[msg.phase] : undefined;
   if (!range) return PIPELINE_STEPS.map(() => 'pending');
@@ -222,16 +227,21 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputPrompt, setInputPrompt] = useState<string>('');
   const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [isStopping, setIsStopping] = useState<boolean>(false);
+  const [confirmRequest, setConfirmRequest] = useState<{
+    title: string; message: string; confirmLabel?: string; destructive?: boolean; action: () => void;
+  } | null>(null);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [runMode, setRunMode] = useState<'guided' | 'auto'>('guided');
   const [aiConfig, setAiConfig] = useState<DesktopAiConfig | null>(null);
+  const [modelSources, setModelSources] = useState<readonly DesktopModelSource[]>([]);
   const [modelMenuOpen, setModelMenuOpen] = useState<boolean>(false);
   const [pendingHitl, setPendingHitl] = useState<DesktopHitlRequest | null>(null);
   const [hitlNote, setHitlNote] = useState<string>('');
   const [now, setNow] = useState<number>(Date.now());
 
   // Which run the stream belongs to; events from other (e.g. stopped) sessions are ignored.
-  const runRef = useRef<{ msgId: string; sessionId: string | null; active: boolean } | null>(null);
+  const runRef = useRef<{ msgId: string; sessionId: string | null; active: boolean; stopping: boolean } | null>(null);
   const stoppedSessionsRef = useRef(new Set<string>());
   const hitlCardRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -243,6 +253,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
 
   useEffect(() => {
     window.aixAPI.getAiConfig().then(setAiConfig).catch(console.error);
+    window.aixAPI.detectModelSources().then(setModelSources).catch(() => {});
   }, []);
   useEffect(() => {
     if (!currentSessionId) return;
@@ -290,6 +301,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
     const run = runRef.current;
     if (run) run.active = false;
     setIsRunning(false);
+    setIsStopping(false);
     setPendingHitl(null);
     setHitlNote('');
     setMessages((prev) => {
@@ -308,6 +320,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
       if (stoppedSessionsRef.current.has(event.sessionId)) return;
       const run = runRef.current;
       if (!run?.active || (run.sessionId !== null && run.sessionId !== event.sessionId)) return;
+      if (run.stopping && !['complete', 'error', 'aborted'].includes(event.type)) return;
       const { msgId } = run;
 
       switch (event.type) {
@@ -326,8 +339,9 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
         case 'complete':
           finishRun(msgId, {
             status: 'done',
-            content: `**Task complete.** All phases passed their gates. Artifacts are in \`.aix/sessions/${event.sessionId}/\`.`,
+            content: `**Code generation finished.** ${event.generatedFilesCount} file(s) were written. Automated verification was not run; review the output and run a test explicitly.`,
             artifacts: event.artifacts,
+            generatedFilesCount: event.generatedFilesCount,
           });
           refreshRef.current?.();
           break;
@@ -355,7 +369,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
     setNow(Date.now());
 
     const assistantId = crypto.randomUUID();
-    runRef.current = { msgId: assistantId, sessionId: null, active: true };
+    runRef.current = { msgId: assistantId, sessionId: null, active: true, stopping: false };
     setMessages((prev) => [
       ...prev,
       { id: crypto.randomUUID(), role: 'user', content: prompt, startedAt: Date.now() },
@@ -377,6 +391,17 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
         run.sessionId = sessionId;
         setCurrentSessionId(sessionId);
         onSessionChange?.(sessionId);
+        if (run.stopping) {
+          const accepted = await window.aixAPI.abortSpine(sessionId);
+          if (!accepted) {
+            run.stopping = false;
+            setIsStopping(false);
+            patchRunMessage(assistantId, (message) => ({
+              ...message,
+              content: '**Stop request was not accepted. The task is still running.**',
+            }));
+          }
+        }
       } else {
         // Stopped before the session id came back: abort it and drop its late events.
         stoppedSessionsRef.current.add(sessionId);
@@ -389,23 +414,44 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
 
   const handleStop = () => {
     const run = runRef.current;
-    if (!run?.active) return;
+    if (!run?.active || run.stopping) return;
+    run.stopping = true;
+    setIsStopping(true);
+    patchRunMessage(run.msgId, (message) => ({ ...message, content: '**Stopping task… waiting for the engine to reach a safe cancellation point.**' }));
     if (run.sessionId) {
-      stoppedSessionsRef.current.add(run.sessionId);
-      void window.aixAPI.abortSpine(run.sessionId);
+      void window.aixAPI.abortSpine(run.sessionId).then((accepted) => {
+        if (accepted) return;
+        run.stopping = false;
+        setIsStopping(false);
+        patchRunMessage(run.msgId, (message) => ({ ...message, content: '**Stop request was not accepted. The task is still running.**' }));
+      }).catch((error: unknown) => {
+        run.stopping = false;
+        setIsStopping(false);
+        patchRunMessage(run.msgId, (message) => ({ ...message, content: `**Could not stop task:** ${String(error)}` }));
+      });
     }
-    // The backend stops at the next phase boundary; the UI releases immediately and ignores late events.
-    finishRun(run.msgId, { status: 'stopped', content: '**Execution stopped by user.**' });
   };
 
   const handleNewChat = () => {
+    const beginNewChat = () => {
+      setCurrentSessionId(null);
+      setMessages([]);
+      onSessionChange?.(null);
+    };
     if (isRunning) {
-      if (!confirm('A task is currently running. Stop it and start a new task?')) return;
-      handleStop();
+      setConfirmRequest({
+        title: 'Stop current task?',
+        message: 'A task is currently running. Stop it and start a new task?',
+        confirmLabel: 'Stop & start new',
+        destructive: true,
+        action: () => {
+          handleStop();
+          beginNewChat();
+        },
+      });
+      return;
     }
-    setCurrentSessionId(null);
-    setMessages([]);
-    onSessionChange?.(null);
+    beginNewChat();
   };
 
   const handleHitlDecision = async (decision: 'approve' | 'revise' | 'cancel') => {
@@ -456,9 +502,13 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
         void hitlDecisionRef.current('approve');
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        if (confirm('Cancel this spine run?')) {
-          void hitlDecisionRef.current('cancel');
-        }
+        setConfirmRequest({
+          title: 'Cancel this spine run?',
+          message: 'The run stops at the next safe cancellation point.',
+          confirmLabel: 'Cancel run',
+          destructive: true,
+          action: () => { void hitlDecisionRef.current('cancel'); },
+        });
       }
     };
     window.addEventListener('keydown', onKey);
@@ -472,17 +522,21 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
     }
   };
 
-  const handleSelectModel = async (model: string) => {
+  const handleSelectModel = async (source: DesktopModelSource, model: string) => {
     setModelMenuOpen(false);
-    if (!aiConfig || model === aiConfig.model) return;
-    // Same provider only: the stored API key belongs to the current provider.
-    const next = { provider: aiConfig.provider, model, baseUrl: aiConfig.baseUrl };
-    await window.aixAPI.setAiConfig(next);
-    setAiConfig({ ...aiConfig, model });
+    if (!aiConfig || (source.provider === aiConfig.provider && model === aiConfig.model)) return;
+    await window.aixAPI.setAiConfig({
+      provider: source.provider,
+      model,
+      sourceId: source.id,
+      baseUrl: aiConfig.baseUrl,
+      useSubscription: source.id === 'claude-code',
+    });
+    setAiConfig({ ...aiConfig, provider: source.provider, model });
     refreshRef.current?.();
   };
 
-  const providerInfo = aiConfig ? PROVIDERS.find((p) => p.id === aiConfig.provider) : undefined;
+  const activeProviderInfo = aiConfig ? PROVIDERS.find((p) => p.id === aiConfig.provider) : undefined;
 
   return (
     <div className="flex-1 flex flex-col h-full bg-background relative overflow-hidden">
@@ -645,11 +699,13 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
-                        if (confirm('Cancel this spine run?')) {
-                          void handleHitlDecision('cancel');
-                        }
-                      }}
+                      onClick={() => setConfirmRequest({
+                        title: 'Cancel this spine run?',
+                        message: 'The run stops at the next safe cancellation point.',
+                        confirmLabel: 'Cancel run',
+                        destructive: true,
+                        action: () => { void handleHitlDecision('cancel'); },
+                      })}
                       className="ml-auto flex items-center gap-2 px-3 py-2 rounded-lg text-rose-300 hover:bg-rose-500/10 text-[12px] font-medium transition-colors"
                     >
                       Cancel run
@@ -682,7 +738,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
             value={inputPrompt}
             onChange={(e) => setInputPrompt(e.target.value)}
             onKeyDown={handleComposerKeyDown}
-            placeholder={isRunning ? 'Agent is running… press Stop to cancel' : 'Describe an engineering task…'}
+            placeholder={isRunning ? isStopping ? 'Stopping… waiting for cancellation point' : 'Agent is running… press Stop to cancel' : 'Describe an engineering task…'}
             className="block w-full bg-transparent px-4 pt-3.5 pb-2 text-[13px] text-white placeholder:text-slate-600 focus:outline-none resize-none leading-relaxed"
           />
           <div className="flex items-center gap-1.5 px-2.5 pb-2.5">
@@ -694,9 +750,9 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                 onClick={() => setModelMenuOpen((v) => !v)}
                 className="flex items-center gap-1 px-2 py-1 rounded-md border border-white/5 hover:bg-white/5 text-[11px] text-slate-300 disabled:opacity-50 transition-colors"
               >
-                <span>{providerInfo?.icon ?? '◆'}</span>
+                <span>{activeProviderInfo?.icon ?? '◆'}</span>
                 <span className="max-w-[220px] truncate">
-                  {providerInfo?.name ?? aiConfig?.provider ?? 'Model'}
+                  {activeProviderInfo?.name ?? aiConfig?.provider ?? 'Model'}
                   <span className="text-slate-500 font-mono"> · {aiConfig?.model ?? '…'}</span>
                 </span>
                 <ChevronDown className="w-3 h-3 text-slate-500" />
@@ -704,21 +760,28 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
               {modelMenuOpen && aiConfig && (
                 <>
                   <div className="fixed inset-0 z-30" onClick={() => setModelMenuOpen(false)} />
-                  <div className="absolute bottom-full mb-1.5 left-0 z-40 w-72 rounded-lg border border-white/10 bg-surface-elevated shadow-2xl shadow-black/50 p-1">
-                    <div className="px-2 py-1.5 text-[10px] uppercase tracking-wider text-slate-500">
-                      {providerInfo?.name ?? aiConfig.provider} models
-                    </div>
-                    {(providerInfo?.models ?? [aiConfig.model]).map((m) => (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => void handleSelectModel(m)}
-                        className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-white/5 text-[12px] font-mono text-slate-300"
-                      >
-                        {m}
-                        {m === aiConfig.model && <Check className="w-3 h-3 text-blue-400" />}
-                      </button>
+                  <div className="absolute bottom-full mb-1.5 left-0 z-40 w-72 rounded-lg border border-white/10 bg-surface-elevated shadow-2xl shadow-black/50 p-1 max-h-80 overflow-y-auto">
+                    {modelSources.filter((s) => s.usable).map((source) => (
+                      <div key={source.id}>
+                        <div className="px-2 pt-2 pb-1 text-[10px] uppercase tracking-wider text-slate-500">
+                          {source.name}
+                        </div>
+                        {source.models.map((m) => (
+                          <button
+                            key={`${source.id}-${m}`}
+                            type="button"
+                            onClick={() => void handleSelectModel(source, m)}
+                            className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-white/5 text-[12px] font-mono text-slate-300"
+                          >
+                            {m}
+                            {source.provider === aiConfig.provider && m === aiConfig.model && <Check className="w-3 h-3 text-blue-400" />}
+                          </button>
+                        ))}
+                      </div>
                     ))}
+                    {modelSources.every((s) => !s.usable) && (
+                      <div className="px-2 py-3 text-[11px] text-slate-500">No model sources detected — check AI Model Hub.</div>
+                    )}
                     <div className="my-1 border-t border-white/5" />
                     <button
                       type="button"
@@ -772,11 +835,12 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                 <button
                   type="button"
                   onClick={handleStop}
-                  title="Stop execution"
-                  aria-label="Stop execution"
+                  disabled={isStopping}
+                  title={isStopping ? 'Waiting for the engine to stop' : 'Stop execution'}
+                  aria-label={isStopping ? 'Waiting for execution to stop' : 'Stop execution'}
                   className="flex items-center gap-1.5 pl-2 pr-2.5 py-1.5 rounded-md bg-white/[0.06] hover:bg-rose-500/15 border border-white/10 hover:border-rose-400/30 text-slate-200 hover:text-rose-200 text-[11px] font-medium transition-colors"
                 >
-                  <Square className="w-3 h-3 fill-current" /> Stop
+                  <Square className="w-3 h-3 fill-current" /> {isStopping ? 'Stopping…' : 'Stop'}
                 </button>
               ) : (
                 <button
@@ -804,6 +868,20 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
           )}
         </div>
       </footer>
+
+      <ConfirmDialog
+        open={confirmRequest !== null}
+        title={confirmRequest?.title ?? ''}
+        message={confirmRequest?.message ?? ''}
+        confirmLabel={confirmRequest?.confirmLabel}
+        destructive={confirmRequest?.destructive}
+        onConfirm={() => {
+          const action = confirmRequest?.action;
+          setConfirmRequest(null);
+          action?.();
+        }}
+        onCancel={() => setConfirmRequest(null)}
+      />
     </div>
   );
 };

@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import type { DesktopSkillSummary, DesktopSkillDetail } from '@shared/api';
 import type { SkillCategory, Provider } from '@x/core';
+import { PageHeader } from '../components/ui/PageHeader';
+import { MarkdownRenderer } from '../components/MarkdownRenderer';
 
 const CATEGORIES: { slug: SkillCategory | 'all'; label: string }[] = [
   { slug: 'all', label: 'All Categories' },
@@ -120,22 +122,13 @@ export const SkillsPage: React.FC = () => {
   return (
     <div className="p-8 space-y-6 max-w-7xl mx-auto">
       {/* Header & Quick Installs */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
-            Canonical Skill Library
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              {skills.length} Skills
-            </span>
-          </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Explore production-grade domain, methodology, and automation skills structured across 9 categories.
-          </p>
-        </div>
-
-        {/* 1-Click Install to Providers */}
-        <div className="flex items-center gap-2">
-          {(['claude', 'cursor', 'codex'] as Provider[]).map((prov) => (
+      <PageHeader
+        title="Canonical Skill Library"
+        description="Explore production-grade domain, methodology, and automation skills structured across 9 categories."
+        actions={
+          /* 1-Click Install to Providers */
+          <div className="flex items-center gap-2">
+            {(['claude', 'cursor', 'codex'] as Provider[]).map((prov) => (
             <button
               key={prov}
               disabled={installingProvider !== null}
@@ -150,45 +143,46 @@ export const SkillsPage: React.FC = () => {
               Sync {prov.toUpperCase()}
             </button>
           ))}
-        </div>
-      </div>
+          </div>
+        }
+        toolbar={
+          <>
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search skills by name, trigger keywords, or technology..."
+                className="w-full bg-white/[0.06] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-all"
+              />
+            </div>
+
+            {/* Category Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-3">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.slug}
+                  onClick={() => setSelectedCategory(cat.slug)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                    selectedCategory === cat.slug
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-white/[0.02] hover:bg-white/[0.06] text-slate-400 hover:text-white border border-white/5'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </>
+        }
+      />
 
       {installStatus && (
         <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-medium">
           {installStatus}
         </div>
       )}
-
-      {/* Search & Category Pills */}
-      <div className="space-y-4">
-        <div className="relative">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search skills by name, trigger keywords, or technology..."
-            className="w-full bg-white/[0.02] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-all"
-          />
-        </div>
-
-        {/* Category Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.slug}
-              onClick={() => setSelectedCategory(cat.slug)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-                selectedCategory === cat.slug
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-white/[0.02] hover:bg-white/[0.06] text-slate-400 hover:text-white border border-white/5'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* Skills Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -320,9 +314,9 @@ export const SkillsPage: React.FC = () => {
 
               <div className="space-y-2">
                 <span className="font-semibold text-white block">Skill Instructions:</span>
-                <pre className="p-4 rounded-xl bg-black/40 border border-white/5 text-slate-300 font-mono whitespace-pre-wrap leading-relaxed text-[11px]">
-                  {selectedSkill.body}
-                </pre>
+                <div className="p-4 rounded-xl bg-black/40 border border-white/5 text-slate-300 leading-relaxed text-xs max-h-[60vh] overflow-y-auto">
+                  <MarkdownRenderer content={selectedSkill.body} />
+                </div>
               </div>
             </div>
           </div>

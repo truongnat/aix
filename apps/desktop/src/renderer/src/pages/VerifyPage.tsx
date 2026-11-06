@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Terminal,
   Play,
@@ -9,6 +9,8 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import type { DesktopSessionSummary, DesktopVerificationResult } from '@shared/api';
+import { PageHeader } from '../components/ui/PageHeader';
+import { Select } from '../components/ui/Select';
 
 interface VerifyPageProps {
   sessions: readonly DesktopSessionSummary[];
@@ -20,6 +22,12 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ sessions }) => {
   const [running, setRunning] = useState<boolean>(false);
   const [result, setResult] = useState<DesktopVerificationResult | null>(null);
 
+  useEffect(() => {
+    if (!sessions.some((session) => session.id === selectedSessionId)) {
+      setSelectedSessionId(sessions[0]?.id ?? '');
+    }
+  }, [sessions, selectedSessionId]);
+
   const handleRunVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedSessionId || !command.trim()) return;
@@ -27,6 +35,16 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ sessions }) => {
     try {
       const res = await window.aixAPI.runVerify(selectedSessionId, command.trim());
       setResult(res);
+    } catch (err: unknown) {
+      setResult({
+        ok: false,
+        exitCode: 1,
+        command: command.trim(),
+        stdout: '',
+        stderr: `Could not run or save verification evidence: ${String(err)}`,
+        durationMs: 0,
+        generatedFilesCount: 0,
+      });
     } finally {
       setRunning(false);
     }
@@ -35,38 +53,32 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ sessions }) => {
   return (
     <div className="p-8 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
-          Sandbox Verification Runner
-        </h1>
-        <p className="text-sm text-slate-400 mt-1">
-          Executes explicit verification commands inside the isolated session sandbox <code className="text-slate-300">.aix/sessions/&lt;id&gt;/generated/</code>.
-        </p>
-      </div>
+      <PageHeader
+        title="Generated-Code Test Runner"
+        description={<span>Runs the selected command in the session's <code className="text-slate-300">generated/</code> working directory with your normal account permissions. This is not an OS sandbox; review generated scripts before running them.</span>}
+      />
 
       {/* Execution Form Card */}
       <form onSubmit={handleRunVerify} className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-400">Target Session Sandbox</label>
-            <select
+            <label htmlFor="verify-session" className="text-xs font-semibold text-slate-400">Target Session Output</label>
+            <Select
               value={selectedSessionId}
-              onChange={(e) => setSelectedSessionId(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono"
-            >
-              {sessions.map((s) => (
-                <option key={s.id} value={s.id} className="bg-surface-elevated text-white">
-                  {s.id}
-                </option>
-              ))}
-            </select>
+              disabled={sessions.length === 0}
+              ariaLabel="Target session output"
+              options={sessions.map((s) => ({ value: s.id, label: s.id }))}
+              onChange={setSelectedSessionId}
+              emptyLabel="No sessions yet"
+            />
           </div>
 
           <div className="md:col-span-2 space-y-1.5">
-            <label className="text-xs font-semibold text-slate-400">Verification Command (in sandbox cwd)</label>
+            <label htmlFor="verify-command" className="text-xs font-semibold text-slate-400">Test Command (in generated/)</label>
             <div className="flex gap-2">
               <input
                 type="text"
+                id="verify-command"
                 required
                 value={command}
                 onChange={(e) => setCommand(e.target.value)}
@@ -75,7 +87,7 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ sessions }) => {
               />
               <button
                 type="submit"
-                disabled={running}
+                disabled={running || !selectedSessionId}
                 className="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-medium text-xs flex items-center gap-2 transition-all shadow-lg shadow-blue-600/25"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />
@@ -85,6 +97,12 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ sessions }) => {
           </div>
         </div>
       </form>
+
+      {sessions.length === 0 && (
+        <div role="status" className="p-5 rounded-xl border border-dashed border-white/10 text-slate-400 text-sm">
+          No sessions are available yet. Run a generation task before trying a test command.
+        </div>
+      )}
 
       {/* Execution Terminal Result */}
       {result && (

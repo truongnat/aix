@@ -24,12 +24,12 @@ export interface SpineStepInfo {
 export const PIPELINE_STEPS: readonly SpineStepInfo[] = [
   { id: 'discuss', name: 'Discuss', role: 'Architect', icon: MessageSquare, artifact: 'DISCUSSION.md' },
   { id: 'plan', name: 'Plan', role: 'Tasks Checklist', icon: FileSpreadsheet, artifact: 'PLAN.md' },
-  { id: 'worktree', name: 'Worktree', role: 'Git Guard', icon: GitBranch, artifact: null },
-  { id: 'tdd', name: 'TDD', role: 'Test First RED', icon: FlaskConical, artifact: null },
-  { id: 'run', name: 'Code', role: 'GREEN Implementation', icon: Code2, artifact: null },
-  { id: 'run', name: 'Review', role: 'Security Audit', icon: ShieldCheck, artifact: 'REVIEW.md' },
-  { id: 'verify', name: 'Verify', role: 'Sandbox Execution', icon: CheckCircle2, artifact: 'VERIFY.md' },
-  { id: 'remember', name: 'Remember', role: 'Durable Memory', icon: Brain, artifact: 'REMEMBER.md' },
+  { id: 'worktree', name: 'Worktree', role: 'Not executed', icon: GitBranch, artifact: null },
+  { id: 'tdd', name: 'TDD', role: 'Not executed', icon: FlaskConical, artifact: null },
+  { id: 'run', name: 'Code', role: 'Code generation', icon: Code2, artifact: null },
+  { id: 'run', name: 'Review', role: 'Text-quality heuristic', icon: ShieldCheck, artifact: 'REVIEW.md' },
+  { id: 'verify', name: 'Verify', role: 'Manual test command', icon: CheckCircle2, artifact: 'VERIFY.md' },
+  { id: 'remember', name: 'Remember', role: 'Manual memory entry', icon: Brain, artifact: 'REMEMBER.md' },
 ];
 
 interface SpinePipelineVisualizerProps {
@@ -50,10 +50,10 @@ export const SpinePipelineVisualizer: React.FC<SpinePipelineVisualizerProps> = (
       <div className="flex items-center justify-between">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-blue-400 block">
-            The 8-Step Engineering Spine
+            Eight-step workflow status
           </span>
           <span className="text-[11px] text-slate-500">
-            Sequential methodology pipeline. Artifacts are generated and validated at each gate.
+            Existing artifact files are shown in green; this desktop runner does not execute every methodology step.
           </span>
         </div>
         {currentPhase && (

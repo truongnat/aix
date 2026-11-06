@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import type { DesktopSystemStatus, DesktopSessionSummary } from '@shared/api';
 import type { NavTab } from '../components/Sidebar';
+import { PageHeader } from '../components/ui/PageHeader';
 
 interface DashboardPageProps {
   status: DesktopSystemStatus | null;
@@ -24,22 +25,18 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ status, sessions, 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
       {/* Hero Welcome */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
-            Engineering Mission Control
-          </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Governing multi-agent workflows with the 8-step engineering spine, 160 verified skills, and isolated execution.
-          </p>
-        </div>
-        <button
-          onClick={() => onNavigate('spine')}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition-all shadow-lg shadow-blue-600/25"
-        >
-          <Play className="w-4 h-4 fill-white" /> Start New Spine Run
-        </button>
-      </div>
+      <PageHeader
+        title="Engineering Mission Control"
+        description="Governing multi-agent workflows with the 8-step engineering spine, verified skills, and inspectable execution."
+        actions={
+          <button
+            onClick={() => onNavigate('spine')}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition-all shadow-lg shadow-blue-600/25"
+          >
+            <Play className="w-4 h-4 fill-white" /> Start New Spine Run
+          </button>
+        }
+      />
       {/* Active AI Intelligence Widget */}
       <div className="p-4 rounded-2xl bg-surface border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -103,11 +100,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ status, sessions, 
 
         <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-3">
           <div className="flex items-center justify-between text-slate-400">
-            <span className="text-xs font-semibold uppercase tracking-wider">Guardrail Status</span>
+            <span className="text-xs font-semibold uppercase tracking-wider">Command Policy</span>
             <CheckCircle2 className="w-4 h-4 text-teal-400" />
           </div>
-          <div className="text-3xl font-bold text-white tracking-tight">Active</div>
-          <div className="text-xs text-emerald-400 font-medium">Path traversal & Denylist locked</div>
+          <div className="text-3xl font-bold text-white tracking-tight">{status ? 'Applied' : '—'}</div>
+          <div className="text-xs text-slate-400 font-medium">Verify command allowlist only; no OS process sandbox</div>
         </div>
       </div>
 
