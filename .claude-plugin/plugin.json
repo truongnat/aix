@@ -1,22 +1,12 @@
 {
   "name": "aix",
-  "version": "0.2.0",
-  "description": "AI engineering methodology spine + 160 skills in 9 categories",
+  "version": "0.1.0",
+  "description": "AI Engineering Platform",
   "author": {
     "name": "truongdq",
     "url": "https://github.com/truongnat"
   },
-  "license": "MIT",
   "skills": [
-    "./skills/",
-    "./skills/methodology/",
-    "./skills/frontend/",
-    "./skills/backend/",
-    "./skills/infrastructure/",
-    "./skills/data/",
-    "./skills/ai-agents/",
-    "./skills/security/",
-    "./skills/design/",
-    "./skills/business/"
+    "./skills/"
   ]
 }
