@@ -7,6 +7,10 @@ import { redactEngineState } from './persistence-redaction.js';
 
 export const SESSIONS_ROOT = join(process.cwd(), '.aix', 'sessions');
 
+function configuredSessionsRoot(): string {
+  return process.env['AIX_SESSIONS_ROOT'] ?? SESSIONS_ROOT;
+}
+
 function assertSessionId(id: string): void {
   if (redact(id).findings.some(finding => finding.type === 'secret')) {
     throw new Error('Session ID contains a recognized secret');
@@ -15,7 +19,7 @@ function assertSessionId(id: string): void {
 
 export function sessionDir(sessionId: string): string {
   assertSessionId(sessionId);
-  return join(SESSIONS_ROOT, sessionId);
+  return join(configuredSessionsRoot(), sessionId);
 }
 
 export function sessionArtifactPath(sessionId: string, name: string): string {
@@ -38,7 +42,7 @@ export class SessionStore {
   readonly #root: string;
 
   constructor(root?: string) {
-    this.#root = root ?? SESSIONS_ROOT;
+    this.#root = root ?? configuredSessionsRoot();
   }
 
   async save(state: EngineState): Promise<string> {

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, realpath, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -37,7 +37,7 @@ test('verify executes the supplied check in the session sandbox and records outp
   const saved = JSON.parse(await readFile(f.statePath, 'utf8'));
   assert.equal(saved.verification.status, 'passed');
   assert.equal(saved.verification.exitCode, 0);
-  assert.equal(saved.verification.cwd, f.generated);
+  assert.equal(saved.verification.cwd, await realpath(f.generated));
   assert.ok(saved.verification.output.includes('addition checked'));
   assert.equal(saved.verification.files['solution.mjs'], createHash('sha256').update(f.source).digest('hex'));
   const next = await new GuardrailLoop().advancePhase(saved.session);

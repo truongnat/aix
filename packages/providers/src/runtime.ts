@@ -126,39 +126,174 @@ export class MockRuntimeProvider implements RuntimeProvider {
   }
 }
 
-export class ApiRuntimeProvider implements RuntimeProvider {
-  readonly id: string;
-  readonly #apiKey: string;
+export interface ProviderRuntimeConfig {
+  readonly provider: string;
+  readonly apiKey: string;
+  readonly oauthToken: string;
+  readonly oauthAccountId: string;
+  readonly apiUrl: string;
+  readonly model: string;
+}
+
+const PROVIDER_KEY_ENV: Readonly<Record<string, string>> = {
+  anthropic: 'ANTHROPIC_API_KEY',
+  openai: 'OPENAI_API_KEY',
+  groq: 'GROQ_API_KEY',
+  inferx: 'INFERX_API_KEY',
+};
+
+export function resolveProviderRuntimeConfig(env: NodeJS.ProcessEnv = process.env): ProviderRuntimeConfig {
+  const inferredProvider = env['ANTHROPIC_API_KEY'] ? 'anthropic'
+    : env['OPENAI_API_KEY'] ? 'openai'
+    : env['GROQ_API_KEY'] ? 'groq'
+    : env['INFERX_API_KEY'] ? 'inferx'
+    : 'anthropic';
+  const provider = env['AIX_PROVIDER'] ?? inferredProvider;
+  const apiUrl = env['AIX_API_URL'] ?? (
+    provider === 'anthropic' ? 'https://api.anthropic.com/v1/messages'
+      : provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions'
+      : provider === 'inferx' ? 'https://model.inferx.net/endpoints/v1/chat/completions'
+      : provider === 'ollama' ? 'http://127.0.0.1:11434/v1/chat/completions'
+      : provider === 'codex' ? 'https://chatgpt.com/backend-api/codex/responses'
+      : 'https://api.openai.com/v1/chat/completions'
+  );
+  const model = env['AIX_MODEL'] ?? (
+    provider === 'anthropic' ? (env['ANTHROPIC_MODEL'] ?? 'claude-sonnet-4-6')
+      : provider === 'groq' ? (env['GROQ_MODEL'] ?? 'llama3-70b-8192')
+      : provider === 'inferx' ? (env['INFERX_MODEL'] ?? 'deepseek-v4.1-flash-1017-basic')
+      : provider === 'ollama' ? 'deepseek-r1:latest'
+      : provider === 'codex' ? (env['OPENAI_MODEL'] ?? 'gpt-5.1-codex-max')
+      : (env['OPENAI_MODEL'] ?? 'gpt-4o')
+  );
+
+  return {
+    provider,
+    apiKey: env['AIX_API_KEY'] ?? env[PROVIDER_KEY_ENV[provider] ?? ''] ?? '',
+    oauthToken: env['AIX_OAUTH_TOKEN'] ?? '',
+    oauthAccountId: env['AIX_OAUTH_ACCOUNT_ID'] ?? '',
+    apiUrl,
+    model,
+  };
+}
+
+/**
+ * Codex CLI login (ChatGPT subscription). Talks to the ChatGPT backend
+ * Responses API, which streams SSE events only.
+ */
+export class CodexRuntimeProvider implements RuntimeProvider {
+  readonly id = 'codex';
+  readonly #oauthToken: string;
+  readonly #accountId: string;
   readonly #apiUrl: string;
   readonly #model: string;
 
-  constructor(opts?: { provider?: string; apiKey?: string; apiUrl?: string; model?: string }) {
-    this.id = opts?.provider ?? process.env.AIX_PROVIDER ?? 'anthropic';
-    this.#apiKey = opts?.apiKey ?? process.env.AIX_API_KEY ?? process.env.ANTHROPIC_API_KEY ?? process.env.OPENAI_API_KEY ?? process.env.GROQ_API_KEY ?? process.env.INFERX_API_KEY ?? '';
-    this.#apiUrl = opts?.apiUrl ?? process.env.AIX_API_URL ?? (
-      this.id === 'anthropic'
-        ? 'https://api.anthropic.com/v1/messages'
-        : this.id === 'groq'
-          ? 'https://api.groq.com/openai/v1/chat/completions'
-          : this.id === 'inferx'
-            ? 'https://model.inferx.net/endpoints/v1/chat/completions'
-            : 'https://api.openai.com/v1/chat/completions'
-    );
-    this.#model = opts?.model ?? process.env.AIX_MODEL ?? (
-      this.id === 'anthropic'
-        ? (process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-6')
-        : this.id === 'groq'
-          ? (process.env.GROQ_MODEL ?? 'llama3-70b-8192')
-          : this.id === 'inferx'
-            ? (process.env.INFERX_MODEL ?? 'deepseek-v4.1-flash-1017-basic')
-            : (process.env.OPENAI_MODEL ?? 'gpt-4o')
-    );
+  constructor(opts?: { oauthToken?: string; accountId?: string; apiUrl?: string; model?: string }) {
+    const resolved = resolveProviderRuntimeConfig({ ...process.env, AIX_PROVIDER: 'codex' });
+    this.#oauthToken = opts?.oauthToken ?? resolved.oauthToken;
+    this.#accountId = opts?.accountId ?? resolved.oauthAccountId;
+    this.#apiUrl = opts?.apiUrl ?? resolved.apiUrl;
+    this.#model = opts?.model ?? resolved.model;
+    if (!this.#oauthToken) {
+      throw new Error('Codex subscription token is missing. Open the Codex CLI once to log in, then retry.');
+    }
   }
 
   async call(opts: ModelCallOptions): Promise<ModelCallResponse> {
-    if (!this.#apiKey) {
-      console.warn('[provider] No API key found (ANTHROPIC_API_KEY, OPENAI_API_KEY, or GROQ_API_KEY). Falling back to mock.');
-      return new MockRuntimeProvider().call(opts);
+    const res = await fetch(this.#apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.#oauthToken}`,
+        'chatgpt-account-id': this.#accountId,
+        'OpenAI-Beta': 'responses=experimental',
+        'Accept': 'text/event-stream',
+      },
+      body: JSON.stringify({
+        model: this.#model,
+        instructions: opts.system,
+        input: [{ role: 'user', content: [{ type: 'input_text', text: opts.user }] }],
+        stream: true,
+        store: false,
+      }),
+    });
+
+    if (!res.ok || !res.body) {
+      const result = redact(await res.text().catch(() => ''));
+      if (res.status === 401) {
+        throw new Error('Codex subscription token was rejected (401). Open the Codex CLI once to refresh the login, then retry.');
+      }
+      throw new Error(`Codex API error: ${res.status} ${result.clean}`);
+    }
+
+    let content = '';
+    let tokens = 0;
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let eventType = '';
+    for await (const chunk of res.body) {
+      buffer += decoder.decode(chunk as Uint8Array, { stream: true });
+      let newlineIndex = buffer.indexOf('\n');
+      while (newlineIndex !== -1) {
+        const line = buffer.slice(0, newlineIndex).trim();
+        buffer = buffer.slice(newlineIndex + 1);
+        if (line.startsWith('event:')) {
+          eventType = line.slice(6).trim();
+        } else if (line.startsWith('data:') && eventType) {
+          const payload = line.slice(5).trim();
+          if (payload && payload !== '[DONE]') {
+            try {
+              const data = JSON.parse(payload) as {
+                delta?: string;
+                response?: { usage?: { input_tokens?: number; output_tokens?: number } };
+              };
+              if (eventType === 'response.output_text.delta' && data.delta) content += data.delta;
+              if (eventType === 'response.completed' && data.response?.usage) {
+                tokens = (data.response.usage.input_tokens ?? 0) + (data.response.usage.output_tokens ?? 0);
+              }
+            } catch {
+              // Ignore malformed SSE frames; the stream continues.
+            }
+          }
+          eventType = '';
+        }
+        newlineIndex = buffer.indexOf('\n');
+      }
+    }
+
+    // ChatGPT subscription calls are not metered per token; this blended
+    // estimate only feeds the budget guard.
+    const usd = (tokens * 5) / 1_000_000;
+    return { content, tokens, usd };
+  }
+}
+
+export class ApiRuntimeProvider implements RuntimeProvider {
+  readonly id: string;
+  readonly #apiKey: string;
+  readonly #oauthToken: string;
+  readonly #apiUrl: string;
+  readonly #model: string;
+
+  constructor(opts?: { provider?: string; apiKey?: string; oauthToken?: string; apiUrl?: string; model?: string }) {
+    const env: NodeJS.ProcessEnv = { ...process.env };
+    if (opts?.provider && env['AIX_PROVIDER'] && env['AIX_PROVIDER'] !== opts.provider) {
+      delete env['AIX_API_KEY'];
+      delete env['AIX_API_URL'];
+      delete env['AIX_MODEL'];
+      delete env['AIX_OAUTH_TOKEN'];
+    }
+    if (opts?.provider) env['AIX_PROVIDER'] = opts.provider;
+    const resolved = resolveProviderRuntimeConfig(env);
+    this.id = opts?.provider ?? resolved.provider;
+    this.#apiKey = opts?.apiKey ?? resolved.apiKey;
+    this.#oauthToken = opts?.oauthToken ?? resolved.oauthToken;
+    this.#apiUrl = opts?.apiUrl ?? resolved.apiUrl;
+    this.#model = opts?.model ?? resolved.model;
+  }
+
+  async call(opts: ModelCallOptions): Promise<ModelCallResponse> {
+    if (!this.#apiKey && !this.#oauthToken && this.id !== 'ollama') {
+      throw new Error(`API key is missing for the selected ${this.id} provider`);
     }
 
     if (this.id === 'anthropic') {
@@ -168,11 +303,21 @@ export class ApiRuntimeProvider implements RuntimeProvider {
   }
 
   async #callAnthropic(opts: ModelCallOptions): Promise<ModelCallResponse> {
+    // Subscription tokens (Claude Code CLI login) authenticate with Bearer +
+    // the oauth beta header; API keys use the x-api-key scheme.
+    const authHeaders: Record<string, string> = this.#oauthToken
+      ? {
+          'Authorization': `Bearer ${this.#oauthToken}`,
+          'anthropic-beta': 'oauth-2025-04-20',
+          'User-Agent': 'claude-cli/aix-desktop (external, cli)',
+        }
+      : { 'x-api-key': this.#apiKey };
+
     const res = await fetch(this.#apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': this.#apiKey,
+        ...authHeaders,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
@@ -243,10 +388,16 @@ export class ApiRuntimeProvider implements RuntimeProvider {
   }
 }
 
-export function createProvider(): RuntimeProvider {
-  if (process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY || process.env.GROQ_API_KEY) {
-    return new ApiRuntimeProvider();
+export function createProvider(env: NodeJS.ProcessEnv = process.env): RuntimeProvider {
+  const config = resolveProviderRuntimeConfig(env);
+  if (config.provider === 'mock') return new MockRuntimeProvider();
+  if (config.provider === 'codex') return new CodexRuntimeProvider({ oauthToken: config.oauthToken, accountId: config.oauthAccountId, apiUrl: config.apiUrl, model: config.model });
+  if (!config.apiKey && !config.oauthToken && config.provider !== 'ollama') {
+    if (env['AIX_PROVIDER']) {
+      throw new Error(`API key is missing for the selected ${config.provider} provider`);
+    }
+    console.warn('[provider] No API key configured. Using mock provider.');
+    return new MockRuntimeProvider();
   }
-  console.warn('[provider] No API key configured. Using mock provider. Set ANTHROPIC_API_KEY, OPENAI_API_KEY, or GROQ_API_KEY.');
-  return new MockRuntimeProvider();
+  return new ApiRuntimeProvider(config);
 }

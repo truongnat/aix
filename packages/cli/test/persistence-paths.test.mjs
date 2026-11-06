@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, realpath, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,10 +29,10 @@ test('actual CLI verify and recheck preserve operational references in an email-
     assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
     const saved = JSON.parse(await readFile(join(sessions, id, 'state.json'), 'utf8'));
     assert.equal(saved.verification.status, 'passed');
-    assert.equal(saved.verification.cwd, generated);
+    assert.equal(saved.verification.cwd, await realpath(generated));
     assert.deepEqual(saved.writtenFiles, [output]);
     assert.ok(saved.verification.files['127.0.0.1/solution.mjs']);
-    assert.equal(saved.session.evidence.find(entry => entry.phase === 'verify').ref, join(sessions, id, 'VERIFY.md'));
+    assert.equal(saved.session.evidence.find(entry => entry.phase === 'verify').ref, await realpath(join(sessions, id, 'VERIFY.md')));
     await readFile(saved.session.evidence.find(entry => entry.phase === 'verify').ref);
   }
 });

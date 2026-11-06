@@ -9,7 +9,7 @@ import { sessionArtifactPath, sessionArchiveDir } from '../session-store.js';
 import { checkBudget, formatBudgetWarnings } from '../budget-guard.js';
 import { redactStrings } from '@x/policy';
 
-const SKILLS_ROOT = process.env.AIX_CONTENT_ROOT ?? join(process.cwd(), 'content');
+const SKILLS_ROOT = process.env.AIX_CONTENT_ROOT ?? join(process.cwd(), 'skills');
 
 export async function discussNode(state: EngineState): Promise<EngineState> {
   if (state.discussion) return state;

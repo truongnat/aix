@@ -26,9 +26,15 @@ function walkFiles(dir) {
 }
 
 function countSourceSkills() {
-  return walkFiles(join(repoRoot, 'skills'))
-    .filter(file => file.endsWith('SKILL.md'))
-    .length;
+  // The registry dedupes skills by their `name` frontmatter, so leftover
+  // duplicate copies on disk must not inflate the expected counts.
+  const names = new Set();
+  for (const file of walkFiles(join(repoRoot, 'skills')).filter(f => f.endsWith('SKILL.md'))) {
+    const frontmatter = /^---\n([\s\S]*?)\n---/.exec(readFileSync(file, 'utf8'))?.[1] ?? '';
+    const name = /^name:\s*(.+)$/m.exec(frontmatter)?.[1]?.trim();
+    names.add(name ?? file);
+  }
+  return names.size;
 }
 
 function countSourceRules() {
