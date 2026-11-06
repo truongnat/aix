@@ -63,6 +63,9 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   const [currentArtifact, setCurrentArtifact] = useState<string>(activeArtifactName ?? 'PLAN.md');
   const [artifactContent, setArtifactContent] = useState<string>('');
   const [loadingArtifact, setLoadingArtifact] = useState<boolean>(false);
+  const [generatedFiles, setGeneratedFiles] = useState<readonly string[]>([]);
+  const [activeGeneratedPath, setActiveGeneratedPath] = useState<string | null>(null);
+  const [filesError, setFilesError] = useState<string | null>(null);
 
   // Verify Sandbox State
   const [verifyCommand, setVerifyCommand] = useState<string>('pnpm test');
@@ -82,6 +85,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   useEffect(() => {
     if (activeArtifactName) {
       setCurrentArtifact(activeArtifactName);
+      setActiveGeneratedPath(null);
       setTab('artifacts');
     }
   }, [activeArtifactName]);
@@ -93,7 +97,21 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   useEffect(() => {
     setVerifyResult(null);
     setPendingVerify(null);
+    setActiveGeneratedPath(null);
+    setGeneratedFiles([]);
+    setFilesError(null);
   }, [effectiveSessionId]);
+
+  useEffect(() => {
+    if (!effectiveSessionId || !isOpen || tab !== 'artifacts') return;
+    let cancelled = false;
+    window.aixAPI.listSessionFiles(effectiveSessionId).then((files) => {
+      if (!cancelled) { setGeneratedFiles(files); setFilesError(null); }
+    }).catch((error: unknown) => {
+      if (!cancelled) setFilesError(`Could not load generated files: ${String(error)}. Reopen Inspector to retry.`);
+    });
+    return () => { cancelled = true; };
+  }, [effectiveSessionId, activeSession?.updatedAt, isOpen, tab]);
 
   // Never let a previous session's late artifact response replace the current one.
   useEffect(() => {
@@ -106,7 +124,10 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
     let cancelled = false;
     setArtifactContent('');
     setLoadingArtifact(true);
-    window.aixAPI.getSessionArtifact(effectiveSessionId, currentArtifact)
+    const content = activeGeneratedPath
+      ? window.aixAPI.readSessionFile(effectiveSessionId, activeGeneratedPath)
+      : window.aixAPI.getSessionArtifact(effectiveSessionId, currentArtifact);
+    content
       .then((content) => {
         if (!cancelled) setArtifactContent(content ?? `No ${currentArtifact} generated in session.`);
       })
@@ -115,7 +136,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
       })
       .finally(() => { if (!cancelled) setLoadingArtifact(false); });
     return () => { cancelled = true; };
-  }, [effectiveSessionId, currentArtifact, activeSession?.updatedAt, isOpen, tab]);
+  }, [effectiveSessionId, currentArtifact, activeGeneratedPath, activeSession?.updatedAt, isOpen, tab]);
 
   // Load Memories
   useEffect(() => {
@@ -239,10 +260,10 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
                 <button
                   key={art}
                   type="button"
-                  aria-pressed={currentArtifact === art}
-                  onClick={() => setCurrentArtifact(art)}
+                  aria-pressed={activeGeneratedPath === null && currentArtifact === art}
+                  onClick={() => { setActiveGeneratedPath(null); setCurrentArtifact(art); }}
                   className={`shrink-0 min-h-7 px-2.5 rounded-lg text-[12px] font-mono font-semibold border transition-colors ${
-                    currentArtifact === art
+                    activeGeneratedPath === null && currentArtifact === art
                       ? 'bg-blue-600/20 text-blue-300 border-blue-500/40'
                       : 'bg-white/[0.02] text-slate-400 hover:text-white border-white/5'
                   }`}
@@ -252,10 +273,33 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
               ))}
             </div>
 
+            <section aria-label="Generated files" className="space-y-2">
+              <h3 className="text-xs font-semibold text-slate-300">Generated files ({generatedFiles.length})</h3>
+              {filesError && <p role="alert" className="text-xs text-rose-300">{filesError}</p>}
+              {generatedFiles.length === 0 ? (
+                <p className="text-xs text-slate-400">Source files appear here after code generation.</p>
+              ) : (
+                <div className="max-h-48 overflow-y-auto space-y-1">
+                  {generatedFiles.map(path => (
+                    <button key={path} type="button" title={path}
+                      aria-pressed={activeGeneratedPath === path}
+                      onClick={() => setActiveGeneratedPath(path)}
+                      className={`block w-full px-2.5 py-2 rounded-md text-left text-xs font-mono break-all transition-colors ${activeGeneratedPath === path ? 'bg-blue-500/15 text-blue-200' : 'text-slate-300 hover:bg-white/5'}`}
+                    >{path}</button>
+                  ))}
+                </div>
+              )}
+            </section>
+
             {/* Rendered Artifact Content */}
             <div className="p-4 rounded-xl bg-black/40 border border-white/5">
               {loadingArtifact ? (
                 <div className="text-slate-400 text-xs py-10 text-center" role="status">Loading artifact…</div>
+              ) : activeGeneratedPath ? (
+                <div>
+                  <h3 className="text-xs text-slate-300 font-mono mb-3 break-all">{activeGeneratedPath}</h3>
+                  <pre className="overflow-x-auto text-xs leading-relaxed text-slate-200"><code>{artifactContent}</code></pre>
+                </div>
               ) : (
                 <MarkdownRenderer content={artifactContent} />
               )}

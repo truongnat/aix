@@ -26,9 +26,10 @@ for (const [label, file] of [['nested dot traversal', '....//....//....//etc/x']
       await rm(join(root, '..'), { recursive: true, force: true });
       if (!file.startsWith('/')) await rm(escaped, { force: true });
     });
-    providerResponse(t, 'export const x = 1;\n');
+    providerResponse(t, JSON.stringify({ files: [{ path: file, content: 'export const x = 1;\n' }] }));
     const current = { id: 'task-1', description: 'write file', status: 'pending' };
-    const state = { ...createInitialEngineState({ id, task: 'write', mode: 'autonomous', phase: 'run', createdAt: '2026-11-05T00:00:00.000Z', evidence: [], budget: createDefaultBudgetState(10) }), current, tasks: [current], ticketPlans: [{ ticketId: 't1', description: 'write file', files: [file], acceptanceCriteria: [] }] };
+    const planned = { id: current.id, title: current.description, description: current.description, dependencies: [], files: [file], acceptanceCriteria: ['exports x'] };
+    const state = { ...createInitialEngineState({ id, task: 'write', mode: 'autonomous', phase: 'run', createdAt: '2026-11-05T00:00:00.000Z', evidence: [], budget: createDefaultBudgetState(10) }), current, tasks: [current], plan: { goal: 'write', steps: [planned.title], tasks: [planned] }, ticketPlans: [{ ticketId: 'ticket-task-1', description: 'write file', dependencies: [], files: [file], acceptanceCriteria: planned.acceptanceCriteria }] };
     await assert.rejects(coderNode(state), error => {
       assert.equal(error.name, 'ValidationError');
       return true;

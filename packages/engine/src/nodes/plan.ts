@@ -1,18 +1,22 @@
 import { mkdir, rename, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { createBudgetTracker } from '@x/core';
+import { createBudgetTracker, ValidationError } from '@x/core';
 import { SkillRegistry } from '@x/registry';
 import { createProvider, type RuntimeProvider } from '@x/providers';
-import type { EngineState, PlanDoc } from '../state.js';
+import type { EngineState, PlanDoc, PlannedTask } from '../state.js';
 import { sessionArtifactPath, sessionArchiveDir } from '../session-store.js';
 import { checkBudget, formatBudgetWarnings } from '../budget-guard.js';
 import { redactStrings } from '@x/policy';
+import { parseJsonObject, parsePlannedTasks } from '../generation-contract.js';
 
 const SKILLS_ROOT = process.env.AIX_CONTENT_ROOT ?? join(process.cwd(), 'skills');
 
 export async function planNode(state: EngineState): Promise<EngineState> {
-  if (state.plan) return state;
+  if (state.plan) {
+    parsePlannedTasks(state.plan.tasks);
+    return state;
+  }
 
   const provider: RuntimeProvider = createProvider();
   const registry = await SkillRegistry.load(SKILLS_ROOT);
@@ -32,18 +36,19 @@ ${skillBodies.join('\n\n')}
 
 Respond with valid JSON in this exact format:
 {
-  "goal": "${goal}",
+  "goal": "concrete project goal",
   "scope": "in scope / out of scope",
   "constraints": ["constraint 1"],
   "assumptions": ["assumption 1"],
-  "affectedFiles": ["src/file1.ts"],
+  "affectedFiles": ["relative/project/file"],
   "tasks": [
     {
+      "id": "task-1",
       "title": "Task title",
       "description": "What to do",
-      "dependencies": ["task-1"],
+      "dependencies": [],
       "acceptanceCriteria": ["condition 1"],
-      "files": ["src/file1.ts"]
+      "files": ["relative/project/file"]
     }
   ],
   "verificationStrategy": "how to verify",
@@ -51,7 +56,7 @@ Respond with valid JSON in this exact format:
   "risks": ["risk 1"]
 }
 
-Each task must be concrete, independently verifiable, and have explicit dependencies.`;
+Each task must have a unique stable id, a full description, exact relative file paths, non-empty acceptance criteria, and explicit dependencies referring to other task ids. Do not create dependency cycles. Choose the language, tools, and project structure from the user's goal and constraints. Include every required source, configuration, test, and documentation file in the tasks. Do not assume a particular language or framework.`;
 
   const constraintText = constraints.length > 0
     ? `\nConstraints:\n${constraints.map(c => `- ${c}`).join('\n')}`
@@ -74,25 +79,21 @@ Each task must be concrete, independently verifiable, and have explicit dependen
 
   const response = await provider.call({ system, user, temperature: 0.3 });
 
-  let planData: Record<string, unknown>;
-  let tasks: Array<Record<string, unknown>> = [];
-
-  try {
-    planData = JSON.parse(response.content);
-    tasks = Array.isArray(planData.tasks) ? planData.tasks : [];
-  } catch {
-    planData = {};
+  const parsed = parseJsonObject(response.content);
+  if (typeof parsed.goal !== 'string' || parsed.goal.trim() === '') {
+    throw new ValidationError('Plan goal must be a non-empty string');
   }
-  planData = redactStrings(planData);
-  tasks = redactStrings(tasks);
-
-  const steps = tasks.length > 0
-    ? tasks.map(t => String(t.title ?? t.description ?? ''))
-    : [redactStrings(state.session.task)];
-
+  const tasks = parsePlannedTasks(parsed.tasks).map(task => ({
+    ...redactStrings(task),
+    id: task.id,
+    dependencies: task.dependencies,
+    files: task.files,
+  }));
+  const planData = { ...redactStrings(parsed), tasks };
   const plan: PlanDoc = {
-    goal: typeof planData.goal === 'string' ? planData.goal : redactStrings(goal),
-    steps,
+    goal: redactStrings(parsed.goal),
+    steps: tasks.map(task => task.title),
+    tasks,
   };
 
   await writePlanArtifact(state.session.id, planData, tasks);
@@ -106,7 +107,7 @@ Each task must be concrete, independently verifiable, and have explicit dependen
 async function writePlanArtifact(
   sessionId: string,
   planData: Record<string, unknown>,
-  tasks: ReadonlyArray<Record<string, unknown>>,
+  tasks: readonly PlannedTask[],
 ): Promise<void> {
   const artifactPath = sessionArtifactPath(sessionId, 'PLAN.md');
   let archiveRef = '';
@@ -141,7 +142,7 @@ async function writePlanArtifact(
         const files = Array.isArray(t.files) && t.files.length > 0
           ? `\n   - Files: ${t.files.join(', ')}`
           : '';
-        return `${i + 1}. ${t.title ?? t.description ?? ''}${deps}${ac}${files}`;
+        return `${i + 1}. ${t.title} (${t.id})\n   - Description: ${t.description}${deps}${ac}${files}`;
       }).join('\n')}`
     : '';
 
@@ -158,6 +159,9 @@ async function writePlanArtifact(
     : '';
 
   const artifact = `${archiveRef}# Plan
+
+## Goal
+${planData.goal}
 ${scope}
 ${constraints}
 ${affectedFiles}

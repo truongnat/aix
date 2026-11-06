@@ -1,13 +1,14 @@
 import { mkdir, rename, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { createBudgetTracker } from '@x/core';
+import { createBudgetTracker, ValidationError } from '@x/core';
 import { SkillRegistry } from '@x/registry';
 import { createProvider, type RuntimeProvider } from '@x/providers';
 import type { EngineState, DiscussionDoc } from '../state.js';
 import { sessionArtifactPath, sessionArchiveDir } from '../session-store.js';
 import { checkBudget, formatBudgetWarnings } from '../budget-guard.js';
 import { redactStrings } from '@x/policy';
+import { parseJsonObject } from '../generation-contract.js';
 
 const SKILLS_ROOT = process.env.AIX_CONTENT_ROOT ?? join(process.cwd(), 'skills');
 
@@ -58,35 +59,34 @@ Keep analysis thorough but concise.`;
 
   const response = await provider.call({ system, user, temperature: 0.3 });
 
-  let discussion: DiscussionDoc;
-  try {
-    const parsed = JSON.parse(response.content);
-    discussion = {
-      goal: parsed.goal ?? state.session.task,
-      constraints: Array.isArray(parsed.constraints) ? parsed.constraints : [],
-      options: Array.isArray(parsed.options)
-        ? parsed.options.map((o: Record<string, unknown>) => ({
-            name: String(o.name ?? ''),
-            value: Number(o.value ?? 0),
-            effortFit: Number(o.effortFit ?? 0),
-            risk: Number(o.risk ?? 0),
-            fit: Number(o.fit ?? 0),
-          }))
-        : [],
-      recommendation: parsed.recommendation ?? '',
-      rationale: parsed.rationale ?? response.content.slice(0, 500),
-    };
-  } catch {
-    discussion = {
-      goal: state.session.task,
-      constraints: [],
-      options: [],
-      recommendation: '',
-      rationale: response.content.slice(0, 500),
-    };
+  const parsed = parseJsonObject(response.content);
+  if (typeof parsed.goal !== 'string' || parsed.goal.trim() === ''
+    || !Array.isArray(parsed.constraints) || parsed.constraints.some(c => typeof c !== 'string')
+    || !Array.isArray(parsed.options)
+    || typeof parsed.recommendation !== 'string' || typeof parsed.rationale !== 'string') {
+    throw new ValidationError('Discussion response must match the structured discussion JSON schema');
   }
-
-  discussion = redactStrings(discussion);
+  const options = parsed.options.map((value: unknown) => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      throw new ValidationError('Discussion option must be an object');
+    }
+    const option = value as Record<string, unknown>;
+    const { name, value: score, effortFit, risk, fit } = option;
+    if (typeof name !== 'string' || typeof score !== 'number' || !Number.isFinite(score)
+      || typeof effortFit !== 'number' || !Number.isFinite(effortFit)
+      || typeof risk !== 'number' || !Number.isFinite(risk)
+      || typeof fit !== 'number' || !Number.isFinite(fit)) {
+      throw new ValidationError('Discussion option must have a name and finite numeric scores');
+    }
+    return { name, value: score, effortFit, risk, fit };
+  });
+  const discussion: DiscussionDoc = redactStrings({
+    goal: parsed.goal,
+    constraints: parsed.constraints as string[],
+    options,
+    recommendation: parsed.recommendation,
+    rationale: parsed.rationale,
+  });
   await writeDiscussionArtifact(state.session.id, discussion);
 
   const tracker = createBudgetTracker();

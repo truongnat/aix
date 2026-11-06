@@ -15,16 +15,27 @@ test('generation visits every planned task without claiming verification from a 
       import { EngineGraph, createInitialEngineState } from ${JSON.stringify(engineUrl)};
       import { GuardrailLoop } from ${JSON.stringify(coreUrl)};
       const session = { ...await new GuardrailLoop().createSession('implement four functions'), mode: 'autonomous' };
+      const definitions = ['alpha', 'beta', 'gamma', 'delta'].map((name, i) => ({
+        id: 'task-' + (i + 1), title: 'implement ' + name + ' function', description: 'implement ' + name + ' function',
+        dependencies: i === 0 ? [] : ['task-' + i], files: ['src/' + name + '.js'], acceptanceCriteria: [name + ' returns 42']
+      }));
+      globalThis.fetch = async (_url, options) => {
+        const request = JSON.parse(options.body);
+        const user = request.messages.find(message => message.role === 'user').content;
+        const paths = JSON.parse(user.match(/Declared file targets: ([^\\n]+)/)[1]);
+        const content = JSON.stringify({files: paths.map(path => ({path, content: 'export const answer = 42;'}))});
+        return new Response(JSON.stringify({choices:[{message:{content}}],usage:{prompt_tokens:10,completion_tokens:10}}),{status:200});
+      };
       const initial = { ...createInitialEngineState(session),
         discussion: { goal: 'four functions', constraints: [], options: [], recommendation: '', rationale: '' },
-        plan: { goal: 'four functions', steps: ['implement alpha function', 'implement beta function', 'implement gamma function', 'implement delta function'] }
+        plan: { goal: 'four functions', steps: definitions.map(task => task.title), tasks: definitions }
       };
       const final = await new EngineGraph().run(initial);
       console.log('FINAL_STATE=' + JSON.stringify(final));
     `;
     const result = spawnSync(process.execPath, ['--input-type=module', '-e', script], {
       cwd, encoding: 'utf8', timeout: 30000,
-      env: { ...process.env, ANTHROPIC_API_KEY: '', OPENAI_API_KEY: '', GROQ_API_KEY: '' },
+      env: { ...process.env, ANTHROPIC_API_KEY: '', GROQ_API_KEY: '', OPENAI_API_KEY: 'fixture-only', AIX_PROVIDER: 'openai' },
     });
     assert.equal(result.status, 0, result.stderr);
     const line = result.stdout.split('\n').find(l => l.startsWith('FINAL_STATE='));
@@ -44,13 +55,15 @@ test('a plan created during execution is not truncated by the pre-plan recursion
       import { EngineGraph, createInitialEngineState } from ${JSON.stringify(engineUrl)};
       import { GuardrailLoop } from ${JSON.stringify(coreUrl)};
       let calls = 0;
-      globalThis.fetch = async () => {
+      globalThis.fetch = async (_url, options) => {
         calls++;
+        const request = JSON.parse(options.body);
+        const user = request.messages.find(message => message.role === 'user').content;
         const content = calls === 1
           ? JSON.stringify({goal:'twelve functions',constraints:[],options:[],recommendation:'',rationale:''})
           : calls === 2
-            ? JSON.stringify({goal:'twelve functions',tasks:Array.from({length:12},(_,i)=>({title:'implement function item '+i}))})
-            : 'export const answer = 42;';
+            ? JSON.stringify({goal:'twelve functions',tasks:Array.from({length:12},(_,i)=>({id:'task-'+(i+1),title:'implement function item '+i,description:'implement function item '+i,dependencies:i===0?[]:['task-'+i],files:['src/item-'+i+'.js'],acceptanceCriteria:['item '+i+' returns 42']}))})
+            : JSON.stringify({files:JSON.parse(user.match(/Declared file targets: ([^\\n]+)/)[1]).map(path=>({path,content:'export const answer = 42;'}))});
         return new Response(JSON.stringify({choices:[{message:{content}}],usage:{prompt_tokens:10,completion_tokens:10}}),{status:200});
       };
       const session = {...await new GuardrailLoop().createSession('implement twelve functions'),mode:'autonomous'};

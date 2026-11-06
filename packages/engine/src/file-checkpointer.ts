@@ -5,6 +5,7 @@ import { BaseCheckpointSaver, copyCheckpoint, getCheckpointId, type Checkpoint, 
 import type { RunnableConfig } from '@langchain/core/runnables';
 import { redact, redactStrings } from '@x/policy';
 import { redactEngineChannel, redactEngineChannels } from './persistence-redaction.js';
+import { configuredSessionsRoot } from './session-store.js';
 
 const DEFAULT_NS = '__default__';
 
@@ -36,7 +37,7 @@ export class FileCheckpointer extends BaseCheckpointSaver {
 
   constructor(root?: string) {
     super();
-    this.#root = root ?? join(process.cwd(), '.aix', 'sessions');
+    this.#root = root ?? configuredSessionsRoot();
   }
 
   async getTuple(config: RunnableConfig): Promise<CheckpointTuple | undefined> {

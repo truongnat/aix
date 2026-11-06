@@ -123,7 +123,7 @@ export const App: React.FC = () => {
     if (event.type === 'phase') {
       setSessions((listed) => listed.map((session) => session.id === event.sessionId
         ? { ...session, phase: event.phase, isRunning: true } : session));
-    } else if (event.type === 'complete' || event.type === 'error' || event.type === 'aborted') {
+    } else if (event.type === 'artifacts' || event.type === 'complete' || event.type === 'error' || event.type === 'aborted') {
       refreshData();
     }
   }), [refreshData]);

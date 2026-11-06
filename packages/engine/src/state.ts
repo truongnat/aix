@@ -1,8 +1,18 @@
 import type { SessionState } from '@x/core';
 
+export interface PlannedTask {
+  readonly id: string;
+  readonly title: string;
+  readonly description: string;
+  readonly dependencies: readonly string[];
+  readonly files: readonly string[];
+  readonly acceptanceCriteria: readonly string[];
+}
+
 export interface PlanDoc {
   readonly goal: string;
   readonly steps: readonly string[];
+  readonly tasks: readonly PlannedTask[];
 }
 
 export interface ScoredOption {
@@ -32,6 +42,7 @@ export interface TaskItem {
 export interface TicketPlan {
   readonly ticketId: string;
   readonly description: string;
+  readonly dependencies: readonly string[];
   readonly files: readonly string[];
   readonly acceptanceCriteria: readonly string[];
 }
@@ -52,7 +63,7 @@ export interface EngineState {
   readonly plan?: PlanDoc;
   readonly rules?: readonly string[];
   readonly tasks: readonly TaskItem[];
-  readonly current?: TaskItem;
+  readonly current?: TaskItem | undefined;
   /** Text quality heuristic only; never evidence of executable correctness. */
   readonly reviewScore?: number;
   readonly attempts: number;

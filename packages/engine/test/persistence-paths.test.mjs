@@ -11,7 +11,7 @@ const secret = `ghp_${'d'.repeat(36)}`;
 function stateFixture() {
   const state = createInitialEngineState({ id: 'alice@example.com', task: `help alice@example.com ${secret}`, mode: 'autonomous', phase: 'verify', createdAt: timestamp, budget: createDefaultBudgetState(10), evidence: [{ phase: 'verify', kind: 'artifact', summary: secret, ref: '/tmp/alice@example.com/VERIFY.md', contentHash: '0123456789abcdef'.repeat(4), at: timestamp }] });
   const current = { id: 'task@example.com', description: secret, status: 'done', output: secret };
-  return { ...state, tasks: [current], current, ticketPlans: [{ ticketId: 'ticket@example.com', description: secret, files: ['127.0.0.1/a.ts'], acceptanceCriteria: [secret] }], writtenFiles: ['/tmp/alice@example.com/project/generated/127.0.0.1/a.ts'], verification: { status: 'passed', command: 'node check.mjs', cwd: '/tmp/alice@example.com/project/generated', exitCode: 0, output: secret, checkedAt: timestamp, files: { '127.0.0.1/a.ts': '0123456789abcdef'.repeat(4) } } };
+  return { ...state, tasks: [current], current, ticketPlans: [{ ticketId: 'ticket@example.com', description: secret, dependencies: [], files: ['127.0.0.1/a.ts'], acceptanceCriteria: [secret] }], writtenFiles: ['/tmp/alice@example.com/project/generated/127.0.0.1/a.ts'], verification: { status: 'passed', command: 'node check.mjs', cwd: '/tmp/alice@example.com/project/generated', exitCode: 0, output: secret, checkedAt: timestamp, files: { '127.0.0.1/a.ts': '0123456789abcdef'.repeat(4) } } };
 }
 async function root(t) {
   const dir = await mkdtemp(join(tmpdir(), 'aix-reference-roundtrip-'));

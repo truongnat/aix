@@ -89,10 +89,11 @@ test('coder rejects recognized secrets without creating a generated sandbox or l
   const id = `secret-output-${process.pid}-${Date.now()}`;
   const dir = sessionGeneratedDir(id);
   t.after(() => rm(join(dir, '..'), { recursive: true, force: true }));
-  providerResponse(t, `export const credential = '${secret}';`);
+  providerResponse(t, JSON.stringify({ files: [{ path: 'src/settings.ts', content: `export const credential = '${secret}';` }] }));
   const state = initial(id);
   const current = { id: 'task-1', description: 'implement credential handling', status: 'pending' };
-  await assert.rejects(coderNode({ ...state, tasks: [current], current }), error => {
+  const planned = { id: current.id, title: current.description, description: current.description, dependencies: [], files: ['src/settings.ts'], acceptanceCriteria: ['handles credentials'] };
+  await assert.rejects(coderNode({ ...state, tasks: [current], current, plan: { goal: 'credential handling', steps: [planned.title], tasks: [planned] } }), error => {
     assert.match(error.message, /secret/i);
     assert.equal(error.message.includes(secret), false);
     return true;
@@ -105,9 +106,10 @@ test('coder preserves generated source numeric literals byte for byte', async t 
   const dir = sessionGeneratedDir(id);
   t.after(() => rm(join(dir, '..'), { recursive: true, force: true }));
   const source = 'export const timeout = 5000; export const count = 1234567890;\n';
-  providerResponse(t, source);
+  providerResponse(t, JSON.stringify({ files: [{ path: 'src/settings.ts', content: source }] }));
   const current = { id: 'task-1', description: 'implement numeric settings', status: 'pending' };
-  const next = await coderNode({ ...initial(id), current, tasks: [current] });
+  const planned = { id: current.id, title: current.description, description: current.description, dependencies: [], files: ['src/settings.ts'], acceptanceCriteria: ['preserves numeric settings'] };
+  const next = await coderNode({ ...initial(id), current, tasks: [current], plan: { goal: 'numeric settings', steps: [planned.title], tasks: [planned] } });
   assert.equal(await readFile(next.writtenFiles[0], 'utf8'), source);
   assert.equal(next.coderOutput, source);
 });
@@ -119,7 +121,7 @@ for (const node of ['discuss', 'plan']) {
     t.after(() => rm(join(artifact, '..'), { recursive: true, force: true }));
     const payload = node === 'discuss'
       ? { goal: secret, constraints: [secret], options: [{ name: secret, value: 8, effortFit: 7, risk: 6, fit: 9 }], recommendation: secret, rationale: secret }
-      : { goal: secret, scope: secret, tasks: [{ title: secret, description: secret, acceptanceCriteria: [secret], files: ['src/settings.ts'] }], verificationStrategy: `Check ${secret}`, risks: [secret] };
+      : { goal: secret, scope: secret, tasks: [{ id: 'settings', title: secret, description: secret, dependencies: [], acceptanceCriteria: [secret], files: ['src/settings.ts'] }], verificationStrategy: `Check ${secret}`, risks: [secret] };
     providerResponse(t, JSON.stringify(payload));
     const next = await (node === 'discuss' ? discussNode : planNode)(initial(id));
     const raw = await readFile(artifact, 'utf8');

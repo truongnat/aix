@@ -1,5 +1,5 @@
-import { readFile, readdir, stat } from 'node:fs/promises';
-import { join } from 'node:path';
+import { readFile, readdir, stat, lstat, realpath } from 'node:fs/promises';
+import { join, resolve, relative, isAbsolute } from 'node:path';
 import type { DesktopSessionSummary } from './api.js';
 import { sessionTitleFromTask } from './desktop-logic.js';
 
@@ -77,4 +77,43 @@ export async function listDesktopSessions(
   return listed.filter((session): session is DesktopSessionSummary => session !== null)
     .sort((a, b) => Number(b.isRunning) - Number(a.isRunning)
       || b.updatedAt.localeCompare(a.updatedAt) || a.id.localeCompare(b.id));
+}
+
+function generatedRoot(root: string, sessionId: string): string {
+  if (!/^[a-zA-Z0-9_-]+$/.test(sessionId)) throw new Error('Invalid session id');
+  return resolve(root, sessionId, 'generated');
+}
+
+export async function listSessionFiles(root: string, sessionId: string): Promise<string[]> {
+  const base = generatedRoot(root, sessionId);
+  const files: string[] = [];
+  try {
+    if ((await lstat(base)).isSymbolicLink()) return [];
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return [];
+    throw error;
+  }
+  const visit = async (dir: string): Promise<void> => {
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) await visit(path);
+      else if (entry.isFile()) files.push(relative(base, path).replace(/\\/g, '/'));
+    }
+  };
+  await visit(base);
+  return files.sort();
+}
+
+export async function readSessionFile(root: string, sessionId: string, path: string): Promise<string> {
+  const base = generatedRoot(root, sessionId);
+  if ((await lstat(base)).isSymbolicLink()) throw new Error('Source path escapes generated files');
+  const target = resolve(base, path);
+  const isInside = (parent: string, child: string) => {
+    const rel = relative(parent, child);
+    return rel !== '' && rel !== '..' && !rel.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`) && !isAbsolute(rel);
+  };
+  if (!isInside(base, target)) throw new Error('Source path escapes generated files');
+  const [canonicalBase, canonicalTarget] = await Promise.all([realpath(base), realpath(target)]);
+  if (!isInside(canonicalBase, canonicalTarget)) throw new Error('Source path escapes generated files');
+  return readFile(canonicalTarget, 'utf-8');
 }

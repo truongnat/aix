@@ -15,6 +15,7 @@ import {
 } from './guards.js';
 import { SessionStore } from './session-store.js';
 import { checkBudget, formatBudgetWarnings } from './budget-guard.js';
+import { ConsoleHitlChannel, type HitlChannel } from '@x/hitl';
 
 
 // --- State annotation ---
@@ -59,9 +60,9 @@ function nodeLabel(nodeId: string): string {
 
 // --- Log tracking ---
 
-async function appendLog(sessionId: string, entry: Record<string, unknown>): Promise<void> {
+async function appendLog(root: string, sessionId: string, entry: Record<string, unknown>): Promise<void> {
   try {
-    const logDir = join(process.cwd(), '.aix', 'sessions', sessionId);
+    const logDir = join(root, sessionId);
     await mkdir(logDir, { recursive: true });
     const line = JSON.stringify(redactStrings({ ts: new Date().toISOString(), ...entry })) + '\n';
     await appendFile(join(logDir, 'checkpoint.log'), line, 'utf-8');
@@ -75,6 +76,8 @@ async function appendLog(sessionId: string, entry: Record<string, unknown>): Pro
 function buildGraph(
   preHook: (state: GraphState, id: string) => Promise<void>,
   postHook: (state: GraphState, id: string, durationMs: number) => Promise<void>,
+  hitl: HitlChannel,
+  root: string,
 ) {
   async function lgDiscussNode(state: GraphState): Promise<Partial<GraphState>> {
     await preHook(state, 'discussStep');
@@ -82,7 +85,7 @@ function buildGraph(
     const next = await discussNode(toEngineState(state));
     const duration = Date.now() - start;
     const justDiscussed = next.discussion !== undefined && state.discussion === undefined;
-    const interrupted = justDiscussed ? await shouldInterrupt('discuss', next) : false;
+    const interrupted = justDiscussed ? await shouldInterrupt('discuss', next, hitl) : false;
     const result = { ...next, _interrupted: interrupted };
     await postHook({ ...state, ...result } as GraphState, 'discussStep', duration);
     return result;
@@ -94,7 +97,7 @@ function buildGraph(
     const next = await planNode(toEngineState(state));
     const duration = Date.now() - start;
     const justPlanned = next.plan !== undefined && state.plan === undefined;
-    const interrupted = justPlanned ? await shouldInterrupt('plan', next) : false;
+    const interrupted = justPlanned ? await shouldInterrupt('plan', next, hitl) : false;
     const result = { ...next, _interrupted: interrupted };
     await postHook({ ...state, ...result } as GraphState, 'planStep', duration);
     return result;
@@ -146,7 +149,7 @@ function buildGraph(
       await postHook({ ...state, ...result } as GraphState, 'ticketPlan', duration);
       return result;
     }
-    const interrupted = await shouldInterrupt('ticket-plan', next);
+    const interrupted = await shouldInterrupt('ticket-plan', next, hitl);
     const result = { ...next, _interrupted: interrupted };
     await postHook({ ...state, ...result } as GraphState, 'ticketPlan', duration);
     return result;
@@ -174,7 +177,7 @@ function buildGraph(
     return result;
   }
 
-  const checkpointer = new FileCheckpointer();
+  const checkpointer = new FileCheckpointer(root);
 
   return new StateGraph(GraphAnnotation)
     .addNode('discussStep', lgDiscussNode)
@@ -207,28 +210,40 @@ function buildGraph(
 
 // --- Public API ---
 
+export interface EngineGraphOptions {
+  readonly hitl?: HitlChannel;
+  readonly signal?: AbortSignal;
+  readonly onNodeStart?: (state: EngineState, node: string) => void | Promise<void>;
+  readonly onNodeComplete?: (state: EngineState, node: string) => void | Promise<void>;
+}
+
 export class EngineGraph {
   readonly #store: SessionStore;
   readonly #graph: ReturnType<typeof buildGraph>;
+  readonly #signal: AbortSignal | undefined;
 
-  constructor(store?: SessionStore) {
+  constructor(store?: SessionStore, options: EngineGraphOptions = {}) {
     this.#store = store ?? new SessionStore();
+    this.#signal = options.signal;
+    const hitl = options.hitl ?? new ConsoleHitlChannel();
     this.#graph = buildGraph(
       async (state: GraphState, id: string) => {
+        options.signal?.throwIfAborted();
         const engineState = toEngineState(state);
         const budgetCheck = checkBudget(engineState);
         if (!budgetCheck.ok) {
           const critical = budgetCheck.warnings.filter(w => !w.recoverable);
           if (critical.length > 0) {
             const msg = `Budget check failed before ${id}:\n${formatBudgetWarnings(critical)}`;
-            await appendLog(engineState.session.id, { event: 'budget_fail', node: id, message: msg });
+            await appendLog(this.#store.root, engineState.session.id, { event: 'budget_fail', node: id, message: msg });
             throw new Error(msg);
           }
         }
+        await options.onNodeStart?.(engineState, nodeLabel(id));
       },
       async (state: GraphState, id: string, durationMs: number) => {
         const engineState = toEngineState(state);
-        await appendLog(engineState.session.id, {
+        await appendLog(this.#store.root, engineState.session.id, {
           event: 'node_complete',
           node: nodeLabel(id),
           phase: engineState.session.phase,
@@ -237,12 +252,15 @@ export class EngineGraph {
           usdSpent: engineState.session.budget.usdSpent,
         });
         await this.#store.save(engineState);
+        await options.onNodeComplete?.(engineState, nodeLabel(id));
       },
+      hitl,
+      this.#store.root,
     );
   }
 
   async run(initial: EngineState): Promise<EngineState> {
-    await appendLog(initial.session.id, { event: 'run_start', task: initial.session.task });
+    await appendLog(this.#store.root, initial.session.id, { event: 'run_start', task: initial.session.task });
 
     const start = Date.now();
     const result = await this.#graph.invoke(
@@ -251,13 +269,14 @@ export class EngineGraph {
         configurable: { thread_id: initial.session.id },
         // Planning discovers task count at runtime; pending work and budget terminate the loop.
         recursionLimit: Number.MAX_SAFE_INTEGER,
+        ...(this.#signal ? { signal: this.#signal } : {}),
       },
     );
     const duration = Date.now() - start;
 
     const engineResult = toEngineState(result as GraphState);
     await this.#store.save(engineResult);
-    await appendLog(initial.session.id, {
+    await appendLog(this.#store.root, initial.session.id, {
       event: 'run_end',
       durationMs: duration,
       score: engineResult.reviewScore,
@@ -269,7 +288,7 @@ export class EngineGraph {
   }
 
   async resume(state: EngineState): Promise<EngineState> {
-    await appendLog(state.session.id, { event: 'resume_start' });
+    await appendLog(this.#store.root, state.session.id, { event: 'resume_start' });
 
     const start = Date.now();
     const result = await this.#graph.invoke(
@@ -277,13 +296,14 @@ export class EngineGraph {
       {
         configurable: { thread_id: state.session.id },
         recursionLimit: Number.MAX_SAFE_INTEGER,
+        ...(this.#signal ? { signal: this.#signal } : {}),
       },
     );
     const duration = Date.now() - start;
 
     const engineResult = toEngineState(result as GraphState);
     await this.#store.save(engineResult);
-    await appendLog(state.session.id, {
+    await appendLog(this.#store.root, state.session.id, {
       event: 'resume_end',
       durationMs: duration,
       score: engineResult.reviewScore,

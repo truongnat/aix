@@ -7,7 +7,7 @@ import { redactEngineState } from './persistence-redaction.js';
 
 export const SESSIONS_ROOT = join(process.cwd(), '.aix', 'sessions');
 
-function configuredSessionsRoot(): string {
+export function configuredSessionsRoot(): string {
   return process.env['AIX_SESSIONS_ROOT'] ?? SESSIONS_ROOT;
 }
 
@@ -43,6 +43,10 @@ export class SessionStore {
 
   constructor(root?: string) {
     this.#root = root ?? configuredSessionsRoot();
+  }
+
+  get root(): string {
+    return this.#root;
   }
 
   async save(state: EngineState): Promise<string> {

@@ -8,11 +8,11 @@
   "main": "./dist/main/index.js",
   "scripts": {
     "dev:renderer": "vite",
-    "build:shared": "tsup src/shared/security.ts src/shared/desktop-logic.ts src/shared/session-list.ts --format esm --out-dir dist/shared --target node22",
+    "build:shared": "tsup src/shared/security.ts src/shared/desktop-logic.ts src/shared/session-list.ts --format esm --out-dir dist/shared --target node22 && tsup src/main/desktop-hitl-channel.ts --format esm --out-dir dist/shared --target node22",
     "build:main": "tsup src/main/index.ts --format esm --out-dir dist/main --target node22 --external electron",
     "build:preload": "tsup src/preload/index.ts --format cjs --out-dir dist/preload --target node22 --external electron",
     "build:renderer": "vite build",
-    "build": "pnpm build:shared && pnpm build:main && pnpm build:preload && pnpm build:renderer",
+    "build": "pnpm exec turbo run build --filter=@x/desktop^... && pnpm build:shared && pnpm build:main && pnpm build:preload && pnpm build:renderer",
     "build:kb-runtime": "pnpm --filter @x/kb-server build && node scripts/prepare-kb-runtime.mjs",
     "lint": "tsc --noEmit",
     "test": "pnpm build:shared && node --test \"test/**/*.test.mjs\"",

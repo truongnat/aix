@@ -130,6 +130,8 @@ export type DesktopSpineEvent =
   | { readonly type: 'phase'; readonly sessionId: string; readonly phase: Phase }
   | { readonly type: 'log'; readonly sessionId: string; readonly message: string; readonly timestamp: string }
   | { readonly type: 'hitl'; readonly sessionId: string; readonly request: DesktopHitlRequest }
+  | { readonly type: 'artifacts'; readonly sessionId: string; readonly artifacts: readonly string[]; readonly generatedFilesCount: number }
+  | { readonly type: 'node'; readonly sessionId: string; readonly node: string }
   | { readonly type: 'complete'; readonly sessionId: string; readonly checkpointId: string; readonly artifacts: readonly string[]; readonly generatedFilesCount: number }
   | { readonly type: 'error'; readonly sessionId: string; readonly error: string }
   | { readonly type: 'aborted'; readonly sessionId: string };
@@ -159,6 +161,8 @@ export interface AixDesktopAPI {
   // Sessions & Spine
   listSessions(): Promise<readonly DesktopSessionSummary[]>;
   getSessionArtifact(sessionId: string, artifactName: string): Promise<string | undefined>;
+  listSessionFiles(sessionId: string): Promise<readonly string[]>;
+  readSessionFile(sessionId: string, path: string): Promise<string>;
   runVerify(sessionId: string, command: string): Promise<DesktopVerificationResult>;
   startSpine(task: string, mode?: 'auto' | 'guided'): Promise<{ sessionId: string }>;
   respondHitl(requestId: string, decision: 'approve' | 'revise' | 'cancel', note?: string): Promise<void>;

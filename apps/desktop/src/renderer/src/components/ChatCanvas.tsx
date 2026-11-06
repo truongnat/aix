@@ -38,7 +38,7 @@ import { Select } from './ui/Select';
 import { sessionTitleFromTask } from '@shared/desktop-logic';
 
 type RunStatus = 'running' | 'done' | 'error' | 'stopped';
-type StepStatus = 'pending' | 'active' | 'done' | 'failed' | 'stopped';
+type StepStatus = 'pending' | 'active' | 'done' | 'failed' | 'stopped' | 'skipped';
 
 interface ChatMessage {
   readonly id: string;
@@ -52,6 +52,7 @@ interface ChatMessage {
   readonly logs?: readonly { message: string; timestamp: string }[];
   readonly artifacts?: readonly string[];
   readonly generatedFilesCount?: number;
+  readonly activeNode?: string;
 }
 
 interface ChatCanvasProps {
@@ -73,14 +74,6 @@ const QUICK_PROMPTS = [
   'Add Playwright browser automation test flow for user checkout',
 ];
 
-/** Backend phases map only to work the desktop runner actually performs. */
-const PHASE_STEP_RANGE: Partial<Record<Phase, readonly [number, number]>> = {
-  discuss: [0, 0],
-  plan: [1, 1],
-  run: [4, 5],
-  verify: [6, 6],
-  remember: [7, 7],
-};
 
 const DRAWER_TOGGLES: readonly { tab: DrawerTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { tab: 'artifacts', label: 'Artifacts', icon: FileCode2 },
@@ -106,18 +99,17 @@ const modelLabelFor = (cfg: DesktopAiConfig | null) => {
 };
 
 function stepStatuses(msg: ChatMessage): StepStatus[] {
-  if (msg.status === 'done') {
-    return PIPELINE_STEPS.map((step, index) => {
-      if (step.artifact) return msg.artifacts?.includes(step.artifact) ? 'done' : 'pending';
-      if (index === 4 && (msg.generatedFilesCount ?? 0) > 0) return 'done';
-      return 'pending';
-    });
-  }
-  const range = msg.phase ? PHASE_STEP_RANGE[msg.phase] : undefined;
-  if (!range) return PIPELINE_STEPS.map(() => 'pending');
-  const current: StepStatus =
-    msg.status === 'error' ? 'failed' : msg.status === 'stopped' ? 'stopped' : 'active';
-  return PIPELINE_STEPS.map((_, i) => (i < range[0] ? 'done' : i <= range[1] ? current : 'pending'));
+  return PIPELINE_STEPS.map((step, index) => {
+    if (step.id === 'worktree' || step.id === 'tdd') return 'skipped';
+    if (index !== 6 && step.artifact && msg.artifacts?.includes(step.artifact)) return 'done';
+    if (index === 4 && msg.status === 'done' && (msg.generatedFilesCount ?? 0) > 0) return 'done';
+    const active = (index === 0 && msg.phase === 'discuss')
+      || (index === 1 && msg.phase === 'plan')
+      || (index === 4 && msg.activeNode === 'coder')
+      || (index === 5 && msg.activeNode === 'reviewer');
+    if (!active || msg.status === 'done') return 'pending';
+    return msg.status === 'error' ? 'failed' : msg.status === 'stopped' ? 'stopped' : 'active';
+  });
 }
 
 const StepStatusIcon: React.FC<{ status: StepStatus }> = ({ status }) => {
@@ -125,6 +117,7 @@ const StepStatusIcon: React.FC<{ status: StepStatus }> = ({ status }) => {
   if (status === 'active') return <Loader2 className="w-3 h-3 text-blue-400 animate-spin" />;
   if (status === 'failed') return <XCircle className="w-3 h-3 text-rose-400" />;
   if (status === 'stopped') return <CircleSlash className="w-3 h-3 text-amber-400" />;
+  if (status === 'skipped') return <CircleSlash className="w-3 h-3 text-slate-500" aria-label="Not executed" />;
   return <span className="w-1.5 h-1.5 rounded-full bg-white/15" />;
 };
 
@@ -355,6 +348,12 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
             logs: [...(m.logs ?? []), { message: event.message, timestamp: event.timestamp }].slice(-200),
           }));
           break;
+        case 'artifacts':
+          patchRunMessage(msgId, (m) => ({ ...m, artifacts: event.artifacts, generatedFilesCount: event.generatedFilesCount }));
+          break;
+        case 'node':
+          patchRunMessage(msgId, (m) => ({ ...m, activeNode: event.node }));
+          break;
         case 'phase':
           patchRunMessage(msgId, (m) => ({ ...m, phase: event.phase }));
           break;
@@ -515,7 +514,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
           // Cmd/Ctrl+Enter explicitly approves even with text in note
           if (e.metaKey || e.ctrlKey) {
             void hitlDecisionRef.current('approve');
-          } else if (hitlNote.trim()) {
+          } else if (hitlNote.trim() && pendingHitl.options.some(option => option.id === 'revise')) {
             // Plain Enter with text in note submits Revise
             void hitlDecisionRef.current('revise');
           } else {
@@ -748,7 +747,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                   </ul>
                   <div className="space-y-1.5">
                     <label htmlFor={hitlNoteId} className="block text-[12px] font-medium text-slate-300">
-                      Revision guidance <span className="font-normal text-slate-400">(optional)</span>
+                      {pendingHitl.options.some(option => option.id === 'revise') ? 'Revision guidance' : 'Decision note'} <span className="font-normal text-slate-400">(optional)</span>
                     </label>
                     <input
                       id={hitlNoteId}
@@ -768,6 +767,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                     >
                       Approve <Kbd>⌘↵</Kbd>
                     </button>
+                    {pendingHitl.options.some(option => option.id === 'revise') && (
                     <button
                       type="button"
                       onClick={() => void handleHitlDecision('revise')}
@@ -775,6 +775,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                     >
                       Request revise {hitlNote.trim() ? <Kbd>↵</Kbd> : null}
                     </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => setConfirmRequest({

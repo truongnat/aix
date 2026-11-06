@@ -1,8 +1,7 @@
 import { checkShell } from '@x/policy';
-import { ConsoleHitlChannel } from '@x/hitl';
+import type { HitlChannel } from '@x/hitl';
 import type { EngineState, TicketPlan } from './state.js';
 
-const hitl = new ConsoleHitlChannel();
 
 export function checkReviewerIsNotCoder(state: EngineState): boolean {
   if (!state.current?.assignedRole) return true;
@@ -29,20 +28,21 @@ export function checkPlanShellDenylist(plans: readonly TicketPlan[] | undefined)
   return true;
 }
 
-export async function shouldInterrupt(phase: string, state: EngineState): Promise<boolean> {
+export async function shouldInterrupt(phase: string, state: EngineState, hitl: HitlChannel): Promise<boolean> {
   if (state.session.mode === 'autonomous') return false;
 
   const interruptPhases = ['discuss', 'plan', 'ticket-plan', 'coder'];
   if (!interruptPhases.includes(phase)) return false;
+  const planned = state.plan?.tasks.find(task => task.id === state.current?.id);
 
   const response = await hitl.ask({
-    question: `Intervention required before "${phase}" phase. Proceed?`,
+    question: planned ? `Approve implementation: ${planned.title}?` : `Proceed with ${phase}?`,
     tier: 0,
     options: [
-      { id: 'proceed', label: 'Proceed', summary: `Continue with ${phase}` },
+      { id: 'proceed', label: 'Proceed', summary: planned ? `Generate ${planned.files.join(', ')}` : `Continue with ${phase}` },
       { id: 'cancel', label: 'Cancel', summary: 'Stop execution' },
     ],
   });
 
-  return response.chosen === 'cancel';
+  return response.chosen !== 'proceed';
 }

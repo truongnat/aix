@@ -35,7 +35,7 @@ import type {
   AiProviderId,
 } from '../shared/api.js';
 import { endpointOverrideFor, isLocalOrCustomEndpoint, normalizeCompletionsUrl, providerEnvironmentFor } from '../shared/desktop-logic.js';
-import { listDesktopSessions } from '../shared/session-list.js';
+import { listDesktopSessions, listSessionFiles, readSessionFile } from '../shared/session-list.js';
 import { applyClaudeSubscriptionEnv, clearClaudeSubscriptionEnv, ensureClaudeSubscriptionToken, listCliSubscriptions } from './cli-subscription.js';
 import { detectModelSources, ensureSourceEnv } from './model-sources.js';
 
@@ -743,6 +743,11 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     }
   });
 
+  ipcMain.handle('spine:listFiles', (_, sessionId: string) =>
+    listSessionFiles(join(storageRoot, '.aix', 'sessions'), sessionId));
+  ipcMain.handle('spine:readFile', (_, sessionId: string, path: string) =>
+    readSessionFile(join(storageRoot, '.aix', 'sessions'), sessionId, path));
+
   ipcMain.handle('spine:getSessionChat', async (_, sessionId: string): Promise<readonly DesktopChatMessage[]> => {
     if (!/^[a-zA-Z0-9_-]+$/.test(sessionId)) return [];
     const chatFile = join(storageRoot, '.aix', 'sessions', sessionId, 'chat.jsonl');
@@ -796,12 +801,12 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     await applyAiConfigToRuntime(await loadAiConfig());
     const webContents = event.sender;
     const loop = new GuardrailLoop();
-    const session = await loop.createSession(task);
+    const session = { ...await loop.createSession(task), mode: mode === 'auto' ? 'autonomous' as const : 'guardrail' as const };
     const sessionId = session.id;
-    const hitlChannel = new DesktopHitlChannel(webContents, sessionId);
-    activeChannels.set(sessionId, hitlChannel);
     const controller = new AbortController();
     const { signal } = controller;
+    const hitlChannel = new DesktopHitlChannel(webContents, sessionId, signal);
+    activeChannels.set(sessionId, hitlChannel);
     activeRuns.set(sessionId, controller);
     const store = new SessionStore(join(storageRoot, '.aix', 'sessions'));
     let engineState = createInitialEngineState(session);
@@ -827,6 +832,16 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
           }
         };
 
+        const emitArtifacts = async () => {
+          const files = await readdir(join(store.root, sessionId));
+          const generatedFiles = await listSessionFiles(store.root, sessionId);
+          if (!webContents.isDestroyed()) webContents.send('spine:event', {
+            type: 'artifacts', sessionId,
+            artifacts: files.filter(file => ['DISCUSSION.md', 'PLAN.md', 'REVIEW.md', 'VERIFY.md', 'REMEMBER.md'].includes(file)),
+            generatedFilesCount: generatedFiles.length,
+          });
+        };
+
         const emitPhase = async (p: Phase) => {
           engineState = { ...engineState, session: { ...engineState.session, phase: p } };
           await store.save(engineState);
@@ -848,8 +863,9 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         engineState = await discussNode(engineState);
         await store.save(engineState);
         emitLog('Generated DISCUSSION.md artifact');
+        await emitArtifacts();
 
-        if (mode === 'guided') {
+        if (mode !== 'auto') {
           let proceed = false;
           while (!proceed) {
             const resp = await hitlChannel.ask({
@@ -868,8 +884,10 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
             signal.throwIfAborted();
             if (resp.chosen === 'revise') {
               emitLog(`Revision requested: ${resp.note ?? 're-evaluating discussion'}`);
-              engineState = await discussNode(engineState);
+              engineState = await discussNode({ ...engineState, discussion: undefined,
+                session: { ...engineState.session, task: `${task}\n\nRevision guidance: ${resp.note ?? 'Reconsider the discussion.'}` } });
               await store.save(engineState);
+              await emitArtifacts();
             } else {
               proceed = true;
             }
@@ -882,15 +900,16 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         emitLog('Executing Step 2: Planning tasks and acceptance criteria...');
         engineState = await planNode(engineState);
         await store.save(engineState);
-        emitLog(`Generated PLAN.md artifact with ${engineState.tasks.length} task(s)`);
+        emitLog(`Generated PLAN.md artifact with ${engineState.plan?.steps.length ?? 0} task(s)`);
+        await emitArtifacts();
 
-        if (mode === 'guided') {
+        if (mode !== 'auto') {
           let proceed = false;
           while (!proceed) {
             const resp = await hitlChannel.ask({
               question: 'Approve execution plan?',
               options: [
-                { id: 'approve', label: 'Approve', summary: 'Proceed to TDD & Execution' },
+                { id: 'approve', label: 'Approve', summary: 'Proceed to code generation' },
                 { id: 'revise', label: 'Revise', summary: 'Request adjustments to Plan' },
                 { id: 'cancel', label: 'Cancel', summary: 'Abort spine execution' },
               ],
@@ -903,8 +922,10 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
             signal.throwIfAborted();
             if (resp.chosen === 'revise') {
               emitLog(`Revision requested: ${resp.note ?? 're-evaluating plan'}`);
-              engineState = await planNode(engineState);
+              engineState = await planNode({ ...engineState, plan: undefined,
+                session: { ...engineState.session, task: `${task}\n\nPlan revision: ${resp.note ?? 'Reconsider the implementation plan.'}` } });
               await store.save(engineState);
+              await emitArtifacts();
             } else {
               proceed = true;
             }
@@ -915,8 +936,28 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         signal.throwIfAborted();
         await emitPhase('run');
         emitLog('Generating implementation and running the engine quality heuristic. Worktree isolation, test-first execution, and verification are not run by this desktop runner.');
-        const graph = new EngineGraph(store);
+        const graph = new EngineGraph(store, {
+          signal,
+          hitl: {
+            ask: async (request) => {
+              const response = await hitlChannel.ask(request);
+              if (response.chosen !== 'proceed') controller.abort();
+              return response;
+            },
+          },
+          onNodeStart: (_state, node) => {
+            if (!webContents.isDestroyed()) webContents.send('spine:event', { type: 'node', sessionId, node });
+          },
+          onNodeComplete: async (state, node) => {
+            await emitArtifacts();
+            if (node === 'coder') emitLog(`Wrote generated source for ${state.current?.description ?? 'task'}`);
+          },
+        });
         engineState = await graph.run(engineState);
+        signal.throwIfAborted();
+        if (!engineState.writtenFiles?.length || engineState.tasks.some(item => item.status !== 'done')) {
+          throw new Error('Execution stopped before all planned files were generated. Review the run before retrying.');
+        }
         await store.save(engineState);
         emitLog(`Generation finished. Output review heuristic: ${engineState.reviewScore ?? 'unavailable'}/10; executable verification was not run.`);
 
@@ -933,6 +974,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
           'Executable verification: NOT RUN. Use the Verify page after reviewing the generated files.',
           '',
         ].join('\n'), 'utf-8');
+        await emitArtifacts();
         const files = await readdir(sessionFolder).catch(() => []);
         const artifacts = files.filter(f => f.endsWith('.md'));
 
