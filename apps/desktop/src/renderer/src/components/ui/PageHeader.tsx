@@ -14,12 +14,12 @@ interface PageHeaderProps {
  */
 export const PageHeader: React.FC<PageHeaderProps> = ({ title, description, actions, toolbar }) => (
   <div className="sticky top-0 z-30 -mx-8 -mt-8 px-8 py-4 mb-6 bg-[#08090d]/90 backdrop-blur-xl border-b border-white/5">
-    <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-      <div className="min-w-0">
-        <h1 className="text-2xl font-bold tracking-tight text-white truncate">{title}</h1>
-        {description && <p className="text-sm text-slate-400 mt-1">{description}</p>}
+    <div className="max-w-7xl mx-auto flex flex-wrap items-start justify-between gap-4">
+      <div className="min-w-0 flex-1 basis-64">
+        <h1 className="text-2xl font-bold tracking-tight text-white break-words [text-wrap:balance]">{title}</h1>
+        {description && <p className="text-sm leading-relaxed text-slate-300 mt-1 max-w-prose break-words">{description}</p>}
       </div>
-      {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
+      {actions && <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2 [&>*]:max-w-full">{actions}</div>}
     </div>
     {toolbar && <div className="max-w-7xl mx-auto mt-4">{toolbar}</div>}
   </div>

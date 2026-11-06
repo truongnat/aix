@@ -53,6 +53,18 @@ inside `.aix/sessions/<id>/generated/`. Heuristic scores are not verification; t
 command must check your actual acceptance criteria and runs with your user's permissions.
 There is no automatic application to source, shipment or deployment.
 
+## Desktop sessions
+
+After building the workspace, run `pnpm desktop:build` and `pnpm desktop` to open the desktop app.
+The chat header lists sessions by the first line of their task rather than by UUID. Older
+sessions use their saved first user message when task metadata is unavailable. UUIDs remain
+the storage identifiers; no session folders are renamed.
+
+New tasks appear immediately with a **Running** label. Active runs appear first, followed
+by sessions ordered by their latest state, chat, or artifact update. The Inspector shows
+the same named session as Chat. **New Task** clears that context instead of showing an
+unrelated older session. Stop the current run before switching to another session.
+
 ## Next
 
 - [Architecture](./architecture)

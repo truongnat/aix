@@ -142,28 +142,50 @@ const PROVIDER_KEY_ENV: Readonly<Record<string, string>> = {
   inferx: 'INFERX_API_KEY',
 };
 
+/** Checks if a URL points to localhost or private network where auth is typically optional. */
+export function isLocalOrCustomEndpoint(url: string): boolean {
+  try {
+    const { hostname } = new URL(url);
+    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname === '0.0.0.0' || hostname.endsWith('.local');
+  } catch {
+    return false;
+  }
+}
+
+/** Normalizes any base URL to an OpenAI-compatible /chat/completions endpoint. */
+export function normalizeCompletionsUrl(url: string): string {
+  const clean = url.trim().replace(/\/+$/, '');
+  if (clean.endsWith('/chat/completions')) return clean;
+  if (clean.endsWith('/v1')) return `${clean}/chat/completions`;
+  return `${clean}/v1/chat/completions`;
+}
+
 export function resolveProviderRuntimeConfig(env: NodeJS.ProcessEnv = process.env): ProviderRuntimeConfig {
-  const inferredProvider = env['ANTHROPIC_API_KEY'] ? 'anthropic'
+  const defaultOpenAiUrl = env['OPENAI_BASE_URL']
+    ? normalizeCompletionsUrl(env['OPENAI_BASE_URL'])
+    : 'https://api.openai.com/v1/chat/completions';
+  const inferredProvider = env['OPENAI_BASE_URL'] ? 'openai'
+    : env['ANTHROPIC_API_KEY'] ? 'anthropic'
     : env['OPENAI_API_KEY'] ? 'openai'
     : env['GROQ_API_KEY'] ? 'groq'
     : env['INFERX_API_KEY'] ? 'inferx'
     : 'anthropic';
   const provider = env['AIX_PROVIDER'] ?? inferredProvider;
   const apiUrl = env['AIX_API_URL'] ?? (
-    provider === 'anthropic' ? 'https://api.anthropic.com/v1/messages'
-      : provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions'
-      : provider === 'inferx' ? 'https://model.inferx.net/endpoints/v1/chat/completions'
-      : provider === 'ollama' ? 'http://127.0.0.1:11434/v1/chat/completions'
-      : provider === 'codex' ? 'https://chatgpt.com/backend-api/codex/responses'
-      : 'https://api.openai.com/v1/chat/completions'
+    provider === 'anthropic' ? (env['ANTHROPIC_BASE_URL'] ?? 'https://api.anthropic.com/v1/messages')
+    : provider === 'groq' ? 'https://api.groq.com/openai/v1/chat/completions'
+    : provider === 'inferx' ? 'https://model.inferx.net/endpoints/v1/chat/completions'
+    : provider === 'ollama' ? 'http://127.0.0.1:11434/v1/chat/completions'
+    : provider === 'codex' ? 'https://chatgpt.com/backend-api/codex/responses'
+    : defaultOpenAiUrl
   );
-  const model = env['AIX_MODEL'] ?? (
+  const model = env['AIX_MODEL'] ?? env['OPENAI_MODEL'] ?? (
     provider === 'anthropic' ? (env['ANTHROPIC_MODEL'] ?? 'claude-sonnet-4-6')
-      : provider === 'groq' ? (env['GROQ_MODEL'] ?? 'llama3-70b-8192')
-      : provider === 'inferx' ? (env['INFERX_MODEL'] ?? 'deepseek-v4.1-flash-1017-basic')
-      : provider === 'ollama' ? 'deepseek-r1:latest'
-      : provider === 'codex' ? (env['OPENAI_MODEL'] ?? 'gpt-5.1-codex-max')
-      : (env['OPENAI_MODEL'] ?? 'gpt-4o')
+    : provider === 'groq' ? (env['GROQ_MODEL'] ?? 'llama3-70b-8192')
+    : provider === 'inferx' ? (env['INFERX_MODEL'] ?? 'deepseek-v4.1-flash-1017-basic')
+    : provider === 'ollama' ? 'deepseek-r1:latest'
+    : provider === 'codex' ? 'gpt-5.1-codex-max'
+    : 'gpt-4o'
   );
 
   return {
@@ -292,7 +314,8 @@ export class ApiRuntimeProvider implements RuntimeProvider {
   }
 
   async call(opts: ModelCallOptions): Promise<ModelCallResponse> {
-    if (!this.#apiKey && !this.#oauthToken && this.id !== 'ollama') {
+    const isKeyless = this.id === 'ollama' || isLocalOrCustomEndpoint(this.#apiUrl);
+    if (!this.#apiKey && !this.#oauthToken && !isKeyless) {
       throw new Error(`API key is missing for the selected ${this.id} provider`);
     }
 
@@ -320,12 +343,12 @@ export class ApiRuntimeProvider implements RuntimeProvider {
         ...authHeaders,
         'anthropic-version': '2023-06-01',
       },
+      // No `temperature`: current Claude models reject it with a 400.
       body: JSON.stringify({
         model: this.#model,
         system: opts.system,
         messages: [{ role: 'user', content: opts.user }],
         max_tokens: opts.maxTokens ?? 4096,
-        temperature: opts.temperature ?? 0.7,
       }),
     });
 
@@ -346,31 +369,41 @@ export class ApiRuntimeProvider implements RuntimeProvider {
     return { content, tokens, usd };
   }
 
-  async #callOpenAI(opts: ModelCallOptions, attempt = 1): Promise<ModelCallResponse> {
-    const res = await fetch(this.#apiUrl, {
+  async #callOpenAI(opts: ModelCallOptions, attempt = 1, omitTemperature = false): Promise<ModelCallResponse> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (this.#apiKey) headers['Authorization'] = `Bearer ${this.#apiKey}`;
+    const body: Record<string, unknown> = {
+      model: this.#model,
+      messages: [
+        { role: 'system', content: opts.system },
+        { role: 'user', content: opts.user },
+      ],
+      max_tokens: opts.maxTokens ?? 4096,
+    };
+    if (!omitTemperature && opts.temperature !== undefined) {
+      body['temperature'] = opts.temperature;
+    } else if (!omitTemperature) {
+      body['temperature'] = 0.7;
+    }
+
+    const targetUrl = normalizeCompletionsUrl(this.#apiUrl);
+    const res = await fetch(targetUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.#apiKey}`,
-      },
-      body: JSON.stringify({
-        model: this.#model,
-        messages: [
-          { role: 'system', content: opts.system },
-          { role: 'user', content: opts.user },
-        ],
-        max_tokens: opts.maxTokens ?? 4096,
-        temperature: opts.temperature ?? 0.7,
-      }),
+      headers,
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) {
       const result = redact(await res.text());
+      if (res.status === 400 && attempt === 1 && /temperature/i.test(result.clean)) {
+        // Auto-retry without temperature: reasoning models (o1, o3) and proxy gateways reject temperature.
+        return this.#callOpenAI(opts, 2, true);
+      }
       if (res.status === 429 && attempt < 4) {
         const delay = Math.min(1000 * 2 ** attempt, 8000);
         console.warn(`[provider] Rate limited (429). Retrying in ${delay}ms (attempt ${attempt}/3)...`);
         await new Promise(r => setTimeout(r, delay));
-        return this.#callOpenAI(opts, attempt + 1);
+        return this.#callOpenAI(opts, attempt + 1, omitTemperature);
       }
       throw new Error(`OpenAI API error: ${res.status} ${result.clean}`);
     }
@@ -392,7 +425,8 @@ export function createProvider(env: NodeJS.ProcessEnv = process.env): RuntimePro
   const config = resolveProviderRuntimeConfig(env);
   if (config.provider === 'mock') return new MockRuntimeProvider();
   if (config.provider === 'codex') return new CodexRuntimeProvider({ oauthToken: config.oauthToken, accountId: config.oauthAccountId, apiUrl: config.apiUrl, model: config.model });
-  if (!config.apiKey && !config.oauthToken && config.provider !== 'ollama') {
+  const isKeyless = config.provider === 'ollama' || isLocalOrCustomEndpoint(config.apiUrl);
+  if (!config.apiKey && !config.oauthToken && !isKeyless) {
     if (env['AIX_PROVIDER']) {
       throw new Error(`API key is missing for the selected ${config.provider} provider`);
     }

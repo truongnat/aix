@@ -34,7 +34,8 @@ import type {
   DesktopChatMessage,
   AiProviderId,
 } from '../shared/api.js';
-import { providerEnvironmentFor } from '../shared/desktop-logic.js';
+import { endpointOverrideFor, isLocalOrCustomEndpoint, normalizeCompletionsUrl, providerEnvironmentFor } from '../shared/desktop-logic.js';
+import { listDesktopSessions } from '../shared/session-list.js';
 import { applyClaudeSubscriptionEnv, clearClaudeSubscriptionEnv, ensureClaudeSubscriptionToken, listCliSubscriptions } from './cli-subscription.js';
 import { detectModelSources, ensureSourceEnv } from './model-sources.js';
 
@@ -410,7 +411,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
       provider: newConfig.provider,
       model,
       apiKey: finalApiKey,
-      baseUrl: newConfig.baseUrl?.trim() || undefined,
+      baseUrl: endpointOverrideFor({ provider: newConfig.provider, baseUrl: newConfig.baseUrl, useSubscription }),
       useSubscription,
     };
 
@@ -429,9 +430,11 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     const apiKey = testParams?.apiKey?.trim()
       ? testParams.apiKey.trim()
       : provider === current.provider ? current.apiKey : '';
-    const baseUrl = testParams?.baseUrl?.trim()
-      ? testParams.baseUrl.trim()
-      : provider === current.provider ? current.baseUrl : undefined;
+    const baseUrl = endpointOverrideFor({
+      provider,
+      useSubscription,
+      baseUrl: testParams?.baseUrl?.trim() ? testParams.baseUrl : provider === current.provider ? current.baseUrl : undefined,
+    });
 
     if (provider === 'mock') {
       return { ok: true, latencyMs: 5, message: 'Mock provider active (offline mode)' };
@@ -448,8 +451,8 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
         return { ok: false, latencyMs: Date.now() - start, message: 'Codex subscription unavailable', error: String(error instanceof Error ? error.message : error) };
       }
     }
-
-    if (!apiKey && !useSubscription && provider !== 'ollama') {
+    const isKeyless = provider === 'ollama' || (Boolean(baseUrl) && isLocalOrCustomEndpoint(baseUrl!));
+    if (!apiKey && !useSubscription && !isKeyless) {
       return { ok: false, latencyMs: 0, message: 'Missing API Key', error: `Missing API Key for provider "${provider}"` };
     }
 
@@ -490,15 +493,17 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
       }
 
       if (provider === 'inferx' || provider === 'openai' || provider === 'groq' || provider === 'ollama') {
-        const url = baseUrl || (
-          provider === 'inferx'
-            ? 'https://model.inferx.net/endpoints/v1/chat/completions'
-            : provider === 'groq'
-              ? 'https://api.groq.com/openai/v1/chat/completions'
-              : provider === 'ollama'
-                ? 'http://127.0.0.1:11434/v1/chat/completions'
-                : 'https://api.openai.com/v1/chat/completions'
-        );
+        const url = baseUrl
+          ? normalizeCompletionsUrl(baseUrl)
+          : (
+            provider === 'inferx'
+              ? 'https://model.inferx.net/endpoints/v1/chat/completions'
+              : provider === 'groq'
+                ? 'https://api.groq.com/openai/v1/chat/completions'
+                : provider === 'ollama'
+                  ? 'http://127.0.0.1:11434/v1/chat/completions'
+                  : 'https://api.openai.com/v1/chat/completions'
+          );
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
         if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
@@ -721,41 +726,8 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
   });
 
   // Sessions & Spine
-  ipcMain.handle('spine:listSessions', async (): Promise<readonly DesktopSessionSummary[]> => {
-    const sessionsDir = join(storageRoot, '.aix', 'sessions');
-    const sessions: DesktopSessionSummary[] = [];
-    try {
-      const dirs = await readdir(sessionsDir);
-      for (const d of dirs) {
-        const full = join(sessionsDir, d);
-        const s = await stat(full);
-        if (!s.isDirectory()) continue;
-        const files = await readdir(full);
-        const artifacts = files.filter(f =>
-          ['DISCUSSION.md', 'PLAN.md', 'REVIEW.md', 'VERIFY.md', 'REMEMBER.md'].includes(f)
-        );
-        let phase: Phase | undefined;
-        try {
-          const stateRaw = await readFile(join(full, 'state.json'), 'utf-8');
-          const parsed = JSON.parse(stateRaw);
-          phase = parsed.phase;
-        } catch {
-          // no state.json
-        }
-
-        sessions.push({
-          id: d,
-          path: full,
-          phase,
-          artifacts,
-          updatedAt: s.mtime.toISOString(),
-        });
-      }
-    } catch {
-      // no sessions directory
-    }
-    return sessions.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-  });
+  ipcMain.handle('spine:listSessions', (): Promise<readonly DesktopSessionSummary[]> =>
+    listDesktopSessions(join(storageRoot, '.aix', 'sessions'), activeRuns));
 
   ipcMain.handle('spine:getArtifact', async (_, sessionId: string, artifactName: string): Promise<string | undefined> => {
     if (!/^[a-zA-Z0-9_-]+$/.test(sessionId)) return undefined;
@@ -831,13 +803,19 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     const controller = new AbortController();
     const { signal } = controller;
     activeRuns.set(sessionId, controller);
+    const store = new SessionStore(join(storageRoot, '.aix', 'sessions'));
+    let engineState = createInitialEngineState(session);
+    try {
+      // The returned ID must already be discoverable by spine:listSessions.
+      await store.save(engineState);
+    } catch (error) {
+      activeChannels.delete(sessionId);
+      activeRuns.delete(sessionId);
+      throw error;
+    }
 
     (async () => {
       try {
-        const store = new SessionStore(join(storageRoot, '.aix', 'sessions'));
-        let engineState = createInitialEngineState(session);
-        await store.save(engineState);
-
         const emitLog = (msg: string) => {
           if (!webContents.isDestroyed()) {
             webContents.send('spine:event', {
@@ -849,7 +827,9 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
           }
         };
 
-        const emitPhase = (p: Phase) => {
+        const emitPhase = async (p: Phase) => {
+          engineState = { ...engineState, session: { ...engineState.session, phase: p } };
+          await store.save(engineState);
           if (!webContents.isDestroyed()) {
             webContents.send('spine:event', {
               type: 'phase',
@@ -863,7 +843,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
 
         // Phase 1: Discuss
         signal.throwIfAborted();
-        emitPhase('discuss');
+        await emitPhase('discuss');
         emitLog('Executing Step 1: Discussing architecture and trade-offs...');
         engineState = await discussNode(engineState);
         await store.save(engineState);
@@ -898,7 +878,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
 
         // Phase 2: Plan
         signal.throwIfAborted();
-        emitPhase('plan');
+        await emitPhase('plan');
         emitLog('Executing Step 2: Planning tasks and acceptance criteria...');
         engineState = await planNode(engineState);
         await store.save(engineState);
@@ -933,7 +913,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
 
         // Phase 3: Run / Execution
         signal.throwIfAborted();
-        emitPhase('run');
+        await emitPhase('run');
         emitLog('Generating implementation and running the engine quality heuristic. Worktree isolation, test-first execution, and verification are not run by this desktop runner.');
         const graph = new EngineGraph(store);
         engineState = await graph.run(engineState);

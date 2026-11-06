@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import {
   FileCode2,
   ShieldCheck,
@@ -21,7 +21,6 @@ import type {
   DesktopMemoryRecord,
 } from '@shared/api';
 import { MarkdownRenderer } from './MarkdownRenderer';
-import { Select } from './ui/Select';
 import { ConfirmDialog } from './ui/Modal';
 
 interface InspectorDrawerProps {
@@ -33,10 +32,18 @@ interface InspectorDrawerProps {
   onRefreshData?: () => void;
   /** `seq` changes on every request so asking for the same tab again still switches to it. */
   requestedTab?: { readonly tab: DrawerTab; readonly seq: number };
-  activeSessionId?: string;
+  activeSessionId?: string | null;
+  width?: number;
 }
 
 export type DrawerTab = 'artifacts' | 'verify' | 'kb' | 'memory';
+
+const DRAWER_TABS: readonly { tab: DrawerTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { tab: 'artifacts', label: 'Artifacts', icon: FileCode2 },
+  { tab: 'verify', label: 'Verify', icon: ShieldCheck },
+  { tab: 'kb', label: 'KB Server', icon: Server },
+  { tab: 'memory', label: 'Memory', icon: Brain },
+];
 
 export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   isOpen,
@@ -47,9 +54,12 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   onRefreshData,
   requestedTab,
   activeSessionId,
+  width,
 }) => {
   const [tab, setTab] = useState<DrawerTab>('artifacts');
-  const [selectedSessionId, setSelectedSessionId] = useState<string>(sessions[0]?.id ?? '');
+  const effectiveSessionId = activeSessionId ?? '';
+  const activeSession = sessions.find((session) => session.id === effectiveSessionId);
+  const sessionTitle = effectiveSessionId ? activeSession?.title ?? 'Loading session…' : 'New task';
   const [currentArtifact, setCurrentArtifact] = useState<string>(activeArtifactName ?? 'PLAN.md');
   const [artifactContent, setArtifactContent] = useState<string>('');
   const [loadingArtifact, setLoadingArtifact] = useState<boolean>(false);
@@ -67,6 +77,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   // Memory State
   const [memories, setMemories] = useState<readonly DesktopMemoryRecord[]>([]);
   const [memorySearch, setMemorySearch] = useState<string>('');
+  const verifyCommandId = useId();
 
   useEffect(() => {
     if (activeArtifactName) {
@@ -80,29 +91,31 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   }, [requestedTab]);
 
   useEffect(() => {
-    if (activeSessionId) setSelectedSessionId(activeSessionId);
-  }, [activeSessionId]);
+    setVerifyResult(null);
+    setPendingVerify(null);
+  }, [effectiveSessionId]);
 
+  // Never let a previous session's late artifact response replace the current one.
   useEffect(() => {
-    if (sessions.length > 0 && !selectedSessionId) {
-      setSelectedSessionId(sessions[0]?.id ?? '');
+    if (!effectiveSessionId) {
+      setArtifactContent('Start or select a task to view its artifacts.');
+      setLoadingArtifact(false);
+      return;
     }
-  }, [sessions]);
-
-  // Load Artifact content
-  useEffect(() => {
-    if (!selectedSessionId || !currentArtifact) return;
+    if (!isOpen || tab !== 'artifacts') return;
+    let cancelled = false;
+    setArtifactContent('');
     setLoadingArtifact(true);
-    window.aixAPI
-      .getSessionArtifact(selectedSessionId, currentArtifact)
+    window.aixAPI.getSessionArtifact(effectiveSessionId, currentArtifact)
       .then((content) => {
-        setArtifactContent(content ?? `No ${currentArtifact} generated in session.`);
+        if (!cancelled) setArtifactContent(content ?? `No ${currentArtifact} generated in session.`);
       })
       .catch((err: unknown) => {
-        setArtifactContent(`Error loading artifact: ${String(err)}`);
+        if (!cancelled) setArtifactContent(`Error loading artifact: ${String(err)}`);
       })
-      .finally(() => setLoadingArtifact(false));
-  }, [selectedSessionId, currentArtifact]);
+      .finally(() => { if (!cancelled) setLoadingArtifact(false); });
+    return () => { cancelled = true; };
+  }, [effectiveSessionId, currentArtifact, activeSession?.updatedAt, isOpen, tab]);
 
   // Load Memories
   useEffect(() => {
@@ -125,14 +138,14 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
 
   const handleRunVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedSessionId || !verifyCommand.trim()) return;
+    if (!effectiveSessionId || !verifyCommand.trim()) return;
     setPendingVerify(verifyCommand.trim());
   };
 
   const executeVerify = async (command: string) => {
     setRunningVerify(true);
     try {
-      const res = await window.aixAPI.runVerify(selectedSessionId, command);
+      const res = await window.aixAPI.runVerify(effectiveSessionId, command);
       setVerifyResult(res);
     } catch (error: unknown) {
       setVerifyResult({
@@ -170,46 +183,26 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   });
 
   return (
-    <aside className="w-[440px] bg-surface border-l border-white/5 flex flex-col h-full shrink-0 z-20">
+    <aside
+      style={{ width: width ? `${width}px` : undefined }}
+      className={`${width ? '' : 'w-[440px]'} bg-surface border-l border-white/5 flex flex-col h-full shrink-0 z-20 overflow-hidden`}
+    >
       {/* Drawer Header with Tabs */}
-      <div className="h-12 px-3 border-b border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => setTab('artifacts')}
-            className={`px-2.5 py-1.5 rounded-md text-[12px] font-medium flex items-center gap-1.5 transition-colors ${
-              tab === 'artifacts' ? 'bg-white/[0.07] text-white' : 'text-slate-500 hover:text-slate-200'
-            }`}
-          >
-            <FileCode2 className="w-3.5 h-3.5" /> Artifacts
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab('verify')}
-            className={`px-2.5 py-1.5 rounded-md text-[12px] font-medium flex items-center gap-1.5 transition-colors ${
-              tab === 'verify' ? 'bg-white/[0.07] text-white' : 'text-slate-500 hover:text-slate-200'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" /> Verify
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab('kb')}
-            className={`px-2.5 py-1.5 rounded-md text-[12px] font-medium flex items-center gap-1.5 transition-colors ${
-              tab === 'kb' ? 'bg-white/[0.07] text-white' : 'text-slate-500 hover:text-slate-200'
-            }`}
-          >
-            <Server className="w-3.5 h-3.5" /> KB Server
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab('memory')}
-            className={`px-2.5 py-1.5 rounded-md text-[12px] font-medium flex items-center gap-1.5 transition-colors ${
-              tab === 'memory' ? 'bg-white/[0.07] text-white' : 'text-slate-500 hover:text-slate-200'
-            }`}
-          >
-            <Brain className="w-3.5 h-3.5" /> Memory
-          </button>
+      <div className="h-12 px-3 border-b border-white/5 flex items-center justify-between gap-2">
+        <div role="group" aria-label="Inspector sections" className="flex min-w-0 items-center gap-1">
+          {DRAWER_TABS.map(({ tab: id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={tab === id}
+              onClick={() => setTab(id)}
+              className={`min-h-8 px-2.5 rounded-md text-[12px] font-medium flex items-center gap-1.5 whitespace-nowrap transition-colors ${
+                tab === id ? 'bg-white/[0.07] text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" /> {label}
+            </button>
+          ))}
         </div>
 
         <button
@@ -217,9 +210,9 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
           onClick={onClose}
           aria-label="Close Inspector Drawer"
           title="Close drawer (Esc)"
-          className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+          className="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
 
@@ -228,18 +221,16 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
         {/* Tab 1: Artifacts Viewer */}
         {tab === 'artifacts' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <div className="flex items-center justify-between gap-3">
+              <span className="shrink-0 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Session Artifacts
               </span>
-              <Select
-                className="max-w-[200px]"
-                value={selectedSessionId}
-                ariaLabel="Session artifacts viewer"
-                options={sessions.map((s) => ({ value: s.id, label: s.id }))}
-                onChange={setSelectedSessionId}
-                emptyLabel="No sessions yet"
-              />
+            <span
+              className="text-xs text-blue-300 bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 rounded truncate max-w-[260px]"
+              title={effectiveSessionId ? `${sessionTitle}\n${effectiveSessionId}` : 'New task'}
+            >
+              {sessionTitle}
+            </span>
             </div>
 
             {/* Artifact Pills */}
@@ -248,11 +239,12 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
                 <button
                   key={art}
                   type="button"
+                  aria-pressed={currentArtifact === art}
                   onClick={() => setCurrentArtifact(art)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all ${
+                  className={`shrink-0 min-h-7 px-2.5 rounded-lg text-[12px] font-mono font-semibold border transition-colors ${
                     currentArtifact === art
-                      ? 'bg-blue-600/20 text-blue-300 border border-blue-500/40 font-bold'
-                      : 'bg-white/[0.02] text-slate-400 hover:text-white border border-white/5'
+                      ? 'bg-blue-600/20 text-blue-300 border-blue-500/40'
+                      : 'bg-white/[0.02] text-slate-400 hover:text-white border-white/5'
                   }`}
                 >
                   {art.replace('.md', '')}
@@ -263,7 +255,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
             {/* Rendered Artifact Content */}
             <div className="p-4 rounded-xl bg-black/40 border border-white/5">
               {loadingArtifact ? (
-                <div className="text-slate-500 text-xs py-10 text-center">Loading artifact...</div>
+                <div className="text-slate-400 text-xs py-10 text-center" role="status">Loading artifact…</div>
               ) : (
                 <MarkdownRenderer content={artifactContent} />
               )}
@@ -276,40 +268,47 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
           <div className="space-y-4">
             <div className="space-y-1">
               <span className="text-xs font-bold text-white block">Execute Sandbox Test</span>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
+              <p className="text-[12px] text-slate-400 leading-relaxed">
                 Runs a whitelisted command in <code className="text-slate-300">generated/</code> with your normal account permissions. This is not an OS sandbox; review generated scripts before running them.
               </p>
             </div>
 
             <form onSubmit={handleRunVerify} className="space-y-3">
               <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-slate-500">Target Session:</label>
-                <Select
-                  value={selectedSessionId}
-                  ariaLabel="Verify target session"
-                  options={sessions.map((s) => ({ value: s.id, label: s.id }))}
-                  onChange={setSelectedSessionId}
-                  emptyLabel="No sessions yet"
-                />
+                <div className="flex items-center justify-between">
+                  <span className="block text-[11px] uppercase font-bold text-slate-400">Target Session</span>
+                  <span
+                    className="text-xs text-blue-300 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded truncate max-w-[260px]"
+                    title={effectiveSessionId ? `${sessionTitle}\n${effectiveSessionId}` : 'New task'}
+                  >
+                    {sessionTitle}
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] uppercase font-bold text-slate-500">Test Command:</label>
+                <label htmlFor={verifyCommandId} className="block text-[11px] uppercase font-bold text-slate-400">Test Command</label>
                 <div className="flex gap-2">
                   <input
+                    id={verifyCommandId}
                     type="text"
                     required
                     value={verifyCommand}
                     onChange={(e) => setVerifyCommand(e.target.value)}
                     placeholder="e.g. pnpm test, pytest -v"
-                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white font-mono placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+                    className="flex-1 min-w-0 min-h-8 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
                   />
                   <button
                     type="submit"
                     disabled={runningVerify}
-                    className="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center gap-1.5 transition-all shadow-md"
+                    className="shrink-0 min-h-8 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-md"
                   >
-                    <Play className="w-3.5 h-3.5 fill-white" /> Run
+                    {runningVerify ? (
+                      <Loader2 className="w-3.5 h-3.5 motion-safe:animate-spin" aria-hidden="true" />
+                    ) : (
+                      <Play className="w-3.5 h-3.5 fill-white" aria-hidden="true" />
+                    )}
+                    Run
                   </button>
                 </div>
               </div>
@@ -355,7 +354,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
           <div className="space-y-4">
             <div className="space-y-1">
               <span className="text-xs font-bold text-white block">Knowledge Base Service (NestJS + SQLite)</span>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
+              <p className="text-[12px] text-slate-400 leading-relaxed">
                 Provides HTTP API and full-text search on port 4000.
               </p>
             </div>
@@ -364,13 +363,14 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
               <div className="flex items-center justify-between">
                 <span className="text-xs text-slate-300 flex items-center gap-2">
                   <span
+                    aria-hidden="true"
                     className={`w-2 h-2 rounded-full ${
-                      status?.kbServiceOnline ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'
+                      status?.kbServiceOnline ? 'bg-emerald-400 motion-safe:animate-pulse' : 'bg-slate-500'
                     }`}
                   />
                   Status: {status?.kbServiceOnline ? 'Online (Active)' : 'Offline'}
                 </span>
-                <span className="text-[11px] font-mono text-slate-500">Port {status?.kbPort ?? 4000}</span>
+                <span className="text-[11px] font-mono text-slate-400">Port {status?.kbPort ?? 4000}</span>
               </div>
 
               <div className="pt-2 flex items-center gap-2">
@@ -378,16 +378,16 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
                   type="button"
                   disabled={togglingKb}
                   onClick={handleToggleKb}
-                  className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  className={`flex-1 min-h-9 py-2 rounded-xl text-xs font-bold transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 ${
                     status?.kbServiceOnline
                       ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20'
                       : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20'
                   }`}
                 >
                   {togglingKb ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 motion-safe:animate-spin" aria-hidden="true" />
                   ) : (
-                    <Power className="w-3.5 h-3.5" />
+                    <Power className="w-3.5 h-3.5" aria-hidden="true" />
                   )}
                   {status?.kbServiceOnline ? 'Stop KB Server' : 'Launch KB Server'}
                 </button>
@@ -395,7 +395,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
             </div>
 
             {kbMessage && (
-              <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs">
+              <div role="status" className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs">
                 {kbMessage}
               </div>
             )}
@@ -406,21 +406,22 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
         {tab === 'memory' && (
           <div className="space-y-3">
             <input
-              type="text"
+              type="search"
+              aria-label="Search memories"
               value={memorySearch}
               onChange={(e) => setMemorySearch(e.target.value)}
-              placeholder="Search past solutions..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500"
+              placeholder="Search past solutions…"
+              className="w-full min-h-8 bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-purple-500 transition-colors"
             />
 
             <div className="space-y-2">
               {filteredMemories.map((m) => (
                 <div key={m.id} className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-white">{m.title}</span>
-                    <span className="text-[9px] uppercase font-semibold text-purple-400">{m.kind}</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="min-w-0 break-words font-bold text-xs text-white">{m.title}</span>
+                    <span className="shrink-0 text-[11px] uppercase font-semibold text-purple-300">{m.kind}</span>
                   </div>
-                  <p className="text-[11px] text-slate-400 line-clamp-2">{m.body}</p>
+                  <p className="text-[12px] text-slate-400 leading-relaxed line-clamp-2">{m.body}</p>
                 </div>
               ))}
             </div>

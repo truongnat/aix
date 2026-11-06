@@ -32,6 +32,8 @@ export interface DesktopMemoryRecord {
 export interface DesktopSessionSummary {
   readonly id: string;
   readonly path: string;
+  readonly title: string;
+  readonly isRunning: boolean;
   readonly phase?: Phase | undefined;
   readonly artifacts: readonly string[];
   readonly updatedAt: string;

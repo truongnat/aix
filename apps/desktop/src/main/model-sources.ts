@@ -3,6 +3,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 import { applyClaudeSubscriptionEnv, ensureClaudeSubscriptionToken, listClaudeCodeSubscription } from './cli-subscription.js';
+import { codexModelsFromCache, isLocalOrCustomEndpoint } from '../shared/desktop-logic.js';
 
 /**
  * Detects every usable model source on this machine — CLI logins
@@ -32,7 +33,6 @@ export interface DesktopModelSource {
 const CLAUDE_MODELS = ['claude-sonnet-4-6', 'claude-sonnet-5', 'claude-opus-4-6', 'claude-haiku-4-5'] as const;
 const GROQ_MODELS = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'] as const;
 const OPENAI_KEY_MODELS = ['gpt-4o', 'gpt-4o-mini', 'o3-mini'] as const;
-const CODEX_FALLBACK_MODELS = ['gpt-6.1-sol-wm', 'gpt-6', 'gpt-6-mini', 'gpt-5-6'] as const;
 
 const LIST_CACHE_TTL_MS = 5 * 60_000;
 const modelListCache = new Map<string, { readonly models: readonly string[]; readonly checkedAt: number }>();
@@ -67,22 +67,6 @@ async function fetchAnthropicModels(accessToken: string): Promise<readonly strin
   return (data.data ?? []).map(m => m.id ?? '').filter(Boolean);
 }
 
-/** Live ChatGPT catalog for Codex CLI logins (slug list). */
-async function fetchChatGptModels(accessToken: string, accountId: string): Promise<readonly string[]> {
-  const res = await fetch('https://chatgpt.com/backend-api/models', {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-      'chatgpt-account-id': accountId,
-    },
-    signal: AbortSignal.timeout(4000),
-  });
-  if (!res.ok) throw new Error(`chatgpt /models: HTTP ${res.status}`);
-  const data = await res.json() as { models?: Array<{ slug?: string }> };
-  return (data.models ?? [])
-    .map(m => m.slug ?? '')
-    .filter(slug => slug && !slug.startsWith('chatgpt_alpha_'));
-}
-
 async function pathExists(path: string): Promise<boolean> {
   try {
     await stat(path);
@@ -92,27 +76,28 @@ async function pathExists(path: string): Promise<boolean> {
   }
 }
 
-async function readCodexSubscription(): Promise<{ accessToken: string; accountId: string; model: string } | null> {
+async function readCodexSubscription(): Promise<{ accessToken: string; accountId: string } | null> {
   try {
     const raw = await readFile(join(homedir(), '.codex', 'auth.json'), 'utf-8');
     const parsed = JSON.parse(raw) as {
       tokens?: { access_token?: string; account_id?: string };
     };
     if (!parsed.tokens?.access_token) return null;
-    let model = '';
-    try {
-      const config = await readFile(join(homedir(), '.codex', 'config.toml'), 'utf-8');
-      model = /^model\s*=\s*"([^"]+)"/m.exec(config)?.[1] ?? '';
-    } catch {
-      // config.toml is optional
-    }
     return {
       accessToken: parsed.tokens.access_token,
       accountId: parsed.tokens.account_id ?? '',
-      model,
     };
   } catch {
     return null;
+  }
+}
+
+/** Codex CLI's own model catalog; empty until Codex CLI has run once. */
+async function readCodexModels(): Promise<string[]> {
+  try {
+    return codexModelsFromCache(JSON.parse(await readFile(join(homedir(), '.codex', 'models_cache.json'), 'utf-8')));
+  } catch {
+    return [];
   }
 }
 
@@ -136,15 +121,49 @@ async function listOllamaModels(): Promise<readonly string[] | null> {
   }
 }
 
+/** Fetches model list from any standard OpenAI-compatible /v1/models endpoint. */
+async function fetchOpenAiModels(baseUrl: string, apiKey?: string): Promise<readonly string[] | null> {
+  try {
+    const clean = baseUrl.trim().replace(/\/+$/, '');
+    const root = clean.endsWith('/chat/completions')
+      ? clean.replace(/\/chat\/completions$/, '')
+      : clean;
+    const modelsUrl = root.endsWith('/v1') ? `${root}/models` : `${root}/v1/models`;
+    const headers: Record<string, string> = {};
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+    const res = await fetch(modelsUrl, { headers, signal: AbortSignal.timeout(2000) });
+    if (!res.ok) return null;
+    const data = await res.json() as { data?: Array<{ id?: string }>; models?: Array<{ id?: string; slug?: string }> };
+    const list = (data.data ?? []).map(m => m.id ?? '')
+      .concat((data.models ?? []).map(m => m.slug ?? m.id ?? ''))
+      .filter(Boolean);
+    return list.length > 0 ? [...new Set(list)] : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function detectModelSources(): Promise<readonly DesktopModelSource[]> {
-  const [claude, codex, ollamaModels, ompKey] = await Promise.all([
+  let savedOpenAiBase = '';
+  try {
+    const configFile = process.env['AIX_CONFIG_PATH'] || join(process.env['AIX_STORAGE_ROOT'] || homedir(), '.aix', 'ai-config.json');
+    const raw = await readFile(configFile, 'utf-8');
+    const parsed = JSON.parse(raw);
+    if (parsed.provider === 'openai' && parsed.baseUrl) savedOpenAiBase = parsed.baseUrl;
+  } catch {
+    // Config file optional
+  }
+  const activeOpenAiBase = process.env['OPENAI_BASE_URL'] || process.env['AIX_API_URL'] || savedOpenAiBase;
+
+  const [claude, codex, codexModels, customOpenAiModels, ollamaModels, ompKey] = await Promise.all([
     listClaudeCodeSubscription(),
     readCodexSubscription(),
+    readCodexModels(),
+    activeOpenAiBase ? fetchOpenAiModels(activeOpenAiBase, process.env['OPENAI_API_KEY']) : Promise.resolve(null),
     listOllamaModels(),
     readOmpInferxKey(),
   ]);
-
-  const [hasAntigravity, hasGeminiCli, claudeLive, codexLive] = await Promise.all([
+  const [hasAntigravity, hasGeminiCli, claudeLive] = await Promise.all([
     pathExists(join(homedir(), '.antigravity')),
     pathExists(join(homedir(), '.gemini')),
     // Live model listings — same pattern as pi/omp: refresh credentials, hit
@@ -159,14 +178,9 @@ export async function detectModelSources(): Promise<readonly DesktopModelSource[
         return null;
       }
     })(),
-    (async (): Promise<readonly string[] | null> => {
-      if (!codex) return null;
-      return cachedList('codex', () => fetchChatGptModels(codex.accessToken, codex.accountId));
-    })(),
   ]);
 
   const claudeModels = claudeLive ?? CLAUDE_MODELS;
-  const codexModels = [...new Set([codex?.model ?? '', ...(codexLive ?? []), ...CODEX_FALLBACK_MODELS].filter(Boolean))];
 
   return [
     {
@@ -194,9 +208,9 @@ export async function detectModelSources(): Promise<readonly DesktopModelSource[
       usable: Boolean(codex),
       note: !codex
         ? 'Install Codex CLI and log in with your ChatGPT account'
-        : codexLive
-          ? `ChatGPT-plan login detected — ${codexLive.length} live models`
-          : 'ChatGPT-plan login detected',
+        : codexModels.length > 0
+          ? `ChatGPT-plan login detected — ${codexModels.length} Codex models`
+          : 'ChatGPT-plan login detected — run Codex CLI once to load its model list',
       models: codexModels,
     },
     {
@@ -249,13 +263,17 @@ export async function detectModelSources(): Promise<readonly DesktopModelSource[
     },
     {
       id: 'openai-key',
-      name: 'OpenAI (API key)',
+      name: activeOpenAiBase ? 'OpenAI / Custom Gateway' : 'OpenAI (API key)',
       provider: 'openai',
-      authNote: 'Environment key',
-      detected: Boolean(process.env['OPENAI_API_KEY']),
-      usable: Boolean(process.env['OPENAI_API_KEY']),
-      note: process.env['OPENAI_API_KEY'] ? 'OPENAI_API_KEY found in environment' : 'No OPENAI_API_KEY in environment',
-      models: OPENAI_KEY_MODELS,
+      authNote: activeOpenAiBase
+        ? (isLocalOrCustomEndpoint(activeOpenAiBase) ? 'Local gateway (key optional)' : 'Custom endpoint')
+        : 'Environment key',
+      detected: Boolean(activeOpenAiBase || process.env['OPENAI_API_KEY']),
+      usable: Boolean((activeOpenAiBase && isLocalOrCustomEndpoint(activeOpenAiBase)) || process.env['OPENAI_API_KEY']),
+      note: activeOpenAiBase
+        ? `Endpoint: ${activeOpenAiBase}${customOpenAiModels ? ` — ${customOpenAiModels.length} models detected` : ''}`
+        : (process.env['OPENAI_API_KEY'] ? 'OPENAI_API_KEY found in environment' : 'No OPENAI_API_KEY in environment'),
+      models: (customOpenAiModels && customOpenAiModels.length > 0) ? customOpenAiModels : OPENAI_KEY_MODELS,
     },
     {
       id: 'groq-key',

@@ -8,7 +8,7 @@
   "main": "./dist/main/index.js",
   "scripts": {
     "dev:renderer": "vite",
-    "build:shared": "tsup src/shared/security.ts src/shared/desktop-logic.ts --format esm --out-dir dist/shared --target node22",
+    "build:shared": "tsup src/shared/security.ts src/shared/desktop-logic.ts src/shared/session-list.ts --format esm --out-dir dist/shared --target node22",
     "build:main": "tsup src/main/index.ts --format esm --out-dir dist/main --target node22 --external electron",
     "build:preload": "tsup src/preload/index.ts --format cjs --out-dir dist/preload --target node22 --external electron",
     "build:renderer": "vite build",

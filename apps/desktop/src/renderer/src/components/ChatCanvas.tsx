@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect, useId } from 'react';
 import {
   ArrowUp,
   ArrowDown,
@@ -34,6 +34,8 @@ import { PROVIDERS } from '../pages/SettingsPage';
 import type { DrawerTab } from './InspectorDrawer';
 import type { NavTab } from './Sidebar';
 import { ConfirmDialog } from './ui/Modal';
+import { Select } from './ui/Select';
+import { sessionTitleFromTask } from '@shared/desktop-logic';
 
 type RunStatus = 'running' | 'done' | 'error' | 'stopped';
 type StepStatus = 'pending' | 'active' | 'done' | 'failed' | 'stopped';
@@ -54,12 +56,14 @@ interface ChatMessage {
 
 interface ChatCanvasProps {
   sessions: readonly DesktopSessionSummary[];
+  activeSessionId?: string | null;
   onOpenArtifact: (artifact: string) => void;
   onRefreshSessions?: () => void;
   onSessionChange?: (sessionId: string | null) => void;
   onToggleDrawer: (tab: DrawerTab) => void;
   drawerTab: DrawerTab | null;
   onNavigate: (tab: NavTab) => void;
+  newChatRequest: number;
 }
 
 const QUICK_PROMPTS = [
@@ -91,6 +95,9 @@ const formatElapsed = (ms: number) => {
   const s = Math.max(0, Math.floor(ms / 1000));
   return s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${s % 60}s`;
 };
+
+const scrollBehavior = (): ScrollBehavior =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 
 const modelLabelFor = (cfg: DesktopAiConfig | null) => {
   if (!cfg) return 'Loading model…';
@@ -127,7 +134,7 @@ const SpineStepCards = React.memo<{ msg: ChatMessage; onOpenArtifact: (a: string
 }) => {
   const statuses = stepStatuses(msg);
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] gap-1.5">
       {PIPELINE_STEPS.map((step, i) => {
         const Icon = step.icon;
         const status = statuses[i] ?? 'pending';
@@ -151,16 +158,16 @@ const SpineStepCards = React.memo<{ msg: ChatMessage; onOpenArtifact: (a: string
           >
             <div className="flex items-center justify-between gap-2">
               <span className="flex items-center gap-1.5 min-w-0">
-                <Icon className={`w-3.5 h-3.5 shrink-0 ${status === 'pending' ? 'text-slate-600' : 'text-slate-300'}`} />
-                <span className={`text-[11px] font-medium truncate ${status === 'pending' ? 'text-slate-500' : 'text-slate-200'}`}>
+                <Icon className={`w-3.5 h-3.5 shrink-0 ${status === 'pending' ? 'text-slate-500' : 'text-slate-300'}`} aria-hidden="true" />
+                <span className={`text-[12px] font-medium truncate ${status === 'pending' ? 'text-slate-400' : 'text-slate-200'}`}>
                   {i + 1}. {step.name}
                 </span>
               </span>
               <StepStatusIcon status={status} />
             </div>
-            <div className="mt-0.5 pl-5 text-[10px] text-slate-500 truncate">
+            <div className="mt-0.5 pl-5 text-[11px] text-slate-400 truncate">
               {step.role}
-              {artifact && <span className="text-blue-400/80"> · {artifact}</span>}
+              {artifact && <span className="text-blue-300"> · {artifact}</span>}
             </div>
           </button>
         );
@@ -183,24 +190,25 @@ const ReasoningBlock = React.memo<{ msg: ChatMessage; now: number }>(({ msg, now
     <div className="rounded-lg border border-white/5 bg-black/20">
       <button
         type="button"
+        aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="w-full px-3 py-2 flex items-center gap-2 text-[11px] text-slate-400 hover:text-slate-200 transition-colors"
+        className="w-full min-h-9 px-3 py-2 flex items-center gap-2 text-[12px] text-slate-400 hover:text-slate-200 transition-colors"
       >
-        {open ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-        <Brain className={`w-3.5 h-3.5 ${running ? 'text-indigo-400 animate-pulse' : 'text-slate-500'}`} />
+        {open ? <ChevronDown className="w-3 h-3" aria-hidden="true" /> : <ChevronRight className="w-3 h-3" aria-hidden="true" />}
+        <Brain className={`w-3.5 h-3.5 ${running ? 'text-indigo-400 motion-safe:animate-pulse' : 'text-slate-400'}`} aria-hidden="true" />
         <span className="font-medium">{running ? 'Thinking' : 'Reasoning process'}</span>
-        <span className="text-slate-600">·</span>
+        <span className="text-slate-500" aria-hidden="true">·</span>
         <span className="font-mono tabular-nums">
           {running ? formatElapsed(elapsed) : `${formatElapsed(elapsed)} total`}
         </span>
-        <span className="ml-auto font-mono text-[10px] text-slate-600">{logs.length} events</span>
+        <span className="ml-auto font-mono text-[11px] text-slate-400">{logs.length} events</span>
       </button>
       {open && (
-        <div className="px-3 pb-3 pt-1 max-h-48 overflow-y-auto font-mono text-[11px] space-y-0.5 border-t border-white/5">
-          {logs.length === 0 && <div className="text-slate-600 pt-1">Waiting for first event…</div>}
+        <div className="px-3 pb-3 pt-1 max-h-48 overflow-y-auto font-mono text-[11px] leading-relaxed space-y-0.5 border-t border-white/5">
+          {logs.length === 0 && <div className="text-slate-400 pt-1">Waiting for first event…</div>}
           {logs.map((log, li) => (
             <div key={li} className="flex gap-2">
-              <span className="text-slate-600 shrink-0">{log.timestamp}</span>
+              <span className="text-slate-400 shrink-0">{log.timestamp}</span>
               <span className={log.message.startsWith('ERROR') ? 'text-rose-400' : 'text-slate-400'}>{log.message}</span>
             </div>
           ))}
@@ -211,18 +219,21 @@ const ReasoningBlock = React.memo<{ msg: ChatMessage; now: number }>(({ msg, now
 });
 
 const Kbd: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <kbd className="px-1 py-px rounded border border-white/10 bg-white/5 font-mono text-[10px] text-slate-400">
+  <kbd className="px-1 py-px rounded border border-white/10 bg-white/5 font-mono text-[11px] text-slate-300">
     {children}
   </kbd>
 );
 
 export const ChatCanvas: React.FC<ChatCanvasProps> = ({
+  sessions,
+  activeSessionId,
   onOpenArtifact,
   onRefreshSessions,
   onSessionChange,
   onToggleDrawer,
   drawerTab,
   onNavigate,
+  newChatRequest,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputPrompt, setInputPrompt] = useState<string>('');
@@ -241,13 +252,16 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
   const [now, setNow] = useState<number>(Date.now());
 
   // Which run the stream belongs to; events from other (e.g. stopped) sessions are ignored.
-  const runRef = useRef<{ msgId: string; sessionId: string | null; active: boolean; stopping: boolean } | null>(null);
+  const runRef = useRef<{ msgId: string; sessionId: string | null; title: string; active: boolean; stopping: boolean } | null>(null);
   const stoppedSessionsRef = useRef(new Set<string>());
   const hitlCardRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [showScrollBottom, setShowScrollBottom] = useState<boolean>(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const modelTriggerRef = useRef<HTMLButtonElement>(null);
+  const modelMenuId = useId();
+  const hitlNoteId = useId();
   const refreshRef = useRef(onRefreshSessions);
   refreshRef.current = onRefreshSessions;
 
@@ -256,12 +270,23 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
     window.aixAPI.detectModelSources().then(setModelSources).catch(() => {});
   }, []);
   useEffect(() => {
-    if (!currentSessionId) return;
+    if (activeSessionId !== undefined && activeSessionId !== currentSessionId) {
+      setCurrentSessionId(activeSessionId);
+    }
+  }, [activeSessionId]);
+  useEffect(() => {
+    if (!currentSessionId) {
+      setMessages([]);
+      return;
+    }
+    // Starting a run already placed its live messages in the canvas.
+    if (runRef.current?.active && runRef.current.sessionId === currentSessionId) return;
+    let cancelled = false;
+    setMessages([]);
     window.aixAPI.getSessionChat(currentSessionId).then((history) => {
-      if (history && history.length > 0) {
-        setMessages(history as unknown as ChatMessage[]);
-      }
+      if (!cancelled) setMessages(history as unknown as ChatMessage[]);
     }).catch(console.error);
+    return () => { cancelled = true; };
   }, [currentSessionId]);
   const handleScroll = () => {
     const el = timelineRef.current;
@@ -271,13 +296,13 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: scrollBehavior() });
     setShowScrollBottom(false);
   };
 
   useEffect(() => {
     if (!showScrollBottom) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current?.scrollIntoView({ behavior: scrollBehavior() });
     }
   }, [messages, pendingHitl, showScrollBottom]);
 
@@ -369,7 +394,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
     setNow(Date.now());
 
     const assistantId = crypto.randomUUID();
-    runRef.current = { msgId: assistantId, sessionId: null, active: true, stopping: false };
+    runRef.current = { msgId: assistantId, sessionId: null, title: sessionTitleFromTask(prompt), active: true, stopping: false };
     setMessages((prev) => [
       ...prev,
       { id: crypto.randomUUID(), role: 'user', content: prompt, startedAt: Date.now() },
@@ -437,6 +462,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
       setCurrentSessionId(null);
       setMessages([]);
       onSessionChange?.(null);
+      textareaRef.current?.focus();
     };
     if (isRunning) {
       setConfirmRequest({
@@ -453,6 +479,13 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
     }
     beginNewChat();
   };
+
+  // Sidebar "Launch New Task" goes through the same reset/confirmation as the header button.
+  const newChatRef = useRef(handleNewChat);
+  newChatRef.current = handleNewChat;
+  useEffect(() => {
+    if (newChatRequest > 0) newChatRef.current();
+  }, [newChatRequest]);
 
   const handleHitlDecision = async (decision: 'approve' | 'revise' | 'cancel') => {
     if (!pendingHitl) return;
@@ -524,33 +557,72 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
 
   const handleSelectModel = async (source: DesktopModelSource, model: string) => {
     setModelMenuOpen(false);
+    modelTriggerRef.current?.focus();
     if (!aiConfig || (source.provider === aiConfig.provider && model === aiConfig.model)) return;
     await window.aixAPI.setAiConfig({
       provider: source.provider,
       model,
       sourceId: source.id,
-      baseUrl: aiConfig.baseUrl,
+      baseUrl: source.provider === aiConfig.provider ? aiConfig.baseUrl : undefined,
       useSubscription: source.id === 'claude-code',
     });
-    setAiConfig({ ...aiConfig, provider: source.provider, model });
+    setAiConfig({
+      ...aiConfig,
+      provider: source.provider,
+      model,
+      baseUrl: source.provider === aiConfig.provider ? aiConfig.baseUrl : undefined,
+    });
     refreshRef.current?.();
   };
 
   const activeProviderInfo = aiConfig ? PROVIDERS.find((p) => p.id === aiConfig.provider) : undefined;
+  const activeSession = sessions.find((session) => session.id === currentSessionId);
+  const sessionOptions = sessions.map((session) => ({
+    value: session.id,
+    label: `${session.title}${session.isRunning ? ' · Running' : ''}`,
+  }));
+  // Keep a newly returned ID selectable while its list request is in flight.
+  if (currentSessionId && !activeSession) {
+    const run = runRef.current;
+    sessionOptions.unshift({ value: currentSessionId,
+      label: run?.sessionId === currentSessionId ? `${run.title}${run.active ? ' · Running' : ''}` : 'Loading session…' });
+  }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-background relative overflow-hidden">
+    <div className="flex-1 min-w-0 flex flex-col h-full bg-background relative overflow-hidden">
       {/* Session header */}
-      <header className="h-12 border-b border-white/5 px-5 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2 text-[12px] min-w-0">
+      <header className="h-12 border-b border-white/5 px-5 flex items-center justify-between gap-3 shrink-0">
+        <div className="flex items-center gap-2 text-[13px] min-w-0">
           <span className="font-medium text-slate-200">Agent</span>
-          <span className="text-slate-700">/</span>
-          <span className="font-mono text-slate-400 truncate">{currentSessionId || 'new session'}</span>
+          <span className="text-slate-500" aria-hidden="true">/</span>
+          {sessionOptions.length > 0 ? (
+            <Select
+              className="min-w-0 w-[280px] text-sm"
+              value={currentSessionId ?? ''}
+              ariaLabel="Switch active session"
+              disabled={isRunning}
+              options={[
+                { value: '', label: 'New task' },
+                ...sessionOptions,
+              ]}
+              onChange={(id) => {
+                if (!id) {
+                  handleNewChat();
+                } else {
+                  setCurrentSessionId(id);
+                  onSessionChange?.(id);
+                }
+              }}
+              emptyLabel="No sessions"
+            />
+          ) : (
+            <span className="text-slate-400 truncate">New task</span>
+          )}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           {isRunning ? (
-            <span className="flex items-center gap-1.5 text-[11px] text-blue-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+            <span className="flex items-center gap-1.5 text-[12px] text-blue-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 motion-safe:animate-pulse" aria-hidden="true" />
               Running
             </span>
           ) : (
@@ -558,35 +630,35 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
               type="button"
               onClick={handleNewChat}
               title="Start a new task (Clear canvas)"
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 transition-colors"
+              className="flex items-center gap-1.5 min-h-8 px-3 rounded-md text-[12px] font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 transition-colors"
             >
-              <Plus className="w-3.5 h-3.5" /> New Task
+              <Plus className="w-3.5 h-3.5" aria-hidden="true" /> New Task
             </button>
           )}
         </div>
       </header>
 
       {/* Timeline */}
-      <div ref={timelineRef} onScroll={handleScroll} className="flex-1 overflow-y-auto px-6 py-8 select-text">
+      <div ref={timelineRef} onScroll={handleScroll} className="flex-1 min-h-0 overflow-y-auto px-5 py-6 select-text">
         {messages.length === 0 ? (
-          <div className="max-w-2xl mx-auto pt-16 space-y-8">
+          <div className="max-w-2xl mx-auto pt-10 space-y-8">
             <div className="space-y-3">
               <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-400/20 flex items-center justify-center">
-                <Layers className="w-5 h-5 text-indigo-300" />
+                <Layers className="w-5 h-5 text-indigo-300" aria-hidden="true" />
               </div>
               <h1 className="text-[22px] font-semibold tracking-tight text-white">What are we building today?</h1>
-              <p className="text-[13px] text-slate-400 leading-relaxed max-w-lg">
+              <p className="text-[14px] text-slate-400 leading-relaxed max-w-lg">
                 Every task runs through the 8-step spine: Discuss → Plan → Worktree → TDD → Code → Review → Verify →
                 Remember.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-2">
               {QUICK_PROMPTS.map((prompt) => (
                 <button
                   key={prompt}
                   type="button"
                   onClick={() => void handleSendMessage(prompt)}
-                  className="p-3 rounded-lg bg-surface hover:bg-white/[0.04] border border-white/5 hover:border-white/10 text-left text-[12px] text-slate-400 hover:text-slate-200 leading-snug transition-colors"
+                  className="p-3 rounded-lg bg-surface hover:bg-white/[0.04] border border-white/5 hover:border-white/10 text-left text-[13px] text-slate-400 hover:text-slate-200 leading-snug transition-colors"
                 >
                   {prompt}
                 </button>
@@ -598,18 +670,18 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
             {messages.map((msg) =>
               msg.role === 'user' ? (
                 <div key={msg.id} className="flex justify-end">
-                  <div className="max-w-[85%] rounded-xl bg-white/[0.05] border border-white/5 px-4 py-2.5 text-[13px] text-slate-100 whitespace-pre-wrap leading-relaxed">
+                  <div className="max-w-[85%] min-w-0 break-words rounded-xl bg-white/[0.05] border border-white/5 px-4 py-2.5 text-[14px] text-slate-100 whitespace-pre-wrap leading-relaxed">
                     {msg.content}
                   </div>
                 </div>
               ) : (
                 <div key={msg.id} className="flex gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-400/20 flex items-center justify-center shrink-0">
+                  <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-400/20 flex items-center justify-center shrink-0" aria-hidden="true">
                     <Layers className="w-3.5 h-3.5 text-indigo-300" />
                   </div>
                   <div className="flex-1 min-w-0 space-y-3">
                     {/* Agent header */}
-                    <div className="flex items-center gap-2 flex-wrap text-[11px] h-7">
+                    <div className="flex items-center gap-2 flex-wrap text-[11px] min-h-7">
                       <span className="text-[13px] font-semibold text-white">aix</span>
                       {msg.modelLabel && (
                         <span className="px-1.5 py-0.5 rounded border border-white/10 bg-white/[0.03] text-slate-300 font-mono text-[10px]">
@@ -621,7 +693,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                           {msg.phase}
                         </span>
                       )}
-                      <span className="text-slate-600 font-mono">{formatClock(msg.startedAt)}</span>
+                      <span className="text-slate-400 font-mono">{formatClock(msg.startedAt)}</span>
                     </div>
 
                     <ReasoningBlock msg={msg} now={now} />
@@ -629,7 +701,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
 
                     {msg.content && (
                       <div
-                        className={`text-[13px] leading-relaxed ${
+                        className={`text-[14px] leading-relaxed break-words ${
                           msg.status === 'error' ? 'text-rose-200' : msg.status === 'stopped' ? 'text-amber-200' : 'text-slate-200'
                         }`}
                       >
@@ -644,9 +716,9 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                             key={art}
                             type="button"
                             onClick={() => onOpenArtifact(art)}
-                            className="px-2 py-1 rounded-md bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 text-slate-300 font-mono text-[11px] flex items-center gap-1.5 transition-colors"
+                            className="min-h-8 px-2.5 rounded-md bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 text-slate-300 font-mono text-[12px] flex items-center gap-1.5 transition-colors"
                           >
-                            <FileCode2 className="w-3 h-3 text-blue-400" />
+                            <FileCode2 className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />
                             {art}
                           </button>
                         ))}
@@ -661,28 +733,34 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
             {pendingHitl && (
               <div ref={hitlCardRef} className="ml-10 rounded-xl border border-amber-400/30 bg-amber-500/[0.04] ring-4 ring-amber-500/[0.04] overflow-hidden">
                 <div className="px-4 py-3 border-b border-amber-400/15 flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-amber-400" />
-                  <span className="text-[12px] font-semibold text-amber-200">Approval required</span>
-                  <span className="text-[10px] font-mono text-amber-400/70 ml-auto">Tier {pendingHitl.tier} gate</span>
+                  <ShieldAlert className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                  <span className="text-[13px] font-semibold text-amber-200">Approval required</span>
+                  <span className="text-[11px] font-mono text-amber-300 ml-auto">Tier {pendingHitl.tier} gate</span>
                 </div>
                 <div className="p-4 space-y-3">
                   <p className="text-[14px] font-medium text-white">{pendingHitl.question}</p>
                   <ul className="space-y-1">
                     {pendingHitl.options.map((opt) => (
-                      <li key={opt.id} className="text-[12px] text-slate-400">
+                      <li key={opt.id} className="text-[13px] text-slate-400 leading-relaxed">
                         <span className="text-slate-200 font-medium">{opt.label}</span> — {opt.summary}
                       </li>
                     ))}
                   </ul>
-                  <input
-                    type="text"
-                    autoFocus
-                    value={hitlNote}
-                    onChange={(e) => setHitlNote(e.target.value)}
-                    placeholder="Optional guidance for Revise (e.g. use SQLite instead of Redis)…"
-                    className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-[12px] text-white placeholder:text-slate-600 focus:outline-none focus:border-amber-400/50"
-                  />
-                  <div className="flex items-center gap-2 pt-1">
+                  <div className="space-y-1.5">
+                    <label htmlFor={hitlNoteId} className="block text-[12px] font-medium text-slate-300">
+                      Revision guidance <span className="font-normal text-slate-400">(optional)</span>
+                    </label>
+                    <input
+                      id={hitlNoteId}
+                      type="text"
+                      autoFocus
+                      value={hitlNote}
+                      onChange={(e) => setHitlNote(e.target.value)}
+                      placeholder="e.g. use SQLite instead of Redis"
+                      className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-[13px] text-white placeholder:text-slate-400 focus:outline-none focus:border-amber-400/50 transition-colors"
+                    />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
                     <button
                       type="button"
                       onClick={() => void handleHitlDecision('approve')}
@@ -717,97 +795,128 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
           </div>
         )}
         <div ref={messagesEndRef} />
+      </div>
+
+      {/* Composer */}
+      <footer className="relative px-4 pb-4 pt-2 shrink-0">
         {showScrollBottom && (
           <button
             type="button"
             onClick={scrollToBottom}
             aria-label="Scroll to newest messages"
-            className="fixed bottom-24 right-1/2 translate-x-1/2 z-30 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium shadow-lg shadow-black/50 backdrop-blur-sm transition-all"
+            className="absolute -top-11 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 min-h-8 px-3.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-medium shadow-lg shadow-black/50 transition-colors"
           >
-            <ArrowDown className="w-3.5 h-3.5" /> New updates
+            <ArrowDown className="w-3.5 h-3.5" aria-hidden="true" /> New updates
           </button>
         )}
-      </div>
-
-      {/* Composer */}
-      <footer className="px-6 pb-5 pt-2 shrink-0">
         <div className="max-w-3xl mx-auto rounded-xl bg-surface border border-white/5 focus-within:border-white/15 transition-colors">
           <textarea
             ref={textareaRef}
             rows={1}
+            aria-label="Task prompt"
             value={inputPrompt}
             onChange={(e) => setInputPrompt(e.target.value)}
             onKeyDown={handleComposerKeyDown}
             placeholder={isRunning ? isStopping ? 'Stopping… waiting for cancellation point' : 'Agent is running… press Stop to cancel' : 'Describe an engineering task…'}
-            className="block w-full bg-transparent px-4 pt-3.5 pb-2 text-[13px] text-white placeholder:text-slate-600 focus:outline-none resize-none leading-relaxed"
+            className="block w-full bg-transparent px-4 pt-3.5 pb-2 text-[14px] text-white placeholder:text-slate-400 focus:outline-none resize-none leading-relaxed"
           />
-          <div className="flex items-center gap-1.5 px-2.5 pb-2.5">
-            {/* Model chip */}
-            <div className="relative">
+          <div className="flex flex-wrap items-center gap-1.5 px-2.5 pb-2.5">
+            {/* Model picker: disclosure; closes on Escape (focus back to trigger) or when focus leaves it. */}
+            <div
+              className="relative min-w-0 max-w-full"
+              onBlur={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setModelMenuOpen(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key !== 'Escape' || !modelMenuOpen) return;
+                // Keep Escape from also closing the Inspector or cancelling a HITL gate.
+                e.preventDefault();
+                e.stopPropagation();
+                setModelMenuOpen(false);
+                modelTriggerRef.current?.focus();
+              }}
+            >
               <button
+                ref={modelTriggerRef}
                 type="button"
                 disabled={isRunning || !aiConfig}
+                aria-expanded={modelMenuOpen}
+                aria-controls={modelMenuId}
                 onClick={() => setModelMenuOpen((v) => !v)}
-                className="flex items-center gap-1 px-2 py-1 rounded-md border border-white/5 hover:bg-white/5 text-[11px] text-slate-300 disabled:opacity-50 transition-colors"
+                className="flex max-w-full items-center gap-1.5 min-h-8 px-2.5 rounded-md border border-white/5 hover:bg-white/5 text-[12px] text-slate-300 disabled:opacity-50 transition-colors"
               >
-                <span>{activeProviderInfo?.icon ?? '◆'}</span>
-                <span className="max-w-[220px] truncate">
+                <span className="sr-only">Model: </span>
+                <span aria-hidden="true">{activeProviderInfo?.icon ?? '◆'}</span>
+                <span className="min-w-0 max-w-[220px] truncate">
                   {activeProviderInfo?.name ?? aiConfig?.provider ?? 'Model'}
-                  <span className="text-slate-500 font-mono"> · {aiConfig?.model ?? '…'}</span>
+                  <span className="text-slate-400 font-mono"> · {aiConfig?.model ?? '…'}</span>
                 </span>
-                <ChevronDown className="w-3 h-3 text-slate-500" />
+                <ChevronDown className="w-3.5 h-3.5 shrink-0 text-slate-400" aria-hidden="true" />
               </button>
               {modelMenuOpen && aiConfig && (
-                <>
-                  <div className="fixed inset-0 z-30" onClick={() => setModelMenuOpen(false)} />
-                  <div className="absolute bottom-full mb-1.5 left-0 z-40 w-72 rounded-lg border border-white/10 bg-surface-elevated shadow-2xl shadow-black/50 p-1 max-h-80 overflow-y-auto">
-                    {modelSources.filter((s) => s.usable).map((source) => (
-                      <div key={source.id}>
-                        <div className="px-2 pt-2 pb-1 text-[10px] uppercase tracking-wider text-slate-500">
+                <div
+                  id={modelMenuId}
+                  role="group"
+                  aria-label="Available models"
+                  tabIndex={-1}
+                  className="absolute bottom-full mb-1.5 left-0 z-40 w-72 max-w-[calc(100vw-2rem)] rounded-lg border border-white/10 bg-surface-elevated shadow-2xl shadow-black/50 p-1 max-h-80 overflow-y-auto focus:outline-none"
+                >
+                  {modelSources.filter((s) => s.usable).map((source) => {
+                    const headingId = `${modelMenuId}-${source.id}`;
+                    return (
+                      <div key={source.id} role="group" aria-labelledby={headingId}>
+                        <div id={headingId} className="px-2 pt-2 pb-1 text-[11px] uppercase tracking-wider text-slate-400">
                           {source.name}
                         </div>
-                        {source.models.map((m) => (
-                          <button
-                            key={`${source.id}-${m}`}
-                            type="button"
-                            onClick={() => void handleSelectModel(source, m)}
-                            className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-white/5 text-[12px] font-mono text-slate-300"
-                          >
-                            {m}
-                            {source.provider === aiConfig.provider && m === aiConfig.model && <Check className="w-3 h-3 text-blue-400" />}
-                          </button>
-                        ))}
+                        {source.models.map((m) => {
+                          const selected = source.provider === aiConfig.provider && m === aiConfig.model;
+                          return (
+                            <button
+                              key={`${source.id}-${m}`}
+                              type="button"
+                              aria-current={selected ? 'true' : undefined}
+                              onClick={() => void handleSelectModel(source, m)}
+                              className={`w-full flex items-center justify-between gap-2 min-h-8 px-2 rounded-md hover:bg-white/5 text-left text-[12px] font-mono transition-colors ${
+                                selected ? 'text-blue-300' : 'text-slate-300'
+                              }`}
+                            >
+                              <span className="truncate">{m}</span>
+                              {selected && <Check className="w-3.5 h-3.5 shrink-0 text-blue-400" aria-hidden="true" />}
+                            </button>
+                          );
+                        })}
                       </div>
-                    ))}
-                    {modelSources.every((s) => !s.usable) && (
-                      <div className="px-2 py-3 text-[11px] text-slate-500">No model sources detected — check AI Model Hub.</div>
-                    )}
-                    <div className="my-1 border-t border-white/5" />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setModelMenuOpen(false);
-                        onNavigate('settings');
-                      }}
-                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-white/5 text-[12px] text-slate-400"
-                    >
-                      <Settings2 className="w-3 h-3" /> Switch provider / API key…
-                    </button>
-                  </div>
-                </>
+                    );
+                  })}
+                  {modelSources.every((s) => !s.usable) && (
+                    <div className="px-2 py-3 text-[12px] text-slate-400">No model sources detected — check AI Model Hub.</div>
+                  )}
+                  <div className="my-1 border-t border-white/5" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setModelMenuOpen(false);
+                      onNavigate('settings');
+                    }}
+                    className="w-full flex items-center gap-2 min-h-8 px-2 rounded-md hover:bg-white/5 text-[12px] text-slate-300 transition-colors"
+                  >
+                    <Settings2 className="w-3.5 h-3.5" aria-hidden="true" /> Switch provider / API key…
+                  </button>
+                </div>
               )}
             </div>
 
             {/* Mode toggle */}
-            <div className="flex items-center rounded-md border border-white/5 p-0.5 text-[11px]">
+            <div role="group" aria-label="Run mode" className="flex shrink-0 items-center rounded-md border border-white/5 p-0.5 text-[12px]">
               {(['guided', 'auto'] as const).map((mode) => (
                 <button
                   key={mode}
                   type="button"
                   disabled={isRunning}
+                  aria-pressed={runMode === mode}
                   onClick={() => setRunMode(mode)}
-                  className={`px-2 py-0.5 rounded transition-colors disabled:opacity-50 ${
-                    runMode === mode ? 'bg-white/[0.08] text-white' : 'text-slate-500 hover:text-slate-300'
+                  className={`min-h-7 px-2.5 rounded transition-colors disabled:opacity-50 ${
+                    runMode === mode ? 'bg-white/[0.08] text-white' : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
                   {mode === 'guided' ? 'Guided' : 'Autonomous'}
@@ -815,22 +924,25 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
               ))}
             </div>
 
-            <div className="ml-auto flex items-center gap-1">
-              {DRAWER_TOGGLES.map(({ tab, label, icon: Icon }) => (
-                <button
-                  key={tab}
-                  type="button"
-                  title={label}
-                  aria-label={label}
-                  onClick={() => onToggleDrawer(tab)}
-                  className={`p-1.5 rounded-md transition-colors ${
-                    drawerTab === tab ? 'bg-white/[0.08] text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                </button>
-              ))}
-              <span className="w-px h-4 bg-white/5 mx-1" />
+            <div className="ml-auto flex shrink-0 items-center gap-1">
+              <div role="group" aria-label="Inspector panels" className="flex items-center gap-0.5">
+                {DRAWER_TOGGLES.map(({ tab, label, icon: Icon }) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    title={label}
+                    aria-label={label}
+                    aria-pressed={drawerTab === tab}
+                    onClick={() => onToggleDrawer(tab)}
+                    className={`w-8 h-8 inline-flex items-center justify-center rounded-md transition-colors ${
+                      drawerTab === tab ? 'bg-white/[0.08] text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </button>
+                ))}
+              </div>
+              <span className="w-px h-4 bg-white/5 mx-1" aria-hidden="true" />
               {isRunning ? (
                 <button
                   type="button"
@@ -838,9 +950,9 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                   disabled={isStopping}
                   title={isStopping ? 'Waiting for the engine to stop' : 'Stop execution'}
                   aria-label={isStopping ? 'Waiting for execution to stop' : 'Stop execution'}
-                  className="flex items-center gap-1.5 pl-2 pr-2.5 py-1.5 rounded-md bg-white/[0.06] hover:bg-rose-500/15 border border-white/10 hover:border-rose-400/30 text-slate-200 hover:text-rose-200 text-[11px] font-medium transition-colors"
+                  className="flex items-center gap-1.5 min-h-8 pl-2.5 pr-3 rounded-md bg-white/[0.06] hover:bg-rose-500/15 border border-white/10 hover:border-rose-400/30 text-slate-200 hover:text-rose-200 text-[12px] font-medium transition-colors"
                 >
-                  <Square className="w-3 h-3 fill-current" /> {isStopping ? 'Stopping…' : 'Stop'}
+                  <Square className="w-3 h-3 fill-current" aria-hidden="true" /> {isStopping ? 'Stopping…' : 'Stop'}
                 </button>
               ) : (
                 <button
@@ -849,20 +961,20 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                   onClick={() => void handleSendMessage(inputPrompt)}
                   title="Run prompt (Enter)"
                   aria-label="Send prompt"
-                  className="p-1.5 rounded-md bg-blue-600 hover:bg-blue-500 disabled:bg-white/[0.06] disabled:text-slate-500 text-white transition-colors"
+                  className="w-8 h-8 inline-flex items-center justify-center rounded-md bg-blue-600 hover:bg-blue-500 disabled:bg-white/[0.06] disabled:text-slate-400 text-white transition-colors"
                 >
-                  <ArrowUp className="w-4 h-4" />
+                  <ArrowUp className="w-4 h-4" aria-hidden="true" />
                 </button>
               )}
             </div>
           </div>
         </div>
-        <div className="max-w-3xl mx-auto mt-1.5 px-1 flex items-center gap-3 text-[10px] text-slate-400">
+        <div className="max-w-3xl mx-auto mt-1.5 px-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400">
           <span>
             <Kbd>Enter</Kbd> run · <Kbd>Shift+Enter</Kbd> newline
           </span>
           {pendingHitl && (
-            <span className="text-amber-400/80">
+            <span className="text-amber-300">
               <Kbd>Enter</Kbd> approve · <Kbd>Esc</Kbd> cancel
             </span>
           )}

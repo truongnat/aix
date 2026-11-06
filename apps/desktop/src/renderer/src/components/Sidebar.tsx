@@ -15,10 +15,12 @@ export type NavTab = 'chat' | 'skills' | 'memory' | 'settings';
 interface SidebarProps {
   currentTab: NavTab;
   onSelectTab: (tab: NavTab) => void;
+  onNewTask: () => void;
   status: DesktopSystemStatus | null;
+  width?: number;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, status }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, onNewTask, status, width }) => {
   const navItems = [
     { id: 'chat' as NavTab, label: 'Agent Chat Canvas', icon: MessageSquareCode },
     { id: 'skills' as NavTab, label: `Skill Library (${status?.skillsCount ?? '…'})`, icon: Sparkles },
@@ -27,7 +29,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
   ];
 
   return (
-    <aside className="w-60 bg-surface border-r border-white/5 flex flex-col justify-between select-none">
+    <aside
+      style={{ width: width ? `${width}px` : undefined }}
+      className={`${width ? '' : 'w-60'} shrink-0 bg-surface border-r border-white/5 flex flex-col justify-between select-none h-full overflow-y-auto`}
+    >
       <div>
         {/* Brand Header */}
         <div className="p-5 flex items-center gap-3 border-b border-white/5">
@@ -49,10 +54,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
         <div className="p-3 pb-1">
           <button
             type="button"
-            onClick={() => onSelectTab('chat')}
-            className="w-full py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs flex items-center justify-center gap-1.5 transition-colors"
+            onClick={onNewTask}
+            className="w-full min-h-10 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-[13px] flex items-center justify-center gap-1.5 transition-colors"
           >
-            <Plus className="w-3.5 h-3.5" /> Launch New Task
+            <Plus className="w-4 h-4" aria-hidden="true" /> Launch New Task
           </button>
         </div>
 
@@ -67,13 +72,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
                 type="button"
                 aria-current={isActive ? 'page' : undefined}
                 onClick={() => onSelectTab(item.id)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors border ${
+                className={`w-full min-h-9 flex items-center gap-2.5 px-3 py-2 rounded-md text-left text-[13px] font-medium transition-colors border ${
                   isActive
                     ? 'bg-white/[0.05] text-white border-white/5'
-                    : 'text-slate-400 border-transparent hover:text-slate-200 hover:bg-white/[0.03]'
+                    : 'text-slate-300 border-transparent hover:text-white hover:bg-white/[0.03]'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} />
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} aria-hidden="true" />
                 {item.label}
               </button>
             );
@@ -94,8 +99,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, statu
           >
             <span
               className={`w-2 h-2 rounded-full ${
-                status?.kbServiceOnline ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'
+                status?.kbServiceOnline ? 'bg-emerald-400 motion-safe:animate-pulse' : 'bg-slate-500'
               }`}
+              aria-hidden="true"
             />
             {status?.kbServiceOnline ? 'Online' : status ? 'Offline' : 'Checking…'}
           </span>

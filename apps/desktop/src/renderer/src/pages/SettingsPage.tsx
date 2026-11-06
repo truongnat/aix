@@ -25,7 +25,7 @@ interface ProviderCardInfo {
 export const PROVIDERS: readonly ProviderCardInfo[] = [
   { id: 'inferx', name: 'InferX DeepSeek', icon: '⚡' },
   { id: 'anthropic', name: 'Anthropic Claude', icon: '🟣' },
-  { id: 'openai', name: 'OpenAI', icon: '🟢' },
+  { id: 'openai', name: 'OpenAI (or Compatible)', icon: '🟢' },
   { id: 'groq', name: 'Groq Cloud', icon: '⚡' },
   { id: 'ollama', name: 'Ollama (Local)', icon: '🦙' },
   { id: 'codex', name: 'Codex (ChatGPT)', icon: '🧩' },
@@ -38,6 +38,7 @@ interface Selection {
 }
 
 const sourceIcon = (source: DesktopModelSource): React.ReactNode => {
+  if (source.id === 'openai-key' && source.name.includes('Gateway')) return <Server className="w-4 h-4 text-cyan-400" />;
   if (source.provider === 'ollama') return <Server className="w-4 h-4 text-emerald-400" />;
   if (source.provider === 'mock') return <FlaskConical className="w-4 h-4 text-slate-400" />;
   if (source.id.endsWith('-key')) return <KeyRound className="w-4 h-4 text-amber-400" />;
@@ -142,7 +143,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
   };
 
   return (
-    <div className="p-8 space-y-6 max-w-3xl mx-auto pb-28">
+    <div className="min-w-0 p-8 space-y-6 max-w-3xl mx-auto">
       <PageHeader
         title="AI Model Hub"
         description="Model sources detected on this machine. Pick a model — CLI logins work without any API key."
@@ -155,7 +156,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
       )}
 
       {loading ? (
-        <div className="py-16 text-center text-slate-500 text-sm flex items-center justify-center gap-2">
+        <div role="status" className="py-16 text-center text-slate-400 text-sm flex items-center justify-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" /> Detecting model sources…
         </div>
       ) : (
@@ -167,7 +168,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
               <section
                 key={source.id}
                 aria-label={`Model source ${source.name}`}
-                className={`p-4 rounded-2xl border transition-all ${
+                className={`p-4 rounded-2xl border transition-colors duration-150 ${
                   isSelected ? 'bg-blue-600/[0.07] border-blue-500/50 shadow-lg shadow-blue-500/10' : 'bg-white/[0.02] border-white/5'
                 }`}
               >
@@ -184,11 +185,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
                             ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                             : source.detected
                               ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                              : 'bg-white/5 text-slate-500 border-white/10'
+                              : 'bg-white/5 text-slate-300 border-white/10'
                         }`}>
                           {ready ? 'Ready' : source.detected ? 'Limited' : 'Not found'}
                         </span>
-                        <span className="text-[10px] text-slate-500 font-medium">{source.authNote}</span>
+                        <span className="text-[11px] text-slate-400 font-medium">{source.authNote}</span>
                       </div>
                       <p className="text-xs text-slate-400 mt-1 leading-relaxed">{source.note}</p>
                     </div>
@@ -204,13 +205,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
                         <button
                           key={model}
                           type="button"
+                          aria-pressed={active}
                           onClick={() => {
                             setCustomModel('');
+                            if (selection?.sourceId !== source.id) setBaseUrl('');
                             setSelection({ sourceId: source.id, model });
                             setTestResult(null);
                             setSaveError(null);
                           }}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all border ${
+                          className={`max-w-full break-all px-3 py-1.5 rounded-lg text-xs font-mono transition-colors duration-150 border ${
                             active
                               ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-600/20'
                               : 'bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 border-white/10'
@@ -250,80 +253,79 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
 
       {/* Advanced overrides */}
       <details className="group rounded-2xl bg-white/[0.02] border border-white/5">
-        <summary className="flex items-center gap-2 px-4 py-3 text-xs font-semibold text-slate-400 cursor-pointer hover:text-white select-none">
-          <ChevronDown className="w-3.5 h-3.5 transition-transform group-open:rotate-180" />
+        <summary className="flex items-center gap-2 rounded-2xl px-4 py-3 text-xs font-semibold text-slate-300 cursor-pointer hover:text-white select-none transition-colors duration-150">
+          <ChevronDown className="w-3.5 h-3.5 transition-transform duration-150 group-open:rotate-180" />
           Advanced — custom model, endpoint, API key
         </summary>
         <div className="px-4 pb-4 space-y-3">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label className="text-[10px] uppercase font-bold text-slate-500">Custom model name</label>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,16rem),1fr))] gap-3">
+            <div className="space-y-1.5">
+              <label htmlFor="settings-custom-model" className="text-xs font-semibold text-slate-300">Custom model name</label>
               <input
+                id="settings-custom-model"
                 type="text"
                 value={customModel}
                 onChange={(e) => setCustomModel(e.target.value)}
                 placeholder={selection?.model ?? 'model-id'}
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-colors duration-150"
               />
             </div>
-            <div className="space-y-1">
-              <label className="text-[10px] uppercase font-bold text-slate-500">Endpoint override</label>
+            <div className="space-y-1.5">
+              <label htmlFor="settings-endpoint" className="text-xs font-semibold text-slate-300">Endpoint override</label>
               <input
+                id="settings-endpoint"
                 type="text"
                 value={baseUrl}
                 onChange={(e) => setBaseUrl(e.target.value)}
                 placeholder="https://proxy.example/v1/chat/completions"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-colors duration-150"
               />
             </div>
           </div>
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-slate-500">API key (only for key-based providers)</label>
+          <div className="space-y-1.5">
+            <label htmlFor="settings-api-key" className="text-xs font-semibold text-slate-300">API key (only for key-based providers)</label>
             <input
+              id="settings-api-key"
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="Leave empty to use CLI subscription / environment"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-colors duration-150"
             />
           </div>
         </div>
       </details>
 
-      {/* Action bar */}
-      <div className="fixed bottom-10 left-[240px] right-0 z-40">
-        <div className="max-w-3xl mx-auto px-8">
-          <div className="p-3 rounded-2xl bg-surface-elevated/95 backdrop-blur border border-white/10 shadow-2xl flex items-center justify-between gap-4">
-            <div className="min-w-0 text-xs">
-              {selectedSource ? (
-                <span className="text-slate-300">
-                  Using <span className="font-mono text-white">{effectiveModel || '—'}</span>
-                  <span className="text-slate-500"> via {selectedSource.name}</span>
-                </span>
-              ) : (
-                <span className="text-slate-500">Pick a model above</span>
-              )}
-              {savedSuccess && <span className="ml-2 text-emerald-400 font-semibold">Saved</span>}
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={handleTest}
-                disabled={!selectedSource || testing || saving}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 text-xs font-medium transition-colors disabled:opacity-50"
-              >
-                {testing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />} Test
-              </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={!selectedSource || saving || testing}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors shadow-lg shadow-blue-600/20 disabled:opacity-50"
-              >
-                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} Save
-              </button>
-            </div>
-          </div>
+      {/* Action bar: sticky inside the Settings scroll pane, so it never covers sidebar or Inspector. */}
+      <div className="sticky bottom-4 z-20 p-3 rounded-2xl bg-surface-elevated/95 backdrop-blur border border-white/10 shadow-2xl flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <div className="min-w-0 flex-1 basis-48 text-xs break-words" aria-live="polite">
+          {selectedSource ? (
+            <span className="text-slate-300">
+              Using <span className="font-mono text-white break-all">{effectiveModel || '—'}</span>
+              <span className="text-slate-400"> via {selectedSource.name}</span>
+            </span>
+          ) : (
+            <span className="text-slate-400">Pick a model above</span>
+          )}
+          {savedSuccess && <span className="ml-2 text-emerald-400 font-semibold">Saved</span>}
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={handleTest}
+            disabled={!selectedSource || testing || saving}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 text-xs font-medium transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {testing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />} Test
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={!selectedSource || saving || testing}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition-colors duration-150 shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />} Save
+          </button>
         </div>
       </div>
     </div>
