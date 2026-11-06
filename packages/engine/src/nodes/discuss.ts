@@ -5,20 +5,21 @@ import { createBudgetTracker, ValidationError } from '@x/core';
 import { SkillRegistry } from '@x/registry';
 import { createProvider, type RuntimeProvider } from '@x/providers';
 import type { EngineState, DiscussionDoc } from '../state.js';
-import { sessionArtifactPath, sessionArchiveDir } from '../session-store.js';
+import { sessionArtifactPath, sessionArchiveDir, resolveSkillsRoot } from '../session-store.js';
 import { checkBudget, formatBudgetWarnings } from '../budget-guard.js';
 import { redactStrings } from '@x/policy';
 import { parseJsonObject } from '../generation-contract.js';
 
-const SKILLS_ROOT = process.env.AIX_CONTENT_ROOT ?? join(process.cwd(), 'skills');
 
 export async function discussNode(state: EngineState): Promise<EngineState> {
   if (state.discussion) return state;
 
   const provider: RuntimeProvider = createProvider();
-  const registry = await SkillRegistry.load(SKILLS_ROOT);
+  const skillsRoot = resolveSkillsRoot();
+  const registry = await SkillRegistry.load(skillsRoot);
 
   const discussSkill = registry.get('discussing-pro');
+  if (!discussSkill) console.warn('[engine] discussing-pro skill not found at:', skillsRoot);
 
   const skillBodies: string[] = [];
   if (discussSkill) skillBodies.push(discussSkill.body);

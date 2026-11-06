@@ -1,11 +1,11 @@
-import { join } from 'node:path';
+import { resolveSkillsRoot } from '../session-store.js';
 import { SkillRegistry } from '@x/registry';
 import type { EngineState } from '../state.js';
 
 export async function rulesNode(state: EngineState): Promise<EngineState> {
   let rules: string[] = [];
   try {
-    const contentRoot = process.env.AIX_CONTENT_ROOT ?? join(process.cwd(), 'content');
+    const contentRoot = resolveSkillsRoot();
     const registry = await SkillRegistry.load(contentRoot);
     const coderSkills = registry.byRole('coder');
     const reviewerSkills = registry.byRole('reviewer');

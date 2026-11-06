@@ -5,12 +5,11 @@ import { createBudgetTracker, ValidationError } from '@x/core';
 import { SkillRegistry } from '@x/registry';
 import { createProvider, type RuntimeProvider } from '@x/providers';
 import type { EngineState, PlanDoc, PlannedTask } from '../state.js';
-import { sessionArtifactPath, sessionArchiveDir } from '../session-store.js';
+import { sessionArtifactPath, sessionArchiveDir, resolveSkillsRoot } from '../session-store.js';
 import { checkBudget, formatBudgetWarnings } from '../budget-guard.js';
 import { redactStrings } from '@x/policy';
 import { parseJsonObject, parsePlannedTasks } from '../generation-contract.js';
 
-const SKILLS_ROOT = process.env.AIX_CONTENT_ROOT ?? join(process.cwd(), 'skills');
 
 export async function planNode(state: EngineState): Promise<EngineState> {
   if (state.plan) {
@@ -19,9 +18,11 @@ export async function planNode(state: EngineState): Promise<EngineState> {
   }
 
   const provider: RuntimeProvider = createProvider();
-  const registry = await SkillRegistry.load(SKILLS_ROOT);
+  const skillsRoot = resolveSkillsRoot();
+  const registry = await SkillRegistry.load(skillsRoot);
 
   const planSkill = registry.get('planning-pro');
+  if (!planSkill) console.warn('[engine] planning-pro skill not found at:', skillsRoot);
 
   const skillBodies: string[] = [];
   if (planSkill) skillBodies.push(planSkill.body);

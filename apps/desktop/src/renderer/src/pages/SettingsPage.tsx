@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { DesktopAiConfig, AiProviderId, DesktopModelSource, DesktopTestConnectionResult } from '@shared/api';
 import { PageHeader } from '../components/ui/PageHeader';
+import { isLocalOrCustomEndpoint } from '@shared/desktop-logic';
 
 interface ProviderCardInfo {
   readonly id: AiProviderId;
@@ -71,6 +72,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
   const [customModel, setCustomModel] = useState<string>('');
   const [baseUrl, setBaseUrl] = useState<string>('');
   const [apiKey, setApiKey] = useState<string>('');
+  const [savedConfig, setSavedConfig] = useState<DesktopAiConfig | null>(null);
 
   const [saving, setSaving] = useState<boolean>(false);
   const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
@@ -84,6 +86,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
       .then(([cfg, detected]) => {
         if (cancelled) return;
         setSources(detected);
+        setSavedConfig(cfg);
         setSelection(matchSavedSelection(cfg, detected));
         if (cfg.baseUrl) setBaseUrl(cfg.baseUrl);
       })
@@ -99,8 +102,22 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
   const selectedSource = sources.find((s) => s.id === selection?.sourceId) ?? null;
   const effectiveModel = customModel.trim() || selection?.model || '';
 
+  const validateDraft = () => {
+    if (!effectiveModel.trim()) {
+      setSaveError('Enter a model name or choose a model above.');
+      return false;
+    }
+    const localGateway = selectedSource?.provider === 'openai' && isLocalOrCustomEndpoint(baseUrl);
+    if (selectedSource?.id.endsWith('-key') && !selectedSource.usable && !apiKey.trim() && !localGateway) {
+      setSaveError(`Enter an API key for ${selectedSource.name}, or configure a local endpoint for OpenAI-compatible models.`);
+      document.getElementById('settings-api-key')?.focus();
+      return false;
+    }
+    return true;
+  };
+
   const handleSave = async () => {
-    if (!selectedSource) return;
+    if (!selectedSource || !validateDraft()) return;
     setSaving(true);
     setSaveError(null);
     try {
@@ -111,6 +128,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
         baseUrl: baseUrl || undefined,
         sourceId: selectedSource.id,
       });
+      const [cfg, detected] = await Promise.all([window.aixAPI.getAiConfig(), window.aixAPI.detectModelSources()]);
+      setSavedConfig(cfg);
+      setSources(detected);
       setSavedSuccess(true);
       setApiKey('');
       onConfigUpdated?.();
@@ -123,7 +143,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
   };
 
   const handleTest = async () => {
-    if (!selectedSource) return;
+    if (!selectedSource || !validateDraft()) return;
     setTesting(true);
     setTestResult(null);
     try {
@@ -146,7 +166,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
     <div className="min-w-0 p-8 space-y-6 max-w-3xl mx-auto">
       <PageHeader
         title="AI Model Hub"
-        description="Model sources detected on this machine. Pick a model — CLI logins work without any API key."
+        description="Choose a model source. Use a CLI login, enter an API key, or configure an OpenAI-compatible endpoint."
       />
 
       {loadError && (
@@ -164,6 +184,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
           {sources.map((source) => {
             const isSelected = selection?.sourceId === source.id;
             const ready = source.usable;
+            const configurable = source.id.endsWith('-key');
             return (
               <section
                 key={source.id}
@@ -187,7 +208,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
                               ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                               : 'bg-white/5 text-slate-300 border-white/10'
                         }`}>
-                          {ready ? 'Ready' : source.detected ? 'Limited' : 'Not found'}
+                          {ready ? 'Ready' : configurable ? 'Needs API key' : source.detected ? 'Limited' : 'Not found'}
                         </span>
                         <span className="text-[11px] text-slate-400 font-medium">{source.authNote}</span>
                       </div>
@@ -197,7 +218,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
                   {isSelected && <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />}
                 </div>
 
-                {ready && source.models.length > 0 && (
+                {(ready || configurable) && source.models.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-3 pl-11">
                     {source.models.map((model) => {
                       const active = selection?.sourceId === source.id && selection.model === model && !customModel.trim();
@@ -209,6 +230,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
                           onClick={() => {
                             setCustomModel('');
                             if (selection?.sourceId !== source.id) setBaseUrl('');
+                            if (selection?.sourceId !== source.id) setApiKey('');
                             setSelection({ sourceId: source.id, model });
                             setTestResult(null);
                             setSaveError(null);
@@ -223,6 +245,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
                         </button>
                       );
                     })}
+                  </div>
+                )}
+                {isSelected && configurable && (
+                  <div className="mt-4 space-y-1.5">
+                    <label htmlFor="settings-api-key" className="text-xs font-semibold text-slate-300">API key</label>
+                    <input id="settings-api-key" type="password" autoComplete="off" spellCheck={false}
+                      value={apiKey} onChange={(event) => setApiKey(event.target.value)}
+                      placeholder={savedConfig?.provider === source.provider && savedConfig.hasApiKey
+                        ? 'Saved key — leave empty to keep it'
+                        : ready ? 'Using configured key; enter a new key to replace it' : 'Paste your API key'}
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:border-blue-500 transition-colors duration-150"
+                    />
+                    <p className="text-xs text-slate-400">Saved on this device. Existing keys are never displayed here.</p>
                   </div>
                 )}
               </section>
@@ -255,7 +290,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
       <details className="group rounded-2xl bg-white/[0.02] border border-white/5">
         <summary className="flex items-center gap-2 rounded-2xl px-4 py-3 text-xs font-semibold text-slate-300 cursor-pointer hover:text-white select-none transition-colors duration-150">
           <ChevronDown className="w-3.5 h-3.5 transition-transform duration-150 group-open:rotate-180" />
-          Advanced — custom model, endpoint, API key
+          Advanced — custom model and endpoint
         </summary>
         <div className="px-4 pb-4 space-y-3">
           <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,16rem),1fr))] gap-3">
@@ -281,17 +316,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onConfigUpdated }) =
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-colors duration-150"
               />
             </div>
-          </div>
-          <div className="space-y-1.5">
-            <label htmlFor="settings-api-key" className="text-xs font-semibold text-slate-300">API key (only for key-based providers)</label>
-            <input
-              id="settings-api-key"
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Leave empty to use CLI subscription / environment"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-colors duration-150"
-            />
           </div>
         </div>
       </details>

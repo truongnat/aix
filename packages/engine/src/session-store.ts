@@ -1,5 +1,5 @@
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { existsSync } from 'node:fs';
 import { redact } from '@x/policy';
 import type { EngineState } from './state.js';
@@ -9,6 +9,21 @@ export const SESSIONS_ROOT = join(process.cwd(), '.aix', 'sessions');
 
 export function configuredSessionsRoot(): string {
   return process.env['AIX_SESSIONS_ROOT'] ?? SESSIONS_ROOT;
+}
+
+/** Resolves the skills directory dynamically, checking env and searching up parent directories. */
+export function resolveSkillsRoot(): string {
+  const override = process.env['AIX_CONTENT_ROOT'];
+  if (override && existsSync(override)) return override;
+  let dir = process.cwd();
+  while (true) {
+    const candidate = join(dir, 'skills');
+    if (existsSync(candidate)) return candidate;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return override || join(process.cwd(), 'skills');
 }
 
 function assertSessionId(id: string): void {

@@ -20,6 +20,7 @@ export const App: React.FC = () => {
   const [drawerRequest, setDrawerRequest] = useState<{ tab: DrawerTab; seq: number } | undefined>(undefined);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [newChatRequest, setNewChatRequest] = useState(0);
+  const [configVersion, setConfigVersion] = useState(0);
   const initializedSessionRef = useRef(false);
   const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
     if (typeof window === 'undefined') return 240;
@@ -193,13 +194,17 @@ export const App: React.FC = () => {
                   drawerTab={drawerOpen ? (drawerRequest?.tab ?? null) : null}
                   onNavigate={setCurrentTab}
                   newChatRequest={newChatRequest}
+                  configVersion={configVersion}
                 />
               </ErrorBoundary>
             </div>
             <ErrorBoundary label={currentTab}>
               {currentTab === 'skills' && <SkillsPage />}
               {currentTab === 'memory' && <MemoryPage />}
-              {currentTab === 'settings' && <SettingsPage onConfigUpdated={refreshData} />}
+              {currentTab === 'settings' && <SettingsPage onConfigUpdated={() => {
+                refreshData();
+                setConfigVersion(version => version + 1);
+              }} />}
             </ErrorBoundary>
           </main>
           {/* Drawer resizer */}

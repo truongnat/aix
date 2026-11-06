@@ -143,23 +143,21 @@ async function fetchOpenAiModels(baseUrl: string, apiKey?: string): Promise<read
   }
 }
 
-export async function detectModelSources(): Promise<readonly DesktopModelSource[]> {
-  let savedOpenAiBase = '';
-  try {
-    const configFile = process.env['AIX_CONFIG_PATH'] || join(process.env['AIX_STORAGE_ROOT'] || homedir(), '.aix', 'ai-config.json');
-    const raw = await readFile(configFile, 'utf-8');
-    const parsed = JSON.parse(raw);
-    if (parsed.provider === 'openai' && parsed.baseUrl) savedOpenAiBase = parsed.baseUrl;
-  } catch {
-    // Config file optional
-  }
-  const activeOpenAiBase = process.env['OPENAI_BASE_URL'] || process.env['AIX_API_URL'] || savedOpenAiBase;
+export async function detectModelSources(config?: { provider: string; apiKey: string; baseUrl?: string }): Promise<readonly DesktopModelSource[]> {
+  const savedKeyFor = (provider: string) => config?.provider === provider ? config.apiKey : '';
+  const anthropicKey = process.env['ANTHROPIC_API_KEY'] || savedKeyFor('anthropic');
+  const openaiKey = process.env['OPENAI_API_KEY'] || savedKeyFor('openai');
+  const groqKey = process.env['GROQ_API_KEY'] || savedKeyFor('groq');
+  const inferxKey = process.env['INFERX_API_KEY'] || savedKeyFor('inferx');
+  const activeOpenAiBase = (config?.provider === 'openai' ? config.baseUrl : undefined)
+    || process.env['OPENAI_BASE_URL']
+    || (process.env['AIX_PROVIDER'] === 'openai' ? process.env['AIX_API_URL'] : undefined);
 
   const [claude, codex, codexModels, customOpenAiModels, ollamaModels, ompKey] = await Promise.all([
     listClaudeCodeSubscription(),
     readCodexSubscription(),
     readCodexModels(),
-    activeOpenAiBase ? fetchOpenAiModels(activeOpenAiBase, process.env['OPENAI_API_KEY']) : Promise.resolve(null),
+    activeOpenAiBase ? fetchOpenAiModels(activeOpenAiBase, openaiKey) : Promise.resolve(null),
     listOllamaModels(),
     readOmpInferxKey(),
   ]);
@@ -255,10 +253,10 @@ export async function detectModelSources(): Promise<readonly DesktopModelSource[
       id: 'anthropic-key',
       name: 'Anthropic (API key)',
       provider: 'anthropic',
-      authNote: 'Environment key',
-      detected: Boolean(process.env['ANTHROPIC_API_KEY']),
-      usable: Boolean(process.env['ANTHROPIC_API_KEY']),
-      note: process.env['ANTHROPIC_API_KEY'] ? 'ANTHROPIC_API_KEY found in environment' : 'No ANTHROPIC_API_KEY in environment',
+      authNote: 'API key',
+      detected: Boolean(anthropicKey),
+      usable: Boolean(anthropicKey),
+      note: anthropicKey ? 'API key configured' : 'Choose a model and enter an API key below',
       models: CLAUDE_MODELS,
     },
     {
@@ -268,31 +266,31 @@ export async function detectModelSources(): Promise<readonly DesktopModelSource[
       authNote: activeOpenAiBase
         ? (isLocalOrCustomEndpoint(activeOpenAiBase) ? 'Local gateway (key optional)' : 'Custom endpoint')
         : 'Environment key',
-      detected: Boolean(activeOpenAiBase || process.env['OPENAI_API_KEY']),
-      usable: Boolean((activeOpenAiBase && isLocalOrCustomEndpoint(activeOpenAiBase)) || process.env['OPENAI_API_KEY']),
+      detected: Boolean(activeOpenAiBase || openaiKey),
+      usable: Boolean((activeOpenAiBase && isLocalOrCustomEndpoint(activeOpenAiBase)) || openaiKey),
       note: activeOpenAiBase
         ? `Endpoint: ${activeOpenAiBase}${customOpenAiModels ? ` — ${customOpenAiModels.length} models detected` : ''}`
-        : (process.env['OPENAI_API_KEY'] ? 'OPENAI_API_KEY found in environment' : 'No OPENAI_API_KEY in environment'),
+        : (openaiKey ? 'API key configured' : 'Choose a model and enter an API key or local endpoint below'),
       models: (customOpenAiModels && customOpenAiModels.length > 0) ? customOpenAiModels : OPENAI_KEY_MODELS,
     },
     {
       id: 'groq-key',
       name: 'Groq (API key)',
       provider: 'groq',
-      authNote: 'Environment key',
-      detected: Boolean(process.env['GROQ_API_KEY']),
-      usable: Boolean(process.env['GROQ_API_KEY']),
-      note: process.env['GROQ_API_KEY'] ? 'GROQ_API_KEY found in environment' : 'No GROQ_API_KEY in environment',
+      authNote: 'API key',
+      detected: Boolean(groqKey),
+      usable: Boolean(groqKey),
+      note: groqKey ? 'API key configured' : 'Choose a model and enter an API key below',
       models: GROQ_MODELS,
     },
     {
       id: 'inferx-key',
       name: 'InferX DeepSeek',
       provider: 'inferx',
-      authNote: 'Pre-configured',
-      detected: Boolean(process.env['INFERX_API_KEY'] || ompKey),
-      usable: Boolean(process.env['INFERX_API_KEY'] || ompKey),
-      note: process.env['INFERX_API_KEY'] || ompKey ? 'Key found (environment or ~/.omp config)' : 'No InferX key configured',
+      authNote: 'API key',
+      detected: Boolean(inferxKey || ompKey),
+      usable: Boolean(inferxKey || ompKey),
+      note: inferxKey || ompKey ? 'API key configured' : 'Choose a model and enter an API key below',
       models: ['deepseek-v4.1-flash-1017-basic'],
     },
     {
@@ -302,7 +300,7 @@ export async function detectModelSources(): Promise<readonly DesktopModelSource[
       authNote: 'No auth',
       detected: true,
       usable: true,
-      note: 'Placeholder provider for UI testing',
+      note: 'Offline workflow demo only; output is labeled and is not a real implementation',
       models: ['mock-engine-v1'],
     },
   ];

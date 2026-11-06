@@ -79,13 +79,13 @@ export async function listDesktopSessions(
       || b.updatedAt.localeCompare(a.updatedAt) || a.id.localeCompare(b.id));
 }
 
-function generatedRoot(root: string, sessionId: string): string {
+export function sessionOutputDir(root: string, sessionId: string): string {
   if (!/^[a-zA-Z0-9_-]+$/.test(sessionId)) throw new Error('Invalid session id');
   return resolve(root, sessionId, 'generated');
 }
 
 export async function listSessionFiles(root: string, sessionId: string): Promise<string[]> {
-  const base = generatedRoot(root, sessionId);
+  const base = sessionOutputDir(root, sessionId);
   const files: string[] = [];
   try {
     if ((await lstat(base)).isSymbolicLink()) return [];
@@ -105,7 +105,7 @@ export async function listSessionFiles(root: string, sessionId: string): Promise
 }
 
 export async function readSessionFile(root: string, sessionId: string, path: string): Promise<string> {
-  const base = generatedRoot(root, sessionId);
+  const base = sessionOutputDir(root, sessionId);
   if ((await lstat(base)).isSymbolicLink()) throw new Error('Source path escapes generated files');
   const target = resolve(base, path);
   const isInside = (parent: string, child: string) => {

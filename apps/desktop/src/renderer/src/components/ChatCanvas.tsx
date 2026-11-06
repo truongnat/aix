@@ -35,7 +35,7 @@ import type { DrawerTab } from './InspectorDrawer';
 import type { NavTab } from './Sidebar';
 import { ConfirmDialog } from './ui/Modal';
 import { Select } from './ui/Select';
-import { sessionTitleFromTask } from '@shared/desktop-logic';
+import { sessionTitleFromTask, hasModelCredentials } from '@shared/desktop-logic';
 
 type RunStatus = 'running' | 'done' | 'error' | 'stopped';
 type StepStatus = 'pending' | 'active' | 'done' | 'failed' | 'stopped' | 'skipped';
@@ -53,6 +53,7 @@ interface ChatMessage {
   readonly artifacts?: readonly string[];
   readonly generatedFilesCount?: number;
   readonly activeNode?: string;
+  readonly outputDir?: string;
 }
 
 interface ChatCanvasProps {
@@ -65,19 +66,20 @@ interface ChatCanvasProps {
   drawerTab: DrawerTab | null;
   onNavigate: (tab: NavTab) => void;
   newChatRequest: number;
+  configVersion: number;
 }
 
 const QUICK_PROMPTS = [
-  'Implement idempotency check for Stripe payment webhooks with TDD',
-  'Investigate race condition in user session authentication token refresh',
-  'Audit repository dependencies and verify security guardrails',
-  'Add Playwright browser automation test flow for user checkout',
+  'Create a Node.js todo CLI with JSON file storage',
+  'Generate a standalone FastAPI service with a health endpoint',
+  'Build a TypeScript utility package with usage examples',
+  'Create a responsive React page for a personal reading list',
 ];
 
 
 const DRAWER_TOGGLES: readonly { tab: DrawerTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { tab: 'artifacts', label: 'Artifacts', icon: FileCode2 },
-  { tab: 'verify', label: 'Sandbox Verify', icon: ShieldCheck },
+  { tab: 'verify', label: 'Run tests / Verify', icon: ShieldCheck },
   { tab: 'kb', label: 'KB Server', icon: Server },
 ];
 
@@ -227,6 +229,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
   drawerTab,
   onNavigate,
   newChatRequest,
+  configVersion,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputPrompt, setInputPrompt] = useState<string>('');
@@ -239,6 +242,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
   const [runMode, setRunMode] = useState<'guided' | 'auto'>('guided');
   const [aiConfig, setAiConfig] = useState<DesktopAiConfig | null>(null);
   const [modelSources, setModelSources] = useState<readonly DesktopModelSource[]>([]);
+  const [modelLoading, setModelLoading] = useState(true);
   const [modelMenuOpen, setModelMenuOpen] = useState<boolean>(false);
   const [pendingHitl, setPendingHitl] = useState<DesktopHitlRequest | null>(null);
   const [hitlNote, setHitlNote] = useState<string>('');
@@ -259,9 +263,15 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
   refreshRef.current = onRefreshSessions;
 
   useEffect(() => {
-    window.aixAPI.getAiConfig().then(setAiConfig).catch(console.error);
-    window.aixAPI.detectModelSources().then(setModelSources).catch(() => {});
-  }, []);
+    let cancelled = false;
+    setModelLoading(true);
+    Promise.all([window.aixAPI.getAiConfig(), window.aixAPI.detectModelSources()])
+      .then(([config, sources]) => {
+        if (!cancelled) { setAiConfig(config); setModelSources(sources); }
+      }).catch(console.error)
+      .finally(() => { if (!cancelled) setModelLoading(false); });
+    return () => { cancelled = true; };
+  }, [configVersion]);
   useEffect(() => {
     if (activeSessionId !== undefined && activeSessionId !== currentSessionId) {
       setCurrentSessionId(activeSessionId);
@@ -363,9 +373,10 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
         case 'complete':
           finishRun(msgId, {
             status: 'done',
-            content: `**Code generation finished.** ${event.generatedFilesCount} file(s) were written. Automated verification was not run; review the output and run a test explicitly.`,
+            content: `**Files generated.** ${event.generatedFilesCount} file(s) saved. Tests have not been run. Review the files, then open Inspector → Verify.`,
             artifacts: event.artifacts,
             generatedFilesCount: event.generatedFilesCount,
+            outputDir: event.outputDir,
           });
           refreshRef.current?.();
           break;
@@ -385,7 +396,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
 
   const handleSendMessage = async (text: string) => {
     const prompt = text.trim();
-    if (!prompt || isRunning) return;
+    if (!prompt || isRunning || !modelReady) return;
 
     setInputPrompt('');
     setIsRunning(true);
@@ -565,16 +576,12 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
       baseUrl: source.provider === aiConfig.provider ? aiConfig.baseUrl : undefined,
       useSubscription: source.id === 'claude-code',
     });
-    setAiConfig({
-      ...aiConfig,
-      provider: source.provider,
-      model,
-      baseUrl: source.provider === aiConfig.provider ? aiConfig.baseUrl : undefined,
-    });
+    setAiConfig(await window.aixAPI.getAiConfig());
     refreshRef.current?.();
   };
 
   const activeProviderInfo = aiConfig ? PROVIDERS.find((p) => p.id === aiConfig.provider) : undefined;
+  const modelReady = aiConfig !== null && hasModelCredentials(aiConfig, modelSources);
   const activeSession = sessions.find((session) => session.id === currentSessionId);
   const sessionOptions = sessions.map((session) => ({
     value: session.id,
@@ -647,8 +654,8 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
               </div>
               <h1 className="text-[22px] font-semibold tracking-tight text-white">What are we building today?</h1>
               <p className="text-[14px] text-slate-400 leading-relaxed max-w-lg">
-                Every task runs through the 8-step spine: Discuss → Plan → Worktree → TDD → Code → Review → Verify →
-                Remember.
+                Discuss the goal, approve a plan, then generate new files in a session folder.
+                Existing projects are not modified. Testing and recording lessons are manual steps.
               </p>
             </div>
             <div className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-2">
@@ -705,6 +712,12 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
                         }`}
                       >
                         <MarkdownRenderer content={msg.content} />
+                      </div>
+                    )}
+                    {msg.outputDir && (
+                      <div className="space-y-1 text-xs text-slate-400">
+                        <span>Files saved to</span>
+                        <code className="block break-all select-text text-slate-300">{msg.outputDir}</code>
                       </div>
                     )}
 
@@ -798,6 +811,15 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
         <div ref={messagesEndRef} />
       </div>
 
+      {!isRunning && !modelLoading && !modelReady && (
+        <div role="status" className="mx-4 mb-2 rounded-lg border border-amber-400/20 bg-amber-500/5 p-3 text-sm text-amber-200">
+          Configure a model before starting a task.
+          <button type="button" onClick={() => onNavigate('settings')} className="ml-2 underline underline-offset-2">Set up model</button>
+        </div>
+      )}
+      {aiConfig?.provider === 'mock' && (
+        <p className="px-5 pt-2 text-xs text-amber-200">Offline demo selected: output is labeled and is not a real implementation.</p>
+      )}
       {/* Composer */}
       <footer className="relative px-4 pb-4 pt-2 shrink-0">
         {showScrollBottom && (
@@ -958,7 +980,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
               ) : (
                 <button
                   type="button"
-                  disabled={!inputPrompt.trim()}
+                  disabled={!inputPrompt.trim() || !modelReady}
                   onClick={() => void handleSendMessage(inputPrompt)}
                   title="Run prompt (Enter)"
                   aria-label="Send prompt"
@@ -970,6 +992,7 @@ export const ChatCanvas: React.FC<ChatCanvasProps> = ({
             </div>
           </div>
         </div>
+        <p className="max-w-3xl mx-auto mt-2 text-xs text-slate-400">Output stays in a session folder. No project files are modified.</p>
         <div className="max-w-3xl mx-auto mt-1.5 px-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400">
           <span>
             <Kbd>Enter</Kbd> run · <Kbd>Shift+Enter</Kbd> newline

@@ -31,9 +31,9 @@ export const StatusBar: React.FC<StatusBarProps> = ({ status, onNavigate }) => {
 
         <span className="text-white/10">•</span>
 
-        <div className="flex items-center gap-1.5 text-slate-500 font-mono text-[10px] truncate max-w-xs">
-          <Folder className="w-3 h-3 text-slate-600" />
-          <span className="truncate">{status?.cwd ?? 'Loading…'}</span>
+        <div className="flex items-center gap-1.5 text-slate-400 font-mono text-[11px] truncate max-w-xs" title={status?.sessionsDir}>
+          <Folder className="w-3 h-3 text-slate-400" />
+          <span className="truncate">Output: {status?.sessionsDir ?? 'Loading…'}</span>
         </div>
       </div>
 

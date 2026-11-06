@@ -1,5 +1,5 @@
-import { app, dialog, ipcMain, safeStorage } from 'electron';
-import { readdir, readFile, stat, unlink, writeFile, mkdir, chmod } from 'node:fs/promises';
+import { app, dialog, ipcMain, safeStorage, shell, clipboard } from 'electron';
+import { readdir, readFile, stat, unlink, writeFile, mkdir, chmod, realpath, lstat } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, resolve, relative, isAbsolute, dirname } from 'node:path';
 import { homedir } from 'node:os';
@@ -35,7 +35,7 @@ import type {
   AiProviderId,
 } from '../shared/api.js';
 import { endpointOverrideFor, isLocalOrCustomEndpoint, normalizeCompletionsUrl, providerEnvironmentFor } from '../shared/desktop-logic.js';
-import { listDesktopSessions, listSessionFiles, readSessionFile } from '../shared/session-list.js';
+import { listDesktopSessions, listSessionFiles, readSessionFile, sessionOutputDir } from '../shared/session-list.js';
 import { applyClaudeSubscriptionEnv, clearClaudeSubscriptionEnv, ensureClaudeSubscriptionToken, listCliSubscriptions } from './cli-subscription.js';
 import { detectModelSources, ensureSourceEnv } from './model-sources.js';
 
@@ -365,6 +365,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
       nodeVersion: process.version,
       platform: process.platform,
       cwd: repoRoot,
+      sessionsDir: join(storageRoot, '.aix', 'sessions'),
       skillsCount: registry.all().length,
       memoryCount: memories.length,
       kbServiceOnline: kb.online,
@@ -386,7 +387,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
     };
   });
 
-  ipcMain.handle('ai:detectSources', async () => detectModelSources());
+  ipcMain.handle('ai:detectSources', async () => detectModelSources(await loadAiConfig()));
 
   ipcMain.handle('ai:setConfig', async (_, newConfig: { provider: AiProviderId; model: string; apiKey?: string; baseUrl?: string; useSubscription?: boolean; sourceId?: string }) => {
     const existing = await loadAiConfig();
@@ -748,6 +749,29 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
   ipcMain.handle('spine:readFile', (_, sessionId: string, path: string) =>
     readSessionFile(join(storageRoot, '.aix', 'sessions'), sessionId, path));
 
+  ipcMain.handle('spine:getOutputDir', (_, sessionId: string) =>
+    sessionOutputDir(join(storageRoot, '.aix', 'sessions'), sessionId));
+
+  ipcMain.handle('spine:copyOutputPath', (_, sessionId: string) => {
+    clipboard.writeText(sessionOutputDir(join(storageRoot, '.aix', 'sessions'), sessionId));
+  });
+
+  ipcMain.handle('spine:openFolder', async (_, sessionId: string): Promise<{ ok: boolean; error?: string }> => {
+    try {
+      const root = join(storageRoot, '.aix', 'sessions');
+      const output = sessionOutputDir(root, sessionId);
+      const info = await lstat(output);
+      if (!info.isDirectory() || info.isSymbolicLink()) throw new Error('The generated output folder is unavailable.');
+      const [canonicalRoot, canonicalOutput] = await Promise.all([realpath(root), realpath(output)]);
+      const rel = relative(canonicalRoot, canonicalOutput);
+      if (rel.startsWith('..') || isAbsolute(rel)) throw new Error('Output folder is outside session storage.');
+      const error = await shell.openPath(canonicalOutput);
+      return error ? { ok: false, error: `${error} Use Copy path to locate the files.` } : { ok: true };
+    } catch (error: unknown) {
+      return { ok: false, error: `Could not open the output folder: ${String(error)}. Generate files first or use Copy path.` };
+    }
+  });
+
   ipcMain.handle('spine:getSessionChat', async (_, sessionId: string): Promise<readonly DesktopChatMessage[]> => {
     if (!/^[a-zA-Z0-9_-]+$/.test(sessionId)) return [];
     const chatFile = join(storageRoot, '.aix', 'sessions', sessionId, 'chat.jsonl');
@@ -971,7 +995,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
           '',
           'This is a text-quality heuristic only. It is not a security audit and does not prove that generated code compiles or passes tests.',
           '',
-          'Executable verification: NOT RUN. Use the Verify page after reviewing the generated files.',
+          'Executable verification: NOT RUN. Open Inspector → Verify after reviewing the generated files and installing any required dependencies.',
           '',
         ].join('\n'), 'utf-8');
         await emitArtifacts();
@@ -985,6 +1009,7 @@ export function registerIpcHandlers(paths: IpcHandlerPaths | string): void {
             checkpointId: sessionId,
             artifacts,
             generatedFilesCount: engineState.writtenFiles?.length ?? 0,
+            outputDir: sessionOutputDir(join(storageRoot, '.aix', 'sessions'), sessionId),
           });
         }
       } catch (err: unknown) {

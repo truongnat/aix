@@ -54,6 +54,7 @@ export interface DesktopSystemStatus {
   readonly nodeVersion: string;
   readonly platform: string;
   readonly cwd: string;
+  readonly sessionsDir: string;
   readonly skillsCount: number;
   readonly memoryCount: number;
   readonly kbServiceOnline: boolean;
@@ -77,6 +78,7 @@ export interface DesktopChatMessage {
   readonly logs?: readonly { readonly message: string; readonly timestamp: string }[];
   readonly artifacts?: readonly string[];
   readonly generatedFilesCount?: number;
+  readonly outputDir?: string;
 }
 
 export interface DesktopAiConfig {
@@ -132,7 +134,7 @@ export type DesktopSpineEvent =
   | { readonly type: 'hitl'; readonly sessionId: string; readonly request: DesktopHitlRequest }
   | { readonly type: 'artifacts'; readonly sessionId: string; readonly artifacts: readonly string[]; readonly generatedFilesCount: number }
   | { readonly type: 'node'; readonly sessionId: string; readonly node: string }
-  | { readonly type: 'complete'; readonly sessionId: string; readonly checkpointId: string; readonly artifacts: readonly string[]; readonly generatedFilesCount: number }
+  | { readonly type: 'complete'; readonly sessionId: string; readonly checkpointId: string; readonly artifacts: readonly string[]; readonly generatedFilesCount: number; readonly outputDir: string }
   | { readonly type: 'error'; readonly sessionId: string; readonly error: string }
   | { readonly type: 'aborted'; readonly sessionId: string };
 
@@ -163,6 +165,9 @@ export interface AixDesktopAPI {
   getSessionArtifact(sessionId: string, artifactName: string): Promise<string | undefined>;
   listSessionFiles(sessionId: string): Promise<readonly string[]>;
   readSessionFile(sessionId: string, path: string): Promise<string>;
+  openSessionFolder(sessionId: string): Promise<{ ok: boolean; error?: string }>;
+  getSessionOutputDir(sessionId: string): Promise<string>;
+  copySessionOutputPath(sessionId: string): Promise<void>;
   runVerify(sessionId: string, command: string): Promise<DesktopVerificationResult>;
   startSpine(task: string, mode?: 'auto' | 'guided'): Promise<{ sessionId: string }>;
   respondHitl(requestId: string, decision: 'approve' | 'revise' | 'cancel', note?: string): Promise<void>;

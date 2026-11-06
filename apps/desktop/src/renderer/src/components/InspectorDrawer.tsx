@@ -13,6 +13,8 @@ import {
   Power,
   Loader2,
   Plus,
+  FolderOpen,
+  Copy,
 } from 'lucide-react';
 import type {
   DesktopSessionSummary,
@@ -66,9 +68,12 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
   const [generatedFiles, setGeneratedFiles] = useState<readonly string[]>([]);
   const [activeGeneratedPath, setActiveGeneratedPath] = useState<string | null>(null);
   const [filesError, setFilesError] = useState<string | null>(null);
+  const [outputDir, setOutputDir] = useState('');
+  const [folderMessage, setFolderMessage] = useState<string | null>(null);
+  const [openingFolder, setOpeningFolder] = useState(false);
 
-  // Verify Sandbox State
-  const [verifyCommand, setVerifyCommand] = useState<string>('pnpm test');
+  // Manual verification in the generated output folder.
+  const [verifyCommand, setVerifyCommand] = useState<string>('');
   const [runningVerify, setRunningVerify] = useState<boolean>(false);
   const [verifyResult, setVerifyResult] = useState<DesktopVerificationResult | null>(null);
   const [pendingVerify, setPendingVerify] = useState<string | null>(null);
@@ -100,13 +105,15 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
     setActiveGeneratedPath(null);
     setGeneratedFiles([]);
     setFilesError(null);
+    setOutputDir('');
+    setFolderMessage(null);
   }, [effectiveSessionId]);
 
   useEffect(() => {
     if (!effectiveSessionId || !isOpen || tab !== 'artifacts') return;
     let cancelled = false;
-    window.aixAPI.listSessionFiles(effectiveSessionId).then((files) => {
-      if (!cancelled) { setGeneratedFiles(files); setFilesError(null); }
+    Promise.all([window.aixAPI.listSessionFiles(effectiveSessionId), window.aixAPI.getSessionOutputDir(effectiveSessionId)]).then(([files, dir]) => {
+      if (!cancelled) { setGeneratedFiles(files); setOutputDir(dir); setFilesError(null); }
     }).catch((error: unknown) => {
       if (!cancelled) setFilesError(`Could not load generated files: ${String(error)}. Reopen Inspector to retry.`);
     });
@@ -137,6 +144,26 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
       .finally(() => { if (!cancelled) setLoadingArtifact(false); });
     return () => { cancelled = true; };
   }, [effectiveSessionId, currentArtifact, activeGeneratedPath, activeSession?.updatedAt, isOpen, tab]);
+
+  const handleOpenFolder = async () => {
+    if (!effectiveSessionId) return;
+    setOpeningFolder(true);
+    setFolderMessage(null);
+    try {
+      const result = await window.aixAPI.openSessionFolder(effectiveSessionId);
+      if (!result.ok) setFolderMessage(result.error ?? 'Could not open the folder. Use Copy path instead.');
+    } catch (error: unknown) {
+      setFolderMessage(`Could not open the folder: ${String(error)}. Use Copy path instead.`);
+    } finally { setOpeningFolder(false); }
+  };
+
+  const handleCopyPath = async () => {
+    if (!effectiveSessionId) return;
+    try {
+      await window.aixAPI.copySessionOutputPath(effectiveSessionId);
+      setFolderMessage('Output path copied.');
+    } catch (error: unknown) { setFolderMessage(`Could not copy the path: ${String(error)}`); }
+  };
 
   // Load Memories
   useEffect(() => {
@@ -275,6 +302,22 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
 
             <section aria-label="Generated files" className="space-y-2">
               <h3 className="text-xs font-semibold text-slate-300">Generated files ({generatedFiles.length})</h3>
+              {outputDir && (
+                <div className="space-y-2">
+                  <code className="block break-all text-xs text-slate-400 select-text">{outputDir}</code>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => void handleOpenFolder()} disabled={generatedFiles.length === 0 || openingFolder}
+                      className="inline-flex items-center gap-1.5 min-h-8 rounded-md border border-white/10 px-2.5 text-xs text-slate-200 hover:bg-white/5 disabled:opacity-50 transition-colors">
+                      <FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />{openingFolder ? 'Opening…' : 'Open folder'}
+                    </button>
+                    <button type="button" onClick={() => void handleCopyPath()}
+                      className="inline-flex items-center gap-1.5 min-h-8 rounded-md border border-white/10 px-2.5 text-xs text-slate-200 hover:bg-white/5 transition-colors">
+                      <Copy className="w-3.5 h-3.5" aria-hidden="true" />Copy path
+                    </button>
+                  </div>
+                </div>
+              )}
+              {folderMessage && <p role="status" className="text-xs text-slate-300">{folderMessage}</p>}
               {filesError && <p role="alert" className="text-xs text-rose-300">{filesError}</p>}
               {generatedFiles.length === 0 ? (
                 <p className="text-xs text-slate-400">Source files appear here after code generation.</p>
@@ -307,13 +350,13 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
           </div>
         )}
 
-        {/* Tab 2: Verify Sandbox */}
+        {/* Manual test execution */}
         {tab === 'verify' && (
           <div className="space-y-4">
             <div className="space-y-1">
-              <span className="text-xs font-bold text-white block">Execute Sandbox Test</span>
+              <span className="text-xs font-bold text-white block">Run tests</span>
               <p className="text-[12px] text-slate-400 leading-relaxed">
-                Runs a whitelisted command in <code className="text-slate-300">generated/</code> with your normal account permissions. This is not an OS sandbox; review generated scripts before running them.
+                Runs an allowed test command in <code className="text-slate-300">generated/</code> with your normal account permissions. Review the files and install required dependencies first.
               </p>
             </div>
 
@@ -339,7 +382,7 @@ export const InspectorDrawer: React.FC<InspectorDrawerProps> = ({
                     required
                     value={verifyCommand}
                     onChange={(e) => setVerifyCommand(e.target.value)}
-                    placeholder="e.g. pnpm test, pytest -v"
+                    placeholder="Enter the project's test command, e.g. npm test"
                     className="flex-1 min-w-0 min-h-8 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white font-mono placeholder:text-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
                   />
                   <button

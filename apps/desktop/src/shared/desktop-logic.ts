@@ -1,3 +1,5 @@
+import type { DesktopAiConfig, DesktopModelSource } from './api.js';
+
 export interface DesktopRuntimeConfig {
   readonly provider: string;
   readonly model: string;
@@ -34,6 +36,18 @@ export function isLocalOrCustomEndpoint(url: string): boolean {
   } catch {
     return false;
   }
+}
+
+export function hasModelCredentials(
+  config: Pick<DesktopAiConfig, 'provider' | 'hasApiKey' | 'useSubscription' | 'baseUrl'>,
+  sources: readonly Pick<DesktopModelSource, 'provider' | 'usable'>[] = [],
+): boolean {
+  if (config.provider === 'mock') return true;
+  if (config.provider === 'codex' || config.provider === 'ollama') {
+    return sources.some(source => source.provider === config.provider && source.usable);
+  }
+  if (config.hasApiKey || (config.provider === 'anthropic' && config.useSubscription)) return true;
+  return config.provider === 'openai' && Boolean(config.baseUrl && isLocalOrCustomEndpoint(config.baseUrl));
 }
 
 /** Normalizes any base URL to an OpenAI-compatible /chat/completions endpoint. */
