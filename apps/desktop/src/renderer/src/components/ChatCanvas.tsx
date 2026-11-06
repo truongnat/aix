@@ -29,7 +29,7 @@ import type {
 } from '@shared/api';
 import type { Phase } from '@x/core';
 import { MarkdownRenderer } from './MarkdownRenderer';
-import { PIPELINE_STEPS } from './SpinePipelineVisualizer';
+import { PIPELINE_STEPS } from './pipeline-steps';
 import { PROVIDERS } from '../pages/SettingsPage';
 import type { DrawerTab } from './InspectorDrawer';
 import type { NavTab } from './Sidebar';

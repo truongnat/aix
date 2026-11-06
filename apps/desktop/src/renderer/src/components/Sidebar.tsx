@@ -1,10 +1,7 @@
 import React from 'react';
 import {
-  LayoutDashboard,
-  Workflow,
   Sparkles,
   BrainCircuit,
-  ShieldCheck,
   Server,
   Layers,
   Sliders,
@@ -13,7 +10,7 @@ import {
 } from 'lucide-react';
 import type { DesktopSystemStatus } from '@shared/api';
 
-export type NavTab = 'chat' | 'dashboard' | 'spine' | 'skills' | 'memory' | 'verify' | 'settings';
+export type NavTab = 'chat' | 'skills' | 'memory' | 'settings';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -24,11 +21,8 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab, status }) => {
   const navItems = [
     { id: 'chat' as NavTab, label: 'Agent Chat Canvas', icon: MessageSquareCode },
-    { id: 'dashboard' as NavTab, label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'spine' as NavTab, label: 'Engineering Spine', icon: Workflow },
     { id: 'skills' as NavTab, label: `Skill Library (${status?.skillsCount ?? '…'})`, icon: Sparkles },
     { id: 'memory' as NavTab, label: 'Memory Hub', icon: BrainCircuit },
-    { id: 'verify' as NavTab, label: 'Test Runner', icon: ShieldCheck },
     { id: 'settings' as NavTab, label: 'AI Model Hub', icon: Sliders },
   ];
 

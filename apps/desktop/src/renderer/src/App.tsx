@@ -5,11 +5,8 @@ import type { NavTab } from './components/Sidebar';
 import { ChatCanvas } from './components/ChatCanvas';
 import { InspectorDrawer } from './components/InspectorDrawer';
 import type { DrawerTab } from './components/InspectorDrawer';
-import { DashboardPage } from './pages/DashboardPage';
-import { SpinePage } from './pages/SpinePage';
 import { SkillsPage } from './pages/SkillsPage';
 import { MemoryPage } from './pages/MemoryPage';
-import { VerifyPage } from './pages/VerifyPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { StatusBar } from './components/StatusBar';
 import type { DesktopSystemStatus, DesktopSessionSummary } from '@shared/api';
@@ -69,13 +66,8 @@ export const App: React.FC = () => {
               </ErrorBoundary>
             </div>
             <ErrorBoundary label={currentTab}>
-              {currentTab === 'dashboard' && (
-                <DashboardPage status={status} sessions={sessions} onNavigate={setCurrentTab} />
-              )}
-              {currentTab === 'spine' && <SpinePage sessions={sessions} onRefreshSessions={refreshData} />}
               {currentTab === 'skills' && <SkillsPage />}
               {currentTab === 'memory' && <MemoryPage />}
-              {currentTab === 'verify' && <VerifyPage sessions={sessions} />}
               {currentTab === 'settings' && <SettingsPage onConfigUpdated={refreshData} />}
             </ErrorBoundary>
           </main>
